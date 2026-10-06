@@ -7,6 +7,7 @@
 | Item | Nilai |
 |---|---|
 | Produk | Content Producer untuk Facebook Reels trivia/fakta |
+| Versi dokumen | 1.1 |
 | Database | Supabase Postgres |
 | Model desain | Hybrid relational + JSONB |
 | Jumlah tabel aplikasi | 12 |
@@ -14,13 +15,21 @@
 | Multi-Page | Ya |
 | Parallel ChatGPT chat | Ya |
 | Target audiens konten | US, UK, CA, AU, dan global |
-| Status | Desain database utama untuk MVP |
+| Status | Desain database utama yang diselaraskan untuk MVP |
 | Dokumen sebelumnya | `plans/database-design-1.md` — dipertahankan sebagai pembanding |
 | Dokumen sumber | `plans/PRDid.md` dan `plans/implementation-plan.md` |
 
 Dokumen ini menggantikan rancangan 24 tabel sebagai desain yang direkomendasikan untuk MVP. Tujuannya adalah mempertahankan kemampuan production—anti-duplikasi, parallel processing, versioning, idempotency, kalender, RLS, dan audit—dengan struktur yang lebih mudah dibaca melalui Supabase Dashboard.
 
 `database-design-1.md` tidak dihapus oleh dokumen ini. File tersebut dapat dipertahankan sampai desain baru selesai diimplementasikan dan lulus pengujian.
+
+### 1.1 Batas kewenangan dokumen
+
+- `PRDid.md` mengatur ruang lingkup produk, perilaku pengguna, aturan konten, dan acceptance criteria.
+- Dokumen ini mengatur nama tabel/kolom, lifecycle status, constraint, transaksi, dan tanggung jawab database function.
+- `implementation-plan.md` mengatur urutan pengerjaan, struktur repository, nama MCP tool final, deployment, dan pengujian.
+- Database hanya mengembalikan UUID `public_id` melalui schema `api`; primary key `bigint` tidak boleh keluar ke MCP.
+- Bila ada konflik, implementasi bagian terkait dihentikan sampai ketiga dokumen diselaraskan. Tidak ada interpretasi ad hoc.
 
 ---
 
@@ -151,7 +160,7 @@ Riwayat chat bukan sumber status. Semua status berikut berasal dari database:
 - fact verification;
 - fact availability;
 - task claim;
-- reservation;
+- fact allocation;
 - post version;
 - approval;
 - calendar slot;
@@ -255,7 +264,9 @@ Contoh:
 - `api.create_generation_batch(...)`;
 - `api.prepare_next_post(...)`;
 - `api.finalize_post(...)`;
+- `api.prepare_post_revision(...)`;
 - `api.revise_post(...)`;
+- `api.mark_post_published(...)`;
 - `api.create_calendar(...)`.
 
 Schema ini menjadi satu-satunya application schema yang perlu diekspos melalui Supabase Data API jika seluruh table access dilakukan melalui RPC.
@@ -276,7 +287,7 @@ Tidak diekspos melalui Data API. Digunakan untuk:
 Digunakan untuk extension seperti:
 
 - `vector`;
-- `pg_jsonschema` bila tersedia dan dipilih saat implementasi;
+- `pg_jsonschema` bila tersedia; jika tidak, kontrak yang sama tetap wajib ditegakkan oleh Zod di Edge Function dan private validation functions/checks di database;
 - `pg_cron` sesuai konfigurasi Supabase.
 
 Extension dibuat tanpa version pin mengikuti kebijakan Supabase terkini.
@@ -331,7 +342,11 @@ Aturan:
 - UUID bukan bukti authorization;
 - ownership tetap diverifikasi dari JWT dan `workspace_id`.
 
+`batch_id` dan `allocation_group_id` juga berupa UUID opaque yang boleh keluar melalui MCP. Keduanya adalah correlation/group identifiers, bukan primary key internal.
+
 Menggunakan bigint untuk relasi menjaga index dan join tetap kecil. UUID digunakan hanya sebagai identifier opaque di luar database.
+
+Kode market disimpan memakai bentuk ISO-like yang disepakati sistem: `US`, `GB`, `CA`, `AU`, dan `GLOBAL`. Label pengguna “UK” dipetakan ke kode penyimpanan `GB`; keduanya tidak boleh muncul sebagai dua market terpisah.
 
 ---
 
@@ -376,6 +391,7 @@ erDiagram
     PAGES ||--o{ POSTS : menerbitkan
     CONTENT_BLUEPRINTS ||--o{ POSTS : menghasilkan
     POSTS ||--o{ POST_VERSIONS : memiliki
+    POSTS ||--o{ FACT_ALLOCATIONS : reservasi_revisi
     FACT_ALLOCATIONS }o--o| POSTS : dikonsumsi_oleh
     GENERATION_TASKS ||--o| POSTS : menghasilkan
 
@@ -400,7 +416,7 @@ erDiagram
 | 5 | `app` | `posts` | Identitas dan lifecycle post |
 | 6 | `app` | `calendars` | Header plan kalender |
 | 7 | `ops` | `generation_tasks` | Satu unit post di dalam batch produksi |
-| 8 | `ops` | `fact_allocations` | Reservation dan consumption fakta |
+| 8 | `ops` | `fact_allocations` | Allocation reserved dan consumed fakta |
 | 9 | `ops` | `post_versions` | Snapshot immutable setiap revisi |
 | 10 | `ops` | `calendar_slots` | Slot penerbitan unik |
 | 11 | `ops` | `idempotency_keys` | Perlindungan retry |
@@ -439,6 +455,7 @@ Satu workspace memiliki satu owner pada MVP. Semua Page di dalam workspace berba
   "fact_uniqueness_scope": "workspace",
   "default_fact_count": {
     "min": 5,
+    "default": 6,
     "max": 9
   },
   "default_duration_seconds": 13,
@@ -451,14 +468,17 @@ Satu workspace memiliki satu owner pada MVP. Semua Page di dalam workspace berba
 
 - `slug` mengikuti format lowercase kebab-case.
 - `settings_schema_version > 0`.
+- `default_fact_count.min <= default_fact_count.default <= default_fact_count.max` dan batas MVP tetap 5–9.
 - `archived_at` terisi jika status `archived`.
-- Satu owner dapat memiliki lebih dari satu workspace pada pengembangan berikutnya.
+- maksimal satu workspace `active` per owner pada MVP melalui partial unique index;
+- satu owner dapat memiliki lebih dari satu workspace pada pengembangan berikutnya setelah constraint tersebut diubah melalui migration dan `get_workspace` menerima selector eksplisit.
 
 ### Index
 
 - unique `public_id`;
 - unique `slug`;
 - `(owner_user_id, status)`.
+- partial unique `(owner_user_id) where status = 'active'`.
 
 ### Data yang tidak boleh disimpan
 
@@ -503,28 +523,60 @@ Tidak ada `updated_at` karena isi versi tidak diedit. Perubahan aturan selalu me
 {
   "schema_version": 1,
   "language": "en",
+  "english_variant": "neutral-international",
+  "spelling_standard": "american",
   "audience": ["US", "GB", "CA", "AU", "GLOBAL"],
+  "allowed_topics": [
+    "animals",
+    "food_science",
+    "human_body",
+    "nature_science",
+    "geography",
+    "history_origins",
+    "inventions_everyday",
+    "general_trivia"
+  ],
   "fact_count": {
     "min": 5,
+    "default": 6,
     "max": 9
   },
   "architectures": [
-    "curiosity-list",
-    "single-theme-list",
-    "contrast-list"
+    "themed",
+    "single_subject",
+    "mixed"
   ],
+  "architecture_weights": {
+    "themed": 45,
+    "single_subject": 40,
+    "mixed": 15
+  },
   "hook_rules": {
     "max_characters": 90,
     "avoid_false_promises": true
   },
   "fact_style_rules": {
     "plain_english": true,
+    "max_words_per_fact": 18,
     "max_sentence_characters": 150,
     "preserve_qualifiers": true
   },
+  "canva_copy_rules": {
+    "min_total_words": 65,
+    "max_total_words": 120
+  },
   "cta_rules": {
     "style": "light-engagement",
-    "avoid_begging": true
+    "avoid_begging": true,
+    "max_characters": 100
+  },
+  "caption_rules": {
+    "max_characters": 500
+  },
+  "hashtag_rules": {
+    "min_count": 0,
+    "default_count": 3,
+    "max_count": 5
   },
   "visual_rules": {
     "duration_seconds": 13,
@@ -544,6 +596,8 @@ Tidak ada `updated_at` karena isi versi tidak diedit. Perubahan aturan selalu me
 - unique `(workspace_id, blueprint_key, content_hash)`;
 - `version_number > 0`;
 - `rules_schema_version > 0`;
+- `fact_count.min <= fact_count.default <= fact_count.max` dan ketiganya berada pada rentang 5–9 untuk blueprint MVP;
+- `english_variant = neutral-international` dan `spelling_standard = american` untuk blueprint MVP;
 - maksimal satu active version per `(workspace_id, blueprint_key)` melalui partial unique index;
 - field isi versi (`name`, `description`, `niche_key`, `content_type`, `rules_schema_version`, `rules`, `content_hash`, `change_notes`) tidak dapat berubah setelah status meninggalkan `draft`;
 - status hanya boleh bergerak `draft → active → retired` melalui function terkontrol;
@@ -589,6 +643,7 @@ Menyimpan konfigurasi setiap Facebook Page.
 | `niche_key` | `text` | MVP: `trivia` |
 | `content_type` | `text` | MVP: `fact_reel` |
 | `language_code` | `text` | Default `en` |
+| `locale_code` | `text` | Default `en-US`; format BCP 47 |
 | `english_variant` | `text` | Default `neutral-international` |
 | `timezone` | `text` | Nama timezone IANA |
 | `config_schema_version` | `integer` | Default 1 |
@@ -611,17 +666,28 @@ Menyimpan konfigurasi setiap Facebook Page.
   ],
   "topics": [
     {"slug": "animals", "weight": 25, "min_gap_posts": 2},
-    {"slug": "science", "weight": 25, "min_gap_posts": 2},
-    {"slug": "space", "weight": 20, "min_gap_posts": 3},
-    {"slug": "history", "weight": 15, "min_gap_posts": 3},
-    {"slug": "everyday-life", "weight": 15, "min_gap_posts": 2}
+    {"slug": "food_science", "weight": 20, "min_gap_posts": 2},
+    {"slug": "human_body", "weight": 15, "min_gap_posts": 3},
+    {"slug": "nature_science", "weight": 15, "min_gap_posts": 2},
+    {"slug": "geography", "weight": 15, "min_gap_posts": 2},
+    {"slug": "history_origins", "weight": 5, "min_gap_posts": 3},
+    {"slug": "inventions_everyday", "weight": 3, "min_gap_posts": 3},
+    {"slug": "general_trivia", "weight": 2, "min_gap_posts": 3}
   ],
   "blueprint_overrides": {
-    "fact_count": {"min": 6, "max": 8}
+    "fact_count": {"min": 6, "default": 6, "max": 8}
+  },
+  "architecture_mix": {
+    "themed": 45,
+    "single_subject": 40,
+    "mixed": 15
   },
   "cta_preferences": {
     "enabled": true,
     "avoid_repeating_within_posts": 5
+  },
+  "emoji_policy": {
+    "enabled": false
   },
   "visual_preferences": {
     "background_style": "photo",
@@ -640,10 +706,12 @@ Menyimpan konfigurasi setiap Facebook Page.
 - unique `(workspace_id, id)` untuk composite FK;
 - `lock_version > 0`;
 - `config_schema_version > 0`;
+- `locale_code` wajib valid BCP 47 dan tetap konsisten dengan `language_code`;
 - market weight 0–100 dan total 100 saat Page diaktifkan;
 - satu market primary;
 - topic slug harus berasal dari allowlist blueprint/server;
 - topic weight total 100 saat Page diaktifkan;
+- architecture mix hanya memakai `themed`, `single_subject`, dan `mixed`, dengan total weight 100 saat Page diaktifkan;
 - `niche_key` dan `content_type` harus sesuai blueprint;
 - archived timestamp sesuai status.
 
@@ -804,12 +872,17 @@ Menyimpan identitas dan lifecycle post. Konten lengkap disimpan di `ops.post_ver
 | `blueprint_id` | `bigint` | Blueprint version yang menjadi dasar |
 | `niche_key` | `text` | MVP `trivia` |
 | `content_type` | `text` | MVP `fact_reel` |
+| `primary_topic` | `text` | Topik utama dari allowlist blueprint, indexed |
+| `theme` | `text` | Tema spesifik, nullable |
 | `status` | `text` | Lifecycle post |
 | `current_version_id` | `bigint` | Nullable saat insert awal, FK ditambah setelah versions tersedia |
 | `current_version_number` | `integer` | Default 0 sampai versi pertama dibuat |
 | `lock_version` | `integer` | Default 1 |
 | `approved_at` | `timestamptz` | Nullable |
 | `approved_by` | `uuid` | Nullable |
+| `rejected_at` | `timestamptz` | Nullable |
+| `rejected_by` | `uuid` | Nullable |
+| `rejection_reason` | `text` | Nullable, dibatasi panjangnya |
 | `scheduled_at` | `timestamptz` | Nullable |
 | `published_at` | `timestamptz` | Nullable |
 | `external_post_ref` | `text` | Nullable, untuk pengembangan Facebook API |
@@ -837,7 +910,10 @@ archived
 - `current_version_number >= 0`;
 - Page dan blueprint berasal dari workspace sama;
 - niche/content type sesuai Page dan blueprint;
-- approved metadata wajib pada status approved atau setelahnya;
+- `primary_topic` wajib berasal dari topic allowlist blueprint/Page;
+- `theme` dibatasi panjangnya dan tidak boleh menjadi pengganti topic terstruktur;
+- approved metadata wajib pada status `approved`, `scheduled`, atau `published`;
+- rejected metadata dan reason wajib pada status `rejected`;
 - scheduled timestamp wajib pada status scheduled;
 - published timestamp wajib pada status published;
 - archived timestamp wajib pada status archived.
@@ -846,6 +922,7 @@ archived
 
 - unique public ID;
 - `(workspace_id, page_id, status, created_at desc)`;
+- `(workspace_id, page_id, primary_topic, created_at desc)`;
 - `(workspace_id, status, scheduled_at)`;
 - partial `(page_id, published_at desc)` untuk published posts;
 - index `blueprint_id`.
@@ -861,7 +938,7 @@ Setelah `ops.post_versions` dibuat, tambahkan composite FK agar current version 
 
 Finalisasi post dilakukan dalam satu transaksi:
 
-1. insert post tanpa current version;
+1. insert post beserta `primary_topic`/`theme`, tanpa current version;
 2. insert version 1;
 3. update current pointer;
 4. consume facts;
@@ -889,6 +966,9 @@ Header satu planning period untuk satu Page.
 | `planning_rules_schema_version` | `integer` | Default 1 |
 | `planning_rules` | `jsonb` | Frequency dan topic distribution |
 | `lock_version` | `integer` | Default 1 |
+| `activated_at` | `timestamptz` | Nullable |
+| `completed_at` | `timestamptz` | Nullable |
+| `archived_at` | `timestamptz` | Nullable |
 | `created_by` | `uuid` | FK user |
 | `created_at` | `timestamptz` | Default `now()` |
 | `updated_at` | `timestamptz` | Default `now()` |
@@ -903,10 +983,13 @@ Header satu planning period untuk satu Page.
   "weekdays": [1, 2, 3, 4, 5, 6, 7],
   "topic_distribution": {
     "animals": 25,
-    "science": 25,
-    "space": 20,
-    "history": 15,
-    "everyday-life": 15
+    "food_science": 20,
+    "human_body": 15,
+    "nature_science": 15,
+    "geography": 15,
+    "history_origins": 5,
+    "inventions_everyday": 3,
+    "general_trivia": 2
   },
   "allow_unassigned_slots": true
 }
@@ -918,7 +1001,10 @@ Header satu planning period untuk satu Page.
 - `lock_version > 0`;
 - Page berada di workspace sama;
 - timezone valid menurut allowlist/runtime validation;
-- rules valid sebelum status menjadi active.
+- rules valid sebelum status menjadi active;
+- active calendar wajib mempunyai minimal satu non-cancelled slot;
+- completed calendar wajib mempunyai minimal satu published slot dan tidak mempunyai slot non-cancelled yang belum published;
+- `activated_at`, `completed_at`, dan `archived_at` wajib sesuai status/transisi masing-masing.
 
 ### Index
 
@@ -932,7 +1018,7 @@ Header satu planning period untuk satu Page.
 
 ## 12.1 `ops.generation_tasks`
 
-Menggabungkan konsep generation job dan job item. Satu row selalu mewakili satu calon post. Beberapa row dikelompokkan oleh `batch_id`.
+Satu row selalu mewakili satu calon post. Beberapa generation task dikelompokkan oleh `batch_id`; tidak ada parent batch row.
 
 ### Kolom
 
@@ -964,10 +1050,7 @@ Menggabungkan konsep generation job dan job item. Satu row selalu mewakili satu 
 
 ```text
 pending
-claimed
 facts_reserved
-generating
-quality_check
 completed
 failed
 cancelled
@@ -979,7 +1062,7 @@ cancelled
 {
   "schema_version": 1,
   "topic": "animals",
-  "architecture": "curiosity-list",
+  "architecture": "themed",
   "fact_count": 7,
   "target_markets": ["US", "GB", "CA", "AU"],
   "calendar_slot_public_id": null,
@@ -994,8 +1077,8 @@ cancelled
 - unique `(workspace_id, batch_id, item_number)`;
 - unique `result_post_id` jika tidak null;
 - `item_number > 0`;
-- `attempt_count >= 0`;
-- task claimed/active wajib memiliki lease;
+- `attempt_count` berada pada 0–3 untuk baseline MVP;
+- task active (`facts_reserved`) wajib memiliki lease;
 - completed task wajib mempunyai result post;
 - Page, blueprint, dan result post berada di workspace sama.
 
@@ -1014,7 +1097,7 @@ Gunakan atomic claim:
 
 ```sql
 update ops.generation_tasks
-set status = 'claimed',
+set status = 'facts_reserved',
     lease_owner = p_lease_owner,
     lease_expires_at = now() + interval '20 minutes',
     attempt_count = attempt_count + 1,
@@ -1026,6 +1109,7 @@ where id = (
   where workspace_id = p_workspace_id
     and page_id = p_page_id
     and status = 'pending'
+    and attempt_count < 3
   order by created_at, id
   for update skip locked
   limit 1
@@ -1039,24 +1123,27 @@ Dengan satu row per post, beberapa chat dapat memproses batch yang sama tanpa pa
 
 ## 12.2 `ops.fact_allocations`
 
-Menggabungkan reservation, consumption, dan hubungan fakta ke post.
+Menggabungkan allocation reserved/consumed dan hubungan fakta ke post.
 
 ### Kolom
 
 | Kolom | Tipe | Aturan |
 |---|---|---|
 | `id` | `bigint` | PK |
-| `public_id` | `uuid` | Unique reservation/allocation token |
+| `public_id` | `uuid` | Unique allocation token |
 | `workspace_id` | `bigint` | FK workspace |
 | `page_id` | `bigint` | Composite FK Page |
 | `fact_id` | `bigint` | Composite FK Fact |
-| `generation_task_id` | `bigint` | Composite FK task |
-| `post_id` | `bigint` | Nullable sampai consumed |
+| `purpose` | `text` | `generation` atau `revision` |
+| `allocation_group_id` | `uuid` | Mengelompokkan satu hasil prepare secara atomik |
+| `generation_task_id` | `bigint` | Nullable; composite FK task untuk purpose `generation` |
+| `post_id` | `bigint` | Nullable pada generation-reserved; wajib pada revision dan consumed |
 | `status` | `text` | `reserved`, `consumed`, `released`, `expired` |
 | `reserved_at` | `timestamptz` | Default `now()` |
 | `expires_at` | `timestamptz` | Wajib ketika reserved |
 | `consumed_at` | `timestamptz` | Nullable |
 | `released_at` | `timestamptz` | Nullable |
+| `expired_at` | `timestamptz` | Nullable |
 | `release_reason` | `text` | Nullable |
 | `created_at` | `timestamptz` | Default `now()` |
 | `updated_at` | `timestamptz` | Default `now()` |
@@ -1071,17 +1158,22 @@ where status in ('reserved', 'consumed');
 
 Maknanya:
 
-- satu fakta hanya dapat memiliki satu reservation aktif;
+- satu fakta hanya dapat memiliki satu allocation aktif;
 - fakta consumed tidak pernah tersedia kembali;
-- released atau expired allocation tidak menghalangi reservation baru;
+- released atau expired allocation tidak menghalangi allocation baru;
 - perlindungan berlaku lintas semua Page di workspace.
 
 ### Constraint tambahan
 
 - consumed wajib mempunyai `post_id` dan `consumed_at`;
-- reserved tidak mempunyai `post_id`;
-- released/expired wajib mempunyai released timestamp/reason yang sesuai;
-- Page, fact, task, dan post berasal dari workspace sama;
+- purpose `generation` wajib mempunyai `generation_task_id`; saat masih reserved, `post_id` harus null;
+- purpose `revision` wajib mempunyai `post_id` sejak reserved dan `generation_task_id` harus null;
+- seluruh row yang dibuat oleh satu prepare call memakai `allocation_group_id` yang sama;
+- satu `allocation_group_id` tidak boleh dipakai ulang untuk purpose, Page, task, atau post berbeda; enforcement dilakukan oleh guarded API function/constraint trigger;
+- unique `(workspace_id, allocation_group_id, fact_id)`;
+- released wajib mempunyai `released_at` dan `release_reason`;
+- expired wajib mempunyai `expired_at`; `release_reason` boleh berisi alasan expiry yang aman;
+- Page, fact, optional task, dan optional post berasal dari workspace yang sama;
 - transition terminal tidak dapat kembali ke reserved.
 
 ### Index
@@ -1090,6 +1182,7 @@ Maknanya:
 - partial unique active fact;
 - partial `(expires_at)` untuk reserved;
 - `(workspace_id, generation_task_id, status)`;
+- `(workspace_id, allocation_group_id, status)`;
 - `(workspace_id, post_id)`;
 - `(workspace_id, page_id, consumed_at desc)`;
 - index setiap FK.
@@ -1140,7 +1233,10 @@ Tidak ada `updated_at`; row immutable.
   "schema_version": 1,
   "language": "en",
   "english_variant": "neutral-international",
-  "architecture": "curiosity-list",
+  "spelling_standard": "american",
+  "topic": "animals",
+  "theme": "octopus biology",
+  "architecture": "themed",
   "hook": "These facts sound made up, but they are real.",
   "facts": [
     {
@@ -1188,6 +1284,9 @@ Tidak ada `updated_at`; row immutable.
 - unique `(post_id, id)` untuk current pointer;
 - `version_number > 0`;
 - content dan quality lulus JSON Schema;
+- `content.topic` sama dengan `app.posts.primary_topic` dan `content.theme` sama dengan snapshot tema post;
+- architecture `mixed` wajib memakai `primary_topic = general_trivia` dan boleh memiliki theme null;
+- `content.english_variant` dan `content.spelling_standard` sesuai blueprint yang digunakan;
 - setiap allocation ID pada content dimiliki post yang sama;
 - setiap fact ID sesuai allocation;
 - display order unik di dalam content;
@@ -1225,7 +1324,7 @@ Satu row mewakili satu kesempatan publikasi.
 | `local_date` | `date` | Tanggal menurut Page timezone |
 | `slot_number` | `smallint` | Urutan slot hari tersebut |
 | `publish_at` | `timestamptz` | Waktu absolut |
-| `status` | `text` | `planned`, `assigned`, `ready`, `published`, `cancelled` |
+| `status` | `text` | `planned`, `ready`, `published`, `cancelled` |
 | `notes` | `text` | Nullable |
 | `lock_version` | `integer` | Default 1 |
 | `created_at` | `timestamptz` | Default `now()` |
@@ -1252,8 +1351,9 @@ where post_id is not null and status <> 'cancelled';
 - `slot_number > 0`;
 - `lock_version > 0`;
 - Page harus sama dengan Page calendar;
-- assigned/ready/published slot wajib mempunyai post;
+- ready/published slot wajib mempunyai post;
 - post harus berasal dari Page sama;
+- jika post terisi, `slot.topic` wajib sama dengan `post.primary_topic`;
 - published slot mengarah pada published post;
 - cancelled slot tidak digunakan oleh production flow.
 
@@ -1297,6 +1397,7 @@ Mencegah retry menghasilkan resource ganda.
 - unique `(workspace_id, operation, idempotency_key)`;
 - key sama dengan request hash berbeda ditolak;
 - completed wajib mempunyai response/resource;
+- failed wajib mempunyai stable `error_code`; replay key yang sama mengembalikan error tersimpan dan tidak menjalankan ulang operasi;
 - request hash berformat SHA-256;
 - expiry setelah creation.
 
@@ -1313,9 +1414,11 @@ Mencegah retry menghasilkan resource ganda.
 - submit/review fact batch;
 - create generation batch;
 - prepare next post;
+- release generation task;
 - finalize post;
-- revise/approve post;
-- create/reschedule calendar.
+- prepare/release post revision;
+- revise/approve/reject/mark published/archive post;
+- create/assign/unassign/reschedule/activate/archive calendar.
 
 ---
 
@@ -1357,15 +1460,16 @@ fact.submitted
 fact.verified
 fact.rejected
 fact.duplicate_detected
-task.claimed
+task.prepared
 fact.reserved
 fact.released
 fact.consumed
 post.finalized
 post.revised
 post.approved
+post.rejected
 calendar.created
-slot.assigned
+slot.ready
 slot.rescheduled
 oauth.client_connected
 ```
@@ -1415,7 +1519,7 @@ oauth.client_connected
 | `fact_embeddings` | `app.facts.embedding` | Satu active embedding |
 | `generation_jobs` | `ops.generation_tasks.batch_id` | Batch tidak membutuhkan parent row |
 | `generation_job_items` | `ops.generation_tasks` | Satu row = satu post task |
-| `fact_reservations` | `ops.fact_allocations` | Reservation + consumption |
+| `fact_reservations` | `ops.fact_allocations` | Konsep lama digabung sebagai allocation reserved/consumed |
 | `post_facts` | `ops.fact_allocations.post_id` | Relasi relational tetap ada |
 | `posts` | `app.posts` | Dipertahankan |
 | `post_versions` | `ops.post_versions` | Dipertahankan |
@@ -1505,7 +1609,8 @@ Wajib memiliki:
 
 Wajib memiliki:
 
-- language/variant;
+- language, neutral-international variant, dan American spelling standard;
+- primary topic dan optional theme;
 - architecture;
 - hook;
 - facts array;
@@ -1602,29 +1707,20 @@ Availability tidak disimpan sebagai boolean karena dapat berubah akibat allocati
 ## 16.1 Fact
 
 ```text
-candidate
-  -> verifying
-  -> needs_review
-  -> verified
-  -> rejected
-  -> duplicate
-
-verified -> verifying  (revalidation)
-verified -> rejected   (correction)
+candidate    -> verifying | rejected | duplicate
+verifying    -> verified | needs_review | rejected | duplicate
+needs_review -> verified | rejected | duplicate
+verified     -> verifying  (revalidation)
+verified     -> rejected   (correction)
 ```
 
 ## 16.2 Generation task
 
 ```text
-pending
-  -> claimed
-  -> facts_reserved
-  -> generating
-  -> quality_check
-  -> completed
-
-active -> failed
-active -> cancelled
+pending -> facts_reserved -> completed
+pending/facts_reserved -> cancelled
+facts_reserved -> failed
+facts_reserved -> pending  (lease recovery jika belum ada consumption)
 ```
 
 ## 16.3 Fact allocation
@@ -1635,27 +1731,49 @@ reserved -> released
 reserved -> expired
 ```
 
-Terminal allocation tidak kembali ke reserved. Reservation berikutnya membuat row baru.
+Terminal allocation tidak kembali ke reserved. Allocation berikutnya membuat row baru.
 
 ## 16.4 Post
 
 ```text
-draft -> needs_review -> approved -> scheduled -> published
-   \-> rejected
-   \-> archived
-
-approved -> needs_review  (substantive revision)
-scheduled -> approved     (slot released)
+draft        -> needs_review | rejected | archived
+needs_review -> approved | rejected | archived
+approved     -> needs_review | scheduled | published | rejected | archived
+scheduled    -> approved | published | archived
+published    -> archived
+rejected     -> archived
 ```
+
+Catatan:
+
+- finalisasi normal langsung membuat `needs_review`; `draft` hanya untuk recovery/penyimpanan pekerjaan belum lengkap;
+- revisi substantif pada post approved mengembalikannya ke `needs_review`;
+- post scheduled harus dilepas dari slot menjadi approved sebelum revisi substantif;
+- `scheduled → approved` terjadi saat slot dilepas;
+- `approved → published` mendukung publikasi manual tanpa kalender;
+- archive dari scheduled membatalkan/melepas slot secara atomik;
+- `failed` hanya status generation task, bukan post; task aktif tetap `facts_reserved` selama ChatGPT menulis dan melakukan QA.
 
 ## 16.5 Calendar slot
 
 ```text
-planned -> assigned -> ready -> published
-planned/assigned/ready -> cancelled
+planned -> ready -> published
+planned/ready -> cancelled
 ```
 
 State transition dijalankan melalui database functions dan dilindungi trigger/checks.
+
+## 16.6 Calendar
+
+```text
+draft -> active -> completed -> archived
+draft/active -> archived
+```
+
+- create selalu menghasilkan `draft`;
+- activate memerlukan minimal satu slot dan tidak ada collision;
+- completed diatur otomatis ketika seluruh slot non-cancelled published dan minimal satu slot published;
+- archive dengan planned/ready slots memerlukan flag pembatalan eksplisit, membatalkan slot tersebut, dan mengembalikan scheduled posts terkait ke approved secara atomik.
 
 ---
 
@@ -1671,7 +1789,7 @@ Hasil:
 - Chat B melewati task 1 dan mendapat task 2.
 - Tidak ada wait panjang.
 
-## 17.2 Fact reservation
+## 17.2 Fact allocation
 
 Setelah task diklaim, facts dipilih dan di-lock dalam urutan `fact.id`.
 
@@ -1679,12 +1797,12 @@ Partial unique index menjadi perlindungan terakhir jika dua transaksi memilih ka
 
 ## 17.3 Lease
 
-Task dan reservation memakai TTL awal 20 menit.
+Task lease dan reserved allocation memakai TTL awal 20 menit.
 
 - Jika ChatGPT selesai: allocation consumed.
 - Jika user membatalkan: allocation released.
 - Jika chat hilang: Cron menandai expired.
-- Task dapat dikembalikan ke pending sesuai retry policy.
+- Task kembali pending hanya bila `attempt_count < 3`; jika batas tercapai, task menjadi failed.
 
 TTL final dikalibrasi melalui UAT.
 
@@ -1720,18 +1838,19 @@ Alur:
 1. Canonicalize request.
 2. Hash request.
 3. Insert idempotency record dengan `ON CONFLICT`.
-4. Jika completed, kembalikan stored response.
-5. Jika processing, return in-progress.
-6. Jika key sama tetapi hash berbeda, tolak.
-7. Jalankan operasi.
-8. Simpan resource dan response.
+4. Jika key sudah ada tetapi request hash berbeda, tolak.
+5. Jika completed, kembalikan stored response.
+6. Jika failed, kembalikan stored stable error tanpa menjalankan ulang operasi.
+7. Jika processing, return in-progress.
+8. Jika record baru, jalankan operasi.
+9. Simpan resource/response atau stable failure.
 
 Idempotency tidak menggantikan unique constraint. Keduanya digunakan bersama.
 
 Contoh stable error:
 
 ```text
-IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD
+IDEMPOTENCY_CONFLICT
 ```
 
 ---
@@ -1769,13 +1888,13 @@ ChatGPT harus membaca ulang resource sebelum mencoba revisi.
 
 # 20. Database Function Interfaces
 
-Nama final dapat disesuaikan saat implementation, tetapi tanggung jawab harus tetap terpisah.
+Nama database function pada bagian ini adalah baseline final MVP. Perubahan nama/tanggung jawab wajib memperbarui PRD, implementation plan, MCP mapping, dan contract tests secara bersamaan.
 
 ## 20.1 Workspace dan Page
 
 ### `api.get_workspace()`
 
-Mengembalikan workspace milik caller dan summary counts.
+Mengembalikan satu active workspace milik caller dan summary counts. MVP menjamin maksimal satu active workspace per owner.
 
 ### `api.list_pages(...)`
 
@@ -1815,6 +1934,10 @@ Exact hash, semantic key, dan vector candidate search.
 
 Batch bounded, idempotent, menyimpan candidate/source metadata.
 
+### `api.list_facts_needing_review(...)`
+
+Read-only, paginated, dan terbatas pada fact `needs_review` atau overdue revalidation milik workspace caller.
+
 ### `api.review_fact_candidates(...)`
 
 Batch review, memperbarui current verification dan audit.
@@ -1830,10 +1953,18 @@ Membuat N task dengan satu batch ID.
 Dalam transaksi singkat:
 
 1. claim task;
-2. reserve verified facts;
+2. membuat reserved allocations untuk verified facts;
 3. update task status;
 4. write audit;
-5. return generation packet.
+5. return generation packet beserta satu `allocation_group_id`.
+
+### `api.release_generation_task(...)`
+
+Melepas hanya allocation `reserved` milik task dan lease caller. Input target action hanya `retry` atau `cancel`: `retry` memetakan ke `pending` jika `attempt_count < 3`, atau `failed` jika batas tercapai; `cancel` memetakan ke `cancelled`. Operasi idempotent dan tidak dapat melepas allocation `consumed`.
+
+### `api.validate_post_draft(...)`
+
+Read-only. Memvalidasi lease, allocation group, fact/blueprint state, serta aturan deterministik yang memerlukan database; tidak mengonsumsi allocation atau mengubah task.
 
 ### `api.finalize_post(...)`
 
@@ -1841,7 +1972,7 @@ Dalam satu transaksi:
 
 1. validate idempotency;
 2. validate task lease;
-3. validate allocations;
+3. validate allocation group, purpose `generation`, dan seluruh allocations;
 4. validate post content/QA;
 5. insert post;
 6. insert version 1;
@@ -1853,7 +1984,9 @@ Dalam satu transaksi:
 
 ### `api.get_generation_batch(batch_id)`
 
-Menghitung status dari generation task rows.
+Menghitung counts dan derived status (`pending`, `in_progress`, `completed`, `partially_completed`, `failed`, atau `cancelled`) dari generation task rows; tidak membaca parent row.
+
+Precedence derived status mengikuti PRD: all pending; any pending/`facts_reserved` after start; all completed; completed mixed dengan failed/cancelled; all cancelled; lalu terminal failure tanpa completed.
 
 ## 20.4 Posts
 
@@ -1863,17 +1996,41 @@ Mengembalikan current version secara default.
 
 ### `api.list_posts(...)`
 
-Bounded filter dan pagination.
+Bounded filter dan pagination, termasuk filter `primary_topic`.
+
+### `api.prepare_post_revision(...)`
+
+Dalam satu transaksi, memvalidasi post/lock version, memilih verified replacement facts, lalu membuat allocations dengan purpose `revision`, `post_id` terisi, dan satu `allocation_group_id` baru.
+
+### `api.release_post_revision(...)`
+
+Melepas seluruh allocation `reserved` pada satu revision allocation group milik post/caller. Operasi idempotent; allocation `consumed` tidak pernah dilepas.
 
 ### `api.revise_post(...)`
 
-Membuat version baru dengan optimistic locking.
+Membuat version baru dengan optimistic locking. Untuk penggantian fakta, function memvalidasi revision allocation group lalu mengonsumsinya. `primary_topic` dan `theme` pada header post diperbarui atomik agar sama dengan current version.
 
 ### `api.approve_post(...)`
 
 Memastikan current version lulus QA.
 
+### `api.reject_post(...)`
+
+Memerlukan expected lock version dan alasan. Hanya draft/needs_review/approved yang dapat ditolak; scheduled post harus di-unassign lebih dahulu. Allocation consumed tetap immutable dan tidak dilepas.
+
+### `api.mark_post_published(...)`
+
+Memerlukan expected lock version dan `published_at`, mengubah post menjadi `published`, menyimpan optional external reference, dan memperbarui ready calendar slot menjadi `published` secara atomik bila ada. Jika post mempunyai slot, calendar wajib `active`. Setelah itu function menandai calendar `completed` jika seluruh slot non-cancelled sudah published dan minimal satu slot published.
+
+### `api.archive_post(...)`
+
+Memerlukan expected lock version, memvalidasi transition, mengubah status menjadi `archived`, membatalkan/melepaskan active slot secara atomik bila post scheduled, menghitung ulang completion calendar terkait, dan menulis audit event. Tidak menghapus post, version, atau allocation history.
+
 ## 20.5 Calendar
+
+### `api.preview_calendar_plan(...)`
+
+Read-only. Mengembalikan bounded conflict/inventory context untuk candidate slots tanpa menyimpan calendar atau slot.
 
 ### `api.create_calendar(...)`
 
@@ -1881,15 +2038,27 @@ Membuat header dan slots atomik.
 
 ### `api.assign_post_to_slot(...)`
 
-Memvalidasi Page, status post, dan slot version.
+Memvalidasi Page, post `approved`, dan slot version; mengubah slot menjadi `ready` dan post menjadi `scheduled` dalam satu transaksi.
+
+### `api.unassign_post_from_slot(...)`
+
+Memerlukan expected slot dan post lock versions. Hanya ready slot yang belum published dapat dilepas; post kembali `approved` dan slot kembali `planned` dalam satu transaksi.
 
 ### `api.get_calendar(...)`
 
 Mengembalikan kalender dan slots dalam rentang terbatas.
 
-### `api.reschedule_slot(...)`
+### `api.reschedule_calendar_slot(...)`
 
 Optimistic locking dan collision validation.
+
+### `api.activate_calendar(...)`
+
+Memvalidasi calendar draft, minimal satu slot, seluruh JSON rules, dan collision; lalu mengubah status menjadi active menggunakan expected lock version.
+
+### `api.archive_calendar(...)`
+
+Mengarsipkan draft/active/completed calendar. Planned/ready slots hanya boleh dibatalkan jika caller mengirim flag eksplisit; scheduled posts terkait kembali approved dalam transaksi yang sama.
 
 ---
 
@@ -1903,12 +2072,15 @@ Database functions mengembalikan compact structured results. Jangan mengembalika
 {
   "task_public_id": "uuid",
   "batch_id": "uuid",
+  "allocation_group_id": "uuid",
   "lease_expires_at": "timestamp",
   "page": {
     "public_id": "uuid",
     "name": "Page A",
     "language": "en",
+    "locale": "en-US",
     "english_variant": "neutral-international",
+    "spelling_standard": "american",
     "markets": ["US", "GB", "CA", "AU"]
   },
   "blueprint": {
@@ -1943,14 +2115,46 @@ Tidak dikembalikan:
 ```json
 {
   "post_public_id": "uuid",
+  "page_public_id": "uuid",
   "version_public_id": "uuid",
   "version_number": 1,
   "lock_version": 1,
   "status": "needs_review",
+  "topic": "animals",
+  "theme": "octopus biology",
+  "architecture": "themed",
+  "hook": "These facts sound made up, but they are real.",
+  "facts": [
+    {"fact_public_id": "00000000-0000-0000-0000-000000000001", "rendered_text": "Rendered fact 1."},
+    {"fact_public_id": "00000000-0000-0000-0000-000000000002", "rendered_text": "Rendered fact 2."},
+    {"fact_public_id": "00000000-0000-0000-0000-000000000003", "rendered_text": "Rendered fact 3."},
+    {"fact_public_id": "00000000-0000-0000-0000-000000000004", "rendered_text": "Rendered fact 4."},
+    {"fact_public_id": "00000000-0000-0000-0000-000000000005", "rendered_text": "Rendered fact 5."},
+    {"fact_public_id": "00000000-0000-0000-0000-000000000006", "rendered_text": "Rendered fact 6."}
+  ],
+  "cta": "Which fact surprised you most?",
   "canva_copy": "...",
   "caption": "...",
   "hashtags": [],
-  "source_notes": []
+  "visual_direction": {
+    "duration_seconds": 13,
+    "background": "subtle-moving-ocean-photo",
+    "text_layout": "high-contrast-centered"
+  },
+  "fact_count": 6,
+  "source_notes": [
+    {"fact_public_id": "00000000-0000-0000-0000-000000000001", "note": "Verified source note 1."},
+    {"fact_public_id": "00000000-0000-0000-0000-000000000002", "note": "Verified source note 2."},
+    {"fact_public_id": "00000000-0000-0000-0000-000000000003", "note": "Verified source note 3."},
+    {"fact_public_id": "00000000-0000-0000-0000-000000000004", "note": "Verified source note 4."},
+    {"fact_public_id": "00000000-0000-0000-0000-000000000005", "note": "Verified source note 5."},
+    {"fact_public_id": "00000000-0000-0000-0000-000000000006", "note": "Verified source note 6."}
+  ],
+  "quality_result": {
+    "status": "passed",
+    "score": 94,
+    "warnings": []
+  }
 }
 ```
 
@@ -2042,7 +2246,7 @@ Jika function benar-benar membutuhkan `SECURITY DEFINER`:
 
 - setiap FK pada child mempunyai index;
 - equality columns lebih dulu, range/sort terakhir;
-- partial indexes untuk active queue/reservations/slots;
+- partial indexes untuk active queue/allocations/slots;
 - JSONB index hanya ketika ada query nyata;
 - index dievaluasi dengan `EXPLAIN (ANALYZE, BUFFERS)`.
 
@@ -2125,27 +2329,27 @@ Critical writes memanggil validator sesuai schema version. Trigger dapat menjadi
 
 # 25. Cron dan Maintenance
 
-## 25.1 Reservation expiry
+## 25.1 Allocation expiry
 
 Jadwal awal setiap 5 menit:
 
 - ubah reserved allocations yang kedaluwarsa menjadi expired;
-- tulis release reason;
-- pulihkan task sesuai retry policy.
+- isi `expired_at` dan reason aman;
+- pulihkan task dengan batas maksimal 3 attempts.
 
 ## 25.2 Task lease recovery
 
-Claimed/active task yang lease-nya kedaluwarsa:
+Task `facts_reserved` yang lease-nya kedaluwarsa:
 
-- kembali pending jika attempt masih di bawah batas;
-- failed jika attempt limit tercapai;
+- kembali pending jika `attempt_count < 3`;
+- failed jika `attempt_count >= 3`;
 - release allocations yang belum consumed.
 
 ## 25.3 Fact revalidation
 
 Fact dengan `revalidate_after <= now()`:
 
-- tidak dipilih untuk reservation;
+- tidak dipilih untuk allocation;
 - masuk needs review/revalidation queue;
 - current verification tidak dihapus;
 - audit event dibuat saat status berubah.
@@ -2213,11 +2417,13 @@ Menampilkan:
 
 Menampilkan counts per batch:
 
+- derived status (`pending`, `in_progress`, `completed`, `partially_completed`, `failed`, atau `cancelled`);
 - total;
 - pending;
 - active;
 - completed;
-- failed.
+- failed;
+- cancelled.
 
 ## 27.4 `reporting.calendar_overview`
 
@@ -2231,7 +2437,10 @@ Semua view yang diakses user harus menggunakan `security_invoker = true` dan men
 
 | Kode | Arti |
 |---|---|
+| `UNAUTHENTICATED` | OAuth token tidak ada/tidak valid |
+| `FORBIDDEN` | Caller tidak berhak melakukan operasi |
 | `WORKSPACE_NOT_FOUND` | Tidak ada atau tidak dapat diakses |
+| `PAGE_NOT_FOUND` | Page tidak ada atau tidak dapat diakses |
 | `PAGE_NOT_ACTIVE` | Page paused/archived |
 | `BLUEPRINT_NOT_ACTIVE` | Blueprint tidak dapat digunakan |
 | `INVALID_JSON_SCHEMA_VERSION` | Versi JSON tidak didukung |
@@ -2242,13 +2451,16 @@ Semua view yang diakses user harus menggunakan `security_invoker = true` dan men
 | `INSUFFICIENT_VERIFIED_FACTS` | Fact pool tidak cukup |
 | `TASK_ALREADY_CLAIMED` | Task sedang dikerjakan chat lain |
 | `FACT_ALREADY_ALLOCATED` | Fact reserved/consumed |
-| `RESERVATION_EXPIRED` | Allocation TTL lewat |
+| `FACT_ALLOCATION_EXPIRED` | Allocation TTL lewat |
 | `IDEMPOTENCY_CONFLICT` | Key sama, request berbeda |
 | `RESOURCE_VERSION_CONFLICT` | Lock version sudah berubah |
 | `POST_QUALITY_FAILED` | Draft tidak lolos QA |
 | `CALENDAR_SLOT_CONFLICT` | Slot/post sudah dipakai |
 | `INVALID_STATE_TRANSITION` | Transisi status ilegal |
 | `CROSS_WORKSPACE_REFERENCE` | Relasi lintas workspace |
+| `RATE_LIMITED` | Batas operasi sementara terlampaui |
+| `DEPENDENCY_UNAVAILABLE` | Dependency eksternal tidak tersedia |
+| `INTERNAL_ERROR` | Kegagalan internal yang disanitasi |
 
 Error response mencantumkan:
 
@@ -2273,7 +2485,7 @@ Gunakan Supabase CLI `migration new` untuk setiap file. Jangan membuat timestamp
 - `api`;
 - `private`;
 - vector;
-- optional pg_jsonschema.
+- optional `pg_jsonschema` dengan fallback validator yang mempertahankan kontrak sama.
 
 ## Migration 2 — Helpers
 
@@ -2302,14 +2514,16 @@ Gunakan Supabase CLI `migration new` untuk setiap file. Jangan membuat timestamp
 
 ## Migration 6 — Generation dan allocations
 
-- generation tasks;
-- fact allocations;
-- queue/reservation indexes.
+- generation tasks dibuat tanpa FK `result_post_id` ke posts;
+- fact allocations dibuat tanpa FK `post_id` ke posts;
+- `result_post_id` dan `post_id` tetap nullable pada tahap ini;
+- queue/allocation indexes.
 
 ## Migration 7 — Posts dan versions
 
 - posts;
 - post versions;
+- tambahkan composite FK `generation_tasks.result_post_id` dan `fact_allocations.post_id` setelah posts tersedia;
 - current pointer FK;
 - immutable guards.
 
@@ -2511,7 +2725,7 @@ Desain dianggap berhasil diterapkan jika:
 ## Kecepatan AI
 
 - [ ] Page context diperoleh satu tool call.
-- [ ] Claim dan fact reservation digabung dalam `prepare_next_post`.
+- [ ] Claim dan fact allocation digabung dalam `prepare_next_post`.
 - [ ] Post finalization selesai satu tool call.
 - [ ] Tool result tidak mengembalikan internal IDs/vector/full audit.
 - [ ] Generation packet bounded dan ringkas.
@@ -2541,7 +2755,7 @@ Desain dianggap berhasil diterapkan jika:
 
 ## Operasional
 
-- [ ] Reservation expiry otomatis.
+- [ ] Allocation expiry otomatis.
 - [ ] Task lease recovery otomatis.
 - [ ] Fact revalidation queue tersedia.
 - [ ] Advisors tidak memiliki critical security finding.
@@ -2673,7 +2887,7 @@ Metrik minimum:
 - available facts per topic;
 - submitted/verified/rejected/duplicate facts;
 - semantic review rate;
-- reservation success/conflict/expiry;
+- allocation success/conflict/expiry;
 - task claim/completion/failure;
 - idempotency hits/conflicts;
 - post QA pass/fail;
@@ -2694,8 +2908,8 @@ Gunakan `request_id` yang sama pada MCP log dan audit event agar satu operasi da
 1. Konfirmasi model embedding masih tersedia dan dimensi 1536 didukung.
 2. Kalibrasi semantic duplicate thresholds.
 3. Finalisasi JSON Schemas versi 1.
-4. Finalisasi topic allowlist trivia.
-5. Finalisasi reservation/task TTL melalui UAT.
+4. Konfirmasi topic allowlist trivia dari PRD dan bentuk JSON Schema versi 1; penambahan slug memerlukan versi blueprint baru.
+5. Finalisasi allocation/task TTL melalui UAT.
 6. Finalisasi retention audit/idempotency.
 7. Verifikasi schema exposure dan grant behavior project Supabase saat implementation.
 8. Verifikasi Supabase CLI, Edge Runtime, dan extension availability terkini.
@@ -2717,7 +2931,7 @@ Desain ini mempertahankan relational guarantees pada bagian yang paling berisiko
 
 - uniqueness;
 - queue claim;
-- fact reservation;
+- fact allocation;
 - post identity/versioning;
 - calendar slots;
 - idempotency;

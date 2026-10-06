@@ -5,6 +5,8 @@
 | Item | Nilai |
 |---|---|
 | Produk | Content Producer untuk Facebook Reels trivia/fakta |
+| Versi dokumen | 1.1 |
+| Tanggal revisi | 6 Oktober 2026 |
 | Dokumen sumber | `plans/PRDid.md` dan `plans/database-design.md` |
 | Target | Private ChatGPT plugin dengan custom MCP server |
 | Database dan Auth | Supabase |
@@ -18,6 +20,14 @@
 | Status | Rencana berurutan, belum dieksekusi |
 
 Dokumen ini adalah urutan pelaksanaan dari repository kosong sampai sistem siap dipakai untuk produksi. Tahap tidak boleh dilompati. Setiap fase memiliki entry criteria, langkah berurutan, hasil, dan exit gate.
+
+### 1.1 Batas kewenangan dokumen
+
+- `PRDid.md` mengatur ruang lingkup produk, perilaku pengguna, aturan konten, dan acceptance criteria.
+- `database-design.md` mengatur nama tabel/kolom, status, constraint, transaksi, dan tanggung jawab database function.
+- Dokumen ini mengatur urutan pengerjaan, struktur repository, nama MCP tool final, deployment, dan pengujian.
+- MCP hanya menerima dan mengembalikan UUID `public_id`; primary key `bigint` internal tidak pernah masuk kontrak tool.
+- Bila ditemukan konflik, hentikan fase terkait dan selaraskan ketiga dokumen sebelum melanjutkan. Jangan membuat keputusan arsitektur diam-diam di dalam kode.
 
 ---
 
@@ -77,7 +87,7 @@ flowchart LR
    ```
 
 3. Supabase Auth menjadi OAuth 2.1 authorization server.
-4. Dynamic client registration diaktifkan untuk koneksi ChatGPT.
+4. Dynamic Client Registration (DCR) dipakai karena panduan Supabase MCP saat ini mendukung alur tersebut. Dukungan dan rekomendasi OpenAI/Supabase wajib diverifikasi lagi pada saat implementasi; Client ID Metadata Documents (CIMD) dapat menjadi migrasi berikutnya bila didukung end-to-end.
 5. Web mini menyediakan halaman sign-in, consent, dan pengelolaan grant.
 6. Supabase JWT diteruskan ke database supaya RLS memakai identitas user asli.
 7. MCP tool tidak menggunakan `service_role` untuk operasi user normal.
@@ -95,7 +105,7 @@ flowchart LR
 
 Alur satu post:
 
-1. ChatGPT memanggil `prepare_next_post` untuk mengklaim satu generation task sekaligus mereservasi fakta.
+1. ChatGPT memanggil `prepare_next_post` untuk mengklaim satu generation task sekaligus membuat reserved fact allocations.
 2. MCP mengembalikan content brief, blueprint, dan fakta terverifikasi.
 3. ChatGPT menulis hook, body, CTA, caption, hashtags, dan visual direction.
 4. ChatGPT mengirim hasil ke tool finalisasi.
@@ -265,10 +275,11 @@ Fallback hanya boleh dipakai jika production belum berisi data nyata.
 
 ### 0.4 Kunci batas konten
 
-- **[BERSAMA]** Konfirmasi topic awal.
+- **[BERSAMA]** Konfirmasi topic allowlist PRD: `animals`, `food_science`, `human_body`, `nature_science`, `geography`, `history_origins`, `inventions_everyday`, dan `general_trivia`.
 - **[BERSAMA]** Keluarkan medical advice, legal advice, financial advice, current politics, dan diagnosis psychology dari MVP.
-- **[BERSAMA]** Konfirmasi 5–9 fakta per post sebagai default.
-- **[BERSAMA]** Konfirmasi output neutral international English yang mudah dipahami US/UK/CA/AU.
+- **[BERSAMA]** Konfirmasi rentang 5–9 fakta per post dengan default 6.
+- **[BERSAMA]** Konfirmasi enum architecture `themed`, `single_subject`, dan `mixed`.
+- **[BERSAMA]** Konfirmasi neutral international English yang mudah dipahami US/UK/CA/AU dengan American spelling sebagai standar ejaan.
 - **[BERSAMA]** Konfirmasi background motion 13 detik sebagai visual baseline.
 - **[BERSAMA]** Konfirmasi fakta tidak boleh diulang lintas Page dalam workspace yang sama.
 
@@ -289,8 +300,9 @@ Baseline:
 - **[BERSAMA]** Konfirmasi Opsi 2 Disempurnakan pada `plans/database-design.md` sebagai source of truth database MVP.
 - **[AI]** Catat enam tabel bisnis `app` dan enam tabel operasional `ops` pada architecture checklist.
 - **[AI]** Verifikasi model embedding yang dipilih masih tersedia dan mendukung dimensi 1536 sebelum migration vector dibuat.
-- **[BERSAMA]** Finalisasi allowed topic trivia dan JSON contract version 1 sebelum seed.
+- **[BERSAMA]** Konfirmasi allowed topic trivia dari PRD dan finalisasi JSON contract version 1 sebelum seed; slug baru memerlukan versi blueprint baru.
 - **[BERSAMA]** Gunakan task/allocation TTL 20 menit sebagai baseline sementara; perubahan dilakukan setelah hasil UAT.
+- **[BERSAMA]** Gunakan maksimal 3 attempts per generation task sebagai baseline MVP.
 - **[BERSAMA]** Tentukan retention awal untuk idempotency dan audit sebelum production hardening.
 
 ## Deliverable
@@ -399,12 +411,14 @@ Dokumentasi OpenAI menyebut official TypeScript SDK, sementara panduan Edge Func
 - **[AI]** Gunakan `supabase functions new mcp` untuk membuat function.
 - **[AI]** Buat satu tool `health_check` read-only.
 - **[AI]** Tool mengembalikan server version, environment name, dan status `ok`; jangan mengembalikan secret.
+- **[AI]** Tambahkan HTTP `GET /healthz` pada function sebagai liveness endpoint terpisah dari MCP calls; respons hanya status generik dan version, tanpa user/database data.
 - **[AI]** Konfigurasikan Streamable HTTP.
 - **[AI]** Set function agar middleware sendiri menangani auth/discovery pada fase selanjutnya.
 - **[AI]** Pin dependency dalam mekanisme yang didukung Edge Runtime.
 
 ### 2.3 Uji lokal tanpa auth
 
+- **[AI]** Perlakukan mode tanpa auth ini sebagai spike localhost sementara; jangan deploy mode ini ke remote development atau production.
 - **[AI]** Jalankan local Supabase stack.
 - **[AI]** Serve function MCP.
 - **[AI]** Panggil initialize dan `tools/list` melalui HTTP.
@@ -518,7 +532,7 @@ Konvensi yang berlaku pada seluruh tabel:
 
 - **[AI]** Buat schema `app`, `ops`, `api`, dan `private`.
 - **[AI]** Aktifkan pgvector pada schema `extensions` tanpa version pin.
-- **[AI]** Aktifkan `pg_jsonschema` hanya bila tersedia dan diputuskan sebagai validator JSONB.
+- **[AI]** Aktifkan `pg_jsonschema` bila tersedia. Jika tidak, gunakan Zod di Edge Function plus private validation functions/checks di database dengan contract tests yang sama; ketiadaan extension tidak boleh melemahkan validasi.
 - **[AI]** Atur default privileges secara eksplisit dan revoke akses yang tidak diperlukan dari `PUBLIC`.
 - **[AI]** Jangan membuat object custom pada schema milik platform seperti `auth`, `storage`, atau `realtime`.
 - **[AI]** Test bahwa schema dan extension tersedia.
@@ -534,9 +548,11 @@ Konvensi yang berlaku pada seluruh tabel:
 ### 4.3 Migration workspace dan blueprint
 
 - **[AI]** Buat `app.workspaces`.
+- **[AI]** Tambahkan partial unique index agar satu owner hanya memiliki satu workspace `active` pada MVP.
 - **[AI]** Buat `app.content_blueprints`; satu row mewakili satu versi blueprint.
 - **[AI]** Tambahkan unique public ID, slug, `(workspace_id, blueprint_key, version_number)`, dan content hash.
 - **[AI]** Tambahkan partial unique index agar hanya satu versi aktif per blueprint key.
+- **[AI]** Validasi fact count blueprint `min/default/max` berada pada 5–9, default 6, serta bahasa `neutral-international` dengan spelling standard `american`.
 - **[AI]** Terapkan aturan: isi versi membeku setelah aktif, status hanya `draft → active → retired`, dan DELETE ditolak.
 - **[AI]** Test owner, archive state, duplicate version, duplicate content, dan lifecycle blueprint.
 
@@ -545,11 +561,12 @@ Konvensi yang berlaku pada seluruh tabel:
 ### 4.4 Migration Page
 
 - **[AI]** Buat `app.pages`.
-- **[AI]** Simpan markets, topic mix, production defaults, dan overrides pada `config jsonb` tervalidasi.
+- **[AI]** Simpan markets, topic mix, architecture mix, production defaults, dan overrides pada `config jsonb` tervalidasi.
 - **[AI]** Pertahankan niche, content type, status, timezone, blueprint, dan lock version sebagai kolom biasa.
+- **[AI]** Simpan `language_code=en`, BCP 47 `locale_code` (default `en-US`), dan `english_variant=neutral-international` sebagai kolom tervalidasi.
 - **[AI]** Tambahkan composite FK agar workspace Page dan blueprint selalu sama.
 - **[AI]** Tambahkan index workspace/status, workspace/niche/content type, blueprint, dan unique slug/public ID.
-- **[AI]** Test invalid market, topic weight tidak valid, timezone tidak valid, duplicate slug, dan cross-workspace reference.
+- **[AI]** Test invalid market, topic/architecture weight tidak valid, timezone tidak valid, duplicate slug, dan cross-workspace reference.
 
 Tidak ada tabel `page_markets`, `topics`, atau `page_topics` pada MVP.
 
@@ -570,11 +587,13 @@ Sources, verification summary, dan embedding tidak memakai tabel terpisah pada M
 - **[AI]** Buat `ops.generation_tasks`; satu row selalu mewakili satu calon post.
 - **[AI]** Gunakan `batch_id` dan `item_number` untuk mengelompokkan task tanpa parent job table.
 - **[AI]** Tambahkan request JSONB tervalidasi, lease, attempt, sanitized error, dan result post pointer.
-- **[AI]** Buat `ops.fact_allocations` sebagai reservation, consumption, dan hubungan fact–post.
+- **[AI]** Buat `ops.fact_allocations` sebagai allocation reserved/consumed dan hubungan fact–post.
+- **[AI]** Tambahkan `purpose` (`generation`/`revision`) dan `allocation_group_id`; `generation_task_id` nullable untuk revision allocation.
 - **[AI]** Pada migration ini buat `result_post_id` dan `post_id` nullable tanpa FK ke post lebih dulu karena `app.posts` belum tersedia.
 - **[AI]** Tambahkan partial unique `(workspace_id, fact_id)` untuk status `reserved` atau `consumed`.
-- **[AI]** Tambahkan queue, lease, expiry, task, post, dan Page indexes.
-- **[AI]** Test dua transaksi tidak dapat mengklaim task atau mereservasi fact yang sama.
+- **[AI]** Tambahkan queue, lease, expiry, allocation group, task, post, dan Page indexes.
+- **[AI]** Terapkan constraint: generation-reserved memiliki task tanpa post; revision-reserved memiliki post tanpa task; consumed selalu memiliki post.
+- **[AI]** Test dua transaksi tidak dapat mengklaim task atau membuat active allocation untuk fact yang sama.
 - **[AI]** Test transition `reserved → consumed/released/expired` dan larangan kembali ke reserved.
 
 Tidak ada tabel `generation_jobs`, `generation_job_items`, atau `fact_reservations` pada MVP.
@@ -582,12 +601,15 @@ Tidak ada tabel `generation_jobs`, `generation_job_items`, atau `fact_reservatio
 ### 4.7 Migration posts dan versions
 
 - **[AI]** Buat `app.posts` lebih dulu dengan current version pointer nullable.
+- **[AI]** Tambahkan `primary_topic` dan nullable `theme` pada post, validasi topic terhadap allowlist, serta index Page/topic/created time.
+- **[AI]** Tambahkan approved/rejected/scheduled/published/archived metadata beserta lifecycle constraints; rejection reason wajib untuk status rejected.
 - **[AI]** Setelah `app.posts` tersedia, tambahkan composite FK untuk `ops.generation_tasks.result_post_id` dan `ops.fact_allocations.post_id` beserta unique/index yang diperlukan.
 - **[AI]** Buat `ops.post_versions` sebagai snapshot immutable yang berisi content dan quality JSONB tervalidasi.
 - **[AI]** Tambahkan composite FK current version setelah kedua tabel tersedia.
 - **[AI]** Tambahkan unique `(post_id, id)` pada versions sebagai target current pointer.
 - **[AI]** Pastikan current version benar-benar milik post yang sama.
 - **[AI]** Validasi setiap allocation dan fact reference di dalam content terhadap `ops.fact_allocations`.
+- **[AI]** Simpan topic, theme, neutral-international English, dan American spelling pada content snapshot; pastikan header post sama dengan current version.
 - **[AI]** Tambahkan unique post/version, public IDs, Page/status/time indexes, dan immutable guard.
 - **[AI]** Test duplicate version, invalid pointer, invalid allocation, UPDATE/DELETE versi lama, serta lifecycle post.
 
@@ -597,6 +619,7 @@ Tidak ada tabel `post_facts`, `post_version_facts`, atau `post_quality_checks`. 
 
 - **[AI]** Buat `app.calendars` dan `ops.calendar_slots`.
 - **[AI]** Simpan planning rules fleksibel pada JSONB tervalidasi, tetapi dates/status/timezone tetap menjadi kolom.
+- **[AI]** Tambahkan activated/completed/archived timestamps beserta lifecycle constraints.
 - **[AI]** Tambahkan partial unique index untuk Page/day/slot number, Page/publish time, dan active post assignment.
 - **[AI]** Tambahkan composite FK lintas workspace dan Page.
 - **[AI]** Test duplicate slot, duplicate post assignment, invalid Page, DST, dan dua insert paralel.
@@ -665,11 +688,12 @@ Seluruh function dibuat melalui versioned migration setelah tabel dasarnya stabi
 - **[AI]** Canonicalize request dan validasi request hash.
 - **[AI]** Implementasikan complete/fail response yang aman untuk replay.
 - **[AI]** Jangan menyimpan token, secret, full vector, atau raw stack pada response payload.
-- **[AI]** Test retry payload sama, in-progress response, failed retry policy, dan payload berbeda dengan key sama.
+- **[AI]** Test replay completed, in-progress response, replay failed yang mengembalikan stable error tanpa re-execution, serta payload berbeda dengan key sama.
 
 ### 5.2 Workspace dan Page functions
 
 - **[AI]** Implementasikan `api.get_workspace`, `api.list_pages`, dan `api.get_page_context`.
+- **[AI]** `api.get_workspace` mengembalikan tepat satu active workspace; nol menghasilkan `WORKSPACE_NOT_FOUND` dan lebih dari satu dianggap invariant violation.
 - **[AI]** Pastikan `get_page_context` menggabungkan Page, active blueprint, bounded fact inventory, recent topic usage, dan calendar summary dalam satu call.
 - **[AI]** Implementasikan `api.create_page` dan `api.update_page` secara idempotent.
 - **[AI]** Validasi config JSON, blueprint, niche/content type, ownership, dan `expected_lock_version`.
@@ -689,7 +713,7 @@ Seluruh function dibuat melalui versioned migration setelah tabel dasarnya stabi
 - **[AI]** Implementasikan `api.create_generation_batch`.
 - **[AI]** Buat N row `ops.generation_tasks` dengan satu `batch_id` dan item number unik.
 - **[AI]** Validasi Page active, blueprint active, request JSON, jumlah post, dan estimated fact inventory.
-- **[AI]** Jangan mereservasi seluruh fakta batch pada tahap ini.
+- **[AI]** Jangan membuat allocations untuk seluruh batch pada tahap ini.
 - **[AI]** Return batch ID dan task summary tanpa internal bigint.
 - **[AI]** Test idempotent retry dan dua batch paralel.
 
@@ -697,22 +721,27 @@ Seluruh function dibuat melalui versioned migration setelah tabel dasarnya stabi
 
 - **[AI]** Implementasikan `api.prepare_next_post` sebagai satu transaksi singkat.
 - **[AI]** Claim satu pending task memakai `FOR UPDATE SKIP LOCKED`.
-- **[AI]** Set lease owner, expiry, attempt, dan task status.
+- **[AI]** Set lease owner, expiry, attempt, dan status task langsung ke `facts_reserved` dalam transaksi yang sama dengan allocation.
 - **[AI]** Pilih verified facts yang available, lock berdasarkan urutan fact ID, lalu insert reserved allocations.
+- **[AI]** Buat satu `allocation_group_id`, set purpose `generation`, dan kaitkan seluruh allocations dengan task yang diklaim.
 - **[AI]** Gunakan partial unique allocation sebagai perlindungan terakhir.
 - **[AI]** Terapkan all-or-nothing bila jumlah fakta tidak cukup.
 - **[AI]** Gunakan TTL awal 20 menit dan kalibrasi melalui UAT.
-- **[AI]** Return generation packet ringkas: task, Page, blueprint, facts, allocation public IDs, output contract, dan lease.
+- **[AI]** Return generation packet ringkas: task, Page, blueprint, facts, allocation group/public IDs, output contract, dan lease.
 - **[AI]** Jangan memanggil embedding atau layanan eksternal selama transaksi/lock terbuka.
 - **[AI]** Test minimal 10 transaksi paralel, insufficient inventory, rollback, dan lease expiry.
 
-Tidak ada call claim terpisah. Penggabungan claim dan reservation mengurangi round trip serta menghilangkan keadaan task claimed tanpa facts akibat client terputus di antara dua tool call.
+Tidak ada call claim terpisah. Penggabungan claim dan allocation mengurangi round trip serta menghilangkan keadaan task ber-lease tanpa facts akibat client terputus di antara dua tool call.
+
+- **[AI]** Implementasikan `api.release_generation_task` secara idempotent: target `retry` mengembalikan task ke pending bila attempt < 3 atau failed bila batas tercapai; target `cancel` memindahkan ke cancelled. Consumed allocation tidak boleh dilepas.
+- **[AI]** Implementasikan read-only `api.validate_post_draft` untuk pengecekan lease/allocation/fact/blueprint dan aturan deterministik yang memerlukan database.
 
 ### 5.6 Finalize post
 
 - **[AI]** Implementasikan `api.finalize_post` sebagai satu transaksi atomik dan idempotent.
 - **[AI]** Validasi caller, task lease, Page/blueprint, allocation ownership/status/expiry, content JSON, quality JSON, dan request hash.
 - **[AI]** Insert `app.posts` tanpa current pointer, lalu insert immutable `ops.post_versions` versi 1.
+- **[AI]** Simpan `primary_topic` dan `theme` pada post serta snapshot content dalam transaksi yang sama.
 - **[AI]** Set current version pointer dan current version number.
 - **[AI]** Ubah allocations menjadi consumed dan tautkan ke post.
 - **[AI]** Set generation task completed dan `result_post_id`.
@@ -722,27 +751,36 @@ Tidak ada call claim terpisah. Penggabungan claim dan reservation mengurangi rou
 
 ### 5.7 Post revision dan approval
 
+- **[AI]** Implementasikan `api.prepare_post_revision` untuk membuat allocation purpose `revision` yang ditautkan ke post dan satu allocation group.
+- **[AI]** Implementasikan `api.release_post_revision` untuk melepas hanya reserved allocation pada revision group yang dibatalkan.
 - **[AI]** Implementasikan `api.revise_post` menggunakan `expected_lock_version`.
 - **[AI]** Insert version baru; jangan update versi lama.
-- **[AI]** Bila facts diganti, reserve/consume allocation baru dan pertahankan allocation lama sebagai consumed history.
+- **[AI]** Bila facts diganti, buat/consume allocation baru dan pertahankan allocation lama sebagai consumed history.
 - **[AI]** Validasi content allocation references sebelum menyimpan snapshot.
 - **[AI]** Update current version pointer dan lock version secara atomik.
+- **[AI]** Update header `primary_topic`/`theme` agar sama dengan current version.
 - **[AI]** Kembalikan post substantif dari approved ke `needs_review`.
 - **[AI]** Implementasikan `api.approve_post` hanya untuk current version yang lulus QA.
+- **[AI]** Implementasikan `api.reject_post` dengan reason dan optimistic lock; consumed allocations tetap immutable.
+- **[AI]** Implementasikan `api.mark_post_published` untuk mengubah post dan ready slot menjadi published secara atomik.
+- **[AI]** Implementasikan `api.archive_post` tanpa menghapus version atau allocation history.
 - **[AI]** Test dua revisi paralel; hanya satu boleh berhasil.
 
 ### 5.8 Calendar functions
 
+- **[AI]** Implementasikan read-only `api.preview_calendar_plan` untuk bounded conflict/inventory context tanpa write.
 - **[AI]** Implementasikan `api.create_calendar` beserta slots secara atomik dan idempotent.
-- **[AI]** Implementasikan `api.assign_post_to_slot`, unassign bila diizinkan policy, `api.get_calendar`, dan `api.reschedule_slot`.
+- **[AI]** Implementasikan `api.assign_post_to_slot`, `api.unassign_post_from_slot`, `api.get_calendar`, `api.reschedule_calendar_slot`, `api.activate_calendar`, dan `api.archive_calendar`.
+- **[AI]** Assign harus mengubah post approved menjadi scheduled secara atomik; unassign ready slot sebelum publish mengembalikannya ke approved.
 - **[AI]** Gunakan optimistic lock untuk perubahan slot.
 - **[AI]** Biarkan partial unique indexes menjadi pengaman terakhir untuk collision.
 - **[AI]** Test duplicate slot, duplicate post assignment, DST, stale version, dan retry.
+- **[AI]** Test draft activation, automatic completion, dan archive dengan/ tanpa pembatalan future slots.
 
 ### 5.9 Maintenance functions dan Cron contract
 
 - **[AI]** Implementasikan expiry untuk reserved allocations.
-- **[AI]** Implementasikan recovery generation task lease dengan bounded attempt policy.
+- **[AI]** Implementasikan recovery generation task lease dengan maksimum 3 attempts.
 - **[AI]** Implementasikan idempotency cleanup tanpa menghapus resource/audit.
 - **[AI]** Implementasikan bounded scan untuk facts yang perlu revalidation.
 - **[AI]** Pastikan setiap query bounded, memakai index, dan tidak memanggil AI.
@@ -886,6 +924,7 @@ Membuktikan bahwa OAuth discovery, token validation, dan RLS bekerja dari MCP cl
 - **[AI]** Pasang user-scoped Supabase middleware.
 - **[AI]** Pastikan discovery endpoint dapat diakses sebelum auth gate.
 - **[AI]** Pastikan request tool tanpa token menghasilkan `401` dan `WWW-Authenticate` yang benar.
+- **[AI]** Biarkan HTTP `/healthz` tanpa OAuth, tetapi pastikan endpoint tersebut tidak memanggil RLS/user query atau menampilkan dependency detail sensitif.
 - **[AI]** Pastikan token divalidasi issuer, expiry, signature, dan audience sesuai current library.
 
 ### 7.2 Perbarui `health_check`
@@ -1094,18 +1133,19 @@ Mengatur beberapa chat agar dapat memproduksi post bersamaan tanpa memakai gener
 - **[AI]** Validasi Page dan blueprint active.
 - **[AI]** Validasi fact inventory cukup secara estimasi.
 - **[AI]** Buat N row `ops.generation_tasks` dengan satu `batch_id` dan item number berurutan.
-- **[AI]** Jangan mereservasi semua fakta batch sekaligus.
+- **[AI]** Jangan membuat allocations untuk semua task batch sekaligus.
 - **[AI]** Return batch ID, task count, status summary, dan instruksi untuk memproses task.
 
 ## 10.2 `prepare_next_post`
 
 - **[AI]** Write dan idempotent karena mengubah task serta membuat allocations.
 - **[AI]** Dapat menerima batch ID atau memilih pending task pada Page tertentu.
-- **[AI]** Memanggil satu database function yang menggabungkan claim task dan fact reservation.
+- **[AI]** Memanggil satu database function yang menggabungkan claim task dan fact allocation.
 - **[AI]** Mengambil 5–9 facts sesuai blueprint, task request, dan topic mix.
 - **[AI]** Menghindari topic repetition berdasarkan recent posts.
 - **[AI]** Return generation packet:
   - task public ID dan batch ID;
+  - allocation group ID;
   - lease expiry;
   - Page context ringkas;
   - blueprint rules dan content hash;
@@ -1118,12 +1158,13 @@ Mengatur beberapa chat agar dapat memproduksi post bersamaan tanpa memakai gener
   - quality requirements.
 - **[AI]** Jangan return internal bigint IDs, full vectors, atau irrelevant audit history.
 - **[AI]** Tool dapat dipanggil berulang sampai batch tidak memiliki pending task.
+- **[AI]** Task tetap berstatus `facts_reserved` selama ChatGPT menulis dan menjalankan QA; tidak ada status antara atau write call tambahan.
 
 ## 10.3 `release_generation_task`
 
 - **[AI]** Write tetapi reversible selama allocations belum consumed.
 - **[AI]** Hanya melepas reserved allocations milik task dan lease caller tersebut.
-- **[AI]** Memerlukan reason dan target action: kembali `pending` atau `cancelled` sesuai policy.
+- **[AI]** Memerlukan reason dan target action `retry` atau `cancel`; retry menjadi pending bila attempt < 3 atau failed bila batas tercapai, sedangkan cancel menjadi cancelled.
 - **[AI]** Idempotent.
 - **[AI]** Tidak dapat melepas consumed allocation.
 
@@ -1131,6 +1172,7 @@ Mengatur beberapa chat agar dapat memproduksi post bersamaan tanpa memakai gener
 
 - **[AI]** Read-only.
 - **[AI]** Hitung summary langsung dari row generation tasks berdasarkan batch ID.
+- **[AI]** Terapkan precedence derived status persis seperti PRD: all pending; any pending/`facts_reserved` after start; all completed; completed mixed terminal failure/cancel; all cancelled; lalu terminal failed.
 - **[AI]** Return counts per status, failed task yang disanitasi, conflicts, dan next action.
 - **[AI]** Tidak menampilkan raw error stack atau internal IDs.
 
@@ -1165,6 +1207,11 @@ Menerima draft dari ChatGPT, memvalidasinya, menyimpan post, dan mengembalikan h
 Draft input memiliki struktur minimum:
 
 ```text
+topic
+theme
+language
+english_variant
+spelling_standard
 hook
 facts[]: { allocation_public_id, fact_public_id, rendered_text, source_note }
 cta
@@ -1177,9 +1224,12 @@ duration_seconds
 ```
 
 - **[AI]** Buat Zod schema ketat.
+- **[AI]** Batasi `architecture` pada `themed`, `single_subject`, atau `mixed`.
 - **[AI]** Batasi panjang tiap field.
-- **[AI]** Batasi jumlah hashtags.
+- **[AI]** Terapkan batas blueprint: hook 90 karakter, CTA 100 karakter, caption 500 karakter, dan 0–5 hashtags dengan default 3 bila relevan.
 - **[AI]** Pastikan setiap rendered fact menunjuk allocation dan fact public ID yang diberikan pada generation packet.
+- **[AI]** Wajibkan topic dari allowlist, optional theme yang ringkas, `language=en`, `english_variant=neutral-international`, dan `spelling_standard=american`.
+- **[AI]** Untuk architecture `mixed`, wajibkan topic `general_trivia` dan izinkan theme null.
 - **[AI]** Tolak field tambahan yang berisiko bila tidak diperlukan.
 
 ## 11.2 Deterministic quality engine
@@ -1215,6 +1265,7 @@ duration_seconds
 ## 11.4 `validate_post_draft`
 
 - **[AI]** Read-only terhadap permanent state; tidak mengonsumsi allocations.
+- **[AI]** Gunakan `api.validate_post_draft` untuk state database dan quality engine Edge Function untuk schema/language/content checks.
 - **[AI]** Return pass/fail/warnings dan normalized preview.
 - **[AI]** Dapat dipanggil beberapa kali selama allocation dan task lease masih aktif.
 
@@ -1224,7 +1275,8 @@ duration_seconds
 - **[AI]** Menjalankan validation lagi di server; jangan percaya hasil tool validate sebelumnya.
 - **[AI]** Memanggil database finalization function.
 - **[AI]** Menyimpan content dan quality snapshot pada immutable `ops.post_versions`.
-- **[AI]** Return post public ID, version public ID, version number, lock version, status, dan copy package.
+- **[AI]** Menyimpan topic/theme pada header `app.posts` dan memastikan nilainya sama dengan snapshot current version.
+- **[AI]** Return post public ID, version public ID, version number, lock version, status, copy package, source notes, dan quality result.
 - **[AI]** Gunakan status awal `needs_review`.
 - **[AI]** Jika retry, return post yang sama.
 
@@ -1299,14 +1351,25 @@ Memungkinkan perbaikan naskah tanpa menghilangkan riwayat atau menimpa revisi da
 
 ### 12.4 Revisi fakta
 
-- **[AI]** Implementasikan `prepare_post_revision` untuk mencari dan mereservasi replacement facts.
-- **[AI]** Return allocation public IDs baru dan bounded revision packet.
+- **[AI]** Implementasikan `prepare_post_revision` untuk mencari replacement facts dan membuat reserved allocations.
+- **[AI]** Buat purpose `revision` dengan `post_id`, satu `allocation_group_id`, dan tanpa generation task.
+- **[AI]** Return allocation group/public IDs baru dan bounded revision packet.
 - **[AI]** Jangan melepaskan consumed allocations lama; fakta lama tetap tidak reusable.
 - **[AI]** Finalisasi replacement melalui `revise_post` dengan validasi allocation.
 - **[AI]** Snapshot version baru menentukan fakta current; source of truth penggunaan tetap seluruh consumed allocations.
-- **[AI]** Release replacement allocations bila revisi dibatalkan sebelum finalisasi.
+- **[AI]** Implementasikan `release_post_revision` yang idempotent untuk melepas satu revision group bila revisi dibatalkan sebelum finalisasi.
 
-### 12.5 Conflict tests
+### 12.5 Reject, published, dan archive lifecycle
+
+- **[AI]** Implementasikan `reject_post` untuk draft/needs_review/approved; scheduled post harus di-unassign lebih dahulu dan consumed facts tidak dilepas.
+- **[AI]** Implementasikan `mark_post_published` dengan `expected_lock_version`, `published_at`, dan optional external reference.
+- **[AI]** Jika post mempunyai ready slot, calendar harus `active`; calendar draft tidak dapat langsung menjadi completed.
+- **[AI]** Jika post berada pada slot aktif, ubah post dan slot menjadi `published` dalam satu transaksi.
+- **[AI]** Setelah publish slot, ubah calendar menjadi `completed` bila seluruh slot non-cancelled sudah published dan minimal satu slot published.
+- **[AI]** Implementasikan `archive_post` dengan optimistic lock dan transition validation; scheduled post harus membatalkan/melepaskan active slot secara atomik lalu menghitung ulang completion calendar.
+- **[AI]** Archive tidak menghapus post versions, allocations, slot history, atau audit events.
+
+### 12.6 Conflict tests
 
 - **[AI]** Dua client membaca lock version sama.
 - **[AI]** Client A revise berhasil.
@@ -1319,7 +1382,10 @@ Memungkinkan perbaikan naskah tanpa menghilangkan riwayat atau menimpa revisi da
 - [ ] Revision history dapat dibaca.
 - [ ] Lost update tidak terjadi.
 - [ ] Fact replacement tidak membuat fakta lama reusable.
+- [ ] Revision allocation yang dibatalkan dapat dilepas tanpa menyentuh consumed history.
 - [ ] Status approval reset bila diperlukan.
+- [ ] Reject tidak melepas consumed facts dan menolak stale lock version.
+- [ ] Mark published dan archive mengikuti transition serta optimistic lock.
 
 ---
 
@@ -1345,10 +1411,12 @@ Input:
 
 - **[AI]** Buat schema dan limits; misalnya maksimal 90 hari per request pada MVP.
 - **[AI]** Validasi timezone IANA.
+- **[AI]** `create_calendar` hanya menyimpan calendar/slots. Jika user memilih generate missing posts, ChatGPT mengorkestrasi `create_generation_batch` dan assignment sebagai call terpisah; database function kalender tidak menjalankan text generation.
 
 ### 13.2 `preview_calendar_plan`
 
 - **[AI]** Read-only.
+- **[AI]** Gunakan `api.preview_calendar_plan` untuk membaca conflict/inventory context melalui schema `api`.
 - **[AI]** Menghitung slot tanpa menyimpan.
 - **[AI]** Menunjukkan topic mix dan inventory requirements.
 - **[AI]** Menunjukkan conflict dengan calendar aktif.
@@ -1357,6 +1425,7 @@ Input:
 
 - **[AI]** Write dan idempotent.
 - **[AI]** Membuat header dan slots dalam transaction.
+- **[AI]** Status awal calendar selalu `draft` dan slot awal `planned`.
 - **[AI]** Unique indexes menjadi pengaman terakhir.
 - **[AI]** Return conflict detail dan alternatif bila ada.
 
@@ -1364,22 +1433,43 @@ Input:
 
 - **[AI]** Write dengan expected slot lock version.
 - **[AI]** Validasi Page post sama dengan Page slot.
-- **[AI]** Validasi post approved/ready sesuai policy.
+- **[AI]** Saat assign, sinkronkan slot topic dengan `post.primary_topic` dan tolak mismatch.
+- **[AI]** Validasi post berstatus `approved`.
+- **[AI]** Update slot dan post menjadi ready/scheduled dalam satu transaksi.
 - **[AI]** Satu post hanya di satu active slot.
 
-### 13.5 `get_calendar`
+### 13.5 `unassign_post_from_slot`
+
+- **[AI]** Write dengan expected slot dan post lock versions.
+- **[AI]** Hanya ready slot yang belum published dapat dilepas.
+- **[AI]** Ubah slot menjadi planned dan post menjadi approved secara atomik.
+
+### 13.6 `get_calendar`
 
 - **[AI]** Read-only.
 - **[AI]** Return local date/time, UTC timestamp, Page, topic, post, dan status.
 - **[AI]** Bounded date range.
 
-### 13.6 `reschedule_calendar_slot`
+### 13.7 `reschedule_calendar_slot`
 
 - **[AI]** Write dengan optimistic lock.
 - **[AI]** Validasi conflict sebelum update.
 - **[AI]** Menulis audit event.
 
-### 13.7 Parallel calendar test
+### 13.8 `activate_calendar`
+
+- **[AI]** Write, idempotent, dan memakai expected calendar lock version.
+- **[AI]** Hanya menerima calendar `draft` dengan minimal satu slot valid dan tanpa collision.
+- **[AI]** Mengubah calendar menjadi `active` serta menulis audit event.
+
+### 13.9 `archive_calendar`
+
+- **[AI]** Write dengan expected lock version.
+- **[AI]** Jika terdapat planned/ready slots, wajibkan flag pembatalan eksplisit.
+- **[AI]** Batalkan slots dan kembalikan scheduled posts terkait menjadi approved secara atomik sebelum archive.
+- **[AI]** Jangan menghapus calendar atau slot history.
+
+### 13.10 Parallel calendar test
 
 - **[AI]** Dua clients mencoba membuat kalender identik.
 - **[AI]** Satu berhasil; satu mendapat conflict/idempotent response.
@@ -1394,6 +1484,7 @@ Input:
 - [ ] UTC dan local time konsisten.
 - [ ] Parallel tests lulus.
 - [ ] Calendar output mudah dibaca user.
+- [ ] Lifecycle draft/active/completed/archived lulus pengujian.
 
 ---
 
@@ -1437,22 +1528,29 @@ Tool MVP yang direkomendasikan:
 17. `get_post`
 18. `list_posts`
 19. `prepare_post_revision`
-20. `revise_post`
-21. `approve_post`
+20. `release_post_revision`
+21. `revise_post`
+22. `approve_post`
+23. `reject_post`
+24. `mark_post_published`
+25. `archive_post`
 
 ### Calendar
 
-22. `preview_calendar_plan`
-23. `create_calendar`
-24. `assign_post_to_slot`
-25. `get_calendar`
-26. `reschedule_calendar_slot`
+26. `preview_calendar_plan`
+27. `create_calendar`
+28. `assign_post_to_slot`
+29. `unassign_post_from_slot`
+30. `get_calendar`
+31. `reschedule_calendar_slot`
+32. `activate_calendar`
+33. `archive_calendar`
 
 ### Internal smoke
 
-27. `health_check`
+34. `health_check`
 
-Jika jumlah tool membuat selection memburuk pada eval, gabungkan hanya operasi yang benar-benar satu domain dan tetap memiliki mode yang sempit. Jangan membuat satu tool serbaguna dengan puluhan aksi.
+Inventaris baseline MVP adalah 34 tool. Jika eval membuktikan selection memburuk, perubahan nama atau penggabungan tool hanya boleh dilakukan melalui keputusan eksplisit yang sekaligus memperbarui PRD, database function mapping, implementation plan, dan contract tests. Jangan menggabungkan tool secara ad hoc atau membuat satu tool serbaguna dengan puluhan aksi.
 
 ## 14.2 Tool metadata
 
@@ -1491,7 +1589,7 @@ Server instructions harus singkat pada bagian awal dan mencakup urutan penting:
 
 ## 14.4 Error behavior
 
-- **[AI]** Mapping database errors ke stable error codes.
+- **[AI]** Mapping database errors hanya ke canonical stable error codes pada `database-design.md` bagian 28; jangan membuat alias seperti `STALE_VERSION` atau `DUPLICATE_FACT`.
 - **[AI]** Sertakan `retryable: true/false`.
 - **[AI]** Sertakan next action yang aman.
 - **[AI]** Jangan mengembalikan SQL, stack trace, token, atau internal IDs.
@@ -2013,7 +2111,7 @@ Mengaktifkan sistem production secara terkontrol.
 - **[MANUAL]** Buat/konfirmasi owner user.
 - **[MANUAL]** Disable public signup untuk private MVP.
 - **[MANUAL]** Aktifkan OAuth 2.1 server.
-- **[MANUAL]** Aktifkan DCR.
+- **[MANUAL]** Aktifkan DCR jika verifikasi dokumentasi fase 6 masih menetapkannya sebagai alur yang didukung end-to-end.
 - **[MANUAL]** Set production authorization path dan Site URL.
 - **[MANUAL]** Konfirmasi asymmetric JWT signing key.
 - **[AI]** Deploy auth web production.
@@ -2214,7 +2312,7 @@ Berikut seluruh tindakan yang pada akhirnya membutuhkan Anda:
 - [ ] Menyimpan credential di password/secret manager.
 - [ ] Login Supabase CLI/browser ketika diperlukan.
 - [ ] Membuat owner user di dev dan prod.
-- [ ] Mengaktifkan OAuth 2.1 server dan DCR bila perlu melalui dashboard.
+- [ ] Mengaktifkan OAuth 2.1 server dan DCR sesuai hasil verifikasi dokumentasi fase 6.
 - [ ] Mengonfirmasi asymmetric JWT signing key.
 - [ ] Menetapkan Auth Site URL dan redirect URLs.
 - [ ] Memasukkan secrets ke hosting/GitHub/Supabase dashboard.

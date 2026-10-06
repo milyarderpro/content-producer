@@ -6,9 +6,9 @@
 |---|---|
 | Nama produk | Content Producer |
 | Versi produk | MVP |
-| Versi dokumen | 1.0 |
-| Status | Draf untuk ditinjau dan disetujui |
-| Tanggal | 5 Oktober 2026 |
+| Versi dokumen | 1.1 |
+| Status | Draf diselaraskan — menunggu persetujuan |
+| Tanggal | 6 Oktober 2026 |
 | Bahasa dokumen | Bahasa Indonesia |
 | Bahasa konten yang dihasilkan | Bahasa Inggris |
 | Platform utama | Plugin pribadi ChatGPT dengan custom MCP server |
@@ -21,6 +21,16 @@ Dokumen ini belum membahas bentuk tabel database secara terperinci atau urutan p
 
 - `plans/database-design.md`
 - `plans/implementation-plan.md`
+
+### 1.1 Batas kewenangan dokumen
+
+Agar implementasi tidak menafsirkan aturan yang sama secara berbeda:
+
+- `PRDid.md` menjadi sumber utama untuk ruang lingkup produk, perilaku pengguna, aturan konten, dan acceptance criteria.
+- `database-design.md` menjadi sumber utama untuk nama tabel, kolom, status, constraint, transaksi, dan tanggung jawab database function.
+- `implementation-plan.md` menjadi sumber utama untuk urutan pengerjaan, struktur repository, nama MCP tool final, deployment, dan pengujian.
+- Semua ID yang keluar melalui MCP atau ditampilkan kepada pengguna adalah UUID `public_id`. Primary key `bigint` internal tidak pernah diekspos.
+- Jika ketiga dokumen berbeda, implementasi harus dihentikan pada bagian tersebut dan ketiga dokumen diperbarui bersama. Tim tidak boleh memilih interpretasi sendiri.
 
 ## 2. Ringkasan produk
 
@@ -178,6 +188,8 @@ Fitur-fitur tersebut dapat dipertimbangkan setelah MVP terbukti stabil.
 | Repository | Private GitHub repository |
 | Cara pengembangan | Coding lokal, deploy development, lalu production |
 
+Label audiens “UK” digunakan dalam percakapan pengguna, sedangkan kode market yang disimpan adalah `GB`. Sistem wajib memetakan keduanya dan tidak boleh memperlakukan UK/GB sebagai dua market berbeda.
+
 ## 9. Pengguna utama
 
 Pengguna MVP adalah satu pemilik sekaligus pengelola beberapa Facebook Page.
@@ -205,10 +217,11 @@ Sistem harus menyembunyikan kerumitan teknis dalam penggunaan sehari-hari. Pengg
 | Fact cluster | Kelompok makna untuk mengenali fakta yang sama walaupun kalimatnya berbeda. |
 | Candidate fact | Fakta yang baru ditemukan dan belum lolos verifikasi. |
 | Verified fact | Fakta yang sudah diperiksa dan memiliki sumber yang layak. |
-| Reservation | Penguncian sementara suatu fakta untuk satu proses pembuatan post. |
+| Fact allocation | Catatan penguncian sementara (`reserved`) atau penggunaan permanen (`consumed`) suatu fakta. |
 | Consumed fact | Fakta yang sudah dipakai dalam post tersimpan dan tidak boleh digunakan lagi. |
 | Post package | Seluruh output post yang siap digunakan, termasuk Canva copy dan caption. |
-| Generation job | Catatan proses pembuatan satu atau beberapa post. |
+| Generation batch | Sekelompok generation task dengan satu `batch_id`; tidak mempunyai parent row tersendiri. |
+| Generation task | Satu row proses untuk menghasilkan tepat satu calon post. |
 | Calendar slot | Posisi jadwal untuk satu post pada tanggal dan waktu tertentu. |
 | Lock version | Nomor versi yang digunakan untuk mencegah dua chat saling menimpa perubahan. |
 | Idempotency key | ID unik agar pengulangan request tidak membuat data ganda. |
@@ -218,7 +231,7 @@ Sistem harus menyembunyikan kerumitan teknis dalam penggunaan sehari-hari. Pengg
 ### 11.1 Fitur yang wajib tersedia
 
 - Login dan autentikasi pemilik.
-- Satu workspace utama.
+- Satu workspace aktif untuk pemilik pada MVP. Schema tetap memungkinkan lebih dari satu workspace pada pengembangan berikutnya.
 - Beberapa profil Facebook Page.
 - Pengaturan konten untuk setiap Page.
 - Blueprint konten yang memiliki versi.
@@ -229,12 +242,12 @@ Sistem harus menyembunyikan kerumitan teknis dalam penggunaan sehari-hari. Pengg
 - Pembuatan satu post.
 - Pembuatan beberapa post sekaligus.
 - Pembuatan kalender konten.
-- Revisi dan persetujuan post.
+- Revisi, persetujuan, penolakan, dan lifecycle post.
 - Output siap salin ke Canva.
 - Dukungan beberapa chat secara paralel.
 - Idempotency untuk setiap tindakan yang menulis data.
 - Riwayat versi post.
-- Status job dan error yang jelas.
+- Status task, ringkasan batch, dan error yang jelas.
 - Audit log untuk tindakan penting.
 - Environment local, development, dan production.
 - Endpoint MCP di `/mcp` menggunakan Streamable HTTP.
@@ -262,15 +275,15 @@ Sistem harus menyembunyikan kerumitan teknis dalam penggunaan sehari-hari. Pengg
 2. Sistem meminta informasi yang belum tersedia, seperti nama Page, target negara, zona waktu, topik, dan jumlah post.
 3. Sistem menampilkan ringkasan pengaturan.
 4. Pengguna menyetujui pengaturan.
-5. Sistem menyimpan Page dan mengembalikan `page_id`.
+5. Sistem menyimpan Page dan mengembalikan `page_public_id`.
 
 ### 12.2 Membuat satu post
 
 1. Pengguna memilih Page.
 2. Pengguna dapat menentukan topik atau membiarkan sistem memilih.
-3. Sistem membuat generation job dengan idempotency key.
+3. Sistem membuat satu generation batch berisi satu task dengan idempotency key.
 4. Sistem mencari verified facts yang belum pernah dipakai.
-5. Fakta dikunci melalui reservation dalam satu database transaction.
+5. Fakta dikunci melalui fact allocation dalam satu database transaction.
 6. Naskah dibuat menggunakan blueprint aktif.
 7. Sistem memeriksa kualitas, keamanan, bahasa, panjang teks, dan kesesuaian fakta.
 8. Jika pemeriksaan gagal, sistem mencoba memperbaiki dalam batas yang sudah ditentukan.
@@ -282,8 +295,8 @@ Sistem harus menyembunyikan kerumitan teknis dalam penggunaan sehari-hari. Pengg
 
 1. Pengguna menentukan Page dan jumlah post.
 2. Pengguna dapat menentukan pembagian topik atau rentang tanggal.
-3. Sistem membuat satu parent job dengan beberapa item.
-4. Sistem mengunci fakta yang berbeda untuk setiap item.
+3. Sistem membuat beberapa generation task dengan satu `batch_id`; tidak ada parent job table.
+4. Setiap chat mengklaim satu task dan mengunci fakta yang berbeda untuk task tersebut.
 5. Setiap post dibuat dan diperiksa secara terpisah.
 6. Post yang berhasil tetap disimpan walaupun item lain gagal.
 7. Fakta dari item yang gagal dilepaskan kembali.
@@ -300,17 +313,20 @@ Sistem harus menyembunyikan kerumitan teknis dalam penggunaan sehari-hari. Pengg
 7. Sistem memeriksa keseimbangan topik, CTA, dan jenis post.
 8. Kalender disimpan sebagai draf.
 9. Pengguna dapat meninjau, memindahkan, atau menyetujui post.
-10. Sistem tidak memublikasikan kalender tersebut ke Facebook.
+10. Pengguna mengaktifkan kalender setelah susunan siap.
+11. Sistem tidak memublikasikan kalender tersebut ke Facebook.
 
 ### 12.5 Merevisi post
 
-1. Pengguna menyebutkan `post_id` atau memilih post dari daftar.
+1. Pengguna menyebutkan `post_public_id` atau memilih post dari daftar.
 2. Sistem mengambil versi terbaru.
 3. Sistem menerapkan perubahan yang diminta.
 4. Sistem tidak boleh mengubah arti fakta secara diam-diam.
-5. Sistem membuat versi baru, bukan menimpa versi lama.
-6. `lock_version` bertambah.
-7. Jika chat menggunakan versi lama, perubahan ditolak dan chat diminta memuat versi terbaru.
+5. Jika fakta diganti, sistem lebih dahulu membuat revision allocation group yang terkait dengan post; consumed facts lama tetap tidak dapat dipakai ulang.
+6. Jika revisi fakta dibatalkan, reserved replacement allocations dilepas secara idempotent.
+7. Sistem membuat versi baru, bukan menimpa versi lama.
+8. `lock_version` bertambah.
+9. Jika chat menggunakan versi lama, perubahan ditolak dan chat diminta memuat versi terbaru.
 
 ### 12.6 Bekerja dari beberapa chat
 
@@ -323,15 +339,17 @@ Contoh pembagian:
 - Chat C meninjau dan merevisi draf.
 - Chat D membuat batch untuk minggu berikutnya.
 
-Setiap operasi harus membawa identitas workspace, Page, job, atau post yang jelas. Sistem tidak boleh hanya bergantung pada ingatan percakapan.
+Setiap operasi harus membawa `public_id` workspace, Page, task/batch, atau post yang jelas. Sistem tidak boleh hanya bergantung pada ingatan percakapan.
 
 ## 13. DNA konten
 
 ### 13.1 Jenis susunan konten
 
-MVP mendukung tiga bentuk utama.
+MVP mendukung tiga bentuk utama. Nilai machine-readable yang dipakai di database dan tool adalah `themed`, `single_subject`, dan `mixed`.
 
 #### Themed trivia
+
+Nilai `architecture`: `themed`.
 
 Beberapa fakta yang berbeda tetapi masih berada dalam satu tema.
 
@@ -344,6 +362,8 @@ Contoh:
 
 #### Single-subject trivia
 
+Nilai `architecture`: `single_subject`.
+
 Beberapa fakta mengenai satu objek, hewan, negara, makanan, organ, atau tokoh.
 
 Contoh:
@@ -355,9 +375,13 @@ Contoh:
 
 #### Mixed trivia
 
+Nilai `architecture`: `mixed`.
+
 Beberapa fakta kuat dari topik yang berbeda dalam satu post.
 
 Mixed trivia digunakan lebih sedikit agar Page tidak terasa acak terus-menerus.
+
+Untuk architecture `mixed`, `primary_topic` disimpan sebagai `general_trivia` dan `theme` boleh null. Untuk `themed` atau `single_subject`, `primary_topic` mengikuti topic dominan dan `theme` diisi bila ada tema/subjek spesifik.
 
 Pembagian awal yang disarankan:
 
@@ -373,8 +397,8 @@ Persentase dapat diubah untuk masing-masing Page.
 
 - Jumlah normal: 6–8 fakta.
 - Default untuk satu kartu Canva: 6 fakta.
-- Batas normal: 5–9 fakta.
-- Lebih dari 9 fakta hanya dibuat jika pengguna memintanya secara khusus.
+- Batas MVP: 5–9 fakta.
+- Permintaan lebih dari 9 fakta ditolak dengan penjelasan bahwa blueprint MVP belum mendukungnya. Dukungan tersebut memerlukan versi blueprint atau perluasan scope baru.
 - Setiap fakta sebaiknya menyampaikan satu klaim utama.
 - Panjang satu fakta biasanya tidak lebih dari 18 kata.
 - Total teks Canva biasanya sekitar 65–120 kata, termasuk hook dan CTA.
@@ -399,6 +423,8 @@ Here are 6 facts you probably never learned.
 
 Hook harus singkat, jujur, dan sesuai dengan isi. Hook tidak boleh menjanjikan sesuatu yang tidak diberikan oleh post.
 
+Batas hook MVP adalah 90 karakter.
+
 ### 13.4 Ciri fakta yang diprioritaskan
 
 Fakta yang baik biasanya memiliki satu atau beberapa unsur berikut:
@@ -417,29 +443,31 @@ Setiap fakta harus menarik karena isinya, bukan karena menggunakan bahasa yang b
 
 ### 13.5 Topik utama
 
-Topik awal MVP:
+Topic allowlist awal MVP berikut menjadi nilai machine-readable pada fakta, post, task, dan kalender:
 
-- Hewan dan perilaku hewan.
-- Makanan dan food science.
-- Tubuh manusia dan anatomi yang aman.
-- Alam dan sains.
-- Geografi, negara, kota, dan landmark.
-- Sejarah dan asal-usul.
-- Penemuan dan benda sehari-hari.
-- General trivia yang dipilih dengan hati-hati.
+- `animals` — hewan dan perilaku hewan.
+- `food_science` — makanan dan food science.
+- `human_body` — tubuh manusia dan anatomi yang aman.
+- `nature_science` — alam dan sains.
+- `geography` — negara, kota, geografi, dan landmark.
+- `history_origins` — sejarah dan asal-usul.
+- `inventions_everyday` — penemuan dan benda sehari-hari.
+- `general_trivia` — general trivia yang dipilih dengan hati-hati.
 
 Pembagian awal kalender:
 
 | Kelompok topik | Persentase awal |
 |---|---:|
-| Hewan | 25% |
-| Makanan dan food science | 20% |
-| Tubuh manusia | 15% |
-| Alam dan sains | 15% |
-| Geografi, negara, dan kota | 15% |
-| Sejarah, penemuan, dan general trivia | 10% |
+| `animals` | 25% |
+| `food_science` | 20% |
+| `human_body` | 15% |
+| `nature_science` | 15% |
+| `geography` | 15% |
+| `history_origins` | 5% |
+| `inventions_everyday` | 3% |
+| `general_trivia` | 2% |
 
-Angka tersebut hanya menjadi pengaturan awal dan dapat disesuaikan per Page.
+Bobot tersebut hanya menjadi pengaturan awal dan dapat disesuaikan per Page, tetapi penambahan slug di luar allowlist memerlukan versi blueprint baru.
 
 ### 13.6 CTA
 
@@ -455,6 +483,8 @@ Share this with someone who loves trivia.
 ```
 
 CTA tidak boleh menipu, terlalu memaksa, atau meminta interaksi yang tidak berhubungan dengan isi.
+
+Batas CTA MVP adalah satu baris dan 100 karakter.
 
 ## 14. Gaya bahasa Inggris
 
@@ -536,30 +566,42 @@ Sumber yang diprioritaskan:
 
 Untuk angka, hukum, kesehatan, keselamatan, rekor, atau klaim yang dapat berubah, sistem harus menggunakan sumber primer atau dua sumber independen yang layak.
 
-### 15.4 Status fakta
+### 15.4 Status verifikasi dan status penggunaan fakta
+
+Verifikasi fakta dan penggunaan fakta adalah dua lifecycle terpisah. Keduanya tidak boleh digabungkan ke dalam satu kolom status.
+
+Status `app.facts.verification_status`:
 
 ```text
-candidate → verifying → verified → reserved → consumed
-                ↘ rejected
-                ↘ duplicate
-
-reserved → released
-reserved → expired
+candidate    → verifying | rejected | duplicate
+verifying    → verified | needs_review | rejected | duplicate
+needs_review → verified | rejected | duplicate
+verified     → verifying (revalidation) | rejected (correction)
 ```
 
 Penjelasan:
 
 - `candidate`: fakta baru ditemukan.
 - `verifying`: fakta sedang diperiksa.
+- `needs_review`: bukti atau kemiripan fakta ambigu dan perlu keputusan manual.
 - `verified`: fakta sudah layak digunakan.
-- `reserved`: fakta dikunci sementara untuk suatu job.
-- `consumed`: fakta sudah digunakan dan tidak boleh digunakan lagi.
 - `rejected`: fakta ditolak karena salah, lemah, atau tidak aman.
 - `duplicate`: fakta memiliki makna yang sama dengan fakta yang sudah ada.
+
+Status penggunaan berada pada `ops.fact_allocations.status`:
+
+```text
+reserved → consumed
+    ↘ released
+    ↘ expired
+```
+
+- `reserved`: fakta dikunci sementara untuk generation task atau revisi post.
+- `consumed`: fakta sudah digunakan pada post tersimpan dan tidak boleh digunakan lagi.
 - `released`: fakta dilepaskan karena job tidak selesai.
 - `expired`: masa penguncian fakta berakhir.
 
-Hanya fakta berstatus `verified` yang boleh dipilih untuk produksi.
+Hanya fakta dengan verification status `verified`, belum kedaluwarsa, dan tanpa allocation aktif yang boleh dipilih untuk produksi. Riwayat perubahan verifikasi disimpan sebagai audit event; row fakta menyimpan keadaan verifikasi terkini.
 
 ### 15.5 Fakta yang dapat berubah
 
@@ -647,11 +689,11 @@ Setiap hasil harus berupa post package terstruktur.
 
 | Bagian | Wajib | Fungsi |
 |---|---:|---|
-| `post_id` | Ya | ID post |
-| `page_id` | Ya | Page tujuan |
+| `post_public_id` | Ya | UUID publik post |
+| `page_public_id` | Ya | UUID publik Page tujuan |
 | `status` | Ya | Status post |
-| `topic` | Ya | Topik utama |
-| `theme` | Ya | Tema spesifik |
+| `topic` | Ya | Topik utama; disimpan sebagai `app.posts.primary_topic` |
+| `theme` | Tidak | Tema spesifik bila relevan; boleh null untuk mixed/general trivia |
 | `architecture` | Ya | Jenis susunan post |
 | `hook` | Ya | Kalimat pembuka |
 | `facts` | Ya | Daftar fakta sesuai urutan |
@@ -661,9 +703,10 @@ Setiap hasil harus berupa post package terstruktur.
 | `hashtags` | Ya | Hashtag relevan dalam jumlah terbatas |
 | `visual_direction` | Ya | Saran background dan gerakan halus |
 | `fact_count` | Ya | Jumlah fakta |
-| `source_summary` | Ya | Ringkasan sumber untuk internal |
+| `source_notes` | Ya | Array ringkasan internal per fakta dari source metadata; tidak masuk Canva copy |
 | `quality_result` | Ya | Hasil pemeriksaan kualitas |
-| `version` | Ya | Nomor versi naskah |
+| `version_public_id` | Ya | UUID publik versi naskah |
+| `version_number` | Ya | Nomor versi naskah |
 
 Aturan `canva_copy`:
 
@@ -676,6 +719,12 @@ Aturan `canva_copy`:
 - Setiap fakta mudah dibedakan.
 - Ditutup dengan satu CTA.
 - Dapat langsung disalin tanpa dibersihkan terlebih dahulu.
+
+Aturan pelengkap:
+
+- Caption maksimal 500 karakter.
+- Hashtag berjumlah 0–5; default 3 jika relevan.
+- Hashtag tidak boleh mengulang kata yang tidak relevan hanya untuk jangkauan.
 
 Contoh bentuk umum:
 
@@ -724,7 +773,7 @@ Setiap Page menyimpan:
 
 ### FR-PAGE-003 — Page harus selalu jelas
 
-Setiap tindakan yang membuat atau mengubah konten harus memiliki `page_id` yang jelas.
+Setiap tindakan yang membuat atau mengubah konten harus memiliki `page_public_id` yang jelas.
 
 Jika pengguna memiliki beberapa Page dan permintaannya ambigu, sistem harus meminta pengguna memilih Page. Sistem tidak boleh menebak jika tebakannya dapat menyimpan konten ke Page yang salah.
 
@@ -740,7 +789,7 @@ Sistem dapat membuat satu post package lengkap berdasarkan Page, topik, dan arah
 
 ### FR-GEN-002 — Membuat batch
 
-Sistem dapat membuat beberapa post dalam satu generation job tanpa mengulang fakta antarp-post.
+Sistem dapat membuat beberapa post dalam satu generation batch tanpa mengulang fakta antar-post.
 
 ### FR-GEN-003 — Hanya memakai verified facts
 
@@ -764,11 +813,11 @@ Jika fakta kuat tidak mencukupi, sistem harus mengurangi jumlah fakta atau menje
 
 ### FR-GEN-008 — Mengembalikan ID yang stabil
 
-Setiap job, post, versi, calendar, dan slot harus memiliki ID yang dapat digunakan pada percakapan berikutnya.
+Setiap batch, task, post, versi, calendar, dan slot harus memiliki UUID publik yang dapat digunakan pada percakapan berikutnya. ID `bigint` internal tidak boleh keluar melalui MCP.
 
 ## 20. Pemeriksaan kualitas
 
-Sebelum post berstatus `ready_for_review`, sistem harus memeriksa:
+Sebelum post berstatus `needs_review`, sistem harus memeriksa:
 
 1. Semua fakta sudah verified.
 2. Semua fakta memiliki sumber.
@@ -795,20 +844,29 @@ Hasil pemeriksaan kualitas harus disimpan di database, bukan hanya ditampilkan s
 ### 21.1 Status post
 
 ```text
-generating → draft → ready_for_review → approved → scheduled → published
-      ↘ failed                         ↘ archived
+draft        → needs_review | rejected | archived
+needs_review → approved | rejected | archived
+approved     → needs_review | scheduled | published | rejected | archived
+scheduled    → approved | published | archived
+published    → archived
+rejected     → archived
 ```
 
 Penjelasan singkat:
 
-- `generating`: post sedang dibuat.
-- `draft`: post sudah tersimpan tetapi belum selesai ditinjau.
-- `ready_for_review`: post lolos pemeriksaan otomatis.
+- `draft`: post tersimpan tetapi belum menjadi paket lengkap; hanya digunakan untuk recovery atau penyimpanan eksplisit pekerjaan belum selesai.
+- `needs_review`: post lengkap dan lolos pemeriksaan otomatis, tetapi belum disetujui pengguna.
 - `approved`: post sudah disetujui pengguna.
 - `scheduled`: post sudah ditempatkan pada kalender.
 - `published`: pengguna menandai bahwa post sudah dipublikasikan.
+- `rejected`: post ditolak dan tidak dilanjutkan.
 - `archived`: post tidak lagi digunakan.
-- `failed`: proses pembuatan gagal.
+
+`failed` adalah status generation task, bukan status post. Task yang sedang ditulis atau diperiksa tetap `facts_reserved` sampai difinalisasi, dilepas, gagal, atau lease-nya dipulihkan. Alur normal `finalize_post` langsung membuat post berstatus `needs_review`; status `draft` bukan hasil normal finalisasi.
+
+Revisi substantif pada post approved mengembalikannya ke `needs_review`. Post scheduled harus dilepas dari slot menjadi approved sebelum revisi substantif. Transisi `approved → published` mendukung publikasi manual tanpa kalender; archive dari scheduled juga harus melepaskan atau membatalkan slot secara atomik.
+
+`reject_post` memerlukan alasan dan optimistic lock. Post scheduled harus dilepas dari slot lebih dahulu. Fakta pada post rejected tetap consumed agar fakta yang pernah diproduksi tidak muncul kembali secara tidak sengaja.
 
 ### 21.2 Riwayat versi
 
@@ -821,7 +879,7 @@ Penjelasan singkat:
 
 ### 21.3 Persetujuan
 
-- Post hasil AI selalu dimulai sebagai draf.
+- Post hasil AI yang berhasil difinalisasi dimulai sebagai `needs_review`.
 - Pengguna dapat menyetujuinya.
 - Persetujuan tidak berarti post langsung dipublikasikan.
 - Jika post yang sudah disetujui direvisi, status review harus diperbarui kembali.
@@ -860,6 +918,8 @@ Sistem dapat:
 - Membuat slot lebih dahulu, lalu mengisi post kemudian; atau
 - Membuat post sekaligus dan langsung menempatkannya ke slot.
 
+Pilihan kedua merupakan orkestrasi ChatGPT atas tool generation dan calendar yang terpisah. `create_calendar` sendiri tidak membuat teks post atau menjalankan background generation.
+
 ### FR-CAL-005 — Tidak memublikasikan ke Facebook
 
 Status kalender hanya digunakan untuk perencanaan internal.
@@ -868,11 +928,23 @@ Status kalender hanya digunakan untuk perencanaan internal.
 
 Ketika post dipindahkan, sistem harus memeriksa slot tujuan dan mencatat perubahan tersebut.
 
+### FR-CAL-007 — Lifecycle kalender
+
+```text
+draft → active → completed → archived
+draft/active → archived
+```
+
+- `create_calendar` selalu membuat kalender `draft`.
+- `activate_calendar` memvalidasi minimal satu slot dan tidak ada conflict sebelum mengubahnya menjadi `active`.
+- Kalender otomatis menjadi `completed` setelah seluruh slot non-cancelled berstatus `published` dan minimal satu slot telah published.
+- `archive_calendar` mengarsipkan kalender. Jika masih ada slot planned/ready, pengguna harus secara eksplisit memilih pembatalan slot masa depan; scheduled posts terkait dikembalikan ke `approved` secara atomik.
+
 ## 23. Dukungan kerja paralel
 
 Dukungan beberapa chat merupakan syarat MVP, bukan fitur tambahan.
 
-### 23.1 Atomic fact reservation
+### 23.1 Atomic fact allocation
 
 Pemilihan dan penguncian fakta harus dilakukan dalam satu database transaction.
 
@@ -881,25 +953,25 @@ Pola berikut tidak diperbolehkan:
 ```text
 SELECT fakta
 → menunggu proses lain
-→ INSERT reservation
+→ INSERT allocation
 ```
 
-Pola tersebut berbahaya karena dua chat dapat membaca fakta yang sama sebelum salah satunya menyimpan reservation.
+Pola tersebut berbahaya karena dua chat dapat membaca fakta yang sama sebelum salah satunya menyimpan allocation.
 
-Jika dua job mencoba mengambil fakta yang sama:
+Jika dua task atau revisi mencoba mengambil fakta yang sama:
 
 - Hanya satu yang boleh berhasil mengunci fakta tersebut.
-- Job lainnya harus mencari fakta lain.
+- Proses lainnya harus mencari fakta lain.
 - Jika tidak ada fakta lain, sistem memberikan error yang jelas.
 - Fakta yang sama tidak boleh masuk ke dua draf yang berhasil.
 
-### 23.2 Masa berlaku reservation
+### 23.2 Masa berlaku allocation
 
-- Reservation memiliki waktu kedaluwarsa.
-- Post yang berhasil mengubah reservation menjadi consumed.
-- Job gagal atau dibatalkan melepaskan reservation.
-- Job yang ditinggalkan tidak boleh mengunci fakta selamanya.
-- Proses pembersihan reservation harus aman jika dijalankan ulang.
+- Allocation berstatus `reserved` memiliki waktu kedaluwarsa.
+- Post atau revisi yang berhasil mengubah allocation menjadi consumed.
+- Task atau revisi yang gagal/dibatalkan melepaskan allocation.
+- Proses yang ditinggalkan tidak boleh mengunci fakta selamanya.
+- Proses pembersihan allocation harus aman jika dijalankan ulang.
 
 ### 23.3 Idempotency
 
@@ -907,10 +979,11 @@ Setiap operasi yang membuat atau mengubah data harus memiliki idempotency key.
 
 Jika request yang sama terkirim dua kali:
 
-- Sistem tidak membuat job kedua.
+- Sistem tidak membuat task/batch kedua.
 - Sistem tidak membuat post kedua.
 - Sistem tidak membuat versi atau slot kedua.
 - Sistem mengembalikan hasil atau ID dari request pertama.
+- Jika request pertama gagal secara terminal, replay key yang sama mengembalikan error tersimpan tanpa menjalankan ulang write; percobaan baru yang disengaja memakai idempotency key baru.
 
 ### 23.4 Optimistic concurrency
 
@@ -929,84 +1002,107 @@ Ketika chat menyimpan perubahan:
 MVP harus lulus pengujian minimal 10 permintaan reservasi fakta atau pembuatan post yang dimulai secara bersamaan tanpa:
 
 - Fakta ganda.
-- Job ganda karena retry.
+- Task atau batch ganda karena retry.
 - Perubahan saling menimpa.
 - Slot kalender ganda.
 
-## 24. Generation job
+## 24. Generation batch dan task
 
-Status generation job:
+Satu generation task mewakili tepat satu calon post. Batch hanya merupakan pengelompokan task melalui `batch_id`; tidak ada parent job row atau parent job status yang disimpan.
+
+Status generation task:
 
 ```text
-queued → processing → completed
-                  ↘ partially_completed
-                  ↘ failed
-                  ↘ cancelled
+pending → facts_reserved → completed
+   ↘ cancelled       ↘ failed
+facts_reserved → pending  (lease recovery jika belum consumed)
 ```
 
-Setiap job menyimpan:
+Setiap task menyimpan workspace, Page, blueprint, `batch_id`, nomor item, request, lease, attempt count, status, waktu proses, error aman, dan post hasil jika berhasil.
 
-- Workspace.
-- Page.
-- Pengguna yang meminta.
-- Jenis job.
-- Idempotency key.
-- Parameter permintaan.
-- Status.
-- Jumlah progress.
-- Waktu dibuat.
-- Waktu mulai.
-- Waktu selesai.
-- Error code.
-- Penjelasan error yang aman.
-- ID hasil.
+Baseline MVP membatasi satu task sampai 3 attempts. Setelah attempt ketiga gagal atau lease kedaluwarsa tanpa hasil, task menjadi `failed`; retry tidak membuat task baru.
 
-Batch atau kalender yang membutuhkan waktu lama harus segera mengembalikan `job_id`. Chat dapat meminta status job tanpa menahan satu MCP call terlalu lama.
+Status batch dihitung dari task rows setiap kali dibaca:
+
+```text
+pending | in_progress | completed | partially_completed | failed | cancelled
+```
+
+`partially_completed` berarti minimal satu task completed dan minimal satu task failed atau cancelled. Ringkasan batch juga memuat count per status, sehingga tidak ada parent row yang dapat berbeda dengan keadaan item sebenarnya.
+
+Urutan aturan derived status:
+
+1. Semua task pending → `pending`.
+2. Ada task pending atau `facts_reserved` setelah pekerjaan dimulai → `in_progress`.
+3. Semua task completed → `completed`.
+4. Ada task completed dan ada task failed/cancelled, tanpa task aktif → `partially_completed`.
+5. Semua task cancelled → `cancelled`.
+6. Kombinasi terminal lain tanpa task completed → `failed`.
+
+`create_generation_batch` harus segera mengembalikan `batch_id`. Beberapa chat kemudian memanggil `prepare_next_post` untuk mengambil task secara aman. Pembuatan teks bersifat pull-based di chat; backend tidak menjalankan text generation otonom di background.
 
 ## 25. MCP tools yang dibutuhkan
 
-Nama dan schema final akan ditentukan dalam implementation plan. MVP membutuhkan kemampuan berikut.
+Nama tool berikut adalah kontrak final MVP dan harus sama dengan `implementation-plan.md`. Database function internal boleh memiliki nama berbeda hanya jika pemetaannya terdokumentasi dengan jelas.
 
-### 25.1 Infrastruktur
+### 25.1 Workspace dan Page
 
-- `system_ping` — menguji koneksi tanpa membaca data pribadi.
-- `get_system_status` — menampilkan status server dan dependency tanpa membocorkan secret.
-- `get_profile` — mengenali akun yang sedang terhubung.
-
-### 25.2 Page
-
+- `get_workspace`
 - `list_pages`
-- `get_page`
+- `get_page_context`
 - `create_page`
 - `update_page`
 
+### 25.2 Facts
+
+- `get_fact_inventory`
+- `check_fact_candidates`
+- `submit_fact_candidates`
+- `list_facts_needing_review`
+- `review_fact_candidates`
+
 ### 25.3 Pembuatan konten
 
-- `generate_post`
-- `generate_post_batch`
-- `get_generation_job`
-- `cancel_generation_job`
+- `create_generation_batch`
+- `prepare_next_post`
+- `validate_post_draft`
+- `finalize_post`
+- `release_generation_task`
+- `get_generation_batch`
 
 ### 25.4 Post
 
-- `list_posts`
 - `get_post`
+- `list_posts`
+- `prepare_post_revision`
+- `release_post_revision`
 - `revise_post`
 - `approve_post`
+- `reject_post`
+- `mark_post_published`
 - `archive_post`
 
 ### 25.5 Kalender
 
-- `create_content_calendar`
-- `get_content_calendar`
-- `update_calendar_slot`
+- `preview_calendar_plan`
+- `create_calendar`
+- `assign_post_to_slot`
+- `unassign_post_from_slot`
+- `get_calendar`
+- `reschedule_calendar_slot`
+- `activate_calendar`
+- `archive_calendar`
+
+### 25.6 Internal smoke
+
+- `health_check` — read-only, tetap memerlukan OAuth setelah fase authentication selesai.
 
 Setiap tool harus memiliki:
 
 - Tanggung jawab yang jelas dan tidak terlalu luas.
 - Input schema.
 - Output schema.
-- Stable IDs.
+- UUID public IDs yang stabil.
 - Validasi.
 - Pemeriksaan authorization.
 - Annotations yang sesuai dengan sifat read-only, write, atau destructive.
@@ -1020,7 +1116,8 @@ Operasi internal seperti memilih row, mengunci fakta, atau menaikkan versi tidak
 
 - Production MCP server menggunakan OAuth 2.1 yang sesuai dengan MCP authorization flow.
 - Koneksi ChatGPT mewakili pengguna yang sudah login.
-- Akses tanpa login hanya boleh digunakan untuk `system_ping` pada development jika memang diperlukan.
+- Endpoint HTTP health yang terpisah boleh tanpa login jika hanya mengembalikan status infrastruktur dan tidak membaca data pengguna.
+- MCP `health_check` wajib menggunakan OAuth setelah fase authentication. Panggilan MCP tanpa authentication hanya boleh ada sementara pada spike lokal sebelum auth dibangun, dan tidak boleh tersedia pada deployment remote development maupun production.
 - Semua data pribadi dan operasi write wajib menggunakan authentication.
 
 ### 26.2 Authorization
@@ -1028,7 +1125,7 @@ Operasi internal seperti memilih row, mengunci fakta, atau menaikkan versi tidak
 - Pengguna hanya dapat mengakses workspace yang dimilikinya.
 - Semua operasi memeriksa workspace dan Page di sisi server.
 - Model AI tidak boleh dijadikan pengaman akses.
-- `workspace_id` atau `page_id` asing harus ditolak.
+- `workspace_public_id` atau `page_public_id` asing harus ditolak.
 - Mengubah argument tool tidak boleh memungkinkan pengguna membuka data lain.
 
 ### 26.3 Keamanan Supabase
@@ -1044,26 +1141,14 @@ Operasi internal seperti memilih row, mengunci fakta, atau menaikkan versi tidak
 
 ## 27. Gambaran data yang perlu disimpan
 
-Detail tabel akan dibuat dalam database design. Secara umum, sistem perlu menyimpan:
+Desain final memakai 12 tabel hybrid yang didefinisikan lengkap di `database-design.md`:
 
-- Workspace.
-- Kepemilikan workspace.
-- Pages dan pengaturannya.
-- Blueprint beserta versinya.
-- Topics dan bobot topik per Page.
-- Facts dan identitas maknanya.
-- Fact sources.
-- Hasil verifikasi fakta.
-- Generation jobs.
-- Fact reservations.
-- Riwayat penggunaan fakta.
-- Posts.
-- Post versions.
-- Content calendars.
-- Calendar slots.
-- Audit events.
+- Enam tabel bisnis: `app.workspaces`, `app.pages`, `app.content_blueprints`, `app.facts`, `app.posts`, dan `app.calendars`.
+- Enam tabel operasional: `ops.generation_tasks`, `ops.fact_allocations`, `ops.post_versions`, `ops.calendar_slots`, `ops.idempotency_keys`, dan `ops.audit_events`.
 
-Aturan penting seperti fakta unik, slot unik, dan reservation aktif harus dijaga oleh database constraint dan transaction. Aturan tersebut tidak boleh hanya mengandalkan kode aplikasi.
+Topik dan bobot Page berada pada JSONB config tervalidasi. Sources serta keadaan verifikasi terkini berada pada row fakta; riwayatnya berada pada audit events. Allocation reserved/consumed dan relasi fakta–post digabungkan pada fact allocations. Tidak ada tabel terpisah untuk owner membership, topic taxonomy, fact sources, fact verification, parent generation job, atau fact usage pada MVP.
+
+Aturan penting seperti fakta unik, slot unik, dan allocation aktif harus dijaga oleh database constraint dan transaction. Aturan tersebut tidak boleh hanya mengandalkan kode aplikasi.
 
 ## 28. Gambaran arsitektur
 
@@ -1075,10 +1160,10 @@ Plugin pribadi Content Producer
 Custom MCP server
         ├── authentication dan authorization
         ├── validasi input
-        ├── pengaturan generation job
-        ├── riset dan verifikasi fakta
+        ├── pengaturan generation task dan allocation
+        ├── validasi kandidat dan metadata sumber
         ├── pemeriksaan duplikat
-        ├── fact reservation
+        ├── fact allocation
         ├── content quality checks
         └── layanan post dan kalender
         ↓
@@ -1097,18 +1182,22 @@ Supabase/Postgres
 - Mengikuti workflow produksi.
 - Memanggil tool yang tepat.
 - Menampilkan hasil dengan jelas.
+- Meneliti sumber publik yang relevan dan memperlakukan seluruh isi web sebagai data tidak tepercaya.
 - Menulis atau merevisi naskah hanya berdasarkan fakta yang sudah disetujui sistem.
 
 ### 28.2 Tanggung jawab MCP server
 
 - Memeriksa authentication dan authorization.
 - Memvalidasi seluruh input.
-- Mengatur job.
+- Mengatur generation task dan batch summary.
 - Menjaga fakta tidak berulang.
-- Menangani reservation dan concurrency.
+- Membuat embedding, memeriksa duplikasi, dan menerapkan kebijakan source pada kandidat yang diserahkan ChatGPT.
+- Menangani allocation dan concurrency.
 - Menyimpan post dan kalender.
 - Menjalankan pemeriksaan kualitas.
 - Mengembalikan structured results.
+
+Pada MVP, MCP server tidak melakukan arbitrary URL fetching. ChatGPT meneliti sumber publik, lalu MCP memvalidasi payload, source metadata, verifikasi, dan deduplikasi sebelum data disimpan.
 
 ### 28.3 Tanggung jawab Supabase
 
@@ -1179,12 +1268,12 @@ Target berikut tidak menghitung waktu ketika penyedia eksternal sedang tidak ter
 | Operasi | Target |
 |---|---:|
 | Tool read sederhana, p95 | Maksimal 2 detik |
-| Pembuatan job, p95 | Maksimal 2 detik |
+| Pembuatan batch/task, p95 | Maksimal 2 detik |
 | Satu post dari verified facts yang sudah tersedia, p95 | Maksimal 90 detik |
 | Batch 7 post | Maksimal 10 menit |
 | Kalender 30 slot | Maksimal 20 menit |
 
-Proses panjang menggunakan asynchronous job dan dapat dicek melalui `job_id`.
+Proses batch bersifat pull-based. `create_generation_batch` mengembalikan `batch_id`, beberapa chat memproses task melalui `prepare_next_post`, dan progress dibaca melalui `get_generation_batch`. Tidak ada backend text-generation job otonom pada MVP.
 
 ### 30.3 Ketersediaan
 
@@ -1200,12 +1289,12 @@ Log boleh menyimpan:
 - ID pengguna dalam bentuk aman.
 - Workspace ID.
 - Page ID.
-- Job ID.
+- Batch ID atau task public ID.
 - Nama tool.
 - Durasi.
 - Status berhasil atau gagal.
 - Error code.
-- Reservation conflict.
+- Allocation conflict.
 
 Log tidak boleh menyimpan:
 
@@ -1226,7 +1315,7 @@ Log tidak boleh menyimpan:
 ### 30.6 Pengendalian biaya
 
 - Batch memiliki batas maksimum.
-- Operasi riset dan generation memiliki rate limit.
+- Operasi kandidat fakta, embedding, dan generation memiliki rate limit.
 - Retry dibatasi.
 - Sistem memeriksa cache dan duplikat sebelum menjalankan operasi mahal.
 - Development tidak boleh memakai production credential.
@@ -1239,14 +1328,25 @@ Kode minimum:
 
 - `UNAUTHENTICATED`
 - `FORBIDDEN`
+- `WORKSPACE_NOT_FOUND`
 - `PAGE_NOT_FOUND`
+- `PAGE_NOT_ACTIVE`
+- `BLUEPRINT_NOT_ACTIVE`
+- `INVALID_JSON_SCHEMA_VERSION`
+- `INVALID_PAGE_CONFIGURATION`
+- `FACT_DUPLICATE_EXACT`
+- `FACT_DUPLICATE_SEMANTIC`
+- `FACT_REVIEW_REQUIRED`
 - `INSUFFICIENT_VERIFIED_FACTS`
-- `FACT_RESERVATION_CONFLICT`
-- `DUPLICATE_FACT`
-- `STALE_VERSION`
+- `TASK_ALREADY_CLAIMED`
+- `FACT_ALREADY_ALLOCATED`
+- `FACT_ALLOCATION_EXPIRED`
+- `IDEMPOTENCY_CONFLICT`
+- `RESOURCE_VERSION_CONFLICT`
+- `POST_QUALITY_FAILED`
 - `CALENDAR_SLOT_CONFLICT`
 - `INVALID_STATE_TRANSITION`
-- `QUALITY_CHECK_FAILED`
+- `CROSS_WORKSPACE_REFERENCE`
 - `RATE_LIMITED`
 - `DEPENDENCY_UNAVAILABLE`
 - `INTERNAL_ERROR`
@@ -1272,12 +1372,12 @@ Error tidak boleh menampilkan:
 Tindakan berikut harus dicatat:
 
 - Page dibuat atau diubah.
-- Fakta diverifikasi, ditolak, ditandai duplikat, di-reserve, dilepas, atau digunakan.
-- Generation job dibuat, selesai, gagal, atau dibatalkan.
+- Fakta diverifikasi, ditolak, ditandai duplikat, dialokasikan, dilepas, kedaluwarsa, atau digunakan.
+- Generation task/batch dibuat, selesai, gagal, atau dibatalkan.
 - Post dibuat, direvisi, disetujui, dijadwalkan, atau diarsipkan.
 - Kalender dibuat.
 - Calendar slot diubah.
-- Konflik versi atau reservation terjadi.
+- Konflik versi atau allocation terjadi.
 
 Setiap audit event minimal memiliki:
 
@@ -1310,7 +1410,7 @@ Audit event tidak boleh diubah setelah dibuat.
 | Ukuran | Target |
 |---|---:|
 | Tool calls berhasil di luar gangguan pihak ketiga | Minimal 99% |
-| Job gagal yang melepaskan reservation | 100% |
+| Task/revisi gagal yang melepaskan allocation | 100% |
 | Conflict error yang memberikan tindakan lanjutan | 100% |
 | Secret penting ditemukan di repository atau log | 0 |
 
@@ -1330,7 +1430,8 @@ Jumlah views bukan kriteria kelulusan MVP karena performa Facebook juga dipengar
 ### AC-001 — Koneksi MCP
 
 - ChatGPT dapat menemukan MCP server.
-- `system_ping` berhasil.
+- MCP `health_check` berhasil setelah OAuth.
+- Endpoint HTTP health terpisah tidak membocorkan data pengguna atau secret.
 - Tool metadata dan schema terbaca tanpa error.
 
 ### AC-002 — Keamanan akses
@@ -1342,12 +1443,12 @@ Jumlah views bukan kriteria kelulusan MVP karena performa Facebook juga dipengar
 ### AC-003 — Membuat Page pertama
 
 - Page dapat dibuat.
-- Page dapat diambil kembali menggunakan ID.
+- Page dapat diambil kembali menggunakan `page_public_id`.
 - Locale, target negara, topik, dan blueprint tersimpan dengan benar.
 
 ### AC-004 — Membuat satu post
 
-- Sistem menghasilkan draf dengan 5–9 fakta.
+- Sistem menghasilkan post package berstatus `needs_review` dengan 5–9 fakta.
 - Semua fakta memiliki sumber.
 - Semua fakta lolos verifikasi.
 - Post lolos quality checks.
@@ -1358,7 +1459,7 @@ Jumlah views bukan kriteria kelulusan MVP karena performa Facebook juga dipengar
 - Fakta yang sudah dipakai Page A ditolak untuk Page B.
 - Parafrase dari fakta tersebut juga ditolak.
 
-### AC-006 — Reservasi paralel
+### AC-006 — Allocation paralel
 
 - Minimal 10 request dijalankan bersamaan.
 - Tidak ada satu fakta yang masuk ke lebih dari satu draf berhasil.
@@ -1377,11 +1478,11 @@ Jumlah views bukan kriteria kelulusan MVP karena performa Facebook juga dipengar
 - Update dari chat kedua ditolak karena versinya sudah lama.
 - Versi dari chat pertama tidak tertimpa.
 
-### AC-009 — Membersihkan reservation dari job gagal
+### AC-009 — Membersihkan allocation dari task atau revisi gagal
 
-- Job gagal setelah mengambil fakta.
+- Task atau revisi gagal setelah mengambil fakta.
 - Fakta yang belum dipakai dilepaskan atau kedaluwarsa.
-- Fakta dapat digunakan kembali oleh job baru.
+- Fakta dapat digunakan kembali oleh task baru.
 
 ### AC-010 — Konflik kalender
 
@@ -1394,7 +1495,7 @@ Jumlah views bukan kriteria kelulusan MVP karena performa Facebook juga dipengar
 - Salah satu post dalam batch gagal.
 - Post lain yang berhasil tetap tersimpan.
 - Fakta dari post gagal dilepaskan.
-- Parent job berstatus `partially_completed`.
+- Ringkasan batch yang dihitung dari task rows menghasilkan status `partially_completed`; tidak ada parent job row.
 - Jumlah berhasil dan gagal dilaporkan dengan jelas.
 
 ### AC-012 — Kualitas bahasa
@@ -1413,6 +1514,14 @@ Jumlah views bukan kriteria kelulusan MVP karena performa Facebook juga dipengar
 - Development tidak dapat membaca atau menulis data production.
 - Development dan production memakai project serta credential yang berbeda.
 
+### AC-015 — Lifecycle kalender
+
+- Calendar baru berstatus `draft`.
+- Calendar tanpa slot atau dengan collision tidak dapat diaktifkan.
+- Calendar valid dapat berubah menjadi `active`.
+- Calendar menjadi `completed` setelah seluruh slot non-cancelled published dan minimal satu slot published.
+- Archive dengan planned/ready slots memerlukan konfirmasi pembatalan eksplisit dan mengembalikan scheduled posts terkait ke `approved`.
+
 ## 35. Pengujian yang wajib dilakukan
 
 ### 35.1 Unit tests
@@ -1429,9 +1538,9 @@ Jumlah views bukan kriteria kelulusan MVP karena performa Facebook juga dipengar
 ### 35.2 Database tests
 
 - Unique constraints.
-- Atomic fact reservation.
-- Reservation expiry.
-- Reservation cleanup.
+- Atomic fact allocation.
+- Allocation expiry.
+- Allocation cleanup.
 - Optimistic concurrency.
 - Calendar slot conflict.
 - RLS untuk akses yang diizinkan.
@@ -1459,7 +1568,7 @@ Simpan kumpulan prompt pengujian yang dapat dijalankan kembali:
 - Topik dengan verified facts yang tidak cukup.
 - Membuat batch.
 - Membuat kalender.
-- Merevisi menggunakan `post_id`.
+- Merevisi menggunakan `post_public_id`.
 - Meminta niche yang tidak didukung.
 - Meminta fakta berbahaya.
 - Mencoba memakai fakta lama.
@@ -1496,14 +1605,14 @@ Simpan kumpulan prompt pengujian yang dapat dijalankan kembali:
 | Risiko | Dampak | Cara mengurangi |
 |---|---|---|
 | AI membuat fakta palsu | Kepercayaan turun atau konten berbahaya | Verified-fact gate, sumber, quality checks, manual review |
-| Fakta sama ditulis ulang | Page menjadi repetitif | Canonical claim, semantic key, similarity check, reservation workspace |
+| Fakta sama ditulis ulang | Page menjadi repetitif | Canonical claim, semantic key, similarity check, allocation workspace |
 | Dua chat bentrok | Fakta ganda atau perubahan hilang | Transaction, uniqueness constraint, idempotency, lock version |
 | Hukum atau rekor sudah berubah | Informasi salah | `as_of` date, expiry, dan revalidation |
 | Terlalu mirip kompetitor | Masalah orisinalitas | Dataset hanya untuk pola, tidak menyalin kalimat |
 | Teks terlalu padat | Sulit dibaca di Canva | Batas fakta, kata, dan pemeriksaan layout density |
 | Hasil AI tidak konsisten | Kualitas berubah-ubah | Blueprint berversi, structured tools, evaluation set |
 | OAuth rumit | Integrasi terlambat | Dibangun dan diuji sejak awal menggunakan provider yang matang |
-| Sumber eksternal tidak tersedia | Riset gagal | Async job, retry terbatas, error jelas, stok verified facts |
+| Sumber eksternal tidak tersedia | Riset gagal | Retry terbatas, error jelas, stok verified facts |
 | Biaya meningkat | Operasional mahal | Batch limit, cache, rate limit, pemantauan penggunaan |
 | Prompt injection dari sumber | Kebocoran data atau tindakan tidak diinginkan | Least privilege, validasi, sumber dianggap sebagai data |
 | Ekspektasi viral terlalu tinggi | Produk dianggap gagal walau bekerja benar | Ukur kualitas yang dapat dikendalikan, tidak menjanjikan views |
@@ -1518,7 +1627,7 @@ Sistem membutuhkan:
 - Supabase development dan production.
 - Private GitHub repository.
 - Deployment workflow.
-- Sumber informasi publik yang layak atau research provider.
+- Sumber informasi publik yang layak yang dapat diteliti ChatGPT.
 - Model untuk menghasilkan dan memperbaiki naskah.
 - Proses manual Canva dan Facebook milik pengguna.
 
@@ -1558,26 +1667,30 @@ Setelah MVP stabil, sistem dapat dikembangkan untuk:
 9. Mendukung bahasa lain.
 10. Menjadi plugin publik atau produk komersial.
 
-## 41. Keputusan teknis yang akan ditentukan kemudian
+## 41. Keputusan teknis dan parameter yang perlu dikalibrasi
 
-Hal berikut akan ditentukan pada database design atau implementation plan:
+Keputusan berikut sudah dikunci untuk MVP:
 
-- TypeScript atau Python untuk MCP server. Pilihan awal yang disarankan adalah TypeScript.
-- Hosting provider.
-- OAuth identity provider.
-- Metode registrasi OAuth client.
-- Research provider.
-- Cara memasukkan dan memperbarui sumber fakta.
-- Teknologi semantic similarity.
-- Nilai threshold untuk mendeteksi duplikat.
-- Apakah generation sepenuhnya dilakukan ChatGPT atau sebagian melalui server-side model API.
-- Queue untuk batch job.
-- Lama reservation lease.
-- Batas batch.
-- Rate limit.
-- Domain development dan production.
+- MCP server menggunakan TypeScript dan berjalan sebagai Supabase Edge Function.
+- Supabase Auth menjadi OAuth 2.1 authorization server dengan PKCE; Dynamic Client Registration dipakai sesuai dukungan panduan Supabase saat implementasi.
+- Auth/consent web direkomendasikan memakai Next.js di Vercel.
+- Content generation dilakukan oleh ChatGPT; backend hanya memakai OpenAI API untuk embedding.
+- Baseline embedding adalah `text-embedding-3-small` dengan dimensi 1536 dan disimpan sebagai `halfvec(1536)`.
+- Tidak ada external queue atau parent job table; `ops.generation_tasks` dan atomic claim `SKIP LOCKED` menjadi queue MVP.
+- Baseline task/allocation TTL adalah 20 menit.
+- URL project Supabase dipakai untuk development dan production; custom domain ditunda.
 
-Keputusan tersebut tidak mengubah tujuan produk, tetapi akan memengaruhi cara sistem dibangun.
+Parameter berikut tetap harus dikalibrasi sebelum migration atau release final:
+
+- Semantic duplicate threshold.
+- Konfirmasi topic allowlist yang sudah ditetapkan dan finalisasi JSON Schema versi 1; slug baru memerlukan versi blueprint baru.
+- Batas batch dan rate limit berdasarkan load/cost test.
+- Detail workflow penelitian serta source policy.
+- TTL final setelah UAT.
+- Retention idempotency dan audit.
+- Ketersediaan model embedding, Supabase CLI, Edge Runtime, dan extension pada saat implementasi.
+
+Perubahan terhadap keputusan yang sudah dikunci wajib diperbarui pada PRD, database design, dan implementation plan sebelum coding bagian terkait.
 
 ## 42. Referensi teknis
 
@@ -1601,4 +1714,3 @@ Dengan menyetujui dokumen ini, pemilik produk menyetujui bahwa:
 6. Publishing ke Facebook tetap dilakukan secara manual.
 7. Sistem tidak menjanjikan hasil viral atau jumlah views tertentu.
 8. Database design dan implementation plan dapat disusun berdasarkan PRD ini.
-
