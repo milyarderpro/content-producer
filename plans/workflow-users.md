@@ -1,180 +1,221 @@
 # Panduan Workflow Pengguna — Content Producer MVP
 
-Dokumen ini adalah panduan operasional singkat. Aturan produk tetap mengacu pada `plans/PRD.md`, sedangkan detail penyimpanan dan transaksi mengacu pada `plans/database-design.md`. Jika panduan ini berbeda dari kedua dokumen tersebut, panduan ini harus diperbarui.
+Dokumen ini adalah panduan operasional singkat. Aturan produk mengacu pada `plans/PRD.md`, sedangkan detail penyimpanan dan transaksi mengacu pada `plans/database-design.md`. MVP hanya memproduksi niche trivia, tetapi workflow core dirancang agar niche lain dapat ditambahkan tanpa mengubah cara kerja dasar pengguna.
 
-## Workflow produksi konten
+## Workflow produksi satu post
 
-1. **Anda memilih plugin di ChatGPT**
+1. **Hubungkan plugin sebagai owner**
 
-   Buka chat, aktifkan plugin, kemudian berikan perintah sederhana, misalnya:
+   Saat koneksi pertama atau sesi autentikasi berakhir, selesaikan Supabase Auth OAuth 2.1. Plugin hanya boleh membaca atau mengubah workspace milik owner yang terautentikasi.
 
-   > Buatkan 3 post untuk Page Curious World, tema mixed facts, untuk jadwal Senin sampai Rabu.
+2. **Berikan permintaan dalam bahasa natural**
 
-2. **Sistem membaca profil Page**
+   Contoh:
 
-   Plugin mengambil pengaturan Page dari Supabase, seperti:
+   > Buatkan satu post trivia untuk Page Curious World tentang animals.
 
-   - Nama Page.
-   - Niche dan tema yang diperbolehkan.
-   - Gaya bahasa.
-   - Target audiens US, UK, CA, dan AU.
-   - Mode jumlah fakta: `fixed` atau `adaptive` 5–9.
-   - Anggaran karakter template Canva.
-   - Kebijakan pemakaian ulang fakta: unik untuk seluruh workspace atau unik hanya dalam Page tersebut.
-   - Format video statis 13 detik.
-   - Riwayat konten yang pernah dibuat.
+   Setiap operasi harus memiliki Page dan niche yang jelas. Pada MVP, niche aktif adalah `trivia`. Jika kelak satu Page memiliki beberapa niche aktif, plugin memakai default yang tidak ambigu atau meminta Anda memilih.
 
-3. **ChatGPT mencari dan menyeleksi fakta**
+3. **Sistem membaca konteks Page dan niche**
 
-   ChatGPT menyusun kandidat fakta, memeriksa sumber, lalu memilih fakta yang:
+   Plugin mengambil:
 
-   - Menarik dan mudah dipahami.
-   - Memiliki potensi rasa penasaran atau kejutan.
-   - Cocok ditampilkan dalam waktu 13 detik.
-   - Tidak terlalu rumit atau memerlukan penjelasan panjang.
-   - Aman dan tidak menyesatkan.
+   - Identitas Page, zona waktu, dan target market.
+   - Konfigurasi trivia Page.
+   - Topik dan format yang diizinkan.
+   - Mode jumlah fakta dan text budget.
+   - Kebijakan reuse fakta.
+   - Subjek, hook, CTA, dan format yang baru digunakan.
+   - Insight performa yang sudah tersedia.
 
-   Pada mode `adaptive`, sistem menyiapkan kandidat sampai batas maksimum lalu mulai dari jumlah minimum Page. Dengan default 5/7/9, sistem mulai dari 5 fakta terbaik. Fakta tambahan hanya dipakai jika kualitas tetap tinggi dan anggaran karakter masih cukup. Jadi hasil dapat berisi 5, 6, 7, 8, atau 9 fakta tanpa pemilihan acak murni.
+4. **ChatGPT meneliti kandidat fakta**
 
-4. **Plugin memeriksa kesamaan dan kelayakan penggunaan**
+   ChatGPT mencari sumber publik yang layak dan menyeleksi fakta yang menarik, mudah dipahami, aman, serta cocok untuk format Reel sekitar 13 detik. Dataset referensi hanya digunakan untuk mempelajari DNA konten, bukan sebagai sumber kebenaran.
 
-   Sebelum naskah diselesaikan, plugin mengecek apakah klaim sudah memiliki catatan fakta utama (canonical), lalu membaca Page yang pernah memakainya. Setiap klaim tetap hanya memiliki satu catatan utama; izin memakainya kembali ditentukan oleh kebijakan Page tujuan.
+5. **Plugin memeriksa duplikasi dan mereservasi fakta**
 
-   Pemeriksaan mencakup:
+   Pemeriksaan mencakup exact match, parafrasa, structured fact key, kemiripan teks, riwayat penggunaan, dan reservasi proses lain. Kandidat final dibuat atau dihubungkan ke row canonical, lalu direservasi secara atomic.
 
-   - Fakta yang sama persis.
-   - Fakta yang hanya berbeda susunan kata.
-   - Fakta dengan subjek dan klaim yang sama.
-   - Fakta yang sudah direservasi oleh proses lain.
+   - `workspace_unique`: fakta yang pernah dipakai Page mana pun tidak dapat digunakan.
+   - `page_unique`: fakta boleh pernah dipakai Page lain, tetapi tidak boleh pernah dipakai Page tujuan.
 
-   Jika Page memakai `workspace_unique`, fakta yang pernah dipakai Page mana pun diganti. Jika Page memakai `page_unique`, fakta dari Page lain boleh dipakai kembali, tetapi fakta yang pernah dipakai Page tujuan tetap diganti. Default Page baru adalah `workspace_unique`.
+6. **ChatGPT menyusun post**
 
-5. **ChatGPT menulis naskah final**
+   Hasil menggunakan natural American English yang tetap mudah dipahami audiens US, UK, CA, AU, dan global. Sistem memilih format trivia, profil panjang, render style, dan interaction goal yang sesuai.
 
-   Fakta yang lolos kemudian ditulis menggunakan:
+   Default render style adalah fakta per baris tanpa nomor. Numbering digunakan hanya ketika urutan atau checklist memang membantu.
 
-   - Natural American English.
-   - Kosakata yang tetap mudah dipahami audiens UK, CA, AU, dan global.
-   - Kalimat pendek dan cepat dibaca.
-   - Hook kuat.
-   - Gaya menarik tanpa clickbait berlebihan.
-   - Struktur yang mengikuti DNA tiga dataset referensi.
+7. **Quality gate dijalankan**
 
-   Sistem menghitung panjang hook, setiap fakta, seluruh blok fakta, CTA, dan Canva copy final. Fakta yang panjang membuat jumlah akhir cenderung mendekati minimum; fakta yang ringkas memungkinkan jumlah lebih banyak.
+   Pemeriksaan sistem memastikan referensi data, reservasi, reuse rule, jadwal, schema version, revision, dan text budget valid. Pemeriksaan editorial menilai dukungan sumber, keamanan, kejelasan, bahasa, hook, CTA, caption, keterbacaan, dan risiko menyalin referensi.
 
-6. **Pemeriksaan kualitas**
+8. **Draft disimpan dan ditampilkan**
 
-   Sebelum ditampilkan, sistem memeriksa:
+   Post disimpan sebagai `draft` sebelum hasil dinyatakan berhasil. Fakta dihubungkan melalui `trivia_post_facts` dengan urutan, wording final, dan snapshot verifikasi.
 
-   - Keunikan fakta.
-   - Kejelasan kalimat.
-   - Konsistensi angka, nama, dan satuan.
-   - Kesesuaian dengan Page.
-   - Keterbacaan untuk video 13 detik.
-   - Seluruh batas karakter Page.
-   - Caption dan hashtag.
-   - Kelengkapan sumber referensi.
-
-7. **Draft disimpan lalu hasil ditampilkan dalam bagian terpisah**
-
-   Setelah lolos pemeriksaan, post lebih dahulu disimpan sebagai `draft`. Format hasilnya kira-kira seperti ini:
+   Hasil ditampilkan dalam bagian terpisah:
 
    **CANVA COPY**
 
-   - Hook atau headline.
-   - Fakta 1 sampai jumlah final yang dipilih sistem, umumnya 5–9.
-   - CTA singkat.
+   - Hook.
+   - Fakta dalam urutan final.
+   - CTA.
 
    **FACEBOOK CAPTION**
 
-   Caption yang sudah siap ditempel ke Facebook.
+   Caption siap salin yang tidak menambahkan klaim baru.
 
    **HASHTAGS**
 
-   Hashtag yang relevan dengan tema dan Page.
+   Hashtag yang relevan.
 
    **INFORMASI INTERNAL**
 
-   - Post ID.
-   - Nama Page.
-   - Status.
-   - Jadwal.
-   - Daftar sumber.
+   - Post ID, Page, niche, format, status, dan jadwal.
+   - Interaction goal.
+   - Sumber fakta.
+   - Ringkasan system checks dan editorial checks.
 
-   Informasi internal dan sumber tidak perlu disalin ke Canva atau Facebook.
+   Informasi internal tidak disalin ke Canva atau Facebook.
 
-8. **Anda melakukan review**
+9. **Tinjau, revisi, setujui, atau buang**
 
-   Anda bisa langsung menyetujui atau meminta perubahan dengan bahasa biasa, misalnya:
+   Contoh revisi:
 
    - “Ganti fakta nomor 3.”
    - “Buat hook lebih kuat.”
+   - “Buat CTA untuk mendorong share.”
    - “Caption terlalu panjang.”
-   - “Gunakan tema animals saja.”
-   - “Buat bahasanya lebih conversational.”
 
-   Jika sebuah fakta diganti, fakta penggantinya kembali melewati pemeriksaan duplikasi.
+   Penggantian fakta selalu melewati deduplikasi dan reservasi ulang. Revisi post `ready` mengembalikannya ke `draft` untuk diperiksa lagi.
 
-9. **Post disetujui**
-
-   Setelah Anda mengatakan:
+   Untuk menyetujui:
 
    > Setujui post ini.
 
-   Post sudah tersimpan sebagai `draft` sejak hasil pertama ditampilkan. Persetujuan mengubah statusnya menjadi `ready`; pencatatan penggunaan fakta tetap mengikuti kebijakan Page tujuan.
+   Setelah semua pemeriksaan lolos dan persetujuan diberikan, status berubah menjadi `ready`.
 
-10. **Salin ke Canva dan Facebook**
+   Jika post tidak akan digunakan:
 
-   Proses manualnya:
+   > Buang draft ini.
 
-   - Salin bagian **CANVA COPY** ke template Canva.
-   - Tambahkan latar bergerak.
-   - Ekspor sebagai video Reel 13 detik.
-   - Upload ke Facebook.
-   - Salin bagian **FACEBOOK CAPTION**.
-   - Salin bagian **HASHTAGS**.
-   - Publikasikan atau jadwalkan melalui Facebook.
+   Status berubah menjadi `discarded` dan alokasi fakta yang belum pernah dipublikasikan dilepas. `Discarded` tidak sama dengan `archived`.
 
-11. **Tandai sebagai sudah diposting**
+10. **Publikasikan secara manual**
 
-   Setelah konten terbit, Anda cukup mengatakan:
+    - Salin Canva copy ke template.
+    - Tambahkan background bergerak.
+    - Ekspor sebagai Reel sekitar 13 detik.
+    - Upload atau jadwalkan di Facebook.
+    - Salin caption dan hashtag.
 
-   > Tandai post ABC123 sudah diposting.
+11. **Tandai sebagai posted**
 
-   Sistem mengubah status menjadi `posted`. Pencatatan fakta tersebut akan digunakan untuk menilai pemakaian berikutnya sesuai kebijakan Page tujuan.
+    Setelah benar-benar terbit:
 
-## Jika membuat kalender konten
+    > Tandai post ABC123 sudah diposting. URL-nya adalah …
 
-Perintahnya juga tetap sederhana:
+    Sistem mengubah status menjadi `posted` dan menyimpan `published_at`, Facebook post ID, atau URL jika diberikan. Fakta pada post tersebut dianggap telah digunakan secara permanen sesuai reuse rule.
 
-> Buat kalender 14 post untuk Page Curious World, satu post per hari mulai 10 Oktober, dengan tema campuran.
+12. **Catat performa ketika tersedia**
+
+    Contoh:
+
+    > Update performa post ABC123: 1.8M views, 23K shares, 8K comments, dicatat hari ini.
+
+    Sistem menyimpan snapshot baru tanpa menimpa snapshot lama. Data ini digunakan untuk menemukan pola topik, format, hook, CTA, panjang, dan interaction goal yang paling efektif pada Page tersebut. Sistem tidak menjanjikan performa viral atau menganggap korelasi sebagai sebab-akibat.
+
+## Workflow batch dan kalender
+
+Contoh:
+
+> Buat kalender 14 post trivia untuk Page Curious World, satu post per hari mulai 10 Oktober, dengan tema campuran.
 
 Sistem akan:
 
-1. Membuat 14 post satu per satu.
-2. Memeriksa duplikasi setiap post.
-3. Memberikan tanggal pada setiap post.
-4. Menyimpan setiap post baru sebagai `draft`.
-5. Mengubah post yang Anda setujui menjadi `ready`.
-6. Menampilkan daftar post berdasarkan tanggal.
-7. Memungkinkan Anda merevisi, memindahkan jadwal, atau mengganti salah satu post.
+1. Membuat satu `content_plan` untuk Page dan niche tersebut.
+2. Membuat satu `content_plan_item` untuk setiap tanggal atau slot yang diminta.
+3. Memproses item dalam chunk kecil, dengan default 3–5 post per putaran aktif.
+4. Menjalankan workflow single-post untuk setiap item.
+5. Menyimpan setiap post segera setelah berhasil.
+6. Mempertahankan post yang sudah berhasil jika item lain gagal.
+7. Menampilkan jumlah selesai, perlu revisi, belum diproses, dan gagal.
 
-Kalender tidak memerlukan tabel atau sistem terpisah; kalender merupakan tampilan dari post yang sudah memiliki tanggal jadwal.
+Tidak ada AI worker atau proses generasi di background. Jika chat berhenti sebelum 14 post selesai, plan tetap menyimpan intent dan progress.
 
-## Jika bekerja menggunakan beberapa chat
+Untuk melanjutkan:
 
-Anda dapat menjalankan beberapa chat secara paralel, misalnya:
+> Lanjutkan content plan kalender Curious World yang belum selesai.
 
-- Chat 1 mengerjakan Page A.
-- Chat 2 mengerjakan Page B.
-- Chat 3 membuat kalender Page C.
+Sistem hanya mengerjakan item yang belum selesai dan tidak membuat ulang post yang sudah tersimpan.
 
-Setiap chat tetap menggunakan database yang sama. Reservasi mencegah dua chat memiliki fakta yang sama pada waktu bersamaan. Setelah transaksi pertama selesai, kelayakan pemakaian berikutnya tetap ditentukan oleh kebijakan Page tujuan.
+Kalender yang dilihat pengguna tetap berupa daftar post berdasarkan tanggal. `content_plans` dan `content_plan_items` berfungsi sebagai checkpoint, bukan scheduler Facebook.
 
-Untuk MVP, AI bekerja ketika chat sedang aktif—belum ada proses produksi otomatis yang terus berjalan sendiri di latar belakang.
+## Workflow beberapa chat
 
-Dengan demikian, pekerjaan rutin Anda nantinya hanya:
+Beberapa chat dapat digunakan secara paralel, misalnya:
 
-**Berikan perintah → tinjau hasil → setujui → salin ke Canva → salin caption dan hashtag ke Facebook → tandai sebagai `posted`.**
+- Chat 1 membuat post Page A.
+- Chat 2 melanjutkan content plan Page B.
+- Chat 3 merevisi post Page C.
 
-Detail teknis tidak perlu diingat saat penggunaan harian; plugin memilih tool yang diperlukan, sedangkan Anda cukup memberi perintah, meninjau hasil, dan mengonfirmasi perubahan status.
+Semua chat memakai Supabase sebagai system of record. Database menangani:
+
+- Reservasi fakta atomic.
+- Reuse rule Page tujuan.
+- Optimistic revision conflict.
+- Keunikan slot jadwal.
+- Idempotency operasi penting.
+- Progress content plan.
+
+Jika dua chat mencoba memakai fakta yang sama atau mengubah post yang sama, salah satunya menerima conflict yang dapat ditindaklanjuti; sistem tidak menimpa data secara diam-diam.
+
+## Status post
+
+Jalur publikasi:
+
+```text
+draft → ready → posted → archived
+```
+
+Jalur pembatalan sebelum publikasi:
+
+```text
+draft → discarded
+ready → discarded
+```
+
+- `draft`: masih dapat direvisi.
+- `ready`: sudah disetujui dan siap dipublikasikan.
+- `posted`: sudah benar-benar dipublikasikan.
+- `discarded`: dibatalkan sebelum publikasi; alokasi item niche dilepas.
+- `archived`: post yang pernah dipublikasikan dikeluarkan dari workflow aktif; penggunaan item niche tetap tercatat.
+
+Post `posted`, `discarded`, atau `archived` tidak direvisi pada MVP. Jika diperlukan versi baru, sistem membuat post baru.
+
+## Perintah operasional yang umum
+
+- “Buatkan satu post trivia animals untuk Page A.”
+- “Buat 5 post trivia dengan format yang bervariasi.”
+- “Lanjutkan content plan yang belum selesai.”
+- “Tampilkan draft Page A minggu ini.”
+- “Ganti fakta nomor 4 pada post ABC123.”
+- “Setujui post ABC123.”
+- “Buang draft ABC123.”
+- “Pindahkan jadwal post ABC123 ke Jumat pukul 19.00.”
+- “Tandai ABC123 sudah diposting dan simpan URL ini.”
+- “Catat performa ABC123: …”
+- “Format trivia apa yang paling banyak menghasilkan share di Page A?”
+
+## Yang tidak dilakukan MVP
+
+- Tidak membuat desain atau video.
+- Tidak mengunggah atau menjadwalkan post melalui Facebook API.
+- Tidak mengambil analytics Facebook secara otomatis.
+- Tidak menjalankan generasi AI di background.
+- Tidak memakai OpenAI API atau embeddings.
+- Tidak mengaktifkan niche selain trivia.
+
+Alur rutin akhirnya adalah:
+
+**Berikan perintah → tinjau draft → revisi atau setujui → salin ke Canva/Facebook → tandai `posted` → catat performa.**

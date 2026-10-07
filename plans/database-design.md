@@ -6,195 +6,161 @@
 |---|---|
 | Nama produk | Content Producer |
 | Versi produk | MVP |
-| Versi dokumen | 1.0 |
-| Status | Draf utama untuk ditinjau |
-| Tanggal | 6 Oktober 2026 |
+| Versi dokumen | 2.0 |
+| Status | Draf utama — arsitektur modular disetujui |
+| Tanggal | 7 Oktober 2026 |
 | Database | Supabase Postgres |
-| Jumlah tabel MVP | 4 |
-| Dokumen induk | `plans/PRD.md` |
+| Dokumen induk | plans/PRD.md |
+| Niche aktif MVP | trivia |
 
-Dokumen ini menjadi sumber utama untuk:
+Dokumen ini menjadi sumber utama untuk nama tabel dan kolom, relasi, constraint, index, kontrak JSONB, lifecycle, transaksi, concurrency, database function, RLS, privilege, dan pengujian database.
 
-- Nama tabel dan kolom.
-- Tipe data.
-- Relasi.
-- Constraint.
-- Index.
-- Struktur JSONB.
-- Status data.
-- Transaksi dan concurrency.
-- Database function/RPC.
-- RLS dan privilege.
-- Pengujian database.
-
-Jika dokumen ini bertentangan dengan `plans/PRD.md`, PRD menjadi acuan kebutuhan produk dan desain database harus diperbarui. Dokumen dalam folder `archive/` bukan sumber implementasi.
+Jika dokumen ini bertentangan dengan PRD, PRD menjadi acuan kebutuhan produk dan desain database harus diperbarui. Dokumen ini mendeskripsikan target schema. Migration dan source code yang sebenarnya tetap menjadi sumber eksekusi setelah implementasi dimulai.
 
 ---
 
 ## 2. Ringkasan keputusan desain
 
-Database MVP hanya mempunyai empat tabel:
+Database dipisahkan menjadi core generik dan modul niche.
 
-1. `public.workspaces`
-2. `public.pages`
-3. `public.posts`
-4. `public.trivia_facts`
+### 2.1 Tabel core
 
-Keputusan ini sengaja mempertahankan dashboard Supabase yang sederhana tanpa mengorbankan kebutuhan penting.
+1. **public.workspaces**
+2. **public.niches**
+3. **public.pages**
+4. **public.page_niche_configs**
+5. **public.content_plans**
+6. **public.content_plan_items**
+7. **public.posts**
+8. **public.post_metrics**
+
+### 2.2 Tabel modul trivia
+
+9. **public.trivia_facts**
+10. **public.trivia_post_facts**
+
+Jumlah tabel tidak dijadikan ukuran kesederhanaan. Relasi eksplisit dipilih ketika mengurangi trigger, array ringkasan, JSON references, dan risiko data tidak sinkron.
 
 | Kebutuhan PRD | Penyelesaian database |
 |---|---|
-| Satu pengguna | Tidak ada tabel users atau memberships pada MVP |
-| Multi-Page | `pages.workspace_id` |
-| Konfigurasi berbeda per Page | `pages.content_config` |
-| Core siap untuk niche lain | `pages.niche_code`, `posts.niche_code`, dan `posts.content_payload` |
-| Fakta khusus trivia | `trivia_facts` sebagai tabel niche-specific |
-| Kalender | `posts.scheduled_at` dan `posts.plan_id` |
-| Revisi | `posts.revision`, tanpa tabel versions |
-| Status post | `draft`, `ready`, `posted`, `archived` |
-| Sumber fakta | `trivia_facts.source_data`; post merujuk fakta melalui payload |
-| Keunikan canonical exact | `claim_hash` yang unik per workspace |
-| Keunikan canonical terstruktur | `structured_hash` yang unik per workspace |
-| Near-duplicate search | Full Text Search dan `pg_trgm` |
-| Kerja beberapa chat | Reservasi atomic pada `trivia_facts` |
-| Jumlah fakta per Page | `pages.content_config.fact_count` dengan mode fixed/adaptive |
-| Kapasitas template | `pages.content_config.text_budget` |
-| Reuse fakta per Page | `pages.content_config.fact_reuse_scope` |
-| Idempotensi pembuatan post | `posts.operation_key` |
-| Konflik revisi | Compare-and-swap menggunakan `posts.revision` |
-| Batch | Beberapa post mandiri; tidak ada tabel job atau batch |
-| Tanpa embeddings | Tidak ada vector extension atau vector column |
+| Satu owner | workspaces.owner_user_id mengacu ke auth.users.id |
+| Multi-Page | pages.workspace_id |
+| Multi-niche | niches dan page_niche_configs |
+| Trivia-only MVP | hanya registry trivia yang aktif dan hanya modul trivia yang diimplementasikan |
+| Konfigurasi per Page+niche | page_niche_configs.config |
+| Core netral terhadap niche | plans, posts, metrics, lifecycle, dan jadwal tidak bergantung pada trivia |
+| Batch dapat dilanjutkan | content_plans dan content_plan_items |
+| Revisi | posts.revision tanpa tabel versions |
+| Status post | draft, ready, posted, discarded, archived |
+| Relasi post–fakta | trivia_post_facts dengan foreign key nyata |
+| Snapshot publikasi | wording, hash, sumber, dan verified_at disimpan pada junction |
+| Canonical dedup | claim_hash dan structured_hash unik per workspace |
+| Near duplicate | Full Text Search dan pg_trgm |
+| Reservasi paralel | lock pada trivia_facts dan reservation token |
+| Reuse fakta | dihitung dari trivia_post_facts yang allocated atau published |
+| Idempotensi | operation_key pada write utama |
+| Konflik revisi | compare-and-swap menggunakan revision |
+| Kalender | plan items menyimpan intent; posts menyimpan jadwal output |
+| Performa | post_metrics sebagai time-series snapshot manual |
+| Tanpa embeddings | tidak ada vector extension atau vector column |
 
-Istilah pada dokumen ini mempunyai batas yang tegas: **deduplikasi canonical** menjaga agar satu klaim hanya mempunyai satu row dalam workspace, sedangkan **reuse** menentukan apakah row itu boleh dipakai untuk Page tujuan. `page_unique` dapat mengizinkan reuse lintas Page, tetapi tidak pernah membuat row fakta duplikat.
+Deduplikasi canonical dan reuse adalah dua konsep berbeda:
+
+- Deduplikasi memastikan satu klaim memiliki satu row canonical dalam workspace.
+- Reuse menentukan apakah canonical fact boleh dialokasikan kepada Page tujuan.
+- Workspace unique dan page unique dievaluasi saat reservasi dan diperiksa kembali saat penyimpanan.
 
 ---
 
 ## 3. Prinsip desain
 
-### 3.1 Mudah dibaca
+### 3.1 Core generik, modul niche spesifik
 
-- Hanya empat tabel bisnis.
-- Nama menggunakan lowercase `snake_case`.
-- Kolom yang sering dilihat atau difilter disimpan sebagai kolom biasa.
-- Data fleksibel dan detail output disimpan dalam JSONB dengan contract yang jelas.
-- Tidak ada tabel teknis hanya untuk memenuhi pola arsitektur yang belum dibutuhkan.
+Core menyimpan ownership, Page, konfigurasi niche, plan, post, lifecycle, jadwal, dan performa. Core tidak mengetahui struktur internal fakta trivia.
 
-### 3.2 Cepat untuk ChatGPT dan MCP
+Modul trivia memiliki canonical facts, deduplikasi, sumber, reservasi, dan junction post–fact. Niche baru menambahkan tabel library dan junction sendiri hanya jika membutuhkan reusable items.
 
-- Query utama mempunyai index yang sesuai.
-- Daftar post tidak perlu menggabungkan banyak tabel.
-- Kalender hanya membaca `posts`.
-- Sumber fakta dapat diambil dari `trivia_facts` menggunakan daftar `fact_id` dalam payload post.
-- Pencarian duplikat memakai index, bukan scan seluruh tabel.
-- Write kompleks dibungkus dalam database function agar selesai dalam satu round trip.
+Tidak digunakan foreign key polymorphic berbentuk item_type + item_id karena PostgreSQL tidak dapat menjamin referential integrity ke beberapa tabel berbeda.
 
-### 3.3 Aman untuk concurrency
+### 3.2 Integritas lebih penting daripada jumlah tabel
 
-- Unique constraint menjadi pertahanan terakhir terhadap fakta ganda.
-- Reservasi dilakukan dalam satu transaction.
-- Row dikunci dalam urutan ID yang konsisten.
-- Transaksi tidak melakukan web request atau pekerjaan AI.
-- Revisi memakai expected revision.
-- Slot jadwal Page dijaga partial unique index.
+- Foreign key nyata lebih diprioritaskan daripada ID di JSON.
+- Ringkasan penggunaan tidak disimpan sebagai array used_page_ids.
+- use_count tidak menjadi sumber kebenaran.
+- Jumlah penggunaan dihitung dari trivia_post_facts.
+- JSONB dipakai untuk payload berversi, bukan untuk menggantikan relasi penting.
 
-### 3.4 Siap dikembangkan
-
-- `workspaces`, `pages`, dan `posts` adalah generic core.
-- `trivia_facts` adalah modul trivia.
-- Niche lain dapat menambahkan tabel sendiri tanpa mengubah fakta trivia.
-- `schema_version` pada JSONB memungkinkan payload berkembang secara terkontrol.
-
-### 3.5 Database menjaga integritas, ChatGPT menjaga kualitas editorial
+### 3.3 Database menjaga state; ChatGPT menjaga editorial
 
 Database bertanggung jawab atas:
 
-- Relasi.
-- Status yang valid.
-- Keunikan.
-- Reservasi.
+- Ownership dan authorization predicate.
+- Relasi dan schema version.
+- Keunikan canonical.
+- Reservasi, reuse, dan concurrency.
 - Idempotensi.
-- Konflik revisi.
-- Jadwal ganda.
-- Struktur minimum JSON.
+- Lifecycle dan revision conflict.
+- Jadwal dan plan progress.
+- System checks yang benar-benar dapat diverifikasi.
+- Snapshot performa.
 
 ChatGPT bertanggung jawab atas:
 
-- Kebenaran penelitian dan kecukupan sumber.
-- Penilaian kemiripan makna.
-- Grammar, gaya bahasa, dan keterbacaan.
-- Kualitas hook, fakta, CTA, caption, dan hashtag.
+- Penelitian dan kecukupan sumber.
+- Penilaian kemiripan makna kandidat.
+- Grammar, gaya, dan keterbacaan.
+- Pemilihan format, hook, CTA, caption, dan hashtag.
+- Editorial checks.
 
-Database tidak mencoba menggantikan penilaian editorial dengan constraint yang rapuh.
+Database tidak menyatakan fact_accuracy benar hanya karena sebuah boolean dikirim model.
+
+### 3.4 Transaksi pendek dan dapat diulang
+
+- Web research dan generasi AI dilakukan di luar transaksi.
+- Transaction hanya memvalidasi data final, mengunci row yang diperlukan, lalu menulis.
+- Row fakta dikunci dalam urutan ID konsisten.
+- operation_key membuat retry aman.
+- Semua update post menggunakan expected_revision.
+
+### 3.5 Versioning kontrak
+
+- page_niche_configs memiliki config_schema_version.
+- posts memiliki content_schema_version.
+- trivia_facts memiliki normalization_version dan ontology_version.
+- JSONB payload lama tetap dapat dibaca setelah modul berkembang.
+- Perubahan breaking membutuhkan migration atau validator versi baru.
 
 ---
 
 ## 4. Gambaran relasi
 
-```mermaid
+~~~mermaid
 erDiagram
+    AUTH_USERS ||--o{ WORKSPACES : owns
     WORKSPACES ||--o{ PAGES : contains
+    NICHES ||--o{ PAGE_NICHE_CONFIGS : configures
+    PAGES ||--o{ PAGE_NICHE_CONFIGS : enables
+
+    WORKSPACES ||--o{ CONTENT_PLANS : owns
+    PAGES ||--o{ CONTENT_PLANS : plans
+    NICHES ||--o{ CONTENT_PLANS : classifies
+    CONTENT_PLANS ||--o{ CONTENT_PLAN_ITEMS : contains
+
     WORKSPACES ||--o{ POSTS : owns
-    WORKSPACES ||--o{ TRIVIA_FACTS : deduplicates
     PAGES ||--o{ POSTS : publishes
-    PAGES ||--o{ TRIVIA_FACTS : reserves_for
-    POSTS ||--o{ TRIVIA_FACTS : uses
+    NICHES ||--o{ POSTS : classifies
+    CONTENT_PLAN_ITEMS o|--o{ POSTS : attempts
 
-    WORKSPACES {
-        bigint id PK
-        uuid public_id UK
-        text name
-        text slug UK
-        boolean is_active
-        jsonb settings
-    }
+    POSTS ||--o{ POST_METRICS : measures
 
-    PAGES {
-        bigint id PK
-        uuid public_id UK
-        bigint workspace_id FK
-        text name
-        text slug
-        text niche_code
-        text timezone
-        jsonb content_config
-        boolean is_active
-    }
+    WORKSPACES ||--o{ TRIVIA_FACTS : deduplicates
+    POSTS ||--o{ TRIVIA_POST_FACTS : renders
+    TRIVIA_FACTS ||--o{ TRIVIA_POST_FACTS : supplies
+~~~
 
-    POSTS {
-        bigint id PK
-        uuid public_id UK
-        bigint workspace_id FK
-        bigint page_id FK
-        uuid operation_key UK
-        uuid plan_id
-        text niche_code
-        text status
-        jsonb content_payload
-        integer revision
-        timestamptz scheduled_at
-    }
+Satu post memiliki tepat satu niche. Satu content plan memiliki tepat satu Page dan satu niche. Kalender multi-niche dibentuk dari beberapa plan.
 
-    TRIVIA_FACTS {
-        bigint id PK
-        uuid public_id UK
-        bigint workspace_id FK
-        text claim_text
-        text claim_hash UK
-        text structured_hash UK
-        text verification_status
-        text reservation_status
-        uuid reservation_token
-        bigint[] used_page_ids
-        integer use_count
-        jsonb source_data
-    }
-```
-
-Relasi `posts → trivia_facts` disimpan melalui `posts.content_payload.facts[].fact_id`. Pendekatan ini memungkinkan satu fakta canonical dipakai pada beberapa Page ketika Page tujuan memakai `page_unique`, tanpa menambah tabel penghubung kelima.
-
-`trivia_facts.used_page_ids` menyimpan daftar Page berbeda yang masih tercatat menggunakan atau pernah memublikasikan fakta tersebut. `use_count` adalah jumlah Page unik dalam array itu, bukan jumlah total post. Database function wajib menjaga ringkasan ini tetap konsisten dengan perubahan post. Urutan dan wording tampilan tetap berada pada payload post.
-
-Array `used_page_ids` adalah kompromi sadar untuk mempertahankan empat tabel pada MVP. Tidak ada hard delete Page, seluruh perubahan array hanya melalui RPC transactional, dan setiap ID Page divalidasi sebelum ditulis. Jika kelak dibutuhkan riwayat penggunaan yang lebih kompleks atau banyak post per fakta pada Page yang sama, desain harus bermigrasi ke tabel relasi khusus.
+Satu plan item dapat mempunyai lebih dari satu post historis jika output sebelumnya discarded. Partial unique index memastikan hanya satu post non-discarded/non-archived yang menjadi output aktif untuk item tersebut.
 
 ---
 
@@ -202,57 +168,62 @@ Array `used_page_ids` adalah kompromi sadar untuk mempertahankan empat tabel pad
 
 ### 5.1 Primary key dan public ID
 
-Setiap tabel memakai:
+Setiap tabel bisnis memakai:
 
-- `id bigint generated always as identity` sebagai primary key internal.
-- `public_id uuid` sebagai ID yang boleh dikembalikan melalui MCP.
+- id bigint generated always as identity sebagai primary key internal.
+- public_id uuid dengan default gen_random_uuid() sebagai ID eksternal.
 
-Alasannya:
+MCP hanya mengembalikan public_id. Internal bigint digunakan untuk join dan lock.
 
-- `bigint` efisien untuk foreign key, index, join, dan insertion locality.
-- UUID aman digunakan sebagai ID eksternal tanpa mengungkap jumlah row.
-- Random UUID tidak menjadi clustered primary key sehingga fragmentasi index utama tetap kecil.
+Tabel registry niches memakai key text sebagai primary key karena nilainya kecil, stabil, dan merupakan kontrak modul.
 
-MCP tidak boleh mengekspos internal `id`.
+### 5.2 Ownership dan workspace scope
 
-### 5.2 Waktu
+Semua tabel user-owned membawa workspace_id secara langsung, termasuk tabel modul niche dan metrics. Redundansi ini disengaja agar:
 
-- Semua timestamp memakai `timestamptz`.
-- Database menyimpan waktu dalam UTC.
-- `pages.timezone` menyimpan nama zona IANA, misalnya `America/New_York` atau `Australia/Sydney`.
-- Konversi untuk tampilan dilakukan berdasarkan zona Page.
-- `scheduled_at` selalu menyimpan waktu absolut.
+- RLS sederhana.
+- Query selalu workspace-scoped.
+- Foreign key lintas workspace dapat ditolak.
+- MCP tidak perlu menebak ownership melalui rantai join panjang.
 
-### 5.3 Teks
+Setiap foreign key lintas tabel memakai composite key jika diperlukan untuk memastikan workspace, Page, dan niche konsisten.
 
-- Gunakan `text`, bukan `varchar(n)`.
-- Batas panjang diterapkan melalui check constraint atau validator jika memang merupakan aturan produk.
-- Slug harus lowercase dan mengikuti pola yang ditetapkan.
+### 5.3 Waktu
+
+- Semua timestamp memakai timestamptz dan disimpan dalam UTC.
+- pages.timezone memakai nama IANA.
+- scheduled_at adalah waktu absolut.
+- captured_at menunjukkan kapan metrik diamati, bukan kapan row dimasukkan.
+- Semua tabel mutable memiliki created_at dan updated_at.
 
 ### 5.4 Status
 
-Status memakai `text` dengan check constraint, bukan PostgreSQL enum. Hal ini membuat perubahan status pada pengembangan berikutnya lebih mudah dimigrasikan.
+Status memakai text dengan check constraint, bukan PostgreSQL enum, agar penambahan state dapat dimigrasikan tanpa mengganti type global.
 
 ### 5.5 JSONB
 
-JSONB hanya digunakan untuk data yang:
+JSONB hanya digunakan untuk:
 
-- Bentuknya dapat berbeda antar-niche.
-- Tidak menjadi filter utama query harian.
-- Lebih mudah dibaca sebagai satu dokumen.
+- Konfigurasi berversi.
+- Payload output yang berbeda antar-niche.
+- Snapshot aturan generasi.
+- Source collection dan editorial report.
+- Metrik tambahan yang belum menjadi kolom stabil.
 
-Setiap JSONB mempunyai `schema_version`. Struktur minimum divalidasi saat write. Tidak semua JSONB diberi GIN index; index hanya ditambahkan jika ada query nyata yang membutuhkannya.
+JSONB bukan sumber kebenaran untuk foreign key post–fact, ownership, status, jadwal, atau penggunaan fakta.
 
 ### 5.6 Soft lifecycle
 
-MCP tidak menyediakan hard delete. Data dinonaktifkan atau diarsipkan melalui:
+Tidak ada hard delete melalui MCP.
 
-- `workspaces.is_active`
-- `pages.is_active`
-- `posts.status = 'archived'`
-- `trivia_facts.verification_status = 'rejected'`
+- Workspace dan Page dinonaktifkan dengan is_active.
+- Konfigurasi niche dinonaktifkan dengan is_enabled.
+- Plan dibatalkan dengan status cancelled.
+- Draft dibuang dengan status discarded.
+- Post yang pernah dipublikasikan dapat menjadi archived.
+- Fakta yang tidak layak menjadi rejected.
 
-Foreign key memakai `on delete restrict` untuk mencegah penghapusan tidak sengaja.
+Semua foreign key memakai on delete restrict.
 
 ---
 
@@ -260,154 +231,178 @@ Foreign key memakai `on delete restrict` untuk mencegah penghapusan tidak sengaj
 
 MVP membutuhkan:
 
-```sql
+~~~sql
 create extension if not exists pgcrypto with schema extensions;
 create extension if not exists pg_trgm with schema extensions;
-```
+~~~
 
-Fungsi:
-
-- `pgcrypto` menyediakan SHA-256 untuk hash dan dukungan UUID bila diperlukan.
-- `pg_trgm` menyediakan kandidat kemiripan teks.
-
-MVP tidak memasang:
-
-- `vector`
-- Extension embeddings.
-- Extension queue.
-- Extension cron hanya untuk membersihkan reservasi.
-
-Reservasi kedaluwarsa dibersihkan secara opportunistic ketika tool fakta dipanggil. Cron dapat ditambahkan kelak jika volume membutuhkannya.
+MVP tidak memasang vector, embeddings, queue, atau cron extension. Reservasi kedaluwarsa dibersihkan secara opportunistic ketika tool trivia dipanggil.
 
 ---
 
-## 7. Tabel `workspaces`
+## 7. Tabel core
 
-### 7.1 Tanggung jawab
+### 7.1 Tabel workspaces
 
-Menyimpan pengaturan global dan nilai default untuk Page baru. MVP mempunyai satu workspace aktif, tetapi tabel tetap dapat menyimpan workspace nonaktif untuk migrasi atau ekspansi masa depan.
+#### Tanggung jawab
 
-### 7.2 Kolom
+Menyimpan owner, bahasa default, market, serta setting core yang tidak khusus trivia.
+
+#### Kolom
 
 | Kolom | Tipe | Null | Default | Keterangan |
 |---|---|---:|---|---|
-| `id` | `bigint identity` | Tidak | Identity | Primary key internal |
-| `public_id` | `uuid` | Tidak | `gen_random_uuid()` | ID eksternal |
-| `name` | `text` | Tidak | — | Nama workspace |
-| `slug` | `text` | Tidak | — | Identifier lowercase yang stabil |
-| `language_code` | `text` | Tidak | `'en'` | Bahasa output default |
-| `locale` | `text` | Tidak | `'en-US'` | Locale dan ejaan default |
-| `target_markets` | `text[]` | Tidak | `['US','GB','CA','AU']` | Market utama |
-| `settings` | `jsonb` | Tidak | Config MVP | Pengaturan global tambahan |
-| `is_active` | `boolean` | Tidak | `true` | Workspace aktif |
-| `created_at` | `timestamptz` | Tidak | `now()` | Waktu pembuatan |
-| `updated_at` | `timestamptz` | Tidak | `now()` | Waktu perubahan terakhir |
+| id | bigint identity | Tidak | identity | Primary key |
+| public_id | uuid | Tidak | gen_random_uuid() | ID eksternal |
+| owner_user_id | uuid | Tidak | — | FK ke auth.users.id |
+| name | text | Tidak | — | Nama workspace |
+| slug | text | Tidak | — | Identifier stabil |
+| language_code | text | Tidak | en | Bahasa default |
+| locale | text | Tidak | en-US | Locale default |
+| target_markets | text[] | Tidak | US,GB,CA,AU | Market utama |
+| settings | jsonb | Tidak | object | Setting core |
+| is_active | boolean | Tidak | true | Workspace aktif |
+| created_at | timestamptz | Tidak | now() | Dibuat |
+| updated_at | timestamptz | Tidak | now() | Diubah |
 
-### 7.3 Constraint
+#### Constraint
 
-- Primary key pada `id`.
-- Unique pada `public_id`.
-- Unique pada `slug`.
-- `slug` harus cocok dengan `^[a-z][a-z0-9-]{1,62}$`.
-- `language_code` harus `en` pada MVP.
-- `locale` harus `en-US` pada MVP.
-- `target_markets` hanya boleh berisi `US`, `GB`, `CA`, dan `AU`.
-- Array market harus memiliki minimal satu nilai dan tidak boleh duplikat.
-- `settings` harus JSON object.
-- Hanya satu row boleh mempunyai `is_active = true`.
+- Unique public_id.
+- Unique slug.
+- FK owner_user_id ke auth.users.id dengan on delete restrict.
+- Maksimal satu workspace aktif per owner pada MVP.
+- language_code = en dan locale = en-US pada MVP.
+- target_markets hanya US, GB, CA, AU; UK dinormalisasi menjadi GB sebelum write.
+- settings harus JSON object.
 
-### 7.4 Struktur `settings`
+Contoh settings:
 
-Versi awal:
-
-```json
+~~~json
 {
   "schema_version": 1,
-  "default_fact_count": {
-    "mode": "adaptive",
-    "min": 5,
-    "preferred": 7,
-    "max": 9
-  },
-  "default_text_budget": {
-    "hook_max_chars": 45,
-    "fact_max_chars": 90,
-    "facts_total_max_chars": 500,
-    "cta_max_chars": 50,
-    "canva_total_max_chars": 600
-  },
-  "default_fact_reuse_scope": "workspace_unique",
   "reservation_ttl_minutes": 30,
-  "default_post_status": "draft"
+  "default_post_status": "draft",
+  "default_plan_chunk_size": 4
 }
-```
+~~~
+
+Nilai reservation TTL antara 5–120 menit. Chunk size default 4 dan rentang MVP 1–5.
+
+### 7.2 Tabel niches
+
+#### Tanggung jawab
+
+Registry modul niche yang dikenali sistem.
+
+| Kolom | Tipe | Null | Default | Keterangan |
+|---|---|---:|---|---|
+| key | text | Tidak | — | Primary key stabil |
+| name | text | Tidak | — | Nama tampilan |
+| status | text | Tidak | development | development, active, disabled |
+| module_version | integer | Tidak | 1 | Versi implementasi modul |
+| config_schema_version | integer | Tidak | 1 | Versi config aktif |
+| content_schema_version | integer | Tidak | 1 | Versi payload aktif |
+| created_at | timestamptz | Tidak | now() | Dibuat |
+| updated_at | timestamptz | Tidak | now() | Diubah |
+
+MVP melakukan seed:
+
+~~~sql
+insert into public.niches
+  (key, name, status, module_version, config_schema_version, content_schema_version)
+values
+  ('trivia', 'Trivia Facts', 'active', 1, 1, 1);
+~~~
+
+Registry hanya dapat dibaca oleh authenticated user. Perubahan dilakukan melalui migration, bukan tool percakapan.
+
+### 7.3 Tabel pages
+
+#### Tanggung jawab
+
+Menyimpan identitas Page dan konfigurasi umum lintas-niche.
+
+| Kolom | Tipe | Null | Default | Keterangan |
+|---|---|---:|---|---|
+| id | bigint identity | Tidak | identity | Primary key |
+| public_id | uuid | Tidak | gen_random_uuid() | ID eksternal |
+| workspace_id | bigint | Tidak | — | Workspace owner |
+| name | text | Tidak | — | Nama Facebook Page |
+| slug | text | Tidak | — | Unik dalam workspace |
+| platform | text | Tidak | facebook | Platform |
+| language_code | text | Tidak | en | Bahasa |
+| locale | text | Tidak | en-US | Locale |
+| timezone | text | Tidak | UTC | Zona IANA |
+| target_markets | text[] | Tidak | US,GB,CA,AU | Market Page |
+| default_niche_key | text | Ya | null | Default bila tidak ambigu |
+| platform_config | jsonb | Tidak | object | Preferensi umum platform |
+| is_active | boolean | Tidak | true | Aktif |
+| created_at | timestamptz | Tidak | now() | Dibuat |
+| updated_at | timestamptz | Tidak | now() | Diubah |
 
 Aturan:
 
-- `default_fact_count` memakai mode adaptive 5/7/9.
-- `default_text_budget` memakai baseline Canva MVP dan menjadi nilai awal Page baru.
-- `default_fact_reuse_scope` adalah `workspace_unique`; nilai ini dipakai saat membuat Page baru.
-- `reservation_ttl_minutes` antara 5 dan 120 menit.
-- Nilai default adalah 30 menit.
+- Unique public_id dan unique workspace_id + slug.
+- Composite unique workspace_id + id untuk foreign key scoped.
+- platform hanya facebook pada MVP.
+- default_niche_key harus menunjuk niche yang enabled untuk Page; invariant ini divalidasi RPC.
+- Timezone harus terdapat pada pg_timezone_names.
+- platform_config harus object.
+- Tidak ada konfigurasi trivia di tabel ini.
 
----
+### 7.4 Tabel page_niche_configs
 
-## 8. Tabel `pages`
+#### Tanggung jawab
 
-### 8.1 Tanggung jawab
-
-Menyimpan satu profil Facebook Page dan aturan produksi kontennya.
-
-### 8.2 Kolom
+Menyimpan aturan produksi khusus satu niche pada satu Page.
 
 | Kolom | Tipe | Null | Default | Keterangan |
 |---|---|---:|---|---|
-| `id` | `bigint identity` | Tidak | Identity | Primary key internal |
-| `public_id` | `uuid` | Tidak | `gen_random_uuid()` | ID eksternal |
-| `workspace_id` | `bigint` | Tidak | — | Workspace pemilik |
-| `name` | `text` | Tidak | — | Nama Facebook Page |
-| `slug` | `text` | Tidak | — | Nama pendek unik dalam workspace |
-| `niche_code` | `text` | Tidak | `'trivia'` | Modul konten yang digunakan |
-| `language_code` | `text` | Tidak | `'en'` | Bahasa output |
-| `locale` | `text` | Tidak | `'en-US'` | Standar bahasa utama |
-| `timezone` | `text` | Tidak | `'UTC'` | Zona IANA untuk jadwal |
-| `target_markets` | `text[]` | Tidak | `['US','GB','CA','AU']` | Market Page |
-| `content_config` | `jsonb` | Tidak | — | Aturan konten Page |
-| `is_active` | `boolean` | Tidak | `true` | Page tersedia untuk produksi |
-| `created_at` | `timestamptz` | Tidak | `now()` | Waktu pembuatan |
-| `updated_at` | `timestamptz` | Tidak | `now()` | Waktu perubahan terakhir |
+| id | bigint identity | Tidak | identity | Primary key |
+| public_id | uuid | Tidak | gen_random_uuid() | ID eksternal |
+| workspace_id | bigint | Tidak | — | Workspace |
+| page_id | bigint | Tidak | — | Page |
+| niche_key | text | Tidak | — | Modul niche |
+| config_schema_version | integer | Tidak | 1 | Versi validator |
+| config | jsonb | Tidak | — | Konfigurasi niche |
+| is_enabled | boolean | Tidak | true | Boleh dipakai |
+| is_default | boolean | Tidak | false | Default Page |
+| created_at | timestamptz | Tidak | now() | Dibuat |
+| updated_at | timestamptz | Tidak | now() | Diubah |
 
-### 8.3 Constraint dan relasi
+Constraint penting:
 
-- Foreign key `workspace_id → workspaces.id` dengan `on delete restrict`.
-- Unique `public_id`.
-- Unique `(workspace_id, slug)`.
-- Composite unique `(workspace_id, id, niche_code)` untuk menjamin post berada pada workspace dan niche yang sama.
-- `slug` mengikuti pola lowercase yang sama dengan workspace.
-- `niche_code` mengikuti pola `^[a-z][a-z0-9_]{1,31}$`.
-- MCP hanya menerima `trivia` pada MVP.
-- `language_code = 'en'` dan `locale = 'en-US'` pada MVP.
-- Market hanya `US`, `GB`, `CA`, `AU`, minimal satu, tanpa duplikat.
-- `timezone` harus terdapat pada `pg_timezone_names`.
-- `content_config` harus JSON object dan lulus validator niche.
+- Unique page_id + niche_key.
+- Composite unique workspace_id + page_id + niche_key.
+- FK workspace_id + page_id ke pages.
+- FK niche_key ke niches.
+- Hanya satu config enabled yang is_default per Page.
+- config harus object dan lulus validator sesuai niche serta config_schema_version.
 
-### 8.4 Struktur `content_config` untuk trivia
+#### Config trivia versi 1
 
-Schema JSON berikut berlaku untuk semua Page trivia, tetapi nilainya dimiliki oleh masing-masing row `pages`. Karena itu dua Page dengan niche sama dapat mempunyai mode jumlah fakta, text budget, topik, bobot, gaya, dan kebijakan reuse yang berbeda.
-
-Jika `create_page` tidak menerima pilihan jumlah, text budget, atau reuse, RPC menyalin default terkait dari workspace aktif ke `content_config` Page baru. Setelah Page dibuat, perubahan satu Page tidak memengaruhi konfigurasi Page lain.
-
-```json
+~~~json
 {
-  "schema_version": 1,
-  "architecture_weights": {
-    "themed": 45,
-    "single_subject": 40,
-    "mixed": 15
+  "allowed_formats": [
+    "single_subject_fast",
+    "themed_utility",
+    "emotional_animal_collection",
+    "comparison",
+    "myth_vs_fact"
+  ],
+  "format_weights": {
+    "single_subject_fast": 35,
+    "themed_utility": 20,
+    "emotional_animal_collection": 20,
+    "comparison": 15,
+    "myth_vs_fact": 10
   },
   "allowed_topics": [
     "animals",
+    "pet_safety",
     "food_science",
+    "food_storage_home",
+    "practical_utility",
     "human_body",
     "nature_science",
     "geography",
@@ -415,15 +410,13 @@ Jika `create_page` tidak menerima pilihan jumlah, text budget, atau reuse, RPC m
     "inventions_everyday",
     "general_trivia"
   ],
-  "topic_weights": {
-    "animals": 25,
-    "food_science": 20,
-    "human_body": 15,
-    "nature_science": 15,
-    "geography": 15,
-    "history_origins": 5,
-    "inventions_everyday": 3,
-    "general_trivia": 2
+  "topic_group_weights": {
+    "animals_pet_safety": 30,
+    "human_body_food_myth": 20,
+    "practical_utility": 15,
+    "places_geography": 15,
+    "nature_space": 10,
+    "history_inventions_people": 10
   },
   "fact_count": {
     "mode": "adaptive",
@@ -431,7 +424,27 @@ Jika `create_page` tidak menerima pilihan jumlah, text budget, atau reuse, RPC m
     "preferred": 7,
     "max": 9
   },
+  "profiles": {
+    "fast_trivia": {
+      "fact_count_min": 7,
+      "fact_count_max": 8,
+      "words_per_fact_min": 8,
+      "words_per_fact_max": 11,
+      "total_words_min": 65,
+      "total_words_max": 85
+    },
+    "practical_utility": {
+      "fact_count_min": 5,
+      "fact_count_max": 6,
+      "words_per_fact_min": 10,
+      "words_per_fact_max": 14,
+      "total_words_min": 65,
+      "total_words_max": 85
+    }
+  },
   "fact_reuse_scope": "workspace_unique",
+  "render_style": "plain_lines",
+  "allowed_interaction_goals": ["share", "save", "comment", "follow"],
   "text_budget": {
     "hook_max_chars": 45,
     "fact_max_chars": 90,
@@ -454,1168 +467,1220 @@ Jika `create_page` tidak menerima pilihan jumlah, text budget, atau reuse, RPC m
     "regional_slang_allowed": false
   }
 }
-```
+~~~
 
-Validator wajib memastikan:
+Validator memastikan:
 
-- Bobot architecture berjumlah 100.
-- Bobot topic hanya memakai topic yang ada di `allowed_topics` dan berjumlah 100.
-- `fact_count.mode` hanya `fixed` atau `adaptive`.
-- Mode fixed mempunyai tepat `value` berupa bilangan bulat 5–9 dan tidak mempunyai `min`, `preferred`, atau `max`.
-- Mode adaptive mempunyai `5 ≤ min ≤ preferred ≤ max ≤ 9` dan tidak mempunyai `value`.
-- Default Page baru adalah adaptive dengan min 5, preferred 7, dan max 9.
-- `text_budget` memiliki seluruh lima batas karakter positif; nilai Page tidak boleh melewati hard ceiling keamanan payload yang ditetapkan validator.
-- `hook_max_chars ≤ 90`, `fact_max_chars ≤ 120`, `facts_total_max_chars ≤ 900`, `cta_max_chars ≤ 100`, dan `canva_total_max_chars ≤ 1000` pada MVP.
-- `facts_total_max_chars` tidak boleh melebihi `canva_total_max_chars`.
-- `fact_reuse_scope` hanya `workspace_unique` atau `page_unique`; default Page baru adalah `workspace_unique`.
-- `workspace_unique` menolak fakta yang sudah digunakan Page mana pun.
-- `page_unique` mengizinkan reuse lintas Page tetapi menolak fakta yang sudah digunakan Page tujuan yang sama.
-- Batas Canva, caption, dan hashtag sesuai PRD.
-- Tidak ada key wajib yang hilang.
-- Key tambahan hanya diterima bila validator versi schema mengenalinya.
+- Format dan topic hanya berasal dari allowlist versi modul.
+- Bobot format berjumlah 100.
+- Bobot topic group berjumlah 100.
+- Mode fixed memakai value 5–9.
+- Mode adaptive memenuhi 5 ≤ min ≤ preferred ≤ max ≤ 9.
+- text_budget lengkap, positif, dan tidak melewati hard ceiling MVP.
+- facts_total_max_chars tidak melebihi canva_total_max_chars.
+- fact_reuse_scope hanya workspace_unique atau page_unique.
+- render_style hanya plain_lines atau numbered.
+- Interaction goal hanya share, save, comment, atau follow.
+- Key tambahan hanya diterima bila validator schema mengenalinya.
 
-Contoh mode fixed untuk Page yang selalu memakai 7 fakta:
+### 7.5 Tabel content_plans
 
-```json
-{
-  "fact_count": {
-    "mode": "fixed",
-    "value": 7
-  }
-}
-```
+#### Tanggung jawab
 
-Jumlah adaptif tidak memakai RNG. ChatGPT melakukan pemilihan berbasis kualitas dan panjang, sedangkan validator memastikan jumlah final serta teks final tidak melewati konfigurasi.
-
----
-
-## 9. Tabel `posts`
-
-### 9.1 Tanggung jawab
-
-Menyimpan output post, status, jadwal, hasil quality check, dan payload sesuai niche.
-
-### 9.2 Kolom
+Menyimpan intent dan konfigurasi batch/kalender sehingga proses dapat dilanjutkan antar-chat.
 
 | Kolom | Tipe | Null | Default | Keterangan |
 |---|---|---:|---|---|
-| `id` | `bigint identity` | Tidak | Identity | Primary key internal |
-| `public_id` | `uuid` | Tidak | `gen_random_uuid()` | ID yang ditampilkan ke ChatGPT |
-| `workspace_id` | `bigint` | Tidak | — | Workspace post |
-| `page_id` | `bigint` | Tidak | — | Facebook Page tujuan |
-| `operation_key` | `uuid` | Tidak | — | Idempotency key saat pembuatan |
-| `plan_id` | `uuid` | Ya | `null` | Pengelompokan kalender tanpa tabel plan |
-| `niche_code` | `text` | Tidak | — | Niche post |
-| `status` | `text` | Tidak | `'draft'` | Lifecycle post |
-| `content_payload` | `jsonb` | Tidak | — | Seluruh output publik dan referensi fact ID |
-| `quality_status` | `text` | Tidak | `'pending'` | `pending`, `passed`, atau `failed` |
-| `quality_report` | `jsonb` | Tidak | `{}` | Ringkasan quality gate |
-| `scheduled_at` | `timestamptz` | Ya | `null` | Waktu kalender/publikasi yang direncanakan |
-| `ready_at` | `timestamptz` | Ya | `null` | Waktu disetujui |
-| `posted_at` | `timestamptz` | Ya | `null` | Waktu ditandai telah diposting |
-| `archived_at` | `timestamptz` | Ya | `null` | Waktu diarsipkan |
-| `revision` | `integer` | Tidak | `1` | Optimistic concurrency counter |
-| `created_at` | `timestamptz` | Tidak | `now()` | Waktu pembuatan |
-| `updated_at` | `timestamptz` | Tidak | `now()` | Waktu perubahan terakhir |
+| id | bigint identity | Tidak | identity | Primary key |
+| public_id | uuid | Tidak | gen_random_uuid() | ID eksternal |
+| workspace_id | bigint | Tidak | — | Workspace |
+| page_id | bigint | Tidak | — | Page |
+| niche_key | text | Tidak | — | Tepat satu niche |
+| operation_key | uuid | Tidak | — | Idempotency create |
+| name | text | Ya | null | Nama plan |
+| status | text | Tidak | pending | Lifecycle plan |
+| requested_count | integer | Tidak | — | Jumlah slot |
+| config_schema_version | integer | Tidak | 1 | Versi config snapshot |
+| plan_config | jsonb | Tidak | object | Intent dan snapshot |
+| started_at | timestamptz | Ya | null | Mulai diproses |
+| completed_at | timestamptz | Ya | null | Semua item terminal |
+| cancelled_at | timestamptz | Ya | null | Dibatalkan |
+| created_at | timestamptz | Tidak | now() | Dibuat |
+| updated_at | timestamptz | Tidak | now() | Diubah |
 
-### 9.3 Constraint dan relasi
+Status plan:
 
-- Foreign key `workspace_id → workspaces.id` dengan `on delete restrict`.
-- Composite foreign key `(workspace_id, page_id, niche_code) → pages(workspace_id, id, niche_code)`.
-- Unique `public_id`.
-- Unique `(workspace_id, operation_key)`.
-- `status` hanya `draft`, `ready`, `posted`, `archived`.
-- `quality_status` hanya `pending`, `passed`, `failed`.
-- `revision ≥ 1`.
-- `content_payload` dan `quality_report` harus JSON object.
-- `ready` dan `posted` hanya boleh mempunyai `quality_status = 'passed'`.
-- Status `ready` atau `posted` membutuhkan `ready_at`.
-- Status `posted` membutuhkan `posted_at`.
-- Status `archived` membutuhkan `archived_at`.
-- `content_payload` wajib lulus validator berdasarkan `niche_code`.
-- Satu Page tidak boleh mempunyai dua post non-archived pada `scheduled_at` yang sama.
+- pending
+- in_progress
+- partially_completed
+- completed
+- failed
+- cancelled
 
-### 9.4 Struktur `content_payload` untuk trivia
+Plan config menyimpan rentang tanggal, frekuensi, requested topic/format mix, chunk size, dan snapshot konfigurasi Page+niche. Counter progress tidak menjadi sumber kebenaran; progress dihitung dari content_plan_items.
 
-```json
+### 7.6 Tabel content_plan_items
+
+#### Tanggung jawab
+
+Menyimpan setiap slot yang diminta sebelum post berhasil dibuat.
+
+| Kolom | Tipe | Null | Default | Keterangan |
+|---|---|---:|---|---|
+| id | bigint identity | Tidak | identity | Primary key |
+| public_id | uuid | Tidak | gen_random_uuid() | ID eksternal |
+| workspace_id | bigint | Tidak | — | Workspace |
+| plan_id | bigint | Tidak | — | Content plan |
+| page_id | bigint | Tidak | — | Page |
+| niche_key | text | Tidak | — | Niche |
+| position | integer | Tidak | — | Urutan dalam plan |
+| operation_key | uuid | Tidak | — | Idempotency item |
+| status | text | Tidak | pending | Progress generasi |
+| scheduled_at | timestamptz | Ya | null | Slot yang diminta |
+| topic_key | text | Ya | null | Intent topik |
+| format_key | text | Ya | null | Intent format |
+| interaction_goal | text | Ya | null | share/save/comment/follow |
+| item_config | jsonb | Tidak | object | Override dan snapshot |
+| attempt_count | integer | Tidak | 0 | Jumlah percobaan |
+| last_error_code | text | Ya | null | Error aman |
+| last_error_detail | text | Ya | null | Detail singkat |
+| started_at | timestamptz | Ya | null | Diproses |
+| completed_at | timestamptz | Ya | null | Output tersimpan |
+| created_at | timestamptz | Tidak | now() | Dibuat |
+| updated_at | timestamptz | Tidak | now() | Diubah |
+
+Status item:
+
+- pending
+- in_progress
+- completed
+- failed
+- cancelled
+
+Constraint:
+
+- Unique plan_id + position.
+- Unique workspace_id + operation_key.
+- Composite FK ke plan menjamin workspace, Page, dan niche sama.
+- scheduled_at untuk Page yang sama tidak boleh dimiliki dua plan item non-cancelled.
+- attempt_count tidak negatif.
+- last_error_detail tidak menyimpan secret, token, atau seluruh output model.
+
+### 7.7 Tabel posts
+
+#### Tanggung jawab
+
+Menyimpan output publik, lifecycle, quality state, jadwal final, dan payload niche berversi.
+
+| Kolom | Tipe | Null | Default | Keterangan |
+|---|---|---:|---|---|
+| id | bigint identity | Tidak | identity | Primary key |
+| public_id | uuid | Tidak | gen_random_uuid() | ID eksternal |
+| workspace_id | bigint | Tidak | — | Workspace |
+| page_id | bigint | Tidak | — | Page |
+| niche_key | text | Tidak | — | Niche |
+| content_plan_item_id | bigint | Ya | null | Slot asal |
+| operation_key | uuid | Tidak | — | Idempotency create |
+| format_key | text | Tidak | — | Format milik niche |
+| topic_key | text | Tidak | — | Topik utama untuk filtering dan analytics |
+| interaction_goal | text | Tidak | — | share/save/comment/follow |
+| content_schema_version | integer | Tidak | 1 | Versi payload |
+| status | text | Tidak | draft | Lifecycle |
+| content_payload | jsonb | Tidak | — | Output publik |
+| generation_snapshot | jsonb | Tidak | — | Config dan input generasi |
+| system_checks | jsonb | Tidak | object | Hasil check DB |
+| editorial_checks | jsonb | Tidak | object | Attestation model/user |
+| quality_status | text | Tidak | pending | pending/passed/failed |
+| scheduled_at | timestamptz | Ya | null | Jadwal final |
+| published_at | timestamptz | Ya | null | Publikasi aktual |
+| platform_post_id | text | Ya | null | ID Facebook |
+| published_url | text | Ya | null | URL Facebook |
+| ready_at | timestamptz | Ya | null | Disetujui |
+| discarded_at | timestamptz | Ya | null | Dibuang |
+| archived_at | timestamptz | Ya | null | Diarsipkan |
+| revision | integer | Tidak | 1 | Optimistic concurrency |
+| created_at | timestamptz | Tidak | now() | Dibuat |
+| updated_at | timestamptz | Tidak | now() | Diubah |
+
+Status:
+
+- draft
+- ready
+- posted
+- discarded
+- archived
+
+Aturan:
+
+- Satu post memiliki satu Page dan satu niche aktif.
+- Config Page+niche harus ada pada saat post dibuat.
+- content_payload, generation_snapshot, system_checks, dan editorial_checks harus object.
+- content_schema_version harus didukung modul.
+- ready, posted, dan archived membutuhkan quality_status passed serta ready_at.
+- posted dan archived membutuhkan published_at.
+- discarded membutuhkan discarded_at dan tidak boleh mempunyai published_at.
+- archived membutuhkan archived_at dan hanya berasal dari posted.
+- revision minimal 1.
+- Satu Page tidak memiliki dua post aktif pada scheduled_at sama.
+- Untuk satu plan item hanya satu post non-discarded/non-archived boleh aktif.
+- published_url harus HTTPS jika diisi.
+- platform_post_id unik per Page jika diisi.
+
+#### Payload trivia versi 1
+
+~~~json
 {
   "schema_version": 1,
-  "rules_snapshot": {
-    "fact_count": {
-      "mode": "adaptive",
-      "min": 5,
-      "preferred": 7,
-      "max": 9
-    },
-    "fact_count_applied": 5,
-    "fact_count_override": false,
-    "text_budget": {
-      "hook_max_chars": 45,
-      "fact_max_chars": 90,
-      "facts_total_max_chars": 500,
-      "cta_max_chars": 50,
-      "canva_total_max_chars": 600
-    },
-    "fact_reuse_scope": "workspace_unique"
-  },
-  "architecture": "mixed",
-  "topic_code": "general_trivia",
-  "theme": "surprising facts",
   "hook": "Did you know?",
-  "facts": [
-    {
-      "position": 1,
-      "fact_id": "1f2a98b8-91bd-4f93-8998-b8050e4f6b08",
-      "text": "Octopuses have three hearts."
-    },
-    {
-      "position": 2,
-      "fact_id": "1f2a98b8-91bd-4f93-8998-b8050e4f6b09",
-      "text": "Honey never spoils when stored properly."
-    },
-    {
-      "position": 3,
-      "fact_id": "1f2a98b8-91bd-4f93-8998-b8050e4f6b0a",
-      "text": "Bananas are berries, but strawberries are not."
-    },
-    {
-      "position": 4,
-      "fact_id": "1f2a98b8-91bd-4f93-8998-b8050e4f6b0b",
-      "text": "A day on Venus is longer than its year."
-    },
-    {
-      "position": 5,
-      "fact_id": "1f2a98b8-91bd-4f93-8998-b8050e4f6b0c",
-      "text": "Sharks existed before trees."
-    }
-  ],
-  "cta": "Follow for more surprising facts.",
-  "canva_copy": "Did you know?\n\n1. Octopuses have three hearts.\n2. Honey never spoils when stored properly.\n3. Bananas are berries, but strawberries are not.\n4. A day on Venus is longer than its year.\n5. Sharks existed before trees.\n\nFollow for more surprising facts.",
+  "body": {
+    "subject": "Dogs",
+    "facts": [
+      {
+        "position": 1,
+        "text": "Dogs can learn more than 100 words and gestures."
+      }
+    ]
+  },
+  "cta": "Share this with a dog lover.",
+  "canva_copy": "Did you know?\n\nDogs can learn more than 100 words and gestures.\n\nShare this with a dog lover.",
+  "caption": "A few surprising things about dogs.",
+  "hashtags": ["#DogFacts", "#DidYouKnow", "#Trivia"],
+  "render_style": "plain_lines",
   "text_metrics": {
     "hook_chars": 13,
-    "fact_chars": [28, 40, 46, 39, 28],
-    "facts_total_chars": 200,
-    "cta_chars": 33,
-    "canva_total_chars": 250
-  },
-  "caption": "A ready-to-paste Facebook caption.",
-  "hashtags": ["#DidYouKnow", "#AmazingFacts", "#Trivia"],
-  "fact_count_exception": null,
-  "visual_direction": {
-    "background": "subtle wildlife footage",
-    "motion": "slow"
+    "fact_chars": [54],
+    "facts_total_chars": 54,
+    "cta_chars": 34,
+    "canva_total_chars": 105,
+    "word_count": 18,
+    "fact_word_counts": [9],
+    "line_count": 5,
+    "estimated_read_seconds": 7.2,
+    "estimated_loops": 1
   }
 }
-```
+~~~
 
-Validator `content_payload` trivia wajib memastikan:
+Fact IDs tidak menjadi sumber relasi di payload. Urutan, canonical fact, dan snapshot verifikasi berada pada trivia_post_facts.
 
-- `schema_version = 1`.
-- `rules_snapshot` wajib menyalin rule Page yang benar-benar diterapkan saat save.
-- `fact_count_applied` harus sama dengan jumlah item `facts`.
-- Pada fixed, jumlah harus sama dengan `value`; pada adaptive, jumlah harus berada antara `min` dan `max`.
-- `fact_count_override = true` hanya untuk permintaan eksplisit pengguna yang berbeda dari fixed value atau berada di luar rentang adaptive tetapi tetap dalam batas MVP 5–9.
-- `text_metrics` wajib dihitung ulang oleh database function; nilai dari client tidak dipercaya.
-- Penghitungan memakai `char_length`, sehingga spasi, punctuation, nomor atau bullet yang dirender, dan line break ikut dihitung.
-- `fact_chars` menghitung teks setiap fakta tanpa prefix posisi; `facts_total_chars` menghitung blok fakta final beserta prefix dan line break; `canva_total_chars` menghitung string `canva_copy` persis seperti disimpan.
-- Setiap nilai aktual wajib kurang dari atau sama dengan batas terkait pada `rules_snapshot.text_budget`.
-- `architecture` termasuk `themed`, `single_subject`, `mixed`.
-- `topic_code` termasuk allowlist Page.
-- Mode adaptive tidak mewajibkan jumlah sama dengan preferred; preferred adalah sasaran lunak setelah kualitas dan budget dipenuhi.
-- Override eksplisit untuk satu post boleh berisi 5–9 item tanpa mengubah konfigurasi Page.
-- Jumlah 1–4 hanya diterima jika `fact_count_exception` mencatat alasan, waktu, dan konfirmasi eksplisit pengguna sesuai PRD.
-- `position` unik dan berurutan mulai dari 1.
-- `fact_id` valid dan tidak berulang.
-- `hook` tidak kosong dan mengikuti snapshot text budget.
-- Setiap `facts[].text`, blok fakta hasil render, dan `cta` mengikuti snapshot text budget.
-- `canva_copy` tidak kosong.
-- `canva_copy` mengikuti `canva_total_max_chars`.
-- `caption` maksimal 500 karakter.
-- `hashtags` berupa array 0–5 string unik.
-- Tidak ada URL sumber atau internal database ID di `canva_copy`.
+#### Generation snapshot trivia
 
-Database function `save_post` dan `revise_post` harus memastikan setiap `fact_id` valid, memenuhi kebijakan reuse Page tujuan, dan riwayat Page pada fakta diperbarui secara atomic.
-
-Perubahan `pages.content_config` tidak mengubah post lama. Revisi wording mempertahankan `rules_snapshot`. Revisi yang secara eksplisit menerapkan rule Page terbaru harus membaca config terbaru, memvalidasi ulang jumlah, text budget, dan reuse, lalu mengganti snapshot dalam transaction yang sama.
-
-Sumber tidak disalin ke `posts.content_payload`. Sumber otoritatif tetap berada di `trivia_facts.source_data` dan diambil melalui relasi fakta yang dipakai post. Dengan begitu, aplikasi tidak mempunyai dua salinan sumber yang dapat berbeda. Output untuk Canva dan Facebook tetap bebas URL, sedangkan tool dapat menampilkan daftar sumber secara terpisah ketika diminta pengguna.
-
-### 9.5 Struktur `quality_report`
-
-```json
+~~~json
 {
-  "schema_version": 1,
-  "checked_at": "2026-10-06T10:30:00Z",
-  "checks": {
-    "page_context": true,
-    "fact_count": true,
-    "text_budget": true,
-    "sources": true,
-    "reuse_policy": true,
-    "fact_accuracy": true,
-    "time_sensitive_context": true,
-    "content_safety": true,
-    "american_english": true,
-    "global_clarity": true,
-    "formatting": true,
-    "caption": true,
-    "hashtags": true
+  "config_schema_version": 1,
+  "fact_count": {
+    "mode": "adaptive",
+    "min": 5,
+    "preferred": 7,
+    "max": 9
   },
-  "notes": []
+  "fact_count_applied": 7,
+  "fact_count_override": false,
+  "text_budget": {
+    "hook_max_chars": 45,
+    "fact_max_chars": 90,
+    "facts_total_max_chars": 500,
+    "cta_max_chars": 50,
+    "canva_total_max_chars": 600
+  },
+  "fact_reuse_scope": "workspace_unique",
+  "profile_key": "fast_trivia",
+  "render_style": "plain_lines",
+  "target_markets": ["US", "GB", "CA", "AU"],
+  "locale": "en-US"
 }
-```
+~~~
 
-Database hanya memeriksa bahwa seluruh key kritis bernilai `true` sebelum status menjadi `ready`. Isi editorial berasal dari review ChatGPT.
+### 7.8 Tabel post_metrics
+
+#### Tanggung jawab
+
+Menyimpan snapshot performa manual tanpa menimpa pengamatan lama.
+
+| Kolom | Tipe | Null | Default | Keterangan |
+|---|---|---:|---|---|
+| id | bigint identity | Tidak | identity | Primary key |
+| public_id | uuid | Tidak | gen_random_uuid() | ID eksternal |
+| workspace_id | bigint | Tidak | — | Workspace |
+| page_id | bigint | Tidak | — | Page |
+| post_id | bigint | Tidak | — | Post |
+| operation_key | uuid | Tidak | — | Idempotency write |
+| captured_at | timestamptz | Tidak | — | Waktu observasi |
+| views | bigint | Ya | null | Views |
+| reach | bigint | Ya | null | Reach |
+| reactions | bigint | Ya | null | Reactions |
+| comments | bigint | Ya | null | Comments |
+| shares | bigint | Ya | null | Shares |
+| saves | bigint | Ya | null | Saves |
+| follows | bigint | Ya | null | Follows |
+| watch_time_seconds | numeric | Ya | null | Total watch time |
+| average_watch_time_seconds | numeric | Ya | null | Average watch time |
+| metrics_payload | jsonb | Tidak | object | Metrik tambahan |
+| created_at | timestamptz | Tidak | now() | Dibuat |
+
+Aturan:
+
+- Unique workspace_id + operation_key.
+- Unique post_id + captured_at.
+- Semua metrik numerik tidak negatif.
+- Minimal satu metrik dikenal atau satu key metrics_payload harus tersedia.
+- Post harus posted atau archived.
+- Metrics tidak membuktikan sebab-akibat dan tidak menjadi syarat lifecycle.
 
 ---
 
-## 10. Tabel `trivia_facts`
+## 8. Modul trivia
 
-### 10.1 Tanggung jawab
+### 8.1 Tabel trivia_facts
 
-Menyimpan satu klaim fakta per row beserta:
+#### Tanggung jawab
 
-- Bentuk canonical.
-- Data terstruktur untuk deduplikasi.
-- Sumber.
-- Status verifikasi.
-- Ringkasan penggunaan per Page.
-- Reservasi sementara.
-- Referensi dari post melalui `content_payload`.
+Menyimpan satu canonical claim per workspace, sumber, ontology key, freshness, dan state reservasi sementara.
 
-### 10.2 Kolom identitas dan relasi
+#### Kolom identitas dan deduplikasi
 
 | Kolom | Tipe | Null | Default | Keterangan |
 |---|---|---:|---|---|
-| `id` | `bigint identity` | Tidak | Identity | Primary key internal |
-| `public_id` | `uuid` | Tidak | `gen_random_uuid()` | ID eksternal fakta |
-| `workspace_id` | `bigint` | Tidak | — | Scope deduplikasi |
-| `reserved_for_page_id` | `bigint` | Ya | `null` | Page tujuan saat reserved |
+| id | bigint identity | Tidak | identity | Primary key |
+| public_id | uuid | Tidak | gen_random_uuid() | ID eksternal |
+| workspace_id | bigint | Tidak | — | Workspace |
+| claim_text | text | Tidak | — | Canonical claim |
+| normalized_claim | text | Tidak | — | Hasil normalisasi |
+| normalization_version | integer | Tidak | 1 | Versi normalisasi |
+| claim_hash | text | Tidak | — | SHA-256 normalized claim |
+| subject_key | text | Tidak | — | Canonical subject |
+| relation_key | text | Tidak | — | Relation ontology |
+| object_key | text | Tidak | — | Canonical object |
+| numbers | jsonb | Tidak | array | Angka dan unit normalized |
+| qualifiers | jsonb | Tidak | object | Waktu, tempat, kondisi |
+| ontology_version | integer | Tidak | 1 | Versi ontology |
+| structured_key | text | Tidak | — | Serialisasi deterministik |
+| structured_hash | text | Tidak | — | SHA-256 structured key |
+| topic_key | text | Tidak | — | Topik trivia |
 
-### 10.3 Kolom klaim dan deduplikasi
-
-| Kolom | Tipe | Null | Default | Keterangan |
-|---|---|---:|---|---|
-| `claim_text` | `text` | Tidak | — | Klaim canonical yang mudah dibaca |
-| `normalized_claim` | `text` | Tidak | — | Hasil normalisasi deterministik |
-| `normalization_version` | `smallint` | Tidak | `1` | Versi algoritma normalisasi |
-| `claim_hash` | `text` | Tidak | — | SHA-256 dari normalized claim |
-| `subject_key` | `text` | Tidak | — | Subjek canonical |
-| `relation_key` | `text` | Tidak | — | Relasi/predicate canonical |
-| `object_key` | `text` | Tidak | — | Objek/nilai canonical |
-| `numbers` | `jsonb` | Tidak | `[]` | Angka dan satuan canonical |
-| `qualifiers` | `jsonb` | Tidak | `{}` | Batasan penting klaim |
-| `structured_key` | `text` | Tidak | — | Bentuk terstruktur yang masih dapat dibaca |
-| `structured_hash` | `text` | Tidak | — | SHA-256 structured key |
-| `topic_code` | `text` | Tidak | — | Topik fakta |
-| `search_vector` | `tsvector` | Tidak | Generated | Full Text Search document |
-
-Contoh data terstruktur:
-
-```json
-{
-  "subject_key": "octopus",
-  "relation_key": "has_body_part_count",
-  "object_key": "heart",
-  "numbers": [
-    {
-      "value": 3,
-      "unit": "count"
-    }
-  ],
-  "qualifiers": {
-    "species_scope": "general"
-  }
-}
-```
-
-`structured_key` yang dihasilkan:
-
-```text
-octopus|has_body_part_count|heart|count:3|species_scope:general
-```
-
-Unit harus dinormalisasi sebelum structured key dibentuk. Contohnya, 10 feet dan 3.048 meters harus menghasilkan nilai canonical yang sama jika keduanya menyatakan klaim yang sama.
-
-### 10.4 Kolom sumber dan verifikasi
+#### Kolom sumber dan verifikasi
 
 | Kolom | Tipe | Null | Default | Keterangan |
 |---|---|---:|---|---|
-| `source_data` | `jsonb` | Tidak | — | Satu atau lebih sumber |
-| `verification_status` | `text` | Tidak | `'needs_review'` | Status bukti |
-| `verified_at` | `timestamptz` | Ya | `null` | Waktu verifikasi |
-| `as_of_date` | `date` | Ya | `null` | Tanggal konteks fakta dinamis |
-| `expires_at` | `timestamptz` | Ya | `null` | Batas penggunaan tanpa recheck |
-| `review_note` | `text` | Ya | `null` | Alasan review atau penolakan |
+| source_data | jsonb | Tidak | — | Array sumber |
+| verification_status | text | Tidak | needs_review | needs_review/verified/rejected |
+| freshness_class | text | Tidak | stable | stable/periodic/volatile |
+| verified_at | timestamptz | Ya | null | Terakhir diverifikasi |
+| as_of_date | date | Ya | null | Konteks waktu klaim |
+| expires_at | timestamptz | Ya | null | Wajib recheck setelah ini |
+| review_note | text | Ya | null | Catatan reviewer |
 
-Nilai `verification_status`:
+#### Kolom reservasi
 
-- `verified`
-- `needs_review`
-- `rejected`
+| Kolom | Tipe | Null | Default | Keterangan |
+|---|---|---:|---|---|
+| reservation_status | text | Tidak | available | available/reserved |
+| reservation_token | uuid | Ya | null | Token proses |
+| reserved_for_page_id | bigint | Ya | null | Page tujuan |
+| reserved_at | timestamptz | Ya | null | Mulai reservasi |
+| reserved_until | timestamptz | Ya | null | Kedaluwarsa |
+| created_at | timestamptz | Tidak | now() | Dibuat |
+| updated_at | timestamptz | Tidak | now() | Diubah |
 
-MVP tidak menyimpan semua ide mentah. Fakta baru dimasukkan ketika sudah mempunyai sumber minimum. Hanya `verified` yang dapat direservasi atau digunakan.
+Constraint:
 
-### 10.5 Struktur `source_data`
+- Unique workspace_id + claim_hash.
+- Unique workspace_id + structured_hash.
+- Hash adalah 64 karakter hex lowercase.
+- numbers array, qualifiers object, source_data array minimal satu.
+- verified membutuhkan verified_at.
+- periodic dan volatile membutuhkan expires_at.
+- Row expired atau rejected tidak dapat direservasi.
+- Bentuk kolom reservasi harus lengkap untuk status reserved dan kosong untuk available.
+- FK reserved_for_page_id scoped ke workspace.
+- Tidak ada used_page_ids dan use_count.
 
-```json
+Freshness default ditentukan oleh jenis klaim:
+
+| Kelas | Contoh | Kebijakan awal |
+|---|---|---|
+| stable | Anatomi dasar, sejarah mapan | Expiry opsional; recheck saat sumber berubah atau fakta direvisi |
+| periodic | Statistik tahunan, populasi, data survei | expires_at maksimal sekitar 12 bulan dari verifikasi |
+| volatile | Pejabat, hukum, rekor aktif, status operasi, ranking | expires_at maksimal sekitar 90 hari atau lebih pendek sesuai sumber |
+
+Safety, medical, legal, food safety, dan pet safety tetap memerlukan review lebih ketat walaupun klaim tampak stable.
+
+#### Source data versi 1
+
+~~~json
 [
   {
     "url": "https://example.org/reference",
     "title": "Reference title",
-    "publisher": "Publishing organization",
+    "publisher": "Reference organization",
     "source_type": "primary",
-    "accessed_at": "2026-10-06",
-    "supports_claim": "The source directly states the relevant claim."
+    "accessed_at": "2026-10-06T10:00:00Z",
+    "supports": "Mendukung inti klaim.",
+    "published_at": "2025-03-01",
+    "as_of": "2025"
   }
 ]
-```
+~~~
 
-Aturan:
+### 8.2 Tabel trivia_post_facts
 
-- Harus berupa array dengan minimal satu item.
-- Setiap item mempunyai URL HTTPS, title, publisher, source type, accessed date, dan support note.
-- `source_type` adalah `primary`, `official`, atau `secondary`.
-- URL yang sama tidak boleh berulang dalam satu fact row.
-- Fakta sensitif atau mudah berubah dapat memiliki dua atau lebih sumber.
-- Database memvalidasi struktur; ChatGPT menilai kecukupan dan relevansinya.
+#### Tanggung jawab
 
-### 10.6 Kolom penggunaan dan reservasi
+Menjadi sumber kebenaran hubungan post–fact dan lifecycle alokasi fakta.
 
 | Kolom | Tipe | Null | Default | Keterangan |
 |---|---|---:|---|---|
-| `reservation_status` | `text` | Tidak | `'available'` | `available` atau `reserved` |
-| `reservation_token` | `uuid` | Ya | `null` | Token satu attempt produksi/revisi |
-| `reserved_at` | `timestamptz` | Ya | `null` | Awal reservasi |
-| `reserved_until` | `timestamptz` | Ya | `null` | Kedaluwarsa reservasi |
-| `used_page_ids` | `bigint[]` | Tidak | `{}` | Page unik yang masih tercatat menggunakan atau pernah memublikasikan fakta ini |
-| `use_count` | `integer` | Tidak | `0` | Jumlah Page pada `used_page_ids` |
-| `usage_started_at` | `timestamptz` | Ya | `null` | Awal periode ketika `use_count` berubah dari 0 menjadi 1 |
-| `usage_updated_at` | `timestamptz` | Ya | `null` | Waktu terakhir daftar Page penggunaan berubah |
-| `created_at` | `timestamptz` | Tidak | `now()` | Waktu pertama disimpan |
-| `updated_at` | `timestamptz` | Tidak | `now()` | Waktu perubahan terakhir |
+| id | bigint identity | Tidak | identity | Primary key |
+| public_id | uuid | Tidak | gen_random_uuid() | ID eksternal |
+| workspace_id | bigint | Tidak | — | Workspace |
+| page_id | bigint | Tidak | — | Page |
+| post_id | bigint | Tidak | — | Post trivia |
+| niche_key | text | Tidak | trivia | Penegasan modul trivia |
+| fact_id | bigint | Tidak | — | Canonical fact |
+| position | integer | Tidak | — | Urutan render |
+| fact_role | text | Tidak | general | Peran fakta dalam post |
+| rendered_text | text | Tidak | — | Wording publik |
+| allocation_state | text | Tidak | allocated | allocated/published/released |
+| claim_hash_snapshot | text | Tidak | — | Hash ketika disimpan |
+| source_snapshot | jsonb | Tidak | — | Sumber ketika disimpan |
+| verified_at_snapshot | timestamptz | Tidak | — | Waktu verifikasi |
+| released_at | timestamptz | Ya | null | Dilepas karena discard/revisi |
+| published_at | timestamptz | Ya | null | Menjadi permanen |
+| created_at | timestamptz | Tidak | now() | Dibuat |
+| updated_at | timestamptz | Tidak | now() | Diubah |
 
-Constraint lifecycle:
+Constraint:
 
-- `available`: seluruh kolom reservation kosong; fakta boleh belum pernah digunakan atau pernah digunakan Page lain.
-- `reserved`: token, Page, `reserved_at`, dan `reserved_until` wajib terisi.
-- `reserved_until > reserved_at`.
-- `reserved` hanya diperbolehkan jika `verification_status = 'verified'`.
-- `use_count = cardinality(used_page_ids)` dan `used_page_ids` tidak boleh berisi ID ganda.
-- Jika `use_count = 0`, `usage_started_at` dan `usage_updated_at` kosong.
-- Jika `use_count > 0`, kedua timestamp penggunaan wajib terisi.
+- Unique post_id + position.
+- Unique post_id + fact_id.
+- Composite FK ke posts menjamin workspace, Page, dan niche trivia sama.
+- FK workspace_id + fact_id ke trivia_facts.
+- Post harus niche trivia.
+- position minimal 1.
+- fact_role hanya general, myth_reversal, numeric_comparison, emotional, practical, scientific, atau visual.
+- source_snapshot array minimal satu.
+- allocated tidak memiliki released_at/published_at.
+- published memiliki published_at dan tidak memiliki released_at.
+- released memiliki released_at dan tidak memiliki published_at.
+- Partial unique page_id + fact_id untuk state allocated/published menegakkan page_unique.
+- Workspace unique diperiksa secara transactional sambil mengunci fact row.
+- Row released tetap disimpan untuk audit; tidak memblokir reuse.
 
-`available` berarti tidak sedang dikunci oleh proses produksi, bukan berarti belum pernah dipakai. Kelayakan fakta ditentukan terpisah berdasarkan Page tujuan:
-
-- `workspace_unique`: `use_count` harus 0.
-- `page_unique`: `used_page_ids` tidak boleh mengandung ID Page tujuan.
-
-Kelayakan diperiksa ketika reservation dan diulang di dalam transaction save/revise. Pemakaian berikutnya oleh Page lain tidak membuat post yang sudah tersimpan menjadi invalid.
-
-### 10.7 Keunikan
-
-Constraint penting:
-
-```text
-unique (workspace_id, claim_hash)
-unique (workspace_id, structured_hash)
-```
-
-Kedua constraint berlaku untuk semua status verifikasi. Fakta yang pernah ditolak tetap tidak boleh dimasukkan kembali sebagai row baru dengan identitas sama; row lama harus ditinjau dan diperbarui secara eksplisit.
-
----
-
-## 11. Lifecycle data
-
-### 11.1 Lifecycle post
-
-```text
-draft → ready → posted → archived
-   └────────────────────→ archived
-ready ──────────────────→ archived
-```
-
-Transisi yang diperbolehkan:
-
-| Dari | Ke | Syarat |
-|---|---|---|
-| `draft` | `ready` | Quality passed dan fakta valid |
-| `draft` | `archived` | Perintah eksplisit pengguna |
-| `ready` | `posted` | Perintah pengguna setelah posting manual |
-| `ready` | `archived` | Perintah eksplisit pengguna |
-| `posted` | `archived` | Perintah eksplisit pengguna |
-| Status yang sama | Status yang sama | Idempotent, kembalikan row saat ini |
-
-Revisi pada post `ready` mengubahnya kembali menjadi `draft`, mengosongkan `ready_at`, dan mengatur `quality_status = 'pending'`. Post `posted` dan `archived` tidak dapat direvisi pada MVP.
-
-Mengarsipkan post tidak melepaskan faktanya.
-
-Transisi langsung `draft → archived` atau `ready → archived` adalah jalur *discard* eksplisit, bukan tanda bahwa konten pernah dipublikasikan. Hanya status `posted` yang menyatakan pengguna sudah memposting konten secara manual.
-
-### 11.2 Lifecycle fakta
-
-```text
-available ⇄ reserved
-    │          │
-    └──────────┴── penggunaan dicatat di used_page_ids
-```
-
-Aturan:
-
-- `available → reserved` hanya melalui transaction reservation.
-- `reserved → available` melalui release atau expiry.
-- Saat `save_post` atau `revise_post` memakai fakta, ID Page ditambahkan ke `used_page_ids`, `use_count` diperbarui, lalu reservation kembali `available`.
-- Saat fakta diganti dari post `draft` atau `ready`, ID Page lama dilepas dari fakta tersebut jika tidak ada penggunaan `posted` atau `archived` yang harus dipertahankan.
-- Fakta pada post `posted` atau `archived` tidak pernah dilepas dari riwayat penggunaan.
-- Reservation tetap eksklusif untuk satu Page pada satu waktu, walaupun Page memakai `page_unique`.
-
-### 11.3 Lifecycle verifikasi
-
-```text
-needs_review → verified | rejected
-verified     → needs_review | rejected
-```
-
-Perubahan dari `verified` tidak menghapus bukti penggunaan lama. Jika fakta yang sudah diposting kemudian ternyata salah, post terkait ditemukan melalui `content_payload.facts[].fact_id` dan ditangani manual.
+Snapshot memastikan perubahan sumber canonical di masa depan tidak menghapus konteks saat post dibuat.
 
 ---
 
-## 12. Index
+## 9. Lifecycle
 
-### 12.1 Index `workspaces`
+### 9.1 Lifecycle post dan alokasi trivia
 
-| Index | Jenis | Tujuan |
+| Transisi | Efek post | Efek trivia_post_facts |
 |---|---|---|
-| Primary key `id` | B-tree | Lookup dan relasi internal |
-| Unique `public_id` | B-tree | Lookup MCP |
-| Unique `slug` | B-tree | Lookup nama stabil |
-| Partial unique active workspace | B-tree | Menjamin satu workspace aktif |
+| create | status draft | insert allocated |
+| draft → ready | set ready_at | tetap allocated |
+| ready → draft karena revisi | increment revision | tetap allocated atau ganti fact atomic |
+| draft/ready → discarded | set discarded_at | allocated → released |
+| ready → posted | set published_at dan identity Facebook bila ada | allocated → published |
+| posted → archived | set archived_at | tetap published |
 
-### 12.2 Index `pages`
+Transisi lain ditolak.
 
-| Index | Jenis | Tujuan |
-|---|---|---|
-| Primary key `id` | B-tree | Lookup internal |
-| Unique `public_id` | B-tree | Lookup MCP |
-| Unique `(workspace_id, slug)` | B-tree | Lookup dan keunikan Page |
-| `(workspace_id, is_active, name)` | B-tree | `list_pages` |
-| Composite relation keys | B-tree | Foreign key dan integrity |
+Post posted, discarded, dan archived bersifat terminal untuk revisi. Membuat versi baru berarti membuat post baru.
 
-### 12.3 Index `posts`
+### 9.2 Lifecycle plan
 
-| Index | Jenis | Tujuan |
-|---|---|---|
-| Primary key `id` | B-tree | Lookup internal |
-| Unique `public_id` | B-tree | Lookup MCP |
-| Unique `(workspace_id, operation_key)` | B-tree | Idempotent create |
-| `(page_id, status, created_at desc, id desc)` | B-tree | Daftar kerja Page |
-| `(page_id, scheduled_at, id)` partial | B-tree | Kalender aktif |
-| `(workspace_id, plan_id, scheduled_at)` partial | B-tree | Mengambil satu rencana |
-| Unique `(page_id, scheduled_at)` partial | B-tree | Mencegah slot ganda |
-| `content_payload jsonb_path_ops` | GIN | Menemukan seluruh post yang memakai satu fact ID |
+- Plan dibuat pending bersama semua item.
+- Ketika item pertama diklaim, plan menjadi in_progress.
+- Item berhasil setelah post draft tersimpan menjadi completed.
+- Item gagal menyimpan error aman dan menjadi failed.
+- Plan completed bila seluruh item completed atau cancelled.
+- Plan partially_completed bila terdapat kombinasi completed dan failed/pending setelah putaran aktif berakhir.
+- Plan dapat dilanjutkan selama masih memiliki pending atau failed item yang dipilih untuk retry.
+- Cancel plan mengubah item pending menjadi cancelled; post yang sudah dibuat tidak dihapus.
 
-Partial index kalender hanya mencakup `scheduled_at is not null and status <> 'archived'`.
+### 9.3 Lifecycle fakta
 
-### 12.4 Index `trivia_facts`
+- needs_review: belum dapat direservasi.
+- verified: dapat dipakai jika belum expired dan reuse rule mengizinkan.
+- rejected: tidak dapat dipakai.
+- available: tidak sedang diproses.
+- reserved: sementara dimiliki satu token.
 
-| Index | Jenis | Tujuan |
-|---|---|---|
-| Primary key `id` | B-tree | Lookup internal |
-| Unique `public_id` | B-tree | Lookup MCP |
-| Unique `(workspace_id, claim_hash)` | B-tree | Exact duplicate |
-| Unique `(workspace_id, structured_hash)` | B-tree | Structured duplicate |
-| `(workspace_id, reservation_status, topic_code, use_count, id)` | B-tree | Inventory dan selection |
-| `(reservation_token, id)` partial | B-tree | Save/release satu reservation |
-| `(reserved_until, id)` partial | B-tree | Expiry cleanup |
-| `(reserved_for_page_id, id)` partial | B-tree | Mendukung foreign key Page reservation |
-| `used_page_ids` | GIN | Pemeriksaan reuse per Page |
-| `search_vector` | GIN | Full Text Search |
-| `normalized_claim gin_trgm_ops` | GIN | Kemiripan teks |
-
-JSONB selain `posts.content_payload` tidak diberi GIN index pada MVP karena tidak menjadi filter utama. Index payload diperlukan untuk audit balik dari fact ID ke post. Index lain baru ditambahkan setelah query nyata dan `EXPLAIN ANALYZE` menunjukkan kebutuhan.
+Reservasi berakhir saat post disimpan, dilepas, atau TTL terlewati. Penggunaan permanen tidak disimpan pada trivia_facts, tetapi pada junction state published.
 
 ---
 
-## 13. Strategi deduplikasi tanpa embeddings
+## 10. Index
 
-### 13.1 Normalisasi versi 1
+### Core
 
-`normalize_fact_text_v1` melakukan:
+- workspaces: unique public_id, unique slug, partial unique owner aktif.
+- pages: unique public_id, unique workspace_id + slug, index workspace_id + is_active.
+- page_niche_configs: unique page_id + niche_key, partial unique default per Page.
+- content_plans: unique public_id, unique workspace_id + operation_key, index page_id + status + created_at.
+- content_plan_items: unique plan_id + position, unique workspace_id + operation_key, index plan_id + status + position, partial unique page schedule.
+- posts: unique public_id, unique workspace_id + operation_key, index page/status/created, page/niche/format, page/niche/topic, plan item, scheduled_at, published_at.
+- post_metrics: unique post_id + captured_at, index post_id + captured_at desc, page_id + captured_at desc.
 
-1. Trim.
+Keunikan jadwal berada pada dua tabel karena plan item dapat ada sebelum post. Setiap operasi yang membuat atau memindahkan slot wajib mengambil transaction-level advisory lock deterministik untuk kombinasi Page + scheduled_at, kemudian memeriksa content_plan_items dan posts sebelum write. Partial unique index pada masing-masing tabel tetap menjadi pertahanan lokal, sedangkan advisory lock mencegah race lintas-tabel.
+
+### Trivia
+
+- Unique workspace_id + claim_hash.
+- Unique workspace_id + structured_hash.
+- GIN search_vector.
+- GIN normalized_claim gin_trgm_ops.
+- Index workspace_id + verification_status + topic_key.
+- Index reservation_token.
+- Partial index reserved_until untuk reserved rows.
+- Junction index fact_id + allocation_state.
+- Junction index page_id + allocation_state + created_at.
+- Partial unique page_id + fact_id untuk allocated/published.
+
+GIN pada content_payload tidak dibuat secara default. Tambahkan hanya jika query produksi benar-benar memerlukannya.
+
+---
+
+## 11. Deduplikasi trivia tanpa embeddings
+
+### 11.1 Normalisasi versi 1
+
+Normalisasi dilakukan deterministik sebelum hash:
+
+1. Unicode normalize.
 2. Lowercase.
-3. Mengubah smart quote dan dash menjadi bentuk standar.
-4. Menghapus punctuation yang tidak mengubah arti.
-5. Mengubah whitespace berulang menjadi satu spasi.
-6. Menghapus trailing punctuation.
+3. Trim.
+4. Collapse whitespace.
+5. Normalisasi tanda baca.
+6. Normalisasi singular/plural alias yang diatur ontology.
+7. Normalisasi angka, unit, dan simbol.
+8. Pertahankan negasi serta qualifier bermakna.
 
-Normalisasi teks tidak bertugas menyamakan unit atau memahami makna. Unit, angka, dan qualifier ditangani oleh structured key.
+normalized_claim tidak boleh menjadi hasil parafrasa kreatif model.
 
-### 13.2 Claim hash
+### 11.2 Claim hash
 
-```text
-claim_hash = sha256(normalization_version + ':' + normalized_claim)
-```
+~~~text
+sha256(normalized_claim)
+~~~
 
-Claim hash mendeteksi teks yang sama setelah normalisasi.
+Unique workspace_id + claim_hash mencegah exact canonical duplicate.
 
-### 13.3 Structured key
+### 11.3 Structured key dan ontology
 
-Structured key dibentuk secara deterministik dari:
+Structured key dibangun deterministik dari:
 
-- `subject_key`
-- `relation_key`
-- `object_key`
-- `numbers` yang sudah memakai unit canonical
-- `qualifiers` penting yang sudah diurutkan
+- subject_key
+- relation_key
+- object_key
+- normalized numbers
+- qualifier waktu
+- qualifier lokasi
+- kondisi penting
+- negasi
 
-```text
-structured_hash = sha256(structured_key)
-```
+Contoh:
 
-Structured hash mendeteksi parafrasa yang berhasil dipetakan ke arti terstruktur yang sama.
+~~~text
+subject=domestic_dog|relation=sweat_gland_location|object=paw_pads|qualifier=primary
+~~~
 
-### 13.4 Candidate retrieval
+Ontology versi 1 wajib mendefinisikan:
 
-Untuk setiap kandidat, database mencari:
+- Canonical subject aliases.
+- Singular/plural.
+- Relation allowlist.
+- Object normalization.
+- Unit conversion.
+- Positive/negative relation.
+- Time/location qualifiers.
 
-1. Claim hash yang sama.
-2. Structured hash yang sama.
-3. Structured fields yang memiliki subject/relation/object sama atau beririsan.
-4. Full Text Search match.
-5. Trigram similarity pada `normalized_claim`.
+### 11.4 Candidate retrieval
 
-Initial candidate threshold trigram adalah `0.35`. Nilai ini sengaja cukup longgar karena hasilnya hanya kandidat untuk ditinjau ChatGPT, bukan keputusan final.
+Pencarian kandidat menggabungkan:
 
-Hasil maksimum default 10 dan batas keras 20 per kandidat. Setiap hasil menyertakan:
+1. Exact claim hash.
+2. Exact structured hash.
+3. FTS rank.
+4. Trigram similarity.
+5. Entitas dan angka yang sama.
+6. Source overlap sebagai sinyal tambahan.
 
-- `fact_id`
-- Claim lama.
-- Match type.
-- Similarity score.
-- Structured key.
-- Verification status.
-- Reservation status.
-- `use_count` dan Page pemakai jika relevan.
+MCP mengembalikan maksimum kandidat relevan; ChatGPT menilai kesamaan makna. Unique constraints dan transactional reuse check tetap menjadi pertahanan akhir.
 
-### 13.5 Keputusan semantik
+### 11.5 Gold evaluation set
 
-ChatGPT membandingkan kandidat dan menentukan:
+Tiga dataset referensi digunakan untuk membangun fixture evaluasi, bukan sebagai sumber kebenaran. Fixture minimal berisi:
 
-- `duplicate`
-- `related_but_distinct`
-- `uncertain`
+- Exact duplicate.
+- Parafrasa lintas akun.
+- Variasi singular/plural dan alias subjek.
+- Angka atau unit yang ekuivalen.
+- Klaim dengan subjek sama tetapi relation berbeda.
+- Pasangan anti-duplicate yang tidak boleh digabung.
+- Klaim berisiko yang harus ditolak atau meminta review.
 
-`uncertain` tidak boleh langsung digunakan. ChatGPT harus memperbaiki struktur fakta, mencari sumber tambahan, atau menggantinya.
+Target awal:
 
-Database tidak menerima keputusan `related_but_distinct` jika claim hash atau structured hash tetap sama. Kandidat harus mempunyai structured key yang benar-benar berbeda.
+- Exact hash dan structured hash menangkap 100% pasangan fixture yang memang identik pada lapisannya.
+- Candidate retrieval mengembalikan minimal 95% known paraphrase dalam batas kandidat yang dikonfigurasi.
+- Tidak ada false merge pada anti-duplicate gold set.
+- Perubahan normalization atau ontology version wajib menjalankan ulang seluruh fixture.
 
 ---
 
-## 14. Reservasi atomic
+## 12. Reservasi trivia secara atomic
 
-### 14.1 Input
+### Input minimum
 
-Reservation menerima:
-
-- Workspace public ID.
+- owner identity dari auth token.
+- workspace public ID.
 - Page public ID.
-- Satu `reservation_token` UUID.
-- TTL 5–120 menit; default dari workspace.
-- Array 1–9 kandidat fakta terverifikasi.
+- reservation token.
+- operation key.
+- reuse scope snapshot.
+- candidate facts beserta canonical fields dan source data.
+- reservation TTL.
 
-Satu token mewakili satu attempt post atau satu attempt revisi.
+### Urutan transaksi
 
-### 14.2 Urutan transaksi
+1. Verifikasi auth.uid() adalah owner workspace.
+2. Verifikasi Page aktif dan trivia config enabled.
+3. Hapus state reservasi expired secara opportunistic pada kandidat.
+4. Upsert candidate canonical dengan menangani unique conflict.
+5. Lock fact rows dalam urutan id.
+6. Pastikan verified dan belum expired.
+7. Query trivia_post_facts untuk allocation state allocated/published.
+8. Terapkan workspace_unique atau page_unique.
+9. Pastikan row tidak reserved token lain.
+10. Set token, Page, reserved_at, dan reserved_until.
+11. Return canonical IDs, expiry, dan kandidat conflict.
 
-Dalam satu database transaction:
+Token yang sama dengan input semantik sama bersifat idempotent. Token sama dengan input berbeda ditolak.
 
-1. Validasi workspace dan Page aktif.
-2. Baca `fact_reuse_scope` dari `content_config` Page tujuan.
-3. Bersihkan reservation workspace yang sudah kedaluwarsa.
-4. Normalisasi ulang setiap claim di server/database.
-5. Bangun ulang claim hash dan structured hash.
-6. Cari row canonical yang sudah ada berdasarkan kedua hash.
-7. Kunci row yang ditemukan menggunakan `for update` dalam urutan `id` menaik.
-8. Jika row masih `reserved` oleh token lain, batalkan dengan `FACT_RESERVED`.
-9. Untuk `workspace_unique`, tolak row dengan `use_count > 0` menggunakan `FACT_REUSE_BLOCKED`.
-10. Untuk `page_unique`, tolak row jika `used_page_ids` sudah berisi Page tujuan menggunakan `FACT_REUSE_BLOCKED`.
-11. Jika row `available` dan verified, ubah menjadi `reserved`.
-12. Jika row belum ada, insert langsung sebagai `verified + reserved`.
-13. Jika unique constraint kalah karena request paralel, batalkan seluruh transaksi dengan conflict yang stabil.
-14. Kembalikan public fact IDs, kebijakan yang diterapkan, dan `reserved_until`.
-
-Semua fakta untuk satu post menggunakan all-or-nothing reservation. Sistem tidak boleh mengembalikan lima fakta sukses dan satu gagal sebagai reservation yang seolah lengkap.
-
-### 14.3 Idempotensi token
-
-Jika token yang sama dikirim ulang:
-
-- Jika seluruh set fakta dan Page sama serta reservation masih valid, kembalikan hasil yang sama.
-- Jika token sudah menghasilkan post, kembalikan post tersebut.
-- Jika token sama tetapi payload berbeda, kembalikan `RESERVATION_TOKEN_MISMATCH`.
-
-### 14.4 Transaksi pendek
-
-Web browsing, penulisan AI, dan quality review harus selesai sebelum memulai transaksi. Transaction hanya melakukan validasi, lock, insert/update, lalu commit dalam hitungan milidetik.
+Satu fact row hanya memiliki satu reservasi aktif. Ini sengaja menyederhanakan MVP; page_unique lintas Page tetap dapat terjadi secara berurutan setelah post pertama tersimpan dan reservation dibersihkan.
 
 ---
 
-## 15. Menyimpan post secara atomic
+## 13. Menyimpan post trivia secara atomic
 
-### 15.1 Input minimum
+### Input minimum
 
-- Workspace dan Page public ID.
-- `reservation_token`.
-- `operation_key`; untuk initial post nilainya sama dengan reservation token.
-- `niche_code`.
-- `content_payload`.
-- `quality_status` dan `quality_report`.
-- `scheduled_at` dan `plan_id` bila ada.
+- operation key.
+- Page dan niche.
+- optional content plan item.
+- reservation token.
+- expected config/content schema versions.
+- format dan interaction goal.
+- topic utama dan fact role setiap item.
+- content payload.
+- generation snapshot.
+- editorial checks.
+- urutan fact IDs dan rendered text.
+- optional schedule.
 
-### 15.2 Urutan transaksi
+### Urutan transaksi
 
-1. Cari post berdasarkan `(workspace_id, operation_key)`.
-2. Jika sudah ada, kembalikan post yang sama sebagai hasil retry.
-3. Validasi Page aktif dan niche sesuai Page.
-4. Kunci semua fakta dengan reservation token dalam urutan ID.
-5. Pastikan reservation belum kedaluwarsa dan ditujukan untuk Page yang sama.
-6. Baca ulang `fact_count`, `text_budget`, dan `fact_reuse_scope` Page, periksa kembali kelayakan seluruh fakta di dalam lock, lalu tulis nilainya ke `rules_snapshot`.
-7. Pastikan fact IDs pada payload sama persis dengan row yang direservasi.
-8. Validasi payload dan quality report.
-9. Insert post `draft`.
-10. Tambahkan Page ID ke `used_page_ids`, perbarui `use_count`, `usage_started_at`, dan `usage_updated_at` pada semua fakta.
-11. Kembalikan `reservation_status` ke `available` dan kosongkan seluruh kolom reservation.
-12. Commit.
+1. Verifikasi owner, Page, trivia config, dan schema version.
+2. Jika operation key sudah ada, return post lama bila request compatible.
+3. Lock seluruh fact rows dalam urutan id.
+4. Validasi token, expiry, verification, source, dan reuse lagi.
+5. Validasi payload, jumlah fakta, text metrics, format, topic, profile, render style, dan budget.
+6. Validasi plan item bila diberikan dan lock item.
+7. Jika scheduled_at terisi, ambil advisory lock Page+slot lalu validasi terhadap plan items dan posts.
+8. Insert posts sebagai draft.
+9. Insert trivia_post_facts sebagai allocated dengan snapshot.
+10. Bersihkan reservation fields pada facts.
+11. Ubah plan item menjadi completed.
+12. Recompute status plan.
+13. Commit dan return post package.
 
-Jika langkah mana pun gagal, post tidak tersimpan dan fakta tetap reserved sampai dilepas atau kedaluwarsa.
+Kegagalan apa pun melakukan rollback penuh. Fakta tidak boleh dianggap allocated tanpa post dan junction yang valid.
 
-### 15.3 Batch
-
-Batch tidak memakai satu transaction besar. Setiap post mempunyai reservation token dan operation key sendiri. Dengan demikian:
-
-- Post yang berhasil tidak dibatalkan oleh kegagalan item lain.
-- Chat dapat melanjutkan batch berdasarkan post yang sudah tersimpan.
-- Tidak ada row job yang perlu disinkronkan.
-
----
-
-## 16. Revisi post secara atomic
-
-### 16.1 Revisi tanpa mengganti fakta
-
-Input:
-
-- Post public ID.
-- `expected_revision`.
-- Payload baru.
-- Quality report baru.
-
-Transaction:
-
-1. Update hanya jika `revision = expected_revision` dan status `draft` atau `ready`.
-2. Pastikan fact IDs tidak berubah.
-3. Validasi payload.
-4. Set status ke `draft` jika sebelumnya `ready`.
-5. Set quality status sesuai hasil baru; default `pending`.
-6. Naikkan revision satu angka.
-7. Jika tidak ada row yang cocok, kembalikan `POST_REVISION_CONFLICT` atau `POST_NOT_EDITABLE`.
-
-### 16.2 Revisi dengan mengganti fakta
-
-Fakta baru harus direservasi sebelum `revise_post` dipanggil.
-
-Dalam satu transaction:
-
-1. Kunci post dan cek expected revision.
-2. Kunci fakta lama yang akan dilepas dan fakta baru berdasarkan urutan ID.
-3. Pastikan post belum `posted` atau `archived`.
-4. Pastikan fakta baru reserved untuk Page yang benar.
-5. Pastikan payload baru mereferensikan set fakta final yang tepat.
-6. Periksa kembali `fact_reuse_scope` Page terhadap fakta baru di dalam lock.
-7. Tambahkan Page ID ke `used_page_ids` fakta baru dan perbarui counter/timestamp.
-8. Lepaskan Page ID dari fakta lama yang dikeluarkan, turunkan `use_count`, dan kosongkan timestamp penggunaan jika count menjadi nol.
-9. Kembalikan fakta baru dari `reserved` ke `available` dengan membersihkan reservation.
-10. Update payload, quality status, timestamps, dan revision.
-11. Commit.
-
-Tidak ada keadaan sementara ketika summary penggunaan menjadi tidak konsisten, fakta yang sama muncul dua kali pada Page yang sama, atau post kehilangan seluruh fakta.
+Batch memanggil transaksi ini per item. Kegagalan satu item tidak membatalkan item lain.
 
 ---
 
-## 17. Mengubah status dan jadwal
+## 14. Revisi post secara atomic
 
-### 17.1 Status
+### 14.1 Tanpa mengganti fakta
 
-`update_post_status` harus:
+1. Lock post.
+2. Verifikasi expected_revision.
+3. Pastikan status draft atau ready.
+4. Validasi payload dan metrics.
+5. Jika ready, kembalikan ke draft dan kosongkan ready_at.
+6. Update payload/checks dan increment revision.
 
-- Mengunci post.
-- Memvalidasi transisi.
-- Bersifat idempotent jika target sama dengan status saat ini.
-- Mengisi timestamp status yang relevan.
-- Tidak melepaskan fakta ketika archived.
+### 14.2 Mengganti fakta
 
-Transisi `draft → ready` wajib memeriksa ulang:
+1. Reserve fakta pengganti lebih dahulu.
+2. Lock post, fact lama, dan fact baru dalam urutan konsisten.
+3. Verifikasi expected_revision dan status.
+4. Periksa reuse fact baru.
+5. Ubah junction lama allocated menjadi released.
+6. Insert atau update junction fact baru sebagai allocated.
+7. Validasi payload final.
+8. Bersihkan reservation fact baru.
+9. Kembalikan post ke draft dan increment revision.
+10. Commit.
 
-- `quality_status = passed`.
-- Seluruh `fact_id` pada payload masih valid dan `used_page_ids` berisi Page post.
-- Seluruh fakta verified.
-- Jumlah fakta memenuhi fixed value, rentang adaptive, override eksplisit 5–9, atau pengecualian 1–4 yang valid dan sudah dikonfirmasi pengguna.
-- Seluruh `text_metrics` cocok dengan hasil hitung ulang dan tidak melewati text budget snapshot.
-- `rules_snapshot.fact_reuse_scope` tersedia dan cocok dengan rule yang diterapkan ketika post disimpan; rule tidak dievaluasi ulang secara retroaktif terhadap pemakaian Page lain yang terjadi kemudian.
-- Source data tersedia.
-
-### 17.2 Jadwal
-
-Jadwal dapat diubah pada post `draft` atau `ready` dengan expected revision. Perubahan:
-
-- Menulis `scheduled_at`.
-- Dapat menulis/mengganti `plan_id`.
-- Menaikkan revision.
-- Tunduk pada unique schedule index.
-
-Post `posted` tidak dijadwalkan ulang. Post `archived` tidak muncul pada kalender aktif.
-
-### 17.3 Kalender
-
-Query kalender:
-
-```sql
-select ...
-from public.posts
-where page_id = :page_id
-  and scheduled_at >= :from
-  and scheduled_at < :to
-  and status <> 'archived'
-order by scheduled_at, id;
-```
-
-Tidak ada tabel, view materialized, atau cache kalender pada MVP.
+Junction published tidak boleh menjadi released. Post posted/archived harus dibuat ulang sebagai post baru.
 
 ---
 
-## 18. Database function dan RPC
+## 15. Status, discard, publikasi, dan metrics
 
-### 18.1 Prinsip
+### 15.1 Menjadi ready
 
-- Function write yang menyentuh beberapa row harus transactional.
-- Gunakan `security invoker`.
-- Gunakan schema-qualified object names.
-- Tetapkan `search_path` aman.
-- Jangan gunakan dynamic SQL kecuali benar-benar diperlukan.
-- Revoke execute dari `public`, `anon`, dan `authenticated`.
-- Grant execute hanya kepada role backend yang digunakan Edge Function.
-- Jangan melakukan HTTP request di dalam function.
+Syarat:
 
-### 18.2 Helper internal
+- expected_revision cocok.
+- status draft.
+- semua system checks bernilai lulus.
+- editorial checks lengkap.
+- quality_status passed.
+- persetujuan pengguna eksplisit.
+- semua junction tetap allocated dan fact tidak rejected.
 
-| Function | Fungsi |
+### 15.2 Menjadi discarded
+
+Hanya dari draft atau ready:
+
+1. Lock post dan junction.
+2. Set status discarded, discarded_at, dan revision + 1.
+3. Ubah semua junction allocated menjadi released.
+4. Lepaskan reservation yang masih terkait bila ada.
+5. Jika berasal dari plan item dan pengguna meminta replacement, reset item menjadi pending; jika tidak, item tetap completed tetapi outputnya tercatat discarded.
+6. Commit.
+
+### 15.3 Menjadi posted
+
+Hanya dari ready:
+
+1. Verifikasi perintah pengguna.
+2. Set status posted dan published_at.
+3. Simpan platform_post_id/published_url jika diberikan.
+4. Ubah junction allocated menjadi published dengan timestamp sama.
+5. Increment revision.
+
+### 15.4 Menjadi archived
+
+Hanya dari posted. Set archived_at dan increment revision. Junction tetap published.
+
+### 15.5 Mencatat metrics
+
+- Hanya post posted atau archived.
+- operation_key membuat retry aman.
+- captured_at adalah waktu observasi.
+- Insert snapshot baru; jangan update snapshot lama untuk data baru.
+- Query insight menggunakan snapshot terbaru per post atau seri waktu sesuai kebutuhan.
+
+---
+
+## 16. Database functions dan MCP mapping
+
+### Prinsip
+
+- Utamakan security invoker.
+- Jangan memakai security definer untuk menyelesaikan error permission.
+- Jika fungsi privileged benar-benar diperlukan, tempatkan pada schema internal yang tidak diekspos, revoke execute from public, set search_path eksplisit, dan periksa auth.uid() serta ownership dalam body.
+- Setiap write menerima operation_key.
+- Error memakai code stabil dan detail aman.
+
+### RPC utama
+
+| Function/RPC | Tujuan |
 |---|---|
-| `set_updated_at()` | Mengisi `updated_at` pada update |
-| `normalize_fact_text_v1(text)` | Normalisasi deterministik |
-| `sha256_hex(text)` | Membuat hash |
-| `build_structured_key(...)` | Membuat structured key canonical |
-| `validate_market_array(text[])` | Memastikan market valid dan unik |
-| `validate_page_content_config(text, jsonb)` | Memvalidasi config berdasarkan niche |
-| `validate_post_payload(text, jsonb)` | Memvalidasi payload niche |
-| `measure_trivia_text(jsonb)` | Menghitung ulang metrics karakter dari payload final |
-| `validate_source_data(jsonb)` | Memvalidasi source array |
-| `fact_is_eligible(bigint, bigint, text)` | Mengecek reuse berdasarkan workspace, Page, dan scope |
-| `expire_trivia_reservations(bigint)` | Melepaskan reservation kedaluwarsa |
+| create_page_with_niche_config | Membuat Page dan trivia config atomic |
+| update_page_niche_config | Memvalidasi config version |
+| get_page_generation_context | Konteks generasi dan insight ringkas |
+| create_content_plan_with_items | Membuat plan dan seluruh slot |
+| claim_content_plan_items | Claim chunk pending secara atomic |
+| retry_content_plan_item | Mengembalikan failed item ke pending |
+| trivia_find_similar_facts | Candidate retrieval |
+| trivia_register_and_reserve_facts | Canonical upsert + reuse check + reservation |
+| trivia_release_facts | Release token secara idempotent |
+| save_trivia_post | Save post + junction + plan progress |
+| revise_trivia_post | Compare-and-swap revision |
+| transition_post_status | Ready, posted, discarded, archived |
+| record_post_performance | Insert metrics snapshot |
+| get_performance_insights | Aggregate read-only |
 
-### 18.3 RPC utama
+### Mapping MCP
 
-| RPC | Sifat | Hasil |
+| MCP tool | Database operation |
+|---|---|
+| list_niches | SELECT niches active |
+| list_pages | SELECT pages + enabled configs |
+| get_page_generation_context | RPC dengan Page+niche |
+| create_content_plan | create_content_plan_with_items |
+| get_content_plan | SELECT plan, items, active/latest posts |
+| trivia_find_similar_facts | trivia_find_similar_facts |
+| trivia_register_and_reserve_facts | trivia_register_and_reserve_facts |
+| trivia_release_facts | trivia_release_facts |
+| save_post | save_trivia_post untuk niche trivia |
+| revise_post | revise_trivia_post |
+| discard_post | transition_post_status target discarded |
+| update_post_status | transition_post_status |
+| record_post_performance | record_post_performance |
+| get_performance_insights | get_performance_insights |
+
+---
+
+## 17. Error contract
+
+| Code | Makna | Tindakan |
 |---|---|---|
-| `db_create_page` | Write | Slug dan payload sama mengembalikan row lama; payload berbeda menghasilkan conflict |
-| `db_update_page` | Write | Page yang diperbarui |
-| `db_find_similar_trivia_facts` | Read | Kandidat duplicate/related |
-| `db_reserve_trivia_facts` | Write transaction | Fact IDs dan expiry |
-| `db_release_trivia_facts` | Write idempotent | Jumlah row yang dilepas |
-| `db_save_post` | Write transaction | Post baru atau hasil retry |
-| `db_revise_post` | Write transaction | Post dengan revision terbaru |
-| `db_update_post_status` | Write transaction | Post dengan status terbaru |
-| `db_reschedule_post` | Write transaction | Jadwal dan revision terbaru |
+| AUTH_REQUIRED | Token tidak valid/absen | Hubungkan ulang plugin |
+| FORBIDDEN | Bukan owner | Tolak tanpa membocorkan data |
+| PAGE_NOT_FOUND | Page tidak ada | Tampilkan Page tersedia |
+| NICHE_NOT_ENABLED | Config niche tidak aktif | Pilih niche aktif |
+| CONFIG_VERSION_UNSUPPORTED | Config lama/baru tidak didukung | Migrasi atau refresh |
+| PLAN_ITEM_CONFLICT | Item sedang diproses/selesai | Ambil progress terbaru |
+| DUPLICATE_CANONICAL_FACT | Canonical sudah ada | Gunakan row canonical |
+| FACT_REUSE_BLOCKED | Rule melarang penggunaan | Pilih pengganti |
+| FACT_RESERVED | Token lain memiliki row | Pilih pengganti atau retry |
+| RESERVATION_EXPIRED | TTL habis | Reserve ulang |
+| FACT_NOT_VERIFIED | Fact belum layak | Review/ganti |
+| SOURCE_INSUFFICIENT | Metadata sumber tidak cukup | Teliti ulang |
+| REVISION_CONFLICT | Expected revision lama | Ambil post terbaru |
+| INVALID_STATUS_TRANSITION | Lifecycle tidak valid | Gunakan transisi legal |
+| SCHEDULE_CONFLICT | Slot Page sudah ada | Pilih waktu lain |
+| QUALITY_GATE_FAILED | Ready tidak diizinkan | Perbaiki check |
+| OPERATION_KEY_REUSED | Key dipakai payload berbeda | Buat key baru |
+| VALIDATION_FAILED | Schema/budget invalid | Perbaiki field |
+| DATABASE_UNAVAILABLE | Storage tidak tersedia | Jangan klaim sukses |
 
-Read sederhana seperti workspace, Page, post, atau kalender dapat memakai parameterized select melalui Supabase client. Semua write tetap melewati function yang sesuai agar invariants tidak tersebar di Edge Function.
-
-### 18.4 Mapping ke MCP tools
-
-| MCP tool | Database access |
-|---|---|
-| `health_check` | Read connection dan active workspace |
-| `get_workspace_context` | Select `workspaces` dan ringkasan inventory |
-| `list_pages` | Select `pages` |
-| `create_page` | `db_create_page` |
-| `update_page` | `db_update_page` |
-| `trivia_find_similar_facts` | `db_find_similar_trivia_facts` |
-| `trivia_reserve_facts` | `db_reserve_trivia_facts` |
-| `trivia_release_facts` | `db_release_trivia_facts` |
-| `save_post` | `db_save_post` |
-| `get_posts` | Parameterized select dan fact join |
-| `revise_post` | `db_revise_post` dan, bila perlu, `db_reschedule_post` |
-| `update_post_status` | `db_update_post_status` |
-
-Nama RPC bersifat internal. Nama MCP tools tetap mengikuti PRD.
+Constraint violation diterjemahkan ke code domain; raw SQL, stack trace, secret, dan internal ID tidak dikirim ke model.
 
 ---
 
-## 19. Error contract
+## 18. Security, RLS, dan privilege
 
-Database function harus mengembalikan atau memetakan error berikut secara stabil:
+### 18.1 Auth model
 
-| Error code | Arti |
-|---|---|
-| `WORKSPACE_NOT_FOUND` | Workspace tidak ada atau tidak aktif |
-| `PAGE_NOT_FOUND` | Page tidak ada atau tidak aktif |
-| `PAGE_SLUG_CONFLICT` | Slug sudah dipakai |
-| `INVALID_TIMEZONE` | Zona IANA tidak valid |
-| `INVALID_CONTENT_CONFIG` | Config gagal validator |
-| `INVALID_POST_PAYLOAD` | Payload gagal validator |
-| `FACT_COUNT_RULE_VIOLATION` | Jumlah final tidak sesuai fixed/adaptive rule atau override |
-| `TEXT_BUDGET_EXCEEDED` | Salah satu component atau total Canva text melewati snapshot budget |
-| `INVALID_SOURCE_DATA` | Source array tidak valid |
-| `FACT_DUPLICATE` | Input baru cocok dengan fakta canonical yang sudah ada |
-| `FACT_RESERVED` | Fakta sedang dimiliki token lain |
-| `FACT_REUSE_BLOCKED` | Fakta melanggar `workspace_unique` atau `page_unique` Page tujuan |
-| `FACT_NOT_VERIFIED` | Fakta belum layak digunakan |
-| `FACT_EXPIRED` | Verifikasi fakta perlu diperbarui |
-| `RESERVATION_EXPIRED` | Reservation sudah lewat batas waktu |
-| `RESERVATION_TOKEN_MISMATCH` | Token dipakai dengan payload berbeda |
-| `POST_NOT_FOUND` | Post tidak ditemukan |
-| `POST_ALREADY_EXISTS` | Operation key sudah menghasilkan post lain |
-| `POST_REVISION_CONFLICT` | Expected revision sudah lama |
-| `POST_NOT_EDITABLE` | Status tidak memperbolehkan revisi |
-| `QUALITY_NOT_PASSED` | Post belum boleh menjadi ready |
-| `INVALID_STATUS_TRANSITION` | Perubahan lifecycle tidak valid |
-| `SCHEDULE_CONFLICT` | Slot Page sudah terisi |
+- Supabase Auth OAuth 2.1 digunakan untuk koneksi MCP.
+- owner_user_id mengacu pada auth.users.id.
+- Authorization memakai auth.uid(), bukan user_metadata.
+- Edge Function meneruskan user JWT dan melakukan server-side authorization.
+- service_role tidak pernah dikirim ke ChatGPT atau public client.
+- Jika service_role dipakai untuk operasi internal terbatas, seluruh ownership harus tetap diverifikasi sebelum query.
 
-Edge Function menerjemahkan database error menjadi MCP structured result. Pesan untuk pengguna tidak boleh menampilkan SQL, nama role, credential, atau detail internal yang sensitif.
+### 18.2 Data API exposure
 
----
+Data API exposure dan RLS adalah dua lapisan terpisah.
 
-## 20. Security, RLS, dan privilege
+- Schema yang diekspos ditentukan eksplisit dalam Supabase settings.
+- Grants ke anon dan authenticated ditentukan eksplisit dalam migration.
+- anon tidak mendapat akses tabel atau execute RPC bisnis.
+- authenticated dapat menerima read access yang dibutuhkan dan execute pada RPC yang diizinkan, tetapi tidak mendapat direct write ke tabel bisnis.
+- Semua tabel dalam exposed schema mengaktifkan RLS.
+- Tidak mengandalkan perilaku otomatis project mengenai table exposure.
 
-### 20.1 Posisi tabel
+### 18.3 Pola RLS
 
-Keempat tabel berada di schema `public` agar mudah dibaca melalui Supabase Dashboard. Karena `public` dapat menjadi exposed schema, semua tabel wajib mempunyai RLS.
+Workspaces:
 
-### 20.2 Kebijakan MVP
+~~~sql
+create policy workspaces_owner_select
+on public.workspaces
+for select
+to authenticated
+using ((select auth.uid()) = owner_user_id);
 
-MVP tidak memiliki login pengguna. Karena itu:
+create policy workspaces_owner_update
+on public.workspaces
+for update
+to authenticated
+using ((select auth.uid()) = owner_user_id)
+with check ((select auth.uid()) = owner_user_id);
+~~~
 
-- RLS diaktifkan pada seluruh tabel.
-- Tidak dibuat policy untuk `anon` atau `authenticated`.
-- Seluruh privilege tabel dan function dicabut dari `anon` dan `authenticated`.
-- Edge Function menggunakan Supabase Secret API key pada backend.
-- Secret key tersebut menjalankan operasi sebagai `service_role` dan melewati RLS.
+Tabel workspace-scoped memakai pola:
 
-RLS dalam desain ini adalah defense in depth terhadap akses Data API biasa, bukan pengganti autentikasi endpoint MCP.
-
-Supabase saat ini merekomendasikan Secret API key untuk backend dan sedang menggantikan legacy `service_role` key. Implementasi baru harus memakai Secret API key bila tersedia. Key tidak pernah dikirim kepada ChatGPT dan tidak pernah disimpan di GitHub.
-
-### 20.3 Grants
-
-Prinsip awal:
-
-```sql
-alter table public.workspaces enable row level security;
-alter table public.pages enable row level security;
-alter table public.posts enable row level security;
-alter table public.trivia_facts enable row level security;
-
-revoke all on public.workspaces from anon, authenticated;
-revoke all on public.pages from anon, authenticated;
-revoke all on public.posts from anon, authenticated;
-revoke all on public.trivia_facts from anon, authenticated;
-
-revoke all on sequence public.workspaces_id_seq from anon, authenticated;
-revoke all on sequence public.pages_id_seq from anon, authenticated;
-revoke all on sequence public.posts_id_seq from anon, authenticated;
-revoke all on sequence public.trivia_facts_id_seq from anon, authenticated;
-```
-
-Semua RPC juga harus:
-
-```sql
-revoke all on function public.<function_signature> from public, anon, authenticated;
-grant execute on function public.<function_signature> to service_role;
-```
-
-Tidak ada function `security definer` pada baseline. Jika di masa depan benar-benar diperlukan, function harus berada di schema non-exposed, memiliki authorization check eksplisit, `search_path` aman, dan melalui security review baru.
-
-### 20.4 Secret
-
-- Gunakan Supabase Edge Function secrets.
-- Local secret berada dalam file env yang di-ignore Git.
-- Repository hanya menyimpan `.env.example` tanpa nilai.
-- Jangan log Secret API key, database password, atau request authorization header.
-
-### 20.5 Risiko no-auth MCP
-
-Endpoint MCP tetap public karena PRD memilih `No authentication`. Database design mengurangi dampak melalui:
-
-- Tidak ada hard-delete RPC.
-- Tidak ada arbitrary SQL tool.
-- Payload dibatasi.
-- Function hanya menjalankan operasi yang dikenal.
-- Rate limiting dilakukan di Edge Function.
-- Database constraint tetap berlaku walaupun request berbahaya masuk.
-
-Kontrol tersebut tidak setara dengan user authentication. OAuth 2.1 tetap menjadi kebutuhan sebelum plugin dibagikan atau dipakai multi-user.
-
----
-
-## 21. Query utama
-
-### 21.1 Daftar Page
-
-```sql
-select public_id, name, slug, niche_code, timezone, target_markets, content_config
-from public.pages
-where workspace_id = :workspace_id
-  and is_active = true
-order by name, id;
-```
-
-### 21.2 Daftar kerja post
-
-```sql
-select public_id, status, scheduled_at, revision, content_payload, updated_at
-from public.posts
-where page_id = :page_id
-  and status = :status
-  and (created_at, id) < (:cursor_created_at, :cursor_id)
-order by created_at desc, id desc
-limit :limit;
-```
-
-Gunakan cursor pagination, bukan deep offset.
-
-### 21.3 Sumber post
-
-```sql
-with requested_facts as (
-  select
-    (item ->> 'fact_id')::uuid as fact_public_id,
-    (item ->> 'position')::integer as position
-  from public.posts p
-  cross join lateral jsonb_array_elements(p.content_payload -> 'facts') as item
-  where p.id = :post_id
+~~~sql
+using (
+  exists (
+    select 1
+    from public.workspaces w
+    where w.id = workspace_id
+      and w.owner_user_id = (select auth.uid())
+  )
 )
-select f.public_id, f.claim_text, f.source_data, f.as_of_date, f.verified_at
-from requested_facts r
-join public.trivia_facts f on f.public_id = r.fact_public_id
-order by r.position;
-```
+~~~
 
-Urutan visual tetap berasal dari `posts.content_payload.facts[].position`.
+Policy UPDATE selalu mempunyai USING dan WITH CHECK. INSERT memakai WITH CHECK. DELETE tidak diberikan.
 
-### 21.4 Kalender
+Niches hanya dapat dibaca authenticated; write dilakukan migration.
 
-Gunakan query pada Bagian 17.3 dengan index `(page_id, scheduled_at, id)`.
+### 18.4 Views dan functions
 
-### 21.5 Inventory fakta
+- View memakai security_invoker = true pada Postgres yang mendukung.
+- View yang tidak diperlukan Data API ditempatkan pada schema tidak terekspos atau grants dicabut.
+- Read function default security invoker.
+- Write hanya melalui RPC sempit; direct INSERT/UPDATE/DELETE pada tabel bisnis dicabut dari authenticated.
+- Jika transaksi write memerlukan SECURITY DEFINER, business function ditempatkan pada schema internal yang tidak diekspos, memakai fully qualified object names, search_path yang dibatasi, dan memeriksa auth.uid() serta ownership di dalam function.
+- Exposed wrapper tetap security invoker dan hanya meneruskan input tervalidasi ke internal function. Internal function tidak dapat ditemukan melalui Data API schema.
+- Execute privilege setiap function baru dicabut dari PUBLIC dan anon, lalu diberikan hanya kepada authenticated untuk entry point yang memang diizinkan.
+- Tidak memakai auth.role(); policy menargetkan TO authenticated dan tetap memeriksa ownership.
 
-Inventory dihitung ketika diperlukan:
+### 18.5 Secrets dan logging
 
-```sql
-select reservation_status, verification_status, topic_code,
-       count(*) filter (where use_count = 0) as never_used,
-       count(*) filter (where use_count > 0) as used_on_any_page,
-       count(*) as total
-from public.trivia_facts
-where workspace_id = :workspace_id
-group by reservation_status, verification_status, topic_code;
-```
-
-Tidak ada tabel counter terpisah pada MVP.
+Log boleh menyimpan request ID, tool, duration, result code, dan public IDs. Log tidak menyimpan Authorization header, JWT, service key, seluruh payload sumber, atau seluruh output model.
 
 ---
 
-## 22. Reference DDL tabel
+## 19. Query utama
 
-DDL berikut adalah blueprint implementasi. Migration final harus dibuat melalui Supabase CLI, dilengkapi helper functions, lalu diuji pada database kosong.
+### 19.1 Generation context
 
-```sql
+Mengambil dalam satu response:
+
+- Page dan config niche.
+- Topic/format weights.
+- Subject, hook, CTA, dan format terbaru.
+- Fact reuse scope.
+- Post terbaru.
+- Insight performa ringkas.
+- Plan item bila request berasal dari plan.
+
+### 19.2 Work queue dan kalender
+
+Join plan items dengan post aktif/latest:
+
+- Filter workspace, Page, niche, status, dan rentang waktu.
+- Urut scheduled_at, position, public_id.
+- Tampilkan pending, completed, failed, discarded output, dan schedule conflict.
+
+### 19.3 Sumber post trivia
+
+Join posts → trivia_post_facts → trivia_facts. UI internal dapat memakai source_snapshot untuk konteks publikasi dan canonical source_data untuk re-verification terbaru.
+
+### 19.4 Inventory dan reuse
+
+Reuse query hanya menghitung junction state allocated atau published:
+
+- workspace_unique: tidak boleh ada junction aktif/published pada workspace.
+- page_unique: tidak boleh ada junction aktif/published pada Page tujuan.
+- released tidak memblokir.
+
+### 19.5 Performance insights
+
+Gunakan latest snapshot per post untuk perbandingan current totals. Group by Page, niche, topic, format, interaction goal, dan periode. Jangan mencampur umur post sangat berbeda tanpa menampilkan konteks.
+
+---
+
+## 20. Reference DDL
+
+DDL berikut adalah baseline dan harus dipisah menjadi migration yang dapat ditinjau. Validator JSON dan RPC transactional tetap diperlukan di luar CHECK constraint.
+
+~~~sql
 create table public.workspaces (
   id bigint generated always as identity primary key,
-  public_id uuid not null default gen_random_uuid(),
+  public_id uuid not null default gen_random_uuid() unique,
+  owner_user_id uuid not null references auth.users(id) on delete restrict,
   name text not null,
-  slug text not null,
+  slug text not null unique,
   language_code text not null default 'en',
   locale text not null default 'en-US',
-  target_markets text[] not null default array['US', 'GB', 'CA', 'AU']::text[],
-  settings jsonb not null default '{
-    "schema_version": 1,
-    "default_fact_count": {
-      "mode": "adaptive",
-      "min": 5,
-      "preferred": 7,
-      "max": 9
-    },
-    "default_text_budget": {
-      "hook_max_chars": 45,
-      "fact_max_chars": 90,
-      "facts_total_max_chars": 500,
-      "cta_max_chars": 50,
-      "canva_total_max_chars": 600
-    },
-    "default_fact_reuse_scope": "workspace_unique",
-    "reservation_ttl_minutes": 30,
-    "default_post_status": "draft"
-  }'::jsonb,
+  target_markets text[] not null default array['US','GB','CA','AU']::text[],
+  settings jsonb not null default '{"schema_version":1}'::jsonb,
   is_active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-
-  constraint workspaces_public_id_key unique (public_id),
-  constraint workspaces_slug_key unique (slug),
-  constraint workspaces_slug_format_check
-    check (slug ~ '^[a-z][a-z0-9-]{1,62}$'),
-  constraint workspaces_language_check
-    check (language_code = 'en' and locale = 'en-US'),
-  constraint workspaces_target_markets_check
-    check (
-      cardinality(target_markets) between 1 and 4
-      and target_markets <@ array['US', 'GB', 'CA', 'AU']::text[]
-    ),
-  constraint workspaces_settings_object_check
-    check (jsonb_typeof(settings) = 'object')
+  constraint workspaces_slug_check check (slug ~ '^[a-z][a-z0-9-]{1,62}$'),
+  constraint workspaces_language_check check (language_code = 'en'),
+  constraint workspaces_locale_check check (locale = 'en-US'),
+  constraint workspaces_settings_object_check check (jsonb_typeof(settings) = 'object'),
+  constraint workspaces_id_scope_key unique (id, owner_user_id)
 );
 
-create unique index workspaces_one_active_idx
-  on public.workspaces ((1))
-  where is_active = true;
+create unique index workspaces_one_active_owner_idx
+  on public.workspaces(owner_user_id)
+  where is_active;
+
+create table public.niches (
+  key text primary key,
+  name text not null,
+  status text not null default 'development'
+    check (status in ('development','active','disabled')),
+  module_version integer not null default 1 check (module_version >= 1),
+  config_schema_version integer not null default 1 check (config_schema_version >= 1),
+  content_schema_version integer not null default 1 check (content_schema_version >= 1),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint niches_key_check check (key ~ '^[a-z][a-z0-9_]{1,31}$')
+);
 
 create table public.pages (
   id bigint generated always as identity primary key,
-  public_id uuid not null default gen_random_uuid(),
-  workspace_id bigint not null,
+  public_id uuid not null default gen_random_uuid() unique,
+  workspace_id bigint not null references public.workspaces(id) on delete restrict,
   name text not null,
   slug text not null,
-  niche_code text not null default 'trivia',
+  platform text not null default 'facebook',
   language_code text not null default 'en',
   locale text not null default 'en-US',
   timezone text not null default 'UTC',
-  target_markets text[] not null default array['US', 'GB', 'CA', 'AU']::text[],
-  content_config jsonb not null,
+  target_markets text[] not null default array['US','GB','CA','AU']::text[],
+  default_niche_key text references public.niches(key) on delete restrict,
+  platform_config jsonb not null default '{}'::jsonb,
   is_active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-
-  constraint pages_public_id_key unique (public_id),
-  constraint pages_workspace_fk
-    foreign key (workspace_id)
-    references public.workspaces (id)
-    on delete restrict,
   constraint pages_workspace_slug_key unique (workspace_id, slug),
   constraint pages_workspace_id_key unique (workspace_id, id),
-  constraint pages_workspace_id_niche_key unique (workspace_id, id, niche_code),
-  constraint pages_slug_format_check
-    check (slug ~ '^[a-z][a-z0-9-]{1,62}$'),
-  constraint pages_niche_format_check
-    check (niche_code ~ '^[a-z][a-z0-9_]{1,31}$'),
-  constraint pages_language_check
-    check (language_code = 'en' and locale = 'en-US'),
-  constraint pages_target_markets_check
-    check (
-      cardinality(target_markets) between 1 and 4
-      and target_markets <@ array['US', 'GB', 'CA', 'AU']::text[]
-    ),
-  constraint pages_content_config_object_check
-    check (jsonb_typeof(content_config) = 'object')
+  constraint pages_platform_check check (platform = 'facebook'),
+  constraint pages_language_check check (language_code = 'en'),
+  constraint pages_locale_check check (locale = 'en-US'),
+  constraint pages_platform_config_object_check check (jsonb_typeof(platform_config) = 'object')
 );
 
-create index pages_workspace_active_name_idx
-  on public.pages (workspace_id, is_active, name, id);
+create index pages_workspace_active_idx
+  on public.pages(workspace_id, is_active, id);
+
+create table public.page_niche_configs (
+  id bigint generated always as identity primary key,
+  public_id uuid not null default gen_random_uuid() unique,
+  workspace_id bigint not null,
+  page_id bigint not null,
+  niche_key text not null references public.niches(key) on delete restrict,
+  config_schema_version integer not null default 1 check (config_schema_version >= 1),
+  config jsonb not null,
+  is_enabled boolean not null default true,
+  is_default boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint page_niche_configs_page_fk
+    foreign key (workspace_id, page_id)
+    references public.pages(workspace_id, id)
+    on delete restrict,
+  constraint page_niche_configs_page_niche_key unique (page_id, niche_key),
+  constraint page_niche_configs_scope_key unique (workspace_id, page_id, niche_key),
+  constraint page_niche_configs_config_object_check check (jsonb_typeof(config) = 'object')
+);
+
+create unique index page_niche_configs_one_default_idx
+  on public.page_niche_configs(page_id)
+  where is_enabled and is_default;
+
+create table public.content_plans (
+  id bigint generated always as identity primary key,
+  public_id uuid not null default gen_random_uuid() unique,
+  workspace_id bigint not null,
+  page_id bigint not null,
+  niche_key text not null,
+  operation_key uuid not null,
+  name text,
+  status text not null default 'pending'
+    check (status in ('pending','in_progress','partially_completed','completed','failed','cancelled')),
+  requested_count integer not null check (requested_count > 0),
+  config_schema_version integer not null default 1 check (config_schema_version >= 1),
+  plan_config jsonb not null default '{}'::jsonb,
+  started_at timestamptz,
+  completed_at timestamptz,
+  cancelled_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint content_plans_page_niche_fk
+    foreign key (workspace_id, page_id, niche_key)
+    references public.page_niche_configs(workspace_id, page_id, niche_key)
+    on delete restrict,
+  constraint content_plans_operation_key unique (workspace_id, operation_key),
+  constraint content_plans_scope_key unique (id, workspace_id, page_id, niche_key),
+  constraint content_plans_config_object_check check (jsonb_typeof(plan_config) = 'object')
+);
+
+create index content_plans_page_status_idx
+  on public.content_plans(page_id, status, created_at desc, id desc);
+
+create table public.content_plan_items (
+  id bigint generated always as identity primary key,
+  public_id uuid not null default gen_random_uuid() unique,
+  workspace_id bigint not null,
+  plan_id bigint not null,
+  page_id bigint not null,
+  niche_key text not null,
+  position integer not null check (position >= 1),
+  operation_key uuid not null,
+  status text not null default 'pending'
+    check (status in ('pending','in_progress','completed','failed','cancelled')),
+  scheduled_at timestamptz,
+  topic_key text,
+  format_key text,
+  interaction_goal text
+    check (interaction_goal is null or interaction_goal in ('share','save','comment','follow')),
+  item_config jsonb not null default '{}'::jsonb,
+  attempt_count integer not null default 0 check (attempt_count >= 0),
+  last_error_code text,
+  last_error_detail text,
+  started_at timestamptz,
+  completed_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint content_plan_items_plan_fk
+    foreign key (plan_id, workspace_id, page_id, niche_key)
+    references public.content_plans(id, workspace_id, page_id, niche_key)
+    on delete restrict,
+  constraint content_plan_items_plan_position_key unique (plan_id, position),
+  constraint content_plan_items_operation_key unique (workspace_id, operation_key),
+  constraint content_plan_items_scope_key unique (id, workspace_id, page_id, niche_key),
+  constraint content_plan_items_config_object_check check (jsonb_typeof(item_config) = 'object')
+);
+
+create index content_plan_items_plan_status_idx
+  on public.content_plan_items(plan_id, status, position);
+
+create unique index content_plan_items_page_schedule_unique_idx
+  on public.content_plan_items(page_id, scheduled_at)
+  where scheduled_at is not null and status <> 'cancelled';
 
 create table public.posts (
   id bigint generated always as identity primary key,
-  public_id uuid not null default gen_random_uuid(),
+  public_id uuid not null default gen_random_uuid() unique,
   workspace_id bigint not null,
   page_id bigint not null,
+  niche_key text not null,
+  content_plan_item_id bigint,
   operation_key uuid not null,
-  plan_id uuid,
-  niche_code text not null,
-  status text not null default 'draft',
+  format_key text not null,
+  topic_key text not null,
+  interaction_goal text not null
+    check (interaction_goal in ('share','save','comment','follow')),
+  content_schema_version integer not null default 1 check (content_schema_version >= 1),
+  status text not null default 'draft'
+    check (status in ('draft','ready','posted','discarded','archived')),
   content_payload jsonb not null,
-  quality_status text not null default 'pending',
-  quality_report jsonb not null default '{}'::jsonb,
+  generation_snapshot jsonb not null,
+  system_checks jsonb not null default '{}'::jsonb,
+  editorial_checks jsonb not null default '{}'::jsonb,
+  quality_status text not null default 'pending'
+    check (quality_status in ('pending','passed','failed')),
   scheduled_at timestamptz,
+  published_at timestamptz,
+  platform_post_id text,
+  published_url text,
   ready_at timestamptz,
-  posted_at timestamptz,
+  discarded_at timestamptz,
   archived_at timestamptz,
-  revision integer not null default 1,
+  revision integer not null default 1 check (revision >= 1),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-
-  constraint posts_public_id_key unique (public_id),
-  constraint posts_workspace_fk
-    foreign key (workspace_id)
-    references public.workspaces (id)
-    on delete restrict,
   constraint posts_page_niche_fk
-    foreign key (workspace_id, page_id, niche_code)
-    references public.pages (workspace_id, id, niche_code)
+    foreign key (workspace_id, page_id, niche_key)
+    references public.page_niche_configs(workspace_id, page_id, niche_key)
     on delete restrict,
-  constraint posts_workspace_operation_key unique (workspace_id, operation_key),
-  constraint posts_status_check
-    check (status in ('draft', 'ready', 'posted', 'archived')),
-  constraint posts_quality_status_check
-    check (quality_status in ('pending', 'passed', 'failed')),
-  constraint posts_revision_check
-    check (revision >= 1),
-  constraint posts_payload_object_check
-    check (jsonb_typeof(content_payload) = 'object'),
-  constraint posts_quality_report_object_check
-    check (jsonb_typeof(quality_report) = 'object'),
+  constraint posts_plan_item_fk
+    foreign key (content_plan_item_id, workspace_id, page_id, niche_key)
+    references public.content_plan_items(id, workspace_id, page_id, niche_key)
+    on delete restrict,
+  constraint posts_operation_key unique (workspace_id, operation_key),
+  constraint posts_scope_key unique (id, workspace_id, page_id),
+  constraint posts_niche_scope_key unique (id, workspace_id, page_id, niche_key),
+  constraint posts_payload_object_check check (jsonb_typeof(content_payload) = 'object'),
+  constraint posts_snapshot_object_check check (jsonb_typeof(generation_snapshot) = 'object'),
+  constraint posts_system_checks_object_check check (jsonb_typeof(system_checks) = 'object'),
+  constraint posts_editorial_checks_object_check check (jsonb_typeof(editorial_checks) = 'object'),
   constraint posts_ready_quality_check
-    check (status not in ('ready', 'posted') or quality_status = 'passed'),
+    check (status not in ('ready','posted','archived') or quality_status = 'passed'),
   constraint posts_ready_at_check
-    check (status not in ('ready', 'posted') or ready_at is not null),
-  constraint posts_posted_at_check
-    check (status <> 'posted' or posted_at is not null),
+    check (status not in ('ready','posted','archived') or ready_at is not null),
+  constraint posts_published_at_check
+    check (status not in ('posted','archived') or published_at is not null),
+  constraint posts_discarded_at_check
+    check (status <> 'discarded' or discarded_at is not null),
   constraint posts_archived_at_check
-    check (status <> 'archived' or archived_at is not null)
+    check (status <> 'archived' or archived_at is not null),
+  constraint posts_discarded_not_published_check
+    check (status <> 'discarded' or published_at is null),
+  constraint posts_published_url_check
+    check (published_url is null or published_url ~ '^https://')
 );
 
 create index posts_page_status_created_idx
-  on public.posts (page_id, status, created_at desc, id desc);
+  on public.posts(page_id, status, created_at desc, id desc);
 
-create index posts_page_schedule_idx
-  on public.posts (page_id, scheduled_at, id)
-  where scheduled_at is not null and status <> 'archived';
+create index posts_page_niche_format_idx
+  on public.posts(page_id, niche_key, format_key, created_at desc);
+
+create index posts_page_niche_topic_idx
+  on public.posts(page_id, niche_key, topic_key, created_at desc);
 
 create unique index posts_page_schedule_unique_idx
-  on public.posts (page_id, scheduled_at)
-  where scheduled_at is not null and status <> 'archived';
+  on public.posts(page_id, scheduled_at)
+  where scheduled_at is not null and status not in ('discarded','archived');
 
-create index posts_workspace_plan_schedule_idx
-  on public.posts (workspace_id, plan_id, scheduled_at, id)
-  where plan_id is not null and scheduled_at is not null;
+create unique index posts_active_plan_item_unique_idx
+  on public.posts(content_plan_item_id)
+  where content_plan_item_id is not null and status not in ('discarded','archived');
 
-create index posts_content_payload_path_idx
-  on public.posts using gin (content_payload jsonb_path_ops);
+create unique index posts_platform_identity_unique_idx
+  on public.posts(page_id, platform_post_id)
+  where platform_post_id is not null;
+
+create table public.post_metrics (
+  id bigint generated always as identity primary key,
+  public_id uuid not null default gen_random_uuid() unique,
+  workspace_id bigint not null,
+  page_id bigint not null,
+  post_id bigint not null,
+  operation_key uuid not null,
+  captured_at timestamptz not null,
+  views bigint,
+  reach bigint,
+  reactions bigint,
+  comments bigint,
+  shares bigint,
+  saves bigint,
+  follows bigint,
+  watch_time_seconds numeric,
+  average_watch_time_seconds numeric,
+  metrics_payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  constraint post_metrics_post_fk
+    foreign key (post_id, workspace_id, page_id)
+    references public.posts(id, workspace_id, page_id)
+    on delete restrict,
+  constraint post_metrics_operation_key unique (workspace_id, operation_key),
+  constraint post_metrics_snapshot_key unique (post_id, captured_at),
+  constraint post_metrics_payload_object_check check (jsonb_typeof(metrics_payload) = 'object'),
+  constraint post_metrics_nonnegative_check check (
+    coalesce(views, 0) >= 0 and
+    coalesce(reach, 0) >= 0 and
+    coalesce(reactions, 0) >= 0 and
+    coalesce(comments, 0) >= 0 and
+    coalesce(shares, 0) >= 0 and
+    coalesce(saves, 0) >= 0 and
+    coalesce(follows, 0) >= 0 and
+    coalesce(watch_time_seconds, 0) >= 0 and
+    coalesce(average_watch_time_seconds, 0) >= 0
+  )
+);
+
+create index post_metrics_post_captured_idx
+  on public.post_metrics(post_id, captured_at desc, id desc);
+
+create index post_metrics_page_captured_idx
+  on public.post_metrics(page_id, captured_at desc, id desc);
 
 create table public.trivia_facts (
   id bigint generated always as identity primary key,
-  public_id uuid not null default gen_random_uuid(),
-  workspace_id bigint not null,
-  reserved_for_page_id bigint,
-
+  public_id uuid not null default gen_random_uuid() unique,
+  workspace_id bigint not null references public.workspaces(id) on delete restrict,
   claim_text text not null,
   normalized_claim text not null,
-  normalization_version smallint not null default 1,
+  normalization_version integer not null default 1 check (normalization_version >= 1),
   claim_hash text not null,
   subject_key text not null,
   relation_key text not null,
   object_key text not null,
   numbers jsonb not null default '[]'::jsonb,
   qualifiers jsonb not null default '{}'::jsonb,
+  ontology_version integer not null default 1 check (ontology_version >= 1),
   structured_key text not null,
   structured_hash text not null,
-  topic_code text not null,
+  topic_key text not null,
   search_vector tsvector generated always as (
     to_tsvector(
       'simple',
@@ -1625,425 +1690,480 @@ create table public.trivia_facts (
       coalesce(object_key, '')
     )
   ) stored,
-
   source_data jsonb not null,
-  verification_status text not null default 'needs_review',
+  verification_status text not null default 'needs_review'
+    check (verification_status in ('needs_review','verified','rejected')),
+  freshness_class text not null default 'stable'
+    check (freshness_class in ('stable','periodic','volatile')),
   verified_at timestamptz,
   as_of_date date,
   expires_at timestamptz,
   review_note text,
-
-  reservation_status text not null default 'available',
+  reservation_status text not null default 'available'
+    check (reservation_status in ('available','reserved')),
   reservation_token uuid,
+  reserved_for_page_id bigint,
   reserved_at timestamptz,
   reserved_until timestamptz,
-  used_page_ids bigint[] not null default '{}'::bigint[],
-  use_count integer not null default 0,
-  usage_started_at timestamptz,
-  usage_updated_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-
-  constraint trivia_facts_public_id_key unique (public_id),
-  constraint trivia_facts_workspace_fk
-    foreign key (workspace_id)
-    references public.workspaces (id)
-    on delete restrict,
+  constraint trivia_facts_workspace_id_key unique (workspace_id, id),
+  constraint trivia_facts_claim_hash_key unique (workspace_id, claim_hash),
+  constraint trivia_facts_structured_hash_key unique (workspace_id, structured_hash),
   constraint trivia_facts_reserved_page_fk
     foreign key (workspace_id, reserved_for_page_id)
-    references public.pages (workspace_id, id)
+    references public.pages(workspace_id, id)
     on delete restrict,
-  constraint trivia_facts_workspace_claim_hash_key
-    unique (workspace_id, claim_hash),
-  constraint trivia_facts_workspace_structured_hash_key
-    unique (workspace_id, structured_hash),
-  constraint trivia_facts_normalization_version_check
-    check (normalization_version >= 1),
-  constraint trivia_facts_claim_hash_format_check
-    check (claim_hash ~ '^[0-9a-f]{64}$'),
-  constraint trivia_facts_structured_hash_format_check
-    check (structured_hash ~ '^[0-9a-f]{64}$'),
-  constraint trivia_facts_numbers_array_check
-    check (jsonb_typeof(numbers) = 'array'),
-  constraint trivia_facts_qualifiers_object_check
-    check (jsonb_typeof(qualifiers) = 'object'),
+  constraint trivia_facts_claim_hash_format_check check (claim_hash ~ '^[0-9a-f]{64}$'),
+  constraint trivia_facts_structured_hash_format_check check (structured_hash ~ '^[0-9a-f]{64}$'),
+  constraint trivia_facts_numbers_array_check check (jsonb_typeof(numbers) = 'array'),
+  constraint trivia_facts_qualifiers_object_check check (jsonb_typeof(qualifiers) = 'object'),
   constraint trivia_facts_source_array_check
     check (jsonb_typeof(source_data) = 'array' and jsonb_array_length(source_data) >= 1),
-  constraint trivia_facts_verification_status_check
-    check (verification_status in ('verified', 'needs_review', 'rejected')),
-  constraint trivia_facts_reservation_status_check
-    check (reservation_status in ('available', 'reserved')),
   constraint trivia_facts_verified_at_check
     check (verification_status <> 'verified' or verified_at is not null),
-  constraint trivia_facts_expiry_check
-    check (expires_at is null or verified_at is null or expires_at > verified_at),
-  constraint trivia_facts_reservation_window_check
-    check (reserved_until is null or reserved_at is null or reserved_until > reserved_at),
-  constraint trivia_facts_verified_reservation_check
-    check (reservation_status = 'available' or verification_status = 'verified'),
-  constraint trivia_facts_reservation_shape_check
-    check (
-      (
-        reservation_status = 'available'
-        and reservation_token is null
-        and reserved_for_page_id is null
-        and reserved_at is null
-        and reserved_until is null
-      )
-      or
-      (
-        reservation_status = 'reserved'
-        and reservation_token is not null
-        and reserved_for_page_id is not null
-        and reserved_at is not null
-        and reserved_until is not null
-      )
-    ),
-  constraint trivia_facts_use_count_check
-    check (use_count >= 0 and use_count = cardinality(used_page_ids)),
-  constraint trivia_facts_usage_timestamp_check
-    check (
-      (use_count = 0 and usage_started_at is null and usage_updated_at is null)
-      or
-      (use_count > 0 and usage_started_at is not null and usage_updated_at is not null)
+  constraint trivia_facts_freshness_expiry_check
+    check (freshness_class = 'stable' or expires_at is not null),
+  constraint trivia_facts_reservation_shape_check check (
+    (
+      reservation_status = 'available' and
+      reservation_token is null and
+      reserved_for_page_id is null and
+      reserved_at is null and
+      reserved_until is null
     )
+    or
+    (
+      reservation_status = 'reserved' and
+      reservation_token is not null and
+      reserved_for_page_id is not null and
+      reserved_at is not null and
+      reserved_until is not null and
+      reserved_until > reserved_at
+    )
+  )
 );
 
-create index trivia_facts_workspace_reservation_topic_idx
-  on public.trivia_facts (workspace_id, reservation_status, topic_code, use_count, id);
+create index trivia_facts_workspace_verification_topic_idx
+  on public.trivia_facts(workspace_id, verification_status, topic_key, id);
 
 create index trivia_facts_reservation_token_idx
-  on public.trivia_facts (reservation_token, id)
+  on public.trivia_facts(reservation_token, id)
   where reservation_token is not null;
 
 create index trivia_facts_reserved_until_idx
-  on public.trivia_facts (reserved_until, id)
+  on public.trivia_facts(reserved_until, id)
   where reservation_status = 'reserved';
 
-create index trivia_facts_reserved_page_idx
-  on public.trivia_facts (reserved_for_page_id, id)
-  where reserved_for_page_id is not null;
-
-create index trivia_facts_used_page_ids_idx
-  on public.trivia_facts using gin (used_page_ids);
-
 create index trivia_facts_search_vector_idx
-  on public.trivia_facts using gin (search_vector);
+  on public.trivia_facts using gin(search_vector);
 
 create index trivia_facts_normalized_claim_trgm_idx
   on public.trivia_facts
-  using gin (normalized_claim extensions.gin_trgm_ops);
-```
+  using gin(normalized_claim extensions.gin_trgm_ops);
 
-### 22.1 Validator yang tidak cukup diwakili CHECK
+create table public.trivia_post_facts (
+  id bigint generated always as identity primary key,
+  public_id uuid not null default gen_random_uuid() unique,
+  workspace_id bigint not null,
+  page_id bigint not null,
+  post_id bigint not null,
+  niche_key text not null default 'trivia' check (niche_key = 'trivia'),
+  fact_id bigint not null,
+  position integer not null check (position >= 1),
+  fact_role text not null default 'general'
+    check (fact_role in ('general','myth_reversal','numeric_comparison','emotional','practical','scientific','visual')),
+  rendered_text text not null,
+  allocation_state text not null default 'allocated'
+    check (allocation_state in ('allocated','published','released')),
+  claim_hash_snapshot text not null,
+  source_snapshot jsonb not null,
+  verified_at_snapshot timestamptz not null,
+  released_at timestamptz,
+  published_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint trivia_post_facts_post_fk
+    foreign key (post_id, workspace_id, page_id, niche_key)
+    references public.posts(id, workspace_id, page_id, niche_key)
+    on delete restrict,
+  constraint trivia_post_facts_fact_fk
+    foreign key (workspace_id, fact_id)
+    references public.trivia_facts(workspace_id, id)
+    on delete restrict,
+  constraint trivia_post_facts_post_position_key unique (post_id, position),
+  constraint trivia_post_facts_post_fact_key unique (post_id, fact_id),
+  constraint trivia_post_facts_source_array_check
+    check (jsonb_typeof(source_snapshot) = 'array' and jsonb_array_length(source_snapshot) >= 1),
+  constraint trivia_post_facts_claim_hash_format_check
+    check (claim_hash_snapshot ~ '^[0-9a-f]{64}$'),
+  constraint trivia_post_facts_state_shape_check check (
+    (
+      allocation_state = 'allocated' and
+      released_at is null and
+      published_at is null
+    )
+    or
+    (
+      allocation_state = 'published' and
+      released_at is null and
+      published_at is not null
+    )
+    or
+    (
+      allocation_state = 'released' and
+      released_at is not null and
+      published_at is null
+    )
+  )
+);
 
-Hal berikut wajib divalidasi oleh database function sebelum insert/update:
+create unique index trivia_post_facts_page_active_fact_unique_idx
+  on public.trivia_post_facts(page_id, fact_id)
+  where allocation_state in ('allocated','published');
 
-- Market array tidak mengandung duplikat.
-- Timezone ada pada `pg_timezone_names`.
-- Struktur penuh `settings` dan `content_config`.
-- Struktur per-item `source_data`.
-- Struktur penuh `content_payload`.
-- Fact IDs pada payload sama dengan fakta yang direservasi dan memenuhi reuse rule Page.
-- `used_page_ids` tidak mempunyai duplikat dan seluruh ID berasal dari workspace yang sama.
-- Perubahan `used_page_ids` dan `use_count` hanya dilakukan bersama perubahan post dalam RPC transactional.
-- `niche_code = trivia` pada MVP.
-- `expires_at > now()` sebelum reservation.
-- Transisi status.
-- Expected revision.
+create index trivia_post_facts_fact_state_idx
+  on public.trivia_post_facts(fact_id, allocation_state, id);
 
-Constraint dan RPC saling melengkapi. MCP validation saja tidak cukup, dan CHECK constraint saja tidak dapat mencakup seluruh aturan lintas-row.
+create index trivia_post_facts_page_state_idx
+  on public.trivia_post_facts(page_id, allocation_state, created_at desc, id desc);
+
+alter table public.workspaces enable row level security;
+alter table public.niches enable row level security;
+alter table public.pages enable row level security;
+alter table public.page_niche_configs enable row level security;
+alter table public.content_plans enable row level security;
+alter table public.content_plan_items enable row level security;
+alter table public.posts enable row level security;
+alter table public.post_metrics enable row level security;
+alter table public.trivia_facts enable row level security;
+alter table public.trivia_post_facts enable row level security;
+
+revoke all on table
+  public.workspaces,
+  public.niches,
+  public.pages,
+  public.page_niche_configs,
+  public.content_plans,
+  public.content_plan_items,
+  public.posts,
+  public.post_metrics,
+  public.trivia_facts,
+  public.trivia_post_facts
+from anon;
+
+revoke insert, update, delete on table
+  public.workspaces,
+  public.niches,
+  public.pages,
+  public.page_niche_configs,
+  public.content_plans,
+  public.content_plan_items,
+  public.posts,
+  public.post_metrics,
+  public.trivia_facts,
+  public.trivia_post_facts
+from authenticated;
+
+grant select on table
+  public.workspaces,
+  public.niches,
+  public.pages,
+  public.page_niche_configs,
+  public.content_plans,
+  public.content_plan_items,
+  public.posts,
+  public.post_metrics,
+  public.trivia_facts,
+  public.trivia_post_facts
+to authenticated;
+~~~
+
+### 20.1 Validasi yang tidak cukup dengan CHECK
+
+RPC atau validator wajib memastikan:
+
+- Market tidak duplikat dan UK dinormalisasi menjadi GB.
+- Timezone terdapat pada pg_timezone_names.
+- default_niche_key menunjuk config enabled pada Page.
+- Config/payload schema version didukung.
+- JSON config trivia lengkap dan bobot valid.
+- Post format/topic/profile sesuai config Page.
+- Text metrics dihitung ulang server-side.
+- Post trivia hanya memakai trivia_facts workspace yang sama.
+- Reuse rule dipenuhi saat reservasi dan save.
+- Post metrics hanya untuk posted/archived.
+- Transisi lifecycle legal.
+- Plan status sesuai agregasi item.
+- Semua public IDs di-resolve dalam workspace owner.
 
 ---
 
-## 23. Trigger
+## 21. Trigger
 
-### 23.1 Updated timestamp
+### 21.1 updated_at
 
-Satu helper trigger mengisi `updated_at = now()` untuk seluruh tabel sebelum update.
+Satu helper trigger mengisi updated_at = now() sebelum update pada seluruh tabel mutable.
 
-### 23.2 Proteksi fakta yang sudah digunakan
+### 21.2 Proteksi canonical fact
 
-Meaning fields berikut tidak boleh diubah langsung ketika `use_count > 0`:
+Meaning fields trivia_facts tidak boleh diubah setelah pernah mempunyai junction, termasuk junction released:
 
-- `claim_text`
-- `normalized_claim`
-- `claim_hash`
-- `subject_key`
-- `relation_key`
-- `object_key`
-- `numbers`
-- `qualifiers`
-- `structured_key`
-- `structured_hash`
+- claim_text
+- normalized_claim
+- claim_hash
+- subject_key
+- relation_key
+- object_key
+- numbers
+- qualifiers
+- ontology_version
+- structured_key
+- structured_hash
 
-Sumber dapat ditambah atau diperbaiki, dan verification status dapat berubah jika ditemukan koreksi. Perubahan klaim harus membuat fakta baru dengan identitas yang berbeda dan melalui review.
+Koreksi makna membuat row canonical baru. Sumber, verification status, freshness, expiry, dan review note dapat diperbarui. Snapshot pada junction mempertahankan konteks post lama.
 
-Baseline dapat menegakkan proteksi ini melalui trigger `protect_used_fact_meaning` atau dengan memastikan seluruh write hanya melalui RPC. Trigger direkomendasikan sebagai defense in depth.
+### 21.3 Tidak ada trigger AI
 
-Trigger ringan `validate_fact_usage_summary` juga wajib menolak `used_page_ids` yang berulang atau berisi Page dari workspace lain, serta memastikan `use_count` sama dengan cardinality array. Trigger tidak menambah atau menghapus ID; perubahan bisnis tetap dilakukan oleh RPC transactional.
-
-### 23.3 Tidak ada trigger untuk AI work
-
-Trigger tidak boleh:
-
-- Memanggil URL.
-- Menjalankan AI.
-- Membuat caption.
-- Menentukan apakah fakta menarik.
-- Melakukan operasi berat yang memperpanjang lock.
+Trigger tidak memanggil URL, AI, atau membuat konten. Trigger harus singkat dan tidak memperpanjang lock tanpa kebutuhan.
 
 ---
 
-## 24. Pagination dan batas query
-
-`get_posts` menggunakan cursor `(created_at, id)` atau `(scheduled_at, id)`, bukan offset besar.
-
-Batas default dan maksimum:
+## 22. Pagination dan batas query
 
 | Query | Default | Maksimum |
 |---|---:|---:|
 | Pages | 50 | 100 |
+| Plans | 20 | 100 |
+| Plan items | 50 | 500 |
 | Posts | 20 | 100 |
-| Kalender | Sesuai rentang | 500 post |
+| Kalender | sesuai rentang | 500 |
 | Similar facts per candidate | 10 | 20 |
-| Fact inventory detail | 50 | 200 |
+| Fact inventory | 50 | 200 |
+| Metric snapshots | 20 | 100 |
 
-Rentang kalender maksimum per request adalah 366 hari pada MVP.
-
----
-
-## 25. Retention dan backup
-
-- Post dan fakta tidak dihapus otomatis.
-- Archived post tetap menyimpan relasi fakta.
-- Riwayat `used_page_ids` tidak dihapus hanya karena fakta sudah lama digunakan.
-- Fakta tidak otomatis boleh dipakai kembali berdasarkan umur; kelayakan tetap mengikuti rule Page tujuan.
-- Reservation yang kedaluwarsa dibersihkan saat operasi fakta berikutnya.
-- Backup mengikuti kemampuan Supabase plan yang digunakan.
-- Sebelum migration berisiko, lakukan backup atau export yang sesuai.
-- Restore procedure harus diuji sebelum production dianggap selesai.
+Cursor memakai pasangan sort key + id, bukan offset besar.
 
 ---
 
-## 26. Migration strategy
+## 23. Retention dan backup
+
+- Post, plan, metric, dan fakta tidak dihapus otomatis.
+- Discarded post serta released junction dipertahankan untuk audit operasional.
+- Archived post mempertahankan published junction.
+- Fact tidak otomatis reusable berdasarkan umur.
+- Reservation expired dibersihkan opportunistic.
+- Sebelum migration berisiko lakukan backup/export sesuai Supabase plan.
+- Restore procedure diuji sebelum production dianggap selesai.
+
+---
+
+## 24. Migration strategy
 
 Urutan migration:
 
 1. Extensions.
-2. Tables dalam urutan dependensi: `workspaces`, `pages`, `posts`, lalu `trivia_facts`.
-3. Helper validation functions.
-4. Transactional RPC functions.
-5. Triggers.
-6. Index.
-7. RLS dan grants.
-8. Seed satu workspace.
-9. Database tests.
+2. Core ownership: workspaces dan niches.
+3. Pages dan page_niche_configs.
+4. Content plans dan content_plan_items.
+5. Posts dan post_metrics.
+6. Trivia facts dan trivia_post_facts.
+7. Validation helpers.
+8. Transactional RPC.
+9. Triggers.
+10. Index tambahan.
+11. RLS policies dan grants.
+12. Seed niche trivia.
+13. Seed workspace owner dan Page uji melalui flow aman.
+14. Database tests.
 
 Aturan:
 
-- Migration dibuat melalui Supabase CLI.
-- Jangan mengarang nama migration timestamp secara manual.
-- Semua migration harus dapat dijalankan pada database kosong.
-- Jangan mengedit schema production melalui Dashboard tanpa migration yang setara.
-- Setelah perubahan, jalankan database advisors dan periksa migration list.
-- Constraint besar pada data produksi kelak dapat ditambahkan `not valid`, divalidasi, lalu diaktifkan untuk mengurangi lock; strategi ini tidak diperlukan pada database kosong.
+- Buat migration melalui Supabase CLI; periksa command dengan --help.
+- Jangan mengarang timestamp migration.
+- Iterasi schema lokal dengan execute SQL atau local DB, lalu hasilkan migration bersih.
+- Jalankan database advisors sebelum final.
+- Verifikasi migration list.
+- Jangan mengubah production Dashboard tanpa migration setara.
+- Data API exposure dan grants menjadi bagian deployment checklist.
 
 ---
 
-## 27. Pengujian database
+## 25. Pengujian database
 
-### 27.1 Schema tests
+### 25.1 Schema dan ownership
 
-- Tepat empat tabel bisnis aplikasi tersedia.
-- Semua primary key, public ID, foreign key, dan unique constraint tersedia.
-- Semua foreign key columns mempunyai index yang dapat digunakan.
-- Semua tabel memiliki RLS aktif.
-- `anon` dan `authenticated` tidak dapat membaca atau menulis data.
+- Sepuluh tabel aplikasi tersedia.
+- Seluruh PK, public ID, FK, unique, dan index penting tersedia.
+- Auth user non-owner tidak dapat membaca atau menulis workspace.
+- Owner dapat mengakses row miliknya.
+- anon tidak memiliki akses.
+- authenticated direct write ke tabel bisnis ditolak; write melalui RPC yang diizinkan berhasil.
+- UPDATE policy memiliki USING dan WITH CHECK.
+- Tidak ada function bisnis executable oleh PUBLIC.
 
-### 27.2 Config validation tests
+### 25.2 Page dan config
 
-- Market valid diterima.
-- `UK` pada input dinormalisasi menjadi `GB` sebelum database write.
-- Market tidak dikenal ditolak.
-- Market ganda ditolak.
-- Timezone IANA valid diterima.
-- Bobot architecture atau topic yang tidak berjumlah 100 ditolak.
-- Fixed value 5, 7, dan 8 diterima pada Page yang berbeda.
-- Fixed value di luar 5–9 ditolak.
-- Adaptive 5/7/9 diterima dan menjadi default Page baru.
-- Adaptive ditolak jika urutan `min ≤ preferred ≤ max` tidak terpenuhi atau berada di luar 5–9.
-- Config fixed yang membawa key adaptive, dan config adaptive yang membawa `value`, ditolak.
-- Text budget lengkap dan positif diterima; key hilang, nilai nol/negatif, atau batas di atas hard ceiling ditolak.
-- `facts_total_max_chars > canva_total_max_chars` ditolak.
-- `fact_reuse_scope` menerima `workspace_unique` dan `page_unique` saja.
-- Page baru tanpa pilihan eksplisit memakai adaptive 5/7/9, baseline text budget, dan `workspace_unique`.
-- Fact count post 5–9 sebagai hasil fixed/adaptive atau override eksplisit diterima tanpa pengecualian kualitas.
-- Fact count 1–4 tanpa `fact_count_exception` ditolak.
-- Fact count 1–4 dengan alasan, waktu, dan konfirmasi eksplisit pengguna diterima.
-- Fact count lebih dari 9 ditolak.
+- Page core tidak menyimpan field trivia.
+- Trivia config enabled dapat dibuat.
+- Satu Page hanya mempunyai satu config per niche.
+- Hanya satu default enabled per Page.
+- Config version tidak dikenal ditolak.
+- Format/topic/bobot invalid ditolak.
+- Fixed/adaptive, budget, reuse scope, render style, dan interaction goal divalidasi.
+- Page tanpa niche aktif tidak dapat menerima post.
 
-### 27.3 Deduplication tests
+### 25.3 Plan dan resume
 
-- Teks exact setelah normalisasi menghasilkan claim hash sama.
-- Case, punctuation, dan whitespace tidak membuat fakta baru.
-- Parafrasa dengan structured key sama ditolak.
-- Subjek sama dengan klaim berbeda dapat mempunyai structured key berbeda.
-- FTS dan trigram mengembalikan near-duplicate sebagai kandidat.
-- Unit berbeda yang dinormalisasi ke nilai sama menghasilkan structured hash sama.
-- Fakta canonical tetap satu row walaupun dipakai lintas Page melalui `page_unique`.
+- Create plan membuat requested_count items dalam satu transaksi.
+- Retry operation key mengembalikan plan sama.
+- Dua plan tidak dapat memegang slot Page sama.
+- Pembuatan plan item dan post paralel untuk Page+slot yang sama menghasilkan satu pemenang melalui advisory lock lintas-tabel.
+- Chunk claim tidak mengambil item yang sedang in_progress.
+- Item berhasil menjadi completed setelah post tersimpan.
+- Item gagal tidak menghapus post item lain.
+- Plan dapat dilanjutkan dari chat lain.
+- Cancel tidak menghapus post yang sudah dibuat.
 
-### 27.4 Reservation tests
+### 25.4 Deduplikasi
 
-- Available fact dapat direservasi.
-- `workspace_unique` menolak fakta dengan `use_count > 0`.
-- `page_unique` menerima fakta yang hanya pernah dipakai Page lain.
-- `page_unique` menolak fakta yang sudah terdapat pada `used_page_ids` Page tujuan.
-- Reserved fact tidak dapat diambil token lain.
-- Token sama dan payload sama idempotent.
-- Token sama dan payload berbeda ditolak.
-- Reservation kedaluwarsa kembali available.
-- Sepuluh request simultan untuk fakta sama menghasilkan satu pemenang.
-- Setelah pemenang menyimpan post, retry Page lain dievaluasi ulang berdasarkan rule Page tersebut.
-- Lock dilakukan dalam urutan konsisten dan tidak menyebabkan deadlock pada test.
+- Normalisasi exact menghasilkan claim hash sama.
+- Structured key sama ditolak.
+- Alias, unit, negasi, waktu, dan lokasi mengikuti ontology.
+- FTS/trigram mengembalikan near duplicate.
+- Satu canonical row dapat dipakai lintas Page hanya bila rule mengizinkan.
+- Gold set memenuhi target exact/structured capture, paraphrase candidate recall, dan zero false merge.
+- Perubahan normalization_version atau ontology_version menjalankan ulang seluruh fixture.
 
-### 27.5 Post tests
+### 25.5 Reservasi dan reuse
 
-- Save post mengonsumsi seluruh reserved facts secara atomic.
-- Save retry dengan operation key sama mengembalikan post lama.
-- Payload dengan fact ID tambahan atau hilang ditolak.
-- Save post menambahkan Page tepat satu kali ke `used_page_ids`, menaikkan `use_count`, lalu membersihkan reservation.
-- Save post memeriksa ulang rule reuse setelah row terkunci.
-- Post dengan Page dari workspace lain ditolak.
-- Niche post yang tidak sama dengan Page ditolak.
-- Post trivia dengan 1–4 fakta tanpa pengecualian yang valid tidak dapat disimpan sebagai `ready`.
-- Post trivia dengan 1–4 fakta dan pengecualian yang valid tetap dapat disimpan sebagai `draft` lalu dipromosikan ke `ready` setelah semua quality gate lulus.
-- Post adaptive dengan 5 fakta panjang berhenti pada minimum ketika fakta ke-6 menyebabkan overflow.
-- Post adaptive dengan fakta pendek dapat mencapai 8–9 selama semua kandidat kuat dan budget lulus.
-- Mismatch antara `text_metrics` input dan hasil hitung database ditolak.
-- Hook, satu fakta, blok fakta, CTA, atau Canva copy yang melewati budget masing-masing ditolak.
-- Slot Page yang sama ditolak oleh unique index.
-- Page berbeda boleh memiliki waktu yang sama.
+- Hanya fact verified dan tidak expired dapat direservasi.
+- Token sama + payload sama idempotent.
+- Token sama + payload berbeda ditolak.
+- Sepuluh reservasi simultan menghasilkan satu pemenang.
+- Workspace unique menolak semua allocated/published junction.
+- Page unique menolak allocated/published pada Page tujuan tetapi mengizinkan Page lain.
+- Released junction tidak memblokir reuse.
+- Expired reservation kembali available.
 
-### 27.6 Revision tests
+### 25.6 Post dan junction
 
-- Expected revision benar berhasil.
-- Expected revision lama ditolak.
-- Revisi ready kembali menjadi draft.
-- Penggantian fakta menambahkan Page ke fakta baru dan melepas Page dari fakta lama dalam satu transaction.
-- Post posted dan archived tidak dapat direvisi.
-- Dua revisi paralel hanya menghasilkan satu pemenang.
+- Save post, junction, release reservation, dan plan progress atomic.
+- Fact ID tambahan/hilang ditolak.
+- Position dan fact per post unik.
+- Snapshot sumber serta hash tersimpan.
+- Topic post dan fact role tersimpan sebagai dimensi analitik yang dapat diindeks.
+- Junction trivia menolak post dengan niche selain trivia.
+- JSON payload bukan sumber relasi.
+- Slot Page sama ditolak.
+- Active output kedua untuk plan item ditolak.
+- Discarded output memungkinkan replacement baru.
+- Config/content schema mismatch ditolak.
 
-### 27.7 Status tests
+### 25.7 Revisi dan lifecycle
 
-- Draft dengan quality pending tidak dapat menjadi ready.
-- Draft dengan quality passed dan fakta valid dapat menjadi ready.
-- Ready dapat menjadi posted hanya melalui perintah tool.
-- Posted membutuhkan `posted_at`.
-- Archived tidak melepaskan fakta.
-- Mengirim target status yang sama bersifat idempotent.
+- Expected revision benar berhasil; lama ditolak.
+- Ready yang direvisi kembali draft.
+- Penggantian fact melepas junction lama dan mengalokasikan baru atomic.
+- Draft/ready menjadi discarded dan junction released.
+- Ready menjadi posted dan junction published.
+- Archived tidak melepaskan published junction.
+- Posted/discarded/archived tidak dapat direvisi.
+- Transisi target sama idempotent bila payload compatible.
 
-### 27.8 Query performance tests
+### 25.8 Quality dan metrics
 
-Gunakan `EXPLAIN (ANALYZE, BUFFERS)` untuk:
+- System checks gagal mencegah ready.
+- Editorial checks tidak diperlakukan sebagai bukti DB di luar attestation.
+- Text metrics dihitung ulang dan overflow ditolak.
+- Metrics untuk draft ditolak.
+- Snapshot metrics tidak menimpa snapshot lama.
+- Nilai negatif ditolak.
+- Retry operation key tidak membuat snapshot ganda.
 
-- List Page.
-- List post berdasarkan Page dan status.
-- Kalender berdasarkan Page dan rentang.
-- Lookup operation key.
-- Lookup reservation token.
-- Exact hash duplicate.
-- Structured hash duplicate.
-- FTS candidate search.
-- Trigram candidate search.
+### 25.9 Performance
 
-Target query server mengikuti PRD: read sederhana p95 ≤ 2 detik; duplicate search dan write sederhana p95 ≤ 3 detik.
+Gunakan EXPLAIN (ANALYZE, BUFFERS) untuk generation context, plan progress, list post, calendar, exact hash, structured hash, FTS, trigram, reuse check, latest metrics, dan insight aggregate.
+
+Target server mengikuti PRD: read sederhana p95 maksimal 2 detik; duplicate search dan write sederhana p95 maksimal 3 detik.
 
 ---
 
-## 28. Audit kesesuaian dengan PRD
+## 26. Audit kesesuaian dengan PRD
 
-| Keputusan PRD | Status desain | Bukti dalam desain |
-|---|---|---|
-| Empat tabel | Sesuai | Bagian 2 dan 7–10 |
-| Multi-Page | Sesuai | `pages.workspace_id`, `posts.page_id` |
-| Trivia saja pada MVP | Sesuai | `trivia_facts`, validator niche |
-| Siap niche lain | Sesuai | Generic pages/posts dan `niche_code` |
-| Fakta canonical workspace-wide | Sesuai | Unique hash menggunakan `workspace_id` |
-| Jumlah fakta per Page | Sesuai | Mode fixed atau adaptive dalam `content_config.fact_count` |
-| Text budget per Page | Sesuai | Component dan total budget dalam `content_config.text_budget` |
-| Reuse per Page | Sesuai | `workspace_unique` atau `page_unique`; default workspace |
-| Tanpa embeddings | Sesuai | Hash, FTS, dan trigram saja |
-| Multi-chat | Sesuai | Atomic reservation dan revision check |
-| Tidak ada job queue | Sesuai | Batch adalah beberapa post independen |
-| Kalender tanpa tabel baru | Sesuai | `scheduled_at` dan `plan_id` pada posts |
-| Tidak ada versions table | Sesuai | `posts.revision` |
-| Empat status post | Sesuai | Check constraint lifecycle |
-| Sumber per fakta | Sesuai | `trivia_facts.source_data` |
-| Output siap Canva/Facebook | Sesuai | `posts.content_payload` |
-| Tanpa OpenAI API | Sesuai | Tidak ada AI/embedding credential atau table |
-| MCP di Supabase | Sesuai | RPC dirancang untuk Edge Function |
-| Tanpa Vercel | Sesuai | Tidak ada dependency hosting eksternal |
-| Tanpa OAuth pada MVP | Sesuai dengan risiko | RLS deny public roles; Edge Function backend secret |
-| Tidak ada hard delete | Sesuai | Lifecycle dan `on delete restrict` |
-
-Tidak ditemukan kebutuhan PRD yang memerlukan tabel kelima pada MVP.
+| Keputusan PRD | Bukti desain |
+|---|---|
+| Multi-niche foundation | niches dan page_niche_configs |
+| Trivia-only MVP | hanya trivia active dan tabel modul trivia |
+| Satu post satu niche | posts.niche_key dan FK config |
+| Satu plan satu Page+niche | content_plans composite FK |
+| Resume batch | content_plan_items |
+| Junction fakta | trivia_post_facts |
+| Discard berbeda dari archive | lifecycle dan allocation_state |
+| OAuth owner | owner_user_id, auth.uid(), RLS |
+| Manual performance feedback | post_metrics |
+| Versioned config/payload | config_schema_version dan content_schema_version |
+| System/editorial checks terpisah | dua JSONB berbeda |
+| Tanpa embeddings | FTS, trigram, hash |
+| Multi-chat | locks, operation_key, revision |
+| Tanpa background AI | plan adalah checkpoint, bukan job queue |
+| Tidak ada hard delete | lifecycle + on delete restrict |
+| Future niche tidak dipaksa menjadi trivia | module contract dan niche-specific junction |
 
 ---
 
-## 29. Pengembangan database setelah MVP
+## 27. Pengembangan database setelah MVP
 
-### 29.1 Niche quotes
+### Quotes
 
-Tambahkan tabel khusus seperti `quote_items` hanya saat niche tersebut dibangun. `posts` tetap dipakai untuk output dan jadwal.
+Tambahkan quote_library dan quote_post_items jika deduplikasi, attribution, reuse, dan source lineage dibutuhkan. Jangan memasukkan quote ke trivia_facts.
 
-Quotes dapat mempunyai aturan reuse berbeda dari trivia, sehingga tidak boleh dimasukkan ke `trivia_facts`.
+### Psychology
 
-### 29.2 Niche psikologi dan motivasi
+Tambahkan psychology_claims dan psychology_post_claims dengan source policy serta safety metadata yang lebih ketat.
 
-Tambahkan tabel sumber khusus hanya jika klaim, referensi, dan deduplikasinya tidak cukup diwakili generic post payload.
+### Motivation
 
-### 29.3 Multi-user
+Tidak wajib memiliki library. Modul dapat hanya memakai posts sampai kebutuhan reusable themes atau frameworks terbukti.
 
-Ketika multi-user dibangun:
+### Multi-user
 
-- Tambahkan owner atau membership model.
-- Hubungkan workspace dengan `auth.users`.
-- Tambahkan RLS policy berbasis ownership/membership.
-- Tambahkan OAuth 2.1 pada MCP.
-- Hentikan penggunaan backend-wide access untuk operasi yang seharusnya user-scoped.
+Tambahkan memberships dan role hanya saat produk benar-benar digunakan tim. owner_user_id MVP tetap menjadi jalur migrasi awal.
 
-Perubahan ini merupakan migration tersendiri dan bukan bagian MVP.
+### Analytics lanjutan
 
-### 29.4 Analytics
+Tambahkan derived views/materialized aggregates atau Facebook ingestion hanya setelah volume dan query nyata membutuhkannya. post_metrics tetap raw snapshot.
 
-Performance metrics dapat ditambahkan ke `posts` sebagai JSONB pada tahap awal. Tabel analytics terpisah baru dibuat jika data menjadi time-series atau membutuhkan banyak event per post.
+### Audit/version history
 
-### 29.5 Post versions dan audit
-
-Tabel version atau audit hanya ditambahkan jika kebutuhan rollback, tim reviewer, atau compliance benar-benar muncul. `posts.revision` cukup untuk concurrency MVP.
+Tambahkan post_versions atau audit_events hanya jika rollback, compliance, atau kolaborasi memerlukannya.
 
 ---
 
-## 30. Handoff ke implementation plan
+## 28. Handoff ke implementation plan
 
-Implementation plan tidak boleh menyalin ulang seluruh keputusan schema karena salinan tersebut mudah tidak sinkron. Dokumen implementasi harus merujuk langsung ke:
+Implementation plan harus merujuk dokumen ini untuk:
 
-- Bagian 7–10 untuk tabel, kolom, JSONB, dan constraint.
-- Bagian 13–17 untuk deduplikasi canonical, reuse, transaksi, revisi, status, dan jadwal.
-- Bagian 18–20 untuk RPC, error contract, serta security.
-- Bagian 22–23 untuk DDL referensi, validator, dan trigger.
-- Bagian 27 untuk kasus pengujian database.
+- Urutan migration.
+- JSON validators per schema version.
+- RPC input/output dan error mapping.
+- RLS/grants/Data API exposure.
+- Tool-to-RPC mapping.
+- Transaction boundaries.
+- Test fixtures dan concurrency tests.
+- Seed niche trivia.
+- Deployment, rollback, dan restore.
 
-Jika implementasi membutuhkan perubahan struktur atau invariant, PRD diperbarui lebih dahulu bila kebutuhan produk berubah, kemudian dokumen database ini diperbarui sebelum implementation plan.
+Sebelum implementasi, module-contract.md dan trivia-content-dna.md harus diselaraskan dengan config, payload, format, ontology, quality checks, serta evaluation fixtures dalam desain ini.
 
 ---
 
-## 31. Referensi teknis
+## 29. Referensi teknis
 
-- [Supabase — Securing your data](https://supabase.com/docs/guides/database/secure-data)
-- [Supabase — Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security)
-- [Supabase — Full Text Search](https://supabase.com/docs/guides/database/full-text-search)
-- [Supabase — Managing Indexes](https://supabase.com/docs/guides/database/postgres/indexes)
-- [Supabase — Edge Function secrets](https://supabase.com/docs/guides/functions/secrets)
-- [Supabase — API keys](https://supabase.com/docs/guides/getting-started/api-keys)
+- Supabase — Securing your API: https://supabase.com/docs/guides/api/securing-your-api
+- Supabase — Row Level Security: https://supabase.com/docs/guides/database/postgres/row-level-security
+- Supabase — Full Text Search: https://supabase.com/docs/guides/database/full-text-search
+- Supabase — Managing Indexes: https://supabase.com/docs/guides/database/postgres/indexes
+- Supabase — Database Functions: https://supabase.com/docs/guides/database/functions
+- Supabase — Edge Function secrets: https://supabase.com/docs/guides/functions/secrets
+- Supabase — API keys: https://supabase.com/docs/guides/getting-started/api-keys
