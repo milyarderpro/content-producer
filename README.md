@@ -6,9 +6,10 @@ designed for future niche modules.
 
 ## Repository status
 
-Phase 1 establishes the repository foundation only. It contains no business
-migrations, deployed resources, MCP handler, production plugin connection, or
-Facebook/Canva integration.
+Phase 2 adds a reproducible local Supabase foundation: configuration, one
+baseline migration, a no-op seed, and database verification. It still contains
+no business tables, business RPCs, deployed resources, MCP handler, production
+plugin connection, or Facebook/Canva integration.
 
 ## Prerequisites
 

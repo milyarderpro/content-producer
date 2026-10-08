@@ -476,8 +476,8 @@ Membuat Supabase local environment dan migration workflow yang dapat direproduks
 4. Mengaktifkan extension yang diperlukan:
    - pgcrypto.
    - pg_trgm.
-5. Menentukan exposed schemas dan Data API policy lokal.
-6. Menetapkan hanya schema `api` sebagai business RPC surface; `public` dan `internal` tidak diekspos.
+5. Menentukan configured business schema, platform schema, object-privilege, dan RLS policy lokal secara terpisah.
+6. Menetapkan `api` sebagai satu-satunya business RPC surface. `public` dan `storage` dapat tersertakan secara teknis oleh platform, tetapi `public` hanya storage tabel bisnis tanpa direct Data API access, `storage` hanya platform surface, dan `internal` tidak dikonfigurasi maupun diberi caller grants. `graphql_public` tidak dipertahankan bila GraphQL tidak digunakan.
 7. Membuat test harness database.
 8. Membuat helper untuk reset, seed, dan verification.
 9. Membuktikan database kosong dapat start, reset, dan menerima migration baseline.
@@ -681,7 +681,7 @@ Membuat seluruh operasi write atomic, owner-scoped, idempotent, dan aman terhada
 12. Mengaktifkan RLS pada seluruh tabel business/internal sebagai defense in depth.
 13. Membuat owner policies menggunakan auth.uid().
     - Policy untuk function-owner role sempit harus mempunyai ownership predicate yang sama; policy `TO authenticated` tidak dianggap berlaku otomatis.
-14. Mengekspos hanya schema `api`, menulis grants eksplisit, dan mencabut seluruh direct table read/write dari authenticated.
+14. Menetapkan `api` sebagai satu-satunya business RPC surface, menulis grants eksplisit, dan mencabut seluruh direct table read/write dari authenticated. `public` dan `storage` dapat tersertakan secara teknis oleh platform, tetapi bukan business RPC surface; `internal` tidak dikonfigurasi sebagai business/Data API schema dan tidak menerima caller grants. Schema inclusion, object privileges, dan RLS tetap diverifikasi sebagai kontrol terpisah.
 15. Membuat narrow RPC allowlist dan database-backed rate limits.
 16. Menggunakan SECURITY INVOKER untuk helper yang tidak memerlukan elevated table access.
 17. Karena authenticated tidak mempunyai direct table privileges, membuat business RPC sebagai SECURITY DEFINER yang dimiliki role sempit `content_producer_api_owner` (`NOLOGIN`, tanpa `BYPASSRLS`, bukan table owner):
@@ -1065,8 +1065,8 @@ Men-deploy database dan MCP ke satu Supabase Free project secara aman dan dapat 
 7. Memverifikasi migration list.
 8. Mengonfigurasi Supabase Auth sebagai OAuth 2.1 authorization server, discovery, DCR/client policy, Site URL, dan authorization path.
 9. Men-deploy frontend auth minimal dengan `/login`, `/oauth/consent`, `/logout`, approve/deny, safe error state, dan publishable key saja.
-10. Mengonfigurasi Data API agar hanya schema `api` menjadi business surface.
-11. Mengonfigurasi explicit grants dan secrets.
+10. Mengonfigurasi `api` sebagai satu-satunya business RPC surface; membedakan schema platform yang tersertakan secara teknis (`public`/`storage`) dari schema bisnis yang diizinkan, dan tidak mempertahankan `graphql_public` bila GraphQL tidak digunakan.
+11. Mengonfigurasi explicit grants, default-privilege revokes, RLS, dan secrets; keberadaan schema platform tidak memberi direct business-object access.
 12. Menetapkan Edge Function `mcp` `verify_jwt = false`, lalu mengandalkan protected-resource/OAuth middleware di dalam function.
 13. Men-deploy Edge Function MCP dan HTTP `/health`.
 14. Seed niche trivia.

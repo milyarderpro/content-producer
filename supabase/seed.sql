@@ -1,0 +1,3 @@
+-- Phase 2 intentionally seeds no business data.
+-- This file keeps local start and reset reproducible until Phase 3 defines
+-- application tables and Phase 4 defines the trivia registry seed.

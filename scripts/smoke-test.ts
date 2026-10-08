@@ -23,4 +23,5 @@ for (const path of requiredPaths) {
 }
 
 run('pnpm', ['run', 'verify-migrations']);
-console.log('Phase 1 smoke test passed.');
+run('pnpm', ['run', 'test:database']);
+console.log('Phase 2 smoke test passed.');

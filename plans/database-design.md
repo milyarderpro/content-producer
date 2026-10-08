@@ -1346,15 +1346,15 @@ Constraint violation diterjemahkan ke code domain; raw SQL, stack trace, secret,
 
 ### 18.2 Data API exposure
 
-Data API exposure dan RLS adalah dua lapisan terpisah.
+Data API schema inclusion, object privilege, dan RLS adalah tiga lapisan terpisah.
 
-- Hanya schema `api` yang diekspos untuk business access; `public` dan `internal` tidak dimasukkan ke exposed schemas.
-- Grants ke anon dan authenticated ditentukan eksplisit dalam migration serta diverifikasi terhadap project Data API settings.
-- anon tidak mendapat akses tabel atau execute RPC bisnis.
-- authenticated hanya mendapat `USAGE` pada `api` dan `EXECUTE` pada RPC allowlist; tidak mendapat direct SELECT/INSERT/UPDATE/DELETE pada tabel bisnis.
+- Local Supabase secara teknis menyertakan schema platform, termasuk `public` dan `storage`. `public` menyimpan tabel bisnis, tetapi bukan business API surface; `storage` adalah platform surface, bukan business RPC surface Content Producer.
+- `api` adalah satu-satunya schema business RPC yang dikonfigurasi aplikasi. `graphql_public` tidak dipertahankan karena MVP tidak memakai GraphQL. `internal` tidak dimasukkan ke configured business schemas dan tidak menerima caller grants.
+- Grants ke anon dan authenticated ditentukan eksplisit dalam migration; direct privilege pada tabel, sequence, dan function bisnis `public` dicabut secara default. `service_role` juga tidak menerima direct business-table access tanpa kebutuhan eksplisit yang terdokumentasi.
+- anon tidak mendapat akses tabel atau execute RPC bisnis. authenticated hanya mendapat `USAGE` pada `api` dan `EXECUTE` pada RPC allowlist; tidak mendapat direct SELECT/INSERT/UPDATE/DELETE pada tabel bisnis.
 - Semua read dan write MCP melewati `.schema('api').rpc(...)` menggunakan user JWT.
-- Semua tabel bisnis tetap mengaktifkan RLS sebagai defense in depth.
-- Tidak mengandalkan perilaku otomatis project mengenai table exposure.
+- Semua tabel bisnis mengaktifkan RLS sebagai defense in depth ketika dibuat; RLS menentukan row setelah object grant ada dan bukan pengganti privilege grant.
+- Tidak mengandalkan auto-exposure atau default privilege Supabase; keduanya hanya defense tambahan terhadap migration grants yang eksplisit.
 
 ### 18.3 Pola RLS
 

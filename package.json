@@ -24,6 +24,12 @@
     "verify-migrations": "tsx scripts/verify-migrations.ts",
     "package-plugin": "tsx scripts/package-plugin.ts",
     "smoke-test": "tsx scripts/smoke-test.ts",
+    "supabase:start": "tsx scripts/supabase-local.ts start",
+    "supabase:stop": "tsx scripts/supabase-local.ts stop",
+    "supabase:reset": "tsx scripts/supabase-local.ts reset",
+    "supabase:seed": "tsx scripts/supabase-local.ts seed",
+    "supabase:verify": "tsx scripts/supabase-local.ts verify-migrations",
+    "test:database": "tsx scripts/supabase-local.ts test-database",
     "supabase": "supabase"
   },
   "devDependencies": {

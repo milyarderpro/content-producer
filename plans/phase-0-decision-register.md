@@ -549,16 +549,17 @@ Write RPC memakai target awal `lock_timeout = 2s` dan `statement_timeout = 15s`.
 
 ### 8.7 Data API dan RPC-only boundary
 
-Data API mengekspos hanya schema `api`. Schema `public` yang berisi tabel bisnis dan schema `internal` tidak dimasukkan dalam exposed schemas.
+Local Supabase secara teknis menyertakan schema platform, termasuk `public` dan `storage`; hal ini tidak menjadikan keduanya business API surface. `api` adalah satu-satunya schema business RPC Content Producer yang dikonfigurasi aplikasi. `public` menyimpan tabel bisnis tetapi direct business-object access harus ditolak; `storage` hanya platform surface. `graphql_public` tidak dipertahankan karena MVP tidak memakai GraphQL. `internal` tidak dimasukkan dalam configured business schemas dan tidak menerima caller grants.
 
 Boundary:
 
 - `anon` tidak mendapat usage/execute pada schema `api` dan tidak mendapat table privilege.
 - `authenticated` mendapat usage pada `api` dan execute hanya pada RPC allowlist.
 - `authenticated` tidak mendapat direct `SELECT`, `INSERT`, `UPDATE`, atau `DELETE` pada tabel bisnis.
+- `service_role` tidak mendapat direct business-table access tanpa kebutuhan eksplisit yang terdokumentasi.
 - Semua read dan write MCP melewati RPC; tidak ada direct `.from(<business_table>)` pada Edge Function.
 - Edge Function memakai user JWT dan memanggil `.schema('api').rpc(...)`.
-- Semua tabel bisnis tetap mengaktifkan RLS sebagai defense in depth.
+- Privilege objek ditulis eksplisit dalam migration; default privileges tidak boleh mengizinkan table, sequence, atau function bisnis secara implisit. RLS tetap wajib pada semua tabel bisnis dan menentukan row access setelah grant ada.
 - RPC exposed memakai explicit argument types, schema validation, stable errors, dan tidak menerima workspace scope hanya berdasarkan input tanpa memeriksa `auth.uid()`.
 
 Untuk RPC yang membutuhkan narrow elevated privilege, digunakan role khusus `content_producer_api_owner` yang:
@@ -631,7 +632,7 @@ Database/integration tests wajib membuktikan:
 10. Archived post tetap memblokir post kedua untuk plan item dan schedule yang sama.
 11. Replacement hanya berhasil setelah pre-publication discard eksplisit.
 12. Setiap successful mutation menaikkan revision sekali; replay tidak menaikkan lagi.
-13. Schema `public` dan `internal` tidak dapat diakses langsung melalui Data API.
+13. Direct business-object access pada `public` ditolak oleh object privileges; profile/schema `internal` ditolak karena tidak termasuk Data API business schemas dan tidak menerima caller grants. `public` dapat tersertakan secara teknis oleh platform, tetapi bukan business surface.
 14. Owner dapat memakai allowlisted RPC; non-owner, anon, dan browser session tanpa OAuth client ditolak.
 15. Dedicated function owner tidak bypass RLS.
 16. Rate limits konsisten pada call paralel dan mengembalikan retry-after.
@@ -1472,7 +1473,7 @@ Keputusan yang dipropagasikan:
 - Plan item mempunyai claim lease, one-time renewal, stale recovery, safe failure, retry, explicit replacement, dan cancellation semantics.
 - Fact lifecycle mencakup re-verification, correction, invalidation, successor lineage, current-row uniqueness, dan immutable published snapshots.
 - Quality gate memakai server renderer/content hash, server checks, editorial attestation, dan owner approval snapshot sebagai authority terpisah.
-- Data API hanya mengekspos schema `api`; `authenticated` tidak mendapat direct table read/write. Public/internal schemas dan helper storage tidak diekspos.
+- Supabase dapat menyertakan schema platform `public` dan `storage` secara teknis. `api` tetap satu-satunya Content Producer business RPC surface; `public` tidak memberi caller direct business-object access, `storage` bukan business RPC surface, dan `internal` tidak dikonfigurasi sebagai business/Data API schema maupun diberi caller grants. `graphql_public` tidak dipertahankan. Schema inclusion, object privileges, dan RLS adalah kontrol terpisah yang ditetapkan eksplisit melalui migration.
 - Edge Function memakai `verify_jwt = false` hanya agar discovery/challenge mencapai middleware; middleware tetap memvalidasi token, OAuth client, scope/resource, dan owner sebelum tool berjalan.
 - Minimal auth frontend diizinkan untuk login/consent/deny/logout/error state, sedangkan product dashboard tetap di luar scope. Vendor static hosting tidak dikunci dan Vercel tidak diwajibkan.
 - OAuth token client menerima seluruh success `2xx`, bukan hanya `201`.
