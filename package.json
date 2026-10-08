@@ -1,0 +1,42 @@
+{
+  "name": "content-producer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Private ChatGPT plugin and Supabase MCP for producing verified Facebook trivia content.",
+  "type": "module",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=20.0.0 <25"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "test": "vitest run --passWithNoTests",
+    "check": "tsx scripts/check.ts",
+    "test-all": "tsx scripts/test-all.ts",
+    "verify-migrations": "tsx scripts/verify-migrations.ts",
+    "package-plugin": "tsx scripts/package-plugin.ts",
+    "smoke-test": "tsx scripts/smoke-test.ts",
+    "supabase": "supabase"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "26.6.4",
+    "eslint": "10.12.0",
+    "globals": "17.13.0",
+    "prettier": "3.9.9",
+    "supabase": "2.120.0",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.1",
+    "vite": "8.3.3",
+    "vitest": "5.0.3"
+  }
+}

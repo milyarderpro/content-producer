@@ -1,0 +1,8 @@
+artifacts/
+archive/
+coverage/
+dataset-reference/
+node_modules/
+pnpm-lock.yaml
+plans/
+supabase/.branches/

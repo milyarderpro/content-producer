@@ -1385,7 +1385,7 @@ Implementasi MVP selesai hanya jika:
 | Phase | Status awal | Gate |
 |---:|---|---|
 | 0 — Specification freeze | Complete | Final audit 0.12 lulus; baseline dibekukan |
-| 1 — Repository foundation | Not started | Toolchain lulus |
+| 1 — Repository foundation | Complete | Toolchain, fresh install, and quality gate lulus pada 8 Oktober 2026 |
 | 2 — Supabase local foundation | Not started | Local reset/migration lulus |
 | 3 — Core database | Not started | Core tests lulus |
 | 4 — Trivia database | Not started | Dedup/reuse tests lulus |
