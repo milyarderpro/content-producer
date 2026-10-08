@@ -339,7 +339,7 @@ Baseline implementasi:
 
 | Komponen | Keputusan |
 |---|---|
-| Node.js lokal/CI | Node.js 22 LTS; Node.js 20 tidak digunakan sebagai baseline baru |
+| Node.js lokal/CI | Node.js 24.15.0; satu-satunya baseline runtime lokal dan CI proyek |
 | Supabase CLI | Minimal 2.117.0; exact tested version dipin pada Phase 1 |
 | Edge runtime | Hosted Supabase Edge Runtime, Deno 2.1-compatible |
 | MCP transport | Streamable HTTP |
@@ -386,7 +386,7 @@ Status: **lulus**.
 - Tidak ada dashboard produk atau MCP App UI yang masuk scope.
 - OAuth registration, discovery, consent, token validation, resource binding, ownership, RLS, session, dan error behavior mempunyai invariant yang dapat diuji.
 - Urutan connect-first lalu package-plugin telah ditetapkan.
-- Runtime baseline tidak bergantung pada Node.js 20 atau legacy HS256.
+- Runtime baseline tidak bergantung pada legacy Node runtime atau HS256.
 - Tidak ada source code, migration, deployment, atau resource cloud yang dibuat.
 - Langkah berikutnya ditetapkan sebagai 0.3 — finalisasi core transaction dan recovery.
 
@@ -1477,7 +1477,7 @@ Keputusan yang dipropagasikan:
 - Minimal auth frontend diizinkan untuk login/consent/deny/logout/error state, sedangkan product dashboard tetap di luar scope. Vendor static hosting tidak dikunci dan Vercel tidak diwajibkan.
 - OAuth token client menerima seluruh success `2xx`, bukan hanya `201`.
 - Implementation order membuktikan remote custom MCP terlebih dahulu, kemudian memfinalkan registered mapping dan plugin package.
-- Dependency baseline diverifikasi ulang saat implementasi; baseline panduan Supabase Edge MCP pada tanggal ini memerlukan Supabase CLI 2.117.0+, Node.js 20+ untuk CLI, dan Deno untuk Edge Function.
+- Dependency baseline diverifikasi ulang saat implementasi; proyek memakai Node.js 24.15.0 untuk local dan CI, Supabase CLI 2.117.0+ untuk local Supabase, dan Docker Edge Runtime untuk Edge Functions. Standalone Deno hanya tooling langsung opsional.
 - Acceptance suite sekarang mewajibkan 33-tool coverage dan 101 frozen prompt cases dengan threshold use-case inventory.
 
 ### 16.1 Trade-off dan dampak

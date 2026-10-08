@@ -12,10 +12,15 @@ Facebook/Canva integration.
 
 ## Prerequisites
 
-- Node.js 20–24 (the checked-in baseline is Node 24.15.0).
+- Node.js 24.15.0 is the local and CI runtime baseline. Node 20 and Node 26
+  are outside the supported project range.
 - pnpm 10.33.2 or a Corepack-managed equivalent.
-- Docker access, Deno 2.9.7 (pinned in `.deno-version`), and Supabase CLI
-  2.117.0+ before beginning Phase 2.
+- Supabase CLI 2.117.0+ and Docker access are required before beginning Phase
+  2, when the local Supabase stack and its Docker Edge Runtime are introduced.
+- Standalone Deno is optional. The checked-in `.deno-version`,
+  `supabase/functions/deno.json`, and Deno foundation test support developers
+  who choose to run `deno fmt`, `deno lint`, `deno test`, or the Deno LSP
+  directly. No Phase 1 pnpm command requires a `deno` executable.
 
 ## Commands
 
@@ -30,6 +35,15 @@ pnpm run smoke-test
 `package-plugin` validates a package only after Phase 7 adds the plugin
 manifest. `verify-migrations` accepts an empty migrations folder during Phase
 1 and validates migration naming once migrations exist.
+
+## Edge Function tooling
+
+Supabase CLI with Docker is the local execution path for future Edge Functions.
+Deno-compatible source configuration is retained for the Edge Runtime and for
+developers who want direct Deno tooling, but installing standalone Deno is not
+a repository prerequisite. See
+[ADR-001](docs/decisions/2026-10-08-node-and-deno-tooling-baseline.md) for the
+runtime decision.
 
 ## Boundaries
 

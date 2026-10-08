@@ -415,7 +415,7 @@ Membuat monorepo, toolchain, conventions, dan quality commands yang menjadi dasa
 
 1. Memeriksa environment dan versi tool.
 2. Menggunakan help command resmi sebelum memakai Supabase CLI.
-3. Memverifikasi baseline platform saat implementasi: Supabase CLI minimal versi yang diwajibkan panduan Edge MCP current (saat baseline 0.11: 2.117.0), Node.js 20+ untuk CLI, dan Deno untuk Edge Function; versi final dipin setelah verification.
+3. Memverifikasi baseline platform saat implementasi: Node.js 24.15.0 untuk local dan CI, Supabase CLI minimal versi yang diwajibkan panduan Edge MCP current (saat baseline 0.11: 2.117.0), serta Docker untuk local Supabase/Edge Runtime. Standalone Deno opsional untuk formatter, linter, test runner, dan LSP langsung; versi dependency final dipin setelah verification.
 4. Membuat struktur repository target.
 5. Membuat:
    - README.md
