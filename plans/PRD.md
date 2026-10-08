@@ -6,9 +6,9 @@
 |---|---|
 | Nama produk | Content Producer |
 | Versi produk | MVP |
-| Versi dokumen | 1.1 |
-| Status | Draf utama — arsitektur modular disetujui |
-| Tanggal | 6 Oktober 2026 |
+| Versi dokumen | 1.2 |
+| Status | Frozen — baseline Phase 0 |
+| Tanggal | 7 Oktober 2026 |
 | Bahasa dokumen | Bahasa Indonesia |
 | Bahasa konten | Bahasa Inggris |
 | Pengguna MVP | Satu pemilik yang mengelola beberapa Facebook Page |
@@ -20,9 +20,12 @@ Dokumen ini menjadi sumber utama untuk tujuan produk, ruang lingkup MVP, pengala
 Kedudukan dokumen perencanaan adalah sebagai berikut:
 
 - `plans/database-design.md` menjadi sumber utama untuk tabel, kolom, index, constraint, database function, dan aturan transaksi.
-- `plans/implementation-plan.md` belum dibuat dalam rangkaian dokumen baru ini. Setelah dibuat, dokumen tersebut menjadi sumber utama untuk urutan pengerjaan, struktur repository, kontrak MCP tool, pengujian, dan deployment.
-- `plans/module-contract.md` akan menjadi sumber utama untuk kontrak yang wajib dipenuhi setiap modul niche.
-- `plans/trivia-content-dna.md` akan menjadi sumber utama untuk aturan editorial, format, deduplikasi, dan evaluasi khusus niche trivia.
+- `plans/implementation-plan.md` menjadi sumber utama untuk urutan pengerjaan, struktur repository, pengujian, dan deployment.
+- `plans/module-contract.md` menjadi sumber utama untuk kontrak yang wajib dipenuhi setiap modul niche.
+- `plans/trivia-content-dna.md` menjadi sumber utama untuk aturan editorial, format, deduplikasi, dan evaluasi khusus niche trivia.
+- `plans/tool-inventory.md` menjadi sumber normatif untuk 33 nama tool, schema, annotations, auth, error, dan orchestration MCP.
+- `plans/use-case-inventory.md` menjadi sumber normatif untuk user goals dan frozen prompt evaluation.
+- `plans/acceptance-traceability.md` menghubungkan requirement serta acceptance criteria ke implementation phase dan evidence.
 - `plans/workflow-users.md` tetap menjadi ringkasan alur penggunaan sehari-hari.
 
 Dokumen dalam folder `archive/` hanya merupakan riwayat rancangan lama dan bukan acuan implementasi baru.
@@ -45,7 +48,7 @@ Format utama adalah Reel sekitar 13 detik yang secara visual menyerupai satu gam
 
 ChatGPT bertindak sebagai mesin penalaran, penelitian, penulisan, dan percakapan. Supabase bertindak sebagai sumber data resmi, memori lintas chat, pemeriksa duplikasi, penyimpan content plan dan performa, serta tempat menjalankan MCP server. GitHub menjadi sumber kode dan version control.
 
-MVP tidak menggunakan OpenAI API, Embeddings API, Vercel, dashboard web, Canva API, atau Facebook Graph API.
+MVP tidak menggunakan OpenAI API, Embeddings API, dashboard produk, Canva API, atau Facebook Graph API. Satu frontend autentikasi minimal untuk login dan OAuth consent diperbolehkan dan bukan dashboard produk. Vendor hosting frontend dipilih saat deployment; Vercel tidak diwajibkan.
 
 ---
 
@@ -154,7 +157,7 @@ MVP dianggap tetap sederhana jika:
 
 - Tidak memerlukan dashboard tambahan untuk penggunaan rutin.
 - Tidak memerlukan akun atau billing OpenAI Platform.
-- Tidak memerlukan layanan hosting selain Supabase.
+- Tidak memerlukan backend hosting selain Supabase; frontend autentikasi minimal boleh memakai static hosting HTTPS.
 - Tidak memiliki background AI worker atau job queue.
 - Tidak memiliki tabel versi post atau audit log terpisah.
 - Tidak memiliki sistem role atau tim.
@@ -174,12 +177,12 @@ Hal berikut tidak dibangun pada MVP:
 - Integrasi Canva API.
 - Pembuatan desain, gambar, background, animasi, atau video.
 - Pembuatan voice-over atau naskah narasi.
-- Dashboard web khusus.
+- Dashboard web khusus; frontend login/consent minimal bukan dashboard.
 - Aplikasi mobile.
 - Banyak pengguna atau kolaborasi tim.
 - Role seperti owner, editor, atau reviewer.
 - Plugin publik untuk pengguna lain.
-- Vercel atau hosting web terpisah.
+- Ketergantungan wajib pada Vercel atau vendor hosting frontend tertentu.
 - OpenAI Platform project.
 - OpenAI API key.
 - Embeddings API atau vector database.
@@ -213,7 +216,7 @@ Hal berikut tidak dibangun pada MVP:
 | OpenAI API | Tidak digunakan |
 | Database | Supabase Postgres |
 | Hosting MCP | Supabase Edge Functions |
-| Hosting tambahan | Tidak ada; Vercel tidak digunakan |
+| Hosting tambahan | Frontend auth minimal pada static hosting HTTPS; vendor tidak dikunci dan Vercel tidak diwajibkan |
 | Autentikasi MCP | Supabase Auth OAuth 2.1; hanya owner yang diizinkan |
 | Interface operasional | Percakapan ChatGPT |
 | Canva | Copy/paste manual |
@@ -949,7 +952,7 @@ Aturan revisi:
 
 1. Pengguna menentukan Page, niche, jumlah post, tema, atau rentang tanggal.
 2. Sistem membuat `content_plan` dan seluruh `content_plan_items` sebagai checkpoint sebelum menghasilkan post.
-3. ChatGPT memproses item dalam chunk kecil, dengan default 3–5 post per putaran aktif.
+3. ChatGPT mengklaim item dalam chunk kecil, default satu dan maksimum tiga post per putaran aktif.
 4. Setiap post disimpan dan ditautkan ke plan item segera setelah berhasil.
 5. Kegagalan satu item tidak menghapus post lain yang sudah berhasil.
 6. Sistem memperbarui progress plan dan menampilkan jumlah selesai, perlu revisi, belum diproses, dan gagal.
@@ -1039,29 +1042,45 @@ Jika post membahas hal yang spesifik untuk Australia, Inggris, Kanada, atau Amer
 
 ## 23. MCP tools tingkat produk
 
-Kontrak detail ditentukan dalam implementation plan, tetapi MVP ditargetkan memiliki tool berikut:
+Kontrak normatif berada pada `plans/tool-inventory.md`. MVP memiliki 33 focused tools berikut:
 
-| Tool | Tujuan |
-|---|---|
-| `health_check` | Memastikan MCP dan database dapat diakses. |
-| `get_workspace_context` | Mengambil aturan global dan ringkasan workspace. |
-| `list_niches` | Menampilkan modul niche yang aktif dan tersedia. |
-| `list_pages` | Menampilkan Page atau mengambil konteks Page tertentu. |
-| `create_page` | Membuat Page baru. |
-| `update_page` | Memperbarui konfigurasi Page. |
-| `get_page_generation_context` | Mengambil konfigurasi Page+niche, riwayat, variasi terbaru, dan insight performa untuk generasi. |
-| `create_content_plan` | Membuat plan dan seluruh slot sebagai checkpoint batch/kalender. |
-| `get_content_plan` | Mengambil progress dan item yang masih perlu diproses. |
-| `trivia_find_similar_facts` | Mencari exact match dan kandidat fakta serupa. |
-| `trivia_register_and_reserve_facts` | Membuat atau memakai row canonical, lalu mereservasi fakta secara atomic. |
-| `trivia_release_facts` | Melepaskan reservasi yang tidak digunakan. |
-| `save_post` | Menyimpan post baru beserta fakta terpilih. |
-| `get_posts` | Mengambil post, daftar kerja, atau kalender berdasarkan filter. |
-| `revise_post` | Menyimpan revisi dengan pemeriksaan revision number. |
-| `update_post_status` | Mengubah status post melalui transisi yang valid. |
-| `discard_post` | Membuang draft/ready dan menjalankan release behavior modul niche. |
-| `record_post_performance` | Menyimpan snapshot metrik yang diberikan pengguna. |
-| `get_performance_insights` | Merangkum pola performa berdasarkan Page, niche, topik, format, dan CTA. |
+| Kelompok | Tool | Tujuan |
+|---|---|---|
+| Identity/context | `get_account_profile` | Mengenali account connection aktif. |
+| Identity/context | `get_workspace_context` | Membaca workspace, module catalog, dan defaults. |
+| Page | `list_pages` | Menemukan Page milik workspace. |
+| Page | `create_page` | Membuat Page dan config niche awal secara atomic. |
+| Page | `update_page` | Memperbarui Page/config dengan compare-and-swap. |
+| Page | `get_page_generation_context` | Mengambil seluruh konteks sebelum generasi. |
+| Plan | `list_content_plans` | Menemukan batch atau calendar plan. |
+| Plan | `create_content_plan` | Membuat plan dan exact item slots. |
+| Plan | `get_content_plan` | Membaca progress dan item sebuah plan. |
+| Plan | `claim_content_plan_items` | Mengambil lease item untuk putaran aktif. |
+| Plan | `renew_content_plan_claim` | Memperpanjang satu lease yang masih aktif. |
+| Plan | `report_content_plan_item_failure` | Menutup attempt gagal dengan error aman. |
+| Plan | `retry_content_plan_item` | Mengembalikan item failed ke pending. |
+| Plan | `replace_discarded_plan_item` | Membuka replacement eksplisit setelah discard. |
+| Plan | `cancel_content_plan` | Membatalkan sisa item non-completed. |
+| Trivia | `trivia_find_similar_facts` | Mengambil kandidat dedup dan reuse signals. |
+| Trivia | `trivia_register_and_reserve_facts` | Registrasi canonical dan reserve set secara atomic. |
+| Trivia | `trivia_release_facts` | Melepaskan reservation yang ditinggalkan. |
+| Trivia | `trivia_reverify_fact` | Memperbarui evidence tanpa mengubah proposisi. |
+| Trivia | `trivia_correct_fact` | Supersede atau invalidate canonical fact. |
+| Post read | `list_posts` | Menemukan post, work queue, atau calendar. |
+| Post read | `get_post` | Membaca satu post lengkap dan state current. |
+| Post write | `save_post` | Menyimpan draft dan fact junction secara atomic. |
+| Post write | `revise_post` | Mengganti konten/fact bindings dengan compare-and-swap. |
+| Post write | `reschedule_post` | Memindahkan atau mengosongkan schedule. |
+| Post write | `approve_post` | Menyetujui draft menjadi ready. |
+| Post write | `revoke_post_approval` | Mengembalikan ready menjadi draft. |
+| Post write | `discard_post` | Membatalkan draft/ready dan melepas allocation. |
+| Post write | `mark_post_posted` | Mencatat publikasi manual sebagai posted. |
+| Post write | `archive_post` | Mengarsipkan post yang sudah published. |
+| Metrics | `record_post_performance` | Menambah snapshot metrics manual. |
+| Metrics | `get_post_performance` | Membaca history metrics satu post. |
+| Metrics | `get_performance_insights` | Membaca agregat performa dengan evidence. |
+
+`GET /health` adalah endpoint operasional, bukan MCP tool. Availability MCP dibuktikan melalui health endpoint, initialize, dan list-tools. Module catalog menggantikan `list_niches`; `list_posts` dan `get_post` menggantikan generic `get_posts`; lifecycle memakai tool eksplisit dan tidak memiliki generic `update_post_status`.
 
 Prinsip tool:
 
@@ -1145,29 +1164,29 @@ Quality gate dibagi menjadi pemeriksaan yang dapat ditegakkan sistem dan penilai
 
 ### 25.1 System checks
 
-1. Owner, workspace, Page, dan niche valid.
-2. Konfigurasi Page+niche dan content schema version valid.
-3. Jumlah fakta mengikuti snapshot konfigurasi atau override eksplisit pengguna.
-4. Seluruh fact ID dan relasi `trivia_post_facts` valid.
-5. Metadata sumber minimum tersedia.
-6. Reservasi dan reuse rule valid.
-7. Slot jadwal tidak bentrok.
-8. Setiap komponen dan Canva copy final memenuhi text budget.
-9. Canva copy bebas URL, ID, JSON, dan catatan teknis.
-10. Revision number dan status transition valid.
+1. **QG-SYS-001:** Owner, workspace, Page, dan niche valid.
+2. **QG-SYS-002:** Konfigurasi Page+niche dan content schema version valid.
+3. **QG-SYS-003:** Jumlah fakta mengikuti snapshot konfigurasi atau waiver eksplisit yang diizinkan.
+4. **QG-SYS-004:** Seluruh fact ID dan relasi `trivia_post_facts` valid.
+5. **QG-SYS-005:** Metadata sumber minimum tersedia.
+6. **QG-SYS-006:** Reservasi dan reuse rule valid.
+7. **QG-SYS-007:** Slot jadwal tidak bentrok.
+8. **QG-SYS-008:** Setiap komponen dan Canva copy final memenuhi text budget.
+9. **QG-SYS-009:** Canva copy bebas URL, ID, JSON, dan catatan teknis.
+10. **QG-SYS-010:** Revision number dan status transition valid.
 
 ### 25.2 Editorial checks
 
-1. Klaim didukung sumber yang memadai.
-2. Fakta time-sensitive memiliki konteks waktu.
-3. Tidak ada medical, legal, financial, atau safety advice yang tidak layak.
-4. American English konsisten dan mudah dipahami secara global.
-5. Hook sesuai isi dan format niche.
-6. CTA relevan dengan interaction goal.
-7. Caption tidak menambahkan klaim baru.
-8. Hashtag relevan dan tidak berlebihan.
-9. Grammar, punctuation, line break, kepadatan kata, dan keterbacaan visual sudah layak.
-10. Teks tidak menyalin dataset referensi atau sumber secara substansial.
+1. **QG-ED-001:** Klaim didukung sumber yang memadai.
+2. **QG-ED-002:** Fakta time-sensitive memiliki konteks waktu.
+3. **QG-ED-003:** Tidak ada medical, legal, financial, atau safety advice yang tidak layak.
+4. **QG-ED-004:** American English konsisten dan mudah dipahami secara global.
+5. **QG-ED-005:** Hook sesuai isi dan format niche.
+6. **QG-ED-006:** CTA relevan dengan interaction goal.
+7. **QG-ED-007:** Caption tidak menambahkan klaim baru.
+8. **QG-ED-008:** Hashtag relevan dan tidak berlebihan.
+9. **QG-ED-009:** Grammar, punctuation, line break, kepadatan kata, dan keterbacaan visual sudah layak.
+10. **QG-ED-010:** Teks tidak menyalin dataset referensi atau sumber secara substansial.
 
 Post hanya dapat menjadi `ready` setelah system checks lolos, editorial checks selesai, dan pengguna memberikan persetujuan eksplisit. Jika pemeriksaan kritis gagal, post tetap `draft` atau proses dihentikan dengan penjelasan yang dapat ditindaklanjuti.
 
@@ -1177,12 +1196,12 @@ Post hanya dapat menjadi `ready` setelah system checks lolos, editorial checks s
 
 ### 26.1 Keandalan data
 
-- Supabase adalah satu-satunya system of record produksi.
-- Constraint penting harus ditegakkan di database, bukan hanya melalui prompt.
-- Reservasi fakta harus transactional.
-- Request yang diulang tidak boleh menghasilkan pelepasan atau perubahan status yang merusak data.
-- Post tidak boleh tersimpan tanpa Page yang valid.
-- Fakta tidak boleh dianggap digunakan tanpa hubungan dengan post yang valid.
+- **NFR-DATA-001:** Supabase adalah satu-satunya system of record produksi.
+- **NFR-DATA-002:** Constraint penting harus ditegakkan di database, bukan hanya melalui prompt.
+- **NFR-DATA-003:** Reservasi fakta harus transactional.
+- **NFR-DATA-004:** Request yang diulang tidak boleh menghasilkan pelepasan atau perubahan status yang merusak data.
+- **NFR-DATA-005:** Post tidak boleh tersimpan tanpa Page yang valid.
+- **NFR-DATA-006:** Fakta tidak boleh dianggap digunakan tanpa hubungan dengan post yang valid.
 
 ### 26.2 Performa
 
@@ -1190,54 +1209,54 @@ Target server, tidak termasuk waktu ChatGPT meneliti atau menulis:
 
 | Operasi | Target p95 |
 |---|---:|
-| Read sederhana | Maksimal 2 detik |
-| Pencarian kandidat duplikat | Maksimal 3 detik |
-| Reservasi atau write sederhana | Maksimal 3 detik |
+| `NFR-PERF-001` — Read sederhana | Maksimal 2 detik |
+| `NFR-PERF-002` — Pencarian kandidat duplikat | Maksimal 3 detik |
+| `NFR-PERF-003` — Reservasi atau write sederhana | Maksimal 3 detik |
 
-Jika jumlah data bertambah dan target tidak tercapai, optimasi dilakukan melalui index dan query tuning sebelum menambah layanan baru.
+**NFR-PERF-004:** Jika jumlah data bertambah dan target tidak tercapai, optimasi dilakukan melalui index dan query tuning sebelum menambah layanan baru.
 
 ### 26.3 Parallelism
 
-- Minimal 10 request reservasi simultan harus dapat diuji tanpa satu fakta dimiliki dua reservation pada saat yang sama.
-- Update post dari revision lama harus ditolak.
-- Dua request pada slot Page yang sama tidak boleh membuat jadwal ganda.
+- **NFR-CONC-001:** Minimal 10 request reservasi simultan harus dapat diuji tanpa satu fakta dimiliki dua reservation pada saat yang sama.
+- **NFR-CONC-002:** Update post dari revision lama harus ditolak.
+- **NFR-CONC-003:** Dua request pada slot Page yang sama tidak boleh membuat jadwal ganda.
 
 ### 26.4 Maintainability
 
-- Business rules dipisahkan dari MCP transport handler.
-- Aturan generik dipisahkan dari modul trivia.
-- Core tidak mengimpor aturan bisnis khusus trivia; modul niche menggunakan layanan core melalui kontrak yang stabil.
-- Setiap modul niche memiliki versioned configuration schema, content payload schema, validation, quality checks, tools, dan evaluation fixtures.
-- Schema database dapat dibuat ulang dari migration.
-- Dependency version dipin dan lockfile disimpan.
-- Tool contract memiliki automated tests.
-- Penambahan niche baru tidak mengharuskan rewrite modul trivia.
+- **NFR-MAINT-001:** Business rules dipisahkan dari MCP transport handler.
+- **NFR-MAINT-002:** Aturan generik dipisahkan dari modul trivia.
+- **NFR-MAINT-003:** Core tidak mengimpor aturan bisnis khusus trivia; modul niche menggunakan layanan core melalui kontrak yang stabil.
+- **NFR-MAINT-004:** Setiap modul niche memiliki versioned configuration schema, content payload schema, validation, quality checks, tools, dan evaluation fixtures.
+- **NFR-MAINT-005:** Schema database dapat dibuat ulang dari migration.
+- **NFR-MAINT-006:** Dependency version dipin dan lockfile disimpan.
+- **NFR-MAINT-007:** Tool contract memiliki automated tests.
+- **NFR-MAINT-008:** Penambahan niche baru tidak mengharuskan rewrite modul trivia.
 
 ### 26.5 Observability
 
 Log minimum:
 
-- Request ID.
-- Nama tool.
-- Waktu mulai dan durasi.
-- Status sukses atau gagal.
-- Workspace, Page, post, atau fact ID yang relevan.
-- Error code yang aman.
-- Reservation conflict.
+- **NFR-OBS-001:** Request ID.
+- **NFR-OBS-002:** Nama tool.
+- **NFR-OBS-003:** Waktu mulai dan durasi.
+- **NFR-OBS-004:** Status sukses atau gagal.
+- **NFR-OBS-005:** Workspace, Page, post, atau fact public ID yang relevan.
+- **NFR-OBS-006:** Error code yang aman.
+- **NFR-OBS-007:** Reservation conflict.
 
 Log tidak boleh menyimpan:
 
-- Database secret.
-- Authorization header.
-- Seluruh isi chat.
-- Data sumber atau output penuh jika tidak diperlukan untuk debugging.
+- **NFR-OBS-008:** Database secret.
+- **NFR-OBS-009:** Authorization header.
+- **NFR-OBS-010:** Seluruh isi chat.
+- **NFR-OBS-011:** Data sumber atau output penuh jika tidak diperlukan untuk debugging.
 
 ### 26.6 Biaya
 
-- Tidak ada biaya OpenAI API terpisah.
-- Penggunaan AI mengikuti batas akun ChatGPT Plus pengguna.
-- Biaya infrastruktur hanya berasal dari penggunaan Supabase dan layanan pengembangan yang dipilih pengguna.
-- Sistem tidak menambahkan embeddings, vector service, atau worker berbayar pada MVP.
+- **NFR-COST-001:** Tidak ada biaya OpenAI API terpisah.
+- **NFR-COST-002:** Penggunaan AI mengikuti batas akun ChatGPT Plus pengguna.
+- **NFR-COST-003:** Biaya infrastruktur hanya berasal dari penggunaan Supabase dan layanan pengembangan/deployment yang dipilih pengguna.
+- **NFR-COST-004:** Sistem tidak menambahkan embeddings, vector service, atau worker berbayar pada MVP.
 
 ---
 
@@ -1245,34 +1264,34 @@ Log tidak boleh menyimpan:
 
 ### 27.1 Model akses
 
-MVP adalah plugin pribadi untuk satu pemilik dan tidak dipublikasikan ke direktori umum. MCP menggunakan Supabase Auth OAuth 2.1. Setiap request harus memiliki identitas pengguna yang valid dan hanya owner yang diizinkan mengakses workspace.
+**SEC-AUTH-001:** MVP adalah plugin pribadi untuk satu pemilik dan tidak dipublikasikan ke direktori umum. **SEC-AUTH-002:** MCP menggunakan Supabase Auth OAuth 2.1 dan setiap request harus memiliki identitas pengguna yang valid. Hanya owner yang diizinkan mengakses workspace.
 
-`workspaces.owner_user_id` menjadi dasar ownership. Pemeriksaan authorization dilakukan server-side pada setiap read dan write; model tidak menentukan hak akses. Identitas yang dapat diedit pengguna seperti `user_metadata` tidak boleh menjadi dasar authorization.
+**SEC-AUTH-003:** `workspaces.owner_user_id` menjadi dasar ownership. Pemeriksaan authorization dilakukan server-side pada setiap read dan write; model tidak menentukan hak akses. Identitas yang dapat diedit pengguna seperti `user_metadata` tidak boleh menjadi dasar authorization.
 
 ### 27.2 Kontrol minimum
 
 Implementasi harus:
 
-- Mengekspos hanya tool yang diperlukan.
-- Tidak menyediakan tool delete permanen.
-- Memvalidasi seluruh input dengan schema ketat.
-- Membatasi ukuran payload.
-- Menerapkan rate limit yang wajar.
-- Memverifikasi token dan ownership pada setiap request.
-- Menggunakan database role dengan privilege minimum yang praktis dan tidak mengandalkan `TO authenticated` tanpa ownership predicate.
-- Tidak pernah mengirim service role key kepada ChatGPT.
-- Menyimpan secret hanya pada Supabase secret storage atau environment lokal.
-- Mengaktifkan RLS pada setiap tabel exposed dan menggunakan `USING` serta `WITH CHECK` yang sesuai untuk update.
-- Mendefinisikan Data API exposure dan database grants secara eksplisit; exposure schema tidak dianggap sama dengan RLS.
-- Menghindari `SECURITY DEFINER` kecuali benar-benar diperlukan; fungsi privileged harus berada di schema internal, memeriksa owner, dan tidak dapat dipanggil publik tanpa grant yang disengaja.
-- Tidak mengembalikan credential melalui tool response atau log.
+- **SEC-CTRL-001:** Mengekspos hanya tool yang diperlukan.
+- **SEC-CTRL-002:** Tidak menyediakan tool delete permanen.
+- **SEC-CTRL-003:** Memvalidasi seluruh input dengan schema ketat.
+- **SEC-CTRL-004:** Membatasi ukuran payload.
+- **SEC-CTRL-005:** Menerapkan rate limit database-backed sesuai kelompok tool.
+- **SEC-CTRL-006:** Memverifikasi token, OAuth client context, dan ownership pada setiap request.
+- **SEC-CTRL-007:** Menggunakan database role dengan privilege minimum yang praktis dan tidak mengandalkan `TO authenticated` tanpa ownership predicate.
+- **SEC-CTRL-008:** Tidak pernah mengirim service role atau secret key kepada ChatGPT.
+- **SEC-CTRL-009:** Menyimpan secret hanya pada Supabase secret storage atau environment lokal yang tidak dilacak.
+- **SEC-CTRL-010:** Mengaktifkan RLS pada setiap tabel exposed dan menggunakan `USING` serta `WITH CHECK` yang sesuai untuk update.
+- **SEC-CTRL-011:** Mendefinisikan Data API exposure dan database grants secara eksplisit; exposure schema tidak dianggap sama dengan RLS.
+- **SEC-CTRL-012:** Membatasi `SECURITY DEFINER` pada entry point `api` yang memang memerlukan table access, dimiliki role sempit `NOLOGIN` tanpa `BYPASSRLS`, memakai `search_path = ''`, memeriksa OAuth client/owner, tetap tunduk pada RLS, dan hanya mempunyai grant execute yang disengaja; helper internal tidak diekspos.
+- **SEC-CTRL-013:** Tidak mengembalikan credential melalui tool response atau log.
 
 ### 27.3 Prompt injection dan sumber eksternal
 
-- Isi website diperlakukan sebagai data tidak tepercaya.
-- Instruksi yang ditemukan dalam halaman sumber harus diabaikan.
-- MCP tidak boleh menjalankan perintah yang berasal dari teks sumber.
-- URL dan metadata sumber harus divalidasi sebelum disimpan.
+- **SEC-UNTRUST-001:** Isi website diperlakukan sebagai data tidak tepercaya.
+- **SEC-UNTRUST-002:** Instruksi yang ditemukan dalam halaman sumber harus diabaikan.
+- **SEC-UNTRUST-003:** MCP tidak boleh menjalankan perintah yang berasal dari teks sumber.
+- **SEC-UNTRUST-004:** URL dan metadata sumber harus divalidasi sebelum disimpan.
 
 ---
 
@@ -1282,25 +1301,25 @@ Error harus singkat, terstruktur, dan memberi langkah berikutnya.
 
 Kategori minimum:
 
-| Error | Tindakan |
-|---|---|
-| Tidak terautentikasi | Minta pengguna menghubungkan atau memperbarui autentikasi plugin. |
-| Tidak memiliki akses | Tolak operasi tanpa membocorkan data workspace lain. |
-| Page tidak ditemukan | Tampilkan Page yang tersedia. |
-| Page ambigu | Minta pengguna memilih. |
-| Niche tidak aktif atau ambigu | Gunakan default yang valid atau minta pengguna memilih. |
-| Klaim sudah memiliki row canonical | Gunakan row tersebut; jangan membuat salinan fakta baru. |
-| Pemakaian ulang tidak diizinkan | Gunakan fakta pengganti yang memenuhi kebijakan Page tujuan. |
-| Reservasi kalah | Cari fakta lain. |
-| Reservasi kedaluwarsa | Reservasi ulang setelah memeriksa status. |
-| Sumber tidak cukup | Ganti atau teliti ulang fakta. |
-| Jumlah fixed/adaptive tidak terpenuhi | Padatkan wording, ganti kandidat, atau minta persetujuan override. |
-| Text budget terlewati | Tulis ulang lebih ringkas atau kurangi jumlah sesuai rule; jangan memotong klaim. |
-| Revision conflict | Ambil post terbaru sebelum merevisi. |
-| Slot jadwal bentrok | Tawarkan waktu lain. |
-| Content plan terputus | Simpan progress dan lanjutkan hanya item yang belum selesai. |
-| Input tidak valid | Jelaskan field yang perlu diperbaiki. |
-| Database tidak tersedia | Jangan mengarang keberhasilan; minta pengguna mencoba kembali. |
+| ID | Error | Tindakan |
+|---|---|---|
+| `ERR-001` | Tidak terautentikasi | Minta pengguna menghubungkan atau memperbarui autentikasi plugin. |
+| `ERR-002` | Tidak memiliki akses | Tolak operasi tanpa membocorkan data workspace lain. |
+| `ERR-003` | Page tidak ditemukan | Tampilkan Page yang tersedia. |
+| `ERR-004` | Page ambigu | Minta pengguna memilih. |
+| `ERR-005` | Niche tidak aktif atau ambigu | Gunakan default yang valid atau minta pengguna memilih. |
+| `ERR-006` | Klaim sudah memiliki row canonical | Gunakan row tersebut; jangan membuat salinan fakta baru. |
+| `ERR-007` | Pemakaian ulang tidak diizinkan | Gunakan fakta pengganti yang memenuhi kebijakan Page tujuan. |
+| `ERR-008` | Reservasi kalah | Cari fakta lain. |
+| `ERR-009` | Reservasi kedaluwarsa | Reservasi ulang setelah memeriksa status. |
+| `ERR-010` | Sumber tidak cukup | Ganti atau teliti ulang fakta. |
+| `ERR-011` | Jumlah fixed/adaptive tidak terpenuhi | Padatkan wording, ganti kandidat, atau minta explicit allowed waiver. |
+| `ERR-012` | Text budget terlewati | Tulis ulang lebih ringkas atau kurangi jumlah sesuai rule; jangan memotong klaim. |
+| `ERR-013` | Revision conflict | Ambil post terbaru sebelum merevisi. |
+| `ERR-014` | Slot jadwal bentrok | Tawarkan waktu lain. |
+| `ERR-015` | Content plan terputus | Simpan progress dan lanjutkan hanya item yang belum selesai. |
+| `ERR-016` | Input tidak valid | Jelaskan field yang perlu diperbaiki. |
+| `ERR-017` | Database tidak tersedia | Jangan mengarang keberhasilan; minta pengguna mencoba kembali. |
 
 Jika proses gagal setelah reservasi tetapi sebelum post berhasil disimpan, sistem harus melepaskan reservasi atau membiarkannya kedaluwarsa secara aman.
 
@@ -1322,7 +1341,7 @@ Data lokal adalah data uji dan boleh dihapus.
 
 ### 29.2 Production
 
-Menggunakan satu Supabase project yang menyediakan:
+Menggunakan satu Supabase project dan satu frontend auth minimal. Supabase menyediakan:
 
 - Postgres database.
 - Edge Function MCP.
@@ -1338,13 +1357,19 @@ https://<project-ref>.supabase.co/functions/v1/mcp
 
 URL tersebut didaftarkan melalui menu ChatGPT Plugins → Create custom MCP server.
 
+Edge Function `mcp` memakai `verify_jwt = false` agar OAuth protected-resource discovery dan `WWW-Authenticate` challenge dapat mencapai middleware. Middleware di dalam function tetap wajib memvalidasi signature, issuer, audience/resource, expiration, scopes, OAuth client context, dan owner sebelum tool berjalan.
+
+Frontend auth minimal menyediakan `/login`, `/oauth/consent`, `/logout`, serta error state. Frontend memakai Supabase publishable key, mempertahankan `authorization_id`, menampilkan client/scopes, dan mendukung approve/deny. Secret/service-role key dilarang berada di browser.
+
+OAuth client menerima seluruh respons sukses token `2xx`; implementasi tidak mengunci keberhasilan pada status `201`.
+
 ### 29.3 Staging
 
 Hosted staging project tidak wajib pada MVP. Staging dapat ditambahkan ketika perubahan menjadi lebih sering, pengguna bertambah, atau risiko deployment meningkat.
 
-### 29.4 Vercel
+### 29.4 Hosting frontend autentikasi
 
-Vercel tidak digunakan pada MVP. Vercel atau hosting lain baru dipertimbangkan jika produk kelak membutuhkan dashboard, consent page OAuth, atau web application terpisah.
+Produk tidak mempunyai dashboard web. Frontend auth minimal memerlukan origin HTTPS stabil dan boleh memakai penyedia static hosting yang mendukung environment variables, SPA route fallback, serta deployment versioning. Vendor tidak dikunci; Vercel boleh dipilih tetapi tidak diwajibkan dan tidak menjadi dependency arsitektur.
 
 ---
 
@@ -1395,10 +1420,12 @@ Views, reach, dan engagement tidak menjadi acceptance metric karena dipengaruhi 
 
 - ChatGPT dapat terhubung ke URL MCP Supabase.
 - Pengguna menyelesaikan Supabase Auth OAuth 2.1 dan teridentifikasi sebagai owner.
-- `health_check` berhasil.
-- Daftar tool dapat dibaca tanpa error.
+- `GET /health` berhasil tanpa membaca data privat.
+- MCP initialize dan daftar 33 tool dapat dibaca tanpa error.
 - Server menggunakan Streamable HTTP.
 - Request tanpa token valid atau dari pengguna non-owner ditolak.
+- Protected-resource dan authorization-server metadata dapat ditemukan; authorization code + PKCE S256 berhasil.
+- Token endpoint dianggap berhasil untuk seluruh status HTTP `2xx`.
 
 ### AC-002 — Multi-Page
 
@@ -1487,8 +1514,9 @@ Views, reach, dan engagement tidak menjadi acceptance metric karena dipengaruhi 
 ### AC-012 — Hosting sederhana
 
 - MCP berjalan di Supabase Edge Functions.
-- Tidak ada deployment Vercel.
-- Tidak ada dashboard web khusus; autentikasi menggunakan alur OAuth yang didukung MCP/Supabase.
+- Tidak ada dashboard web khusus.
+- Frontend autentikasi minimal hanya menangani login, consent, deny, logout, dan error state.
+- Hosting frontend tidak dikunci ke Vercel; backend MCP dan database tetap hanya di Supabase.
 
 ### AC-013 — Feedback performa
 
@@ -1522,11 +1550,16 @@ Daftar berikut menetapkan cakupan produk. Kasus database yang rinci dan menjadi 
 - Release alokasi saat `discarded` dan retensi penggunaan saat `archived`.
 - Schedule uniqueness.
 - Content plan progress dan resume.
+- Global operation-ledger replay dan payload mismatch.
+- Claim lease, renewal, expiry, failure reporting, retry, replacement, dan cancellation.
 - Ownership dan RLS policy.
+- RPC-only `api` schema, explicit grants, dan rate-limit buckets.
 - Multiple metric snapshots.
 - Revision conflict.
 - Validasi konfigurasi `fixed` dan `adaptive`.
 - Validasi component budget dan total budget.
+- Fact re-verification, correction, invalidation, dan successor lineage.
+- Content hash, system checks, editorial attestation, approval snapshot, serta revoke behavior.
 
 ### 32.2 MCP contract tests
 
@@ -1538,6 +1571,9 @@ Daftar berikut menetapkan cakupan produk. Kasus database yang rinci dan menjadi 
 - Safe error response.
 - Payload size limit.
 - Tidak ada secret pada response.
+- Seluruh 33 tools cocok dengan `plans/tool-inventory.md`.
+- HTTP `/health` terpisah dari model-callable tools.
+- OAuth discovery, PKCE, resource/audience, scopes, `WWW-Authenticate`, relink, dan seluruh token success `2xx`.
 
 ### 32.3 Workflow tests
 
@@ -1554,6 +1590,9 @@ Daftar berikut menetapkan cakupan produk. Kasus database yang rinci dan menjadi 
 - Menandai post sebagai `posted`.
 - Mencatat metrik dan meminta insight.
 - Mengambil post dari chat lain.
+- Memperpanjang lease item, melaporkan kegagalan aman, retry, explicit replacement, dan cancel plan.
+- Memverifikasi ulang fakta tanpa mengubah proposisi serta mengoreksi/menginvalidasi fakta dengan lineage.
+- Mencabut approval, mengarsipkan post, dan mengambil histori metrik.
 
 ### 32.4 Content evaluation
 
@@ -1581,6 +1620,22 @@ Evaluation set harus mencakup:
 - Dua revisi pada post yang sama.
 - Dua request untuk slot Page yang sama.
 - Release yang dikirim ulang.
+- Dua claim plan item dan reclaim lease kedaluwarsa.
+- Plan item versus direct post pada slot sama.
+- Fact correction versus approval/publish.
+- Idempotent replay dan lost response untuk setiap kelas write.
+
+### 32.6 Prompt dan tool-selection evaluation
+
+`plans/use-case-inventory.md` menetapkan 31 supported/clarification user goals dan 101 frozen prompt cases. Phase 8 wajib menjalankan seluruh suite dengan target:
+
+- Direct requests: 100% pass.
+- Indirect requests: minimal 90% pass.
+- Overall: minimal 95% pass.
+- Hard fail: 0.
+- 33/33 tools memiliki positive path dan boundary/recovery path.
+
+Generated paraphrases boleh ditambahkan untuk robustness, tetapi tidak mengganti frozen prompts atau expected behavior.
 
 ---
 
@@ -1598,7 +1653,7 @@ Evaluation set harus mencakup:
 | Teks terlalu panjang | Sulit dibaca pada Reel 13 detik | Adaptive fact count, component budget, total Canva budget, quality gate |
 | Page terdengar identik | Brand differentiation lemah | Konfigurasi Page dan campuran topik terpisah |
 | Schema terlalu trivia-specific | Sulit menambah niche | Generic pages/posts core dan tabel niche terpisah |
-| Batch terputus | Slot hilang atau dibuat dua kali | Content plan, plan items, idempotency, dan chunk 3–5 item |
+| Batch terputus | Slot hilang atau dibuat dua kali | Content plan, claim lease, global idempotency, dan chunk maksimal tiga item |
 | Draft yang dibuang membakar fakta | Library cepat habis | Status `discarded` dan release alokasi niche |
 | Metrik dibaca sebagai jaminan sebab-akibat | Keputusan editorial menyesatkan | Simpan snapshot, tampilkan konteks sampel, dan larang klaim jaminan viral |
 | Scope bertambah sebelum MVP stabil | Proyek menjadi kompleks | Enforce non-goals dan acceptance criteria |
@@ -1665,18 +1720,24 @@ MVP dinyatakan selesai apabila:
 7. Pengguna dapat membuat Page, post, batch, kalender, dan melanjutkan content plan melalui chat.
 8. Output siap disalin ke Canva dan Facebook.
 9. Pemakaian fakta selalu mengikuti `workspace_unique` atau `page_unique` milik Page tujuan.
-10. Tidak ada OpenAI API, embeddings, Vercel, dashboard, atau auto-posting dalam runtime MVP.
+10. Tidak ada OpenAI API, embeddings, product dashboard, atau auto-posting dalam runtime MVP; frontend auth minimal diperbolehkan.
 11. OAuth, ownership check, RLS, dan Data API exposure telah diverifikasi.
 12. Pengguna dapat mencatat performa dan mengambil insight dasar melalui chat.
-13. Dokumentasi database, workflow, module contract, trivia DNA, dan implementation plan sudah selaras dengan PRD ini.
+13. Dokumentasi database, workflow, module contract, trivia DNA, tool inventory, use-case inventory, traceability, dan implementation plan sudah selaras dengan PRD ini.
+14. Seluruh 33 MCP tools lulus contract tests dan seluruh 101 frozen prompts memenuhi threshold evaluasi.
 
 ---
 
 ## 37. Referensi teknis
 
 - [OpenAI — Build an MCP server](https://developers.openai.com/plugins/build/mcp-server)
-- [OpenAI — Add custom MCP server](https://developers.openai.com/api/docs/guides/custom-mcp-server)
+- [OpenAI — Authentication for plugins](https://developers.openai.com/plugins/build/auth)
+- [OpenAI — Package your plugin](https://developers.openai.com/plugins/build/plugins)
 - [Supabase — Deploy MCP servers](https://supabase.com/docs/guides/ai-tools/byo-mcp)
+- [Supabase — MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication)
+- [Supabase — OAuth server getting started](https://supabase.com/docs/guides/auth/oauth-server/getting-started)
+- [Supabase — OAuth token endpoint HTTP 200 change](https://supabase.com/changelog/45468-breaking-change-oauth-token-endpoint-will-return-http-200-instead-of-201)
+- [Supabase — Securing your API](https://supabase.com/docs/guides/api/securing-your-api)
 - [Supabase — Edge Functions](https://supabase.com/docs/guides/functions)
 
 Referensi teknis digunakan untuk memastikan rancangan dapat diimplementasikan. Jika dokumentasi platform berubah, implementation plan harus diperbarui tanpa mengubah tujuan produk kecuali perubahan tersebut memengaruhi scope atau pengalaman pengguna.

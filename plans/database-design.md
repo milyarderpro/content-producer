@@ -6,8 +6,8 @@
 |---|---|
 | Nama produk | Content Producer |
 | Versi produk | MVP |
-| Versi dokumen | 2.0 |
-| Status | Draf utama — arsitektur modular disetujui |
+| Versi dokumen | 2.2 |
+| Status | Frozen — baseline Phase 0 |
 | Tanggal | 7 Oktober 2026 |
 | Database | Supabase Postgres |
 | Dokumen induk | plans/PRD.md |
@@ -39,6 +39,13 @@ Database dipisahkan menjadi core generik dan modul niche.
 9. **public.trivia_facts**
 10. **public.trivia_post_facts**
 
+### 2.3 Tabel internal operasional
+
+11. **internal.operation_ledger** — idempotency global lintas seluruh write RPC.
+12. **internal.rate_limit_buckets** — fixed-window rate limiting per actor, OAuth client, dan limit group.
+
+Sepuluh tabel pertama adalah tabel aplikasi/domain. Dua tabel `internal` bukan surface produk, tidak diekspos melalui Data API, dan tidak dapat diakses langsung oleh MCP caller.
+
 Jumlah tabel tidak dijadikan ukuran kesederhanaan. Relasi eksplisit dipilih ketika mengurangi trigger, array ringkasan, JSON references, dan risiko data tidak sinkron.
 
 | Kebutuhan PRD | Penyelesaian database |
@@ -54,11 +61,11 @@ Jumlah tabel tidak dijadikan ukuran kesederhanaan. Relasi eksplisit dipilih keti
 | Status post | draft, ready, posted, discarded, archived |
 | Relasi post–fakta | trivia_post_facts dengan foreign key nyata |
 | Snapshot publikasi | wording, hash, sumber, dan verified_at disimpan pada junction |
-| Canonical dedup | claim_hash dan structured_hash unik per workspace |
+| Canonical dedup | claim_hash unik per workspace; structured_hash unik hanya untuk row yang lengkap dan deterministic-safe |
 | Near duplicate | Full Text Search dan pg_trgm |
 | Reservasi paralel | lock pada trivia_facts dan reservation token |
 | Reuse fakta | dihitung dari trivia_post_facts yang allocated atau published |
-| Idempotensi | operation_key pada write utama |
+| Idempotensi | `internal.operation_ledger` dengan unique workspace + operation key lintas seluruh write RPC |
 | Konflik revisi | compare-and-swap menggunakan revision |
 | Kalender | plan items menyimpan intent; posts menyimpan jadwal output |
 | Performa | post_metrics sebagai time-series snapshot manual |
@@ -119,7 +126,7 @@ Database tidak menyatakan fact_accuracy benar hanya karena sebuah boolean dikiri
 - Web research dan generasi AI dilakukan di luar transaksi.
 - Transaction hanya memvalidasi data final, mengunci row yang diperlukan, lalu menulis.
 - Row fakta dikunci dalam urutan ID konsisten.
-- operation_key membuat retry aman.
+- Global operation ledger membuat retry aman dan menolak key yang dipakai ulang untuk payload/operation berbeda.
 - Semua update post menggunakan expected_revision.
 
 ### 3.5 Versioning kontrak
@@ -496,7 +503,7 @@ Menyimpan intent dan konfigurasi batch/kalender sehingga proses dapat dilanjutka
 | workspace_id | bigint | Tidak | — | Workspace |
 | page_id | bigint | Tidak | — | Page |
 | niche_key | text | Tidak | — | Tepat satu niche |
-| operation_key | uuid | Tidak | — | Idempotency create |
+| created_by_operation_id | bigint | Ya | null | Audit link ke operation ledger |
 | name | text | Ya | null | Nama plan |
 | status | text | Tidak | pending | Lifecycle plan |
 | requested_count | integer | Tidak | — | Jumlah slot |
@@ -534,7 +541,7 @@ Menyimpan setiap slot yang diminta sebelum post berhasil dibuat.
 | page_id | bigint | Tidak | — | Page |
 | niche_key | text | Tidak | — | Niche |
 | position | integer | Tidak | — | Urutan dalam plan |
-| operation_key | uuid | Tidak | — | Idempotency item |
+| created_by_operation_id | bigint | Ya | null | Audit link ke operation ledger pembuat plan |
 | status | text | Tidak | pending | Progress generasi |
 | scheduled_at | timestamptz | Ya | null | Slot yang diminta |
 | topic_key | text | Ya | null | Intent topik |
@@ -542,8 +549,13 @@ Menyimpan setiap slot yang diminta sebelum post berhasil dibuat.
 | interaction_goal | text | Ya | null | share/save/comment/follow |
 | item_config | jsonb | Tidak | object | Override dan snapshot |
 | attempt_count | integer | Tidak | 0 | Jumlah percobaan |
+| claim_token | uuid | Ya | null | Token lease putaran aktif |
+| claimed_at | timestamptz | Ya | null | Awal lease aktif |
+| claim_expires_at | timestamptz | Ya | null | Batas lease aktif |
+| claim_renewal_count | integer | Tidak | 0 | Maksimum satu renewal MVP |
 | last_error_code | text | Ya | null | Error aman |
 | last_error_detail | text | Ya | null | Detail singkat |
+| replacement_reason | text | Ya | null | Alasan explicit replacement setelah discard |
 | started_at | timestamptz | Ya | null | Diproses |
 | completed_at | timestamptz | Ya | null | Output tersimpan |
 | created_at | timestamptz | Tidak | now() | Dibuat |
@@ -560,10 +572,11 @@ Status item:
 Constraint:
 
 - Unique plan_id + position.
-- Unique workspace_id + operation_key.
 - Composite FK ke plan menjamin workspace, Page, dan niche sama.
 - scheduled_at untuk Page yang sama tidak boleh dimiliki dua plan item non-cancelled.
 - attempt_count tidak negatif.
+- Fresh claim atau reclaim menghasilkan token baru; default lease 30 menit, maksimal absolut 60 menit dengan satu renewal.
+- Claim fields seluruhnya kosong untuk item yang tidak `in_progress`; stale token ditolak.
 - last_error_detail tidak menyimpan secret, token, atau seluruh output model.
 
 ### 7.7 Tabel posts
@@ -580,7 +593,7 @@ Menyimpan output publik, lifecycle, quality state, jadwal final, dan payload nic
 | page_id | bigint | Tidak | — | Page |
 | niche_key | text | Tidak | — | Niche |
 | content_plan_item_id | bigint | Ya | null | Slot asal |
-| operation_key | uuid | Tidak | — | Idempotency create |
+| created_by_operation_id | bigint | Ya | null | Audit link ke operation ledger |
 | format_key | text | Tidak | — | Format milik niche |
 | topic_key | text | Tidak | — | Topik utama untuk filtering dan analytics |
 | interaction_goal | text | Tidak | — | share/save/comment/follow |
@@ -590,6 +603,8 @@ Menyimpan output publik, lifecycle, quality state, jadwal final, dan payload nic
 | generation_snapshot | jsonb | Tidak | — | Config dan input generasi |
 | system_checks | jsonb | Tidak | object | Hasil check DB |
 | editorial_checks | jsonb | Tidak | object | Attestation model/user |
+| approval_snapshot | jsonb | Ya | null | Explicit owner approval untuk fingerprint current |
+| content_hash | text | Tidak | — | SHA-256 canonical quality-relevant content |
 | quality_status | text | Tidak | pending | pending/passed/failed |
 | scheduled_at | timestamptz | Ya | null | Jadwal final |
 | published_at | timestamptz | Ya | null | Publikasi aktual |
@@ -616,13 +631,13 @@ Aturan:
 - Config Page+niche harus ada pada saat post dibuat.
 - content_payload, generation_snapshot, system_checks, dan editorial_checks harus object.
 - content_schema_version harus didukung modul.
-- ready, posted, dan archived membutuhkan quality_status passed serta ready_at.
+- ready, posted, dan archived membutuhkan quality_status passed, approval snapshot current, content hash current, serta ready_at.
 - posted dan archived membutuhkan published_at.
 - discarded membutuhkan discarded_at dan tidak boleh mempunyai published_at.
 - archived membutuhkan archived_at dan hanya berasal dari posted.
 - revision minimal 1.
 - Satu Page tidak memiliki dua post aktif pada scheduled_at sama.
-- Untuk satu plan item hanya satu post non-discarded/non-archived boleh aktif.
+- Untuk satu plan item hanya satu post non-discarded boleh ada; archived tetap memblokir output kedua.
 - published_url harus HTTPS jika diisi.
 - platform_post_id unik per Page jika diisi.
 
@@ -704,7 +719,7 @@ Menyimpan snapshot performa manual tanpa menimpa pengamatan lama.
 | workspace_id | bigint | Tidak | — | Workspace |
 | page_id | bigint | Tidak | — | Page |
 | post_id | bigint | Tidak | — | Post |
-| operation_key | uuid | Tidak | — | Idempotency write |
+| created_by_operation_id | bigint | Ya | null | Audit link ke operation ledger |
 | captured_at | timestamptz | Tidak | — | Waktu observasi |
 | views | bigint | Ya | null | Views |
 | reach | bigint | Ya | null | Reach |
@@ -720,12 +735,46 @@ Menyimpan snapshot performa manual tanpa menimpa pengamatan lama.
 
 Aturan:
 
-- Unique workspace_id + operation_key.
 - Unique post_id + captured_at.
 - Semua metrik numerik tidak negatif.
 - Minimal satu metrik dikenal atau satu key metrics_payload harus tersedia.
 - Post harus posted atau archived.
 - Metrics tidak membuktikan sebab-akibat dan tidak menjadi syarat lifecycle.
+
+Seluruh numeric engagement field adalah cumulative totals pada `captured_at`. `null` berarti tidak dicatat; `0` berarti nilai nol dilaporkan eksplisit.
+
+### 7.9 Tabel internal.operation_ledger
+
+Menyediakan idempotency global untuk seluruh write RPC. Ledger insert, business mutation, dan ledger completion berada dalam transaksi yang sama.
+
+| Kolom | Tipe | Null | Keterangan |
+|---|---|---:|---|
+| id | bigint identity | Tidak | Primary key internal |
+| workspace_id | bigint | Tidak | Scope tenant |
+| actor_user_id | uuid | Tidak | Actor dari token tervalidasi |
+| operation_key | uuid | Tidak | UUID v4 satu logical write |
+| operation_name | text | Tidak | Nama domain operation berversi |
+| request_schema_version | integer | Tidak | Versi canonical request |
+| request_hash | text | Tidak | SHA-256 semantic request canonical |
+| response_snapshot | jsonb | Ya | Respons sukses minimal untuk replay |
+| target_type | text | Ya | Jenis target aman |
+| target_public_id | uuid | Ya | Public ID target bila ada |
+| created_at | timestamptz | Tidak | Waktu operasi dimulai |
+| completed_at | timestamptz | Ya | Waktu commit sukses |
+
+Invariant:
+
+- Unique `(workspace_id, operation_key)` berlaku lintas seluruh write RPC.
+- Business row hanya dapat mengaitkan `created_by_operation_id` ke ledger dengan `workspace_id` yang sama melalui composite FK.
+- Key dan hash sama mengembalikan snapshot tanpa mutation ulang.
+- Key sama dengan operation name atau request hash berbeda menghasilkan `OPERATION_KEY_REUSED`.
+- Request hash dibuat server-side setelah schema validation dan normalisasi identifier/timestamp.
+- Snapshot hanya menyimpan public ID, status, revision, dan timestamp yang diperlukan; tidak menyimpan full content, source, token, atau secret.
+- Ledger dipertahankan tanpa expiry pada MVP.
+
+### 7.10 Tabel internal.rate_limit_buckets
+
+Counter memakai key `(actor_user_id, oauth_client_id, limit_group, window_start)` dan atomic upsert. Window MVP adalah satu menit UTC. Default production: read 120/menit, expensive read 20/menit, write 30/menit, dan contention write 20/menit. Pelanggaran menghasilkan `RATE_LIMITED` sebelum business mutation.
 
 ---
 
@@ -756,14 +805,19 @@ Menyimpan satu canonical claim per workspace, sumber, ontology key, freshness, d
 | ontology_version | integer | Tidak | 1 | Versi ontology |
 | structured_key | text | Tidak | — | Serialisasi deterministik |
 | structured_hash | text | Tidak | — | SHA-256 structured key |
+| structured_match_eligible | boolean | Tidak | false | True hanya jika seluruh field material lengkap dan relation deterministic-safe |
 | topic_key | text | Tidak | — | Topik trivia |
+| dedup_review_snapshot | jsonb | Tidak | object | Keputusan kandidat kuat dan identity version |
+| supersedes_fact_id | bigint | Ya | null | Predecessor untuk correction lineage |
+| correction_reason | text | Ya | null | Alasan koreksi/invalidation |
+| corrected_at | timestamptz | Ya | null | Waktu server koreksi |
 
 #### Kolom sumber dan verifikasi
 
 | Kolom | Tipe | Null | Default | Keterangan |
 |---|---|---:|---|---|
 | source_data | jsonb | Tidak | — | Array sumber |
-| verification_status | text | Tidak | needs_review | needs_review/verified/rejected |
+| verification_status | text | Tidak | needs_review | needs_review/verified/rejected/invalidated/superseded |
 | freshness_class | text | Tidak | stable | stable/periodic/volatile |
 | verified_at | timestamptz | Ya | null | Terakhir diverifikasi |
 | as_of_date | date | Ya | null | Konteks waktu klaim |
@@ -784,26 +838,28 @@ Menyimpan satu canonical claim per workspace, sumber, ontology key, freshness, d
 
 Constraint:
 
-- Unique workspace_id + claim_hash.
-- Unique workspace_id + structured_hash.
+- Unique current row untuk workspace_id + claim_hash.
+- Unique current row untuk workspace_id + structured_hash yang deterministic-safe.
+- `structured_match_eligible` hanya boleh ditetapkan validator server setelah completeness dan relation allowlist lulus; caller tidak dapat mengaktifkannya langsung.
 - Hash adalah 64 karakter hex lowercase.
 - numbers array, qualifiers object, source_data array minimal satu.
 - verified membutuhkan verified_at.
 - periodic dan volatile membutuhkan expires_at.
-- Row expired atau rejected tidak dapat direservasi.
+- Row expired, needs_review, rejected, invalidated, atau superseded tidak dapat direservasi.
 - Bentuk kolom reservasi harus lengkap untuk status reserved dan kosong untuk available.
 - FK reserved_for_page_id scoped ke workspace.
 - Tidak ada used_page_ids dan use_count.
+- Lineage berada dalam workspace yang sama, tidak self-reference/cycle, dan satu predecessor hanya mempunyai satu direct successor current.
 
 Freshness default ditentukan oleh jenis klaim:
 
 | Kelas | Contoh | Kebijakan awal |
 |---|---|---|
-| stable | Anatomi dasar, sejarah mapan | Expiry opsional; recheck saat sumber berubah atau fakta direvisi |
+| stable | Anatomi dasar, sejarah mapan | Maksimal 24 bulan |
 | periodic | Statistik tahunan, populasi, data survei | expires_at maksimal sekitar 12 bulan dari verifikasi |
-| volatile | Pejabat, hukum, rekor aktif, status operasi, ranking | expires_at maksimal sekitar 90 hari atau lebih pendek sesuai sumber |
+| volatile | Pejabat, hukum, rekor aktif, status operasi, ranking | 30 hari default; maksimal 90 hari dengan rationale |
 
-Safety, medical, legal, food safety, dan pet safety tetap memerlukan review lebih ketat walaupun klaim tampak stable.
+Safety, medical, legal, food safety, dan pet safety memakai minimum dari kelasnya dan 180 hari serta memerlukan source/review lebih ketat.
 
 #### Source data versi 1
 
@@ -890,23 +946,33 @@ Post posted, discarded, dan archived bersifat terminal untuk revisi. Membuat ver
 ### 9.2 Lifecycle plan
 
 - Plan dibuat pending bersama semua item.
-- Ketika item pertama diklaim, plan menjadi in_progress.
+- Claim memilih maksimum tiga item memakai `FOR UPDATE SKIP LOCKED`, memberi token baru, dan menetapkan lease default 30 menit.
+- Lease dapat diperpanjang satu kali sampai maksimum absolut 60 menit dari claim awal; expired `in_progress` dapat direclaim secara opportunistic.
+- Ketika item pertama diklaim, plan menjadi in_progress. Fresh claim/reclaim menambah attempt count; replay/renewal tidak.
 - Item berhasil setelah post draft tersimpan menjadi completed.
-- Item gagal menyimpan error aman dan menjadi failed.
+- Save dan failure report wajib membawa claim token current yang belum expired.
+- Item gagal menyimpan error aman, membersihkan claim fields, dan menjadi failed.
+- Retry hanya mengubah failed menjadi pending; cancelled tidak dapat di-retry.
 - Plan completed bila seluruh item completed atau cancelled.
 - Plan partially_completed bila terdapat kombinasi completed dan failed/pending setelah putaran aktif berakhir.
 - Plan dapat dilanjutkan selama masih memiliki pending atau failed item yang dipilih untuk retry.
-- Cancel plan mengubah item pending menjadi cancelled; post yang sudah dibuat tidak dihapus.
+- Cancel plan mengubah pending/failed/in_progress menjadi cancelled dan membersihkan lease; post yang sudah dibuat tidak dihapus.
+- Discarded draft/ready tidak otomatis membuka item. Replacement memerlukan perintah eksplisit, semua output lama harus discarded, dan tidak boleh ada post yang pernah posted/archived.
+- Post posted/archived membuat item permanen terminal. Archived tetap memblokir output kedua.
 
 ### 9.3 Lifecycle fakta
 
 - needs_review: belum dapat direservasi.
 - verified: dapat dipakai jika belum expired dan reuse rule mengizinkan.
-- rejected: tidak dapat dipakai.
+- rejected: kandidat tidak pernah lolos verifikasi dan tidak dapat dipakai.
+- invalidated: sebelumnya verified tetapi salah/tidak lagi didukung tanpa successor.
+- superseded: digantikan canonical fact baru melalui koreksi bermakna.
 - available: tidak sedang diproses.
 - reserved: sementara dimiliki satu token.
 
 Reservasi berakhir saat post disimpan, dilepas, atau TTL terlewati. Penggunaan permanen tidak disimpan pada trivia_facts, tetapi pada junction state published.
+
+Re-verification hanya memperbarui sumber/freshness bila proposisi tetap sama. Koreksi makna membuat successor baru dan menandai predecessor `superseded` secara atomic; invalidation tanpa pengganti memakai `invalidated`. Ready post yang terdampak kembali menjadi draft dan approval current dibatalkan, sedangkan posted/archived snapshots tidak ditulis ulang.
 
 ---
 
@@ -917,17 +983,19 @@ Reservasi berakhir saat post disimpan, dilepas, atau TTL terlewati. Penggunaan p
 - workspaces: unique public_id, unique slug, partial unique owner aktif.
 - pages: unique public_id, unique workspace_id + slug, index workspace_id + is_active.
 - page_niche_configs: unique page_id + niche_key, partial unique default per Page.
-- content_plans: unique public_id, unique workspace_id + operation_key, index page_id + status + created_at.
-- content_plan_items: unique plan_id + position, unique workspace_id + operation_key, index plan_id + status + position, partial unique page schedule.
-- posts: unique public_id, unique workspace_id + operation_key, index page/status/created, page/niche/format, page/niche/topic, plan item, scheduled_at, published_at.
+- content_plans: unique public_id, index page_id + status + created_at.
+- content_plan_items: unique plan_id + position, index plan_id + status + position, claim expiry, partial unique page schedule.
+- posts: unique public_id, index page/status/created, page/niche/format, page/niche/topic, plan item, scheduled_at, published_at, content hash.
 - post_metrics: unique post_id + captured_at, index post_id + captured_at desc, page_id + captured_at desc.
+- internal.operation_ledger: unique workspace_id + operation_key, index target dan created_at.
+- internal.rate_limit_buckets: unique actor + OAuth client + group + window.
 
 Keunikan jadwal berada pada dua tabel karena plan item dapat ada sebelum post. Setiap operasi yang membuat atau memindahkan slot wajib mengambil transaction-level advisory lock deterministik untuk kombinasi Page + scheduled_at, kemudian memeriksa content_plan_items dan posts sebelum write. Partial unique index pada masing-masing tabel tetap menjadi pertahanan lokal, sedangkan advisory lock mencegah race lintas-tabel.
 
 ### Trivia
 
 - Unique workspace_id + claim_hash.
-- Unique workspace_id + structured_hash.
+- Partial unique workspace_id + structured_hash hanya untuk row current dengan `structured_match_eligible = true`.
 - GIN search_vector.
 - GIN normalized_claim gin_trgm_ops.
 - Index workspace_id + verification_status + topic_key.
@@ -1044,19 +1112,19 @@ Target awal:
 
 ### Urutan transaksi
 
-1. Verifikasi auth.uid() adalah owner workspace.
-2. Verifikasi Page aktif dan trivia config enabled.
+1. Verifikasi auth.uid(), OAuth client context, owner workspace, Page aktif, dan trivia config enabled.
+2. Claim global operation key dan verifikasi canonical request hash.
 3. Hapus state reservasi expired secara opportunistic pada kandidat.
-4. Upsert candidate canonical dengan menangani unique conflict.
+4. Resolve exact/structured identity dan dedup decision; uncertain candidate tetap needs_review.
 5. Lock fact rows dalam urutan id.
-6. Pastikan verified dan belum expired.
+6. Pastikan seluruh set current verified, sumber valid, dan belum expired.
 7. Query trivia_post_facts untuk allocation state allocated/published.
 8. Terapkan workspace_unique atau page_unique.
-9. Pastikan row tidak reserved token lain.
-10. Set token, Page, reserved_at, dan reserved_until.
-11. Return canonical IDs, expiry, dan kandidat conflict.
+9. Pastikan tidak ada row yang direservasi token lain.
+10. Set satu token, Page, config/reuse snapshot, reserved_at, dan reserved_until untuk seluruh set secara all-or-nothing.
+11. Complete operation ledger dan return canonical IDs serta expiry.
 
-Token yang sama dengan input semantik sama bersifat idempotent. Token sama dengan input berbeda ditolak.
+Operation key dan semantic input yang sama bersifat idempotent. Key sama dengan payload/operation berbeda ditolak. Reservation token yang expired tidak dapat dihidupkan oleh replay.
 
 Satu fact row hanya memiliki satu reservasi aktif. Ini sengaja menyederhanakan MVP; page_unique lintas Page tetap dapat terjadi secara berurutan setelah post pertama tersimpan dan reservation dibersihkan.
 
@@ -1081,19 +1149,15 @@ Satu fact row hanya memiliki satu reservasi aktif. Ini sengaja menyederhanakan M
 
 ### Urutan transaksi
 
-1. Verifikasi owner, Page, trivia config, dan schema version.
-2. Jika operation key sudah ada, return post lama bila request compatible.
-3. Lock seluruh fact rows dalam urutan id.
-4. Validasi token, expiry, verification, source, dan reuse lagi.
-5. Validasi payload, jumlah fakta, text metrics, format, topic, profile, render style, dan budget.
-6. Validasi plan item bila diberikan dan lock item.
-7. Jika scheduled_at terisi, ambil advisory lock Page+slot lalu validasi terhadap plan items dan posts.
-8. Insert posts sebagai draft.
-9. Insert trivia_post_facts sebagai allocated dengan snapshot.
-10. Bersihkan reservation fields pada facts.
-11. Ubah plan item menjadi completed.
-12. Recompute status plan.
-13. Commit dan return post package.
+1. Verifikasi owner/OAuth client, canonicalize request, dan claim global operation key.
+2. Ambil schedule advisory lock, plan/item, post, fact, lalu junction locks sesuai global lock order.
+3. Validasi claim token, reservation token, expiry, verification, freshness, source, reuse, config/schema version, payload, text metrics, dan schedule.
+4. Render ulang public copy server-side, hitung content hash, system checks, serta validasi editorial attestation terhadap hash current.
+5. Insert post sebagai draft.
+6. Insert seluruh trivia_post_facts sebagai allocated dengan snapshot immutable.
+7. Bersihkan reservation fields pada facts.
+8. Ubah plan item menjadi completed, bersihkan claim fields, dan hitung ulang plan state.
+9. Complete operation ledger dan commit.
 
 Kegagalan apa pun melakukan rollback penuh. Fakta tidak boleh dianggap allocated tanpa post dan junction yang valid.
 
@@ -1105,12 +1169,12 @@ Batch memanggil transaksi ini per item. Kegagalan satu item tidak membatalkan it
 
 ### 14.1 Tanpa mengganti fakta
 
-1. Lock post.
-2. Verifikasi expected_revision.
+1. Claim operation ledger lalu lock post.
+2. Verifikasi expected_revision dan expected content hash bila relevan.
 3. Pastikan status draft atau ready.
-4. Validasi payload dan metrics.
-5. Jika ready, kembalikan ke draft dan kosongkan ready_at.
-6. Update payload/checks dan increment revision.
+4. Render ulang, validasi payload, hitung content hash, system checks, dan editorial attestation.
+5. Jika ready, kembalikan ke draft, kosongkan ready_at/approval snapshot current, dan tandai evidence lama stale.
+6. Update payload/checks dan increment revision tepat satu kali.
 
 ### 14.2 Mengganti fakta
 
@@ -1137,11 +1201,13 @@ Syarat:
 
 - expected_revision cocok.
 - status draft.
-- semua system checks bernilai lulus.
-- editorial checks lengkap.
-- quality_status passed.
-- persetujuan pengguna eksplisit.
-- semua junction tetap allocated dan fact tidak rejected.
+- content hash hasil hitung ulang sama dengan expected current hash.
+- semua blocking system checks bernilai lulus.
+- editorial attestation current terhadap rubric dan content hash yang sama.
+- persetujuan owner eksplisit terhadap revision/hash current.
+- semua junction tetap allocated dan fact current verified/fresh.
+
+Approval transaction menyimpan `approval_snapshot`, menetapkan `quality_status = passed`, `ready_at`, dan revision + 1. Caller tidak dapat mengirim authoritative system pass, actor, atau timestamp.
 
 ### 15.2 Menjadi discarded
 
@@ -1182,49 +1248,53 @@ Hanya dari posted. Set archived_at dan increment revision. Junction tetap publis
 
 ### Prinsip
 
-- Utamakan security invoker.
-- Jangan memakai security definer untuk menyelesaikan error permission.
-- Jika fungsi privileged benar-benar diperlukan, tempatkan pada schema internal yang tidak diekspos, revoke execute from public, set search_path eksplisit, dan periksa auth.uid() serta ownership dalam body.
+- Utamakan security invoker untuk helper yang tidak membutuhkan elevated table access.
+- Jangan memakai security definer sebagai workaround permission. Business `api` entry point memakainya secara terencana karena authenticated tidak mempunyai direct table grants, dengan narrow owner role, RLS, `search_path = ''`, ownership/OAuth-client check, dan explicit execute grant.
+- Tempatkan helper internal pada schema tidak terekspos dan revoke execute from public.
 - Setiap write menerima operation_key.
 - Error memakai code stabil dan detail aman.
 
 ### RPC utama
 
-| Function/RPC | Tujuan |
-|---|---|
-| create_page_with_niche_config | Membuat Page dan trivia config atomic |
-| update_page_niche_config | Memvalidasi config version |
-| get_page_generation_context | Konteks generasi dan insight ringkas |
-| create_content_plan_with_items | Membuat plan dan seluruh slot |
-| claim_content_plan_items | Claim chunk pending secara atomic |
-| retry_content_plan_item | Mengembalikan failed item ke pending |
-| trivia_find_similar_facts | Candidate retrieval |
-| trivia_register_and_reserve_facts | Canonical upsert + reuse check + reservation |
-| trivia_release_facts | Release token secara idempotent |
-| save_trivia_post | Save post + junction + plan progress |
-| revise_trivia_post | Compare-and-swap revision |
-| transition_post_status | Ready, posted, discarded, archived |
-| record_post_performance | Insert metrics snapshot |
-| get_performance_insights | Aggregate read-only |
+Public `api` entry points mengikuti 33 domain operations pada tool inventory. Helper internal boleh berbagi implementasi, tetapi caller tidak mendapat generic executor atau generic status mutation.
 
 ### Mapping MCP
 
 | MCP tool | Database operation |
 |---|---|
-| list_niches | SELECT niches active |
-| list_pages | SELECT pages + enabled configs |
-| get_page_generation_context | RPC dengan Page+niche |
-| create_content_plan | create_content_plan_with_items |
-| get_content_plan | SELECT plan, items, active/latest posts |
-| trivia_find_similar_facts | trivia_find_similar_facts |
-| trivia_register_and_reserve_facts | trivia_register_and_reserve_facts |
-| trivia_release_facts | trivia_release_facts |
-| save_post | save_trivia_post untuk niche trivia |
-| revise_post | revise_trivia_post |
-| discard_post | transition_post_status target discarded |
-| update_post_status | transition_post_status |
-| record_post_performance | record_post_performance |
-| get_performance_insights | get_performance_insights |
+| `get_account_profile` | Authenticated profile projection |
+| `get_workspace_context` | Workspace, module catalog, defaults |
+| `list_pages` | Page/config projection |
+| `create_page` | Create Page + initial niche config atomic |
+| `update_page` | Page/config compare-and-swap |
+| `get_page_generation_context` | Page+niche generation context |
+| `list_content_plans` | Paginated plan projection |
+| `create_content_plan` | Create plan + exact item slots atomic |
+| `get_content_plan` | Plan, items, output state |
+| `claim_content_plan_items` | Claim/reclaim item lease atomic |
+| `renew_content_plan_claim` | Renew current lease once |
+| `report_content_plan_item_failure` | Claim-bound safe failure |
+| `retry_content_plan_item` | Failed → pending |
+| `replace_discarded_plan_item` | Explicit completed → pending replacement |
+| `cancel_content_plan` | Cancel remaining items atomic |
+| `trivia_find_similar_facts` | Exact/structured/candidate retrieval |
+| `trivia_register_and_reserve_facts` | Canonical registration + all-or-nothing reserve |
+| `trivia_release_facts` | Token-bound idempotent release |
+| `trivia_reverify_fact` | Evidence/freshness refresh without identity change |
+| `trivia_correct_fact` | Successor/invalidation transaction |
+| `list_posts` | Paginated post/work-queue/calendar projection |
+| `get_post` | One complete post/current state projection |
+| `save_post` | Niche-routed atomic draft save |
+| `revise_post` | Niche-routed compare-and-swap revision |
+| `reschedule_post` | Atomic schedule move/clear |
+| `approve_post` | Recheck quality + explicit owner approval |
+| `revoke_post_approval` | Ready → draft and invalidate approval current |
+| `discard_post` | Explicit discard + release allocation |
+| `mark_post_posted` | Manual publication record + allocation publish |
+| `archive_post` | Posted → archived |
+| `record_post_performance` | Insert cumulative metrics snapshot |
+| `get_post_performance` | Metrics history projection |
+| `get_performance_insights` | Evidence-bearing aggregate read |
 
 ---
 
@@ -1234,20 +1304,28 @@ Hanya dari posted. Set archived_at dan increment revision. Junction tetap publis
 |---|---|---|
 | AUTH_REQUIRED | Token tidak valid/absen | Hubungkan ulang plugin |
 | FORBIDDEN | Bukan owner | Tolak tanpa membocorkan data |
+| OAUTH_CLIENT_REQUIRED | Token bukan koneksi OAuth MCP yang diizinkan | Relink melalui plugin |
+| RATE_LIMITED | Limit group terlampaui | Tunggu `retry_after_seconds` |
 | PAGE_NOT_FOUND | Page tidak ada | Tampilkan Page tersedia |
 | NICHE_NOT_ENABLED | Config niche tidak aktif | Pilih niche aktif |
 | CONFIG_VERSION_UNSUPPORTED | Config lama/baru tidak didukung | Migrasi atau refresh |
 | PLAN_ITEM_CONFLICT | Item sedang diproses/selesai | Ambil progress terbaru |
+| PLAN_ITEM_CLAIM_MISMATCH | Claim token bukan milik lease current | Ambil progress/claim ulang |
+| PLAN_ITEM_CLAIM_EXPIRED | Lease telah kedaluwarsa | Claim ulang item |
 | DUPLICATE_CANONICAL_FACT | Canonical sudah ada | Gunakan row canonical |
 | FACT_REUSE_BLOCKED | Rule melarang penggunaan | Pilih pengganti |
 | FACT_RESERVED | Token lain memiliki row | Pilih pengganti atau retry |
 | RESERVATION_EXPIRED | TTL habis | Reserve ulang |
 | FACT_NOT_VERIFIED | Fact belum layak | Review/ganti |
+| FACT_HASH_COLLISION | Hash sama tetapi canonical input berbeda | Hentikan merge dan review |
+| FACT_RESERVATION_CONTEXT_CHANGED | Page/config/reuse berubah sejak reserve | Release dan reserve ulang |
 | SOURCE_INSUFFICIENT | Metadata sumber tidak cukup | Teliti ulang |
 | REVISION_CONFLICT | Expected revision lama | Ambil post terbaru |
 | INVALID_STATUS_TRANSITION | Lifecycle tidak valid | Gunakan transisi legal |
 | SCHEDULE_CONFLICT | Slot Page sudah ada | Pilih waktu lain |
 | QUALITY_GATE_FAILED | Ready tidak diizinkan | Perbaiki check |
+| CONTENT_HASH_MISMATCH | Fingerprint content bukan current | Ambil post current dan evaluasi ulang |
+| APPROVAL_REQUIRED | Aksi membutuhkan approval owner eksplisit | Minta keputusan pengguna |
 | OPERATION_KEY_REUSED | Key dipakai payload berbeda | Buat key baru |
 | VALIDATION_FAILED | Schema/budget invalid | Perbaiki field |
 | DATABASE_UNAVAILABLE | Storage tidak tersedia | Jangan klaim sukses |
@@ -1263,19 +1341,19 @@ Constraint violation diterjemahkan ke code domain; raw SQL, stack trace, secret,
 - Supabase Auth OAuth 2.1 digunakan untuk koneksi MCP.
 - owner_user_id mengacu pada auth.users.id.
 - Authorization memakai auth.uid(), bukan user_metadata.
-- Edge Function meneruskan user JWT dan melakukan server-side authorization.
-- service_role tidak pernah dikirim ke ChatGPT atau public client.
-- Jika service_role dipakai untuk operasi internal terbatas, seluruh ownership harus tetap diverifikasi sebelum query.
+- Edge Function `mcp` memakai gateway `verify_jwt = false` agar discovery/challenge mencapai middleware, lalu middleware memvalidasi signature, issuer, audience/resource, exp/nbf, scopes, OAuth client, dan owner sebelum handler.
+- Browser auth hanya memakai publishable key. Service-role/secret key tidak pernah dikirim ke ChatGPT atau public client.
 
 ### 18.2 Data API exposure
 
 Data API exposure dan RLS adalah dua lapisan terpisah.
 
-- Schema yang diekspos ditentukan eksplisit dalam Supabase settings.
-- Grants ke anon dan authenticated ditentukan eksplisit dalam migration.
+- Hanya schema `api` yang diekspos untuk business access; `public` dan `internal` tidak dimasukkan ke exposed schemas.
+- Grants ke anon dan authenticated ditentukan eksplisit dalam migration serta diverifikasi terhadap project Data API settings.
 - anon tidak mendapat akses tabel atau execute RPC bisnis.
-- authenticated dapat menerima read access yang dibutuhkan dan execute pada RPC yang diizinkan, tetapi tidak mendapat direct write ke tabel bisnis.
-- Semua tabel dalam exposed schema mengaktifkan RLS.
+- authenticated hanya mendapat `USAGE` pada `api` dan `EXECUTE` pada RPC allowlist; tidak mendapat direct SELECT/INSERT/UPDATE/DELETE pada tabel bisnis.
+- Semua read dan write MCP melewati `.schema('api').rpc(...)` menggunakan user JWT.
+- Semua tabel bisnis tetap mengaktifkan RLS sebagai defense in depth.
 - Tidak mengandalkan perilaku otomatis project mengenai table exposure.
 
 ### 18.3 Pola RLS
@@ -1312,16 +1390,18 @@ using (
 
 Policy UPDATE selalu mempunyai USING dan WITH CHECK. INSERT memakai WITH CHECK. DELETE tidak diberikan.
 
-Niches hanya dapat dibaca authenticated; write dilakukan migration.
+Niches hanya dapat dibaca owner melalui `api` context RPC; write dilakukan migration.
+
+Karena business RPC berjalan sebagai `content_producer_api_owner`, policy yang diperlukan RPC juga menargetkan role sempit tersebut dan mengulang ownership predicate berbasis `(select auth.uid())`. Policy `TO authenticated` tidak dianggap otomatis berlaku bagi function-owner role. Integration test wajib membuktikan RLS tetap menolak non-owner melalui setiap SECURITY DEFINER entry point.
 
 ### 18.4 Views dan functions
 
 - View memakai security_invoker = true pada Postgres yang mendukung.
 - View yang tidak diperlukan Data API ditempatkan pada schema tidak terekspos atau grants dicabut.
-- Read function default security invoker.
-- Write hanya melalui RPC sempit; direct INSERT/UPDATE/DELETE pada tabel bisnis dicabut dari authenticated.
-- Jika transaksi write memerlukan SECURITY DEFINER, business function ditempatkan pada schema internal yang tidak diekspos, memakai fully qualified object names, search_path yang dibatasi, dan memeriksa auth.uid() serta ownership di dalam function.
-- Exposed wrapper tetap security invoker dan hanya meneruskan input tervalidasi ke internal function. Internal function tidak dapat ditemukan melalui Data API schema.
+- Helper yang tidak memerlukan elevated table access tetap security invoker.
+- Read dan write hanya melalui RPC sempit; seluruh direct table privilege dicabut dari authenticated. Karena itu entry point `api` yang membaca atau menulis tabel bisnis memakai SECURITY DEFINER secara sengaja dan dimiliki role `content_producer_api_owner` yang `NOLOGIN`, tidak mempunyai `BYPASSRLS`, bukan table owner, dan hanya menerima privilege objek minimum.
+- Setiap privileged function memakai fully qualified object names, `search_path = ''`, memeriksa `auth.uid()`, OAuth client context, workspace ownership, serta input di dalam body, dan tetap tunduk pada RLS.
+- Public entry point berada pada schema `api`; helper internal tidak dapat ditemukan melalui Data API schema.
 - Execute privilege setiap function baru dicabut dari PUBLIC dan anon, lalu diberikan hanya kepada authenticated untuk entry point yang memang diizinkan.
 - Tidak memakai auth.role(); policy menargetkan TO authenticated dan tetap memeriksa ownership.
 
@@ -1400,6 +1480,38 @@ create unique index workspaces_one_active_owner_idx
   on public.workspaces(owner_user_id)
   where is_active;
 
+create schema if not exists internal;
+create schema if not exists api;
+
+create table internal.operation_ledger (
+  id bigint generated always as identity primary key,
+  workspace_id bigint not null references public.workspaces(id) on delete restrict,
+  actor_user_id uuid not null references auth.users(id) on delete restrict,
+  operation_key uuid not null,
+  operation_name text not null,
+  request_schema_version integer not null check (request_schema_version >= 1),
+  request_hash text not null check (request_hash ~ '^[0-9a-f]{64}$'),
+  response_snapshot jsonb,
+  target_type text,
+  target_public_id uuid,
+  created_at timestamptz not null default now(),
+  completed_at timestamptz,
+  constraint operation_ledger_workspace_key unique (workspace_id, operation_key),
+  constraint operation_ledger_workspace_id_key unique (workspace_id, id),
+  constraint operation_ledger_response_object_check
+    check (response_snapshot is null or jsonb_typeof(response_snapshot) = 'object')
+);
+
+create table internal.rate_limit_buckets (
+  actor_user_id uuid not null references auth.users(id) on delete cascade,
+  oauth_client_id text not null,
+  limit_group text not null check (limit_group in ('read','expensive_read','write','contention_write')),
+  window_start timestamptz not null,
+  request_count integer not null default 0 check (request_count >= 0),
+  updated_at timestamptz not null default now(),
+  primary key (actor_user_id, oauth_client_id, limit_group, window_start)
+);
+
 create table public.niches (
   key text primary key,
   name text not null,
@@ -1471,7 +1583,7 @@ create table public.content_plans (
   workspace_id bigint not null,
   page_id bigint not null,
   niche_key text not null,
-  operation_key uuid not null,
+  created_by_operation_id bigint,
   name text,
   status text not null default 'pending'
     check (status in ('pending','in_progress','partially_completed','completed','failed','cancelled')),
@@ -1487,7 +1599,10 @@ create table public.content_plans (
     foreign key (workspace_id, page_id, niche_key)
     references public.page_niche_configs(workspace_id, page_id, niche_key)
     on delete restrict,
-  constraint content_plans_operation_key unique (workspace_id, operation_key),
+  constraint content_plans_operation_fk
+    foreign key (workspace_id, created_by_operation_id)
+    references internal.operation_ledger(workspace_id, id)
+    on delete restrict,
   constraint content_plans_scope_key unique (id, workspace_id, page_id, niche_key),
   constraint content_plans_config_object_check check (jsonb_typeof(plan_config) = 'object')
 );
@@ -1503,7 +1618,7 @@ create table public.content_plan_items (
   page_id bigint not null,
   niche_key text not null,
   position integer not null check (position >= 1),
-  operation_key uuid not null,
+  created_by_operation_id bigint,
   status text not null default 'pending'
     check (status in ('pending','in_progress','completed','failed','cancelled')),
   scheduled_at timestamptz,
@@ -1513,8 +1628,13 @@ create table public.content_plan_items (
     check (interaction_goal is null or interaction_goal in ('share','save','comment','follow')),
   item_config jsonb not null default '{}'::jsonb,
   attempt_count integer not null default 0 check (attempt_count >= 0),
+  claim_token uuid,
+  claimed_at timestamptz,
+  claim_expires_at timestamptz,
+  claim_renewal_count integer not null default 0 check (claim_renewal_count between 0 and 1),
   last_error_code text,
   last_error_detail text,
+  replacement_reason text,
   started_at timestamptz,
   completed_at timestamptz,
   created_at timestamptz not null default now(),
@@ -1523,10 +1643,22 @@ create table public.content_plan_items (
     foreign key (plan_id, workspace_id, page_id, niche_key)
     references public.content_plans(id, workspace_id, page_id, niche_key)
     on delete restrict,
+  constraint content_plan_items_operation_fk
+    foreign key (workspace_id, created_by_operation_id)
+    references internal.operation_ledger(workspace_id, id)
+    on delete restrict,
   constraint content_plan_items_plan_position_key unique (plan_id, position),
-  constraint content_plan_items_operation_key unique (workspace_id, operation_key),
   constraint content_plan_items_scope_key unique (id, workspace_id, page_id, niche_key),
-  constraint content_plan_items_config_object_check check (jsonb_typeof(item_config) = 'object')
+  constraint content_plan_items_config_object_check check (jsonb_typeof(item_config) = 'object'),
+  constraint content_plan_items_claim_shape_check check (
+    (
+      status = 'in_progress' and claim_token is not null and claimed_at is not null and
+      claim_expires_at is not null and claim_expires_at > claimed_at
+    ) or (
+      status <> 'in_progress' and claim_token is null and claimed_at is null and
+      claim_expires_at is null and claim_renewal_count = 0
+    )
+  )
 );
 
 create index content_plan_items_plan_status_idx
@@ -1543,7 +1675,7 @@ create table public.posts (
   page_id bigint not null,
   niche_key text not null,
   content_plan_item_id bigint,
-  operation_key uuid not null,
+  created_by_operation_id bigint,
   format_key text not null,
   topic_key text not null,
   interaction_goal text not null
@@ -1555,6 +1687,8 @@ create table public.posts (
   generation_snapshot jsonb not null,
   system_checks jsonb not null default '{}'::jsonb,
   editorial_checks jsonb not null default '{}'::jsonb,
+  approval_snapshot jsonb,
+  content_hash text not null,
   quality_status text not null default 'pending'
     check (quality_status in ('pending','passed','failed')),
   scheduled_at timestamptz,
@@ -1575,15 +1709,23 @@ create table public.posts (
     foreign key (content_plan_item_id, workspace_id, page_id, niche_key)
     references public.content_plan_items(id, workspace_id, page_id, niche_key)
     on delete restrict,
-  constraint posts_operation_key unique (workspace_id, operation_key),
+  constraint posts_operation_fk
+    foreign key (workspace_id, created_by_operation_id)
+    references internal.operation_ledger(workspace_id, id)
+    on delete restrict,
   constraint posts_scope_key unique (id, workspace_id, page_id),
   constraint posts_niche_scope_key unique (id, workspace_id, page_id, niche_key),
   constraint posts_payload_object_check check (jsonb_typeof(content_payload) = 'object'),
   constraint posts_snapshot_object_check check (jsonb_typeof(generation_snapshot) = 'object'),
   constraint posts_system_checks_object_check check (jsonb_typeof(system_checks) = 'object'),
   constraint posts_editorial_checks_object_check check (jsonb_typeof(editorial_checks) = 'object'),
+  constraint posts_approval_snapshot_object_check
+    check (approval_snapshot is null or jsonb_typeof(approval_snapshot) = 'object'),
+  constraint posts_content_hash_format_check check (content_hash ~ '^[0-9a-f]{64}$'),
   constraint posts_ready_quality_check
     check (status not in ('ready','posted','archived') or quality_status = 'passed'),
+  constraint posts_ready_approval_check
+    check (status not in ('ready','posted','archived') or approval_snapshot is not null),
   constraint posts_ready_at_check
     check (status not in ('ready','posted','archived') or ready_at is not null),
   constraint posts_published_at_check
@@ -1609,11 +1751,11 @@ create index posts_page_niche_topic_idx
 
 create unique index posts_page_schedule_unique_idx
   on public.posts(page_id, scheduled_at)
-  where scheduled_at is not null and status not in ('discarded','archived');
+  where scheduled_at is not null and status <> 'discarded';
 
 create unique index posts_active_plan_item_unique_idx
   on public.posts(content_plan_item_id)
-  where content_plan_item_id is not null and status not in ('discarded','archived');
+  where content_plan_item_id is not null and status <> 'discarded';
 
 create unique index posts_platform_identity_unique_idx
   on public.posts(page_id, platform_post_id)
@@ -1625,7 +1767,7 @@ create table public.post_metrics (
   workspace_id bigint not null,
   page_id bigint not null,
   post_id bigint not null,
-  operation_key uuid not null,
+  created_by_operation_id bigint,
   captured_at timestamptz not null,
   views bigint,
   reach bigint,
@@ -1642,7 +1784,10 @@ create table public.post_metrics (
     foreign key (post_id, workspace_id, page_id)
     references public.posts(id, workspace_id, page_id)
     on delete restrict,
-  constraint post_metrics_operation_key unique (workspace_id, operation_key),
+  constraint post_metrics_operation_fk
+    foreign key (workspace_id, created_by_operation_id)
+    references internal.operation_ledger(workspace_id, id)
+    on delete restrict,
   constraint post_metrics_snapshot_key unique (post_id, captured_at),
   constraint post_metrics_payload_object_check check (jsonb_typeof(metrics_payload) = 'object'),
   constraint post_metrics_nonnegative_check check (
@@ -1680,7 +1825,12 @@ create table public.trivia_facts (
   ontology_version integer not null default 1 check (ontology_version >= 1),
   structured_key text not null,
   structured_hash text not null,
+  structured_match_eligible boolean not null default false,
   topic_key text not null,
+  dedup_review_snapshot jsonb not null default '{}'::jsonb,
+  supersedes_fact_id bigint,
+  correction_reason text,
+  corrected_at timestamptz,
   search_vector tsvector generated always as (
     to_tsvector(
       'simple',
@@ -1692,7 +1842,7 @@ create table public.trivia_facts (
   ) stored,
   source_data jsonb not null,
   verification_status text not null default 'needs_review'
-    check (verification_status in ('needs_review','verified','rejected')),
+    check (verification_status in ('needs_review','verified','rejected','invalidated','superseded')),
   freshness_class text not null default 'stable'
     check (freshness_class in ('stable','periodic','volatile')),
   verified_at timestamptz,
@@ -1708,8 +1858,12 @@ create table public.trivia_facts (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint trivia_facts_workspace_id_key unique (workspace_id, id),
-  constraint trivia_facts_claim_hash_key unique (workspace_id, claim_hash),
-  constraint trivia_facts_structured_hash_key unique (workspace_id, structured_hash),
+  constraint trivia_facts_supersedes_fk
+    foreign key (workspace_id, supersedes_fact_id)
+    references public.trivia_facts(workspace_id, id)
+    on delete restrict,
+  constraint trivia_facts_not_self_superseding_check
+    check (supersedes_fact_id is null or supersedes_fact_id <> id),
   constraint trivia_facts_reserved_page_fk
     foreign key (workspace_id, reserved_for_page_id)
     references public.pages(workspace_id, id)
@@ -1718,6 +1872,7 @@ create table public.trivia_facts (
   constraint trivia_facts_structured_hash_format_check check (structured_hash ~ '^[0-9a-f]{64}$'),
   constraint trivia_facts_numbers_array_check check (jsonb_typeof(numbers) = 'array'),
   constraint trivia_facts_qualifiers_object_check check (jsonb_typeof(qualifiers) = 'object'),
+  constraint trivia_facts_dedup_review_object_check check (jsonb_typeof(dedup_review_snapshot) = 'object'),
   constraint trivia_facts_source_array_check
     check (jsonb_typeof(source_data) = 'array' and jsonb_array_length(source_data) >= 1),
   constraint trivia_facts_verified_at_check
@@ -1743,6 +1898,18 @@ create table public.trivia_facts (
     )
   )
 );
+
+create unique index trivia_facts_current_claim_hash_key
+  on public.trivia_facts(workspace_id, claim_hash)
+  where verification_status in ('needs_review','verified');
+
+create unique index trivia_facts_current_structured_hash_key
+  on public.trivia_facts(workspace_id, structured_hash)
+  where verification_status in ('needs_review','verified') and structured_match_eligible;
+
+create unique index trivia_facts_one_current_successor_idx
+  on public.trivia_facts(workspace_id, supersedes_fact_id)
+  where supersedes_fact_id is not null and verification_status in ('needs_review','verified');
 
 create index trivia_facts_workspace_verification_topic_idx
   on public.trivia_facts(workspace_id, verification_status, topic_key, id);
@@ -1838,6 +2005,8 @@ alter table public.posts enable row level security;
 alter table public.post_metrics enable row level security;
 alter table public.trivia_facts enable row level security;
 alter table public.trivia_post_facts enable row level security;
+alter table internal.operation_ledger enable row level security;
+alter table internal.rate_limit_buckets enable row level security;
 
 revoke all on table
   public.workspaces,
@@ -1850,33 +2019,15 @@ revoke all on table
   public.post_metrics,
   public.trivia_facts,
   public.trivia_post_facts
-from anon;
+from anon, authenticated;
 
-revoke insert, update, delete on table
-  public.workspaces,
-  public.niches,
-  public.pages,
-  public.page_niche_configs,
-  public.content_plans,
-  public.content_plan_items,
-  public.posts,
-  public.post_metrics,
-  public.trivia_facts,
-  public.trivia_post_facts
-from authenticated;
+revoke all on table
+  internal.operation_ledger,
+  internal.rate_limit_buckets
+from anon, authenticated;
 
-grant select on table
-  public.workspaces,
-  public.niches,
-  public.pages,
-  public.page_niche_configs,
-  public.content_plans,
-  public.content_plan_items,
-  public.posts,
-  public.post_metrics,
-  public.trivia_facts,
-  public.trivia_post_facts
-to authenticated;
+grant usage on schema api to authenticated;
+-- EXECUTE diberikan satu per satu hanya pada api RPC allowlist.
 ~~~
 
 ### 20.1 Validasi yang tidak cukup dengan CHECK
@@ -1891,6 +2042,9 @@ RPC atau validator wajib memastikan:
 - Post format/topic/profile sesuai config Page.
 - Text metrics dihitung ulang server-side.
 - Post trivia hanya memakai trivia_facts workspace yang sama.
+- Audit link `created_by_operation_id` hanya menunjuk ledger dalam workspace yang sama.
+- `structured_match_eligible` hanya true setelah structured fields lengkap dan relation deterministic-safe; collision yang belum eligible tetap masuk review.
+- Correction lineage tidak self-reference/cycle dan hanya memiliki satu direct successor current.
 - Reuse rule dipenuhi saat reservasi dan save.
 - Post metrics hanya untuk posted/archived.
 - Transisi lifecycle legal.
@@ -1920,6 +2074,7 @@ Meaning fields trivia_facts tidak boleh diubah setelah pernah mempunyai junction
 - ontology_version
 - structured_key
 - structured_hash
+- structured_match_eligible
 
 Koreksi makna membuat row canonical baru. Sumber, verification status, freshness, expiry, dan review note dapat diperbarui. Snapshot pada junction mempertahankan konteks post lama.
 
@@ -1964,18 +2119,19 @@ Urutan migration:
 
 1. Extensions.
 2. Core ownership: workspaces dan niches.
-3. Pages dan page_niche_configs.
-4. Content plans dan content_plan_items.
-5. Posts dan post_metrics.
-6. Trivia facts dan trivia_post_facts.
-7. Validation helpers.
-8. Transactional RPC.
-9. Triggers.
-10. Index tambahan.
-11. RLS policies dan grants.
-12. Seed niche trivia.
-13. Seed workspace owner dan Page uji melalui flow aman.
-14. Database tests.
+3. Internal operation ledger dan rate-limit buckets.
+4. Pages dan page_niche_configs.
+5. Content plans dan content_plan_items.
+6. Posts dan post_metrics.
+7. Trivia facts dan trivia_post_facts.
+8. Validation helpers.
+9. Transactional RPC pada schema `api` dan helper `internal`.
+10. Triggers.
+11. Index tambahan.
+12. RLS policies, explicit exposed schema, dan grants.
+13. Seed niche trivia.
+14. Seed workspace owner dan Page uji melalui flow aman.
+15. Database tests.
 
 Aturan:
 
@@ -1993,12 +2149,13 @@ Aturan:
 
 ### 25.1 Schema dan ownership
 
-- Sepuluh tabel aplikasi tersedia.
+- Sepuluh tabel aplikasi dan dua tabel internal operasional tersedia.
 - Seluruh PK, public ID, FK, unique, dan index penting tersedia.
 - Auth user non-owner tidak dapat membaca atau menulis workspace.
+- Composite audit FK menolak business row yang menunjuk operation ledger workspace lain.
 - Owner dapat mengakses row miliknya.
 - anon tidak memiliki akses.
-- authenticated direct write ke tabel bisnis ditolak; write melalui RPC yang diizinkan berhasil.
+- authenticated direct read/write ke tabel bisnis ditolak; read/write melalui `api` RPC allowlist berhasil.
 - UPDATE policy memiliki USING dan WITH CHECK.
 - Tidak ada function bisnis executable oleh PUBLIC.
 
@@ -2016,30 +2173,34 @@ Aturan:
 ### 25.3 Plan dan resume
 
 - Create plan membuat requested_count items dalam satu transaksi.
-- Retry operation key mengembalikan plan sama.
+- Global operation-key retry mengembalikan plan sama; key sama dengan payload/operation berbeda ditolak.
 - Dua plan tidak dapat memegang slot Page sama.
 - Pembuatan plan item dan post paralel untuk Page+slot yang sama menghasilkan satu pemenang melalui advisory lock lintas-tabel.
 - Chunk claim tidak mengambil item yang sedang in_progress.
+- Lease dapat di-renew satu kali, expired lease dapat direclaim, dan stale token ditolak.
 - Item berhasil menjadi completed setelah post tersimpan.
 - Item gagal tidak menghapus post item lain.
 - Plan dapat dilanjutkan dari chat lain.
 - Cancel tidak menghapus post yang sudah dibuat.
+- Replacement hanya tersedia bila seluruh output lama discarded dan tidak pernah posted/archived.
 
 ### 25.4 Deduplikasi
 
 - Normalisasi exact menghasilkan claim hash sama.
-- Structured key sama ditolak.
+- Structured key sama ditolak hanya bila kedua row current dinilai lengkap dan deterministic-safe; collision non-eligible masuk review.
 - Alias, unit, negasi, waktu, dan lokasi mengikuti ontology.
 - FTS/trigram mengembalikan near duplicate.
 - Satu canonical row dapat dipakai lintas Page hanya bila rule mengizinkan.
 - Gold set memenuhi target exact/structured capture, paraphrase candidate recall, dan zero false merge.
 - Perubahan normalization_version atau ontology_version menjalankan ulang seluruh fixture.
+- Reverify tidak mengubah identity; correction membuat successor atau invalidation dengan lineage valid.
+- Self-reference dan cycle pada correction lineage ditolak.
 
 ### 25.5 Reservasi dan reuse
 
 - Hanya fact verified dan tidak expired dapat direservasi.
-- Token sama + payload sama idempotent.
-- Token sama + payload berbeda ditolak.
+- Operation key sama + payload sama idempotent.
+- Operation key sama + payload/operation berbeda ditolak.
 - Sepuluh reservasi simultan menghasilkan satu pemenang.
 - Workspace unique menolak semua allocated/published junction.
 - Page unique menolak allocated/published pada Page tujuan tetapi mengizinkan Page lain.
@@ -2069,12 +2230,15 @@ Aturan:
 - Ready menjadi posted dan junction published.
 - Archived tidak melepaskan published junction.
 - Posted/discarded/archived tidak dapat direvisi.
-- Transisi target sama idempotent bila payload compatible.
+- Replay key yang sama idempotent; target sama dengan key baru ditolak sebagai invalid transition.
 
 ### 25.8 Quality dan metrics
 
 - System checks gagal mencegah ready.
 - Editorial checks tidak diperlakukan sebagai bukti DB di luar attestation.
+- Approval memerlukan revision/content hash current, actor auth current, dan menyimpan approval snapshot.
+- Status ready/posted/archived tanpa approval snapshot ditolak oleh database constraint.
+- Revisi/revoke/correction membuat approval lama stale dan ready kembali draft.
 - Text metrics dihitung ulang dan overflow ditolak.
 - Metrics untuk draft ditolak.
 - Snapshot metrics tidak menimpa snapshot lama.
@@ -2105,7 +2269,7 @@ Target server mengikuti PRD: read sederhana p95 maksimal 2 detik; duplicate sear
 | Versioned config/payload | config_schema_version dan content_schema_version |
 | System/editorial checks terpisah | dua JSONB berbeda |
 | Tanpa embeddings | FTS, trigram, hash |
-| Multi-chat | locks, operation_key, revision |
+| Multi-chat | global operation ledger, leases, locks, dan revision CAS |
 | Tanpa background AI | plan adalah checkpoint, bukan job queue |
 | Tidak ada hard delete | lifecycle + on delete restrict |
 | Future niche tidak dipaksa menjadi trivia | module contract dan niche-specific junction |
@@ -2161,6 +2325,9 @@ Sebelum implementasi, module-contract.md dan trivia-content-dna.md harus diselar
 ## 29. Referensi teknis
 
 - Supabase — Securing your API: https://supabase.com/docs/guides/api/securing-your-api
+- Supabase — Securing your data: https://supabase.com/docs/guides/database/secure-data
+- Supabase — MCP Authentication: https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication
+- Supabase — Using custom schemas: https://supabase.com/docs/guides/api/using-custom-schemas
 - Supabase — Row Level Security: https://supabase.com/docs/guides/database/postgres/row-level-security
 - Supabase — Full Text Search: https://supabase.com/docs/guides/database/full-text-search
 - Supabase — Managing Indexes: https://supabase.com/docs/guides/database/postgres/indexes

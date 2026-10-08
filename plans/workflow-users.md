@@ -1,12 +1,18 @@
 # Panduan Workflow Pengguna — Content Producer MVP
 
-Dokumen ini adalah panduan operasional singkat. Aturan produk mengacu pada `plans/PRD.md`, sedangkan detail penyimpanan dan transaksi mengacu pada `plans/database-design.md`. MVP hanya memproduksi niche trivia, tetapi workflow core dirancang agar niche lain dapat ditambahkan tanpa mengubah cara kerja dasar pengguna.
+| Bagian | Keterangan |
+|---|---|
+| Versi | 1.1 |
+| Status | Frozen — baseline Phase 0 |
+| Tanggal | 7 Oktober 2026 |
+
+Dokumen ini adalah panduan operasional singkat. Aturan produk mengacu pada `plans/PRD.md`, detail penyimpanan dan transaksi mengacu pada `plans/database-design.md`, dan nama/kontrak tool mengacu pada `plans/tool-inventory.md`. MVP hanya memproduksi niche trivia, tetapi workflow core dirancang agar niche lain dapat ditambahkan tanpa mengubah cara kerja dasar pengguna.
 
 ## Workflow produksi satu post
 
 1. **Hubungkan plugin sebagai owner**
 
-   Saat koneksi pertama atau sesi autentikasi berakhir, selesaikan Supabase Auth OAuth 2.1. Plugin hanya boleh membaca atau mengubah workspace milik owner yang terautentikasi.
+   Pada setup pertama, remote MCP dihubungkan sebagai custom server dan diuji sebelum package plugin final dipasang. Saat koneksi pertama atau sesi berakhir, frontend auth minimal membuka login dan consent Supabase Auth OAuth 2.1. Periksa nama client dan scopes, lalu approve atau deny. Plugin hanya boleh membaca atau mengubah workspace milik owner yang terautentikasi; relink diperlukan setelah session/revocation tertentu.
 
 2. **Berikan permintaan dalam bahasa natural**
 
@@ -18,7 +24,7 @@ Dokumen ini adalah panduan operasional singkat. Aturan produk mengacu pada `plan
 
 3. **Sistem membaca konteks Page dan niche**
 
-   Plugin mengambil:
+   Plugin mengenali account connection, workspace, module catalog, lalu mengambil:
 
    - Identitas Page, zona waktu, dan target market.
    - Konfigurasi trivia Page.
@@ -47,7 +53,7 @@ Dokumen ini adalah panduan operasional singkat. Aturan produk mengacu pada `plan
 
 7. **Quality gate dijalankan**
 
-   Pemeriksaan sistem memastikan referensi data, reservasi, reuse rule, jadwal, schema version, revision, dan text budget valid. Pemeriksaan editorial menilai dukungan sumber, keamanan, kejelasan, bahasa, hook, CTA, caption, keterbacaan, dan risiko menyalin referensi.
+   Pemeriksaan sistem dihitung server-side untuk referensi data, reservasi, reuse rule, jadwal, schema version, revision, renderer, dan text budget. ChatGPT memberikan editorial attestation berversi untuk sumber, keamanan, kejelasan, bahasa, hook, CTA, caption, keterbacaan, dan risiko menyalin. Keduanya terikat pada fingerprint konten yang sama; tidak satu pun menggantikan persetujuan owner.
 
 8. **Draft disimpan dan ditampilkan**
 
@@ -93,7 +99,7 @@ Dokumen ini adalah panduan operasional singkat. Aturan produk mengacu pada `plan
 
    > Setujui post ini.
 
-   Setelah semua pemeriksaan lolos dan persetujuan diberikan, status berubah menjadi `ready`.
+   Setelah semua blocking checks lolos dan persetujuan diberikan secara eksplisit untuk revision/fingerprint current, status berubah menjadi `ready`. Jika approval dicabut, status kembali `draft`. Revisi konten atau koreksi fakta juga membuat approval lama tidak berlaku dan mengembalikan `ready` ke `draft`.
 
    Jika post tidak akan digunakan:
 
@@ -135,7 +141,7 @@ Sistem akan:
 
 1. Membuat satu `content_plan` untuk Page dan niche tersebut.
 2. Membuat satu `content_plan_item` untuk setiap tanggal atau slot yang diminta.
-3. Memproses item dalam chunk kecil, dengan default 3–5 post per putaran aktif.
+3. Mengklaim item dalam chunk kecil, default satu dan maksimum tiga post per putaran aktif, memakai lease 30 menit.
 4. Menjalankan workflow single-post untuk setiap item.
 5. Menyimpan setiap post segera setelah berhasil.
 6. Mempertahankan post yang sudah berhasil jika item lain gagal.
@@ -148,6 +154,10 @@ Untuk melanjutkan:
 > Lanjutkan content plan kalender Curious World yang belum selesai.
 
 Sistem hanya mengerjakan item yang belum selesai dan tidak membuat ulang post yang sudah tersimpan.
+
+Jika proses aktif mendekati batas lease, claim dapat diperpanjang satu kali. Kegagalan disimpan sebagai error aman; item failed dapat di-retry. Item expired dapat diklaim ulang tanpa background worker. Plan dapat dibatalkan secara eksplisit tanpa menghapus post yang sudah berhasil.
+
+Jika draft/ready hasil plan dibuang, item tidak otomatis membuat pengganti. Pengguna harus meminta replacement secara eksplisit. Replacement ditolak bila ada output yang pernah `posted` atau `archived`.
 
 Kalender yang dilihat pengguna tetap berupa daftar post berdasarkan tanggal. `content_plans` dan `content_plan_items` berfungsi sebagai checkpoint, bukan scheduler Facebook.
 
@@ -165,10 +175,13 @@ Semua chat memakai Supabase sebagai system of record. Database menangani:
 - Reuse rule Page tujuan.
 - Optimistic revision conflict.
 - Keunikan slot jadwal.
-- Idempotency operasi penting.
+- Idempotency global lintas seluruh write operation.
+- Claim lease dan stale recovery plan item.
 - Progress content plan.
 
 Jika dua chat mencoba memakai fakta yang sama atau mengubah post yang sama, salah satunya menerima conflict yang dapat ditindaklanjuti; sistem tidak menimpa data secara diam-diam.
+
+Retry setelah respons hilang memakai operation key logical yang sama. Jika key yang sama dipakai untuk operasi atau payload berbeda, server menolak request agar state lama tidak tertimpa.
 
 ## Status post
 
@@ -201,10 +214,17 @@ Post `posted`, `discarded`, atau `archived` tidak direvisi pada MVP. Jika diperl
 - “Tampilkan draft Page A minggu ini.”
 - “Ganti fakta nomor 4 pada post ABC123.”
 - “Setujui post ABC123.”
+- “Cabut persetujuan post ABC123.”
 - “Buang draft ABC123.”
+- “Buat pengganti untuk item plan yang post-nya dibuang.”
+- “Batalkan sisa content plan ini.”
 - “Pindahkan jadwal post ABC123 ke Jumat pukul 19.00.”
 - “Tandai ABC123 sudah diposting dan simpan URL ini.”
+- “Arsipkan post ABC123.”
+- “Verifikasi ulang fakta ini dengan sumber terbaru tanpa mengubah klaimnya.”
+- “Koreksi fakta ini dan simpan successor yang sudah diverifikasi.”
 - “Catat performa ABC123: …”
+- “Tampilkan histori performa ABC123.”
 - “Format trivia apa yang paling banyak menghasilkan share di Page A?”
 
 ## Yang tidak dilakukan MVP
@@ -215,6 +235,7 @@ Post `posted`, `discarded`, atau `archived` tidak direvisi pada MVP. Jika diperl
 - Tidak menjalankan generasi AI di background.
 - Tidak memakai OpenAI API atau embeddings.
 - Tidak mengaktifkan niche selain trivia.
+- Tidak menyediakan dashboard produk; halaman login/consent hanya dipakai saat autentikasi.
 
 Alur rutin akhirnya adalah:
 

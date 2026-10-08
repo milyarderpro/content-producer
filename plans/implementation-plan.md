@@ -6,8 +6,8 @@
 |---|---|
 | Nama produk | Content Producer |
 | Versi produk | MVP |
-| Versi dokumen | 1.0 |
-| Status | Rencana implementasi utama |
+| Versi dokumen | 1.1 |
+| Status | Approved — baseline eksekusi Phase 1–11 |
 | Tanggal | 7 Oktober 2026 |
 | Niche aktif | Trivia facts |
 | Pengguna MVP | Satu owner |
@@ -44,11 +44,14 @@ Jika terdapat konflik, gunakan urutan berikut:
 
 1. **plans/PRD.md** — kebutuhan dan batas produk.
 2. **plans/database-design.md** — schema, relasi, transaksi, RLS, dan invariant.
-3. **plans/module-contract.md** — kontrak setiap niche setelah dibuat.
-4. **plans/trivia-content-dna.md** — aturan editorial trivia setelah dibuat.
-5. **plans/implementation-plan.md** — urutan pengerjaan.
-6. Migration, source code, dan automated tests — implementasi aktual.
-7. **plans/workflow-users.md** — ringkasan operasional pengguna.
+3. **plans/module-contract.md** — kontrak setiap niche.
+4. **plans/trivia-content-dna.md** — aturan editorial trivia.
+5. **plans/tool-inventory.md** — 33 MCP tool contracts.
+6. **plans/use-case-inventory.md** — user goals dan frozen prompt suite.
+7. **plans/acceptance-traceability.md** — requirement-to-phase/evidence mapping.
+8. **plans/implementation-plan.md** — urutan pengerjaan.
+9. Migration, source code, dan automated tests — implementasi aktual.
+10. **plans/workflow-users.md** — ringkasan operasional pengguna.
 
 Perubahan kebutuhan harus dimulai dari PRD. Perubahan invariant database harus memperbarui database design sebelum migration final dibuat.
 
@@ -108,7 +111,7 @@ AI harus menyiapkan instruksi manual yang singkat, spesifik, dan hanya diberikan
 - Jangan menyimpan secret di Git.
 - Jangan membuat migration filename secara manual; gunakan Supabase CLI.
 - Jangan melakukan perubahan production hanya melalui Dashboard tanpa migration setara.
-- Jangan memakai OpenAI API, embeddings, vector database, Vercel, dashboard web, atau Facebook/Canva API pada MVP.
+- Jangan memakai OpenAI API, embeddings, vector database, product dashboard, atau Facebook/Canva API pada MVP. Frontend login/consent minimal diizinkan; vendor hosting tidak dikunci.
 
 ---
 
@@ -122,6 +125,7 @@ AI harus menyiapkan instruksi manual yang singkat, spesifik, dan hanya diberikan
 | MCP transport | Streamable HTTP |
 | MCP runtime | Satu Supabase Edge Function bernama mcp |
 | Authentication | Supabase Auth OAuth 2.1 |
+| Auth frontend | Minimal login/consent/logout/error SPA pada origin HTTPS stabil |
 | Authorization | Owner workspace, diperiksa server-side |
 | Database | Supabase Postgres |
 | AI generation | ChatGPT aktif pengguna |
@@ -129,12 +133,14 @@ AI harus menyiapkan instruksi manual yang singkat, spesifik, dan hanya diberikan
 | Niche MVP | Trivia |
 | Core | Netral terhadap niche |
 | Deduplikasi | Hash + structured ontology + FTS + pg_trgm + review semantik |
-| Batch | Active-turn, chunk 3–5, checkpoint di content plan |
+| Batch | Active-turn, claim default satu/maksimal tiga, checkpoint di content plan |
 | Publishing | Manual ke Canva dan Facebook |
 | Metrics | Manual melalui chat |
 | Hosted staging | Tidak wajib pada MVP |
 | Local environment | Supabase local development |
 | Production | Satu Supabase Free project |
+| Idempotency | Global `internal.operation_ledger` |
+| MCP surface | 33 focused tools; `/health` bukan tool |
 
 ---
 
@@ -154,7 +160,11 @@ content-producer/
 │   ├── workflow-users.md
 │   ├── implementation-plan.md
 │   ├── module-contract.md
-│   └── trivia-content-dna.md
+│   ├── trivia-content-dna.md
+│   ├── tool-inventory.md
+│   ├── use-case-inventory.md
+│   ├── acceptance-traceability.md
+│   └── phase-0-decision-register.md
 │
 ├── docs/
 │   ├── architecture/
@@ -173,6 +183,10 @@ content-producer/
 │               ├── core/
 │               └── niches/
 │                   └── trivia/
+│
+├── auth-frontend/
+│   ├── src/
+│   └── static-host-config/
 │
 ├── supabase/
 │   ├── config.toml
@@ -273,6 +287,8 @@ Menggunakan satu Supabase Free project untuk:
 - Secret storage.
 - Logs.
 
+Satu static HTTPS frontend terpisah hanya menangani login, OAuth consent/deny, logout, dan safe error state. Frontend bukan dashboard produk dan hanya memakai publishable key.
+
 Tidak ada hosted staging pada baseline MVP. Local environment menjadi staging teknis. Hosted staging dapat memakai project Free kedua hanya jika dibutuhkan dan kuota organisasi masih memungkinkan.
 
 ### 8.3 Free Plan constraints
@@ -300,14 +316,14 @@ Batas plan harus diperiksa ulang terhadap dokumentasi Supabase sebelum deploymen
 | 0 | Specification freeze | Module contract dan trivia DNA final |
 | 1 | Repository foundation | Struktur repo dan toolchain |
 | 2 | Supabase local foundation | Local project dan migration pipeline |
-| 3 | Core database | Delapan tabel core |
+| 3 | Core database | Delapan tabel core + dua tabel internal operasional |
 | 4 | Trivia database | Facts, junction, dedup, reservation |
 | 5 | RPC, lifecycle, dan security | Transactional API + RLS |
 | 6 | MCP Edge Function | Remote Streamable HTTP server |
-| 7 | Plugin dan skill | Installable private plugin package |
+| 7 | Plugin skill dan package source | Validated skill/package source tanpa registered connection final |
 | 8 | Verification suite | Full automated and content evaluation |
 | 9 | Production deployment | Production database dan MCP |
-| 10 | ChatGPT integration dan pilot | End-to-end content workflow |
+| 10 | ChatGPT connection, package final, dan pilot | Verified remote MCP + installed private plugin + end-to-end workflow |
 | 11 | Stabilization dan handoff | Operational readiness |
 
 ---
@@ -357,6 +373,8 @@ Menutup seluruh keputusan yang memengaruhi schema, tool contract, dan content be
    - Out-of-scope requests.
 6. Membuat traceability matrix dari acceptance criteria ke phase dan test.
 7. Menandai seluruh keputusan yang belum final.
+8. Menyinkronkan seluruh dokumen normatif terhadap keputusan accepted.
+9. Menjalankan audit final untuk coverage, tool-set equality, referensi, Markdown integrity, tenant isolation, quality gate, dedup eligibility, dan lineage; kemudian membekukan baseline.
 
 ## Pekerjaan manual pengguna
 
@@ -367,8 +385,10 @@ Menutup seluruh keputusan yang memengaruhi schema, tool contract, dan content be
 
 - plans/module-contract.md
 - plans/trivia-content-dna.md
-- Tool inventory final.
-- Acceptance-test traceability matrix.
+- plans/tool-inventory.md
+- plans/use-case-inventory.md
+- plans/acceptance-traceability.md
+- plans/phase-0-decision-register.md dengan gate 0.12 lulus.
 
 ## Verification gate
 
@@ -376,6 +396,8 @@ Menutup seluruh keputusan yang memengaruhi schema, tool contract, dan content be
 - Setiap requirement mempunyai implementation phase dan test.
 - Tidak ada niche selain trivia dalam scope implementasi.
 - Tidak ada keputusan schema kritis yang masih terbuka.
+- Exact set 33 tools, 31 user goals, dan 101 frozen prompts konsisten pada seluruh artefak terkait.
+- Tidak ada broken local document reference atau Markdown fence yang tidak seimbang.
 
 ## Rollback
 
@@ -393,24 +415,25 @@ Membuat monorepo, toolchain, conventions, dan quality commands yang menjadi dasa
 
 1. Memeriksa environment dan versi tool.
 2. Menggunakan help command resmi sebelum memakai Supabase CLI.
-3. Membuat struktur repository target.
-4. Membuat:
+3. Memverifikasi baseline platform saat implementasi: Supabase CLI minimal versi yang diwajibkan panduan Edge MCP current (saat baseline 0.11: 2.117.0), Node.js 20+ untuk CLI, dan Deno untuk Edge Function; versi final dipin setelah verification.
+4. Membuat struktur repository target.
+5. Membuat:
    - README.md
    - AGENTS.md
    - .gitignore
    - .editorconfig
    - .env.example
-5. Menentukan Deno/TypeScript configuration untuk Edge Function.
-6. Membuat scripts:
+6. Menentukan Deno/TypeScript configuration untuk Edge Function.
+7. Membuat scripts:
    - check
    - test-all
    - verify-migrations
    - package-plugin
    - smoke-test
-7. Menyiapkan dependency pinning dan lockfile.
-8. Menyiapkan lint, format, type-check, dan unit-test command.
-9. Memastikan artifacts dan local secrets di-ignore.
-10. Membuat baseline CI hanya jika repository remote dan kewenangan tersedia.
+8. Menyiapkan dependency pinning dan lockfile.
+9. Menyiapkan lint, format, type-check, dan unit-test command.
+10. Memastikan artifacts dan local secrets di-ignore.
+11. Membuat baseline CI hanya jika repository remote dan kewenangan tersedia.
 
 ## Pekerjaan manual pengguna
 
@@ -454,10 +477,11 @@ Membuat Supabase local environment dan migration workflow yang dapat direproduks
    - pgcrypto.
    - pg_trgm.
 5. Menentukan exposed schemas dan Data API policy lokal.
-6. Membuat test harness database.
-7. Membuat helper untuk reset, seed, dan verification.
-8. Membuktikan database kosong dapat start, reset, dan menerima migration baseline.
-9. Mendokumentasikan local development.
+6. Menetapkan hanya schema `api` sebagai business RPC surface; `public` dan `internal` tidak diekspos.
+7. Membuat test harness database.
+8. Membuat helper untuk reset, seed, dan verification.
+9. Membuktikan database kosong dapat start, reset, dan menerima migration baseline.
+10. Mendokumentasikan local development.
 
 ## Pekerjaan manual pengguna
 
@@ -496,10 +520,11 @@ Mengimplementasikan seluruh tabel core, constraint, index, dan config validation
 Migration dibuat melalui Supabase CLI berdasarkan kelompok berikut, tanpa mengarang filename:
 
 1. Workspace dan niche registry.
-2. Pages dan page niche configs.
-3. Content plans dan plan items.
-4. Posts dan post metrics.
-5. Core indexes dan validation helpers.
+2. Internal operation ledger dan rate-limit buckets.
+3. Pages dan page niche configs.
+4. Content plans dan plan items.
+5. Posts dan post metrics.
+6. Core indexes dan validation helpers.
 
 ## Pekerjaan AI
 
@@ -512,20 +537,22 @@ Migration dibuat melalui Supabase CLI berdasarkan kelompok berikut, tanpa mengar
    - content_plan_items.
    - posts.
    - post_metrics.
-2. Menambahkan public ID, ownership, timestamps, operation keys, dan revision.
-3. Menambahkan composite foreign keys untuk workspace/Page/niche.
-4. Menambahkan lifecycle constraints.
-5. Menambahkan schedule indexes.
-6. Menambahkan advisory-lock helper untuk Page+scheduled_at.
-7. Menambahkan JSON validators:
+2. Membuat `internal.operation_ledger` dan `internal.rate_limit_buckets` yang tidak diekspos.
+3. Menambahkan public ID, ownership, timestamps, audit link ke operation ledger yang terikat workspace, dan revision.
+4. Menambahkan claim lease fields pada plan item serta content hash/approval snapshot pada post.
+5. Menambahkan composite foreign keys untuk workspace/Page/niche.
+6. Menambahkan lifecycle constraints.
+7. Menambahkan schedule indexes.
+8. Menambahkan advisory-lock helper untuk Page+scheduled_at.
+9. Menambahkan JSON validators:
    - Workspace settings.
    - Trivia page config v1.
    - Plan config.
    - Post payload envelope.
    - System/editorial checks.
    - Metrics payload.
-8. Seed registry niche trivia.
-9. Membuat database tests untuk setiap invariant.
+10. Seed registry niche trivia.
+11. Membuat database tests untuk setiap invariant.
 
 ## Pekerjaan manual pengguna
 
@@ -540,12 +567,15 @@ Tidak ada, kecuali permission local runtime.
 
 ## Verification gate
 
-- Delapan tabel core tersedia.
+- Delapan tabel core dan dua tabel internal operasional tersedia.
 - Semua FK, unique, check, dan index lulus inspection.
 - Cross-workspace write ditolak.
+- Audit link business row ke operation ledger lintas-workspace ditolak.
 - Dua slot Page sama tidak dapat dibuat paralel.
 - Plan dapat menyimpan item sebelum post dibuat.
 - Metrics hanya valid untuk post published sesuai rule.
+- Operation key unik global dan replay/payload-mismatch semantics lulus.
+- Claim lease shape serta approval/content-hash shape valid.
 - Reset database dari nol lulus.
 
 ## Rollback
@@ -574,25 +604,26 @@ Mengimplementasikan canonical facts, deduplication, source/freshness, reservatio
    - Unit conversion.
    - Negation.
    - Time/location qualifiers.
-4. Membuat claim hash dan structured hash.
+4. Membuat claim hash, structured hash, dan eligibility flag yang hanya diisi validator server untuk structured match yang lengkap serta deterministic-safe.
 5. Membuat search vector dan trigram indexes.
 6. Membuat source validator.
 7. Membuat freshness policy.
 8. Membuat reservation state dan TTL.
-9. Membuat allocation states:
+9. Membuat fact lifecycle `needs_review/verified/rejected/invalidated/superseded`, dedup review snapshot, re-verification, dan correction lineage.
+10. Membuat allocation states:
    - allocated.
    - published.
    - released.
-10. Menambahkan source/hash/verified snapshots.
-11. Menambahkan topic_key dan fact_role.
-12. Membuat trigger proteksi canonical meaning.
-13. Membuat gold dedup fixture dari dataset referensi:
+11. Menambahkan immutable source/hash/identity/freshness snapshots.
+12. Menambahkan topic_key dan fact_role.
+13. Membuat trigger proteksi canonical meaning.
+14. Membuat gold dedup fixture minimal 150 unique cases dengan frozen holdout:
    - Exact duplicates.
    - Paraphrases.
    - Unit variants.
    - Anti-duplicates.
    - Risky claims.
-14. Membuat database tests untuk dedup, reuse, source, freshness, dan junction.
+15. Membuat database tests untuk dedup, structured-match eligibility, reuse, source, freshness, correction lineage termasuk self-reference/cycle, dan junction.
 
 ## Pekerjaan manual pengguna
 
@@ -607,13 +638,14 @@ Mengimplementasikan canonical facts, deduplication, source/freshness, reservatio
 
 ## Verification gate
 
-- Exact/structured duplicate constraints lulus.
+- Exact duplicate dan eligible structured-duplicate constraints lulus; structured collision yang belum eligible masuk review tanpa false merge.
 - Known paraphrase candidate recall mencapai target dokumen database.
 - Tidak ada false merge pada anti-duplicate gold set.
 - Workspace/page reuse berjalan sesuai config.
 - Released junction tidak memblokir reuse.
 - Junction tidak dapat menunjuk post non-trivia.
 - Canonical meaning tidak dapat diubah setelah pernah dipakai.
+- Reverify mempertahankan identity; correction/invalidation menjaga lineage dan tidak menulis ulang published snapshot.
 
 ## Rollback
 
@@ -630,47 +662,35 @@ Membuat seluruh operasi write atomic, owner-scoped, idempotent, dan aman terhada
 
 ## Pekerjaan AI
 
-1. Membuat RPC:
-   - create_page_with_niche_config.
-   - update_page_niche_config.
-   - get_page_generation_context.
-   - create_content_plan_with_items.
-   - claim_content_plan_items.
-   - retry_content_plan_item.
-   - trivia_find_similar_facts.
-   - trivia_register_and_reserve_facts.
-   - trivia_release_facts.
-   - save_trivia_post.
-   - revise_trivia_post.
-   - transition_post_status.
-   - record_post_performance.
-   - get_performance_insights.
-2. Menerapkan operation-key idempotency.
-3. Menerapkan expected-revision compare-and-swap.
-4. Menerapkan row locking berurutan.
+1. Membuat 33 public `api` operations satu-to-satu dengan `plans/tool-inventory.md`; helper internal boleh digunakan tetapi tidak ada generic executor/status mutation.
+2. Menerapkan global operation-ledger idempotency, canonical request hash, replay snapshot, dan payload mismatch rejection.
+3. Menerapkan expected-revision dan expected-content-hash compare-and-swap.
+4. Menerapkan global lock ordering dan timeout mapping.
 5. Menerapkan advisory lock jadwal lintas plan items dan posts.
-6. Menerapkan opportunistic reservation cleanup.
-7. Menerapkan lifecycle:
+6. Menerapkan plan claim, one-time renewal, safe failure, retry, explicit replacement, cancellation, serta stale recovery.
+7. Menerapkan opportunistic reservation cleanup, all-or-nothing reservation set, dan token/context validation.
+8. Menerapkan fact re-verification, correction, invalidation, successor lineage, dan dampaknya pada draft/ready/posted snapshots.
+9. Menerapkan lifecycle:
    - draft → ready.
    - ready → draft saat revisi.
    - draft/ready → discarded.
    - ready → posted.
    - posted → archived.
-8. Menerapkan release/publish junction secara atomic.
-9. Mengaktifkan RLS pada semua tabel.
-10. Membuat owner policies menggunakan auth.uid().
-11. Memisahkan Data API exposure dan grants.
-12. Mencabut direct table write dari authenticated.
-13. Membuat narrow write RPC boundary.
-14. Menggunakan SECURITY INVOKER secara default.
-15. Jika SECURITY DEFINER benar-benar diperlukan:
-    - Tempatkan business function di schema internal.
-    - Tetapkan search_path aman.
-    - Gunakan fully qualified names.
-    - Periksa auth.uid() dan ownership.
-    - Revoke PUBLIC/anon.
-16. Membuat stable error-code mapping.
-17. Menjalankan database advisors.
+10. Menerapkan server renderer, content hash, system checks, editorial attestation, owner approval, revoke, dan warning acceptance.
+11. Menerapkan release/publish junction secara atomic.
+12. Mengaktifkan RLS pada seluruh tabel business/internal sebagai defense in depth.
+13. Membuat owner policies menggunakan auth.uid().
+    - Policy untuk function-owner role sempit harus mempunyai ownership predicate yang sama; policy `TO authenticated` tidak dianggap berlaku otomatis.
+14. Mengekspos hanya schema `api`, menulis grants eksplisit, dan mencabut seluruh direct table read/write dari authenticated.
+15. Membuat narrow RPC allowlist dan database-backed rate limits.
+16. Menggunakan SECURITY INVOKER untuk helper yang tidak memerlukan elevated table access.
+17. Karena authenticated tidak mempunyai direct table privileges, membuat business RPC sebagai SECURITY DEFINER yang dimiliki role sempit `content_producer_api_owner` (`NOLOGIN`, tanpa `BYPASSRLS`, bukan table owner):
+    - Tempatkan entry point pada `api` dan helper pada schema internal yang tidak diekspos.
+    - Tetapkan `search_path = ''` dan gunakan fully qualified names.
+    - Periksa auth.uid(), OAuth client context, dan ownership di setiap operation.
+    - Pertahankan RLS; revoke PUBLIC/anon dan grant execute satu per satu hanya kepada authenticated.
+18. Membuat stable error-code mapping.
+19. Menjalankan database advisors.
 
 ## Pekerjaan manual pengguna
 
@@ -688,13 +708,14 @@ Tidak ada pada local environment.
 
 - User tanpa token ditolak.
 - Non-owner tidak dapat membaca atau menulis.
-- Direct table writes ditolak.
+- Direct table reads dan writes ditolak.
 - RPC owner berhasil.
 - Sepuluh reservation paralel menghasilkan satu pemenang.
 - Dua revisi paralel menghasilkan satu pemenang.
 - Schedule collision menghasilkan satu pemenang.
 - Retry compatible bersifat idempotent.
 - Retry operation key dengan payload berbeda ditolak.
+- Claim lease/reclaim, correction race, approval hash, revoke, dan rate-limit tests lulus.
 - Database advisors tidak memiliki temuan security kritis.
 
 ## Rollback
@@ -715,14 +736,15 @@ Menyediakan satu MCP server Streamable HTTP yang mengekspos focused tools kepada
 
 1. Membuat **supabase/functions/mcp/index.ts** sebagai entry point tipis.
 2. Membuat shared MCP server dan tool registry.
-3. Menambahkan OAuth token validation.
-4. Membuat request context:
+3. Menambahkan OAuth protected-resource discovery, `WWW-Authenticate`, dan token validation untuk issuer, audience/resource, exp/nbf, scopes, OAuth client, dan owner.
+4. Menetapkan `[functions.mcp] verify_jwt = false` agar discovery/challenge mencapai middleware; tidak ada tool yang boleh berjalan sebelum middleware auth lulus.
+5. Membuat request context:
    - Request ID.
    - Actor ID.
    - Workspace scope.
    - Safe logger.
-5. Mendaftarkan tools secara bertahap.
-6. Memberikan setiap tool:
+6. Mendaftarkan 33 tools secara bertahap.
+7. Memberikan setiap tool:
    - Action-oriented name.
    - Human-readable title.
    - Kapan tool digunakan.
@@ -730,21 +752,21 @@ Menyediakan satu MCP server Streamable HTTP yang mengekspos focused tools kepada
    - Explicit output schema.
    - Accurate annotations.
    - Safe structured errors.
-7. Menambahkan server instructions untuk urutan lintas-tool.
-8. Menetapkan readOnlyHint, destructiveHint, openWorldHint, dan idempotent behavior secara akurat.
-9. Membatasi payload dan result size.
-10. Menerapkan rate limiting yang wajar.
-11. Tidak mengembalikan internal bigint, secret, raw SQL, atau stack trace.
-12. Membuat structuredContent dan ringkasan text yang konsisten.
-13. Membuat function tests.
+8. Menambahkan server instructions untuk urutan lintas-tool.
+9. Menetapkan readOnlyHint, destructiveHint, openWorldHint, dan idempotent behavior secara akurat.
+10. Membatasi payload dan result size.
+11. Menghubungkan database-backed rate-limit groups.
+12. Tidak mengembalikan internal bigint, secret, raw SQL, atau stack trace.
+13. Membuat structuredContent dan ringkasan text yang konsisten.
+14. Menyediakan `GET /health` operasional di luar MCP tool list.
+15. Membuat function tests.
 
 ## Tool build order
 
 ### Foundation
 
-- health_check.
+- get_account_profile.
 - get_workspace_context.
-- list_niches.
 - list_pages.
 - get_page_generation_context.
 
@@ -752,26 +774,41 @@ Menyediakan satu MCP server Streamable HTTP yang mengekspos focused tools kepada
 
 - create_page.
 - update_page.
+- list_content_plans.
 - create_content_plan.
 - get_content_plan.
+- claim_content_plan_items.
+- renew_content_plan_claim.
+- report_content_plan_item_failure.
+- retry_content_plan_item.
+- replace_discarded_plan_item.
+- cancel_content_plan.
 
 ### Trivia
 
 - trivia_find_similar_facts.
 - trivia_register_and_reserve_facts.
 - trivia_release_facts.
+- trivia_reverify_fact.
+- trivia_correct_fact.
 
 ### Posts
 
 - save_post.
-- get_posts.
+- list_posts.
+- get_post.
 - revise_post.
+- reschedule_post.
+- approve_post.
+- revoke_post_approval.
 - discard_post.
-- update_post_status.
+- mark_post_posted.
+- archive_post.
 
 ### Metrics
 
 - record_post_performance.
+- get_post_performance.
 - get_performance_insights.
 
 ## Pekerjaan manual pengguna
@@ -789,7 +826,7 @@ Tidak ada untuk local implementation.
 ## Verification gate
 
 - MCP initialization berhasil.
-- Semua tools terdaftar.
+- Tepat 33 tools terdaftar dan metadata cocok dengan tool inventory.
 - Input invalid ditolak secara terstruktur.
 - Auth dipaksakan pada private reads dan writes.
 - Read/write annotations sesuai perilaku.
@@ -804,17 +841,17 @@ Tidak ada untuk local implementation.
 
 ---
 
-# Phase 7 — Plugin package dan skill
+# Phase 7 — Plugin skill dan package source
 
 ## Tujuan
 
-Membuat plugin private yang menggabungkan MCP server dan workflow skill.
+Membuat workflow skill dan package source yang siap difinalkan setelah remote MCP production terbukti terhubung. Phase ini tidak mengarang endpoint atau registered connection ID.
 
 ## Pekerjaan AI
 
-1. Membuat portable **plugin/plugin.json**.
-2. Membuat **plugin/mcp.json** dengan remote Streamable HTTP server.
-3. Membuat compatibility manifest hanya jika dibutuhkan hasil test host.
+1. Membuat portable **plugin/plugin.json** dengan identity dan presentation metadata tervalidasi.
+2. Menyiapkan schema/generator untuk **plugin/mcp.json** tanpa membuat file final berisi placeholder; file dengan URL production baru dibuat pada Phase 10 setelah custom MCP connection lulus.
+3. Menyiapkan compatibility manifest hanya jika dibutuhkan hasil test host; registered mapping tidak dibuat sebelum technical ID terverifikasi.
 4. Membuat **plugin/skills/content-producer/SKILL.md**.
 5. Membuat references/core:
    - workflow.
@@ -841,7 +878,7 @@ Membuat plugin private yang menggabungkan MCP server dan workflow skill.
    - Record performance.
 8. Memastikan skill tidak meminta secret.
 9. Memastikan skill tidak menganggap tool response sebagai authorization.
-10. Membuat package validation dan packaging script.
+10. Membuat package validation dan packaging script tanpa mengunggah package.
 
 ## Pekerjaan manual pengguna
 
@@ -849,19 +886,19 @@ Membuat plugin private yang menggabungkan MCP server dan workflow skill.
 
 ## Deliverables
 
-- Portable plugin package.
+- Portable plugin source/package candidate.
 - Content Producer skill.
 - Plugin package tests.
-- Artifact package lokal.
+- Artifact candidate lokal; final installable artifact dibuat pada Phase 10.
 
 ## Verification gate
 
 - Manifest valid.
 - Path package tidak keluar dari plugin root.
-- MCP mapping valid.
+- MCP config schema valid dan tidak berisi endpoint/connection ID rekaan.
 - Skill metadata dan instructions dapat dimuat.
 - Instruksi core dan trivia tidak bertentangan.
-- Plugin package tidak mengandung secret, test database, atau data production.
+- Package candidate tidak mengandung secret, test database, atau data production.
 
 ## Rollback
 
@@ -900,6 +937,9 @@ Membuktikan seluruh acceptance criteria sebelum production disentuh.
 - Plan/resume.
 - Metrics.
 - Idempotency.
+- Claim leases dan stale recovery.
+- Fact reverify/correction lineage.
+- Content hash, approval snapshot, dan rate limits.
 
 ### MCP tests
 
@@ -910,6 +950,8 @@ Membuktikan seluruh acceptance criteria sebelum production disentuh.
 - Error mapping.
 - Payload limits.
 - Response safety.
+- Tepat 33 tools serta `/health` yang tidak masuk tool list.
+- OAuth discovery, PKCE/resource/scopes, relink, dan token success `2xx`.
 
 ### Concurrency tests
 
@@ -919,6 +961,8 @@ Membuktikan seluruh acceptance criteria sebelum production disentuh.
 - Plan item versus direct post pada slot sama.
 - Repeated release.
 - Repeated status transition.
+- Fact correction versus approval/publish.
+- Lost response dan operation-ledger replay.
 
 ### Workflow tests
 
@@ -935,6 +979,14 @@ Membuktikan seluruh acceptance criteria sebelum production disentuh.
 - Cross-chat retrieval.
 - Record metrics.
 - Performance insights.
+- Revoke approval, metrics history, plan replacement/cancel, fact reverify/correct.
+
+### Prompt dan tool-selection evaluation
+
+- Jalankan 101 frozen prompts dari `plans/use-case-inventory.md`.
+- Direct pass 100%, indirect minimal 90%, overall minimal 95%, dan hard fail 0.
+- Buktikan 33/33 positive paths dan 33/33 boundary/recovery paths.
+- Jalankan generated paraphrases sebagai robustness supplement tanpa mengganti frozen cases.
 
 ### Content evaluation
 
@@ -970,10 +1022,13 @@ Membuktikan seluruh acceptance criteria sebelum production disentuh.
 - Security/advisors report.
 - Performance baseline.
 - Acceptance-criteria matrix.
+- Requirement trace report terhadap `plans/acceptance-traceability.md`.
+- Frozen prompt/tool-selection report.
 
 ## Verification gate
 
 - Seluruh acceptance criteria PRD lulus.
+- Seluruh requirement trace mempunyai evidence dan threshold prompt suite tercapai.
 - Tidak ada security issue kritis/high yang belum diterima.
 - Tidak ada data-integrity failure.
 - Output editorial pilot disetujui.
@@ -1002,22 +1057,24 @@ Men-deploy database dan MCP ke satu Supabase Free project secara aman dan dapat 
 ## Pekerjaan AI
 
 1. Memeriksa changelog dan dokumentasi Supabase terbaru.
-2. Memeriksa Supabase CLI version dan help.
+2. Memeriksa Supabase CLI version dan help; jangan melanjutkan bila lebih rendah dari minimum panduan Edge MCP current.
 3. Menautkan repository ke project yang benar.
 4. Memvalidasi target project ID sebelum write.
 5. Membuat pre-deployment export jika data sudah ada.
 6. Menjalankan migration secara berurutan.
 7. Memverifikasi migration list.
-8. Mengonfigurasi Auth/OAuth.
-9. Mengonfigurasi Data API exposure.
-10. Mengonfigurasi grants dan secrets.
-11. Men-deploy Edge Function MCP.
-12. Seed niche trivia.
-13. Membuat workspace owner melalui flow aman.
-14. Menjalankan smoke tests.
-15. Menjalankan database advisors.
-16. Memeriksa logs tanpa membocorkan secret.
-17. Menulis deployment report.
+8. Mengonfigurasi Supabase Auth sebagai OAuth 2.1 authorization server, discovery, DCR/client policy, Site URL, dan authorization path.
+9. Men-deploy frontend auth minimal dengan `/login`, `/oauth/consent`, `/logout`, approve/deny, safe error state, dan publishable key saja.
+10. Mengonfigurasi Data API agar hanya schema `api` menjadi business surface.
+11. Mengonfigurasi explicit grants dan secrets.
+12. Menetapkan Edge Function `mcp` `verify_jwt = false`, lalu mengandalkan protected-resource/OAuth middleware di dalam function.
+13. Men-deploy Edge Function MCP dan HTTP `/health`.
+14. Seed niche trivia.
+15. Membuat workspace owner melalui flow aman; public signup tetap disabled.
+16. Menjalankan smoke tests termasuk seluruh token success `2xx` behavior.
+17. Menjalankan database advisors.
+18. Memeriksa logs tanpa membocorkan secret.
+19. Menulis deployment report.
 
 ## Pekerjaan manual pengguna
 
@@ -1031,14 +1088,16 @@ Men-deploy database dan MCP ke satu Supabase Free project secara aman dan dapat 
 - Production schema.
 - Production Edge Function URL.
 - Auth configuration.
+- Auth frontend URL/deployment.
 - Deployment report.
 - Backup/export awal.
 
 ## Verification gate
 
-- Health check production berhasil.
+- HTTP `/health`, MCP initialize, dan 33-tool discovery production berhasil.
 - Request tanpa auth ditolak.
 - Owner request berhasil.
+- OAuth discovery, PKCE consent/deny, refresh/relink, dan token `2xx` berhasil.
 - RLS production sesuai local.
 - Semua migration tercatat.
 - Smoke workflow tidak meninggalkan reservation bocor.
@@ -1053,19 +1112,20 @@ Men-deploy database dan MCP ke satu Supabase Free project secara aman dan dapat 
 
 ---
 
-# Phase 10 — ChatGPT integration dan pilot
+# Phase 10 — ChatGPT connection, package final, dan pilot
 
 ## Tujuan
 
-Menghubungkan plugin private ke ChatGPT dan menyelesaikan satu siklus produksi nyata.
+Membuktikan remote MCP sebagai custom server terlebih dahulu, lalu memfinalkan plugin private dan menyelesaikan satu siklus produksi nyata.
 
 ## Pekerjaan AI
 
-1. Menyiapkan plugin package final.
-2. Menyiapkan URL MCP dan connection instructions.
-3. Menyiapkan test prompt langsung, tidak langsung, edge case, dan out-of-scope.
-4. Membimbing instalasi private plugin.
-5. Menjalankan end-to-end tests:
+1. Menyiapkan URL MCP production dan connection instructions.
+2. Menambahkan remote MCP sebagai custom server, menyelesaikan OAuth, dan memverifikasi profile, initialize, serta 33 tools.
+3. Menjalankan representative direct/indirect/edge/out-of-scope prompts terhadap custom server.
+4. Setelah koneksi terbukti, memfinalkan `plugin/mcp.json`, portable package, dan bila diperlukan registered MCP mapping dengan technical ID yang benar.
+5. Memvalidasi, membuat artifact final, lalu membimbing instalasi private plugin.
+6. Menjalankan end-to-end tests:
    - Connection.
    - Authentication.
    - List/create Page.
@@ -1078,16 +1138,15 @@ Menghubungkan plugin private ke ChatGPT dan menyelesaikan satu siklus produksi n
    - Interrupt/resume.
    - Mark posted.
    - Record metrics.
-6. Memeriksa tool-choice behavior.
-7. Memperbaiki instructions atau descriptions bila model memilih tool salah.
-8. Membuat Page pertama dan config trivia.
-9. Menghasilkan batch pilot kecil.
+7. Memeriksa tool-choice behavior terhadap frozen suite yang relevan.
+8. Memperbaiki instructions atau descriptions bila model memilih tool salah dan menjalankan regression suite.
+9. Membuat Page pertama dan config trivia.
+10. Menghasilkan batch pilot kecil.
 
 ## Pekerjaan manual pengguna
 
-- Membuka Plugin Directory atau custom plugin flow.
-- Memasang/mengaktifkan plugin.
-- Menyelesaikan OAuth consent.
+- Membuka custom MCP flow, lalu Plugin Directory setelah koneksi lolos.
+- Menyelesaikan OAuth consent dan memasang/mengaktifkan plugin final.
 - Memberikan preferensi Page.
 - Meninjau dan menyetujui konten.
 - Memindahkan pilot ke Canva.
@@ -1096,6 +1155,7 @@ Menghubungkan plugin private ke ChatGPT dan menyelesaikan satu siklus produksi n
 ## Deliverables
 
 - Plugin terpasang.
+- Custom MCP connection dan registered mapping yang terverifikasi.
 - Page production pertama.
 - Pilot posts.
 - End-to-end test report.
@@ -1250,11 +1310,12 @@ Threshold tersebut adalah operational trigger, bukan hard platform limit, dan ha
 ## 13. Security completion checklist
 
 - OAuth 2.1 aktif.
-- Owner identity diverifikasi setiap request.
+- Protected-resource/authorization-server metadata, PKCE S256, resource/audience, scopes, dan `WWW-Authenticate` teruji.
+- Owner identity dan OAuth client context diverifikasi setiap request di middleware meskipun gateway `verify_jwt = false`.
 - user_metadata tidak digunakan untuk authorization.
 - RLS aktif pada semua tabel exposed.
 - UPDATE policy memiliki USING dan WITH CHECK.
-- authenticated tidak memiliki direct business-table writes.
+- authenticated tidak memiliki direct business-table reads atau writes.
 - anon tidak memiliki business access.
 - SECURITY DEFINER tidak berada di exposed schema tanpa proteksi.
 - PUBLIC execute dicabut.
@@ -1266,6 +1327,7 @@ Threshold tersebut adalah operational trigger, bukan hard platform limit, dan ha
 - Source URLs dan metadata divalidasi.
 - Prompt injection dari halaman sumber diperlakukan sebagai untrusted data.
 - Database advisors lulus tanpa temuan kritis.
+- Token endpoint menerima seluruh success `2xx`; session revoke/relink recovery teruji.
 
 ---
 
@@ -1287,6 +1349,7 @@ Threshold tersebut adalah operational trigger, bukan hard platform limit, dan ha
 - Caption tidak menambah klaim.
 - Teks tidak menyalin dataset atau sumber secara substansial.
 - System checks dan editorial checks tersimpan terpisah.
+- Owner approval tersimpan terpisah, terikat content hash/revision current, dan tidak dapat melewati blocking checks.
 
 ---
 
@@ -1297,11 +1360,11 @@ Implementasi MVP selesai hanya jika:
 1. Semua fase 0–11 lulus.
 2. Repository dapat disiapkan dari fresh checkout.
 3. Database dapat dibuat ulang dari migration.
-4. Sepuluh tabel aplikasi dan seluruh invariant tersedia.
+4. Sepuluh tabel aplikasi, dua tabel internal operasional, dan seluruh invariant tersedia.
 5. OAuth, ownership, RLS, grants, dan Data API exposure terverifikasi.
 6. MCP berjalan sebagai satu Supabase Edge Function.
 7. Portable plugin package valid dan terpasang.
-8. Semua tools lulus contract tests.
+8. Tepat 33 tools lulus contract tests dan `/health` tetap bukan model-callable tool.
 9. Reservation, revision, dan schedule concurrency tests lulus.
 10. Dedup gold set memenuhi target.
 11. Single post, batch, calendar, dan resume berfungsi.
@@ -1311,8 +1374,9 @@ Implementasi MVP selesai hanya jika:
 15. Production smoke test lulus.
 16. Backup/export dan restore procedure tersedia.
 17. Tidak ada defect security/data-integrity kritis.
-18. Dokumentasi sesuai source code.
-19. Tidak ada OpenAI API, embeddings, Vercel, dashboard, atau auto-posting dalam runtime MVP.
+18. Dokumentasi sesuai source code dan acceptance trace report lengkap.
+19. Seluruh 101 frozen prompts memenuhi threshold dengan zero hard fail.
+20. Tidak ada OpenAI API, embeddings, product dashboard, atau auto-posting dalam runtime MVP; frontend auth minimal diperbolehkan.
 
 ---
 
@@ -1320,17 +1384,17 @@ Implementasi MVP selesai hanya jika:
 
 | Phase | Status awal | Gate |
 |---:|---|---|
-| 0 — Specification freeze | Not started | Dokumen dan traceability disetujui |
+| 0 — Specification freeze | Complete | Final audit 0.12 lulus; baseline dibekukan |
 | 1 — Repository foundation | Not started | Toolchain lulus |
 | 2 — Supabase local foundation | Not started | Local reset/migration lulus |
 | 3 — Core database | Not started | Core tests lulus |
 | 4 — Trivia database | Not started | Dedup/reuse tests lulus |
 | 5 — RPC dan security | Not started | Security/concurrency lulus |
 | 6 — MCP Edge Function | Not started | Inspector/contract lulus |
-| 7 — Plugin dan skill | Not started | Package validation lulus |
+| 7 — Plugin skill/package source | Not started | Source/package candidate validation lulus |
 | 8 — Full verification | Not started | Acceptance criteria lulus |
 | 9 — Production deployment | Not started | Production smoke lulus |
-| 10 — ChatGPT pilot | Not started | End-to-end pilot lulus |
+| 10 — MCP connection/package/pilot | Not started | Remote MCP, final plugin, dan end-to-end pilot lulus |
 | 11 — Stabilization | Not started | Production readiness disetujui |
 
 Status yang digunakan:
@@ -1352,6 +1416,9 @@ Phase tracker diperbarui setiap kali fase dimulai atau selesai.
 - OpenAI — Skills: https://developers.openai.com/plugins/concepts/skills
 - OpenAI — Authentication: https://developers.openai.com/plugins/build/auth
 - Supabase — Deploy MCP servers: https://supabase.com/docs/guides/ai-tools/byo-mcp
+- Supabase — MCP Authentication: https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication
+- Supabase — OAuth server getting started: https://supabase.com/docs/guides/auth/oauth-server/getting-started
+- Supabase — OAuth token endpoint HTTP 200 change: https://supabase.com/changelog/45468-breaking-change-oauth-token-endpoint-will-return-http-200-instead-of-201
 - Supabase — Edge Function limits: https://supabase.com/docs/guides/functions/limits
 - Supabase — Securing your API: https://supabase.com/docs/guides/api/securing-your-api
 - Supabase — Row Level Security: https://supabase.com/docs/guides/database/postgres/row-level-security
