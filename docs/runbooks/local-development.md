@@ -59,10 +59,10 @@ order, and runs the local seed. It does not delete files in
 `supabase/migrations/`; migration source is the reproducible record and must
 remain under version control.
 
-At Phase 2, `supabase/seed.sql` is deliberately a no-op. It exists so local
-start and reset always have an explicit, reproducible seed step. No business
-tables or business data may be added until their scheduled implementation
-phase.
+At Phase 3, `supabase/seed.sql` remains deliberately a no-op. It exists so
+local start and reset always have an explicit, reproducible seed step. The
+generic `trivia` niche registry is migration-managed; it is not seed data.
+Phase 4 owns trivia-specific storage and facts.
 
 To run the current seed file again without resetting:
 
@@ -91,23 +91,23 @@ pnpm run verify-migrations
 The first command compares the checked-in migration history with the running
 local database. The second validates migration filenames in the repository.
 
-## Database boundary at Phase 2
+## Database boundary at Phase 3
 
 `supabase/config.toml` configures `api` as the only Content Producer business
 RPC schema. Supabase also includes platform schemas such as `public` and
 `storage` in its local runtime. Their technical presence does not authorize a
 business Data API surface:
 
-- `public` will store future business tables, but caller roles have no direct
-  business-object grants.
+- `public` contains the Phase 3 core business tables, but caller roles have no
+  direct business-object grants.
 - `api` is reserved for the reviewed business-RPC allowlist introduced in
-  Phase 5; Phase 2 creates no RPCs.
+  Phase 5; Phases 2 and 3 create no RPCs.
 - `storage` is a platform service, not a Content Producer RPC schema.
 - `internal` is neither configured as a Data API schema nor granted to caller
   roles.
 
 Object privileges, Data API schema configuration, and row-level security are
-separate controls. The Phase 2 migration establishes explicit default
+separate controls. The baseline and Phase 3 migrations establish explicit
 privilege revokes; `auto_expose_new_tables = false` is only additional defense
 in depth. Future table migrations must still set explicit grants and RLS
 policies appropriate to their access model.
@@ -133,7 +133,7 @@ and OAuth/DCR discovery baseline:
 pnpm run test:database
 ```
 
-Run the Phase 2 smoke test, which checks repository structure, migration
+Run the repository smoke test, which checks repository structure, migration
 naming, and the local database baseline:
 
 ```sh
@@ -191,4 +191,4 @@ it from migrations plus seed, while preserving the migration source files.
 All commands above are local. Do not run `supabase login`, `supabase link`,
 `supabase db push`, `supabase db reset --linked`, or any deployment command as
 part of this runbook. No remote project has been linked or modified during
-Phase 2.
+Phases 2 or 3.

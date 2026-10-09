@@ -1,3 +1,4 @@
--- Phase 2 intentionally seeds no business data.
--- This file keeps local start and reset reproducible until Phase 3 defines
--- application tables and Phase 4 defines the trivia registry seed.
+-- Phase 3 intentionally keeps this seed file as a no-op.
+-- The generic `trivia` niche registry row is deterministic migration-managed
+-- Phase 3 data. Phase 4 adds trivia-fact storage and fact-specific data, not
+-- the generic niche registry.

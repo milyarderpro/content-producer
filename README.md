@@ -6,18 +6,20 @@ designed for future niche modules.
 
 ## Repository status
 
-Phase 2 adds a reproducible local Supabase foundation: configuration, one
-baseline migration, a no-op seed, and database verification. It still contains
-no business tables, business RPCs, deployed resources, MCP handler, production
-plugin connection, or Facebook/Canva integration.
+Phase 3 adds the generic local database core on top of the reproducible
+Supabase foundation: eight core tables in `public`, two operational tables in
+`internal`, versioned evidence validators, tenant-isolation constraints, and
+database verification. It still contains no public business RPCs, deployed
+resources, MCP handler, production plugin connection, or Facebook/Canva
+integration.
 
 ## Prerequisites
 
 - Node.js 24.15.0 is the local and CI runtime baseline. Node 20 and Node 26
   are outside the supported project range.
 - pnpm 10.33.2 or a Corepack-managed equivalent.
-- Supabase CLI 2.117.0+ and Docker access are required before beginning Phase
-  2, when the local Supabase stack and its Docker Edge Runtime are introduced.
+- Supabase CLI 2.117.0+ and Docker access are required for local Supabase work
+  from Phase 2 onward, including the Phase 3 database suite.
 - Standalone Deno is optional. The checked-in `.deno-version`,
   `supabase/functions/deno.json`, and Deno foundation test support developers
   who choose to run `deno fmt`, `deno lint`, `deno test`, or the Deno LSP
@@ -53,7 +55,8 @@ runtime decision.
 - `auth-frontend/` is limited to login, OAuth consent, logout, and safe errors.
   It is not a product dashboard.
 - `supabase/` contains local project configuration, migrations, Edge Functions,
-  and database tests. Phase 2 initializes the Supabase project.
+  and database tests. Phase 2 initializes the project; Phase 3 adds the generic
+  core schema only.
 - `tests/` contains cross-cutting tests; `supabase/tests/` contains database and
   function fixtures.
 
