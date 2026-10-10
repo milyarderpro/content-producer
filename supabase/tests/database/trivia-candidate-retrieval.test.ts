@@ -270,26 +270,55 @@ describe('Phase 4 checkpoint 4.4 gold development gate', () => {
     expect(gunzipSync(Buffer.from(frozenArtifact, 'base64')).toString('utf8')).toBe(
       expectedContent,
     );
+
+    const report = JSON.parse(
+      readFileSync(
+        resolve(import.meta.dirname, '../fixtures/trivia/dedup-v1/evaluation-report-v1.json'),
+        'utf8',
+      ),
+    ) as {
+      fixture_manifest_version: number;
+      threshold_schema_version: number;
+      evaluated_splits: Record<string, { case_count: number; status: string }>;
+      results: Record<string, boolean | number>;
+    };
+    expect(report.fixture_manifest_version).toBe(2);
+    expect(report.threshold_schema_version).toBe(1);
+    expect(report.evaluated_splits.development).toEqual({ case_count: 105, status: 'passed' });
+    expect(report.evaluated_splits.holdout).toEqual({ case_count: 45, status: 'passed' });
+    expect(report.results).toMatchObject({
+      exact_precision: 1,
+      exact_recall: 1,
+      eligible_structured_precision: 1,
+      candidate_recall_at_20: 1,
+      false_automatic_merges: 0,
+      unsafe_automatic_actions: 0,
+      deterministic_repeatability: true,
+    });
   });
 
-  it('evaluates every development fixture through the private database helper', () => {
-    const development = goldCases.filter((item) => item.split === 'development');
-    const suffix = `${process.pid}${Date.now()}`;
-    const cases = sqlLiteral(
-      JSON.stringify(
-        development.map((item) => ({
-          fixture_id: item.fixture_id,
-          expected_decision: item.expected_decision,
-          expected_signals: item.expected_signals,
-          material_differences: item.material_differences,
-          left: item.left,
-          right: item.right,
-        })),
-      ),
-    );
+  it.each([
+    ['development', goldCases.filter((item) => item.split === 'development')],
+    ['frozen holdout', goldCases.filter((item) => item.split === 'holdout')],
+  ])(
+    'evaluates %s through the private database helper',
+    (_split, evaluationCases) => {
+      const suffix = `${process.pid}${Date.now()}`;
+      const cases = sqlLiteral(
+        JSON.stringify(
+          evaluationCases.map((item) => ({
+            fixture_id: item.fixture_id,
+            expected_decision: item.expected_decision,
+            expected_signals: item.expected_signals,
+            material_differences: item.material_differences,
+            left: item.left,
+            right: item.right,
+          })),
+        ),
+      );
 
-    expect(() =>
-      query(`
+      expect(() =>
+        query(`
         do $$
         declare
           item jsonb;
@@ -341,12 +370,14 @@ describe('Phase 4 checkpoint 4.4 gold development gate', () => {
             end;
           end loop;
           if exact_hit<>exact_total or structured_hit<>structured_total or candidate_hit<>candidate_total or unsafe_actions<>0 then
-            raise exception 'development metrics failed exact precision/recall %/% structured precision %/% recall@20 %/% unsafe auto-action %/%',exact_hit,exact_total,structured_hit,structured_total,candidate_hit,candidate_total,unsafe_actions,unsafe_total;
+            raise exception 'dedup evaluation failed exact precision/recall %/% structured precision %/% recall@20 %/% unsafe auto-action %/%',exact_hit,exact_total,structured_hit,structured_total,candidate_hit,candidate_total,unsafe_actions,unsafe_total;
           end if;
         end $$;
       `),
-    ).not.toThrow();
-  }, 60_000);
+      ).not.toThrow();
+    },
+    60_000,
+  );
 
   it('uses the expected indexes in actual exact, structured, FTS, and trigram plans', () => {
     const suffix = `${process.pid}${Date.now()}`;

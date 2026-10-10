@@ -94,7 +94,6 @@ function parseJsonOutput(output: string, command: string): JsonRecord {
     if (!isJsonRecord(parsed)) {
       throw new Error(`${command} returned a JSON value instead of an object.`);
     }
-
     return parsed;
   } catch (error) {
     throw new Error(

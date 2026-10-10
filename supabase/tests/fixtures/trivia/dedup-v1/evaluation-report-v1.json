@@ -1,0 +1,28 @@
+{
+  "report_schema_version": 1,
+  "fixture_manifest_version": 2,
+  "threshold_schema_version": 1,
+  "checkpoint": "phase-4.7",
+  "fixture_source": "cases.v1.jsonl",
+  "holdout_checksum_file": "holdout.sha256",
+  "evaluation_evidence": "supabase/tests/database/trivia-candidate-retrieval.test.ts",
+  "evaluated_splits": {
+    "development": {
+      "case_count": 105,
+      "status": "passed"
+    },
+    "holdout": {
+      "case_count": 45,
+      "status": "passed"
+    }
+  },
+  "results": {
+    "exact_precision": 1,
+    "exact_recall": 1,
+    "eligible_structured_precision": 1,
+    "candidate_recall_at_20": 1,
+    "false_automatic_merges": 0,
+    "unsafe_automatic_actions": 0,
+    "deterministic_repeatability": true
+  }
+}
