@@ -1,0 +1,6 @@
+{
+  "threshold_schema_version": 1,
+  "trigram_candidate_minimum": 0.2,
+  "candidate_limit": 20,
+  "auto_match_policy": "Only exact claim or eligible exact structured identity may be auto-matched. FTS, trigram, entity, numeric, qualifier, and source-overlap signals are candidate-only."
+}

@@ -1,0 +1,25 @@
+{
+  "fixture_manifest_version": 2,
+  "normalization_version": 1,
+  "ontology_version": 1,
+  "total_cases": 150,
+  "development_cases": 105,
+  "holdout_cases": 45,
+  "case_source": "cases.v1.jsonl",
+  "holdout_content_source": "the ordered holdout records in cases.v1.jsonl",
+  "holdout_checksum_file": "holdout.sha256",
+  "thresholds_file": "thresholds-v1.json",
+  "datasets": {
+    "curious_mind": 50,
+    "dyk": 50,
+    "daily_facts": 50
+  },
+  "categories": {
+    "exact": 30,
+    "paraphrase": 40,
+    "alias_unit": 20,
+    "anti_duplicate": 50,
+    "risky_review": 10
+  },
+  "holdout_policy": "The SHA-256 checksum binds the ordered holdout records in cases.v1.jsonl. Batch A development evaluation must reject holdout records and inspect only their checksum/integrity. Thresholds are fixed in thresholds-v1.json and may only be changed with a new fixture manifest version."
+}
