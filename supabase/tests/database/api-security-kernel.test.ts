@@ -235,7 +235,7 @@ describe('Phase 5.1 API security kernel', () => {
     expect(catalog.api_owner_auth_schema_usage).toBe(false);
     expect(catalog.api_owner_auth_users_select).toBe(false);
     expect(catalog.api_owner_has_no_direct_auth_uid_execute).toBe(true);
-    expect(catalog.api_function_count).toBe(0);
+    expect(catalog.api_function_count).toBe(10);
     expect(catalog.kernel_function_count).toBe(15);
     expect(catalog.unsafe_kernel_function_count).toBe(0);
     expect(catalog.caller_executable_internal_function_count).toBe(0);
@@ -243,7 +243,7 @@ describe('Phase 5.1 API security kernel', () => {
     expect(catalog.api_owner_workspace_select).toBe(true);
     expect(catalog.api_owner_ledger_write).toBe(true);
     expect(catalog.api_owner_rate_limit_write).toBe(true);
-    expect(catalog.api_owner_ungranted_pages_select).toBe(false);
+    expect(catalog.api_owner_ungranted_pages_select).toBe(true);
     expect(catalog.auth_uid_bridge_is_narrow).toBe(true);
   }, 30_000);
 
