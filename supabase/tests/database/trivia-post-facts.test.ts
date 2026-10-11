@@ -407,7 +407,7 @@ describe('Phase 4 checkpoint 4.5 trivia post-fact usage snapshots', () => {
                 and relname in ('workspaces', 'niches', 'pages', 'page_niche_configs', 'content_plans', 'content_plan_items',
                   'posts', 'post_metrics', 'trivia_facts', 'trivia_post_facts', 'operation_ledger', 'rate_limit_buckets')
                 and relrowsecurity) <> 12
-            or (select count(*) from information_schema.routines where routine_schema = 'api') <> 10 then
+            or (select count(*) from information_schema.routines where routine_schema = 'api') <> 13 then
             raise exception 'Phase 4 inventory or API boundary changed';
           end if;
 
