@@ -1215,8 +1215,10 @@ describe('Phase 5.3 page and content-plan write RPCs', () => {
         has_table_privilege('authenticated', 'public.content_plan_items', 'select,insert') as caller_items_access
     `);
 
-    expect(catalog.api_function_count).toBe(13);
+    expect(catalog.api_function_count).toBe(19);
     expect(String(catalog.api_function_names).replace(/[{}]/g, '').split(',')).toEqual([
+      'cancel_content_plan',
+      'claim_content_plan_items',
       'create_content_plan',
       'create_page',
       'get_account_profile',
@@ -1229,9 +1231,13 @@ describe('Phase 5.3 page and content-plan write RPCs', () => {
       'list_content_plans',
       'list_pages',
       'list_posts',
+      'renew_content_plan_claim',
+      'replace_discarded_plan_item',
+      'report_content_plan_item_failure',
+      'retry_content_plan_item',
       'update_page',
     ]);
-    expect(catalog.authenticated_execute_count).toBe(13);
+    expect(catalog.authenticated_execute_count).toBe(19);
     expect(catalog.non_authenticated_execute_count).toBe(0);
     expect(catalog.unsafe_api_function_count).toBe(0);
     expect(catalog.public_execute_count).toBe(0);

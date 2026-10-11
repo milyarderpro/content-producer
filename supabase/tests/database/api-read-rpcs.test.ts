@@ -325,7 +325,7 @@ function businessState(workspacePublicId: string): JsonRecord {
 }
 
 describe('Phase 5.2 owner-scoped read projections', () => {
-  it('exposes exactly the thirteen authenticated API RPCs with narrow catalog privileges', () => {
+  it('exposes exactly the nineteen authenticated API RPCs with narrow catalog privileges', () => {
     const catalog = querySingleRow(`
       with api_functions as (
         select procedure.oid, procedure.proname
@@ -346,8 +346,10 @@ describe('Phase 5.2 owner-scoped read projections', () => {
         has_table_privilege('service_role', 'public.post_metrics', 'select') as service_role_metrics_select
     `);
 
-    expect(catalog.api_function_count).toBe(13);
+    expect(catalog.api_function_count).toBe(19);
     expect(String(catalog.api_function_names).replace(/[{}]/g, '').split(',')).toEqual([
+      'cancel_content_plan',
+      'claim_content_plan_items',
       'create_content_plan',
       'create_page',
       'get_account_profile',
@@ -360,9 +362,13 @@ describe('Phase 5.2 owner-scoped read projections', () => {
       'list_content_plans',
       'list_pages',
       'list_posts',
+      'renew_content_plan_claim',
+      'replace_discarded_plan_item',
+      'report_content_plan_item_failure',
+      'retry_content_plan_item',
       'update_page',
     ]);
-    expect(catalog.authenticated_execute_count).toBe(13);
+    expect(catalog.authenticated_execute_count).toBe(19);
     expect(catalog.non_authenticated_execute_count).toBe(0);
     expect(catalog.caller_internal_helper_count).toBe(0);
     expect(catalog.api_owner_create).toBe(false);
