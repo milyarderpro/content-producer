@@ -490,17 +490,26 @@ describe('Checkpoint 5.4 public plan lifecycle', () => {
         owner_rows: number;
         immutable: boolean;
         no_delete: boolean;
-        no_status_write: boolean;
+        no_unplanned_post_write: boolean;
+        no_plan_post_mutation: boolean;
       }>(`select
         (select count(*) from internal.content_plan_item_events where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')) owner_rows,
         not has_table_privilege('content_producer_api_owner','internal.content_plan_item_events','UPDATE') immutable,
         not has_table_privilege('content_producer_api_owner','internal.content_plan_item_events','DELETE') no_delete,
-        not has_column_privilege('content_producer_api_owner','public.posts','status','UPDATE') no_status_write`);
+        -- CR-012 adds only the columns needed by atomic fact-correction impact.
+        not exists(select 1 from pg_attribute a where a.attrelid='public.posts'::regclass and a.attnum>0 and not a.attisdropped
+          and a.attname not in ('id','status','quality_status','revision','ready_at','approval_snapshot','system_checks','editorial_checks')
+          and has_column_privilege('content_producer_api_owner','public.posts',a.attname,'UPDATE')) no_unplanned_post_write,
+        not exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+          where ((n.nspname='internal' and p.proname like 'plan_%') or (n.nspname='api' and p.proname in
+            ('claim_content_plan_items','renew_content_plan_claim','report_content_plan_item_failure','retry_content_plan_item','replace_discarded_plan_item','cancel_content_plan')))
+            and p.prosrc ~* 'update[[:space:]]+public[.]posts') no_plan_post_mutation`);
       expect(ownerAccess).toEqual({
         owner_rows: 1,
         immutable: true,
         no_delete: true,
-        no_status_write: true,
+        no_unplanned_post_write: true,
+        no_plan_post_mutation: true,
       });
       expect(
         sql(`begin; do $$ begin perform set_config('request.jwt.claims',${json({ sub: f.owner, role: 'authenticated', client_id: 'owner' })}::text,true); end $$;

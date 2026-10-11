@@ -1215,7 +1215,7 @@ describe('Phase 5.3 page and content-plan write RPCs', () => {
         has_table_privilege('authenticated', 'public.content_plan_items', 'select,insert') as caller_items_access
     `);
 
-    expect(catalog.api_function_count).toBe(19);
+    expect(catalog.api_function_count).toBe(24);
     expect(String(catalog.api_function_names).replace(/[{}]/g, '').split(',')).toEqual([
       'cancel_content_plan',
       'claim_content_plan_items',
@@ -1235,9 +1235,14 @@ describe('Phase 5.3 page and content-plan write RPCs', () => {
       'replace_discarded_plan_item',
       'report_content_plan_item_failure',
       'retry_content_plan_item',
+      'trivia_correct_fact',
+      'trivia_find_similar_facts',
+      'trivia_register_and_reserve_facts',
+      'trivia_release_facts',
+      'trivia_reverify_fact',
       'update_page',
     ]);
-    expect(catalog.authenticated_execute_count).toBe(19);
+    expect(catalog.authenticated_execute_count).toBe(24);
     expect(catalog.non_authenticated_execute_count).toBe(0);
     expect(catalog.unsafe_api_function_count).toBe(0);
     expect(catalog.public_execute_count).toBe(0);
