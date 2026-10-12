@@ -140,7 +140,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'expensive_read',
     write: false,
     requiredGuards: [],
-    testOwner: 'api-trivia-rpcs.test.ts',
+    testOwner: 'api-trivia-facts.test.ts',
   },
   {
     name: 'trivia_register_and_reserve_facts',
@@ -148,7 +148,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'contention_write',
     write: true,
     requiredGuards: ['operation_key', 'expected_config_updated_at'],
-    testOwner: 'api-trivia-rpcs.test.ts',
+    testOwner: 'api-trivia-facts.test.ts',
   },
   {
     name: 'trivia_release_facts',
@@ -156,7 +156,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'contention_write',
     write: true,
     requiredGuards: ['operation_key', 'reservation_token'],
-    testOwner: 'api-trivia-rpcs.test.ts',
+    testOwner: 'api-trivia-facts.test.ts',
   },
   {
     name: 'trivia_reverify_fact',
@@ -164,7 +164,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'write',
     write: true,
     requiredGuards: ['operation_key', 'expected_fact_updated_at'],
-    testOwner: 'api-trivia-rpcs.test.ts',
+    testOwner: 'api-trivia-correction.test.ts',
   },
   {
     name: 'trivia_correct_fact',
@@ -172,7 +172,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'contention_write',
     write: true,
     requiredGuards: ['operation_key', 'expected_fact_updated_at', 'explicit_correction'],
-    testOwner: 'api-trivia-rpcs.test.ts',
+    testOwner: 'api-trivia-correction.test.ts',
   },
   {
     name: 'list_posts',
@@ -288,7 +288,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'read',
     write: false,
     requiredGuards: [],
-    testOwner: 'api-read-rpcs.test.ts',
+    testOwner: 'api-metrics-insights.test.ts',
   },
   {
     name: 'get_performance_insights',
@@ -296,7 +296,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'expensive_read',
     write: false,
     requiredGuards: [],
-    testOwner: 'api-read-rpcs.test.ts',
+    testOwner: 'api-metrics-insights.test.ts',
   },
 ];
 

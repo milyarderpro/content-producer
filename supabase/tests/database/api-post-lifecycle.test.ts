@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
+import { record, metricRpc } from './helpers/metrics-rpc.js';
 import {
   approve,
   archive,
@@ -148,10 +149,8 @@ describe('Checkpoint 5.7 public explicit lifecycle', () => {
       ).toBe(true);
       const publishedEvidence = evidence(p),
         publishedUsage = usages(p);
-      // Administrative metric fixture until the 5.8 write exists; archive itself is public.
-      sql(
-        `insert into public.post_metrics(workspace_id,page_id,post_id,captured_at,views) select workspace_id,page_id,id,'2026-10-12T03:00:00Z',12 from public.posts where public_id='${p.post_public_id}'`,
-      );
+      // Complete Phase 5 retention now records observations through the public writer.
+      metricRpc(f, record(f, p, { views: 12 }, '2026-10-12T03:00:00Z'));
       const metrics = row(
         `select to_jsonb(m) metric from public.post_metrics m where post_id=(select id from public.posts where public_id='${p.post_public_id}')`,
       );

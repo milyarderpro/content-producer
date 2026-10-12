@@ -1,0 +1,983 @@
+{
+  "baseline": "05958bf",
+  "migration_count": 63,
+  "manifest": [
+    {
+      "file": "20261008045700_baseline_extensions_and_schemas.sql",
+      "sha256": "87b7b398dfdeaea64b29cfee302a74479298437ad14aa2cd1471599ee2f53dd9"
+    },
+    {
+      "file": "20261008083822_create_workspaces_and_niches.sql",
+      "sha256": "1e298894206aab1445b64158b238884134f12522f90c301706e51c01d13e5b37"
+    },
+    {
+      "file": "20261008090336_create_operation_ledger_and_rate_limit_buckets.sql",
+      "sha256": "01bb623b5860f734e2a66f22a77bc87fdbca7c5eed2eecae4f1aee71aeac45c9"
+    },
+    {
+      "file": "20261008113150_create_pages_and_page_niche_configs.sql",
+      "sha256": "fec4bdbfd2f072607feec4d8e17086f76d61ccaae4009d8f67d8e45ea3c01053"
+    },
+    {
+      "file": "20261008114606_create_content_plans_and_plan_items.sql",
+      "sha256": "ce7673255ad03688b7be621a986f4a49c813613e32967fb1c91caec244852da7"
+    },
+    {
+      "file": "20261008123228_tighten_operation_key_uuid_v4_constraint.sql",
+      "sha256": "c9ab29f679d5321439b832c511ed85fcc607ae2bef9416a8b3d02c0fce6b5d6e"
+    },
+    {
+      "file": "20261008130753_create_posts_and_post_metrics.sql",
+      "sha256": "01a4f0194138ec0c73ec573c0112583898a33fa976ab99971138697a69648e49"
+    },
+    {
+      "file": "20261008132513_add_core_validators_primitives_and_indexes.sql",
+      "sha256": "851844d8f890bdfd3c00c7a6e218a30fe3062e35a2055bc167e3a369b32173f7"
+    },
+    {
+      "file": "20261008165228_harden_phase_three_validators_and_metrics.sql",
+      "sha256": "19ba758048a03b2e9bf4484d907c97e8cc55870c11a094878a695f4ac46c8c6e"
+    },
+    {
+      "file": "20261009004020_correct_editorial_evidence_contract.sql",
+      "sha256": "7df26008dcc6d10f3753f8eaee9daada713dd1d46b5e2c518a8f70c3baf932dc"
+    },
+    {
+      "file": "20261009012428_enforce_integer_evidence_versions.sql",
+      "sha256": "8640aa08f66b0c03cf4b46522fa3c9ec4d078ababd7a40319446b5f7b99f0fa9"
+    },
+    {
+      "file": "20261009043307_create_trivia_facts.sql",
+      "sha256": "e2ae67888cf08d8374f787d73138262cffd1c947bc05c180be77cd814c63dfd7"
+    },
+    {
+      "file": "20261009060516_add_trivia_identity_source_freshness.sql",
+      "sha256": "7f1035265350d5123a0fb56fcae25c45036f79d906a5f279bdac368242cdc464"
+    },
+    {
+      "file": "20261009063241_add_trivia_candidate_retrieval.sql",
+      "sha256": "a9eea5cd8ae94b8050f7dcc7fae9e7fc1465c73fbe1ec11242a414ec7674653c"
+    },
+    {
+      "file": "20261009075733_remediate_batch_a_audit_findings.sql",
+      "sha256": "207e1ec468644ac15410aef1cc93e45326edc4a5644882ed59352effe2be8bac"
+    },
+    {
+      "file": "20261009113820_finalize_batch_a_contract_remediation.sql",
+      "sha256": "cfafdd564ae78d76ce95327008614e74fb4e87b9e8a5c0021f41b05d31f9042d"
+    },
+    {
+      "file": "20261009164218_extend_trivia_canonical_units.sql",
+      "sha256": "7fd92452dcdab585aa345e8f23b5af0b8641d58d74a7cbe87206cd5960b342dc"
+    },
+    {
+      "file": "20261010072439_create_trivia_post_facts_and_usage_snapshots.sql",
+      "sha256": "ee5fc323694b2690e6c1d35a0799a2cf785656f6d5e90c40951f4e7d3b291614"
+    },
+    {
+      "file": "20261010081127_add_trivia_reservation_and_reuse_primitives.sql",
+      "sha256": "aab1b7b41de92e2cc6bdea2b823f8525f605fa08962135718516a8bbf25f677f"
+    },
+    {
+      "file": "20261010084550_add_trivia_lineage_reverification_correction_primitives.sql",
+      "sha256": "567e37e95def106d84299dbb31733a1d71f60ec6df0976909156e2480454eb31"
+    },
+    {
+      "file": "20261010132708_phase_5_security_kernel.sql",
+      "sha256": "f451e129e70d089c6aa73e1f598d8034f3e9d261e1e69a53547f7e05dec703a1"
+    },
+    {
+      "file": "20261010145937_harden_phase_5_security_kernel.sql",
+      "sha256": "8ec40ce3e5eebc1586f9d6f9eff27620a331757a20f57b245d695c3143babc27"
+    },
+    {
+      "file": "20261010150936_grant_api_owner_auth_uid_access.sql",
+      "sha256": "0553b1ac03159661819daea4903a1f5f429ec7b262ce73fe0ddf4ef73d16b943"
+    },
+    {
+      "file": "20261010152018_add_auth_uid_identity_bridge.sql",
+      "sha256": "0afd2051179aedf7632cd5dd5cfa678ef320644449e1c48509856f00dc5bfce1"
+    },
+    {
+      "file": "20261011012723_revoke_direct_auth_privileges_from_api_owner.sql",
+      "sha256": "7f9bd9f1457e0e8b1665ceb47c8cf169209a966e0bb7e1bdd0bf4389a64ffab0"
+    },
+    {
+      "file": "20261011015742_phase_5_2_owner_scoped_read_projections.sql",
+      "sha256": "346328b0e10109121fe66e83c1a51d41495df0bf9e4055d25cd06d5b795851e3"
+    },
+    {
+      "file": "20261011030705_remediate_phase_5_2_read_contracts.sql",
+      "sha256": "6e55ab079b7d8934d9a744f82fbf50b5fd472bf317651d72043efc8fa6560196"
+    },
+    {
+      "file": "20261011052125_phase_5_3_page_and_content_plan_writes.sql",
+      "sha256": "61103bc134ac0b35b08aa5735dca079740262889c89124c952991eeb80bda67e"
+    },
+    {
+      "file": "20261011071343_remediate_phase_5_3_audit_contracts.sql",
+      "sha256": "093cfe53d4b03d87853154032cea60308ec8e52ac554f40bc920be45a7131ec3"
+    },
+    {
+      "file": "20261011071839_harden_phase_5_3_snapshot_context.sql",
+      "sha256": "66b18d9c7939a4d1f778fc879898f8ebcd10240600dfa64422ca05d75ad43b3c"
+    },
+    {
+      "file": "20261011073111_close_phase_5_3_config_validation.sql",
+      "sha256": "ff1618642bab086cd1618476cdb46cde66599230a1bc24c5debc7242dc61729b"
+    },
+    {
+      "file": "20261011101751_phase_5_4_plan_lifecycle_foundation.sql",
+      "sha256": "b94698e913230f7bf3283149053d1140282b3adbecfc07f4da6234b5e955fd48"
+    },
+    {
+      "file": "20261011101753_phase_5_4_plan_lifecycle_rpcs.sql",
+      "sha256": "de7497b82e44641e4a28839455695a57fa086ddc2c416a048eb6749c3e4b915d"
+    },
+    {
+      "file": "20261011104153_harden_phase_5_4_replay_projections.sql",
+      "sha256": "d130962801644cda64f507876a545d5284d2ac1eebec0c57f48c9e2ac5851e20"
+    },
+    {
+      "file": "20261011104603_guard_phase_5_4_terminal_plan_claims.sql",
+      "sha256": "0f184b3f643bb798ac915057b0abfd46231da24804b893e36b3a56a5819e4224"
+    },
+    {
+      "file": "20261011104806_map_phase_5_4_statement_cancellation.sql",
+      "sha256": "d5835a6df5e99a7957c5ba022270236ff713b3bf2c549922273ab8d9599b721f"
+    },
+    {
+      "file": "20261011131503_phase_5_5_trivia_rpc_foundation.sql",
+      "sha256": "4d615edb213620820a32a780f2e03af9b620930f0c3e0aa53b6dfa4384542583"
+    },
+    {
+      "file": "20261011131505_phase_5_5_trivia_registration_reservation_rpcs.sql",
+      "sha256": "f16baf32929f68b41f64f041abc6ed2c426fe95b31d4996ddbf8bc818e207f41"
+    },
+    {
+      "file": "20261011131507_phase_5_5_trivia_reverification_correction_rpcs.sql",
+      "sha256": "adb27ee152c00f0d9bad1e151dda8dc21a9b559c9cf0b5f84f14f32cfa4fce1a"
+    },
+    {
+      "file": "20261011151632_harden_phase_5_5_fact_resolution.sql",
+      "sha256": "4a4bbb9d6d78efed77c9c2c8a73e445401d6df286f64e40b244910fac83ccfda"
+    },
+    {
+      "file": "20261011151903_harden_phase_5_5_ordered_candidate_sets.sql",
+      "sha256": "a9f1392897639d95ddd344d7db683af6c690d2c257bb7a9a7935afba73e03c37"
+    },
+    {
+      "file": "20261011152031_fix_phase_5_5_token_free_completion.sql",
+      "sha256": "2e199a7900ad44220539fb2d7e4cb3d291aaaa884052a8582e2fc6b476523090"
+    },
+    {
+      "file": "20261011152154_fix_phase_5_5_review_aliases_and_post_dependencies.sql",
+      "sha256": "b4c4a357371b3610d4b38e2c811a2fc3f1b67f6e2424925ee4d0875b3409270c"
+    },
+    {
+      "file": "20261011152951_enforce_phase_5_5_read_limits_and_closed_replay.sql",
+      "sha256": "aadd976b5a58545e587005b14e90a3c5f63d40fc15c28d8511b6fa067dd09198"
+    },
+    {
+      "file": "20261011153430_guard_phase_5_5_identity_and_replay_bindings.sql",
+      "sha256": "f6e7153affc748eb3b295d3164efb839c837e34ad6e39296b6eadbe68f64044d"
+    },
+    {
+      "file": "20261011154353_harden_phase_5_5_history_context.sql",
+      "sha256": "d3225aeb27e1fd6ce31502d6f9d3cbb6fd5ef4b95f3f3c6c532dec049bfafc1a"
+    },
+    {
+      "file": "20261011164409_phase_5_6_renderer_and_quality.sql",
+      "sha256": "38ef5dae162aae1b11a4696c9ca349734fea14f4ad0965f73ecec08d9206d141"
+    },
+    {
+      "file": "20261011164412_phase_5_6_post_transaction_foundation.sql",
+      "sha256": "0424a02656d9a33872ebe6b88044c93b1d11a7a0ed30cda41fdba7c37575056a"
+    },
+    {
+      "file": "20261011164415_phase_5_6_post_write_rpcs.sql",
+      "sha256": "efff092ebe7702e93025f7499124997351d70aa3f13c0c1dec19fd80b5949b06"
+    },
+    {
+      "file": "20261011165618_harden_phase_5_6_record_resolution.sql",
+      "sha256": "fb6bcce58a54c6dfecec957736e970741351345a0c90255d969d9e4ce49f4aa2"
+    },
+    {
+      "file": "20261011165728_qualify_phase_5_6_target_discovery.sql",
+      "sha256": "23fb326759b9d8adc1052c194c684ee511a8afe285eecab1f3b54e0e89731ce7"
+    },
+    {
+      "file": "20261011170544_close_phase_5_6_history_and_metrics.sql",
+      "sha256": "2410585804345cd727e3d78eac4471b4817f6e7699e31f45d183f5825c472dcd"
+    },
+    {
+      "file": "20261012024443_enforce_phase_5_6_text_privacy.sql",
+      "sha256": "6a59a67958391b410a4d5fd4b7404be03388c97c1b65e8730bf9ea7385150105"
+    },
+    {
+      "file": "20261012025954_enforce_phase_5_6_schedule_evidence.sql",
+      "sha256": "c6a21beaf40725f05113b61c9e58e4774d16a88d1cac8387e79d0822bcd8d5f7"
+    },
+    {
+      "file": "20261012030302_guard_phase_5_6_claim_source_privacy.sql",
+      "sha256": "95e28ea8da6ef27399c7f5a37d2f64196e45f6dde18a5e5fddf5f12150dadc3e"
+    },
+    {
+      "file": "20261012045014_phase_5_7_lifecycle_gate.sql",
+      "sha256": "453e88a5d6a7afb5352a2e0edef328fba64f1d695071f9216382bfc8efe0b882"
+    },
+    {
+      "file": "20261012045016_phase_5_7_lifecycle_history.sql",
+      "sha256": "f26dea3208c30da9cdee51f3878bfcf653c2b6d6d90587a26708314dc1002c54"
+    },
+    {
+      "file": "20261012045018_phase_5_7_lifecycle_rpcs.sql",
+      "sha256": "60c60a960e837c4a622d26eb0af98dd01e8dff576c25893a56b20e4f9cb4fd55"
+    },
+    {
+      "file": "20261012052003_harden_phase_5_7_history_metadata.sql",
+      "sha256": "7571ef5a384df0ab5e1c18115501ff43586add8bdbed05b769b3a96e3725494a"
+    },
+    {
+      "file": "20261012072241_phase_5_8_metrics_foundation.sql",
+      "sha256": "d1175def89be53c05fd70b04d47883369635acd78762861ba69c19ac1e0f872f"
+    },
+    {
+      "file": "20261012072242_phase_5_8_record_post_performance.sql",
+      "sha256": "7d6c83b34862e642f6dd907f4183e1ff66c52cbed2594fd770d2fd5b4a4b9391"
+    },
+    {
+      "file": "20261012072243_phase_5_8_metrics_read_completion.sql",
+      "sha256": "6fb580d25f47df59975bd36d98c80a0f5ecb50b555c7113cb5fa3d570a5bb001"
+    },
+    {
+      "file": "20261012073221_harden_phase_5_8_insight_lookup.sql",
+      "sha256": "b34f76757a92df6cd5cdcdf22f453ce7f7be90c4a249b9f22cb8983e8f69fc97"
+    }
+  ],
+  "applied": [
+    "20261008045700",
+    "20261008083822",
+    "20261008090336",
+    "20261008113150",
+    "20261008114606",
+    "20261008123228",
+    "20261008130753",
+    "20261008132513",
+    "20261008165228",
+    "20261009004020",
+    "20261009012428",
+    "20261009043307",
+    "20261009060516",
+    "20261009063241",
+    "20261009075733",
+    "20261009113820",
+    "20261009164218",
+    "20261010072439",
+    "20261010081127",
+    "20261010084550",
+    "20261010132708",
+    "20261010145937",
+    "20261010150936",
+    "20261010152018",
+    "20261011012723",
+    "20261011015742",
+    "20261011030705",
+    "20261011052125",
+    "20261011071343",
+    "20261011071839",
+    "20261011073111",
+    "20261011101751",
+    "20261011101753",
+    "20261011104153",
+    "20261011104603",
+    "20261011104806",
+    "20261011131503",
+    "20261011131505",
+    "20261011131507",
+    "20261011151632",
+    "20261011151903",
+    "20261011152031",
+    "20261011152154",
+    "20261011152951",
+    "20261011153430",
+    "20261011154353",
+    "20261011164409",
+    "20261011164412",
+    "20261011164415",
+    "20261011165618",
+    "20261011165728",
+    "20261011170544",
+    "20261012024443",
+    "20261012025954",
+    "20261012030302",
+    "20261012045014",
+    "20261012045016",
+    "20261012045018",
+    "20261012052003",
+    "20261012072241",
+    "20261012072242",
+    "20261012072243",
+    "20261012073221"
+  ],
+  "audit": {
+    "cleanup": {
+      "facts": 0,
+      "items": 0,
+      "pages": 0,
+      "plans": 0,
+      "posts": 0,
+      "events": 0,
+      "ledger": 0,
+      "configs": 0,
+      "metrics": 0,
+      "junctions": 0,
+      "workspaces": 0,
+      "post_history": 0,
+      "rate_buckets": 0,
+      "fixture_users": 0,
+      "reservation_history": 0
+    },
+    "schemas": {
+      "anon_api_usage": false,
+      "authenticated_api_usage": true,
+      "authenticated_internal_usage": false
+    },
+    "owner_role": {
+      "login": false,
+      "inherit": false,
+      "bypassrls": false,
+      "superuser": false,
+      "api_create": false,
+      "memberships": 0,
+      "internal_create": false
+    },
+    "api_inventory": [
+      {
+        "name": "approve_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.approve_post(integer,uuid,uuid,uuid,integer,text,boolean,text[],text)",
+        "security_definer": true
+      },
+      {
+        "name": "archive_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.archive_post(integer,uuid,uuid,uuid,integer,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "cancel_content_plan",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.cancel_content_plan(integer,uuid,uuid,uuid,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "claim_content_plan_items",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.claim_content_plan_items(integer,uuid,uuid,uuid,integer,integer)",
+        "security_definer": true
+      },
+      {
+        "name": "create_content_plan",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.create_content_plan(integer,uuid,uuid,uuid,text,integer,jsonb,text,text)",
+        "security_definer": true
+      },
+      {
+        "name": "create_page",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.create_page(integer,uuid,uuid,text,text,text,text[],text,integer,jsonb,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "discard_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.discard_post(integer,uuid,uuid,uuid,integer,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "get_account_profile",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_account_profile(integer)",
+        "security_definer": true
+      },
+      {
+        "name": "get_content_plan",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_content_plan(integer,uuid,uuid,text[],integer,text)",
+        "security_definer": true
+      },
+      {
+        "name": "get_page_generation_context",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_page_generation_context(integer,uuid,uuid,text,integer,text,text,text,timestamp with time zone)",
+        "security_definer": true
+      },
+      {
+        "name": "get_performance_insights",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_performance_insights(integer,uuid,uuid,text,timestamp with time zone,timestamp with time zone,text[],text,integer,integer)",
+        "security_definer": true
+      },
+      {
+        "name": "get_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_post(integer,uuid,uuid,boolean,boolean,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "get_post_performance",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_post_performance(integer,uuid,uuid,timestamp with time zone,timestamp with time zone,integer,text)",
+        "security_definer": true
+      },
+      {
+        "name": "get_workspace_context",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_workspace_context(integer,uuid)",
+        "security_definer": true
+      },
+      {
+        "name": "list_content_plans",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.list_content_plans(integer,uuid,uuid,text,text,text[],timestamp with time zone,timestamp with time zone,integer,text)",
+        "security_definer": true
+      },
+      {
+        "name": "list_pages",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.list_pages(integer,uuid,text,boolean,text,integer,text)",
+        "security_definer": true
+      },
+      {
+        "name": "list_posts",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.list_posts(integer,uuid,uuid,text,text[],text,text,timestamp with time zone,timestamp with time zone,timestamp with time zone,timestamp with time zone,text,integer,text)",
+        "security_definer": true
+      },
+      {
+        "name": "mark_post_posted",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.mark_post_posted(integer,uuid,uuid,uuid,integer,text,timestamp with time zone,text,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "record_post_performance",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.record_post_performance(integer,uuid,uuid,uuid,timestamp with time zone,jsonb,jsonb)",
+        "security_definer": true
+      },
+      {
+        "name": "renew_content_plan_claim",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.renew_content_plan_claim(integer,uuid,uuid,uuid,uuid)",
+        "security_definer": true
+      },
+      {
+        "name": "replace_discarded_plan_item",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.replace_discarded_plan_item(integer,uuid,uuid,uuid,uuid,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "report_content_plan_item_failure",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.report_content_plan_item_failure(integer,uuid,uuid,uuid,uuid,text,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "reschedule_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.reschedule_post(integer,uuid,uuid,uuid,integer,timestamp with time zone,text)",
+        "security_definer": true
+      },
+      {
+        "name": "retry_content_plan_item",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.retry_content_plan_item(integer,uuid,uuid,uuid,text)",
+        "security_definer": true
+      },
+      {
+        "name": "revise_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.revise_post(integer,uuid,uuid,uuid,integer,text,uuid,integer,text,text,text,jsonb,jsonb,jsonb,jsonb,text)",
+        "security_definer": true
+      },
+      {
+        "name": "revoke_post_approval",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.revoke_post_approval(integer,uuid,uuid,uuid,integer,text,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "save_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.save_post(integer,uuid,uuid,uuid,text,uuid,timestamp with time zone,jsonb,timestamp with time zone,integer,text,text,text,jsonb,jsonb,jsonb,jsonb)",
+        "security_definer": true
+      },
+      {
+        "name": "trivia_correct_fact",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_correct_fact(integer,uuid,uuid,uuid,timestamp with time zone,text,text,jsonb,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "trivia_find_similar_facts",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_find_similar_facts(integer,uuid,uuid,jsonb,integer)",
+        "security_definer": true
+      },
+      {
+        "name": "trivia_register_and_reserve_facts",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_register_and_reserve_facts(integer,uuid,uuid,uuid,uuid,timestamp with time zone,text,integer,jsonb)",
+        "security_definer": true
+      },
+      {
+        "name": "trivia_release_facts",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_release_facts(integer,uuid,uuid,uuid,uuid,text)",
+        "security_definer": true
+      },
+      {
+        "name": "trivia_reverify_fact",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_reverify_fact(integer,uuid,uuid,uuid,timestamp with time zone,text,jsonb,text,date,timestamp with time zone,text,text)",
+        "security_definer": true
+      },
+      {
+        "name": "update_page",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.update_page(integer,uuid,uuid,uuid,timestamp with time zone,jsonb,jsonb)",
+        "security_definer": true
+      }
+    ],
+    "policy_inventory": [
+      {
+        "name": "content_plan_items_api_owner_insert_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM (content_plans plan\n     JOIN workspaces workspace ON ((workspace.id = plan.workspace_id)))\n  WHERE ((plan.id = content_plan_items.plan_id) AND (plan.workspace_id = content_plan_items.workspace_id) AND (plan.page_id = content_plan_items.page_id) AND (plan.niche_key = content_plan_items.niche_key) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plan_items",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "content_plan_items_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plan_items",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = content_plan_items.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "content_plan_items_api_owner_update_5_4",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plan_items.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plan_items",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plan_items.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "content_plans_api_owner_insert_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM (pages page\n     JOIN workspaces workspace ON ((workspace.id = page.workspace_id)))\n  WHERE ((page.workspace_id = content_plans.workspace_id) AND (page.id = content_plans.page_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plans",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "content_plans_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plans",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = content_plans.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "content_plans_api_owner_update_5_4",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plans.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plans",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plans.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "plan_events_api_owner_insert",
+        "check": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plan_item_events.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))) AND (EXISTS ( SELECT 1\n   FROM internal.operation_ledger l\n  WHERE ((l.workspace_id = content_plan_item_events.workspace_id) AND (l.id = content_plan_item_events.operation_id) AND (l.actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (l.completed_at IS NULL)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.content_plan_item_events",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "plan_events_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.content_plan_item_events",
+        "using": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plan_item_events.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))))",
+        "command": "r"
+      },
+      {
+        "name": "operation_ledger_api_owner_insert",
+        "check": "((actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = operation_ledger.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.operation_ledger",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "operation_ledger_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.operation_ledger",
+        "using": "((actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = operation_ledger.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))))))",
+        "command": "r"
+      },
+      {
+        "name": "operation_ledger_api_owner_update",
+        "check": "((actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = operation_ledger.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.operation_ledger",
+        "using": "((actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = operation_ledger.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))))))",
+        "command": "w"
+      },
+      {
+        "name": "post_history_owner_insert",
+        "check": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = post_write_history.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))) AND (EXISTS ( SELECT 1\n   FROM internal.operation_ledger l\n  WHERE ((l.id = post_write_history.operation_id) AND (l.workspace_id = post_write_history.workspace_id) AND (l.actor_user_id = post_write_history.actor_user_id) AND (l.operation_name = post_write_history.operation_name) AND (l.completed_at IS NULL)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.post_write_history",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "post_history_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.post_write_history",
+        "using": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = post_write_history.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))))",
+        "command": "r"
+      },
+      {
+        "name": "rate_limit_buckets_api_owner_insert",
+        "check": "(actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.rate_limit_buckets",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "rate_limit_buckets_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.rate_limit_buckets",
+        "using": "(actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))",
+        "command": "r"
+      },
+      {
+        "name": "rate_limit_buckets_api_owner_update",
+        "check": "(actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.rate_limit_buckets",
+        "using": "(actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))",
+        "command": "w"
+      },
+      {
+        "name": "trivia_reservation_sets_api_owner_insert",
+        "check": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_reservation_sets.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))) AND (EXISTS ( SELECT 1\n   FROM internal.operation_ledger l\n  WHERE ((l.id = trivia_reservation_sets.operation_id) AND (l.workspace_id = trivia_reservation_sets.workspace_id) AND (l.actor_user_id = trivia_reservation_sets.actor_user_id) AND (l.request_hash = trivia_reservation_sets.request_hash) AND (l.operation_name = 'trivia_register_and_reserve_facts'::text)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.trivia_reservation_sets",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "trivia_reservation_sets_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.trivia_reservation_sets",
+        "using": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_reservation_sets.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))))",
+        "command": "r"
+      },
+      {
+        "name": "niches_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "niches",
+        "using": "(( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1) IS NOT NULL)",
+        "command": "r"
+      },
+      {
+        "name": "page_niche_configs_api_owner_insert_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM (pages page\n     JOIN workspaces workspace ON ((workspace.id = page.workspace_id)))\n  WHERE ((page.workspace_id = page_niche_configs.workspace_id) AND (page.id = page_niche_configs.page_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "page_niche_configs",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "page_niche_configs_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "page_niche_configs",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = page_niche_configs.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "page_niche_configs_api_owner_update_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM (pages page\n     JOIN workspaces workspace ON ((workspace.id = page.workspace_id)))\n  WHERE ((page.workspace_id = page_niche_configs.workspace_id) AND (page.id = page_niche_configs.page_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "page_niche_configs",
+        "using": "(EXISTS ( SELECT 1\n   FROM (pages page\n     JOIN workspaces workspace ON ((workspace.id = page.workspace_id)))\n  WHERE ((page.workspace_id = page_niche_configs.workspace_id) AND (page.id = page_niche_configs.page_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "pages_api_owner_insert_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = pages.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "pages",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "pages_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "pages",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = pages.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "pages_api_owner_update_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = pages.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "pages",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = pages.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "post_metrics_api_owner_insert",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = post_metrics.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "post_metrics",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "post_metrics_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "post_metrics",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = post_metrics.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "posts_api_owner_insert_5_6",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = posts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "posts",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "posts_api_owner_row_lock_5_4",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = posts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "posts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = posts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "posts_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "posts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = posts.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "trivia_facts_api_owner_insert_5_5",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_facts",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "trivia_facts_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_facts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = trivia_facts.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "trivia_facts_api_owner_update_5_5",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_facts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "junction_api_owner_insert_5_6",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_post_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_post_facts",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "junction_api_owner_update_5_6",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_post_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_post_facts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_post_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "trivia_post_facts_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_post_facts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = trivia_post_facts.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "workspaces_api_owner_lock_5_5",
+        "check": "(is_active AND (owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))",
+        "roles": ["content_producer_api_owner"],
+        "table": "workspaces",
+        "using": "(is_active AND (owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))",
+        "command": "w"
+      },
+      {
+        "name": "workspaces_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "workspaces",
+        "using": "(is_active AND (( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1) = owner_user_id))",
+        "command": "r"
+      }
+    ],
+    "unsafe_api_count": 0,
+    "api_function_count": 33,
+    "business_table_count": 15,
+    "leftover_fault_count": 0,
+    "overloaded_api_count": 0,
+    "invalid_v8_ledger_count": 0,
+    "rls_enabled_table_count": 15,
+    "banned_api_execute_count": 0,
+    "metrics_owner_privileges": {
+      "delete": false,
+      "insert": true,
+      "select": true,
+      "update": false,
+      "truncate": false
+    },
+    "public_api_execute_count": 0,
+    "uncompleted_ledger_count": 0,
+    "unsafe_default_acl_count": 0,
+    "metrics_immutable_trigger": 1,
+    "private_definer_inventory": [
+      {
+        "owner": "postgres",
+        "settings": ["search_path=\"\""],
+        "signature": "internal.current_auth_uid_v1()"
+      }
+    ],
+    "tables_owned_by_api_owner": 0,
+    "allowlist_difference_count": 0,
+    "unsafe_update_policy_count": 0,
+    "caller_helper_execute_count": 0,
+    "public_helper_execute_count": 0,
+    "caller_table_privilege_count": 0,
+    "public_table_privilege_count": 0,
+    "caller_column_privilege_count": 0,
+    "invalid_v6_v7_operation_count": 0,
+    "authenticated_api_execute_count": 33,
+    "caller_sequence_privilege_count": 0,
+    "disabled_business_trigger_count": 0,
+    "public_sequence_privilege_count": 0,
+    "missing_owner_select_policy_count": 0
+  },
+  "legacy": {
+    "history_privileges": {
+      "delete": false,
+      "insert": true,
+      "select": true,
+      "update": false,
+      "truncate": false
+    },
+    "post_update_columns": [
+      "approval_snapshot",
+      "archived_at",
+      "content_hash",
+      "content_payload",
+      "content_schema_version",
+      "discarded_at",
+      "editorial_checks",
+      "format_key",
+      "generation_snapshot",
+      "id",
+      "interaction_goal",
+      "platform_post_id",
+      "published_at",
+      "published_url",
+      "quality_status",
+      "ready_at",
+      "revision",
+      "scheduled_at",
+      "status",
+      "system_checks",
+      "topic_key"
+    ],
+    "junction_update_columns": [
+      "allocation_state",
+      "fact_role",
+      "id",
+      "is_current",
+      "position",
+      "published_at",
+      "released_at",
+      "rendered_text"
+    ],
+    "history_triggers": ["post_history_immutable", "post_history_validate"]
+  },
+  "environment": {
+    "postgres": "PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 15.2.0, 64-bit",
+    "timezone": "UTC",
+    "enable_seqscan": "on"
+  }
+}

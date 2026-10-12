@@ -218,7 +218,7 @@ describe('Checkpoint 5.6 public draft save/revise', () => {
         (select bool_and(octet_length(response::text)<=524288 and octet_length(before_evidence::text)<=98304) from internal.post_write_history) bounded,
         not exists(select 1 from internal.operation_ledger where response_snapshot::text ~ '"(reservation_token|claim_token|content_payload|sources)"') no_tokens`);
       expect(catalog).toEqual({
-        api: 32,
+        api: 33,
         private: true,
         immutable: true,
         bounded: true,
