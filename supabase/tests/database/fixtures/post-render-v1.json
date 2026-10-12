@@ -1,0 +1,110 @@
+{
+  "fixture_manifest_version": 1,
+  "versions": { "module": 1, "config": 1, "content": 1, "renderer": 1, "gate": 1, "rubric": 1 },
+  "provenance_category": "synthetic deterministic layout; not source verification",
+  "review_status": "expected values calculated independently from frozen formulas",
+  "golden": [
+    {
+      "fixture_id": "RENDER-GOLDEN-PLAIN-001",
+      "reason_label": "blank-line layout counts every separator",
+      "style": "plain_lines",
+      "facts": ["Cats can purr.", "Birds can fly."],
+      "expected_copy": "Did you know?\n\nCats can purr.\n\nBirds can fly.\n\nShare this with a curious friend.",
+      "expected_metrics": {
+        "hook_chars": 13,
+        "fact_chars": [14, 14],
+        "facts_total_chars": 30,
+        "cta_chars": 33,
+        "canva_total_chars": 80,
+        "word_count": 15,
+        "fact_word_counts": [3, 3],
+        "line_count": 7,
+        "fact_line_counts": [1, 1],
+        "hook_word_count": 3,
+        "cta_word_count": 6,
+        "hook_line_count": 1,
+        "cta_line_count": 1,
+        "estimated_read_seconds": 5.9,
+        "replay_ratio": 0.453846,
+        "estimated_loops": 1
+      }
+    },
+    {
+      "fixture_id": "RENDER-GOLDEN-NUMBERED-001",
+      "reason_label": "number prefixes contribute characters and words",
+      "style": "numbered",
+      "facts": ["Cats can purr.", "Birds can fly."],
+      "expected_copy": "Did you know?\n\n1. Cats can purr.\n\n2. Birds can fly.\n\nShare this with a curious friend.",
+      "expected_metrics": {
+        "hook_chars": 13,
+        "fact_chars": [14, 14],
+        "facts_total_chars": 36,
+        "cta_chars": 33,
+        "canva_total_chars": 86,
+        "word_count": 17,
+        "fact_word_counts": [3, 3],
+        "line_count": 7,
+        "fact_line_counts": [1, 1],
+        "hook_word_count": 3,
+        "cta_word_count": 6,
+        "hook_line_count": 1,
+        "cta_line_count": 1,
+        "estimated_read_seconds": 6.5,
+        "replay_ratio": 0.5,
+        "estimated_loops": 1
+      }
+    }
+  ],
+  "boundaries": [
+    {
+      "fixture_id": "RENDER-CHAR-090",
+      "reason_label": "structural fact cap",
+      "fact_chars": 90,
+      "expected_error": null
+    },
+    {
+      "fixture_id": "RENDER-CHAR-091",
+      "reason_label": "no truncation above cap",
+      "fact_chars": 91,
+      "expected_error": "CONTENT_PAYLOAD_INVALID"
+    },
+    {
+      "fixture_id": "READ-LINES-028",
+      "reason_label": "hard line boundary",
+      "fact_lengths": [69, 69, 69, 65, 65, 65, 65],
+      "hook_chars": 35,
+      "expected_line_count": 28,
+      "expected_status": "passed"
+    },
+    {
+      "fixture_id": "READ-LINES-029",
+      "reason_label": "one line above hard boundary",
+      "fact_lengths": [69, 69, 69, 69, 65, 65, 65],
+      "hook_chars": 35,
+      "expected_line_count": 29,
+      "expected_status": "failed"
+    },
+    {
+      "fixture_id": "READ-REPLAY-250",
+      "reason_label": "100 words and 2.5 replay boundary",
+      "fact_count": 5,
+      "words_per_fact": 18,
+      "cta_words": 7,
+      "expected_word_count": 100,
+      "expected_read_seconds": 32.5,
+      "expected_ratio": 2.5,
+      "expected_status": "passed"
+    },
+    {
+      "fixture_id": "READ-REPLAY-OVER",
+      "reason_label": "one word above word/replay boundary",
+      "fact_count": 5,
+      "words_per_fact": 18,
+      "cta_words": 8,
+      "expected_word_count": 101,
+      "expected_read_seconds": 32.8,
+      "expected_ratio": 2.523077,
+      "expected_status": "failed"
+    }
+  ]
+}

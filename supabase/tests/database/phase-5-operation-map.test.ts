@@ -217,7 +217,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'write',
     write: true,
     requiredGuards: ['operation_key', 'expected_revision'],
-    testOwner: 'api-post-save-revise.test.ts',
+    testOwner: 'api-post-reschedule.test.ts',
   },
   {
     name: 'approve_post',
