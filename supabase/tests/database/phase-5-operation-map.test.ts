@@ -230,7 +230,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
       'expected_content_hash',
       'explicit_approval',
     ],
-    testOwner: 'api-post-lifecycle.test.ts',
+    testOwner: 'api-post-approval-quality.test.ts',
   },
   {
     name: 'revoke_post_approval',

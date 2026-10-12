@@ -19,6 +19,7 @@ import {
   sql,
   state,
 } from './helpers/post-rpc.js';
+import { archive, discard, lifecycleRpc, posted } from './helpers/post-lifecycle.js';
 
 describe('Checkpoint 5.6 public schedule-only revision', () => {
   it('CORE-003 archived posts still occupy slots; terminal targets reject schedule writes', () => {
@@ -26,11 +27,9 @@ describe('Checkpoint 5.6 public schedule-only revision', () => {
     try {
       const r = request(f);
       r.schedule = '2026-10-30T10:00:00Z';
-      const archived = setReady(f, rpc(f, save(f, r)).data.post);
-      // Lifecycle setup is administrative until 5.7; occupancy is a public RPC proof.
-      sql(
-        `update public.posts set status='archived',published_at=clock_timestamp(),archived_at=clock_timestamp() where public_id='${archived.post_public_id}'`,
-      );
+      const published = posted(f, setReady(f, rpc(f, save(f, r)).data.post));
+      lifecycleRpc(f, archive(f, published));
+      const archived = get(f, published.post_public_id);
       const p = rpc(f, save(f, request(f))).data.post;
       const before = state(f);
       expect(() => rpc(f, reschedule(f, p, r.schedule))).toThrow(/^SCHEDULE_CONFLICT$/);
@@ -92,17 +91,20 @@ describe('Checkpoint 5.6 public schedule-only revision', () => {
       const current = get(f, p.post_public_id);
       expect(current.content_hash).toBe(p.content_hash);
       expect(current.quality_status).toBe(p.quality_status);
-      expect(current.editorial_checks).toEqual({ ...p.editorial_checks, post_revision: 2 });
+      expect(current.editorial_checks).toEqual({
+        ...p.editorial_checks,
+        post_revision: p.revision + 1,
+      });
       expect(
         row<{ s: unknown }>(
           `select system_checks s from public.posts where public_id='${p.post_public_id}'`,
         ).s,
-      ).toEqual({ ...p.system_checks, post_revision: 2 });
+      ).toEqual({ ...p.system_checks, post_revision: p.revision + 1 });
       expect(
         row<{ a: unknown }>(
           `select approval_snapshot a from public.posts where public_id='${p.post_public_id}'`,
         ).a,
-      ).toEqual({ ...original.a, approved_revision: 2 });
+      ).toEqual({ ...original.a, approved_revision: p.revision + 1 });
       expect(
         row<{ e: unknown }>(
           `select before_evidence->'editorial_checks' e from internal.post_write_history where operation_name='reschedule_post' and post_id=(select id from public.posts where public_id='${p.post_public_id}')`,
@@ -145,10 +147,10 @@ describe('Checkpoint 5.6 public schedule-only revision', () => {
           'drop trigger test_post_fault on internal.post_write_history; drop function internal.test_post_completion_fault();',
         );
       }
-      sql(
-        `update public.posts set status='discarded',discarded_at=now() where public_id='${p.post_public_id}'`,
+      lifecycleRpc(f, discard(f, current));
+      expect(() => rpc(f, reschedule(f, get(f, p.post_public_id), null))).toThrow(
+        /^INVALID_STATUS_TRANSITION$/,
       );
-      expect(() => rpc(f, reschedule(f, current, null))).toThrow(/^INVALID_STATUS_TRANSITION$/);
     } finally {
       cleanup(f);
     }

@@ -217,7 +217,7 @@ describe('Checkpoint 5.5 authenticated trivia races and security', () => {
         (select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api' and (not p.prosecdef or p.proowner<>'content_producer_api_owner'::regrole or not p.proconfig @> array['search_path=""'])) unsafe,
         has_table_privilege('authenticated','internal.trivia_reservation_sets','select,insert,update,delete') caller,
         has_table_privilege('content_producer_api_owner','internal.trivia_reservation_sets','update,delete') rewrite`);
-      expect(catalog).toEqual({ api: 27, unsafe: 0, caller: false, rewrite: false });
+      expect(catalog).toEqual({ api: 32, unsafe: 0, caller: false, rewrite: false });
       const rateClient = randomUUID();
       const read = `api.trivia_find_similar_facts(1,'${f.workspace}','${f.page}',${json([c])},1)`;
       sql(`insert into internal.rate_limit_buckets(actor_user_id,oauth_client_id,limit_group,window_start,request_count)

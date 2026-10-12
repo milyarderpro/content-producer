@@ -496,10 +496,11 @@ describe('Checkpoint 5.4 public plan lifecycle', () => {
         (select count(*) from internal.content_plan_item_events where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')) owner_rows,
         not has_table_privilege('content_producer_api_owner','internal.content_plan_item_events','UPDATE') immutable,
         not has_table_privilege('content_producer_api_owner','internal.content_plan_item_events','DELETE') no_delete,
-        -- CR-012/013 cumulative columns: correction impact and explicit post writes.
+        -- CR-012/013/014 cumulative columns: correction, post writes and lifecycle.
         not exists(select 1 from pg_attribute a where a.attrelid='public.posts'::regclass and a.attnum>0 and not a.attisdropped
           and a.attname not in ('id','status','quality_status','revision','ready_at','approval_snapshot','system_checks','editorial_checks',
-            'format_key','topic_key','interaction_goal','content_schema_version','content_payload','generation_snapshot','content_hash','scheduled_at')
+            'format_key','topic_key','interaction_goal','content_schema_version','content_payload','generation_snapshot','content_hash','scheduled_at',
+            'published_at','platform_post_id','published_url','discarded_at','archived_at')
           and has_column_privilege('content_producer_api_owner','public.posts',a.attname,'UPDATE')) no_unplanned_post_write,
         not exists(select 1 from pg_proc p join pg_namespace n on n.oid=p.pronamespace
           where ((n.nspname='internal' and p.proname like 'plan_%') or (n.nspname='api' and p.proname in

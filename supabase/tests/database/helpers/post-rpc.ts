@@ -236,9 +236,17 @@ export function get(f: Fixture, id: string): Post {
   return rpc(f, `api.get_post(1,'${f.workspace}','${id}')`).data.post;
 }
 export function setReady(f: Fixture, p: Post): Post {
-  // Administrative 5.7 fixture only: not a public approve/publish proof.
-  sql(`update public.posts set status='ready',quality_status='passed',ready_at=clock_timestamp(),approval_snapshot=jsonb_build_object(
-    'schema_version',1,'approved_by_user_id','${f.owner}','approved_at',internal.iso_timestamp_v1(clock_timestamp()),'approved_revision',revision,
-    'content_hash',content_hash,'operation_id',created_by_operation_id,'accepted_warning_ids','[]'::jsonb,'warning_acceptance_reason',null) where public_id='${p.post_public_id}'`);
-  return { ...p, status: 'ready', quality_status: 'passed' };
+  // 5.7 public lifecycle replaces the earlier administrative ready fixture.
+  rpc(
+    f,
+    `api.approve_post(1,'${f.workspace}','${randomUUID()}','${p.post_public_id}',${p.revision},'${p.content_hash}',true,
+    array['trivia.profile.preferred_band'],'Accept the reviewed preferred profile warning.')`,
+  );
+  const current = get(f, p.post_public_id);
+  return {
+    ...current,
+    system_checks: row<{ s: Record<string, unknown> }>(
+      `select system_checks s from public.posts where public_id='${p.post_public_id}'`,
+    ).s,
+  };
 }
