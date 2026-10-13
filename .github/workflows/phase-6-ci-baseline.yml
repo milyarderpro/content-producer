@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   checkpoint:
-    name: Phase 6.1 targeted CI (0 MCP tools)
+    name: Phase 6.2 targeted CI (0 MCP tools)
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
@@ -100,17 +100,18 @@ jobs:
           echo "Migration SQL count: $(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
           exit "$code"
 
-      - name: Checkpoint 6.1 - internal MCP tests
+      - name: Checkpoint 6.2 - internal MCP tests
         id: mcp
         run: |
           pnpm run test:mcp
           echo "Exit code: 0 (pnpm run test:mcp)"
 
-      - name: Checkpoint 6.1 - local HTTP fail-closed smoke
+      - name: Checkpoint 6.2 - local HTTP fail-closed smoke
         id: http
         shell: bash
         run: |
-          pnpm exec supabase functions serve mcp --no-verify-jwt > "$RUNNER_TEMP/phase-6-mcp-serve.log" 2>&1 &
+          printf 'MCP_RESOURCE_URL=http://127.0.0.1:54321/functions/v1/mcp\nMCP_OWNER_USER_ID=11111111-1111-4111-8111-111111111111\n' > "$RUNNER_TEMP/phase-6-mcp-env"
+          pnpm exec supabase functions serve mcp --no-verify-jwt --env-file "$RUNNER_TEMP/phase-6-mcp-env" > "$RUNNER_TEMP/phase-6-mcp-serve.log" 2>&1 &
           serve_pid=$!
           trap 'kill "$serve_pid" 2>/dev/null || true' EXIT
           pnpm exec tsx scripts/phase-6-1-http-smoke.ts
@@ -150,9 +151,9 @@ jobs:
           REGRESSION_OUTCOME: ${{ steps.regression.outcome }}
         run: |
           mkdir -p "$RUNNER_TEMP/phase-6-evidence"
-          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.1.md"
+          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.2.md"
           {
-            echo "# Phase 6.1 targeted checkpoint CI"
+            echo "# Phase 6.2 targeted checkpoint CI"
             echo
             echo "- Commit: `$(git rev-parse HEAD)`"
             echo "- Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
@@ -183,7 +184,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase-6-1-ci-evidence
-          path: ${{ runner.temp }}/phase-6-evidence/checkpoint-6.1.md
+          name: phase-6-2-ci-evidence
+          path: ${{ runner.temp }}/phase-6-evidence/checkpoint-6.2.md
           if-no-files-found: error
           retention-days: 14
