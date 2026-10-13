@@ -49,7 +49,11 @@ const plan = {
   created_at: stamp,
   updated_at: stamp,
 };
-const shared = { request_schema_version: 1, workspace_public_id: workspace, operation_key: operation };
+const shared = {
+  request_schema_version: 1,
+  workspace_public_id: workspace,
+  operation_key: operation,
+};
 const claimArgs = { ...shared, plan_public_id: planId, lease_minutes: 30 };
 const renewArgs = { ...shared, plan_item_public_id: itemId, claim_token: claimToken };
 const failArgs = {
@@ -66,13 +70,15 @@ function envelope(data: object) {
 }
 const claimData = {
   plan_public_id: planId,
-  claimed_items: [{
-    item,
-    claim_token: claimToken,
-    claimed_at: stamp,
-    claim_expires_at: expiry,
-    claim_renewal_count: 0,
-  }],
+  claimed_items: [
+    {
+      item,
+      claim_token: claimToken,
+      claimed_at: stamp,
+      claim_expires_at: expiry,
+      claim_renewal_count: 0,
+    },
+  ],
   remaining_claimable_count: 0,
   replayed: false,
 };
@@ -107,7 +113,7 @@ async function mcp(method: string, params?: object) {
     }),
   );
   assert(res.status === 200, 'MCP HTTP status');
-  return await res.json() as {
+  return (await res.json()) as {
     result?: {
       content?: Array<{ type: string; text: string }>;
       structuredContent?: Record<string, unknown>;
@@ -122,62 +128,113 @@ async function call(name: string, args: object) {
   return response.result;
 }
 
-Deno.test('6.5 registry exposes exactly twelve OAuth tools and no profile/annotation drift', async () => {
-  const listed = await mcp('tools/list');
-  const tools = listed.result?.tools ?? [];
-  assert(MCP_TOOL_COUNT === 12 && tools.length === 12, 'exact 12 registered tools');
-  for (const name of PLAN_CLAIM_TOOL_NAMES) {
-    const tool = tools.find((t) => t.name === name);
-    assert(tool, 'missing claim tool ' + name);
-    const meta = tool._meta as { securitySchemes?: Array<{ type: string; scopes: string[] }> };
-    assert(meta?.securitySchemes?.[0]?.type === 'oauth2', 'OAuth scheme');
-    assert(meta?.securitySchemes?.[0]?.scopes?.join(' ') === 'openid email', 'OAuth scopes');
-    const annotations = tool.annotations as Record<string, boolean>;
-    assert(annotations.readOnlyHint === false, 'claim tool must be a write');
-    assert(annotations.destructiveHint === false && annotations.openWorldHint === false, 'annotations');
-    assert(!Object.hasOwn(meta, 'openai/profile'), 'claim tool cannot be profile');
-    assert((tool.inputSchema as { additionalProperties?: boolean }).additionalProperties === false, 'closed input');
-    assert((tool.outputSchema as { additionalProperties?: boolean }).additionalProperties === false, 'closed output');
-  }
-  assert(!tools.some((t) => t.name === 'retry_content_plan_item'), '6.6 not yet registered');
-});
+Deno.test(
+  '6.5 registry exposes exactly twelve OAuth tools and no profile/annotation drift',
+  async () => {
+    const listed = await mcp('tools/list');
+    const tools = listed.result?.tools ?? [];
+    assert(MCP_TOOL_COUNT === 12 && tools.length === 12, 'exact 12 registered tools');
+    for (const name of PLAN_CLAIM_TOOL_NAMES) {
+      const tool = tools.find((t) => t.name === name);
+      assert(tool, 'missing claim tool ' + name);
+      const meta = tool._meta as { securitySchemes?: Array<{ type: string; scopes: string[] }> };
+      assert(meta?.securitySchemes?.[0]?.type === 'oauth2', 'OAuth scheme');
+      assert(meta?.securitySchemes?.[0]?.scopes?.join(' ') === 'openid email', 'OAuth scopes');
+      const annotations = tool.annotations as Record<string, boolean>;
+      assert(annotations.readOnlyHint === false, 'claim tool must be a write');
+      assert(
+        annotations.destructiveHint === false && annotations.openWorldHint === false,
+        'annotations',
+      );
+      assert(!Object.hasOwn(meta, 'openai/profile'), 'claim tool cannot be profile');
+      assert(
+        (tool.inputSchema as { additionalProperties?: boolean }).additionalProperties === false,
+        'closed input',
+      );
+      assert(
+        (tool.outputSchema as { additionalProperties?: boolean }).additionalProperties === false,
+        'closed output',
+      );
+    }
+    assert(!tools.some((t) => t.name === 'retry_content_plan_item'), '6.6 not yet registered');
+  },
+);
 
-Deno.test('6.5 public MCP calls forward only allowlisted api RPCs with original JWT, lease, key, token and safe failure', async () => {
-  const original = globalThis.fetch;
-  const calls: Array<{ name: string; params: Record<string, unknown> }> = [];
-  globalThis.fetch = ((input: Request | URL | string, init?: RequestInit) => {
-    const name = String(input).split('/').pop()!;
-    const headers = new Headers(init?.headers);
-    assert(String(input).endsWith('/rest/v1/rpc/' + name), 'wrong RPC endpoint');
-    assert(headers.get('Content-Profile') === 'api', 'api RPC schema');
-    assert(headers.get('Authorization') === 'Bearer ' + context.accessToken, 'original user JWT');
-    assert(headers.get('apikey') === context.publishableKey, 'publishable key only');
-    assert(init?.method === 'POST' && init.redirect === 'error', 'RPC transport');
-    const params = JSON.parse(String(init.body)) as Record<string, unknown>;
-    calls.push({ name, params });
-    assert(Object.hasOwn(reply, name), 'unexpected RPC call');
-    return Promise.resolve(Response.json(reply[name]));
-  }) as typeof fetch;
-  try {
-    const claimed = await call('claim_content_plan_items', claimArgs);
-    assert(claimed?.isError !== true, 'claim failed');
-    const data = claimed?.structuredContent as { data?: typeof claimData };
-    assert(data?.data?.claimed_items[0]?.claim_token === claimToken, 'claim token required in structured content');
-    assert(!JSON.stringify(claimed?.content).includes(claimToken), 'claim token exposed to text/log summary');
-    assert((await call('renew_content_plan_claim', renewArgs))?.isError !== true, 'renew failed');
-    assert((await call('report_content_plan_item_failure', failArgs))?.isError !== true, 'failure report failed');
-    assert(calls.map((c) => c.name).join(',') === PLAN_CLAIM_TOOL_NAMES.join(','), 'RPC order/names');
-    assert(calls.every((c) => c.params.p_workspace_public_id === workspace), 'workspace owner binding');
-    assert(calls.every((c) => c.params.p_operation_key === operation), 'operation key preserved');
-    assert(calls[0].params.p_limit === 1 && calls[0].params.p_lease_minutes === 30, 'lease/default');
-    assert(calls[1].params.p_claim_token === claimToken && calls[2].params.p_claim_token === claimToken, 'claim token passed only to expected RPCs');
-    assert(calls[2].params.p_failure_detail === failArgs.failure_detail &&
-      calls[2].params.p_retry_recommended === true, 'safe failure untouched');
-    assert(calls.every((c) => !Object.keys(c.params).some((k) => /^(p_actor|p_owner|p_oauth_client|p_service)/.test(k))), 'identity override');
-  } finally {
-    globalThis.fetch = original;
-  }
-});
+Deno.test(
+  '6.5 public MCP calls forward only allowlisted api RPCs with original JWT, lease, key, token and safe failure',
+  async () => {
+    const original = globalThis.fetch;
+    const calls: Array<{ name: string; params: Record<string, unknown> }> = [];
+    globalThis.fetch = ((input: Request | URL | string, init?: RequestInit) => {
+      const name = String(input).split('/').pop()!;
+      const headers = new Headers(init?.headers);
+      assert(String(input).endsWith('/rest/v1/rpc/' + name), 'wrong RPC endpoint');
+      assert(headers.get('Content-Profile') === 'api', 'api RPC schema');
+      assert(headers.get('Authorization') === 'Bearer ' + context.accessToken, 'original user JWT');
+      assert(headers.get('apikey') === context.publishableKey, 'publishable key only');
+      assert(init?.method === 'POST' && init.redirect === 'error', 'RPC transport');
+      const params = JSON.parse(String(init.body)) as Record<string, unknown>;
+      calls.push({ name, params });
+      assert(Object.hasOwn(reply, name), 'unexpected RPC call');
+      return Promise.resolve(Response.json(reply[name]));
+    }) as typeof fetch;
+    try {
+      const claimed = await call('claim_content_plan_items', claimArgs);
+      assert(claimed?.isError !== true, 'claim failed');
+      const data = claimed?.structuredContent as { data?: typeof claimData };
+      assert(
+        data?.data?.claimed_items[0]?.claim_token === claimToken,
+        'claim token required in structured content',
+      );
+      assert(
+        !JSON.stringify(claimed?.content).includes(claimToken),
+        'claim token exposed to text/log summary',
+      );
+      assert((await call('renew_content_plan_claim', renewArgs))?.isError !== true, 'renew failed');
+      assert(
+        (await call('report_content_plan_item_failure', failArgs))?.isError !== true,
+        'failure report failed',
+      );
+      assert(
+        calls.map((c) => c.name).join(',') === PLAN_CLAIM_TOOL_NAMES.join(','),
+        'RPC order/names',
+      );
+      assert(
+        calls.every((c) => c.params.p_workspace_public_id === workspace),
+        'workspace owner binding',
+      );
+      assert(
+        calls.every((c) => c.params.p_operation_key === operation),
+        'operation key preserved',
+      );
+      assert(
+        calls[0].params.p_limit === 1 && calls[0].params.p_lease_minutes === 30,
+        'lease/default',
+      );
+      assert(
+        calls[1].params.p_claim_token === claimToken &&
+          calls[2].params.p_claim_token === claimToken,
+        'claim token passed only to expected RPCs',
+      );
+      assert(
+        calls[2].params.p_failure_detail === failArgs.failure_detail &&
+          calls[2].params.p_retry_recommended === true,
+        'safe failure untouched',
+      );
+      assert(
+        calls.every(
+          (c) =>
+            !Object.keys(c.params).some((k) =>
+              /^(p_actor|p_owner|p_oauth_client|p_service)/.test(k),
+            ),
+        ),
+        'identity override',
+      );
+    } finally {
+      globalThis.fetch = original;
+    }
+  },
+);
 
 Deno.test('6.5 invalid or foreign claim inputs never invoke business RPC', async () => {
   const original = globalThis.fetch;
@@ -216,67 +273,105 @@ Deno.test('6.5 invalid or foreign claim inputs never invoke business RPC', async
   }
 });
 
-Deno.test('6.5 replay claim returns identical historical token/expiry without hidden renewal', async () => {
-  const original = globalThis.fetch;
-  const snapshots: object[] = [
-    envelope(claimData),
-    envelope({ ...claimData, replayed: true }),
-    envelope({ ...claimData, claimed_items: [], remaining_claimable_count: 0, replayed: false }),
-  ];
-  let n = 0;
-  globalThis.fetch = (() => Promise.resolve(Response.json(snapshots[n++]))) as typeof fetch;
-  try {
-    const first = await call('claim_content_plan_items', { ...claimArgs, limit: 1 });
-    const second = await call('claim_content_plan_items', { ...claimArgs, limit: 1 });
-    const empty = await call('claim_content_plan_items', { ...claimArgs, limit: 3, operation_key: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' });
-    const data = (r: typeof first) => (r?.structuredContent as { data: typeof claimData }).data;
-    assert(data(first).claimed_items[0].claim_token === data(second).claimed_items[0].claim_token, 'replay rotated token');
-    assert(data(first).claimed_items[0].claim_expires_at === data(second).claimed_items[0].claim_expires_at, 'replay extended lease');
-    assert(data(second).replayed === true, 'replay marker missing');
-    assert(data(empty).claimed_items.length === 0 && data(empty).remaining_claimable_count === 0, 'empty is successful');
-    assert(n === 3, 'unexpected RPC call count');
-  } finally {
-    globalThis.fetch = original;
-  }
-});
-
-Deno.test('6.5 safe error mapping, rate limit, and token privacy fail closed on malformed RPC output', async () => {
-  const original = globalThis.fetch;
-  const errors = [
-    'PLAN_ITEM_CLAIM_MISMATCH',
-    'PLAN_ITEM_CLAIM_EXPIRED',
-    'PLAN_CLAIM_RENEWAL_LIMIT',
-    'PLAN_STATUS_CONFLICT',
-    'OPERATION_KEY_REUSED',
-    'RATE_LIMITED',
-  ];
-  let n = 0;
-  globalThis.fetch = (() => {
-    const index = n++;
-    if (index < errors.length)
-      return Promise.resolve(Response.json({
-        code: 'P0001',
-        message: errors[index],
-        details: 'SQLSTATE internal_id=42 authorization secret',
-      }, { status: 400 }));
-    return Promise.resolve(Response.json(envelope({
-      ...claimData,
-      claimed_items: [{ ...claimData.claimed_items[0], item: { ...item, item_config: { claim_token: claimToken } } }],
-    })));
-  }) as typeof fetch;
-  try {
-    for (const expected of errors) {
-      const response = await call('claim_content_plan_items', claimArgs);
-      const text = JSON.stringify(response);
-      assert(response?.isError === true && text.includes(expected), 'missing safe error ' + expected);
-      assert(!text.includes('SQLSTATE') && !text.includes('internal_id'), 'raw SQL leak');
-      assert(!text.includes(claimToken), 'token in error');
-      if (expected === 'RATE_LIMITED') assert(text.includes('retry_after_seconds'), 'rate limit recovery hint');
+Deno.test(
+  '6.5 replay claim returns identical historical token/expiry without hidden renewal',
+  async () => {
+    const original = globalThis.fetch;
+    const snapshots: object[] = [
+      envelope(claimData),
+      envelope({ ...claimData, replayed: true }),
+      envelope({ ...claimData, claimed_items: [], remaining_claimable_count: 0, replayed: false }),
+    ];
+    let n = 0;
+    globalThis.fetch = (() => Promise.resolve(Response.json(snapshots[n++]))) as typeof fetch;
+    try {
+      const first = await call('claim_content_plan_items', { ...claimArgs, limit: 1 });
+      const second = await call('claim_content_plan_items', { ...claimArgs, limit: 1 });
+      const empty = await call('claim_content_plan_items', {
+        ...claimArgs,
+        limit: 3,
+        operation_key: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+      });
+      const data = (r: typeof first) => (r?.structuredContent as { data: typeof claimData }).data;
+      assert(
+        data(first).claimed_items[0].claim_token === data(second).claimed_items[0].claim_token,
+        'replay rotated token',
+      );
+      assert(
+        data(first).claimed_items[0].claim_expires_at ===
+          data(second).claimed_items[0].claim_expires_at,
+        'replay extended lease',
+      );
+      assert(data(second).replayed === true, 'replay marker missing');
+      assert(
+        data(empty).claimed_items.length === 0 && data(empty).remaining_claimable_count === 0,
+        'empty is successful',
+      );
+      assert(n === 3, 'unexpected RPC call count');
+    } finally {
+      globalThis.fetch = original;
     }
-    const malformed = await call('claim_content_plan_items', claimArgs);
-    assert(malformed?.isError === true, 'unexpected nested token must be rejected');
-    assert(!JSON.stringify(malformed).includes(claimToken), 'nested token leaked');
-  } finally {
-    globalThis.fetch = original;
-  }
-});
+  },
+);
+
+Deno.test(
+  '6.5 safe error mapping, rate limit, and token privacy fail closed on malformed RPC output',
+  async () => {
+    const original = globalThis.fetch;
+    const errors = [
+      'PLAN_ITEM_CLAIM_MISMATCH',
+      'PLAN_ITEM_CLAIM_EXPIRED',
+      'PLAN_CLAIM_RENEWAL_LIMIT',
+      'PLAN_STATUS_CONFLICT',
+      'OPERATION_KEY_REUSED',
+      'RATE_LIMITED',
+    ];
+    let n = 0;
+    globalThis.fetch = (() => {
+      const index = n++;
+      if (index < errors.length)
+        return Promise.resolve(
+          Response.json(
+            {
+              code: 'P0001',
+              message: errors[index],
+              details: 'SQLSTATE internal_id=42 authorization secret',
+            },
+            { status: 400 },
+          ),
+        );
+      return Promise.resolve(
+        Response.json(
+          envelope({
+            ...claimData,
+            claimed_items: [
+              {
+                ...claimData.claimed_items[0],
+                item: { ...item, item_config: { claim_token: claimToken } },
+              },
+            ],
+          }),
+        ),
+      );
+    }) as typeof fetch;
+    try {
+      for (const expected of errors) {
+        const response = await call('claim_content_plan_items', claimArgs);
+        const text = JSON.stringify(response);
+        assert(
+          response?.isError === true && text.includes(expected),
+          'missing safe error ' + expected,
+        );
+        assert(!text.includes('SQLSTATE') && !text.includes('internal_id'), 'raw SQL leak');
+        assert(!text.includes(claimToken), 'token in error');
+        if (expected === 'RATE_LIMITED')
+          assert(text.includes('retry_after_seconds'), 'rate limit recovery hint');
+      }
+      const malformed = await call('claim_content_plan_items', claimArgs);
+      assert(malformed?.isError === true, 'unexpected nested token must be rejected');
+      assert(!JSON.stringify(malformed).includes(claimToken), 'nested token leaked');
+    } finally {
+      globalThis.fetch = original;
+    }
+  },
+);
