@@ -110,7 +110,7 @@ Deno.test('6.2 discovery and 401 WWW-Authenticate bind exact resource', async ()
     ).status === 204,
     'preflight closed',
   );
-  assert(MCP_TOOL_COUNT === 12, '6.4 must have nine owner-scoped tools');
+  assert(MCP_TOOL_COUNT === 12, '6.5 must have twelve owner-scoped tools');
 });
 
 Deno.test(
@@ -179,7 +179,7 @@ Deno.test(
 );
 
 Deno.test(
-  '6.4 real HTTP MCP transport accepts signed owner fixture and lists nine tools',
+  '6.5 real HTTP MCP transport accepts signed owner fixture and lists twelve tools',
   async () => {
     const { claims, dependencies, sign } = await fixture();
     const token = await sign(claims);
