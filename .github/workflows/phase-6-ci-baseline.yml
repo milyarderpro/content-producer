@@ -4,6 +4,11 @@ on:
   push:
     branches: [codex/phase-6-mcp]
   workflow_dispatch:
+    inputs:
+      full_gate:
+        description: Run the Batch A full gate (6.6 only)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -14,14 +19,17 @@ concurrency:
 
 jobs:
   checkpoint:
-    name: Phase 6.5 targeted CI (12 MCP tools)
+    name: Phase 6.6 checkpoint and Batch A gate (15 MCP tools)
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 120
     env:
       SUPABASE_TELEMETRY_DISABLED: '1'
+      FULL_GATE: ${{ contains(github.event.head_commit.message, '[batch-a-gate]') || inputs.full_gate == true }}
     steps:
       - name: Checkout checkpoint commit
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install pinned pnpm
         uses: pnpm/action-setup@v4
@@ -60,12 +68,14 @@ jobs:
 
       - name: Required project check
         id: check
+        if: env.FULL_GATE != 'true'
         run: |
           pnpm run check
           echo "Exit code: 0 (pnpm run check)"
 
       - name: Verify migration filenames
         id: migrations
+        if: env.FULL_GATE != 'true'
         run: |
           pnpm run verify-migrations
           echo "Exit code: 0 (pnpm run verify-migrations)"
@@ -73,11 +83,14 @@ jobs:
       - name: Verify pinned Supabase CLI
         id: cli
         run: |
+          pnpm exec supabase db reset --help > /dev/null
+          pnpm exec supabase migration list --help > /dev/null
           test "$(pnpm exec supabase --version)" = "2.120.0"
           echo "Supabase CLI: 2.120.0 (verified)"
 
-      - name: Checkpoint 6.5 - internal MCP tests
+      - name: Checkpoint 6.6 - internal MCP tests
         id: mcp
+        if: env.FULL_GATE != 'true'
         run: |
           pnpm run test:mcp
           echo "Exit code: 0 (pnpm run test:mcp)"
@@ -106,7 +119,7 @@ jobs:
           echo "Migration SQL count: $(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
           exit "$code"
 
-      - name: Checkpoint 6.5 - local HTTP fail-closed smoke
+      - name: Checkpoint 6.6 - local HTTP fail-closed smoke
         id: http
         shell: bash
         run: |
@@ -119,6 +132,7 @@ jobs:
 
       - name: Focused database regression - Phase 5 claim/lease/failure, plan race, Page/plan and security
         id: regression
+        if: env.FULL_GATE != 'true'
         shell: bash
         run: |
           started=$SECONDS
@@ -137,8 +151,55 @@ jobs:
           echo "Focused Phase 5 regression: exit code $code; elapsed $((SECONDS - started))s"
           exit "$code"
 
-      # Gate penuh (pnpm run test-all, smoke-test, supabase:verify, audits,
-      # Inspector, git diff --check) is reserved for 6.6 and 6.13.
+      # Full gate runs only for the tagged Batch A commit or explicit 6.6 dispatch.
+      # Future checkpoint pushes retain targeted CI, without automatic test-all.
+      - name: Batch A - test-all after clean reset (includes check, migration names, MCP, database)
+        id: full
+        if: env.FULL_GATE == 'true'
+        run: |
+          pnpm run test-all
+          echo "Exit code: 0 (pnpm run test-all)"
+
+      - name: Batch A - smoke-test (duplicates database suite in test-all)
+        id: smoke
+        if: env.FULL_GATE == 'true'
+        run: |
+          pnpm run smoke-test
+          echo "Exit code: 0 (pnpm run smoke-test; database suite duplicated)"
+
+      - name: Batch A - verify applied local migration history
+        id: history
+        if: env.FULL_GATE == 'true'
+        run: |
+          pnpm run supabase:verify
+          echo "Exit code: 0 (pnpm run supabase:verify)"
+
+      - name: Batch A - security catalog and fixture cleanup audit
+        id: audit
+        if: env.FULL_GATE == 'true'
+        run: |
+          pnpm exec tsx scripts/phase-5-evidence.ts final
+          mkdir -p "$RUNNER_TEMP/phase-6-evidence"
+          cp docs/phase-5-9-final-catalog.json "$RUNNER_TEMP/phase-6-evidence/batch-a-catalog.json"
+          git restore docs/phase-5-9-final-catalog.json
+          echo "Exit code: 0 (33 RPCs, RLS/ACL, source/history, fixture cleanup audit)"
+
+      - name: Batch A - authenticated public HTTP MCP and pinned Inspector against real local database
+        id: inspector
+        if: env.FULL_GATE == 'true'
+        run: |
+          pnpm exec tsx scripts/phase-6-batch-a.ts
+          pnpm exec tsx scripts/phase-5-evidence.ts final
+          cp docs/phase-5-9-final-catalog.json "$RUNNER_TEMP/phase-6-evidence/batch-a-post-inspector-catalog.json"
+          git restore docs/phase-5-9-final-catalog.json
+          echo "Exit code: 0 (Inspector 2.5.0, 15 valid/invalid tools, auth, recovery/race, post-test audit)"
+
+      - name: Batch A - git diff whitespace check
+        id: diff
+        if: env.FULL_GATE == 'true'
+        run: |
+          git diff --check
+          echo "Exit code: 0 (git diff --check)"
 
       - name: Record non-sensitive checkpoint evidence
         if: always()
@@ -153,18 +214,24 @@ jobs:
           RESET_OUTCOME: ${{ steps.reset.outcome }}
           MCP_OUTCOME: ${{ steps.mcp.outcome }}
           HTTP_OUTCOME: ${{ steps.http.outcome }}
+          FULL_OUTCOME: ${{ steps.full.outcome }}
+          SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
+          HISTORY_OUTCOME: ${{ steps.history.outcome }}
+          AUDIT_OUTCOME: ${{ steps.audit.outcome }}
+          INSPECTOR_OUTCOME: ${{ steps.inspector.outcome }}
+          DIFF_OUTCOME: ${{ steps.diff.outcome }}
           REGRESSION_OUTCOME: ${{ steps.regression.outcome }}
         run: |
           mkdir -p "$RUNNER_TEMP/phase-6-evidence"
-          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.5.md"
+          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.6.md"
           {
-            echo "# Phase 6.5 targeted checkpoint CI"
+            echo "# Phase 6.6 checkpoint / Batch A gate CI"
             echo
             echo "- Commit: $(git rev-parse HEAD)"
             echo "- Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             echo "- Started UTC: ${STARTED_UTC:-not recorded}"
             echo "- Finished UTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            echo "- New tools: 3; cumulative tools: **12/33**"
+            echo "- New tools: 3; cumulative tools: **15/33**"
             echo "- Local Supabase only, no remote project, secrets, or deployment"
             echo
             echo "| Stage | Actual command / scope | GitHub step outcome |"
@@ -180,7 +247,14 @@ jobs:
             echo '| Black-box HTTP | `supabase functions serve mcp --no-verify-jwt` + HTTP smoke | '"$HTTP_OUTCOME"' |'
             echo '| Focused regression | Phase 5 plan lifecycle/claims, concurrency, Page/plan, security/catalog, metrics/rate limits, baseline | '"$REGRESSION_OUTCOME"' |'
             echo
-            echo "The complete batch gate is NOT run on checkpoint pushes; it is reserved for 6.6/6.13."
+            echo "| Full test-all (includes check/MCP/migration names/database) | sequential after clean reset | $FULL_OUTCOME |"
+            echo "| Smoke (duplicates database suite) | pnpm run smoke-test | $SMOKE_OUTCOME |"
+            echo "| Migration history | pnpm run supabase:verify | $HISTORY_OUTCOME |"
+            echo "| Security/catalog/cleanup | phase-5-evidence.ts final | $AUDIT_OUTCOME |"
+            echo "| Inspector 2.5.0 + real DB public HTTP | 15 valid / 15 invalid tool calls, auth, recovery and race | $INSPECTOR_OUTCOME |"
+            echo "| Whitespace | git diff --check | $DIFF_OUTCOME |"
+            echo "Full gate requested: $FULL_GATE. test-all includes check/MCP and smoke repeats database tests; these are not independent evidence."
+            echo "Hosted OAuth/PKCE/consent/DCR/refresh/relink/ChatGPT 2xx: deferred Phase 9–10. Independent Batch A audit still pending."
             echo "Numerical exit codes and exact assertions are in Actions step logs. A skipped stage is not a pass."
           } > "$report"
           cat "$report" >> "$GITHUB_STEP_SUMMARY"
@@ -189,7 +263,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase-6-5-ci-evidence
-          path: ${{ runner.temp }}/phase-6-evidence/checkpoint-6.5.md
+          name: phase-6-6-ci-evidence
+          path: ${{ runner.temp }}/phase-6-evidence/
           if-no-files-found: error
           retention-days: 14

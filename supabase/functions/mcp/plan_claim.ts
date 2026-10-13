@@ -40,7 +40,7 @@ const failureCode = z.enum([
 ]);
 // Match the Phase 5 safe-reason validator before transmitting a failure
 // detail. Never allow tokens, UUIDs, SQL or secret-like text as failure data.
-const safeDetail = z
+export const safeDetail = z
   .string()
   .min(1)
   .max(500)

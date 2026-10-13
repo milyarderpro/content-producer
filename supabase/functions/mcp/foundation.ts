@@ -206,6 +206,12 @@ const safeErrors = {
     false,
     'Review current Page posts.',
   ],
+  POST_NOT_FOUND: ['Post is not available.', false, 'Read current Page posts.'],
+  PLAN_ITEM_REPLACEMENT_BLOCKED: [
+    'This output cannot be replaced.',
+    false,
+    'Review the discarded pre-publication output.',
+  ],
   PLAN_NOT_FOUND: ['Content plan is not available.', false, 'List plans for this workspace.'],
   PLAN_LIMIT_EXCEEDED: ['Plan item limit exceeded.', false, 'Reduce the requested item count.'],
   PLAN_ITEM_NOT_FOUND: ['Plan item is not available.', false, 'Read current plan items.'],

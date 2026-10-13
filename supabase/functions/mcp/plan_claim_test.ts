@@ -133,11 +133,11 @@ async function call(name: string, args: object) {
 }
 
 Deno.test(
-  '6.5 registry exposes exactly twelve OAuth tools and no profile/annotation drift',
+  '6.5 registry exposes exactly fifteen OAuth tools and no profile/annotation drift',
   async () => {
     const listed = await mcp('tools/list');
     const tools = listed.result?.tools ?? [];
-    assert(MCP_TOOL_COUNT === 12 && tools.length === 12, 'exact 12 registered tools');
+    assert(MCP_TOOL_COUNT === 15 && tools.length === 15, 'exact 15 registered tools');
     for (const name of PLAN_CLAIM_TOOL_NAMES) {
       const tool = tools.find((t) => t.name === name);
       assert(tool, 'missing claim tool ' + name);
@@ -160,7 +160,7 @@ Deno.test(
         'closed output',
       );
     }
-    assert(!tools.some((t) => t.name === 'retry_content_plan_item'), '6.6 not yet registered');
+    assert(!tools.some((t) => t.name === 'trivia_find_similar_facts'), '6.7 not yet registered');
   },
 );
 
