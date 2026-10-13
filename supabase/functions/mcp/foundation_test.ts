@@ -129,9 +129,9 @@ Deno.test(
     const listed = await request('tools/list');
     for (const name of FOUNDATION_TOOL_NAMES) assert(listed.includes(name), 'missing ' + name);
     assert((listed.match(/"readOnlyHint":true/g) || []).length === 6, 'six read-only tools');
-    assert((listed.match(/"openWorldHint":false/g) || []).length === 9, 'open world must be off');
+    assert((listed.match(/"openWorldHint":false/g) || []).length === 12, 'open world must be off');
     assert(listed.split('"openai/profile":true').length === 2, 'one profile metadata');
-    assert((listed.match(/"oauth2"/g) || []).length === 9, 'nine OAuth security schemes');
+    assert((listed.match(/"oauth2"/g) || []).length === 12, 'twelve OAuth security schemes');
     assert(listed.includes('create_page'), '6.4 tool must be present');
   },
 );
