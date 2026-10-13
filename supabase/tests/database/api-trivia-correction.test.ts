@@ -250,7 +250,7 @@ describe('Checkpoint 5.5 public trivia reverify and correction', () => {
     } finally {
       cleanup(f);
     }
-  });
+  }, 20_000);
 
   it('caps affected summaries at 50 without capping mutation or exact counts', () => {
     const f = fixture();

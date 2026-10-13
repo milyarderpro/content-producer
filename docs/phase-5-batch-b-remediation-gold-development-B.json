@@ -1,0 +1,11 @@
+{
+  "split": "development",
+  "counts": {
+    "cases": 105,
+    "same": 63,
+    "same_found": 63,
+    "exact": 21,
+    "structured": 16,
+    "unsafe_auto_signals": 0
+  }
+}

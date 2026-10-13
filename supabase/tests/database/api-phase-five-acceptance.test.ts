@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { format } from 'prettier';
+import { format, resolveConfig } from 'prettier';
 import { phaseFiveOperationMap } from './phase-5-operation-map.test.js';
 import { row, sql } from './helpers/plan-lifecycle.js';
 import {
@@ -189,13 +189,16 @@ describe('5.9 phase-wide public surface and scope acceptance', () => {
       console.info(
         `5.9 public local p95: ${JSON.stringify(timings)}; fixture=251 posts/10040 observations; normal planner`,
       );
-      const label = process.env.PHASE5_EVIDENCE_RUN;
+      const label = process.env.CR016_EVIDENCE_RUN ?? process.env.PHASE5_EVIDENCE_RUN;
+      const prefix = process.env.CR016_EVIDENCE_RUN
+        ? 'phase-5-batch-b-remediation-performance'
+        : 'phase-5-9-performance';
       if (label === 'A' || label === 'B')
         writeFileSync(
-          `docs/phase-5-9-performance-${label}.json`,
+          `docs/${prefix}-${label}.json`,
           await format(
             JSON.stringify({ label, fixture: { posts: 251, observations: 10040 }, timings, plans }),
-            { parser: 'json' },
+            { ...(await resolveConfig(`docs/${prefix}-${label}.json`)), parser: 'json' },
           ),
         );
     } finally {

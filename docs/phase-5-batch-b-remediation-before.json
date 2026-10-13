@@ -1,0 +1,28 @@
+{
+  "baseline": "289afe31d7700cdee962ce8e8d014c449100041c",
+  "initial_census": {
+    "posts": 0,
+    "users": 0,
+    "qualifying": 0,
+    "workspaces": 0
+  },
+  "populated_census": { "n": 2 },
+  "fixture": { "n": 5001, "digest": "93d96d699e2701ab57117b0af40b71c1" },
+  "result_digest": "ac8aebb557bd6133044abd166e2b0401b63eb12044626d60242630b704f79c00",
+  "function_digest": "4706a2fdaf1dbe78b70ebf839a763d06",
+  "timing": {
+    "n": 12,
+    "samples_ms": [
+      3721.0019680000005, 3773.640907999994, 3737.2508030000026, 3717.110099999998,
+      3795.0956650000007, 3749.512416000005, 3714.5154459999976, 3787.218814, 3719.5149949999977,
+      3798.7787420000095, 3727.3059769999963, 3751.487872999991
+    ],
+    "p95_ms": 3798.7787420000095,
+    "target_ms": 3000
+  },
+  "plans": {
+    "public_rpc": "Result  (cost=0.00..0.26 rows=1 width=32) (actual time=3669.245..3669.245 rows=1 loops=1)\n  Buffers: shared hit=5605\nPlanning Time: 0.010 ms\nExecution Time: 3669.255 ms",
+    "private_diagnostic": "Function Scan on trivia_candidates_v3  (cost=5.51..15.51 rows=1000 width=73) (actual time=3976.676..3976.679 rows=20 loops=1)\n  Buffers: shared hit=2411\n  InitPlan 2\n    ->  Seq Scan on workspaces  (cost=0.26..5.26 rows=1 width=8) (actual time=0.157..0.172 rows=1 loops=1)\n          Filter: (is_active AND ((InitPlan 1).col1 = owner_user_id) AND (public_id = '3ec718b4-a8d3-4f1a-8748-c42d726c8c78'::uuid))\n          Rows Removed by Filter: 2\n          Buffers: shared hit=31\n          InitPlan 1\n            ->  Result  (cost=0.00..0.26 rows=1 width=16) (actual time=0.136..0.137 rows=1 loops=1)\n                  Buffers: shared hit=26\nPlanning:\n  Buffers: shared hit=963\nPlanning Time: 5.063 ms\nExecution Time: 3976.772 ms"
+  },
+  "enable_seqscan": "on"
+}

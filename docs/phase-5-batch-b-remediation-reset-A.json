@@ -1,0 +1,3053 @@
+{
+  "baseline": "289afe31d7700cdee962ce8e8d014c449100041c",
+  "original_migration_count": 63,
+  "migration_count": 67,
+  "manifest": [
+    {
+      "file": "20261008045700_baseline_extensions_and_schemas.sql",
+      "sha256": "87b7b398dfdeaea64b29cfee302a74479298437ad14aa2cd1471599ee2f53dd9"
+    },
+    {
+      "file": "20261008083822_create_workspaces_and_niches.sql",
+      "sha256": "1e298894206aab1445b64158b238884134f12522f90c301706e51c01d13e5b37"
+    },
+    {
+      "file": "20261008090336_create_operation_ledger_and_rate_limit_buckets.sql",
+      "sha256": "01bb623b5860f734e2a66f22a77bc87fdbca7c5eed2eecae4f1aee71aeac45c9"
+    },
+    {
+      "file": "20261008113150_create_pages_and_page_niche_configs.sql",
+      "sha256": "fec4bdbfd2f072607feec4d8e17086f76d61ccaae4009d8f67d8e45ea3c01053"
+    },
+    {
+      "file": "20261008114606_create_content_plans_and_plan_items.sql",
+      "sha256": "ce7673255ad03688b7be621a986f4a49c813613e32967fb1c91caec244852da7"
+    },
+    {
+      "file": "20261008123228_tighten_operation_key_uuid_v4_constraint.sql",
+      "sha256": "c9ab29f679d5321439b832c511ed85fcc607ae2bef9416a8b3d02c0fce6b5d6e"
+    },
+    {
+      "file": "20261008130753_create_posts_and_post_metrics.sql",
+      "sha256": "01a4f0194138ec0c73ec573c0112583898a33fa976ab99971138697a69648e49"
+    },
+    {
+      "file": "20261008132513_add_core_validators_primitives_and_indexes.sql",
+      "sha256": "851844d8f890bdfd3c00c7a6e218a30fe3062e35a2055bc167e3a369b32173f7"
+    },
+    {
+      "file": "20261008165228_harden_phase_three_validators_and_metrics.sql",
+      "sha256": "19ba758048a03b2e9bf4484d907c97e8cc55870c11a094878a695f4ac46c8c6e"
+    },
+    {
+      "file": "20261009004020_correct_editorial_evidence_contract.sql",
+      "sha256": "7df26008dcc6d10f3753f8eaee9daada713dd1d46b5e2c518a8f70c3baf932dc"
+    },
+    {
+      "file": "20261009012428_enforce_integer_evidence_versions.sql",
+      "sha256": "8640aa08f66b0c03cf4b46522fa3c9ec4d078ababd7a40319446b5f7b99f0fa9"
+    },
+    {
+      "file": "20261009043307_create_trivia_facts.sql",
+      "sha256": "e2ae67888cf08d8374f787d73138262cffd1c947bc05c180be77cd814c63dfd7"
+    },
+    {
+      "file": "20261009060516_add_trivia_identity_source_freshness.sql",
+      "sha256": "7f1035265350d5123a0fb56fcae25c45036f79d906a5f279bdac368242cdc464"
+    },
+    {
+      "file": "20261009063241_add_trivia_candidate_retrieval.sql",
+      "sha256": "a9eea5cd8ae94b8050f7dcc7fae9e7fc1465c73fbe1ec11242a414ec7674653c"
+    },
+    {
+      "file": "20261009075733_remediate_batch_a_audit_findings.sql",
+      "sha256": "207e1ec468644ac15410aef1cc93e45326edc4a5644882ed59352effe2be8bac"
+    },
+    {
+      "file": "20261009113820_finalize_batch_a_contract_remediation.sql",
+      "sha256": "cfafdd564ae78d76ce95327008614e74fb4e87b9e8a5c0021f41b05d31f9042d"
+    },
+    {
+      "file": "20261009164218_extend_trivia_canonical_units.sql",
+      "sha256": "7fd92452dcdab585aa345e8f23b5af0b8641d58d74a7cbe87206cd5960b342dc"
+    },
+    {
+      "file": "20261010072439_create_trivia_post_facts_and_usage_snapshots.sql",
+      "sha256": "ee5fc323694b2690e6c1d35a0799a2cf785656f6d5e90c40951f4e7d3b291614"
+    },
+    {
+      "file": "20261010081127_add_trivia_reservation_and_reuse_primitives.sql",
+      "sha256": "aab1b7b41de92e2cc6bdea2b823f8525f605fa08962135718516a8bbf25f677f"
+    },
+    {
+      "file": "20261010084550_add_trivia_lineage_reverification_correction_primitives.sql",
+      "sha256": "567e37e95def106d84299dbb31733a1d71f60ec6df0976909156e2480454eb31"
+    },
+    {
+      "file": "20261010132708_phase_5_security_kernel.sql",
+      "sha256": "f451e129e70d089c6aa73e1f598d8034f3e9d261e1e69a53547f7e05dec703a1"
+    },
+    {
+      "file": "20261010145937_harden_phase_5_security_kernel.sql",
+      "sha256": "8ec40ce3e5eebc1586f9d6f9eff27620a331757a20f57b245d695c3143babc27"
+    },
+    {
+      "file": "20261010150936_grant_api_owner_auth_uid_access.sql",
+      "sha256": "0553b1ac03159661819daea4903a1f5f429ec7b262ce73fe0ddf4ef73d16b943"
+    },
+    {
+      "file": "20261010152018_add_auth_uid_identity_bridge.sql",
+      "sha256": "0afd2051179aedf7632cd5dd5cfa678ef320644449e1c48509856f00dc5bfce1"
+    },
+    {
+      "file": "20261011012723_revoke_direct_auth_privileges_from_api_owner.sql",
+      "sha256": "7f9bd9f1457e0e8b1665ceb47c8cf169209a966e0bb7e1bdd0bf4389a64ffab0"
+    },
+    {
+      "file": "20261011015742_phase_5_2_owner_scoped_read_projections.sql",
+      "sha256": "346328b0e10109121fe66e83c1a51d41495df0bf9e4055d25cd06d5b795851e3"
+    },
+    {
+      "file": "20261011030705_remediate_phase_5_2_read_contracts.sql",
+      "sha256": "6e55ab079b7d8934d9a744f82fbf50b5fd472bf317651d72043efc8fa6560196"
+    },
+    {
+      "file": "20261011052125_phase_5_3_page_and_content_plan_writes.sql",
+      "sha256": "61103bc134ac0b35b08aa5735dca079740262889c89124c952991eeb80bda67e"
+    },
+    {
+      "file": "20261011071343_remediate_phase_5_3_audit_contracts.sql",
+      "sha256": "093cfe53d4b03d87853154032cea60308ec8e52ac554f40bc920be45a7131ec3"
+    },
+    {
+      "file": "20261011071839_harden_phase_5_3_snapshot_context.sql",
+      "sha256": "66b18d9c7939a4d1f778fc879898f8ebcd10240600dfa64422ca05d75ad43b3c"
+    },
+    {
+      "file": "20261011073111_close_phase_5_3_config_validation.sql",
+      "sha256": "ff1618642bab086cd1618476cdb46cde66599230a1bc24c5debc7242dc61729b"
+    },
+    {
+      "file": "20261011101751_phase_5_4_plan_lifecycle_foundation.sql",
+      "sha256": "b94698e913230f7bf3283149053d1140282b3adbecfc07f4da6234b5e955fd48"
+    },
+    {
+      "file": "20261011101753_phase_5_4_plan_lifecycle_rpcs.sql",
+      "sha256": "de7497b82e44641e4a28839455695a57fa086ddc2c416a048eb6749c3e4b915d"
+    },
+    {
+      "file": "20261011104153_harden_phase_5_4_replay_projections.sql",
+      "sha256": "d130962801644cda64f507876a545d5284d2ac1eebec0c57f48c9e2ac5851e20"
+    },
+    {
+      "file": "20261011104603_guard_phase_5_4_terminal_plan_claims.sql",
+      "sha256": "0f184b3f643bb798ac915057b0abfd46231da24804b893e36b3a56a5819e4224"
+    },
+    {
+      "file": "20261011104806_map_phase_5_4_statement_cancellation.sql",
+      "sha256": "d5835a6df5e99a7957c5ba022270236ff713b3bf2c549922273ab8d9599b721f"
+    },
+    {
+      "file": "20261011131503_phase_5_5_trivia_rpc_foundation.sql",
+      "sha256": "4d615edb213620820a32a780f2e03af9b620930f0c3e0aa53b6dfa4384542583"
+    },
+    {
+      "file": "20261011131505_phase_5_5_trivia_registration_reservation_rpcs.sql",
+      "sha256": "f16baf32929f68b41f64f041abc6ed2c426fe95b31d4996ddbf8bc818e207f41"
+    },
+    {
+      "file": "20261011131507_phase_5_5_trivia_reverification_correction_rpcs.sql",
+      "sha256": "adb27ee152c00f0d9bad1e151dda8dc21a9b559c9cf0b5f84f14f32cfa4fce1a"
+    },
+    {
+      "file": "20261011151632_harden_phase_5_5_fact_resolution.sql",
+      "sha256": "4a4bbb9d6d78efed77c9c2c8a73e445401d6df286f64e40b244910fac83ccfda"
+    },
+    {
+      "file": "20261011151903_harden_phase_5_5_ordered_candidate_sets.sql",
+      "sha256": "a9f1392897639d95ddd344d7db683af6c690d2c257bb7a9a7935afba73e03c37"
+    },
+    {
+      "file": "20261011152031_fix_phase_5_5_token_free_completion.sql",
+      "sha256": "2e199a7900ad44220539fb2d7e4cb3d291aaaa884052a8582e2fc6b476523090"
+    },
+    {
+      "file": "20261011152154_fix_phase_5_5_review_aliases_and_post_dependencies.sql",
+      "sha256": "b4c4a357371b3610d4b38e2c811a2fc3f1b67f6e2424925ee4d0875b3409270c"
+    },
+    {
+      "file": "20261011152951_enforce_phase_5_5_read_limits_and_closed_replay.sql",
+      "sha256": "aadd976b5a58545e587005b14e90a3c5f63d40fc15c28d8511b6fa067dd09198"
+    },
+    {
+      "file": "20261011153430_guard_phase_5_5_identity_and_replay_bindings.sql",
+      "sha256": "f6e7153affc748eb3b295d3164efb839c837e34ad6e39296b6eadbe68f64044d"
+    },
+    {
+      "file": "20261011154353_harden_phase_5_5_history_context.sql",
+      "sha256": "d3225aeb27e1fd6ce31502d6f9d3cbb6fd5ef4b95f3f3c6c532dec049bfafc1a"
+    },
+    {
+      "file": "20261011164409_phase_5_6_renderer_and_quality.sql",
+      "sha256": "38ef5dae162aae1b11a4696c9ca349734fea14f4ad0965f73ecec08d9206d141"
+    },
+    {
+      "file": "20261011164412_phase_5_6_post_transaction_foundation.sql",
+      "sha256": "0424a02656d9a33872ebe6b88044c93b1d11a7a0ed30cda41fdba7c37575056a"
+    },
+    {
+      "file": "20261011164415_phase_5_6_post_write_rpcs.sql",
+      "sha256": "efff092ebe7702e93025f7499124997351d70aa3f13c0c1dec19fd80b5949b06"
+    },
+    {
+      "file": "20261011165618_harden_phase_5_6_record_resolution.sql",
+      "sha256": "fb6bcce58a54c6dfecec957736e970741351345a0c90255d969d9e4ce49f4aa2"
+    },
+    {
+      "file": "20261011165728_qualify_phase_5_6_target_discovery.sql",
+      "sha256": "23fb326759b9d8adc1052c194c684ee511a8afe285eecab1f3b54e0e89731ce7"
+    },
+    {
+      "file": "20261011170544_close_phase_5_6_history_and_metrics.sql",
+      "sha256": "2410585804345cd727e3d78eac4471b4817f6e7699e31f45d183f5825c472dcd"
+    },
+    {
+      "file": "20261012024443_enforce_phase_5_6_text_privacy.sql",
+      "sha256": "6a59a67958391b410a4d5fd4b7404be03388c97c1b65e8730bf9ea7385150105"
+    },
+    {
+      "file": "20261012025954_enforce_phase_5_6_schedule_evidence.sql",
+      "sha256": "c6a21beaf40725f05113b61c9e58e4774d16a88d1cac8387e79d0822bcd8d5f7"
+    },
+    {
+      "file": "20261012030302_guard_phase_5_6_claim_source_privacy.sql",
+      "sha256": "95e28ea8da6ef27399c7f5a37d2f64196e45f6dde18a5e5fddf5f12150dadc3e"
+    },
+    {
+      "file": "20261012045014_phase_5_7_lifecycle_gate.sql",
+      "sha256": "453e88a5d6a7afb5352a2e0edef328fba64f1d695071f9216382bfc8efe0b882"
+    },
+    {
+      "file": "20261012045016_phase_5_7_lifecycle_history.sql",
+      "sha256": "f26dea3208c30da9cdee51f3878bfcf653c2b6d6d90587a26708314dc1002c54"
+    },
+    {
+      "file": "20261012045018_phase_5_7_lifecycle_rpcs.sql",
+      "sha256": "60c60a960e837c4a622d26eb0af98dd01e8dff576c25893a56b20e4f9cb4fd55"
+    },
+    {
+      "file": "20261012052003_harden_phase_5_7_history_metadata.sql",
+      "sha256": "7571ef5a384df0ab5e1c18115501ff43586add8bdbed05b769b3a96e3725494a"
+    },
+    {
+      "file": "20261012072241_phase_5_8_metrics_foundation.sql",
+      "sha256": "d1175def89be53c05fd70b04d47883369635acd78762861ba69c19ac1e0f872f"
+    },
+    {
+      "file": "20261012072242_phase_5_8_record_post_performance.sql",
+      "sha256": "7d6c83b34862e642f6dd907f4183e1ff66c52cbed2594fd770d2fd5b4a4b9391"
+    },
+    {
+      "file": "20261012072243_phase_5_8_metrics_read_completion.sql",
+      "sha256": "6fb580d25f47df59975bd36d98c80a0f5ecb50b555c7113cb5fa3d570a5bb001"
+    },
+    {
+      "file": "20261012073221_harden_phase_5_8_insight_lookup.sql",
+      "sha256": "b34f76757a92df6cd5cdcdf22f453ce7f7be90c4a249b9f22cb8983e8f69fc97"
+    },
+    {
+      "file": "20261012124844_restore_nonretroactive_allocation_reuse.sql",
+      "sha256": "a18cc7cb8489de5ede82425bf766810c5608a6a72fb4c4723359d4e547d07225"
+    },
+    {
+      "file": "20261012124847_normalize_unapproved_draft_quality.sql",
+      "sha256": "577a9a0a0574c051125863d176292319cc9b598478213a4843b2e6fca8d7e5a3"
+    },
+    {
+      "file": "20261012124850_enforce_config_aware_preferred_profiles.sql",
+      "sha256": "ba5ba61a716f5da604f0e1503a34f9747c9bbea352eb6610683b3e75c1139f5b"
+    },
+    {
+      "file": "20261012124852_materialize_trivia_candidate_input.sql",
+      "sha256": "4396d390ddd66501209d6d12774f1971c16eac6e4b3606bc81b1c1138af29813"
+    }
+  ],
+  "applied": [
+    "20261008045700",
+    "20261008083822",
+    "20261008090336",
+    "20261008113150",
+    "20261008114606",
+    "20261008123228",
+    "20261008130753",
+    "20261008132513",
+    "20261008165228",
+    "20261009004020",
+    "20261009012428",
+    "20261009043307",
+    "20261009060516",
+    "20261009063241",
+    "20261009075733",
+    "20261009113820",
+    "20261009164218",
+    "20261010072439",
+    "20261010081127",
+    "20261010084550",
+    "20261010132708",
+    "20261010145937",
+    "20261010150936",
+    "20261010152018",
+    "20261011012723",
+    "20261011015742",
+    "20261011030705",
+    "20261011052125",
+    "20261011071343",
+    "20261011071839",
+    "20261011073111",
+    "20261011101751",
+    "20261011101753",
+    "20261011104153",
+    "20261011104603",
+    "20261011104806",
+    "20261011131503",
+    "20261011131505",
+    "20261011131507",
+    "20261011151632",
+    "20261011151903",
+    "20261011152031",
+    "20261011152154",
+    "20261011152951",
+    "20261011153430",
+    "20261011154353",
+    "20261011164409",
+    "20261011164412",
+    "20261011164415",
+    "20261011165618",
+    "20261011165728",
+    "20261011170544",
+    "20261012024443",
+    "20261012025954",
+    "20261012030302",
+    "20261012045014",
+    "20261012045016",
+    "20261012045018",
+    "20261012052003",
+    "20261012072241",
+    "20261012072242",
+    "20261012072243",
+    "20261012073221",
+    "20261012124844",
+    "20261012124847",
+    "20261012124850",
+    "20261012124852"
+  ],
+  "audit": {
+    "cleanup": {
+      "facts": 0,
+      "items": 0,
+      "pages": 0,
+      "plans": 0,
+      "posts": 0,
+      "events": 0,
+      "ledger": 0,
+      "configs": 0,
+      "metrics": 0,
+      "junctions": 0,
+      "workspaces": 0,
+      "post_history": 0,
+      "rate_buckets": 0,
+      "fixture_users": 0,
+      "reservation_history": 0
+    },
+    "schemas": {
+      "anon_api_usage": false,
+      "authenticated_api_usage": true,
+      "authenticated_internal_usage": false
+    },
+    "owner_role": {
+      "login": false,
+      "inherit": false,
+      "bypassrls": false,
+      "superuser": false,
+      "api_create": false,
+      "memberships": 0,
+      "internal_create": false
+    },
+    "api_inventory": [
+      {
+        "name": "approve_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.approve_post(integer,uuid,uuid,uuid,integer,text,boolean,text[],text)",
+        "security_definer": true
+      },
+      {
+        "name": "archive_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.archive_post(integer,uuid,uuid,uuid,integer,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "cancel_content_plan",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.cancel_content_plan(integer,uuid,uuid,uuid,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "claim_content_plan_items",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.claim_content_plan_items(integer,uuid,uuid,uuid,integer,integer)",
+        "security_definer": true
+      },
+      {
+        "name": "create_content_plan",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.create_content_plan(integer,uuid,uuid,uuid,text,integer,jsonb,text,text)",
+        "security_definer": true
+      },
+      {
+        "name": "create_page",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.create_page(integer,uuid,uuid,text,text,text,text[],text,integer,jsonb,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "discard_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.discard_post(integer,uuid,uuid,uuid,integer,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "get_account_profile",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_account_profile(integer)",
+        "security_definer": true
+      },
+      {
+        "name": "get_content_plan",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_content_plan(integer,uuid,uuid,text[],integer,text)",
+        "security_definer": true
+      },
+      {
+        "name": "get_page_generation_context",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_page_generation_context(integer,uuid,uuid,text,integer,text,text,text,timestamp with time zone)",
+        "security_definer": true
+      },
+      {
+        "name": "get_performance_insights",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_performance_insights(integer,uuid,uuid,text,timestamp with time zone,timestamp with time zone,text[],text,integer,integer)",
+        "security_definer": true
+      },
+      {
+        "name": "get_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_post(integer,uuid,uuid,boolean,boolean,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "get_post_performance",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_post_performance(integer,uuid,uuid,timestamp with time zone,timestamp with time zone,integer,text)",
+        "security_definer": true
+      },
+      {
+        "name": "get_workspace_context",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_workspace_context(integer,uuid)",
+        "security_definer": true
+      },
+      {
+        "name": "list_content_plans",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.list_content_plans(integer,uuid,uuid,text,text,text[],timestamp with time zone,timestamp with time zone,integer,text)",
+        "security_definer": true
+      },
+      {
+        "name": "list_pages",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.list_pages(integer,uuid,text,boolean,text,integer,text)",
+        "security_definer": true
+      },
+      {
+        "name": "list_posts",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.list_posts(integer,uuid,uuid,text,text[],text,text,timestamp with time zone,timestamp with time zone,timestamp with time zone,timestamp with time zone,text,integer,text)",
+        "security_definer": true
+      },
+      {
+        "name": "mark_post_posted",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.mark_post_posted(integer,uuid,uuid,uuid,integer,text,timestamp with time zone,text,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "record_post_performance",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.record_post_performance(integer,uuid,uuid,uuid,timestamp with time zone,jsonb,jsonb)",
+        "security_definer": true
+      },
+      {
+        "name": "renew_content_plan_claim",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.renew_content_plan_claim(integer,uuid,uuid,uuid,uuid)",
+        "security_definer": true
+      },
+      {
+        "name": "replace_discarded_plan_item",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.replace_discarded_plan_item(integer,uuid,uuid,uuid,uuid,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "report_content_plan_item_failure",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.report_content_plan_item_failure(integer,uuid,uuid,uuid,uuid,text,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "reschedule_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.reschedule_post(integer,uuid,uuid,uuid,integer,timestamp with time zone,text)",
+        "security_definer": true
+      },
+      {
+        "name": "retry_content_plan_item",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.retry_content_plan_item(integer,uuid,uuid,uuid,text)",
+        "security_definer": true
+      },
+      {
+        "name": "revise_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.revise_post(integer,uuid,uuid,uuid,integer,text,uuid,integer,text,text,text,jsonb,jsonb,jsonb,jsonb,text)",
+        "security_definer": true
+      },
+      {
+        "name": "revoke_post_approval",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.revoke_post_approval(integer,uuid,uuid,uuid,integer,text,text,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "save_post",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.save_post(integer,uuid,uuid,uuid,text,uuid,timestamp with time zone,jsonb,timestamp with time zone,integer,text,text,text,jsonb,jsonb,jsonb,jsonb)",
+        "security_definer": true
+      },
+      {
+        "name": "trivia_correct_fact",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_correct_fact(integer,uuid,uuid,uuid,timestamp with time zone,text,text,jsonb,boolean)",
+        "security_definer": true
+      },
+      {
+        "name": "trivia_find_similar_facts",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_find_similar_facts(integer,uuid,uuid,jsonb,integer)",
+        "security_definer": true
+      },
+      {
+        "name": "trivia_register_and_reserve_facts",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_register_and_reserve_facts(integer,uuid,uuid,uuid,uuid,timestamp with time zone,text,integer,jsonb)",
+        "security_definer": true
+      },
+      {
+        "name": "trivia_release_facts",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_release_facts(integer,uuid,uuid,uuid,uuid,text)",
+        "security_definer": true
+      },
+      {
+        "name": "trivia_reverify_fact",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_reverify_fact(integer,uuid,uuid,uuid,timestamp with time zone,text,jsonb,text,date,timestamp with time zone,text,text)",
+        "security_definer": true
+      },
+      {
+        "name": "update_page",
+        "owner": "content_producer_api_owner",
+        "settings": ["search_path=\"\""],
+        "signature": "api.update_page(integer,uuid,uuid,uuid,timestamp with time zone,jsonb,jsonb)",
+        "security_definer": true
+      }
+    ],
+    "policy_inventory": [
+      {
+        "name": "content_plan_items_api_owner_insert_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM (content_plans plan\n     JOIN workspaces workspace ON ((workspace.id = plan.workspace_id)))\n  WHERE ((plan.id = content_plan_items.plan_id) AND (plan.workspace_id = content_plan_items.workspace_id) AND (plan.page_id = content_plan_items.page_id) AND (plan.niche_key = content_plan_items.niche_key) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plan_items",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "content_plan_items_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plan_items",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = content_plan_items.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "content_plan_items_api_owner_update_5_4",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plan_items.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plan_items",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plan_items.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "content_plans_api_owner_insert_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM (pages page\n     JOIN workspaces workspace ON ((workspace.id = page.workspace_id)))\n  WHERE ((page.workspace_id = content_plans.workspace_id) AND (page.id = content_plans.page_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plans",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "content_plans_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plans",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = content_plans.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "content_plans_api_owner_update_5_4",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plans.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "content_plans",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plans.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "plan_events_api_owner_insert",
+        "check": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plan_item_events.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))) AND (EXISTS ( SELECT 1\n   FROM internal.operation_ledger l\n  WHERE ((l.workspace_id = content_plan_item_events.workspace_id) AND (l.id = content_plan_item_events.operation_id) AND (l.actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (l.completed_at IS NULL)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.content_plan_item_events",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "plan_events_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.content_plan_item_events",
+        "using": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = content_plan_item_events.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))))",
+        "command": "r"
+      },
+      {
+        "name": "operation_ledger_api_owner_insert",
+        "check": "((actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = operation_ledger.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.operation_ledger",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "operation_ledger_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.operation_ledger",
+        "using": "((actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = operation_ledger.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))))))",
+        "command": "r"
+      },
+      {
+        "name": "operation_ledger_api_owner_update",
+        "check": "((actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = operation_ledger.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.operation_ledger",
+        "using": "((actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = operation_ledger.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))))))",
+        "command": "w"
+      },
+      {
+        "name": "post_history_owner_insert",
+        "check": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = post_write_history.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))) AND (EXISTS ( SELECT 1\n   FROM internal.operation_ledger l\n  WHERE ((l.id = post_write_history.operation_id) AND (l.workspace_id = post_write_history.workspace_id) AND (l.actor_user_id = post_write_history.actor_user_id) AND (l.operation_name = post_write_history.operation_name) AND (l.completed_at IS NULL)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.post_write_history",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "post_history_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.post_write_history",
+        "using": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = post_write_history.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))))",
+        "command": "r"
+      },
+      {
+        "name": "rate_limit_buckets_api_owner_insert",
+        "check": "(actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.rate_limit_buckets",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "rate_limit_buckets_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.rate_limit_buckets",
+        "using": "(actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))",
+        "command": "r"
+      },
+      {
+        "name": "rate_limit_buckets_api_owner_update",
+        "check": "(actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.rate_limit_buckets",
+        "using": "(actor_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1))",
+        "command": "w"
+      },
+      {
+        "name": "trivia_reservation_sets_api_owner_insert",
+        "check": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_reservation_sets.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))) AND (EXISTS ( SELECT 1\n   FROM internal.operation_ledger l\n  WHERE ((l.id = trivia_reservation_sets.operation_id) AND (l.workspace_id = trivia_reservation_sets.workspace_id) AND (l.actor_user_id = trivia_reservation_sets.actor_user_id) AND (l.request_hash = trivia_reservation_sets.request_hash) AND (l.operation_name = 'trivia_register_and_reserve_facts'::text)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.trivia_reservation_sets",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "trivia_reservation_sets_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "internal.trivia_reservation_sets",
+        "using": "((actor_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)) AND (EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_reservation_sets.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1))))))",
+        "command": "r"
+      },
+      {
+        "name": "niches_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "niches",
+        "using": "(( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1) IS NOT NULL)",
+        "command": "r"
+      },
+      {
+        "name": "page_niche_configs_api_owner_insert_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM (pages page\n     JOIN workspaces workspace ON ((workspace.id = page.workspace_id)))\n  WHERE ((page.workspace_id = page_niche_configs.workspace_id) AND (page.id = page_niche_configs.page_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "page_niche_configs",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "page_niche_configs_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "page_niche_configs",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = page_niche_configs.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "page_niche_configs_api_owner_update_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM (pages page\n     JOIN workspaces workspace ON ((workspace.id = page.workspace_id)))\n  WHERE ((page.workspace_id = page_niche_configs.workspace_id) AND (page.id = page_niche_configs.page_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "page_niche_configs",
+        "using": "(EXISTS ( SELECT 1\n   FROM (pages page\n     JOIN workspaces workspace ON ((workspace.id = page.workspace_id)))\n  WHERE ((page.workspace_id = page_niche_configs.workspace_id) AND (page.id = page_niche_configs.page_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "pages_api_owner_insert_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = pages.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "pages",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "pages_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "pages",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = pages.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "pages_api_owner_update_5_3",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = pages.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "pages",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = pages.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "post_metrics_api_owner_insert",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = post_metrics.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "post_metrics",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "post_metrics_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "post_metrics",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = post_metrics.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "posts_api_owner_insert_5_6",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = posts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "posts",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "posts_api_owner_row_lock_5_4",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = posts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "posts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = posts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "posts_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "posts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = posts.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "trivia_facts_api_owner_insert_5_5",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_facts",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "trivia_facts_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_facts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = trivia_facts.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "trivia_facts_api_owner_update_5_5",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_facts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "junction_api_owner_insert_5_6",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_post_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_post_facts",
+        "using": null,
+        "command": "a"
+      },
+      {
+        "name": "junction_api_owner_update_5_6",
+        "check": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_post_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_post_facts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = trivia_post_facts.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))))",
+        "command": "w"
+      },
+      {
+        "name": "trivia_post_facts_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "trivia_post_facts",
+        "using": "(EXISTS ( SELECT 1\n   FROM workspaces workspace\n  WHERE ((workspace.id = trivia_post_facts.workspace_id) AND workspace.is_active AND (workspace.owner_user_id = ( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1)))))",
+        "command": "r"
+      },
+      {
+        "name": "workspaces_api_owner_lock_5_5",
+        "check": "(is_active AND (owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))",
+        "roles": ["content_producer_api_owner"],
+        "table": "workspaces",
+        "using": "(is_active AND (owner_user_id = ( SELECT internal.request_actor_user_id_v1() AS request_actor_user_id_v1)))",
+        "command": "w"
+      },
+      {
+        "name": "workspaces_api_owner_select",
+        "check": null,
+        "roles": ["content_producer_api_owner"],
+        "table": "workspaces",
+        "using": "(is_active AND (( SELECT internal.current_auth_uid_v1() AS current_auth_uid_v1) = owner_user_id))",
+        "command": "r"
+      }
+    ],
+    "unsafe_api_count": 0,
+    "api_function_count": 33,
+    "business_table_count": 15,
+    "leftover_fault_count": 0,
+    "overloaded_api_count": 0,
+    "invalid_v8_ledger_count": 0,
+    "rls_enabled_table_count": 15,
+    "banned_api_execute_count": 0,
+    "metrics_owner_privileges": {
+      "delete": false,
+      "insert": true,
+      "select": true,
+      "update": false,
+      "truncate": false
+    },
+    "public_api_execute_count": 0,
+    "uncompleted_ledger_count": 0,
+    "unsafe_default_acl_count": 0,
+    "metrics_immutable_trigger": 1,
+    "private_definer_inventory": [
+      {
+        "owner": "postgres",
+        "settings": ["search_path=\"\""],
+        "signature": "internal.current_auth_uid_v1()"
+      }
+    ],
+    "tables_owned_by_api_owner": 0,
+    "allowlist_difference_count": 0,
+    "unsafe_update_policy_count": 0,
+    "caller_helper_execute_count": 0,
+    "public_helper_execute_count": 0,
+    "caller_table_privilege_count": 0,
+    "public_table_privilege_count": 0,
+    "caller_column_privilege_count": 0,
+    "invalid_v6_v7_operation_count": 0,
+    "authenticated_api_execute_count": 33,
+    "caller_sequence_privilege_count": 0,
+    "disabled_business_trigger_count": 0,
+    "public_sequence_privilege_count": 0,
+    "missing_owner_select_policy_count": 0
+  },
+  "legacy": {
+    "post_update_columns": [
+      "approval_snapshot",
+      "archived_at",
+      "content_hash",
+      "content_payload",
+      "content_schema_version",
+      "discarded_at",
+      "editorial_checks",
+      "format_key",
+      "generation_snapshot",
+      "id",
+      "interaction_goal",
+      "platform_post_id",
+      "published_at",
+      "published_url",
+      "quality_status",
+      "ready_at",
+      "revision",
+      "scheduled_at",
+      "status",
+      "system_checks",
+      "topic_key"
+    ],
+    "junction_update_columns": [
+      "allocation_state",
+      "fact_role",
+      "id",
+      "is_current",
+      "position",
+      "published_at",
+      "released_at",
+      "rendered_text"
+    ],
+    "history_privileges": {
+      "delete": false,
+      "insert": true,
+      "select": true,
+      "update": false,
+      "truncate": false
+    },
+    "history_triggers": ["post_history_immutable", "post_history_validate"]
+  },
+  "extra": {
+    "objects": [
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=arw/postgres}",
+        "owner": "postgres",
+        "object": "content_plan_items"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=rU/postgres}",
+        "owner": "postgres",
+        "object": "content_plan_items_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=arw/postgres}",
+        "owner": "postgres",
+        "object": "content_plans"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=rU/postgres}",
+        "owner": "postgres",
+        "object": "content_plans_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=ar/postgres}",
+        "owner": "postgres",
+        "object": "internal.content_plan_item_events"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=rU/postgres}",
+        "owner": "postgres",
+        "object": "internal.content_plan_item_events_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=arw/postgres}",
+        "owner": "postgres",
+        "object": "internal.operation_ledger"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=rU/postgres}",
+        "owner": "postgres",
+        "object": "internal.operation_ledger_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=ar/postgres}",
+        "owner": "postgres",
+        "object": "internal.post_write_history"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=rU/postgres}",
+        "owner": "postgres",
+        "object": "internal.post_write_history_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=arw/postgres}",
+        "owner": "postgres",
+        "object": "internal.rate_limit_buckets"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=ar/postgres}",
+        "owner": "postgres",
+        "object": "internal.trivia_reservation_sets"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=rU/postgres}",
+        "owner": "postgres",
+        "object": "internal.trivia_reservation_sets_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=r/postgres}",
+        "owner": "postgres",
+        "object": "niches"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=arw/postgres}",
+        "owner": "postgres",
+        "object": "page_niche_configs"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=rU/postgres}",
+        "owner": "postgres",
+        "object": "page_niche_configs_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=arw/postgres}",
+        "owner": "postgres",
+        "object": "pages"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=rU/postgres}",
+        "owner": "postgres",
+        "object": "pages_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=ar/postgres}",
+        "owner": "postgres",
+        "object": "post_metrics"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=U/postgres}",
+        "owner": "postgres",
+        "object": "post_metrics_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=ar/postgres}",
+        "owner": "postgres",
+        "object": "posts"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=rU/postgres}",
+        "owner": "postgres",
+        "object": "posts_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=arw/postgres}",
+        "owner": "postgres",
+        "object": "trivia_facts"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=rU/postgres}",
+        "owner": "postgres",
+        "object": "trivia_facts_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=ar/postgres}",
+        "owner": "postgres",
+        "object": "trivia_post_facts"
+      },
+      {
+        "acl": "{postgres=rwU/postgres,content_producer_api_owner=rU/postgres}",
+        "owner": "postgres",
+        "object": "trivia_post_facts_id_seq"
+      },
+      {
+        "acl": "{postgres=arwdDxtm/postgres,content_producer_api_owner=r/postgres}",
+        "owner": "postgres",
+        "object": "workspaces"
+      },
+      { "acl": "{postgres=rwU/postgres}", "owner": "postgres", "object": "workspaces_id_seq" }
+    ],
+    "postgres": "PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 15.2.0, 64-bit",
+    "functions": [
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.approve_post(integer,uuid,uuid,uuid,integer,text,boolean,text[],text)",
+        "source_sha256": "3686dc1e26a18eaec18d71ed13399a29ced472c2ea2e79db7aae737a49d7d34d"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.archive_post(integer,uuid,uuid,uuid,integer,text,boolean)",
+        "source_sha256": "3d29b6f51b2c6d43187caa04a1c09210a7806b518aaca04658f9ca6b8961e3a2"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.cancel_content_plan(integer,uuid,uuid,uuid,text,boolean)",
+        "source_sha256": "54277d9f01462e9d9d2d9c444237df15f03cd3f91f95e71e89f5a45752463ca3"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.claim_content_plan_items(integer,uuid,uuid,uuid,integer,integer)",
+        "source_sha256": "6c22f043fa87a504c51a68660b440384e0d8d1db86298fd9a4431739c7082500"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.create_content_plan(integer,uuid,uuid,uuid,text,integer,jsonb,text,text)",
+        "source_sha256": "8115939f3e939e698057064ed4f2e2c11b655e1a3a09311ecdfd8d14749977df"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.create_page(integer,uuid,uuid,text,text,text,text[],text,integer,jsonb,boolean)",
+        "source_sha256": "47739dbac2ddb85354697dcdfb7fc04b8cb8ead265ffb5f0177fe19b030de71f"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.discard_post(integer,uuid,uuid,uuid,integer,text,boolean)",
+        "source_sha256": "6a579bcf9c5c077d647740ffcdafa0abceb97c6c8fc64f5800970b0efa507ede"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_account_profile(integer)",
+        "source_sha256": "012a69c0d18810a721e5a85f8fd3a1460a39c24f5ba34d378ef39ade74744f35"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_content_plan(integer,uuid,uuid,text[],integer,text)",
+        "source_sha256": "5cc9c93f3777cebf0a9bf888d7908cf421371affeed56f935a31923dcee15760"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_page_generation_context(integer,uuid,uuid,text,integer,text,text,text,timestamp with time zone)",
+        "source_sha256": "94472fa45b1903c5f030133669d1c497dd2648f93da1d020dbd8337e14da7610"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_performance_insights(integer,uuid,uuid,text,timestamp with time zone,timestamp with time zone,text[],text,integer,integer)",
+        "source_sha256": "baf63dd6bff293c885fd66e1574c6e309a8e329895e9fb7619c23bd1a6aa8d41"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_post_performance(integer,uuid,uuid,timestamp with time zone,timestamp with time zone,integer,text)",
+        "source_sha256": "636960d2e7977b1f042c8a0e7a226a0d9a79d6d21cef2ef255763f305d6f53f7"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_post(integer,uuid,uuid,boolean,boolean,boolean)",
+        "source_sha256": "681378e064badd9cd333866a6eade0edf1f47d825c48e899b501f18af21d0dae"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.get_workspace_context(integer,uuid)",
+        "source_sha256": "152194bd5871d97080422ce31757074064a3ce54239c8449c04959d0975f6aa2"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.list_content_plans(integer,uuid,uuid,text,text,text[],timestamp with time zone,timestamp with time zone,integer,text)",
+        "source_sha256": "3de56fece810510ca2711b64f76ee25b57c7d40ae5236a04ff67d367bce10ecf"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.list_pages(integer,uuid,text,boolean,text,integer,text)",
+        "source_sha256": "7828ebc1569d44cb250d567811784e33e5a233cd92dd987613dcb40917d93675"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.list_posts(integer,uuid,uuid,text,text[],text,text,timestamp with time zone,timestamp with time zone,timestamp with time zone,timestamp with time zone,text,integer,text)",
+        "source_sha256": "bc68992127b9d4da03a7eec18ef4539c3d45019e6c3461d179245abf76284975"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.mark_post_posted(integer,uuid,uuid,uuid,integer,text,timestamp with time zone,text,text,boolean)",
+        "source_sha256": "c8f2f690b0bf2b3ffc0f30e68e6bf9cfab8d1e42fa8f6aea953de74d19f319f3"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.record_post_performance(integer,uuid,uuid,uuid,timestamp with time zone,jsonb,jsonb)",
+        "source_sha256": "b0646b6e7a4f2a4c4fed3d86c220a48a909d483ceb7d87260b3e4d71d7ce4bba"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.renew_content_plan_claim(integer,uuid,uuid,uuid,uuid)",
+        "source_sha256": "fca95552997d78ab27d3464fefe84a1fb2968fb318ca56433a7d09cf4307a7a2"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.replace_discarded_plan_item(integer,uuid,uuid,uuid,uuid,text,boolean)",
+        "source_sha256": "417012ee450e297ddbec24e0be41509fe70b9778b45005a523bdac749d78ddb7"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.report_content_plan_item_failure(integer,uuid,uuid,uuid,uuid,text,text,boolean)",
+        "source_sha256": "177f960861e014b2423bd989266231139031377a564473a3f6b192e60f9fa4e2"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.reschedule_post(integer,uuid,uuid,uuid,integer,timestamp with time zone,text)",
+        "source_sha256": "e92c7a355412d3badf63e081dd4cbdb9f8af69b4e8f305d1ef7d3dc4d424d511"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.retry_content_plan_item(integer,uuid,uuid,uuid,text)",
+        "source_sha256": "41551f14d8d8aff70b165eda2f9ca742f872801bdbd1628782a0b703868cd463"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.revise_post(integer,uuid,uuid,uuid,integer,text,uuid,integer,text,text,text,jsonb,jsonb,jsonb,jsonb,text)",
+        "source_sha256": "dec52cc1c922ab4e5ad0fd821231ed31a881f234a89568eca1ea58508e39509c"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.revoke_post_approval(integer,uuid,uuid,uuid,integer,text,text,boolean)",
+        "source_sha256": "ea859432a61e6ead8fdbe57e32c358ffd18ad3998d8c36922ab2c333aadfa23d"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.save_post(integer,uuid,uuid,uuid,text,uuid,timestamp with time zone,jsonb,timestamp with time zone,integer,text,text,text,jsonb,jsonb,jsonb,jsonb)",
+        "source_sha256": "229203c5e4f6df5d48eff2e64c5e6961d5bc76f801e51b9f94714e67dc9771d9"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_correct_fact(integer,uuid,uuid,uuid,timestamp with time zone,text,text,jsonb,boolean)",
+        "source_sha256": "8aaabb8de039e9e0cd4a6cb262308f058e165725b958914f8419524b35bd3f8e"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_find_similar_facts(integer,uuid,uuid,jsonb,integer)",
+        "source_sha256": "3a4de495e54acb9635f2812a020f9b3d5f8d83255a40612bb442b3965615329b"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_register_and_reserve_facts(integer,uuid,uuid,uuid,uuid,timestamp with time zone,text,integer,jsonb)",
+        "source_sha256": "61de8cc377fa8ffc47d7a55d7276136bb65da966c0dd02192f8d04525ee7f2e0"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_release_facts(integer,uuid,uuid,uuid,uuid,text)",
+        "source_sha256": "57adede7f83e0474b7970b71d28a5414e16859fbfcb3349c8075bbdee74ab3d7"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.trivia_reverify_fact(integer,uuid,uuid,uuid,timestamp with time zone,text,jsonb,text,date,timestamp with time zone,text,text)",
+        "source_sha256": "f252e920d80fe2b9a14ec2b2e091a7cd0e1ff151f8eee3e6c064d35561e5c268"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "api.update_page(integer,uuid,uuid,uuid,timestamp with time zone,jsonb,jsonb)",
+        "source_sha256": "aa642621542b8bc5b1797b5c7bc2ed36d809ff1099ed1c83b9eb4aaa3186a93f"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, public"],
+        "signature": "internal.assert_page_schedule_available(bigint,timestamp with time zone,bigint,bigint)",
+        "source_sha256": "582a0f449bde390920d444ad02de15ff9358b21019d4516a89bf62517fe13d6e"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.assert_rate_limit_v1(text)",
+        "source_sha256": "f690f0cccc158c7c3b9cbb6d8c44b0bc2187fab444980aad563843cde1c39db4"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.assert_request_context_v1()",
+        "source_sha256": "21b0d8c809652c312aab39539b37e4299ee61a5f17e15758589929787fa643c6"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.assert_write_operation_name_v1(text)",
+        "source_sha256": "890555f5dba4ba71cbe859b063a994d6113c7b7c54e4b8dffcdde5ad22658a69"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.begin_read_v1(integer,text)",
+        "source_sha256": "588e08d5219ecb625edae861fd764124c3093216b0996ce01aeee9c5417c1f55"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.canonical_request_hash_v1(text,uuid,integer,jsonb)",
+        "source_sha256": "cdeea1712b93359b25a867bd1f67766e04d34a17d4a13f837d3998e9f7527536"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.claim_operation_for_owner_v1(uuid,uuid,text,integer,jsonb)",
+        "source_sha256": "4346da767c3d2f096118997383beb7dc80f6d138e6a65f8db6f8c23fe065f0d2"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.claim_operation(bigint,uuid,uuid,text,integer,text)",
+        "source_sha256": "49317f897e2c613263767d6c09e10c09dd13ca79b2d9b8c15350bb8495f19475"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.complete_operation_for_owner_v2(uuid,bigint,text,jsonb,text,uuid)",
+        "source_sha256": "6f3916f402bd706fd8027723fcad4a2637bee9c3504117580eee9e8bf962958d"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.complete_page_plan_operation_v3(uuid,bigint,text,jsonb,text,uuid)",
+        "source_sha256": "62756684375d90a0093fb4501238e8d8a5c98ae0e45a43bc2a2b95c2b8dc6a6c"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.configure_write_transaction_v1()",
+        "source_sha256": "195f4be5bd2ece5e8f6b266a5919a7ad77af6ef4123827050f9e8e3fad00cdf6"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.consume_rate_limit_v1(text)",
+        "source_sha256": "d583d31013fa7fc001cbe8b4871035838cf3486170acbf399f87395e5f1c6bbf"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": true,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.current_auth_uid_v1()",
+        "source_sha256": "ea7b95f7c1a0a6986456ff27e7af8b832d1310193aedd16f58e6cf208dfa1ba4"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.decode_read_cursor_v1(text,text)",
+        "source_sha256": "fcf86c476592b5e0c42fedc1738ae7086dcceb59548cd5af1def17d713abda11"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.default_trivia_config_v1()",
+        "source_sha256": "92290d274307d512eef85e74d27503f3d784aef906c67f40f59dcf6392a1caca"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.encode_read_cursor_v1(text,text,bigint)",
+        "source_sha256": "284894998ae3e85df3da5b7096d91fb9d0962ccc70ede90f34fed03558c3c110"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.fact_usage_snapshot_matches_fact_v1(jsonb,bigint)",
+        "source_sha256": "f0843a88fc2e0ec3b1259fab8122a952c740707675fad03a2cb8ba687958a75f"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.has_exact_json_keys(jsonb,text[])",
+        "source_sha256": "b2512fff2f07cda027763b818cfceb61525592a381b524cf2d4bde8d5d0b68e8"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.is_allowed_text_array(jsonb,text[],integer)",
+        "source_sha256": "73777d4aaa298801e9950547c3492899b18b6200ce630ee88dd29a07dfe7783f"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.is_json_integer_between(jsonb,integer,integer)",
+        "source_sha256": "7dcf9f45c3ea653e28d1d209fdb94fbdf931732722fa78f2194d404b3a1ee7c3"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.is_safe_operation_response_snapshot_v2(text,jsonb)",
+        "source_sha256": "69c81eabadbdb6065d78ff097a57e5fca004bfc59c58445ddb421c7460f411a3"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_check_snapshot_v1(jsonb,text)",
+        "source_sha256": "8d48a04464aac3f71c7d2dcb6714016c0566e37a419e1ab60d141bc515708fd4"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_dedup_review_snapshot_v1(jsonb)",
+        "source_sha256": "845333d9582389d3a8fdc50fe893fc94067fdfcdb07386b15e1ab5c9462db842"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_dedup_review_snapshot_v2(jsonb)",
+        "source_sha256": "93d3c0e08b9d7176e0610e66100a62cd79d68b01877f3756b81c04135ba9c768"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_editorial_checks_v1(jsonb,text,integer)",
+        "source_sha256": "8ede5e35198ca7ac55bcc3a61902bd1febff8f5a6e1b6c8288f1e22b78580f70"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_fact_usage_snapshot_v1(jsonb)",
+        "source_sha256": "7f770efa6565dd2edba4926042217d2d620e09782d771e8448c1c3d3382b9ed4"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_generation_snapshot_legacy_v1(jsonb)",
+        "source_sha256": "b6ae9097a9fc32abf84b960ee7bb7f56c31ea48743a9a6e2cb97cfd5e98dbd40"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.is_valid_generation_snapshot_v1(jsonb)",
+        "source_sha256": "f37058681ca71479e43a687f50961a8321b1b58bd1cf7cad8a5607f1f048f83c"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_metrics_payload_v1(jsonb)",
+        "source_sha256": "c1b5c4c32366a03b2ddecc756ab76083c63998f51673fa26772f15743549a5a0"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_plan_config_v1(jsonb)",
+        "source_sha256": "a3e495478b921382c57abeb55a250fab3cb7580d2511e784c7dc130bba942ded"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.is_valid_plan_config_v2_shape(jsonb)",
+        "source_sha256": "b8fd4a5bf0ab4c11e5eb96e4af0add8fb886c2821dce423f7b275978008bd1ac"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.is_valid_plan_config_v2(jsonb)",
+        "source_sha256": "61d6bceda90aba5827837f2d55c4ce7124f427c9e82de935d0a618998d8a4330"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_post_payload_v1(jsonb,integer)",
+        "source_sha256": "71e34b6cd314e9e539d45b2a684ac82c69c6f3503f30a9efbda31ca1d2b920e8"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_reservation_context_v1(jsonb,bigint,bigint,timestamp with time zone,timestamp with time zone)",
+        "source_sha256": "4cf4a1bb916860b2038d82b10ef65b80373bfeb649fd9844fd59467f14b33cf5"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_source_evidence_v1(jsonb)",
+        "source_sha256": "740bd8be94297053a7c893dc3b9e6f4c8b30affaf101aea3411933afb3b93cb0"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_source_evidence_v2(jsonb)",
+        "source_sha256": "4c8ef227c48416fc2f7a1b34d6dd538be7d02dd58c7efb43ebb0abba2751aaf8"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_system_checks_v1(jsonb,text,integer)",
+        "source_sha256": "02657432c140e70decc6c05a87631510defbc31157a39bd6015e051754331e9e"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.is_valid_timestamp_text(text)",
+        "source_sha256": "8d56ace6b1366130abe518278aa99a049c0de783c065b3f3e8a54a41ac778adc"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.is_valid_timezone_name(text)",
+        "source_sha256": "93eb0e491690418ba09f9d85e863aee34a856082db0b6382755935939745e228"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_trivia_config_v1_shape(jsonb)",
+        "source_sha256": "d7763cb9236ff98b987f0fd2b3b402fd9d37b66c77894f8f7f5ea4e04677444d"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.is_valid_trivia_config_v1(jsonb)",
+        "source_sha256": "82415b53898865c8824e426d9f1eb7b36f88c3971d7c7c80fced6cdb64258f9c"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.is_valid_trivia_plan_override_v1(jsonb,jsonb)",
+        "source_sha256": "abf2d9fef44c9190d82055e301c7807ce833a85856f9d5673c96d1b38bc75454"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.is_valid_workspace_settings_v1(jsonb)",
+        "source_sha256": "8a852a6863a302658a590e9911fbae22a7450d702e9c34a387cb4cc1208f22eb"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.iso_timestamp_v1(timestamp with time zone)",
+        "source_sha256": "1a50eb430c9f8ee67e7f79b5539d019c7906e7371b72d1fcbf7f639f2aef79e9"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.json_integer_value(jsonb)",
+        "source_sha256": "aa2d6210405246192a4339a7ba6d3b446cb37e22ba20caf904add7571db0ce56"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_approval_summary_v1(jsonb)",
+        "source_sha256": "85d424e13567cdf21711fcfc7dc941f98ff719c9c6fdedd7f2719a8cb277872f"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_approval_v1(posts)",
+        "source_sha256": "edc32ff5e65e232144904beae61508d93ff00d396d2491a69e76679c966d2fa8"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_archive_guard_v1()",
+        "source_sha256": "698dbfdb3de19722e5d35dcffd9e6dd7ab56288bb95ef32e3007b26d1b31e6ad"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_complete_v7(bigint,text,posts,posts,text)",
+        "source_sha256": "52ddb04bb07185d076730f31bb96444bdee05cd3bfc2537f78347d52a23043cd"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_current_system_v1(posts)",
+        "source_sha256": "bfbb9e4db2f03b34e0528ef4d380dc5c80aa11403c18d6d99ad204472a74048f"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_effective_gate_v1(jsonb,jsonb,jsonb,text[],text,boolean)",
+        "source_sha256": "291662449365e2683559caf5f9ed9cafcda0d56ff5fb14173be6b7f168fc25d0"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_evidence_history_valid_v1(internal.post_write_history)",
+        "source_sha256": "119e9f3d18e93c424f4c83072a240403cfe7736c9d0bd1b8be01343d8ba6c7d5"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_evidence_v1(posts,boolean)",
+        "source_sha256": "8eebadab028811b82f35e6c709b8b5ffd03b328489d07d96a2c67be009ee1360"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_history_validate_v1(internal.post_write_history)",
+        "source_sha256": "744b3a9edebd70c0dd58e47d0457b8095f2a6b6e4f1db0cfe49056404dac0ed7"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_ids_v1(text[])",
+        "source_sha256": "c52ddf0c6704347f22f0f7dd17721fd10a3ab1d238ccb19ebde440246e950729"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_plan_item_v1(posts)",
+        "source_sha256": "829e54d07b0d9c1bb510d5fd28654b540e2ee1ce03f14317f7e3edcff5edfd38"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_raise_v1(text,text)",
+        "source_sha256": "6746809a6cf19d3a1ba413c965b33abbd67acd5b27409aa6b7441224be1f71ad"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_reason_v1(text[],text)",
+        "source_sha256": "b7f5843969eff467cb31fe5a9b27ae3bdbaa027e00280984b00fcaeff7c4f4f7"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_rebind_v1(jsonb,integer)",
+        "source_sha256": "9251706cbe7b99fc9e4121e1c6a409af4d04779fd641ae53768f8784e964ca01"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_replay_v7(bigint,text)",
+        "source_sha256": "84732acc38c1d243381a355b0bec5ecafea3e0f7fa3ca7a3e388a661c7e559cd"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_response_v1(text,posts)",
+        "source_sha256": "d881b9ed2bee68a2f4beadd63c0bd70692fffc51c2adab9772aaef280fb3df27"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_response_valid_v1(text,jsonb)",
+        "source_sha256": "b0b5ab6ef64118bf7fbcb0b925c2d9dbb6fed7e5ec70e71a68a9e070093beeb5"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_source_policy_v1(jsonb,text,boolean)",
+        "source_sha256": "b830b770e3c13dc7f8a2e8cf996ebd36b831fd5e29ab9d2c8975091c86d9717b"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.lifecycle_url_v1(text)",
+        "source_sha256": "0b85682da77fc81ddd8c4f7f708435d5284424cb9229b77d915f46f87f32a341"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.mask_email_v1(text)",
+        "source_sha256": "526256b6e5b3971a8d1d82eb90e9fbfcd6c44d2b503707477587d6277eb9ea99"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_compatible_v1(jsonb,jsonb)",
+        "source_sha256": "6189f2b2cdd2f6cfa72380dadf02eb3ff18bf55fd328eceb352a24a2d1e7a9d6"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_complete_v8(bigint,post_metrics,uuid)",
+        "source_sha256": "56e12e475706bf8cbca52ae2336d6075a86b97c828bd6951707d7d5d5b6b0b93"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_delta_v1(post_metrics,post_metrics)",
+        "source_sha256": "974caec845fd32c433f7b528260bf6f7dc8d7c84aece0b64c03d3666bea58a5e"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_dimensions_v1(posts,text[])",
+        "source_sha256": "cdb3d606747ce448a8ba29a198f46554451eebcbe7e60d80c82d2d1c25d81e3e"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_flags_v1(post_metrics,post_metrics,timestamp with time zone)",
+        "source_sha256": "9e5639b5945916ddc6891d28875b4d79171f28c80e66f5db7ed30bbabdea810e"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_immutable_v1()",
+        "source_sha256": "f2f06087cdd69d1ee3bf76250392df34b2b26e2a060d06e512c67569e824ee9e"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_insight_rows_v1(bigint,bigint,text,timestamp with time zone,timestamp with time zone,text[],text)",
+        "source_sha256": "2a2e7e4d995df7f7c125896cc2f701453f79e5ba032c3de9c5ba9aeae8e69030"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_known_source_v1(jsonb)",
+        "source_sha256": "50d671c9c6538bfb9e25080bff5e675334afe452db3c4c8490ebee0c93b6f0d6"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_median_v1(numeric[])",
+        "source_sha256": "398ff44c494c83e4465c4f8942864188fce192ecee06f236189b412a41f9aef7"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_negative_v1(jsonb)",
+        "source_sha256": "a64f3559ea2ed95a1efa30635a059f0b14c2e72d7a8f2087161d3715dbcc4be7"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_numbers_v1(post_metrics)",
+        "source_sha256": "c629dae3cdbd4ed4bb828bb844febd168ef2f258db961fe4de57fb7767f010a8"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_raise_v1(text,text)",
+        "source_sha256": "8263c9faa644753b392033eff1532a08db7f0a19ef23cd7048bd9c1fb1b4cc54"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_replay_v8(bigint)",
+        "source_sha256": "eeb55397d49934bfa97adb718691608475e2e3da8553a55bfef009e46972e24b"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_response_v1(post_metrics,uuid)",
+        "source_sha256": "d3fb6bf3bb3c5387d217be4f697c8c1e32387a7a903cf9eed817f346fb017b77"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_snapshot_v1(post_metrics,uuid,text[])",
+        "source_sha256": "616244a383c3e02c312c1b42526391f674e12e499d1c2ad0b623409924b60653"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_source_v1(jsonb)",
+        "source_sha256": "b408da2fd839315ddc0d5445b8d2cfdc64e6a9499146c3877d562ac8244d5821"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.metric_values_v1(jsonb)",
+        "source_sha256": "05d28e4360d72860776f58842b974a667fbb9e08cf40551c1f91954365a45664"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.normalize_page_target_markets_v1(text[])",
+        "source_sha256": "b39e12363c7e1ed1b26d8975e8d4c134ee633678be4dc70566d48c59ff58344f"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.normalize_target_markets(text[])",
+        "source_sha256": "6ed06cc39b37b2027ff3c36dd8d37cb357d2dc9f4bc580046ce8ca58258d97c9"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.normalize_unapproved_drafts_v1()",
+        "source_sha256": "5162c053759065de956d8489e337d56f2ceb7e71bec78e4b3f0952a9b4c6b21d"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_append_event_v1(bigint,content_plan_items,uuid,text,text,text,text,text,boolean,uuid)",
+        "source_sha256": "98f496bf110b1a9087e7e83ad9ffdf0f37ddb9988c771283d29976f33963c12c"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_assert_current_claim_v1(content_plan_items,uuid)",
+        "source_sha256": "a06bf52b7dd177a98ae11a5f8364e24172f3106a16e01770d3f7b615daf3d315"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_assert_write_input_v1(integer,uuid,uuid,uuid)",
+        "source_sha256": "ef3fd3e2444ad1ef2d2f030f6e1ecee640aa54f363939c9c4fdafb47911d927f"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_complete_operation_v4(bigint,text,uuid,jsonb)",
+        "source_sha256": "4e8b900fae4bafa764ea214173e38db0564c496d7254aaf8bca469c2464b69f3"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_context_snapshot_v1(pages,page_niche_configs)",
+        "source_sha256": "32e0478e2dd2555dc3e180a2eeb1d8c45f70af67fed457143b2867825ce6afd3"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_failure_code_v1(text)",
+        "source_sha256": "0c92989da2c49e2b49a8dea1c0337ad8ca85cd27ec9f92e2482e16983869ea2e"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_is_item_v1(jsonb)",
+        "source_sha256": "ac2a7ca5c5b013801b63cafca10dfe118e2461a7370a42d62294e8c3b2c9784d"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_is_response_v4(text,jsonb)",
+        "source_sha256": "294cb6c54e14c3d1eafa2489c6050503c14acb44450d47b6cd9ef909447c2e2d"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_is_summary_v1(jsonb)",
+        "source_sha256": "2ad7ddefd308f984553e24d264469e15fe791f03a093c243dc6e145827f8dac2"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_is_time_v1(jsonb,boolean)",
+        "source_sha256": "9538834dab7820002a08dc16f00d3521d0de09ae0c4ea0d7fd951a3193cc4d69"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_is_uuid_v1(jsonb)",
+        "source_sha256": "ab5b6ea7867d586397a6776674a394a402d295147ebe9b7590d7d6e995a0399c"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_lock_target_v1(bigint,uuid,uuid,text)",
+        "source_sha256": "0e5b5b5b0777117f0dc8d8f9d91ffe6f26e97929e2fe5ed61ca17e791bdaa864"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_project_item_v1(content_plan_items,uuid)",
+        "source_sha256": "ea807851b467a385c3ed5730acf2367cab73552e22dc460a5a0adceb3864a46c"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_project_summary_v1(bigint)",
+        "source_sha256": "b210003cf988d913120bd6956647033cbc766c482385dd1dd75d8ba4326d72a2"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_raise_error_v1(text,text)",
+        "source_sha256": "f235dac36a3f5d5dc2f81b104e2918bc3154d223a2192329b3c0c982ef64013b"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_refresh_status_v1(bigint,boolean)",
+        "source_sha256": "92da6aa4f934bee852e7736e81625649a1a52779ab31394d8cd7d3839c4ccac7"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_replay_operation_v4(bigint,text,jsonb)",
+        "source_sha256": "46850f84ab721d2ffb9c20f4b550ec2288b2fb05d9c1c044e772bb453466a236"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_safe_reason_v1(text)",
+        "source_sha256": "28290376dd9f18769bc1aeae6f80daf992f75c31c37a9dc9cc43bf05981d9d6c"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.plan_validate_event_v1()",
+        "source_sha256": "fbe67764c08741947380bbd654c870f8afcd21dbdfc70393687ebd83556d0eed"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_allocate_v1(posts,jsonb,uuid,page_niche_configs)",
+        "source_sha256": "cf29e44862b11a48622882aa30aab61e6001c3f18f7e0074fd9c6a94a5e095d7"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_assert_choices_v1(page_niche_configs,integer,text,text,text)",
+        "source_sha256": "c5fa3a4d7bf1c29873fe72c3e1e094137042f3cf482ffc07fbff7a6dd9a50123"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_bindings_v1(jsonb,jsonb)",
+        "source_sha256": "767c24351c2a746e2d91cbf7b274e10540f963e37ec0228df283a48c4ef127ce"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_complete_v6(bigint,text,posts,jsonb,posts,text)",
+        "source_sha256": "c1bb4eeba4897fcd33acb2f7f6976c6709514650ec333b89a1f11ad92bb0127c"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_editorial_input_v1(jsonb)",
+        "source_sha256": "87d01d4adbea727f377a766532ac9cd1f53890031ba9e36958ac8db561b62f21"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_editorial_v1(jsonb,text,integer)",
+        "source_sha256": "b547a3e4dac7c60f5488d5aab1d4ff2da422eb99d1248012cd88d177aa5a07eb"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_generation_context_v1(jsonb,page_niche_configs,pages,jsonb,jsonb)",
+        "source_sha256": "442539fe16e1224e730092963835968b795f632e61cd68813b0a93ce5d4aed31"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_generation_shape_v1(jsonb)",
+        "source_sha256": "92a110b7aaf58753610843e5d90ce651c797e8b2e5facb91244aa0915c7a7c4b"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_hash_v1(posts)",
+        "source_sha256": "c5d4b56a1c18cbf96115f9e584d035d55397ce28a1d4d894a9f64f29f94bf772"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_history_validate_v1()",
+        "source_sha256": "2b2d44b5a1924e919ab8a36e34678e0128f4708d4434048f1e817f0619a2a257"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_lines_v1(text,integer)",
+        "source_sha256": "c42fd00c99f805a5b82c623046fb2918b7daddfd331c6ef7dea03a00c5304644"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_lock_facts_v1(bigint,uuid[],bigint)",
+        "source_sha256": "9d7262b660d46379e3f6b993b47174733063c0ecd933299a6d920a12c0f15d48"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_lock_slots_v1(bigint,timestamp with time zone,timestamp with time zone)",
+        "source_sha256": "5b7a3bc016e3edb03d854613714db662b9fd054b0a825b461d50e0a5b2f53ad6"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_lock_target_v1(bigint,uuid,timestamp with time zone,boolean)",
+        "source_sha256": "09d716c7d30408ed98e619187e8cfae6a5920555fae7e11866eb0b5e5a00485f"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_package_v1(posts)",
+        "source_sha256": "4310e0ff5caaa1d77865f2f403f999221dc7ce586286e77d43020e18c7811ba4"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_quality_v1(jsonb,jsonb)",
+        "source_sha256": "e16a65a06760566bbb3cd2d5c3c043948db6443bee4de456eb6d9d8711acd370"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_raise_v1(text,text)",
+        "source_sha256": "22cc97faabcdaf69781f242a4db7f393e455ab854c71adacf08e16e21de9111e"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_render_v1(jsonb)",
+        "source_sha256": "39d82659cac4cd6042707f317a34854f657a93b7ad20f2c0486b1cce047f517f"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_replay_v6(bigint,text)",
+        "source_sha256": "f7714ad742e8625e3bc5178d15329e5b2929cabf683ea5add9e9c821b77664bd"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_response_shape_v1(text,jsonb)",
+        "source_sha256": "85491f98a90af6484f6224bdc49874e18eef7701caf4ea897cec532c07c30c19"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_response_valid_v1(text,jsonb)",
+        "source_sha256": "f7efa77267f6473c352e9b61b1d2caab5ca9304384e2a5e1b798b3843d92155c"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_system_base_v1(jsonb,jsonb,text,integer)",
+        "source_sha256": "300c5d29dee52bfb4189eddad82e59e867debe73ecdbb607d0c24d4cca1e340e"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_system_for_config_v1(jsonb,jsonb,text,integer,jsonb)",
+        "source_sha256": "b75be4b18a342d58b40bec325b25355b26a59d2344b8edd2fb7bf5ec41744a1c"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_system_v1(jsonb,jsonb,text,integer)",
+        "source_sha256": "9818b61a54fcf010b29570a4ba32793771b06b44a893c952c31bec74b0c4208d"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_text_v1(text,boolean)",
+        "source_sha256": "529383ad9f2f6d79c3c45c9eb3b1f96a8a41ce514af885424e2a3bf0b45b058a"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_usage_immutable_v1()",
+        "source_sha256": "6e32f663ee54f0a51cc96983a7793c491cad4a0c0a8b5dfbf736ece865f324bf"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_usage_snapshot_v1(trivia_facts)",
+        "source_sha256": "8a912590f1aa65cfe18a7ba9f404f1118d8158431c1f389f82c03c8e8010e4bb"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.post_words_v1(text)",
+        "source_sha256": "00ffb9b56221d0eefa4b5647a1a38a461fc0be21fafa0daaf0e8fc8fc66b5820"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.project_check_snapshot_v1(jsonb,boolean)",
+        "source_sha256": "a84324c21a6fcec4b893f3bd1c9da61222497f64f2e7779b9f948f6090ad12f7"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.project_fact_source_snapshot_v1(jsonb)",
+        "source_sha256": "2e07cfefb066146e43c99a73887d90abe2205a40c9fbfda2c278798a62f18e1c"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.project_metric_snapshot_v1(uuid,uuid,timestamp with time zone,bigint,bigint,bigint,bigint,bigint,bigint,bigint,bigint,numeric,numeric,jsonb,timestamp with time zone)",
+        "source_sha256": "ccc81b9db29ecbe40ad58c1eeb3e70020ffbf8eabf95ed1181381f863f0e94a6"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.project_metric_source_v1(jsonb)",
+        "source_sha256": "8ccb13553e0c16c69daa7ad9fb6a94c7e0bbd8da6e3a4f309ef66289de0bbf81"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.raise_mapped_error_v1(text,text)",
+        "source_sha256": "06246083d37b0723e1352af74c617b1f4bb141b65689bf936b6e42e7205c1295"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.raise_read_error_v1(text)",
+        "source_sha256": "41ade02400e99779ebf7dda706fea50b34923ec81068266ff1a7d4f2d051c186"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.rate_limit_group_for_write_operation_v1(text)",
+        "source_sha256": "8636c5777f7ddcec6820e482550e6ecc0d8968a9508de9332fac3af129d2c6dd"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.request_actor_user_id_v1()",
+        "source_sha256": "7c6fe41a1569ca35bdc7d6400556c2b9c0cfb441d99b0e2ddc14dbdbbb8bd39e"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.resolve_workspace_owner_v1(uuid)",
+        "source_sha256": "7b99ed2ac431fd4b221ec1892d60095e3b0ab5a9845e131e826f420bb9f0b438"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.safe_error_code_v1(text,text)",
+        "source_sha256": "1e5ac6dc70cc4a8a67c7b5358c29de447b3693c4def08d4d2df5fe13de4c9da0"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.safe_error_response_v1(text,integer)",
+        "source_sha256": "72b5a53de20703c20442bb5fe229d7f9bf7f78bca80e70fba02bd02cecdaa1e7"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.touch_updated_at()",
+        "source_sha256": "55d2f3311240ba845c727ef6dbbbc09e0a28fbc892d86b010afd2857290553be"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_affected_posts_v1(bigint,bigint)",
+        "source_sha256": "968f51b558ad66259e9a6381b96dd75d5e49249e08cadd92840717e88d3b6e24"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.trivia_build_structured_key_v1(text,text,text,jsonb,jsonb)",
+        "source_sha256": "30dbd9df64f820b0977bea09c47d331e6af34cf459b4b1fcdbf4524070baca34"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.trivia_build_structured_key_v2(text,text,text,jsonb,jsonb)",
+        "source_sha256": "4d01d2099d7b304138c993a14322542e953f76f1c082ad97a732254fce65e7e6"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.trivia_build_structured_key_v3(text,text,text,jsonb,jsonb)",
+        "source_sha256": "0a4e7a72fd5785cf189670a800323a98ac9a45fc1acebbf0a08e77fa2d1c323a"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_candidate_v1(jsonb)",
+        "source_sha256": "f1296fb42d4991159c6028c421e1ff6cd88c4e28ab13075fb178975e68d36a0e"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_candidates_v3(bigint,jsonb,jsonb,integer)",
+        "source_sha256": "490080273468c537091e81494671879d749961fe1094a53739b6bd07298b427b"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_canonical_numbers_v1(jsonb)",
+        "source_sha256": "b881932e7edf7c6c1d83c6336920784c740d2231e8e84aa9404b25e472297b3f"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.trivia_canonical_numbers_v2(jsonb)",
+        "source_sha256": "dbf75828a99b63e11233dcf14713c88a48b31361827241af16a0ca541317fe32"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_canonical_qualifiers_v1(jsonb)",
+        "source_sha256": "c82b5e7f8f94f84f28b9c1f5a1e4fc2928e65915f4300d5e07e8bb7696f6763f"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_canonical_qualifiers_v2(jsonb)",
+        "source_sha256": "1dc6bc0c8ff32dc73b71954c666a71decf4a2d60c8a0c6696a7b7a48cba0baf2"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.trivia_canonical_qualifiers_v3(text,jsonb)",
+        "source_sha256": "1bb5a18c5981cc97b96408d74827d163f7b1250f42ce643bfdd7e52b78e783c5"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, extensions"],
+        "signature": "internal.trivia_claim_hash_v1(text)",
+        "source_sha256": "13aabde32756c5777383ba7eb8f998a02378c574d5e041f6287239f0a8c4fb39"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.trivia_clear_expired_reservation_v1(bigint)",
+        "source_sha256": "58eb22444467e9a84be65a1fe25d72031186d6b41e518677a0763edab878c682"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_complete_v5(bigint,text,uuid,jsonb)",
+        "source_sha256": "bf9594bb151b4c32d26ed9b727910b771bde48c218d7a3d691497aff0eb342bd"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.trivia_correct_fact_v1(bigint,uuid,text,text,text,text,jsonb,jsonb,text,jsonb,jsonb,text,text,timestamp with time zone,date,timestamp with time zone,text,text)",
+        "source_sha256": "3aff29c262786d258bba9077120fa2dc4b3aba2a35f6b389e32dbdc8fa2c4cb7"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_effective_expiry_v1(jsonb,text,text,date,timestamp with time zone,timestamp with time zone,text,text)",
+        "source_sha256": "7ebd684dfcef9c4839bc488f4966c3b55fb3f24233dc4d82c05f86ebb9302bfa"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_fact_input_v1(jsonb,boolean)",
+        "source_sha256": "4c7ed2ec4f15a6f8c13a3e224a8c9d24175e1f8aac0a5a54059b29e338d716f2"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public, extensions"],
+        "signature": "internal.trivia_find_candidates_v1(bigint,text,text,text,text,jsonb,jsonb,jsonb,integer)",
+        "source_sha256": "9b83b5e2399fcfcf5f48ac80ddf65fa25b1bc5adf76b3532a7b654dc7974b1e2"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public, extensions"],
+        "signature": "internal.trivia_find_candidates_v2(bigint,text,text,text,text,text,jsonb,jsonb,jsonb,integer)",
+        "source_sha256": "dfeb65bfccc305b93d5585504d20055f41ea212ec7545ca8f76f5e4ca4b1a88b"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_hex_scalar_v1(text)",
+        "source_sha256": "15b976330f11026392f8f9def02554e82608ea6c8e291067761a092f76d02aa8"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_history_ids_valid_v1(uuid[])",
+        "source_sha256": "2860f54bb1e57a44e3b6c348a5f341316b36673b7e08d5d91f66dd59f06f62db"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_history_immutable_v1()",
+        "source_sha256": "0839da7df6e631f29c5b38253e98ba03493b397347227b5f4a4d99b4dae44c70"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.trivia_invalidate_fact_v1(bigint,uuid,text)",
+        "source_sha256": "228971d2bcbf8b00e9dbe1c31ad4a8b3dfbf28c58d8063126a68ec842641a157"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_is_valid_date_text_v1(text)",
+        "source_sha256": "3332468c5cf679e52e2d548118dac5eb836b14c45904ddacc621098bb00b1942"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_is_valid_rfc3339_v1(text)",
+        "source_sha256": "f6f7baadce9d3360e01e5c8fbf57eb4adbaac09940ae4d15aaf7813fef115a9e"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_is_valid_uuid_text_v1(text)",
+        "source_sha256": "4a1fba6653ca8f1dee981dd242adc8fce0a1b1de20a29a1f4b76ac8858caf4d2"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_is_valid_uuid_v4_v1(text)",
+        "source_sha256": "1a0ed3ac5cdbdea5cfa1b72f00ca5f2776d3ffd252f35c0e7f72ae4ae350bb26"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_lock_fact_context_v1(bigint,uuid)",
+        "source_sha256": "9a4aecf32caf76119b164ba98e6d882d017e054326360b7dcf6c3f495dad7506"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_lock_identities_v1(bigint,jsonb)",
+        "source_sha256": "cc01d97bbdbe46ea7ef4c3a080d94480a413aac93a8c20564eec840f2fa4dfbe"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_lock_page_v1(bigint,uuid,boolean)",
+        "source_sha256": "f97ede61ee3973dd85eaf504893555c044678210a2a37142bdabf03682771905"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_lock_workspace_v1(bigint)",
+        "source_sha256": "cf0c354bd1478b15203b17f47191a425b5e04883a11594707cfa6a84c6e99cdd"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_normalize_claim_v1(text)",
+        "source_sha256": "4fdbb49cab8e2116f9a4848c8236247eebfdb98a5e7e6db4f27e8e027b42dcad"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.trivia_protect_referenced_fact_meaning_v1()",
+        "source_sha256": "3aafa2478e8b6dda0965288c7d49e33be78102aa27bb22eb8af6f101d0fa7ef8"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_relation_direction_is_valid_v1(text,text)",
+        "source_sha256": "9c8af093448e5ffd60fa78b27c52f7c82153dcaff6c4075b96ef44cfe7cae8e3"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_relation_is_deterministic_safe_v1(text)",
+        "source_sha256": "afe1b0cc1532f33cef714e4eb2068bbe52edd10e7fba61a3b81d73136e470794"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog"],
+        "signature": "internal.trivia_relation_is_known_v1(text)",
+        "source_sha256": "59938a4cd2c71ddb086469243c77b99ab8403ab81ba1b1313ffd178f6d5fba55"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.trivia_release_facts_v1(uuid,uuid)",
+        "source_sha256": "2118c6b99088f83bc3493ba7397cd17f5bce6c969a99fb7aed6c86fb8ce9ed23"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_replay_v5(bigint,text,uuid)",
+        "source_sha256": "7021364c4aebf61a79fe441b45123c902c8613cfe92481b0257f79d1e0a8383e"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.trivia_reservation_fact_public_ids_v1(jsonb)",
+        "source_sha256": "697e1f021efab714dfc7cf19f90dba9dd7b8e7b412948aa61555ac2e9550235e"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.trivia_reserve_facts_v1(bigint,bigint,uuid,uuid,integer,timestamp with time zone,text,jsonb,text,integer)",
+        "source_sha256": "97646c83ff11c6040b750f0000e4b1091044b157de70d9edccc694da5662fd30"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_resolve_fact_v1(bigint,jsonb,boolean,bigint)",
+        "source_sha256": "975c6e5255bcb967c7d596679e981ad18ac4757cc4973410b296ff31d6a2976a"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_resolve_fact_v2(bigint,jsonb,boolean,bigint,bigint[])",
+        "source_sha256": "5368cfc7280801a3f83894c2a7e84dd51e7f9ed2d5342ddb89100f212cec1963"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_response_valid_v5(text,jsonb)",
+        "source_sha256": "a8794056e2e84bf258377f9de0bf20dc989fa238d83e781c7a4255923f49c17a"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.trivia_reverify_fact_v1(bigint,uuid,text,text,text,text,jsonb,jsonb,text,jsonb,text,timestamp with time zone,date,timestamp with time zone,text)",
+        "source_sha256": "c5207df26a6e934132082481ee0ae8679de37425cd237cea91a044d58487d055"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_rpc_raise_v1(text,text)",
+        "source_sha256": "604df5ad727d2cf1020fb657c90b6012d070433b1a90ba30f04990b513ad4256"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, extensions"],
+        "signature": "internal.trivia_structured_hash_v1(text)",
+        "source_sha256": "4cd8f15a3aa2d6989c86cfe7d2751301c3f4a7fbc114e706ab1206ff8c66c683"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.trivia_structured_match_eligible_v1(text,jsonb,jsonb,integer)",
+        "source_sha256": "0a253c85808022b70f188485df25ceac4d0707529591cf5736052fbab6fac58a"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_token_fingerprint_v1(bigint,uuid)",
+        "source_sha256": "5fe20471d959a77dac99d8bc8f405c2d583c3666de50ca028f7774600625f86a"
+      },
+      {
+        "acl": "{content_producer_api_owner=X/content_producer_api_owner}",
+        "owner": "content_producer_api_owner",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.trivia_touch_updated_at_v1()",
+        "source_sha256": "9b2e8c9a26e89597036586e82d6ef6385d122707700910b004c4679e86ea4532"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.trivia_validate_fact_row_v1()",
+        "source_sha256": "bbd987753ccbb0280f99f87cbae84ef9b3080d1a763f95610ac8c15e55789d66"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.trivia_validate_fact_row_v2()",
+        "source_sha256": "8da8c07faa6e38b65799f50948d8fb1458e42fb0311eb10e11b8edce34e17ad2"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.trivia_validate_lineage_v1()",
+        "source_sha256": "d42116731d07761eb08842d305bea35d3d8ebdd0756011309bce63242f70a419"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.trivia_validate_post_fact_v1()",
+        "source_sha256": "90207fad8df26e88057bbbf75e573c67ff4097908cb791ebb50933e097c61dec"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.validate_content_plan_config()",
+        "source_sha256": "28a94eec3e8378418aa4826cd3596c36cae2de68328b09ab8503fd0673bd7134"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=\"\""],
+        "signature": "internal.validate_page_locale_row()",
+        "source_sha256": "3ecda80ea039583a8f9a5a613999aabbdc0c0e3adc1b9d534a14895c88ebf983"
+      },
+      {
+        "acl": "{postgres=X/postgres,content_producer_api_owner=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.validate_page_niche_config()",
+        "source_sha256": "46d860e25b367686b258f2e3528157c4aa64e01f75e36421d5ad2e735fe4cbda"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.validate_post_metric()",
+        "source_sha256": "ff64f1b60ed7aab7c7def6dce1990067fdb8d938d010c29457032232c17fbdc1"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal, public"],
+        "signature": "internal.validate_post_row()",
+        "source_sha256": "82cd086926a0c198d79e3e53567343ac7e483785d6a59a7cf878bad5b2531048"
+      },
+      {
+        "acl": "{postgres=X/postgres}",
+        "owner": "postgres",
+        "definer": false,
+        "settings": ["search_path=pg_catalog, internal"],
+        "signature": "internal.validate_workspace_row()",
+        "source_sha256": "0ba9bb1a1c72f65daf55f2c1d8b883ca5bb10bbf78d7647f7382c809303a8014"
+      }
+    ],
+    "auth_users": 0,
+    "owner_role": {
+      "login": false,
+      "inherit": false,
+      "createdb": false,
+      "bypassrls": false,
+      "superuser": false,
+      "api_create": false,
+      "createrole": false,
+      "memberships": 0,
+      "replication": false,
+      "internal_create": false
+    },
+    "enable_seqscan": "on",
+    "storage_objects": 0,
+    "normalization_helper": {
+      "owner": "postgres",
+      "definer": false,
+      "settings": ["search_path=\"\""],
+      "api_owner_execute": false
+    },
+    "owner_auth_privileges": 0,
+    "unapproved_passed_drafts": 0
+  }
+}

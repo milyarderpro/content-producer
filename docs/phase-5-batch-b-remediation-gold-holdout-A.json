@@ -1,0 +1,11 @@
+{
+  "split": "holdout",
+  "counts": {
+    "cases": 45,
+    "same": 27,
+    "same_found": 27,
+    "exact": 10,
+    "structured": 11,
+    "unsafe_auto_signals": 0
+  }
+}

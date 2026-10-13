@@ -1,0 +1,18 @@
+{
+  "fixture": { "n": 5001, "digest": "276ed00c11b6145aa1e9fd6c3848a9d2" },
+  "timing": {
+    "n": 12,
+    "samples_ms": [
+      273.37243899999976, 264.8843940000006, 279.42003099999965, 277.1769779999995,
+      269.8945759999988, 293.0184910000007, 274.00572700000157, 241.3559959999984,
+      246.92910099999972, 268.2716870000004, 288.68937299999925, 272.2229209999987
+    ],
+    "p95_ms": 293.0184910000007,
+    "target_ms": 3000
+  },
+  "plans": {
+    "public_rpc": "Result  (cost=0.00..0.26 rows=1 width=32) (actual time=152.720..152.721 rows=1 loops=1)\n  Buffers: shared hit=5138\nPlanning Time: 0.009 ms\nExecution Time: 152.731 ms",
+    "private_diagnostic": "Function Scan on trivia_candidates_v3  (cost=5.52..15.52 rows=1000 width=73) (actual time=127.719..127.722 rows=20 loops=1)\n  Buffers: shared hit=2434\n  InitPlan 2\n    ->  Seq Scan on workspaces  (cost=0.26..5.27 rows=1 width=8) (actual time=0.166..0.167 rows=1 loops=1)\n          Filter: (is_active AND ((InitPlan 1).col1 = owner_user_id) AND (public_id = 'e2036474-8583-4bfb-b796-5093b9dc98c2'::uuid))\n          Buffers: shared hit=31\n          InitPlan 1\n            ->  Result  (cost=0.00..0.26 rows=1 width=16) (actual time=0.137..0.137 rows=1 loops=1)\n                  Buffers: shared hit=26\nPlanning:\n  Buffers: shared hit=962\nPlanning Time: 5.559 ms\nExecution Time: 127.814 ms"
+  },
+  "enable_seqscan": "on"
+}

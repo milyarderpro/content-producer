@@ -105,7 +105,7 @@ export function reserve(
   f: TriviaFixture,
   facts: Record<string, unknown>[] = [factInput()],
   key = randomUUID(),
-  token = randomUUID(),
+  token: string = randomUUID(),
   time = f.configTime,
   scope = 'workspace_unique',
   ttl = 30,

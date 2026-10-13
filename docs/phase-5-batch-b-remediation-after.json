@@ -1,0 +1,41 @@
+{
+  "baseline": "289afe31d7700cdee962ce8e8d014c449100041c",
+  "fixture": { "n": 5001, "digest": "93d96d699e2701ab57117b0af40b71c1" },
+  "result_digest": "ac8aebb557bd6133044abd166e2b0401b63eb12044626d60242630b704f79c00",
+  "function_digest": "79e69b28c9ca5f9c9b26aa6f6fa1f6df",
+  "timing": {
+    "n": 12,
+    "samples_ms": [
+      230.4902669999865, 231.64899299999524, 202.43625299999258, 197.9732720000029,
+      234.5929909999977, 232.66148700000485, 209.53626199999417, 232.19959299999755,
+      237.4414140000008, 242.1639140000043, 229.71216399999685, 223.6000309999945
+    ],
+    "p95_ms": 242.1639140000043,
+    "target_ms": 3000
+  },
+  "nine_candidate_timing": {
+    "n": 12,
+    "samples_ms": [
+      1013.1839719999989, 983.3680469999963, 1021.3503120000096, 1016.5578600000008,
+      1033.864723000006, 1027.49586000001, 998.3500449999992, 1022.0303870000062, 1027.818471000006,
+      1013.8770190000068, 1028.066393000001, 985.1820100000041
+    ],
+    "p95_ms": 1033.864723000006,
+    "target_ms": 3000
+  },
+  "plans": {
+    "public_rpc": "Result  (cost=0.00..0.26 rows=1 width=32) (actual time=123.459..123.460 rows=1 loops=1)\n  Buffers: shared hit=5611\nPlanning Time: 0.010 ms\nExecution Time: 123.470 ms",
+    "private_diagnostic": "Function Scan on trivia_candidates_v3  (cost=5.51..15.51 rows=1000 width=73) (actual time=93.872..93.875 rows=20 loops=1)\n  Buffers: shared hit=2415\n  InitPlan 2\n    ->  Seq Scan on workspaces  (cost=0.26..5.26 rows=1 width=8) (actual time=0.161..0.177 rows=1 loops=1)\n          Filter: (is_active AND ((InitPlan 1).col1 = owner_user_id) AND (public_id = '3ec718b4-a8d3-4f1a-8748-c42d726c8c78'::uuid))\n          Rows Removed by Filter: 2\n          Buffers: shared hit=31\n          InitPlan 1\n            ->  Result  (cost=0.00..0.26 rows=1 width=16) (actual time=0.141..0.141 rows=1 loops=1)\n                  Buffers: shared hit=26\nPlanning:\n  Buffers: shared hit=963\nPlanning Time: 5.204 ms\nExecution Time: 93.974 ms"
+  },
+  "enable_seqscan": "on",
+  "normalization": {
+    "before": 2,
+    "after": 0,
+    "second_run": 0,
+    "inactive_included": true,
+    "revision_increment": 1,
+    "ledger_history_unchanged": true,
+    "original_passed_save_replays_exact": true,
+    "approved_published_unchanged": true
+  }
+}
