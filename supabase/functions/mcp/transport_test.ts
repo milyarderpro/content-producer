@@ -42,35 +42,38 @@ Deno.test('6.1 internal protocol errors are structured', async () => {
   assert(body.includes('error'), 'missing JSON-RPC protocol error');
 });
 
-Deno.test('6.2 without OAuth configuration fails closed with only health and preflight', async () => {
-  const url = 'http://localhost/functions/v1/mcp';
-  const health = await handleHttpRequest(new Request(`${url}/health`));
-  const payload = await health.json();
-  assert(health.status === 200, 'health must return 200');
-  assert(payload.status === 'ok' && payload.version === '0.1.0', 'invalid health status');
-  assert(Number.isFinite(Date.parse(payload.timestamp)), 'missing server timestamp');
-  assert(!('owner' in payload) && !('tools' in payload), 'health exposed business data');
+Deno.test(
+  '6.2 without OAuth configuration fails closed with only health and preflight',
+  async () => {
+    const url = 'http://localhost/functions/v1/mcp';
+    const health = await handleHttpRequest(new Request(`${url}/health`));
+    const payload = await health.json();
+    assert(health.status === 200, 'health must return 200');
+    assert(payload.status === 'ok' && payload.version === '0.1.0', 'invalid health status');
+    assert(Number.isFinite(Date.parse(payload.timestamp)), 'missing server timestamp');
+    assert(!('owner' in payload) && !('tools' in payload), 'health exposed business data');
 
-  const preflight = await handleHttpRequest(new Request(url, { method: 'OPTIONS' }));
-  assert(preflight.status === 204, 'preflight must return 204');
-  assert((await preflight.text()) === '', 'preflight must have no payload');
+    const preflight = await handleHttpRequest(new Request(url, { method: 'OPTIONS' }));
+    assert(preflight.status === 204, 'preflight must return 204');
+    assert((await preflight.text()) === '', 'preflight must have no payload');
 
-  for (const method of ['initialize', 'tools/list', 'tools/call']) {
-    for (const authorization of [undefined, 'Bearer never-validated']) {
-      const request = protocolRequest(method);
-      const headers = new Headers(request.headers);
-      if (authorization) headers.set('Authorization', authorization);
-      const blocked = await handleHttpRequest(
-        new Request(url, { method: 'POST', headers, body: await request.text() }),
-      );
-      assert(blocked.status === 503, `${method} unexpectedly passed the auth gate`);
-      assert(!blocked.headers.has('WWW-Authenticate'), 'unconfigured OAuth must fail closed');
+    for (const method of ['initialize', 'tools/list', 'tools/call']) {
+      for (const authorization of [undefined, 'Bearer never-validated']) {
+        const request = protocolRequest(method);
+        const headers = new Headers(request.headers);
+        if (authorization) headers.set('Authorization', authorization);
+        const blocked = await handleHttpRequest(
+          new Request(url, { method: 'POST', headers, body: await request.text() }),
+        );
+        assert(blocked.status === 503, `${method} unexpectedly passed the auth gate`);
+        assert(!blocked.headers.has('WWW-Authenticate'), 'unconfigured OAuth must fail closed');
+      }
     }
-  }
-  assert((await handleHttpRequest(new Request(url))).status === 503, 'GET MCP must be closed');
-  assert((await handleHttpRequest(new Request(`${url}/unknown`))).status === 404, 'bad route');
-  assert(
-    (await handleHttpRequest(new Request(`${url}/health`, { method: 'POST' }))).status === 405,
-    'health must only accept GET',
-  );
-});
+    assert((await handleHttpRequest(new Request(url))).status === 503, 'GET MCP must be closed');
+    assert((await handleHttpRequest(new Request(`${url}/unknown`))).status === 404, 'bad route');
+    assert(
+      (await handleHttpRequest(new Request(`${url}/health`, { method: 'POST' }))).status === 405,
+      'health must only accept GET',
+    );
+  },
+);

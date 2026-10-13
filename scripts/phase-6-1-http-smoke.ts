@@ -59,13 +59,19 @@ for (const [label, body, bearer] of [
     body,
   });
   expectStatus(response.status, 401, label);
-  if (!response.headers.get('WWW-Authenticate')?.includes(url + '/oauth-protected-resource')) throw new Error(`${label}: incorrect challenge`);
+  if (!response.headers.get('WWW-Authenticate')?.includes(url + '/oauth-protected-resource'))
+    throw new Error(`${label}: incorrect challenge`);
 }
 expectStatus((await fetch(url)).status, 401, 'GET MCP is closed');
 const discovery = await fetch(url + '/oauth-protected-resource');
 expectStatus(discovery.status, 200, 'OAuth resource discovery');
 const metadata = (await discovery.json()) as Record<string, unknown>;
-if (metadata.resource !== url || !Array.isArray(metadata.authorization_servers) || !Array.isArray(metadata.scopes_supported)) throw new Error('OAuth discovery mismatch');
+if (
+  metadata.resource !== url ||
+  !Array.isArray(metadata.authorization_servers) ||
+  !Array.isArray(metadata.scopes_supported)
+)
+  throw new Error('OAuth discovery mismatch');
 expectStatus((await fetch(url, { method: 'OPTIONS' })).status, 204, 'MCP preflight');
 expectStatus((await fetch(`${url}/not-a-route`)).status, 404, 'unknown route');
 console.log('6.2 OAuth discovery and challenge smoke PASS (zero tools).');
