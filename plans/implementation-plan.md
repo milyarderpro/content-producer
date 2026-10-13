@@ -1401,7 +1401,7 @@ ditulis, bukan status terkini.
 | 3 — Core database | Complete | Core tests lulus | `1e3bd9c` |
 | 4 — Trivia database | Complete | Dedup/reuse tests lulus | `f513286`, `cb3568a` |
 | 5 — RPC dan security | Complete | Security/concurrency lulus | `04f6373`; [final local verification](../docs/phase-5-batch-b-remediation-p2-03-report.md) |
-| 6 — MCP Edge Function | Not started | Inspector/contract lulus | `supabase/functions/mcp/index.ts` belum ada; local function disabled |
+| 6 — MCP Edge Function | In progress | Inspector/contract lulus | Checkpoint 6.0 CI baseline pada branch `codex/phase-6-mcp`; MCP belum diimplementasikan, local function tetap disabled |
 | 7 — Plugin skill/package source | Not started | Source/package candidate validation lulus | — |
 | 8 — Full verification | Not started | Acceptance criteria lulus | — |
 | 9 — Production deployment | Not started | Production smoke lulus | — |
@@ -1413,7 +1413,7 @@ perubahan di-commit sebagai `04f6373`. Laporan remediasi yang lebih awal masih
 menyebut independent re-audit pending karena laporan itu adalah handoff pada
 waktu penulisan. Repository ini belum memuat dokumen pengesahan audit independen
 terakhir; status `Complete` di sini tidak mengklaim adanya dokumen tersebut.
-Phase 6 belum dimulai dan tetap harus melewati gate-nya sendiri.
+Phase 6 dimulai dengan checkpoint 6.0 (CI baseline); status ini bukan bukti gate Phase 6 lulus. MCP belum diimplementasikan dan gate Phase 6 tetap wajib diuji.
 
 Status yang digunakan:
 
