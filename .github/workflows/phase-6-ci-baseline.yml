@@ -151,6 +151,15 @@ jobs:
           echo "Focused Phase 5 regression: exit code $code; elapsed $((SECONDS - started))s"
           exit "$code"
 
+      - name: Batch A - short real HTTP recovery preflight, then fresh clean reset
+        id: preflight
+        if: env.FULL_GATE == 'true'
+        run: |
+          pnpm run test:mcp
+          pnpm exec tsx scripts/phase-6-batch-a.ts --preflight
+          pnpm run supabase:reset > "$RUNNER_TEMP/phase-6-supabase-gate-reset.log" 2>&1
+          echo "Exit code: 0 (focused MCP + real HTTP recovery preflight + fresh clean reset)"
+
       # Full gate runs only for the tagged Batch A commit or explicit 6.6 dispatch.
       # Future checkpoint pushes retain targeted CI, without automatic test-all.
       - name: Batch A - test-all after clean reset (includes check, migration names, MCP, database)
@@ -214,6 +223,7 @@ jobs:
           RESET_OUTCOME: ${{ steps.reset.outcome }}
           MCP_OUTCOME: ${{ steps.mcp.outcome }}
           HTTP_OUTCOME: ${{ steps.http.outcome }}
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
           FULL_OUTCOME: ${{ steps.full.outcome }}
           SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
           HISTORY_OUTCOME: ${{ steps.history.outcome }}
@@ -247,6 +257,7 @@ jobs:
             echo '| Black-box HTTP | `supabase functions serve mcp --no-verify-jwt` + HTTP smoke | '"$HTTP_OUTCOME"' |'
             echo '| Focused regression | Phase 5 plan lifecycle/claims, concurrency, Page/plan, security/catalog, metrics/rate limits, baseline | '"$REGRESSION_OUTCOME"' |'
             echo
+            echo "| Short real HTTP recovery preflight + fresh reset | MCP, recovery/race, clean reset | $PREFLIGHT_OUTCOME |"
             echo "| Full test-all (includes check/MCP/migration names/database) | sequential after clean reset | $FULL_OUTCOME |"
             echo "| Smoke (duplicates database suite) | pnpm run smoke-test | $SMOKE_OUTCOME |"
             echo "| Migration history | pnpm run supabase:verify | $HISTORY_OUTCOME |"

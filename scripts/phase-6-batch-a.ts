@@ -190,7 +190,7 @@ try {
         issuer,
         jwksUrl: issuer + '/.well-known/jwks.json',
         ownerUserId: f.owner,
-        supabaseUrl: 'http://127.0.0.1:54329',
+        supabaseUrl: 'http://127.0.0.1:54330',
         publishableKey: 'local-fixture-public-key',
       },
     }),
@@ -365,101 +365,103 @@ try {
   );
 
   clearFixtureBuckets();
-  await inspector('initialize');
-  const listed = await inspector('tools/list');
-  check(listed.tools.length === 15, 'INSPECTOR_CENSUS');
-  await inspector('tools/call', 'get_account_profile', { request_schema_version: 1 });
-  await inspector('tools/call', 'get_workspace_context', common());
-  await inspector('tools/call', 'list_pages', common());
-  await inspector('tools/call', 'get_page_generation_context', {
-    ...common(),
-    page_public_id: f.page,
-    niche_key: 'trivia',
-  });
-  const config = row<{ config: unknown }>(
-    'select internal.default_trivia_config_v1() config',
-  ).config;
-  const newPage = (
-    await inspector('tools/call', 'create_page', {
-      ...write(),
-      name: 'Inspector Page',
-      slug: f.prefix + '-inspector',
-      timezone: 'UTC',
-      target_markets: ['US'],
+  if (!process.argv.includes('--preflight')) {
+    await inspector('initialize');
+    const listed = await inspector('tools/list');
+    check(listed.tools.length === 15, 'INSPECTOR_CENSUS');
+    await inspector('tools/call', 'get_account_profile', { request_schema_version: 1 });
+    await inspector('tools/call', 'get_workspace_context', common());
+    await inspector('tools/call', 'list_pages', common());
+    await inspector('tools/call', 'get_page_generation_context', {
+      ...common(),
+      page_public_id: f.page,
       niche_key: 'trivia',
-      config_schema_version: 1,
-      config,
-    })
-  ).structuredContent.data.page;
-  await inspector('tools/call', 'update_page', {
-    ...write(),
-    page_public_id: newPage.page_public_id,
-    expected_page_updated_at: newPage.updated_at,
-    page_patch: { name: 'Inspector Page updated' },
-  });
-  await inspector('tools/call', 'list_content_plans', common());
-  const newPlan = (
-    await inspector('tools/call', 'create_content_plan', {
+    });
+    const config = row<{ config: unknown }>(
+      'select internal.default_trivia_config_v1() config',
+    ).config;
+    const newPage = (
+      await inspector('tools/call', 'create_page', {
+        ...write(),
+        name: 'Inspector Page',
+        slug: f.prefix + '-inspector',
+        timezone: 'UTC',
+        target_markets: ['US'],
+        niche_key: 'trivia',
+        config_schema_version: 1,
+        config,
+      })
+    ).structuredContent.data.page;
+    await inspector('tools/call', 'update_page', {
       ...write(),
       page_public_id: newPage.page_public_id,
-      niche_key: 'trivia',
-      config_schema_version: 1,
-      plan_intent: 'Create a local test plan.',
-      items: [1, 2].map((position) => ({
-        position,
-        topic_key: 'animals',
-        format_key: 'single_subject_fast',
-        interaction_goal: 'share',
-        item_config: {},
-        scheduled_at: null,
-      })),
-    })
-  ).structuredContent.data;
-  await inspector('tools/call', 'get_content_plan', {
-    ...common(),
-    plan_public_id: newPlan.plan.plan_public_id,
-  });
-  const leased = (
-    await inspector('tools/call', 'claim_content_plan_items', {
+      expected_page_updated_at: newPage.updated_at,
+      page_patch: { name: 'Inspector Page updated' },
+    });
+    await inspector('tools/call', 'list_content_plans', common());
+    const newPlan = (
+      await inspector('tools/call', 'create_content_plan', {
+        ...write(),
+        page_public_id: newPage.page_public_id,
+        niche_key: 'trivia',
+        config_schema_version: 1,
+        plan_intent: 'Create a local test plan.',
+        items: [1, 2].map((position) => ({
+          position,
+          topic_key: 'animals',
+          format_key: 'single_subject_fast',
+          interaction_goal: 'share',
+          item_config: {},
+          scheduled_at: null,
+        })),
+      })
+    ).structuredContent.data;
+    await inspector('tools/call', 'get_content_plan', {
+      ...common(),
+      plan_public_id: newPlan.plan.plan_public_id,
+    });
+    const leased = (
+      await inspector('tools/call', 'claim_content_plan_items', {
+        ...write(),
+        plan_public_id: newPlan.plan.plan_public_id,
+        lease_minutes: 30,
+        limit: 1,
+      })
+    ).structuredContent.data.claimed_items[0];
+    const leaseArgs = {
+      plan_item_public_id: leased.item.plan_item_public_id,
+      claim_token: leased.claim_token,
+    };
+    await inspector('tools/call', 'renew_content_plan_claim', { ...write(), ...leaseArgs });
+    await inspector('tools/call', 'report_content_plan_item_failure', {
+      ...write(),
+      ...leaseArgs,
+      failure_code: 'FACT_SOURCE_INSUFFICIENT',
+      failure_detail: 'Sources were insufficient.',
+      retry_recommended: true,
+    });
+    await inspector(
+      'tools/call',
+      'retry_content_plan_item',
+      itemArgs(leased.item.plan_item_public_id),
+    );
+    const replacementItem = newPlan.items[1].plan_item_public_id;
+    completeFixtureItem(replacementItem);
+    const replacementPost = insertPost(replacementItem);
+    await inspector('tools/call', 'replace_discarded_plan_item', {
+      ...itemArgs(replacementItem),
+      discarded_post_public_id: replacementPost,
+      explicit_replacement: true,
+    });
+    await inspector('tools/call', 'cancel_content_plan', {
       ...write(),
       plan_public_id: newPlan.plan.plan_public_id,
-      lease_minutes: 30,
-      limit: 1,
-    })
-  ).structuredContent.data.claimed_items[0];
-  const leaseArgs = {
-    plan_item_public_id: leased.item.plan_item_public_id,
-    claim_token: leased.claim_token,
-  };
-  await inspector('tools/call', 'renew_content_plan_claim', { ...write(), ...leaseArgs });
-  await inspector('tools/call', 'report_content_plan_item_failure', {
-    ...write(),
-    ...leaseArgs,
-    failure_code: 'FACT_SOURCE_INSUFFICIENT',
-    failure_detail: 'Sources were insufficient.',
-    retry_recommended: true,
-  });
-  await inspector(
-    'tools/call',
-    'retry_content_plan_item',
-    itemArgs(leased.item.plan_item_public_id),
-  );
-  const replacementItem = newPlan.items[1].plan_item_public_id;
-  completeFixtureItem(replacementItem);
-  const replacementPost = insertPost(replacementItem);
-  await inspector('tools/call', 'replace_discarded_plan_item', {
-    ...itemArgs(replacementItem),
-    discarded_post_public_id: replacementPost,
-    explicit_replacement: true,
-  });
-  await inspector('tools/call', 'cancel_content_plan', {
-    ...write(),
-    plan_public_id: newPlan.plan.plan_public_id,
-    reason: 'Cancel the local fixture.',
-    explicit_cancellation: true,
-  });
-  clearFixtureBuckets();
-  for (const tool of tools) await inspector('tools/call', tool.name, {}, 5);
+      reason: 'Cancel the local fixture.',
+      explicit_cancellation: true,
+    });
+    clearFixtureBuckets();
+    for (const tool of tools) await inspector('tools/call', tool.name, {}, 5);
+  }
   check(
     !logs.includes(bearer) &&
       !logs.includes(foreignBearer) &&
@@ -469,7 +471,7 @@ try {
   );
   timings.sort((a, b) => a - b);
   console.info(
-    `Batch A: Inspector initialize/list, 15/15 valid and 15/15 invalid tool calls PASS; HTTP log privacy PASS; typical local latency median ${Math.round(timings[Math.floor(timings.length / 2)])}ms, max ${Math.round(timings.at(-1)!)}ms (fixture scope).`,
+    `Batch A ${process.argv.includes('--preflight') ? 'preflight: real HTTP recovery/race' : 'gate: Inspector initialize/list, 15/15 valid and 15/15 invalid tool calls'} PASS; HTTP log privacy PASS; typical local latency median ${Math.round(timings[Math.floor(timings.length / 2)])}ms, max ${Math.round(timings.at(-1)!)}ms (fixture scope).`,
   );
 } catch (error) {
   // Print safe assertion labels only, never raw child stdout, SQL or payloads.
