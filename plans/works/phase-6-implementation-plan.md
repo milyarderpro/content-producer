@@ -1,10 +1,11 @@
 # Phase 6 — MCP Edge Function implementation plan
 
 Status: rencana eksekusi; implementasi Phase 6 belum dimulai.
-Baseline source: `b5770f8` pada `main`, 67 migration, 33 `api` RPC, dan
-`[functions.mcp] enabled = false`. Belum ada
-`supabase/functions/mcp/index.ts` atau workflow GitHub Actions. Angka katalog
-Phase 5 berasal dari verifikasi lokal terakhir; checkpoint 6.0 harus
+Baseline kode Phase 5 terakhir: `b5770f8`, 67 migration, 33 `api` RPC, dan
+`[functions.mcp] enabled = false`. Checkpoint 6.0 harus dibuat dari `main`
+terbaru yang sudah memuat runbook ini; catat SHA awal aktual dalam handoff.
+Belum ada `supabase/functions/mcp/index.ts` atau workflow GitHub Actions.
+Angka katalog Phase 5 berasal dari verifikasi lokal terakhir; checkpoint 6.0 harus
 membuktikan ulang bahwa baseline dapat dijalankan di CI.
 
 ## 1. Tujuan dan sumber keputusan
