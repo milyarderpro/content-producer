@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   checkpoint:
-    name: Phase 6.4 targeted CI (9 MCP tools)
+    name: Phase 6.5 targeted CI (12 MCP tools)
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
@@ -76,7 +76,7 @@ jobs:
           test "$(pnpm exec supabase --version)" = "2.120.0"
           echo "Supabase CLI: 2.120.0 (verified)"
 
-      - name: Checkpoint 6.4 - internal MCP tests
+      - name: Checkpoint 6.5 - internal MCP tests
         id: mcp
         run: |
           pnpm run test:mcp
@@ -106,7 +106,7 @@ jobs:
           echo "Migration SQL count: $(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
           exit "$code"
 
-      - name: Checkpoint 6.4 - local HTTP fail-closed smoke
+      - name: Checkpoint 6.5 - local HTTP fail-closed smoke
         id: http
         shell: bash
         run: |
@@ -117,7 +117,7 @@ jobs:
           pnpm exec tsx scripts/phase-6-1-http-smoke.ts
           echo "Exit code: 0 (local MCP HTTP smoke)"
 
-      - name: Focused database regression - Phase 5 Page/plan writes, concurrency, read and security
+      - name: Focused database regression - Phase 5 claim/lease/failure, plan race, Page/plan and security
         id: regression
         shell: bash
         run: |
@@ -127,6 +127,8 @@ jobs:
             supabase/tests/database/api-read-rpcs.test.ts \
             supabase/tests/database/api-page-plan-writes.test.ts \
             supabase/tests/database/api-plan-concurrency.test.ts \
+            supabase/tests/database/api-plan-lifecycle.test.ts \
+            supabase/tests/database/api-security-kernel.test.ts \
             supabase/tests/database/api-phase-five-acceptance.test.ts \
             supabase/tests/database/api-metrics.test.ts \
             supabase/tests/database/api-metrics-concurrency.test.ts \
@@ -154,15 +156,15 @@ jobs:
           REGRESSION_OUTCOME: ${{ steps.regression.outcome }}
         run: |
           mkdir -p "$RUNNER_TEMP/phase-6-evidence"
-          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.4.md"
+          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.5.md"
           {
-            echo "# Phase 6.4 targeted checkpoint CI"
+            echo "# Phase 6.5 targeted checkpoint CI"
             echo
             echo "- Commit: $(git rev-parse HEAD)"
             echo "- Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             echo "- Started UTC: ${STARTED_UTC:-not recorded}"
             echo "- Finished UTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            echo "- New tools: 5; cumulative tools: **9/33**"
+            echo "- New tools: 3; cumulative tools: **12/33**"
             echo "- Local Supabase only, no remote project, secrets, or deployment"
             echo
             echo "| Stage | Actual command / scope | GitHub step outcome |"
@@ -176,7 +178,7 @@ jobs:
             echo '| Clean reset | `pnpm run supabase:reset` | '"$RESET_OUTCOME"' |'
             echo '| Internal MCP | `pnpm run test:mcp` | '"$MCP_OUTCOME"' |'
             echo '| Black-box HTTP | `supabase functions serve mcp --no-verify-jwt` + HTTP smoke | '"$HTTP_OUTCOME"' |'
-            echo '| Focused regression | Phase 5 Page/plan writes, concurrency, read RPCs, catalog, metrics, rate limits, baseline | '"$REGRESSION_OUTCOME"' |'
+            echo '| Focused regression | Phase 5 plan lifecycle/claims, concurrency, Page/plan, security/catalog, metrics/rate limits, baseline | '"$REGRESSION_OUTCOME"' |'
             echo
             echo "The complete batch gate is NOT run on checkpoint pushes; it is reserved for 6.6/6.13."
             echo "Numerical exit codes and exact assertions are in Actions step logs. A skipped stage is not a pass."
@@ -187,7 +189,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase-6-4-ci-evidence
-          path: ${{ runner.temp }}/phase-6-evidence/checkpoint-6.4.md
+          name: phase-6-5-ci-evidence
+          path: ${{ runner.temp }}/phase-6-evidence/checkpoint-6.5.md
           if-no-files-found: error
           retention-days: 14
