@@ -1,4 +1,3 @@
-// Supabase Edge Function entrypoint. OAuth is implemented in Phase 6.2.
+// Supabase Edge Function entrypoint. OAuth is required before MCP transport.
 import { handleHttpRequest } from './http.ts';
-
 Deno.serve(handleHttpRequest);
