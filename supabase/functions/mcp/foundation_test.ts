@@ -94,7 +94,7 @@ Deno.test('6.3 exactly four OAuth-scoped, read-only tools; profile alone has met
   for (const name of FOUNDATION_TOOL_NAMES) assert(listed.includes(name), 'missing ' + name);
   assert((listed.match(/"readOnlyHint":true/g) || []).length === 4, 'read-only annotations');
   assert((listed.match(/"openWorldHint":false/g) || []).length === 4, 'open world must be off');
-  assert((listed.match(/"openai\\/profile":true/g) || []).length === 1, 'one profile metadata');
+  assert(listed.split('"openai/profile":true').length === 2, 'one profile metadata');
   assert((listed.match(/"oauth2"/g) || []).length === 4, 'four OAuth security schemes');
   assert(!(listed.includes('create_page')), '6.4 tool not permitted');
 });
