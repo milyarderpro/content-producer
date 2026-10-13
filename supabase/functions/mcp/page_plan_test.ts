@@ -386,7 +386,7 @@ Deno.test(
   async () => {
     const original = globalThis.fetch;
     let n = 0;
-    globalThis.fetch = ((_input: Request | URL | string, _init?: RequestInit) => {
+    globalThis.fetch = (() => {
       n++;
       if (n === 1)
         return Promise.resolve(
