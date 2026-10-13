@@ -53,6 +53,11 @@ Deno.test(
     assert(Number.isFinite(Date.parse(payload.timestamp)), 'missing server timestamp');
     assert(!('owner' in payload) && !('tools' in payload), 'health exposed business data');
 
+    const oversized = await handleHttpRequest(
+      new Request(url, { method: 'POST', body: 'x'.repeat(256 * 1024 + 1) }),
+    );
+    assert(oversized.status === 413, 'oversized MCP request must be rejected');
+
     const preflight = await handleHttpRequest(new Request(url, { method: 'OPTIONS' }));
     assert(preflight.status === 204, 'preflight must return 204');
     assert((await preflight.text()) === '', 'preflight must have no payload');

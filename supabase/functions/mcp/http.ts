@@ -95,6 +95,15 @@ export async function handleHttpRequest(
     );
   }
   if (!isMcp) return jsonResponse({ error: 'not_found' }, 404);
+  if (request.method === 'POST') {
+    try {
+      if ((await request.clone().arrayBuffer()).byteLength > 256 * 1024) {
+        return jsonResponse({ error: 'request_too_large' }, 413);
+      }
+    } catch {
+      return jsonResponse({ error: 'invalid_request' }, 400);
+    }
+  }
   if (path !== expectedPath) return challenge(config.resource, 401);
   const id = crypto.randomUUID();
   try {

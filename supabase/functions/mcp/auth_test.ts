@@ -110,7 +110,7 @@ Deno.test('6.2 discovery and 401 WWW-Authenticate bind exact resource', async ()
     ).status === 204,
     'preflight closed',
   );
-  assert(MCP_TOOL_COUNT === 0, '6.2 registered business tools');
+  assert(MCP_TOOL_COUNT === 4, '6.3 must have four owner-scoped tools');
 });
 
 Deno.test(
@@ -179,7 +179,7 @@ Deno.test(
 );
 
 Deno.test(
-  '6.2 real HTTP MCP transport accepts signed fixture but still lists zero tools',
+  '6.3 real HTTP MCP transport accepts signed owner fixture and lists four tools',
   async () => {
     const { claims, dependencies, sign } = await fixture();
     const token = await sign(claims);
@@ -214,7 +214,8 @@ Deno.test(
       const body = await response.text();
       assert(response.status === 200, 'validated MCP transport unavailable');
       assert(
-        method === 'initialize' ? body.includes('serverInfo') : /"tools"\s*:\s*\[\s*\]/.test(body),
+        method === 'initialize' ? body.includes('serverInfo') :
+          ['get_account_profile', 'get_workspace_context', 'list_pages', 'get_page_generation_context'].every((name) => body.includes(name)),
         'invalid transport response',
       );
     }
