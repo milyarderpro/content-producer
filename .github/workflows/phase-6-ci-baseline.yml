@@ -76,6 +76,12 @@ jobs:
           test "$(pnpm exec supabase --version)" = "2.120.0"
           echo "Supabase CLI: 2.120.0 (verified)"
 
+      - name: Checkpoint 6.3 - internal MCP tests
+        id: mcp
+        run: |
+          pnpm run test:mcp
+          echo "Exit code: 0 (pnpm run test:mcp)"
+
       - name: Start local Supabase
         id: start
         shell: bash
@@ -99,12 +105,6 @@ jobs:
           echo "pnpm run supabase:reset: exit code $code; elapsed $((SECONDS - started))s"
           echo "Migration SQL count: $(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
           exit "$code"
-
-      - name: Checkpoint 6.3 - internal MCP tests
-        id: mcp
-        run: |
-          pnpm run test:mcp
-          echo "Exit code: 0 (pnpm run test:mcp)"
 
       - name: Checkpoint 6.3 - local HTTP fail-closed smoke
         id: http
