@@ -136,7 +136,7 @@ Deno.test('6.4 registry exposes exactly 9 tools with correct metadata and no ano
   assert((text.match(/"readOnlyHint":true/g) || []).length === 6, 'six read tools');
   assert((text.match(/"readOnlyHint":false/g) || []).length === 3, 'three writes');
   assert((text.match(/"destructiveHint":true/g) || []).length === 1, 'update_page destructive');
-  assert((text.match(/"openai/profile":true/g) || []).length === 1, 'profile only');
+  assert(text.split('"openai/profile":true').length === 2, 'profile only');
   assert(!text.includes('claim_content_plan_items'), '6.5 must not be registered');
 });
 
