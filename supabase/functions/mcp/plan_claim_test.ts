@@ -116,7 +116,7 @@ async function mcp(method: string, params?: object) {
   const raw = await res.text();
   // The pinned Streamable HTTP transport may use SSE for an ordinary
   // JSON-RPC call; parse only its data frame, never log the frame or token.
-  const dataFrame = raw.split('\\n').find((line) => line.startsWith('data: '));
+  const dataFrame = raw.split(String.fromCharCode(10)).find((line) => line.startsWith('data: '));
   return JSON.parse(dataFrame ? dataFrame.slice(6) : raw) as {
     result?: {
       content?: Array<{ type: string; text: string }>;
