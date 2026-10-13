@@ -68,6 +68,12 @@ Perubahan kebutuhan harus dimulai dari PRD. Perubahan invariant database harus m
 - Kegagalan gate menghentikan perpindahan fase.
 - Perbaikan dilakukan dalam fase yang sama.
 
+Untuk Phase 6, pengguna memilih alur yang lebih ketat: satu task AI hanya
+mengerjakan satu checkpoint, checkpoint dikerjakan berurutan pada branch yang
+sama, dan audit independen dilakukan setelah 15 serta 33 tools. GitHub Issue
+melacak kemajuan checkpoint; kontrak frozen dan verification gate fase tetap
+menjadi sumber keputusan teknis.
+
 ### 4.2 AI-first execution
 
 AI mengerjakan seluruh pekerjaan yang dapat dilakukan melalui repository, terminal, Supabase CLI, database, MCP tooling, atau browser yang terotorisasi.
@@ -1382,20 +1388,32 @@ Implementasi MVP selesai hanya jika:
 
 ## 16. Phase tracker
 
-| Phase | Status awal | Gate |
-|---:|---|---|
-| 0 — Specification freeze | Complete | Final audit 0.12 lulus; baseline dibekukan |
-| 1 — Repository foundation | Complete | Toolchain, fresh install, and quality gate lulus pada 8 Oktober 2026 |
-| 2 — Supabase local foundation | Not started | Local reset/migration lulus |
-| 3 — Core database | Not started | Core tests lulus |
-| 4 — Trivia database | Not started | Dedup/reuse tests lulus |
-| 5 — RPC dan security | Not started | Security/concurrency lulus |
-| 6 — MCP Edge Function | Not started | Inspector/contract lulus |
-| 7 — Plugin skill/package source | Not started | Source/package candidate validation lulus |
-| 8 — Full verification | Not started | Acceptance criteria lulus |
-| 9 — Production deployment | Not started | Production smoke lulus |
-| 10 — MCP connection/package/pilot | Not started | Remote MCP, final plugin, dan end-to-end pilot lulus |
-| 11 — Stabilization | Not started | Production readiness disetujui |
+Status terkini per 13 Oktober 2026. Bagian ini adalah tracker yang diperbarui
+seiring kemajuan proyek; scope, kontrak, dan verification gate fase di atas
+tetap berlaku. Runbook checkpoint dan laporan lama mencatat keadaan pada saat
+ditulis, bukan status terkini.
+
+| Phase | Status terkini | Gate | Bukti status |
+|---:|---|---|---|
+| 0 — Specification freeze | Complete | Final audit 0.12 lulus; baseline dibekukan | `0b137e1` |
+| 1 — Repository foundation | Complete | Toolchain, fresh install, and quality gate lulus pada 8 Oktober 2026 | `64c61b6`, `1f496f8` |
+| 2 — Supabase local foundation | Complete | Local reset/migration lulus | `5086676` |
+| 3 — Core database | Complete | Core tests lulus | `1e3bd9c` |
+| 4 — Trivia database | Complete | Dedup/reuse tests lulus | `f513286`, `cb3568a` |
+| 5 — RPC dan security | Complete | Security/concurrency lulus | `04f6373`; [final local verification](../docs/phase-5-batch-b-remediation-p2-03-report.md) |
+| 6 — MCP Edge Function | Not started | Inspector/contract lulus | `supabase/functions/mcp/index.ts` belum ada; local function disabled |
+| 7 — Plugin skill/package source | Not started | Source/package candidate validation lulus | — |
+| 8 — Full verification | Not started | Acceptance criteria lulus | — |
+| 9 — Production deployment | Not started | Production smoke lulus | — |
+| 10 — MCP connection/package/pilot | Not started | Remote MCP, final plugin, dan end-to-end pilot lulus | — |
+| 11 — Stabilization | Not started | Production readiness disetujui | — |
+
+Phase 5 ditutup atas keputusan pengguna setelah gate lokal terakhir lulus dan
+perubahan di-commit sebagai `04f6373`. Laporan remediasi yang lebih awal masih
+menyebut independent re-audit pending karena laporan itu adalah handoff pada
+waktu penulisan. Repository ini belum memuat dokumen pengesahan audit independen
+terakhir; status `Complete` di sini tidak mengklaim adanya dokumen tersebut.
+Phase 6 belum dimulai dan tetap harus melewati gate-nya sendiri.
 
 Status yang digunakan:
 

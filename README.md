@@ -6,20 +6,21 @@ designed for future niche modules.
 
 ## Repository status
 
-Phase 3 adds the generic local database core on top of the reproducible
-Supabase foundation: eight core tables in `public`, two operational tables in
-`internal`, versioned evidence validators, tenant-isolation constraints, and
-database verification. It still contains no public business RPCs, deployed
-resources, MCP handler, production plugin connection, or Facebook/Canva
-integration.
+Phases 2–5 are complete on `main`. The local database has 67 checked-in
+migrations and 33 owner-scoped business RPCs in `api`. Phase 6 is next: the MCP
+Edge Function entrypoint and tool registry have not been implemented, and the
+local `mcp` function remains disabled. No production deployment, plugin
+connection, or Facebook/Canva integration has been completed. See the
+[current phase tracker](plans/implementation-plan.md#16-phase-tracker) for
+status and evidence; earlier phase runbooks and reports are historical records.
 
 ## Prerequisites
 
 - Node.js 24.15.0 is the local and CI runtime baseline. Node 20 and Node 26
   are outside the supported project range.
 - pnpm 10.33.2 or a Corepack-managed equivalent.
-- Supabase CLI 2.117.0+ and Docker access are required for local Supabase work
-  from Phase 2 onward, including the Phase 3 database suite.
+- The project pins Supabase CLI 2.120.0. Docker access is required for local
+  Supabase work and database tests.
 - Standalone Deno is optional. The checked-in `.deno-version`,
   `supabase/functions/deno.json`, and Deno foundation test support developers
   who choose to run `deno fmt`, `deno lint`, `deno test`, or the Deno LSP
@@ -36,12 +37,12 @@ pnpm run smoke-test
 ```
 
 `package-plugin` validates a package only after Phase 7 adds the plugin
-manifest. `verify-migrations` accepts an empty migrations folder during Phase
-1 and validates migration naming once migrations exist.
+manifest. `verify-migrations` validates checked-in migration filenames.
 
 ## Edge Function tooling
 
-Supabase CLI with Docker is the local execution path for future Edge Functions.
+Supabase CLI with Docker is the local execution path for the Phase 6 Edge
+Function.
 Deno-compatible source configuration is retained for the Edge Runtime and for
 developers who want direct Deno tooling, but installing standalone Deno is not
 a repository prerequisite. See
@@ -54,9 +55,8 @@ runtime decision.
   in Phase 7.
 - `auth-frontend/` is limited to login, OAuth consent, logout, and safe errors.
   It is not a product dashboard.
-- `supabase/` contains local project configuration, migrations, Edge Functions,
-  and database tests. Phase 2 initializes the project; Phase 3 adds the generic
-  core schema only.
+- `supabase/` contains local project configuration, migrations, and database
+  tests from Phases 2–5. Phase 6 adds the MCP Edge Function implementation.
 - `tests/` contains cross-cutting tests; `supabase/tests/` contains database and
   function fixtures.
 

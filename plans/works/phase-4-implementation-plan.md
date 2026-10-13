@@ -1,5 +1,9 @@
 # Phase 4 — Trivia Database Module Implementation Plan
 
+> Historical execution plan. Phase 4 was committed at `cb3568a`. Status and
+> stop instructions below reflect the checkpoint when this plan was written;
+> see [the current phase tracker](../implementation-plan.md#16-phase-tracker).
+
 Status: Ready for staged execution after Phase 4 preflight and contract reconciliation
 Execution model: Two implementation batches with one mandatory independent mid-audit
 Starting commit: `1e3bd9c` (`feat: complete Phase 3 core database`)

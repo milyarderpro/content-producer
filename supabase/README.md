@@ -1,5 +1,10 @@
 # Supabase boundary
 
-Phase 2 initializes this directory with the Supabase CLI. It will contain the
-local project configuration, migrations, seed data, Edge Functions, and
-database/function tests. Do not create business migrations manually in Phase 1.
+This directory contains the local Supabase configuration, 67 checked-in
+migrations from Phases 2–5, the migration-managed trivia niche, a no-op seed,
+and database tests. Phase 5 exposes 33 owner-scoped business RPCs through
+`api`. The `mcp` Edge Function is disabled until Phase 6 adds its entrypoint.
+
+See the [local development runbook](../docs/runbooks/local-development.md) for
+commands and the [phase tracker](../plans/implementation-plan.md#16-phase-tracker)
+for current status. Historical phase plans are not live progress trackers.

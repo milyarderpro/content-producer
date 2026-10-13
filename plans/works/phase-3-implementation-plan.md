@@ -1,5 +1,9 @@
 # Phase 3 — Core Database Implementation Plan
 
+> Historical execution plan. Phase 3 was committed at `1e3bd9c`. Status and
+> stop instructions below reflect the checkpoint when this plan was written;
+> see [the current phase tracker](../implementation-plan.md#16-phase-tracker).
+
 Status: Final acceptance verified locally; ready for Phase 4 planning
 Execution model: One checkpoint at a time through an AI agent
 Target environment: Local Supabase only

@@ -6,6 +6,13 @@ The frozen Phase 0 documents under `plans/` govern implementation. Resolve a
 contract conflict through a documented change record before changing schema,
 tool contracts, or editorial behavior.
 
+The current phase status is tracked in section 16 of
+`plans/implementation-plan.md`. Plans under `plans/works/` and checkpoint
+reports record their status at the time they were written. A GitHub Issue may
+track Phase 6 checkpoints, but it does not override the frozen contracts.
+For Phase 6, work on exactly one checkpoint per task in order, and stop for
+independent audits after the first 15 tools and after all 33 tools.
+
 ## Boundaries
 
 - Keep MCP transport thin; place domain rules in core or niche modules.

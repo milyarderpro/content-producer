@@ -1,5 +1,10 @@
 # Phase 5 — Transactional RPC, Lifecycle, and Security Implementation Plan
 
+> Historical execution plan. Phase 5 was closed and committed at `04f6373`.
+> Checklists and stop instructions below reflect their original checkpoints;
+> see [the current phase tracker](../implementation-plan.md#16-phase-tracker)
+> and [final local verification](../../docs/phase-5-batch-b-remediation-p2-03-report.md).
+
 ## 1. Purpose
 
 This document is the executable runbook for Phase 5. It turns the Phase 3

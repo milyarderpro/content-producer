@@ -4,6 +4,10 @@ This runbook covers the reproducible local Supabase environment for Content
 Producer. It is intentionally limited to local development: it neither links
 to nor changes a hosted Supabase project.
 
+It describes the Phase 5 exit baseline. See the
+[phase tracker](../../plans/implementation-plan.md#16-phase-tracker) for current
+progress and treat earlier phase-specific runbooks as historical snapshots.
+
 ## Prerequisites
 
 - Node.js `24.15.x` (the repository supports `>=24.15.0 <25`).
@@ -59,10 +63,10 @@ order, and runs the local seed. It does not delete files in
 `supabase/migrations/`; migration source is the reproducible record and must
 remain under version control.
 
-At Phase 3, `supabase/seed.sql` remains deliberately a no-op. It exists so
+`supabase/seed.sql` remains deliberately a no-op through Phase 5. It exists so
 local start and reset always have an explicit, reproducible seed step. The
-generic `trivia` niche registry is migration-managed; it is not seed data.
-Phase 4 owns trivia-specific storage and facts.
+generic `trivia` niche registry and Phase 4 trivia-specific storage are
+migration-managed; they are not seed data.
 
 To run the current seed file again without resetting:
 
@@ -91,23 +95,23 @@ pnpm run verify-migrations
 The first command compares the checked-in migration history with the running
 local database. The second validates migration filenames in the repository.
 
-## Database boundary at Phase 3
+## Current database boundary
 
 `supabase/config.toml` configures `api` as the only Content Producer business
 RPC schema. Supabase also includes platform schemas such as `public` and
 `storage` in its local runtime. Their technical presence does not authorize a
 business Data API surface:
 
-- `public` contains the Phase 3 core business tables, but caller roles have no
+- `public` contains business tables from Phases 3–5, but caller roles have no
   direct business-object grants.
-- `api` is reserved for the reviewed business-RPC allowlist introduced in
-  Phase 5; Phases 2 and 3 create no RPCs.
+- `api` contains the 33 reviewed, owner-scoped Phase 5 business RPCs. Callers
+  use this allowlist rather than direct table access.
 - `storage` is a platform service, not a Content Producer RPC schema.
 - `internal` is neither configured as a Data API schema nor granted to caller
   roles.
 
 Object privileges, Data API schema configuration, and row-level security are
-separate controls. The baseline and Phase 3 migrations establish explicit
+separate controls. The Phase 2–5 migrations establish explicit
 privilege revokes; `auto_expose_new_tables = false` is only additional defense
 in depth. Future table migrations must still set explicit grants and RLS
 policies appropriate to their access model.
@@ -126,21 +130,24 @@ available.
 
 ## Tests and verification
 
-Run the focused local Supabase foundation test, covering the database, Data API,
-and OAuth/DCR discovery baseline:
+Run the database suite, including the original Supabase foundation, Data API,
+OAuth/DCR discovery, and Phase 3–5 RPC tests:
 
 ```sh
 pnpm run test:database
 ```
 
 Run the repository smoke test, which checks repository structure, migration
-naming, and the local database baseline:
+naming, and the current local database suite:
 
 ```sh
 pnpm run smoke-test
 ```
 
-Run the complete repository gate before handing off a change:
+For a Phase 6 checkpoint that changes TypeScript or configuration, run
+`pnpm run check` and focused tests for the affected MCP behavior. Run the
+complete repository gate at the batch audits and before claiming the Phase 6
+gate complete, rather than after every checkpoint:
 
 ```sh
 pnpm run check
@@ -178,8 +185,8 @@ clean.
 
 The MCP Edge Function is a Phase 6 deliverable. In Phase 2,
 `[functions.mcp]` is explicitly disabled in `supabase/config.toml`, so local
-start skips it. Do not create a placeholder handler or enable the function
-before Phase 6.
+start still skips it at the Phase 5 exit baseline. Do not create a placeholder
+handler or enable the function before Phase 6.
 
 ### Local state seems stale
 
@@ -188,7 +195,6 @@ it from migrations plus seed, while preserving the migration source files.
 
 ## Local versus remote boundary
 
-All commands above are local. Do not run `supabase login`, `supabase link`,
-`supabase db push`, `supabase db reset --linked`, or any deployment command as
-part of this runbook. No remote project has been linked or modified during
-Phases 2 or 3.
+All commands above target the local stack. Do not run `supabase login`,
+`supabase link`, `supabase db push`, `supabase db reset --linked`, or any
+deployment command as part of this runbook.
