@@ -218,18 +218,18 @@ const payloads: Record<string, object> = {
 };
 
 Deno.test(
-  '6.4 registry exposes exactly 9 tools with correct metadata and no anonymous tools',
+  '6.4 registry exposes exactly 12 tools with correct metadata and no anonymous tools',
   async () => {
     const text = await request('tools/list');
-    assert(MCP_TOOL_COUNT === 9, 'cumulative registry count must be 9');
+    assert(MCP_TOOL_COUNT === 12, 'cumulative registry count must be 12');
     for (const tool of PAGE_PLAN_TOOL_NAMES) assert(text.includes(tool), 'missing ' + tool);
-    assert((text.match(/"oauth2"/g) || []).length === 9, 'every tool requires OAuth');
-    assert((text.match(/"openWorldHint":false/g) || []).length === 9, 'open world hint');
+    assert((text.match(/"oauth2"/g) || []).length === 12, 'every tool requires OAuth');
+    assert((text.match(/"openWorldHint":false/g) || []).length === 12, 'open world hint');
     assert((text.match(/"readOnlyHint":true/g) || []).length === 6, 'six read tools');
-    assert((text.match(/"readOnlyHint":false/g) || []).length === 3, 'three writes');
+    assert((text.match(/"readOnlyHint":false/g) || []).length === 6, 'six writes');
     assert((text.match(/"destructiveHint":true/g) || []).length === 1, 'update_page destructive');
     assert(text.split('"openai/profile":true').length === 2, 'profile only');
-    assert(!text.includes('claim_content_plan_items'), '6.5 must not be registered');
+    assert(text.includes('claim_content_plan_items'), '6.5 claim tool must be registered');
   },
 );
 
