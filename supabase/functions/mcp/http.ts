@@ -1,50 +1,82 @@
 import { MCP_SERVICE_NAME, MCP_SERVICE_VERSION } from './server.ts';
+import { createAuthenticatedTransport } from './transport.ts';
+import {
+  authenticateRequest, AuthRejection, runtimeOAuthConfig,
+  type OAuthConfig, type AuthDependencies,
+} from './auth.ts';
 
-// Public paths in checkpoint 6.1 contain no user or workspace data.
 const publicHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Access-Control-Allow-Headers':
     'authorization, content-type, accept, mcp-protocol-version, mcp-session-id, last-event-id',
+  'Access-Control-Expose-Headers': 'WWW-Authenticate, MCP-Session-Id',
   'Cache-Control': 'no-store',
 };
-
-function jsonResponse(body: object, status: number): Response {
-  return Response.json(body, { status, headers: publicHeaders });
+export interface HttpOptions { config?: OAuthConfig; dependencies?: AuthDependencies }
+function jsonResponse(body: object, status: number, extra: Record<string, string> = {}): Response {
+  return Response.json(body, { status, headers: { ...publicHeaders, ...extra } });
 }
-
-export function handleHttpRequest(request: Request): Response {
+function metadataUrl(resource: string): string { return resource + '/oauth-protected-resource'; }
+function challenge(resource: string, status: number): Response {
+  const header = 'Bearer resource_metadata="' + metadataUrl(resource) + '"';
+  return jsonResponse({
+    error: status === 503 ? 'authentication_unavailable' : 'authentication_required',
+    _meta: { 'mcp/www_authenticate': [header] },
+  }, status, { 'WWW-Authenticate': header });
+}
+function discoveryPath(path: string, resourcePath: string): boolean {
+  return path === resourcePath + '/oauth-protected-resource' ||
+    path === '/.well-known/oauth-protected-resource' + resourcePath ||
+    path === '/.well-known/oauth-protected-resource';
+}
+function safeLog(id: string, stage: string, status: number): void {
+  // Never log request URLs, headers, tokens, user claims, bodies or RPC results.
+  console.info(JSON.stringify({ event: 'mcp_request', request_id: id, stage, status }));
+}
+export async function handleHttpRequest(
+  request: Request, options: HttpOptions = {},
+): Promise<Response> {
   const path = new URL(request.url).pathname.replace(/\/+$/, '') || '/';
-  const isMcpPath = path === '/mcp' || path === '/functions/v1/mcp';
-  const isHealthPath =
-    path === '/health' || path === '/mcp/health' || path === '/functions/v1/mcp/health';
-
-  if (!isMcpPath && !isHealthPath) return jsonResponse({ error: 'not_found' }, 404);
-
+  const isHealth = path === '/health' || path === '/mcp/health' ||
+    path === '/functions/v1/mcp/health';
+  const isMcp = path === '/mcp' || path === '/functions/v1/mcp';
+  const isDiscovery = path.includes('oauth-protected-resource');
+  if (!isHealth && !isMcp && !isDiscovery) return jsonResponse({ error: 'not_found' }, 404);
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: publicHeaders });
   }
-  if (isHealthPath) {
+  if (isHealth) {
     if (request.method !== 'GET') return jsonResponse({ error: 'method_not_allowed' }, 405);
-    return jsonResponse(
-      {
-        status: 'ok',
-        service: MCP_SERVICE_NAME,
-        version: MCP_SERVICE_VERSION,
-        timestamp: new Date().toISOString(),
-      },
-      200,
-    );
+    return jsonResponse({
+      status: 'ok', service: MCP_SERVICE_NAME,
+      version: MCP_SERVICE_VERSION, timestamp: new Date().toISOString(),
+    }, 200);
   }
-
-  // Strict fail-closed gate: even an Authorization header is not trusted.
-  // No MCP initialize, tools/list or RPC body reaches a handler yet.
-  return new Response(JSON.stringify({ error: 'authentication_required' }), {
-    status: 401,
-    headers: {
-      ...publicHeaders,
-      'Content-Type': 'application/json; charset=utf-8',
-      'WWW-Authenticate': 'Bearer',
-    },
-  });
+  let config: OAuthConfig;
+  try { config = options.config || runtimeOAuthConfig(); }
+  catch { return jsonResponse({ error: 'authentication_unavailable' }, 503); }
+  const expectedPath = new URL(config.resource).pathname;
+  if (discoveryPath(path, expectedPath)) {
+    if (request.method !== 'GET') return jsonResponse({ error: 'method_not_allowed' }, 405);
+    return jsonResponse({
+      resource: config.resource,
+      authorization_servers: [config.issuer],
+      scopes_supported: ['openid', 'email'],
+      bearer_methods_supported: ['header'],
+    }, 200);
+  }
+  if (!isMcp) return jsonResponse({ error: 'not_found' }, 404);
+  if (path !== expectedPath) return challenge(config.resource, 401);
+  const id = crypto.randomUUID();
+  try {
+    const context = await authenticateRequest(request, config, options.dependencies);
+    const response = await createAuthenticatedTransport(context).fetch(request);
+    safeLog(id, 'mcp', response.status);
+    return response;
+  } catch (error) {
+    const status = error instanceof AuthRejection ? error.status : 503;
+    safeLog(id, 'auth_denied', status);
+    return challenge(config.resource, status);
+  }
 }
