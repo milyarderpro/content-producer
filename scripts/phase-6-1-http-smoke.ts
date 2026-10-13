@@ -47,7 +47,11 @@ const headers = {
 for (const [label, body, bearer] of [
   ['initialize without auth', initializeBody, false],
   ['initialize with unverified bearer', initializeBody, true],
-  ['tools/list without auth', JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }), false],
+  [
+    'tools/list without auth',
+    JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }),
+    false,
+  ],
 ] as const) {
   const response = await fetch(url, {
     method: 'POST',
