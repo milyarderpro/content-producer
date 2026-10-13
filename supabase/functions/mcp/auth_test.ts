@@ -67,8 +67,8 @@ async function fixture() {
     return data + '.' + b64(signature);
   }
   const dependencies: AuthDependencies = {
-    loadKeys: async () => ({ keys: [publicJwk] }),
-    checkOwner: async (_config, _token, actor) => (actor === owner ? workspace : null),
+    loadKeys: () => Promise.resolve({ keys: [publicJwk] }),
+    checkOwner: (_config, _token, actor) => Promise.resolve(actor === owner ? workspace : null),
     now: () => now * 1000,
   };
   return { claims, dependencies, sign };
@@ -160,7 +160,7 @@ Deno.test(
     try {
       await authenticateRequest(withToken(valid), config, {
         ...dependencies,
-        checkOwner: async () => null,
+        checkOwner: () => Promise.resolve(null),
       });
     } catch (error) {
       nonOwnerDenied = error instanceof AuthRejection && error.status === 403;
