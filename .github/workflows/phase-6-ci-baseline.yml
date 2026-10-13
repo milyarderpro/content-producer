@@ -1,0 +1,150 @@
+name: Phase 6.0 - CI baseline
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  phase-5-baseline:
+    name: Phase 6.0 preflight and Phase 5 baseline
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      SUPABASE_TELEMETRY_DISABLED: '1'
+    steps:
+      - name: Checkout proposed commit
+        uses: actions/checkout@v4
+
+      - name: Install pinned pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+
+      - name: Set up project Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Record start and verify Docker
+        id: runner
+        shell: bash
+        run: |
+          echo "STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+          echo "Checked-out commit: $(git rev-parse HEAD)"
+          echo "Node: $(node --version)"
+          echo "pnpm: $(pnpm --version)"
+          echo "Docker server: $(docker info --format '{{.ServerVersion}}')"
+          test "$(pnpm --version)" = "10.33.2"
+
+      - name: Preflight - install frozen project dependencies
+        id: install
+        run: |
+          pnpm install --frozen-lockfile
+          echo "Exit code: 0 (pnpm install --frozen-lockfile)"
+
+      - name: Preflight - verify pinned Supabase CLI
+        id: cli
+        run: |
+          pnpm exec supabase --version
+          test "$(pnpm exec supabase --version)" = "2.120.0"
+          echo "Exit code: 0 (Supabase CLI version check)"
+
+      - name: Preflight - start local Supabase in Docker
+        id: start
+        shell: bash
+        run: |
+          set +e
+          started=$SECONDS
+          pnpm run supabase:start > "$RUNNER_TEMP/phase-6-supabase-start.log" 2>&1
+          code=$?
+          echo "pnpm run supabase:start: exit code $code; elapsed $((SECONDS - started))s"
+          echo "CLI output withheld: Supabase start can print local keys and DB credentials."
+          exit "$code"
+
+      - name: Preflight - clean local migration reset
+        id: reset
+        shell: bash
+        run: |
+          set +e
+          started=$SECONDS
+          pnpm run supabase:reset > "$RUNNER_TEMP/phase-6-supabase-reset.log" 2>&1
+          code=$?
+          echo "pnpm run supabase:reset: exit code $code; elapsed $((SECONDS - started))s"
+          echo "Migration SQL files: $(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
+          echo "CLI output withheld to protect locally generated credentials."
+          exit "$code"
+
+      - name: Preflight - focused local database boundary test
+        id: focused
+        shell: bash
+        run: |
+          started=$SECONDS
+          pnpm exec vitest run --config vitest.database.config.ts supabase/tests/database/baseline.test.ts
+          code=$?
+          echo "Focused test exit code: $code; elapsed $((SECONDS - started))s"
+          exit "$code"
+
+      - name: Baseline gate - Phase 5 test-all
+        id: baseline
+        shell: bash
+        run: |
+          started=$SECONDS
+          pnpm run test-all
+          code=$?
+          echo "pnpm run test-all: exit code $code; elapsed $((SECONDS - started))s"
+          exit "$code"
+
+      - name: Record checkpoint evidence
+        if: always()
+        shell: bash
+        env:
+          RUNNER_OUTCOME: ${{ steps.runner.outcome }}
+          INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          CLI_OUTCOME: ${{ steps.cli.outcome }}
+          START_OUTCOME: ${{ steps.start.outcome }}
+          RESET_OUTCOME: ${{ steps.reset.outcome }}
+          FOCUSED_OUTCOME: ${{ steps.focused.outcome }}
+          BASELINE_OUTCOME: ${{ steps.baseline.outcome }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/phase-6-evidence"
+          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.0.md"
+          {
+            echo "# Phase 6.0 CI evidence"
+            echo
+            echo "- PR head commit: \`$HEAD_SHA\`"
+            echo "- Workflow checkout commit: \`$(git rev-parse HEAD)\`"
+            echo "- Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "- Started (UTC): \`${STARTED_UTC:-not recorded}\`"
+            echo "- Finished (UTC): \`$(date -u +%Y-%m-%dT%H:%M:%SZ)\`"
+            echo "- Cumulative MCP tools: **0**"
+            echo "- Scope: local Supabase only; no deployment or remote project"
+            echo
+            echo "| Stage | Actual command | GitHub step outcome |"
+            echo "|---|---|---|"
+            echo "| Toolchain/Docker | Node .nvmrc, pnpm 10.33.2, docker info | $RUNNER_OUTCOME |"
+            echo '| Preflight install | \`pnpm install --frozen-lockfile\` | '"$INSTALL_OUTCOME"' |'
+            echo '| Supabase CLI | \`pnpm exec supabase --version\` (2.120.0) | '"$CLI_OUTCOME"' |'
+            echo '| Local start | \`pnpm run supabase:start\` | '"$START_OUTCOME"' |'
+            echo '| Clean local reset | \`pnpm run supabase:reset\` | '"$RESET_OUTCOME"' |'
+            echo '| Focused test | \`pnpm exec vitest run --config vitest.database.config.ts supabase/tests/database/baseline.test.ts\` | '"$FOCUSED_OUTCOME"' |'
+            echo '| Phase 5 baseline | \`pnpm run test-all\` | '"$BASELINE_OUTCOME"' |'
+            echo
+            echo "Each command's numeric exit code and elapsed seconds appear in its Actions step log; a skipped outcome means it was not run. The baseline aggregator includes check, migration filename verification, and the Phase 5 database suite."
+          } > "$report"
+          cat "$report" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload non-sensitive evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-6-0-ci-evidence
+          path: ${{ runner.temp }}/phase-6-evidence/checkpoint-6.0.md
+          if-no-files-found: error
+          retention-days: 14
