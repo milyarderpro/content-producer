@@ -208,6 +208,17 @@ const safeErrors = {
   ],
   PLAN_NOT_FOUND: ['Content plan is not available.', false, 'List plans for this workspace.'],
   PLAN_LIMIT_EXCEEDED: ['Plan item limit exceeded.', false, 'Reduce the requested item count.'],
+  PLAN_ITEM_NOT_FOUND: ['Plan item is not available.', false, 'Read current plan items.'],
+  PLAN_STATUS_CONFLICT: ['Plan status no longer permits this action.', false, 'Read current plan status.'],
+  PLAN_ITEM_CLAIM_MISMATCH: [
+    'This item is not claimed by this attempt.', false, 'Read the current item state before reclaiming.',
+  ],
+  PLAN_ITEM_CLAIM_EXPIRED: [
+    'This claim has expired.', false, 'Reclaim eligible work with a new operation key.',
+  ],
+  PLAN_CLAIM_RENEWAL_LIMIT: [
+    'This lease has already been renewed.', false, 'Complete or release the attempt before expiry.',
+  ],
   SCHEDULE_CONFLICT: [
     'A requested slot is unavailable.',
     false,
@@ -246,15 +257,22 @@ function failure(code: SafeError) {
 function isSafeError(text: unknown): text is SafeError {
   return typeof text === 'string' && Object.prototype.hasOwnProperty.call(safeErrors, text);
 }
-function forbiddenOutputKeys(value: unknown): boolean {
+function forbiddenOutputKeys(value: unknown, allowClaimToken = false, path = ''): boolean {
   if (!value || typeof value !== 'object') return false;
-  if (Array.isArray(value)) return value.some(forbiddenOutputKeys);
-  return Object.entries(value).some(
-    ([key, nested]) =>
+  if (Array.isArray(value))
+    return value.some((entry) => forbiddenOutputKeys(entry, allowClaimToken, path + '.*'));
+  return Object.entries(value).some(([key, nested]) => {
+    const at = path ? path + '.' + key : key;
+    // A token is intentionally returned ONLY in the authenticated claim tool's
+    // closed data.claimed_items[*] output. Never echo it in content or logs.
+    if (key === 'claim_token' && allowClaimToken && at === 'data.claimed_items.*.claim_token')
+      return false;
+    return (
       /^(access_token|refresh_token|authorization|password|secret|claim_token|reservation_token|owner_user_id|oauth_client_id|internal_id)$/i.test(
         key,
-      ) || forbiddenOutputKeys(nested),
-  );
+      ) || forbiddenOutputKeys(nested, allowClaimToken, at)
+    );
+  });
 }
 export async function invoke(
   tool: string,
@@ -300,7 +318,7 @@ export async function invoke(
       return failure(rpc.status === 401 ? 'AUTH_REQUIRED' : 'DATABASE_UNAVAILABLE');
     }
     const parsed = schema.safeParse(raw);
-    if (!parsed.success || forbiddenOutputKeys(parsed.data)) {
+    if (!parsed.success || forbiddenOutputKeys(parsed.data, tool === 'claim_content_plan_items')) {
       return failure('DATABASE_UNAVAILABLE');
     }
     return {
