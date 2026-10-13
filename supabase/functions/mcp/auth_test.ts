@@ -214,7 +214,7 @@ Deno.test(
       const body = await response.text();
       assert(response.status === 200, 'validated MCP transport unavailable');
       assert(
-        method === 'initialize' ? body.includes('serverInfo') : body.includes('get_account_profile'),
+        method === 'initialize' ? body.includes('serverInfo') : body.includes('list_pages'),
         'invalid transport response',
       );
     }
