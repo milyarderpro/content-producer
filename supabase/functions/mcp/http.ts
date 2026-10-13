@@ -40,6 +40,8 @@ function challenge(resource: string, status: number): Response {
 function discoveryPath(path: string, resourcePath: string): boolean {
   return (
     path === resourcePath + '/oauth-protected-resource' ||
+    path === '/mcp/oauth-protected-resource' ||
+    path === '/oauth-protected-resource' ||
     path === '/.well-known/oauth-protected-resource' + resourcePath ||
     path === '/.well-known/oauth-protected-resource'
   );
