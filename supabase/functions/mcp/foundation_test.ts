@@ -224,7 +224,9 @@ Deno.test(
     let count = 0;
     globalThis.fetch = (() => {
       count++;
-      return Promise.resolve(Response.json(envelope({ items: [], next_cursor: null, has_more: false })));
+      return Promise.resolve(
+        Response.json(envelope({ items: [], next_cursor: null, has_more: false })),
+      );
     }) as typeof fetch;
     try {
       const empty = await request('tools/call', {
@@ -279,14 +281,16 @@ Deno.test(
 Deno.test('6.3 SQL and sensitive outputs are not returned in tool errors', async () => {
   const original = globalThis.fetch;
   globalThis.fetch = (() =>
-    Promise.resolve(Response.json(
-      {
-        code: 'P0001',
-        message: 'PAGE_NOT_FOUND',
-        details: 'private SQL detail: token',
-      },
-      { status: 400 },
-    ))) as typeof fetch;
+    Promise.resolve(
+      Response.json(
+        {
+          code: 'P0001',
+          message: 'PAGE_NOT_FOUND',
+          details: 'private SQL detail: token',
+        },
+        { status: 400 },
+      ),
+    )) as typeof fetch;
   try {
     const answer = await request('tools/call', {
       name: 'get_page_generation_context',
