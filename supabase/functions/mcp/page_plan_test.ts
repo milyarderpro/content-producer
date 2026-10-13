@@ -34,7 +34,7 @@ async function request(method: string, params?: object) {
   assert(res.status === 200, method + ' HTTP ' + res.status);
   return await res.text();
 }
-async function call(name: string, args: object) {
+function call(name: string, args: object) {
   return request('tools/call', { name, arguments: args });
 }
 const config = {
