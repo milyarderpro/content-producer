@@ -209,15 +209,25 @@ const safeErrors = {
   PLAN_NOT_FOUND: ['Content plan is not available.', false, 'List plans for this workspace.'],
   PLAN_LIMIT_EXCEEDED: ['Plan item limit exceeded.', false, 'Reduce the requested item count.'],
   PLAN_ITEM_NOT_FOUND: ['Plan item is not available.', false, 'Read current plan items.'],
-  PLAN_STATUS_CONFLICT: ['Plan status no longer permits this action.', false, 'Read current plan status.'],
+  PLAN_STATUS_CONFLICT: [
+    'Plan status no longer permits this action.',
+    false,
+    'Read current plan status.',
+  ],
   PLAN_ITEM_CLAIM_MISMATCH: [
-    'This item is not claimed by this attempt.', false, 'Read the current item state before reclaiming.',
+    'This item is not claimed by this attempt.',
+    false,
+    'Read the current item state before reclaiming.',
   ],
   PLAN_ITEM_CLAIM_EXPIRED: [
-    'This claim has expired.', false, 'Reclaim eligible work with a new operation key.',
+    'This claim has expired.',
+    false,
+    'Reclaim eligible work with a new operation key.',
   ],
   PLAN_CLAIM_RENEWAL_LIMIT: [
-    'This lease has already been renewed.', false, 'Complete or release the attempt before expiry.',
+    'This lease has already been renewed.',
+    false,
+    'Complete or release the attempt before expiry.',
   ],
   SCHEDULE_CONFLICT: [
     'A requested slot is unavailable.',
