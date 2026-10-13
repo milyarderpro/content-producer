@@ -124,7 +124,7 @@ async function request(method: string, params?: object) {
   return await result.text();
 }
 Deno.test(
-  '6.3 exactly four OAuth-scoped, read-only tools; profile alone has metadata',
+  '6.3 four foundation reads alongside five 6.4 tools; profile alone has metadata',
   async () => {
     const listed = await request('tools/list');
     for (const name of FOUNDATION_TOOL_NAMES) assert(listed.includes(name), 'missing ' + name);
@@ -132,7 +132,7 @@ Deno.test(
     assert((listed.match(/"openWorldHint":false/g) || []).length === 4, 'open world must be off');
     assert(listed.split('"openai/profile":true').length === 2, 'one profile metadata');
     assert((listed.match(/"oauth2"/g) || []).length === 4, 'four OAuth security schemes');
-    assert(!listed.includes('create_page'), '6.4 tool not permitted');
+    assert(listed.includes('create_page'), '6.4 tool must be present');
   },
 );
 
