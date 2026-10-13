@@ -1,4 +1,4 @@
-name: Phase 6.0 - CI baseline
+name: Phase 6 - CI baseline and checkpoint 6.1
 
 on:
   pull_request:
@@ -30,6 +30,11 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
+
+      - name: Set up pinned Deno for MCP tests
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version-file: .deno-version
 
       - name: Record start and verify Docker
         id: runner
@@ -90,6 +95,23 @@ jobs:
           echo "Focused test exit code: $code; elapsed $((SECONDS - started))s"
           exit "$code"
 
+      - name: Checkpoint 6.1 - focused internal transport tests
+        id: mcp_focused
+        shell: bash
+        run: |
+          pnpm run test:mcp
+          echo "Exit code: 0 (pnpm run test:mcp)"
+
+      - name: Checkpoint 6.1 - black-box local HTTP fail-closed smoke
+        id: mcp_http
+        shell: bash
+        run: |
+          pnpm exec supabase functions serve mcp --no-verify-jwt > "$RUNNER_TEMP/phase-6-mcp-serve.log" 2>&1 &
+          serve_pid=$!
+          trap 'kill "$serve_pid" 2>/dev/null || true' EXIT
+          pnpm exec tsx scripts/phase-6-1-http-smoke.ts
+          echo "Exit code: 0 (local MCP HTTP smoke)"
+
       - name: Baseline gate - Phase 5 test-all
         id: baseline
         shell: bash
@@ -111,12 +133,14 @@ jobs:
           RESET_OUTCOME: ${{ steps.reset.outcome }}
           FOCUSED_OUTCOME: ${{ steps.focused.outcome }}
           BASELINE_OUTCOME: ${{ steps.baseline.outcome }}
+          MCP_FOCUSED_OUTCOME: ${{ steps.mcp_focused.outcome }}
+          MCP_HTTP_OUTCOME: ${{ steps.mcp_http.outcome }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           mkdir -p "$RUNNER_TEMP/phase-6-evidence"
           report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.0.md"
           {
-            echo "# Phase 6.0 CI evidence"
+            echo "# Phase 6.0 baseline + Phase 6.1 CI evidence"
             echo
             echo "- PR head commit: \`$HEAD_SHA\`"
             echo "- Workflow checkout commit: \`$(git rev-parse HEAD)\`"
@@ -136,6 +160,11 @@ jobs:
             echo '| Focused test | \`pnpm exec vitest run --config vitest.database.config.ts supabase/tests/database/baseline.test.ts\` | '"$FOCUSED_OUTCOME"' |'
             echo '| Phase 5 baseline | \`pnpm run test-all\` | '"$BASELINE_OUTCOME"' |'
             echo
+            echo '| Phase 6.1 internal transport | \`pnpm run test:mcp\` | '"$MCP_FOCUSED_OUTCOME"' |'
+            echo '| Phase 6.1 HTTP acceptance | \`supabase functions serve mcp --no-verify-jwt\` and local smoke | '"$MCP_HTTP_OUTCOME"' |'
+            echo
+            echo "Checkpoint 6.1: 0 tools. HTTP MCP is fail-closed; initialize/tools-list are available to internal harness only until Phase 6.2."
+            echo
             echo "Each command's numeric exit code and elapsed seconds appear in its Actions step log; a skipped outcome means it was not run. The baseline aggregator includes check, migration filename verification, and the Phase 5 database suite."
           } > "$report"
           cat "$report" >> "$GITHUB_STEP_SUMMARY"
@@ -144,7 +173,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase-6-0-ci-evidence
+          name: phase-6-1-ci-evidence
           path: ${{ runner.temp }}/phase-6-evidence/checkpoint-6.0.md
           if-no-files-found: error
           retention-days: 14

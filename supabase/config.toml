@@ -389,7 +389,7 @@ deno_version = 2
 # discovery and WWW-Authenticate challenge requests can reach it. The function
 # is disabled until its Phase 6 entrypoint exists; Phase 6 enables it.
 [functions.mcp]
-enabled = false
+enabled = true
 verify_jwt = false
 
 # [edge_runtime.secrets]
