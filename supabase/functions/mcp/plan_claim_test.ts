@@ -113,7 +113,11 @@ async function mcp(method: string, params?: object) {
     }),
   );
   assert(res.status === 200, 'MCP HTTP status');
-  return (await res.json()) as {
+  const raw = await res.text();
+  // The pinned Streamable HTTP transport may use SSE for an ordinary
+  // JSON-RPC call; parse only its data frame, never log the frame or token.
+  const dataFrame = raw.split('\\n').find((line) => line.startsWith('data: '));
+  return JSON.parse(dataFrame ? dataFrame.slice(6) : raw) as {
     result?: {
       content?: Array<{ type: string; text: string }>;
       structuredContent?: Record<string, unknown>;
