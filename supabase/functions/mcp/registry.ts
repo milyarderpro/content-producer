@@ -1,8 +1,8 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
-// No business tools until checkpoint 6.3.
-export const MCP_TOOL_COUNT = 0;
+import { FOUNDATION_TOOL_NAMES, registerFoundationTools } from './foundation.ts';
+
+export const MCP_TOOL_COUNT = FOUNDATION_TOOL_NAMES.length;
 export function registerTools(server: McpServer, context?: RequestContext): void {
-  void server;
-  void context;
+  registerFoundationTools(server, context);
 }

@@ -29,7 +29,7 @@
     "supabase:reset": "tsx scripts/supabase-local.ts reset",
     "supabase:seed": "tsx scripts/supabase-local.ts seed",
     "supabase:verify": "tsx scripts/supabase-local.ts verify-migrations",
-    "test:mcp": "cd supabase/functions && deno check mcp/index.ts mcp/transport_test.ts mcp/auth_test.ts && deno lint mcp && deno test mcp/transport_test.ts mcp/auth_test.ts",
+    "test:mcp": "cd supabase/functions && deno check mcp/index.ts mcp/transport_test.ts mcp/auth_test.ts mcp/foundation_test.ts && deno lint mcp && deno test mcp/transport_test.ts mcp/auth_test.ts mcp/foundation_test.ts",
     "test:database": "tsx scripts/supabase-local.ts test-database",
     "supabase": "supabase"
   },

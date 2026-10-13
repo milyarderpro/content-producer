@@ -17,12 +17,12 @@ function protocolRequest(method: string, params?: object): Request {
   });
 }
 
-Deno.test('6.1 internal Streamable HTTP initializes and lists zero tools', async () => {
+Deno.test('6.3 internal transport is functional, but lists no unauthenticated tools', async () => {
   const initialized = await mcpTransport.fetch(
     protocolRequest('initialize', {
       protocolVersion: '2025-06-18',
       capabilities: {},
-      clientInfo: { name: 'phase-6-1-harness', version: '1.0.0' },
+      clientInfo: { name: 'phase-6-3-harness', version: '1.0.0' },
     }),
   );
   const initBody = await initialized.text();
@@ -32,8 +32,8 @@ Deno.test('6.1 internal Streamable HTTP initializes and lists zero tools', async
   const listed = await mcpTransport.fetch(protocolRequest('tools/list'));
   const listBody = await listed.text();
   assert(listed.status === 200, `internal tools/list: ${listed.status}`);
-  assert(/"tools"\s*:\s*\[\s*\]/.test(listBody), 'expected empty tool registry');
-  assert(MCP_TOOL_COUNT === 0, 'tool registry count must remain zero');
+  assert(/"tools"\\s*:\\s*\\[\\s*\\]/.test(listBody), 'unauthed registry must be empty');
+  assert(MCP_TOOL_COUNT === 4, 'checkpoint 6.3 must register exactly four tools for owners');
 });
 
 Deno.test('6.1 internal protocol errors are structured', async () => {
