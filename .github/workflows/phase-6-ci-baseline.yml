@@ -1,22 +1,26 @@
-name: Phase 6 - CI baseline and checkpoint 6.1
+name: Phase 6 - checkpoint verification
 
 on:
-  pull_request:
-    branches: [main]
+  push:
+    branches: [codex/phase-6-mcp]
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: phase-6-checkpoint-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  phase-5-baseline:
-    name: Phase 6.0 preflight and Phase 5 baseline
+  checkpoint:
+    name: Phase 6.1 targeted CI (0 MCP tools)
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    timeout-minutes: 45
     env:
       SUPABASE_TELEMETRY_DISABLED: '1'
     steps:
-      - name: Checkout proposed commit
+      - name: Checkout checkpoint commit
         uses: actions/checkout@v4
 
       - name: Install pinned pnpm
@@ -36,31 +40,43 @@ jobs:
         with:
           deno-version-file: .deno-version
 
-      - name: Record start and verify Docker
+      - name: Record environment and verify Docker
         id: runner
         shell: bash
         run: |
           echo "STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
-          echo "Checked-out commit: $(git rev-parse HEAD)"
+          echo "Checkpoint SHA: $(git rev-parse HEAD)"
           echo "Node: $(node --version)"
           echo "pnpm: $(pnpm --version)"
-          echo "Docker server: $(docker info --format '{{.ServerVersion}}')"
+          echo "Deno: $(deno --version | head -1)"
+          echo "Docker: $(docker info --format '{{.ServerVersion}}')"
           test "$(pnpm --version)" = "10.33.2"
 
-      - name: Preflight - install frozen project dependencies
+      - name: Install locked dependencies
         id: install
         run: |
           pnpm install --frozen-lockfile
           echo "Exit code: 0 (pnpm install --frozen-lockfile)"
 
-      - name: Preflight - verify pinned Supabase CLI
+      - name: Required project check
+        id: check
+        run: |
+          pnpm run check
+          echo "Exit code: 0 (pnpm run check)"
+
+      - name: Verify migration filenames
+        id: migrations
+        run: |
+          pnpm run verify-migrations
+          echo "Exit code: 0 (pnpm run verify-migrations)"
+
+      - name: Verify pinned Supabase CLI
         id: cli
         run: |
-          pnpm exec supabase --version
           test "$(pnpm exec supabase --version)" = "2.120.0"
-          echo "Exit code: 0 (Supabase CLI version check)"
+          echo "Supabase CLI: 2.120.0 (verified)"
 
-      - name: Preflight - start local Supabase in Docker
+      - name: Start local Supabase
         id: start
         shell: bash
         run: |
@@ -69,10 +85,10 @@ jobs:
           pnpm run supabase:start > "$RUNNER_TEMP/phase-6-supabase-start.log" 2>&1
           code=$?
           echo "pnpm run supabase:start: exit code $code; elapsed $((SECONDS - started))s"
-          echo "CLI output withheld: Supabase start can print local keys and DB credentials."
+          echo "Supabase credentials and local keys omitted from CI logs."
           exit "$code"
 
-      - name: Preflight - clean local migration reset
+      - name: Clean local migration reset
         id: reset
         shell: bash
         run: |
@@ -81,29 +97,17 @@ jobs:
           pnpm run supabase:reset > "$RUNNER_TEMP/phase-6-supabase-reset.log" 2>&1
           code=$?
           echo "pnpm run supabase:reset: exit code $code; elapsed $((SECONDS - started))s"
-          echo "Migration SQL files: $(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
-          echo "CLI output withheld to protect locally generated credentials."
+          echo "Migration SQL count: $(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
           exit "$code"
 
-      - name: Preflight - focused local database boundary test
-        id: focused
-        shell: bash
-        run: |
-          started=$SECONDS
-          pnpm exec vitest run --config vitest.database.config.ts supabase/tests/database/baseline.test.ts
-          code=$?
-          echo "Focused test exit code: $code; elapsed $((SECONDS - started))s"
-          exit "$code"
-
-      - name: Checkpoint 6.1 - focused internal transport tests
-        id: mcp_focused
-        shell: bash
+      - name: Checkpoint 6.1 - internal MCP tests
+        id: mcp
         run: |
           pnpm run test:mcp
           echo "Exit code: 0 (pnpm run test:mcp)"
 
-      - name: Checkpoint 6.1 - black-box local HTTP fail-closed smoke
-        id: mcp_http
+      - name: Checkpoint 6.1 - local HTTP fail-closed smoke
+        id: http
         shell: bash
         run: |
           pnpm exec supabase functions serve mcp --no-verify-jwt > "$RUNNER_TEMP/phase-6-mcp-serve.log" 2>&1 &
@@ -112,68 +116,74 @@ jobs:
           pnpm exec tsx scripts/phase-6-1-http-smoke.ts
           echo "Exit code: 0 (local MCP HTTP smoke)"
 
-      - name: Baseline gate - Phase 5 test-all
-        id: baseline
+      - name: Focused database regression - Phase 5 surface, metrics, rate limits
+        id: regression
         shell: bash
         run: |
           started=$SECONDS
-          pnpm run test-all
+          pnpm exec vitest run --config vitest.database.config.ts \
+            supabase/tests/database/baseline.test.ts \
+            supabase/tests/database/api-phase-five-acceptance.test.ts \
+            supabase/tests/database/api-metrics.test.ts \
+            supabase/tests/database/api-metrics-concurrency.test.ts \
+            supabase/tests/database/operation-ledger-and-rate-limit-buckets.test.ts
           code=$?
-          echo "pnpm run test-all: exit code $code; elapsed $((SECONDS - started))s"
+          echo "Focused Phase 5 regression: exit code $code; elapsed $((SECONDS - started))s"
           exit "$code"
 
-      - name: Record checkpoint evidence
+      # Gate penuh (pnpm run test-all, smoke-test, supabase:verify, audits,
+      # Inspector, git diff --check) is reserved for 6.6 and 6.13.
+
+      - name: Record non-sensitive checkpoint evidence
         if: always()
         shell: bash
         env:
           RUNNER_OUTCOME: ${{ steps.runner.outcome }}
           INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          CHECK_OUTCOME: ${{ steps.check.outcome }}
+          MIGRATIONS_OUTCOME: ${{ steps.migrations.outcome }}
           CLI_OUTCOME: ${{ steps.cli.outcome }}
           START_OUTCOME: ${{ steps.start.outcome }}
           RESET_OUTCOME: ${{ steps.reset.outcome }}
-          FOCUSED_OUTCOME: ${{ steps.focused.outcome }}
-          BASELINE_OUTCOME: ${{ steps.baseline.outcome }}
-          MCP_FOCUSED_OUTCOME: ${{ steps.mcp_focused.outcome }}
-          MCP_HTTP_OUTCOME: ${{ steps.mcp_http.outcome }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          MCP_OUTCOME: ${{ steps.mcp.outcome }}
+          HTTP_OUTCOME: ${{ steps.http.outcome }}
+          REGRESSION_OUTCOME: ${{ steps.regression.outcome }}
         run: |
           mkdir -p "$RUNNER_TEMP/phase-6-evidence"
-          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.0.md"
+          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.1.md"
           {
-            echo "# Phase 6.0 baseline + Phase 6.1 CI evidence"
+            echo "# Phase 6.1 targeted checkpoint CI"
             echo
-            echo "- PR head commit: \`$HEAD_SHA\`"
-            echo "- Workflow checkout commit: \`$(git rev-parse HEAD)\`"
+            echo "- Commit: `$(git rev-parse HEAD)`"
             echo "- Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-            echo "- Started (UTC): \`${STARTED_UTC:-not recorded}\`"
-            echo "- Finished (UTC): \`$(date -u +%Y-%m-%dT%H:%M:%SZ)\`"
-            echo "- Cumulative MCP tools: **0**"
-            echo "- Scope: local Supabase only; no deployment or remote project"
+            echo "- Started UTC: `${STARTED_UTC:-not recorded}`"
+            echo "- Finished UTC: `$(date -u +%Y-%m-%dT%H:%M:%SZ)`"
+            echo "- New tools: 0; cumulative tools: **0/33**"
+            echo "- Local Supabase only, no remote project, secrets, or deployment"
             echo
-            echo "| Stage | Actual command | GitHub step outcome |"
+            echo "| Stage | Actual command / scope | GitHub step outcome |"
             echo "|---|---|---|"
-            echo "| Toolchain/Docker | Node .nvmrc, pnpm 10.33.2, docker info | $RUNNER_OUTCOME |"
-            echo '| Preflight install | \`pnpm install --frozen-lockfile\` | '"$INSTALL_OUTCOME"' |'
-            echo '| Supabase CLI | \`pnpm exec supabase --version\` (2.120.0) | '"$CLI_OUTCOME"' |'
-            echo '| Local start | \`pnpm run supabase:start\` | '"$START_OUTCOME"' |'
-            echo '| Clean local reset | \`pnpm run supabase:reset\` | '"$RESET_OUTCOME"' |'
-            echo '| Focused test | \`pnpm exec vitest run --config vitest.database.config.ts supabase/tests/database/baseline.test.ts\` | '"$FOCUSED_OUTCOME"' |'
-            echo '| Phase 5 baseline | \`pnpm run test-all\` | '"$BASELINE_OUTCOME"' |'
+            echo "| Runtime/Docker | pinned versions, docker info | $RUNNER_OUTCOME |"
+            echo '| Dependencies | `pnpm install --frozen-lockfile` | '"$INSTALL_OUTCOME"' |'
+            echo '| Project check | `pnpm run check` | '"$CHECK_OUTCOME"' |'
+            echo '| Migration filenames | `pnpm run verify-migrations` | '"$MIGRATIONS_OUTCOME"' |'
+            echo "| Supabase CLI 2.120.0 | pinned version | $CLI_OUTCOME |"
+            echo '| Local Docker | `pnpm run supabase:start` | '"$START_OUTCOME"' |'
+            echo '| Clean reset | `pnpm run supabase:reset` | '"$RESET_OUTCOME"' |'
+            echo '| Internal MCP | `pnpm run test:mcp` | '"$MCP_OUTCOME"' |'
+            echo '| Black-box HTTP | `supabase functions serve mcp --no-verify-jwt` + HTTP smoke | '"$HTTP_OUTCOME"' |'
+            echo '| Focused regression | Phase 5 catalog, metrics, concurrency, rate limits, baseline | '"$REGRESSION_OUTCOME"' |'
             echo
-            echo '| Phase 6.1 internal transport | \`pnpm run test:mcp\` | '"$MCP_FOCUSED_OUTCOME"' |'
-            echo '| Phase 6.1 HTTP acceptance | \`supabase functions serve mcp --no-verify-jwt\` and local smoke | '"$MCP_HTTP_OUTCOME"' |'
-            echo
-            echo "Checkpoint 6.1: 0 tools. HTTP MCP is fail-closed; initialize/tools-list are available to internal harness only until Phase 6.2."
-            echo
-            echo "Each command's numeric exit code and elapsed seconds appear in its Actions step log; a skipped outcome means it was not run. The baseline aggregator includes check, migration filename verification, and the Phase 5 database suite."
+            echo "The complete batch gate is NOT run on checkpoint pushes; it is reserved for 6.6/6.13."
+            echo "Numerical exit codes and exact assertions are in Actions step logs. A skipped stage is not a pass."
           } > "$report"
           cat "$report" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload non-sensitive evidence
+      - name: Upload non-sensitive checkpoint evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: phase-6-1-ci-evidence
-          path: ${{ runner.temp }}/phase-6-evidence/checkpoint-6.0.md
+          path: ${{ runner.temp }}/phase-6-evidence/checkpoint-6.1.md
           if-no-files-found: error
           retention-days: 14
