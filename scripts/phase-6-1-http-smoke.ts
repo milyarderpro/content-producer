@@ -65,3 +65,4 @@ expectStatus((await fetch(url)).status, 401, 'GET MCP is closed');
 expectStatus((await fetch(url, { method: 'OPTIONS' })).status, 204, 'MCP preflight');
 expectStatus((await fetch(`${url}/not-a-route`)).status, 404, 'unknown route');
 console.log('6.1 local HTTP smoke PASS (zero tools).');
+export {};
