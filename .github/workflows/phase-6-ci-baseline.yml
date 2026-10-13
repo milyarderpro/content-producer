@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: phase-6-checkpoint-${{ github.ref }}
@@ -24,7 +25,8 @@ jobs:
     timeout-minutes: 120
     env:
       SUPABASE_TELEMETRY_DISABLED: '1'
-      FULL_GATE: ${{ contains(github.event.head_commit.message, '[batch-a-gate]') || inputs.full_gate == true }}
+      FULL_GATE: ${{ contains(github.event.head_commit.message, '[batch-a-gate]') || contains(github.event.head_commit.message, '[batch-a-resume]') || inputs.full_gate == true }}
+      REUSE_FULL_SUITES: ${{ contains(github.event.head_commit.message, '[batch-a-resume]') }}
     steps:
       - name: Checkout checkpoint commit
         uses: actions/checkout@v4
@@ -68,14 +70,14 @@ jobs:
 
       - name: Required project check
         id: check
-        if: env.FULL_GATE != 'true'
+        if: env.FULL_GATE != 'true' || env.REUSE_FULL_SUITES == 'true'
         run: |
           pnpm run check
           echo "Exit code: 0 (pnpm run check)"
 
       - name: Verify migration filenames
         id: migrations
-        if: env.FULL_GATE != 'true'
+        if: env.FULL_GATE != 'true' || env.REUSE_FULL_SUITES == 'true'
         run: |
           pnpm run verify-migrations
           echo "Exit code: 0 (pnpm run verify-migrations)"
@@ -160,18 +162,28 @@ jobs:
           pnpm run supabase:reset > "$RUNNER_TEMP/phase-6-supabase-gate-reset.log" 2>&1
           echo "Exit code: 0 (focused MCP + real HTTP recovery preflight + fresh clean reset)"
 
+      - name: Verify previous full-suite PASS and exact audit-only source diff
+        id: reuse
+        if: env.REUSE_FULL_SUITES == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/phase-6-evidence"
+          pnpm exec tsx scripts/phase-6-reuse-suites.ts
+          echo "Exit code: 0 (unchanged product source and verified prior full-suite PASS)"
+
       # Full gate runs only for the tagged Batch A commit or explicit 6.6 dispatch.
       # Future checkpoint pushes retain targeted CI, without automatic test-all.
       - name: Batch A - test-all after clean reset (includes check, migration names, MCP, database)
         id: full
-        if: env.FULL_GATE == 'true'
+        if: env.FULL_GATE == 'true' && env.REUSE_FULL_SUITES != 'true'
         run: |
           pnpm run test-all
           echo "Exit code: 0 (pnpm run test-all)"
 
       - name: Batch A - smoke-test (duplicates database suite in test-all)
         id: smoke
-        if: env.FULL_GATE == 'true'
+        if: env.FULL_GATE == 'true' && env.REUSE_FULL_SUITES != 'true'
         run: |
           pnpm run smoke-test
           echo "Exit code: 0 (pnpm run smoke-test; database suite duplicated)"
@@ -187,10 +199,9 @@ jobs:
         id: audit
         if: env.FULL_GATE == 'true'
         run: |
-          pnpm exec tsx scripts/phase-5-evidence.ts final
+          pnpm exec tsx scripts/phase-6-catalog-audit.ts
           mkdir -p "$RUNNER_TEMP/phase-6-evidence"
-          cp docs/phase-5-9-final-catalog.json "$RUNNER_TEMP/phase-6-evidence/batch-a-catalog.json"
-          git restore docs/phase-5-9-final-catalog.json
+          cp artifacts/phase-6-batch-a-catalog.json "$RUNNER_TEMP/phase-6-evidence/batch-a-catalog.json"
           echo "Exit code: 0 (33 RPCs, RLS/ACL, source/history, fixture cleanup audit)"
 
       - name: Batch A - authenticated public HTTP MCP and pinned Inspector against real local database
@@ -198,9 +209,8 @@ jobs:
         if: env.FULL_GATE == 'true'
         run: |
           pnpm exec tsx scripts/phase-6-batch-a.ts
-          pnpm exec tsx scripts/phase-5-evidence.ts final
-          cp docs/phase-5-9-final-catalog.json "$RUNNER_TEMP/phase-6-evidence/batch-a-post-inspector-catalog.json"
-          git restore docs/phase-5-9-final-catalog.json
+          pnpm exec tsx scripts/phase-6-catalog-audit.ts
+          cp artifacts/phase-6-batch-a-catalog.json "$RUNNER_TEMP/phase-6-evidence/batch-a-post-inspector-catalog.json"
           echo "Exit code: 0 (Inspector 2.5.0, 15 valid/invalid tools, auth, recovery/race, post-test audit)"
 
       - name: Batch A - git diff whitespace check
@@ -224,6 +234,7 @@ jobs:
           MCP_OUTCOME: ${{ steps.mcp.outcome }}
           HTTP_OUTCOME: ${{ steps.http.outcome }}
           PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+          REUSE_OUTCOME: ${{ steps.reuse.outcome }}
           FULL_OUTCOME: ${{ steps.full.outcome }}
           SMOKE_OUTCOME: ${{ steps.smoke.outcome }}
           HISTORY_OUTCOME: ${{ steps.history.outcome }}
@@ -258,14 +269,16 @@ jobs:
             echo '| Focused regression | Phase 5 plan lifecycle/claims, concurrency, Page/plan, security/catalog, metrics/rate limits, baseline | '"$REGRESSION_OUTCOME"' |'
             echo
             echo "| Short real HTTP recovery preflight + fresh reset | MCP, recovery/race, clean reset | $PREFLIGHT_OUTCOME |"
+            echo "| Reuse proof (audit-only repair) | prior full-suite PASS + unchanged product/SQL/config/tests | $REUSE_OUTCOME |"
             echo "| Full test-all (includes check/MCP/migration names/database) | sequential after clean reset | $FULL_OUTCOME |"
             echo "| Smoke (duplicates database suite) | pnpm run smoke-test | $SMOKE_OUTCOME |"
             echo "| Migration history | pnpm run supabase:verify | $HISTORY_OUTCOME |"
-            echo "| Security/catalog/cleanup | phase-5-evidence.ts final | $AUDIT_OUTCOME |"
+            echo "| Security/catalog/cleanup | phase-6-catalog-audit.ts (accepted 67-migration baseline) | $AUDIT_OUTCOME |"
             echo "| Inspector 2.5.0 + real DB public HTTP | 15 valid / 15 invalid tool calls, auth, recovery and race | $INSPECTOR_OUTCOME |"
             echo "| Whitespace | git diff --check | $DIFF_OUTCOME |"
             echo "Full gate requested: $FULL_GATE. test-all includes check/MCP and smoke repeats database tests; these are not independent evidence."
             echo "Hosted OAuth/PKCE/consent/DCR/refresh/relink/ChatGPT 2xx: deferred Phase 9–10. Independent Batch A audit still pending."
+            echo "Full suites reused: $REUSE_FULL_SUITES; when true, reused-full-suites.json records the verified prior SHA/run and unchanged-source proof."
             echo "Numerical exit codes and exact assertions are in Actions step logs. A skipped stage is not a pass."
           } > "$report"
           cat "$report" >> "$GITHUB_STEP_SUMMARY"
