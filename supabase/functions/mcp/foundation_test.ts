@@ -139,7 +139,7 @@ Deno.test(
 Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation', async () => {
   const original = globalThis.fetch;
   const calls: Array<{ name: string; args: Record<string, unknown> }> = [];
-  globalThis.fetch = (async (input: Request | URL | string, init?: RequestInit) => {
+  globalThis.fetch = ((input: Request | URL | string, init?: RequestInit) => {
     const url = String(input);
     const name = url.split('/').pop()!;
     assert(Object.prototype.hasOwnProperty.call(payloads, name), 'unexpected RPC ' + name);
@@ -155,7 +155,7 @@ Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation',
       'must use publishable key, not service role',
     );
     calls.push({ name, args: JSON.parse(String(init?.body)) });
-    return Response.json(payloads[name]);
+    return Promise.resolve(Response.json(payloads[name]));
   }) as typeof fetch;
   try {
     const profile = await request('tools/call', {
@@ -222,9 +222,9 @@ Deno.test(
   async () => {
     const original = globalThis.fetch;
     let count = 0;
-    globalThis.fetch = (async () => {
+    globalThis.fetch = (() => {
       count++;
-      return Response.json(envelope({ items: [], next_cursor: null, has_more: false }));
+      return Promise.resolve(Response.json(envelope({ items: [], next_cursor: null, has_more: false })));
     }) as typeof fetch;
     try {
       const empty = await request('tools/call', {
@@ -278,15 +278,15 @@ Deno.test(
 
 Deno.test('6.3 SQL and sensitive outputs are not returned in tool errors', async () => {
   const original = globalThis.fetch;
-  globalThis.fetch = (async () =>
-    Response.json(
+  globalThis.fetch = (() =>
+    Promise.resolve(Response.json(
       {
         code: 'P0001',
         message: 'PAGE_NOT_FOUND',
         details: 'private SQL detail: token',
       },
       { status: 400 },
-    )) as typeof fetch;
+    ))) as typeof fetch;
   try {
     const answer = await request('tools/call', {
       name: 'get_page_generation_context',

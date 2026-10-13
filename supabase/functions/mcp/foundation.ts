@@ -310,7 +310,7 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
       annotations,
       _meta: { securitySchemes, 'openai/profile': true },
     },
-    async (args) =>
+    (args) =>
       invoke(
         'get_account_profile',
         scoped,
@@ -331,7 +331,7 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
       annotations,
       _meta: { securitySchemes },
     },
-    async (args) =>
+    (args) =>
       invoke(
         'get_workspace_context',
         scoped,
@@ -353,7 +353,7 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
       annotations,
       _meta: { securitySchemes },
     },
-    async (args) =>
+    (args) =>
       invoke(
         'list_pages',
         scoped,
@@ -380,7 +380,7 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
       annotations,
       _meta: { securitySchemes },
     },
-    async (args) =>
+    (args) =>
       invoke(
         'get_page_generation_context',
         scoped,
