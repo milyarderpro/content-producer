@@ -1,10 +1,9 @@
 import { McpServer } from '@modelcontextprotocol/server';
+import type { RequestContext } from './auth.ts';
 import { registerTools } from './registry.ts';
-
 export const MCP_SERVICE_NAME = 'content-producer-mcp';
 export const MCP_SERVICE_VERSION = '0.1.0';
-
-export function createMcpServer(): McpServer {
+export function createMcpServer(context?: RequestContext): McpServer {
   const server = new McpServer(
     { name: MCP_SERVICE_NAME, version: MCP_SERVICE_VERSION },
     {
@@ -15,6 +14,6 @@ export function createMcpServer(): McpServer {
         'Tools are introduced only in the corresponding Phase 6 checkpoints.',
     },
   );
-  registerTools(server);
+  registerTools(server, context);
   return server;
 }
