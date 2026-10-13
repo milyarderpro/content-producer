@@ -58,16 +58,6 @@ jobs:
           pnpm install --frozen-lockfile
           echo "Exit code: 0 (pnpm install --frozen-lockfile)"
 
-      - name: Emit source formatting diagnostics (non-sensitive; no worktree changes)
-        shell: bash
-        run: |
-          for file in supabase/functions/mcp/foundation.ts supabase/functions/mcp/page_plan.ts supabase/functions/mcp/page_plan_test.ts supabase/functions/mcp/foundation_test.ts; do
-            echo "FORMAT_BEGIN:$file"
-            pnpm exec prettier "$file" | base64 -w0
-            echo
-            echo "FORMAT_END:$file"
-          done
-
       - name: Required project check
         id: check
         run: |
