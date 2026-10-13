@@ -5,7 +5,9 @@ import type { RequestContext } from './auth.ts';
 import { invoke } from './foundation.ts';
 import { planItem, planSummary } from './page_plan.ts';
 
-const uuid = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+const uuid = z
+  .string()
+  .regex(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
 const timestamp = z.string().datetime({ offset: true });
 const common = {
   request_schema_version: z.literal(1),
@@ -45,9 +47,11 @@ const safeDetail = z
   .refine(
     (s) =>
       s === s.trim() &&
-      !/[\x00-\x1f\x7f]/.test(s) &&
+      !Array.from(s).some((c) => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127) &&
       !/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(s) &&
-      !/(bearer\s|eyJ[A-Za-z0-9_-]+\.|(token|secret|password|authorization|api[_-]?key)\s*[:=]|SQLSTATE|CONTEXT:|DETAIL:|stack[\s_-]*trace|select\s.*from\s|insert\s+into|update\s.*set\s|delete\s+from)/i.test(s),
+      !/(bearer\s|eyJ[A-Za-z0-9_-]+\.|(token|secret|password|authorization|api[_-]?key)\s*[:=]|SQLSTATE|CONTEXT:|DETAIL:|stack[\s_-]*trace|select\s.*from\s|insert\s+into|update\s.*set\s|delete\s+from)/i.test(
+        s,
+      ),
     'failure_detail must be safe and must not contain credentials or SQL',
   );
 const failureInput = z.strictObject({
@@ -61,15 +65,17 @@ const envelope = <T extends z.ZodType>(data: T) =>
 const claimOutput = envelope(
   z.strictObject({
     plan_public_id: uuid,
-    claimed_items: z.array(
-      z.strictObject({
-        item: planItem,
-        claim_token: uuid,
-        claimed_at: timestamp,
-        claim_expires_at: timestamp,
-        claim_renewal_count: z.number().int().min(0).max(1),
-      }),
-    ).max(3),
+    claimed_items: z
+      .array(
+        z.strictObject({
+          item: planItem,
+          claim_token: uuid,
+          claimed_at: timestamp,
+          claim_expires_at: timestamp,
+          claim_renewal_count: z.number().int().min(0).max(1),
+        }),
+      )
+      .max(3),
     remaining_claimable_count: z.number().int().min(0),
     replayed: z.boolean(),
   }),
