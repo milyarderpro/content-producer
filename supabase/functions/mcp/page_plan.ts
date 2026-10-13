@@ -182,7 +182,7 @@ const planProgress = z.strictObject({
   failed: z.number().int().min(0),
   cancelled: z.number().int().min(0),
 });
-const planSummary = z.strictObject({
+export const planSummary = z.strictObject({
   plan_public_id: uuid,
   name: name.nullable(),
   page_public_id: uuid,
@@ -199,7 +199,7 @@ const itemConfig = z
     (value) => new TextEncoder().encode(JSON.stringify(value)).length <= 8 * 1024,
     'item_config must be at most 8 KiB',
   );
-const planItem = z.strictObject({
+export const planItem = z.strictObject({
   plan_item_public_id: uuid,
   plan_public_id: uuid,
   position: z.number().int().min(1).max(100),
