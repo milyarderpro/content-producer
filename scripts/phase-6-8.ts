@@ -787,7 +787,7 @@ try {
        where p.public_id in ('${postedPost}','${archivedPost}'))::text ||
       (select jsonb_agg(to_jsonb(j) order by j.id) from public.trivia_post_facts j
        where j.fact_id=(select id from public.trivia_facts where public_id='${refreshId}'))::text
-    ) hash`).hash;
+    )) hash`).hash;
   const correctionInput = {
     ...write(),
     fact_public_id: refreshId,
@@ -818,7 +818,7 @@ try {
        where p.public_id in ('${postedPost}','${archivedPost}'))::text ||
       (select jsonb_agg(to_jsonb(j) order by j.id) from public.trivia_post_facts j
        where j.fact_id=(select id from public.trivia_facts where public_id='${refreshId}'))::text
-    ) hash`).hash;
+    )) hash`).hash;
   check(historyBefore === historyAfter, 'IMMUTABLE_POSTED_ARCHIVED_SNAPSHOTS');
   check(
     (await call('trivia_correct_fact', correctionInput)).replayed === true,
