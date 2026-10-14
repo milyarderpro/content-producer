@@ -795,7 +795,8 @@ try {
   const correctionInput = {
     ...write(),
     fact_public_id: refreshId,
-    expected_fact_updated_at: refreshed.fact_updated_at,
+    // Release and binding changes may advance fact.updated_at. Enforce CAS on current row.
+    expected_fact_updated_at: time(refreshId),
     action: 'invalidate',
     correction_reason: 'Fresh external evidence invalidated this claim.',
     explicit_correction: true,
