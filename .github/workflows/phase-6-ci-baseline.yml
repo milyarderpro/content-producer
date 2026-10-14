@@ -90,7 +90,7 @@ jobs:
           test "$(pnpm exec supabase --version)" = "2.120.0"
           echo "Supabase CLI: 2.120.0 (verified)"
 
-      - name: Checkpoint 6.10 - internal MCP tests
+      - name: Checkpoint 6.11 - internal MCP tests
         id: mcp
         if: env.FULL_GATE != 'true'
         run: |
@@ -121,7 +121,7 @@ jobs:
           echo "Migration SQL count: $(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
           exit "$code"
 
-      - name: Checkpoint 6.10 - local HTTP fail-closed smoke
+      - name: Checkpoint 6.11 - local HTTP fail-closed smoke
         id: http
         shell: bash
         run: |

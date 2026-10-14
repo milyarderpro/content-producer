@@ -29,7 +29,7 @@
     "supabase:reset": "tsx scripts/supabase-local.ts reset",
     "supabase:seed": "tsx scripts/supabase-local.ts seed",
     "supabase:verify": "tsx scripts/supabase-local.ts verify-migrations",
-    "test:mcp": "cd supabase/functions && deno check mcp/index.ts mcp/transport_test.ts mcp/auth_test.ts mcp/foundation_test.ts mcp/page_plan_test.ts mcp/plan_claim_test.ts mcp/plan_recovery_test.ts mcp/trivia_fact_test.ts mcp/trivia_correction_test.ts mcp/post_base_test.ts mcp/post_edit_test.ts mcp/post_approval_test.ts mcp/post_approval_test.ts && deno lint mcp && AI_AGENT=none APPVEYOR=1 deno test --allow-env=NODE_ENV,AI_AGENT,APPVEYOR,CI,DEBUG,TEST,MODE,MINIMAL,NO_COLOR,FORCE_COLOR,TERM mcp/transport_test.ts mcp/auth_test.ts mcp/foundation_test.ts mcp/page_plan_test.ts mcp/plan_claim_test.ts mcp/plan_recovery_test.ts mcp/trivia_fact_test.ts mcp/trivia_correction_test.ts mcp/post_base_test.ts mcp/post_edit_test.ts",
+    "test:mcp": "cd supabase/functions && deno check mcp/index.ts mcp/transport_test.ts mcp/auth_test.ts mcp/foundation_test.ts mcp/page_plan_test.ts mcp/plan_claim_test.ts mcp/plan_recovery_test.ts mcp/trivia_fact_test.ts mcp/trivia_correction_test.ts mcp/post_base_test.ts mcp/post_edit_test.ts mcp/post_approval_test.ts && deno lint mcp && AI_AGENT=none APPVEYOR=1 deno test --allow-env=NODE_ENV,AI_AGENT,APPVEYOR,CI,DEBUG,TEST,MODE,MINIMAL,NO_COLOR,FORCE_COLOR,TERM mcp/transport_test.ts mcp/auth_test.ts mcp/foundation_test.ts mcp/page_plan_test.ts mcp/plan_claim_test.ts mcp/plan_recovery_test.ts mcp/trivia_fact_test.ts mcp/trivia_correction_test.ts mcp/post_base_test.ts mcp/post_edit_test.ts mcp/post_approval_test.ts",
     "test:database": "tsx scripts/supabase-local.ts test-database",
     "supabase": "supabase"
   },
