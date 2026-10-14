@@ -34,8 +34,8 @@ Deno.test('6.3 internal transport is functional, but lists no unauthenticated to
   assert(listed.status === 200, `internal tools/list: ${listed.status}`);
   assert(/"tools"\s*:\s*\[\s*\]/.test(listBody), 'unauthed registry must be empty');
   assert(
-    MCP_TOOL_COUNT === 28,
-    'checkpoint 6.11 must register exactly twenty-eight tools for owners',
+    MCP_TOOL_COUNT === 30,
+    'checkpoint 6.11 must register exactly thirty tools for owners',
   );
 });
 

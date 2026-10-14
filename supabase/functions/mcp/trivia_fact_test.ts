@@ -133,10 +133,10 @@ async function call(name: string, args = inputs[name]) {
   return (await mcp('tools/call', { name, arguments: args })).result;
 }
 Deno.test(
-  '6.7 trivia tools among 28 OAuth tools, closed schemas and correct annotations',
+  '6.7 trivia tools among 30 OAuth tools, closed schemas and correct annotations',
   async () => {
     const listed = (await mcp('tools/list')).result.tools;
-    check(MCP_TOOL_COUNT === 28 && listed.length === 28, 'EXACT_TWENTY_EIGHT_TOOLS');
+    check(MCP_TOOL_COUNT === 30 && listed.length === 30, 'EXACT_THIRTY_TOOLS');
     for (const name of TRIVIA_FACT_TOOL_NAMES) {
       const tool = listed.find((value: { name: string }) => value.name === name);
       check(tool && tool._meta.securitySchemes[0].type === 'oauth2', 'OAUTH_REQUIRED');

@@ -3,6 +3,7 @@ import type { RequestContext } from './auth.ts';
 import { POST_BASE_TOOL_NAMES, registerPostBaseTools } from './post_base.ts';
 import { POST_EDIT_TOOL_NAMES, registerPostEditTools } from './post_edit.ts';
 import { POST_APPROVAL_TOOL_NAMES, registerPostApprovalTools } from './post_approval.ts';
+import { POST_PUBLICATION_TOOL_NAMES, registerPostPublicationTools } from './post_publication.ts';
 import { FOUNDATION_TOOL_NAMES, registerFoundationTools } from './foundation.ts';
 import { PAGE_PLAN_TOOL_NAMES, registerPagePlanTools } from './page_plan.ts';
 import { PLAN_CLAIM_TOOL_NAMES, registerPlanClaimTools } from './plan_claim.ts';
@@ -23,7 +24,8 @@ export const MCP_TOOL_COUNT =
   TRIVIA_CORRECTION_TOOL_NAMES.length +
   POST_BASE_TOOL_NAMES.length +
   POST_EDIT_TOOL_NAMES.length +
-  POST_APPROVAL_TOOL_NAMES.length;
+  POST_APPROVAL_TOOL_NAMES.length +
+  POST_PUBLICATION_TOOL_NAMES.length;
 export function registerTools(server: McpServer, context?: RequestContext): void {
   registerFoundationTools(server, context);
   registerPagePlanTools(server, context);
@@ -34,4 +36,5 @@ export function registerTools(server: McpServer, context?: RequestContext): void
   registerPostBaseTools(server, context);
   registerPostEditTools(server, context);
   registerPostApprovalTools(server, context);
+  registerPostPublicationTools(server, context);
 }
