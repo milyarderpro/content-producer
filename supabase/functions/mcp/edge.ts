@@ -22,7 +22,9 @@ export function createEdgeHandler(
       return handleHttpRequest(request);
     }
     if (!protectedHandler) {
-      const authDependencies = fixtureJwks ? { loadKeys: async () => fixtureJwks } : undefined;
+      const authDependencies = fixtureJwks
+        ? { loadKeys: () => Promise.resolve(fixtureJwks) }
+        : undefined;
       protectedHandler = pipeline(
         [
           withOAuthProtectedResource({
