@@ -3,6 +3,7 @@ import * as z from 'npm:zod@4.3.6';
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { invoke } from './foundation.ts';
+import { triviaConfig, triviaPlanItemConfig } from './schemas.ts';
 
 const uuid = z.string().uuid();
 const version = z.literal(1);
@@ -29,86 +30,6 @@ const itemStatus = z.enum(['pending', 'in_progress', 'completed', 'failed', 'can
 
 // Closed TriviaConfigV1 shape. The authoritative value constraints and
 // supported keys also remain enforced by internal.is_valid_trivia_config_v1.
-const formats = [
-  'single_subject_fast',
-  'themed_utility',
-  'emotional_animal_collection',
-  'comparison',
-  'myth_vs_fact',
-] as const;
-const topics = [
-  'animals',
-  'pet_safety',
-  'food_science',
-  'food_storage_home',
-  'practical_utility',
-  'human_body',
-  'nature_science',
-  'geography',
-  'history_origins',
-  'inventions_everyday',
-  'general_trivia',
-] as const;
-const weights = z.number().int().min(0).max(100);
-const profile = z.strictObject({
-  fact_count_min: z.number().int().min(1).max(9),
-  fact_count_max: z.number().int().min(1).max(9),
-  words_per_fact_min: z.number().int().min(1).max(18),
-  words_per_fact_max: z.number().int().min(1).max(18),
-  total_words_min: z.number().int().min(1).max(500),
-  total_words_max: z.number().int().min(1).max(500),
-});
-const triviaConfig = z.strictObject({
-  allowed_formats: z.array(z.enum(formats)).min(1),
-  format_weights: z.strictObject({
-    single_subject_fast: weights,
-    themed_utility: weights,
-    emotional_animal_collection: weights,
-    comparison: weights,
-    myth_vs_fact: weights,
-  }),
-  allowed_topics: z.array(z.enum(topics)).min(1),
-  topic_group_weights: z.strictObject({
-    animals_pet_safety: weights,
-    human_body_food_myth: weights,
-    practical_utility: weights,
-    places_geography: weights,
-    nature_space: weights,
-    history_inventions_people: weights,
-  }),
-  fact_count: z.discriminatedUnion('mode', [
-    z.strictObject({
-      mode: z.literal('adaptive'),
-      min: z.number().int().min(5).max(9),
-      preferred: z.number().int().min(5).max(9),
-      max: z.number().int().min(5).max(9),
-    }),
-    z.strictObject({ mode: z.literal('fixed'), value: z.number().int().min(5).max(9) }),
-  ]),
-  profiles: z.strictObject({ fast_trivia: profile, practical_utility: profile }),
-  fact_reuse_scope: z.enum(['workspace_unique', 'page_unique']),
-  render_style: z.enum(['plain_lines', 'numbered']),
-  allowed_interaction_goals: z.array(goals).min(1),
-  text_budget: z.strictObject({
-    hook_max_chars: z.number().int().min(1).max(90),
-    fact_max_chars: z.number().int().min(1).max(90),
-    facts_total_max_chars: z.number().int().min(1).max(500),
-    cta_max_chars: z.number().int().min(1).max(100),
-    canva_total_max_chars: z.number().int().min(1).max(600),
-  }),
-  caption: z.strictObject({ max_chars: z.number().int().min(1).max(500) }),
-  hashtags: z.strictObject({
-    default_count: z.number().int().min(0).max(5),
-    min_count: z.number().int().min(0).max(5),
-    max_count: z.number().int().min(0).max(5),
-  }),
-  style: z.strictObject({
-    english_variant: z.literal('en-US'),
-    tone: z.literal('conversational_credible'),
-    emoji_allowed: z.literal(false),
-    regional_slang_allowed: z.literal(false),
-  }),
-});
 const nicheSummary = z.strictObject({
   niche_key: key,
   is_enabled: z.boolean(),
@@ -193,12 +114,7 @@ export const planSummary = z.strictObject({
   created_at: timestamp,
   updated_at: timestamp,
 });
-const itemConfig = z
-  .record(z.string(), z.unknown())
-  .refine(
-    (value) => new TextEncoder().encode(JSON.stringify(value)).length <= 8 * 1024,
-    'item_config must be at most 8 KiB',
-  );
+const itemConfig = triviaPlanItemConfig;
 export const planItem = z.strictObject({
   plan_item_public_id: uuid,
   plan_public_id: uuid,

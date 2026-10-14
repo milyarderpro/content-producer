@@ -3,6 +3,7 @@
 import * as z from 'npm:zod@4.3.6';
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
+import { triviaConfig, workspaceSettings } from './schemas.ts';
 
 const publicId = z
   .string()
@@ -81,7 +82,6 @@ const moduleCatalog = z.strictObject({
 // The versioned settings/config values are validated by the Phase 5 RPC and
 // niche validator. Preserve those objects intact rather than creating new
 // editorial rules in the facade.
-const versionedConfig = z.record(z.string(), z.unknown());
 const workspaceOutput = response(
   z.strictObject({
     workspace: z.strictObject({
@@ -90,7 +90,7 @@ const workspaceOutput = response(
       language_code: z.string(),
       target_markets: z.array(z.string()),
       default_timezone: z.string(),
-      defaults: versionedConfig,
+      defaults: workspaceSettings,
     }),
     modules: z.array(moduleCatalog),
     page_counts: z.strictObject({
@@ -118,18 +118,18 @@ const contextOutput = response(
       content_schema_versions: z.array(z.number().int().min(1)),
       capabilities: z.array(z.string()),
     }),
-    config: versionedConfig,
+    config: triviaConfig,
     generation_rules: z.strictObject({
-      allowed_topics: z.unknown(),
-      allowed_formats: z.unknown(),
+      allowed_topics: triviaConfig.shape.allowed_topics,
+      allowed_formats: triviaConfig.shape.allowed_formats,
       allowed_profiles: z.array(z.string()),
-      allowed_interaction_goals: z.unknown(),
-      fact_count: z.unknown(),
-      profiles: z.unknown(),
-      text_budget: z.unknown(),
+      allowed_interaction_goals: triviaConfig.shape.allowed_interaction_goals,
+      fact_count: triviaConfig.shape.fact_count,
+      profiles: triviaConfig.shape.profiles,
+      text_budget: triviaConfig.shape.text_budget,
       locale: z.string(),
       english_variant: z.string().nullable(),
-      render_style: z.unknown(),
+      render_style: triviaConfig.shape.render_style,
     }),
     reuse_policy: z.strictObject({
       scope: z.string(),
@@ -297,6 +297,7 @@ export async function invoke(
   schema: z.ZodType,
 ) {
   if (
+    context.workspacePublicId !== null &&
     params.p_workspace_public_id !== undefined &&
     params.p_workspace_public_id !== context.workspacePublicId
   )

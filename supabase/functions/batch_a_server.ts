@@ -1,8 +1,9 @@
 // Local-only test host: production HTTP middleware and transport, real PostgREST.
-import { handleHttpRequest } from './mcp/http.ts';
+import { createEdgeHandler } from './mcp/edge.ts';
 import type { OAuthConfig } from './mcp/auth.ts';
 const fixture = JSON.parse(await Deno.readTextFile(Deno.args[0]));
 const config: OAuthConfig = fixture.config;
+const handleEdgeRequest = createEdgeHandler(config, fixture.jwks);
 Deno.serve({ hostname: '127.0.0.1', port: 54330 }, async (request) => {
   // Match Kong's REST prefix while preserving the original user Authorization.
   const path = new URL(request.url).pathname;
@@ -17,5 +18,5 @@ Deno.serve({ hostname: '127.0.0.1', port: 54330 }, async (request) => {
   if (new URL(request.url).pathname === '/auth/v1/.well-known/jwks.json') {
     return Response.json(fixture.jwks);
   }
-  return handleHttpRequest(request, { config });
+  return handleEdgeRequest(request);
 });

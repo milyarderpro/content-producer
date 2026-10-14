@@ -1,6 +1,7 @@
 import { createAuthenticatedTransport } from './transport.ts';
 import type { RequestContext } from './auth.ts';
 import { FOUNDATION_TOOL_NAMES } from './foundation.ts';
+import { MCP_TOOL_COUNT } from './registry.ts';
 
 const owner = '11111111-1111-4111-8111-111111111111';
 const workspace = '44444444-4444-4444-8444-444444444444';
@@ -17,6 +18,20 @@ const context: RequestContext = {
 };
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error(message);
+}
+function assertClosedObjects(schema: unknown, path = 'schema'): void {
+  if (!schema || typeof schema !== 'object') return;
+  if (Array.isArray(schema)) {
+    schema.forEach((value, index) => assertClosedObjects(value, path + '[' + index + ']'));
+    return;
+  }
+  const value = schema as Record<string, unknown>;
+  if (value.type === 'object') {
+    assert(value.additionalProperties === false, 'open object schema at ' + path);
+  }
+  for (const [key, child] of Object.entries(value)) {
+    assertClosedObjects(child, path + '.' + key);
+  }
 }
 function mcp(method: string, params?: object) {
   return new Request('http://127.0.0.1:54321/functions/v1/mcp', {
@@ -67,7 +82,7 @@ const payloads: Record<string, object> = {
       language_code: 'en',
       target_markets: ['US'],
       default_timezone: 'UTC',
-      defaults: { schema_version: 1, reservation_ttl_minutes: 30 },
+      defaults: { schema_version: 1, reservation_ttl_minutes: 30, default_post_status: 'draft', default_plan_chunk_size: 3 },
     },
     modules: [
       {
@@ -94,15 +109,35 @@ const payloads: Record<string, object> = {
       content_schema_versions: [1],
       capabilities: ['project_generation_context'],
     },
-    config: { schema_version: 1, allowed_formats: ['single_subject_fast'] },
-    generation_rules: {
-      allowed_topics: [],
+    config: {
       allowed_formats: ['single_subject_fast'],
-      allowed_profiles: ['fast_trivia'],
+      format_weights: { single_subject_fast: 35, themed_utility: 20, emotional_animal_collection: 20, comparison: 15, myth_vs_fact: 10 },
+      allowed_topics: ['animals'],
+      topic_group_weights: { animals_pet_safety: 30, human_body_food_myth: 20, practical_utility: 15, places_geography: 15, nature_space: 10, history_inventions_people: 10 },
+      fact_count: { mode: 'adaptive', min: 5, preferred: 5, max: 9 },
+      profiles: {
+        fast_trivia: { fact_count_min: 7, fact_count_max: 8, words_per_fact_min: 8, words_per_fact_max: 11, total_words_min: 65, total_words_max: 85 },
+        practical_utility: { fact_count_min: 5, fact_count_max: 6, words_per_fact_min: 10, words_per_fact_max: 14, total_words_min: 65, total_words_max: 85 },
+      },
+      fact_reuse_scope: 'workspace_unique',
+      render_style: 'plain_lines',
       allowed_interaction_goals: ['share'],
-      fact_count: {},
-      profiles: {},
-      text_budget: {},
+      text_budget: { hook_max_chars: 45, fact_max_chars: 90, facts_total_max_chars: 500, cta_max_chars: 50, canva_total_max_chars: 600 },
+      caption: { max_chars: 500 },
+      hashtags: { default_count: 3, min_count: 0, max_count: 5 },
+      style: { english_variant: 'en-US', tone: 'conversational_credible', emoji_allowed: false, regional_slang_allowed: false },
+    },
+    generation_rules: {
+      allowed_topics: ['animals'],
+      allowed_formats: ['single_subject_fast'],
+      allowed_profiles: ['fast_trivia', 'practical_utility'],
+      allowed_interaction_goals: ['share'],
+      fact_count: { mode: 'adaptive', min: 5, preferred: 5, max: 9 },
+      profiles: {
+        fast_trivia: { fact_count_min: 7, fact_count_max: 8, words_per_fact_min: 8, words_per_fact_max: 11, total_words_min: 65, total_words_max: 85 },
+        practical_utility: { fact_count_min: 5, fact_count_max: 6, words_per_fact_min: 10, words_per_fact_max: 14, total_words_min: 65, total_words_max: 85 },
+      },
+      text_budget: { hook_max_chars: 45, fact_max_chars: 90, facts_total_max_chars: 500, cta_max_chars: 50, canva_total_max_chars: 600 },
       locale: 'en-US',
       english_variant: 'US',
       render_style: 'plain_lines',
@@ -135,6 +170,17 @@ Deno.test(
     assert(listed.includes('create_page'), '6.4 tool must be present');
   },
 );
+
+Deno.test('Batch A all tool input/output object schemas are closed recursively', async () => {
+  const raw = await request('tools/list');
+  const parsed = JSON.parse(raw);
+  const tools = parsed.result?.tools ?? [];
+  assert(tools.length === MCP_TOOL_COUNT && tools.length === 15, 'exact 15 schemas');
+  for (const tool of tools) {
+    assertClosedObjects(tool.inputSchema, tool.name + '.input');
+    assertClosedObjects(tool.outputSchema, tool.name + '.output');
+  }
+});
 
 Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation', async () => {
   const original = globalThis.fetch;

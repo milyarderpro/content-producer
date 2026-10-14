@@ -234,7 +234,11 @@ try {
   );
   const tools = (await rpcHttp('tools/list')).body.result.tools;
   check(tools.length === 15, 'EXACT_FIFTEEN_TOOLS');
-  check((await rpcHttp('tools/list', undefined, foreignBearer)).status === 403, 'NON_OWNER_DENIAL');
+  const foreignDenied = await rpcHttp('tools/list', undefined, foreignBearer);
+  check(
+    foreignDenied.status === 403 && foreignDenied.body.error?.code === 'OWNER_ACCESS_REQUIRED',
+    'NON_OWNER_DENIAL',
+  );
   check(
     (await rpcHttp('tools/list', undefined, token(f.owner, 'authenticated'))).status === 401,
     'EXACT_AUDIENCE_DENIAL',
@@ -245,10 +249,133 @@ try {
     'Public HTTP auth, initialize, exact 15-tool census: PASS; original RS256 user JWT accepted by real local PostgREST.',
   );
 
+  const defaultConfig = row<{ config: object }>(
+    'select internal.default_trivia_config_v1() config',
+  ).config;
+  const createPageInput = {
+    ...write(),
+    name: 'Batch A MCP Page',
+    slug: f.prefix + '-mcp-page',
+    timezone: 'UTC',
+    target_markets: ['US'],
+    niche_key: 'trivia',
+    config_schema_version: 1,
+    config: defaultConfig,
+    make_default: false,
+  };
+  const createdPage = await call('create_page', createPageInput);
+  check(createdPage.replayed === false, 'CREATE_PAGE_INITIAL');
+  const createdPageId = createdPage.page.page_public_id;
+  const pageReplay = await call('create_page', createPageInput);
+  check(
+    pageReplay.replayed === true && pageReplay.page.page_public_id === createdPageId,
+    'CREATE_PAGE_REPLAY',
+  );
+  await call(
+    'create_page',
+    { ...createPageInput, name: 'Changed request under same key' },
+    'OPERATION_KEY_REUSED',
+  );
+  await call(
+    'create_page',
+    { ...write(), ...createPageInput, operation_key: randomUUID() },
+    'PAGE_SLUG_CONFLICT',
+  );
+  const afterPage = row<{ read_count: number; write_count: number }>(
+    `select
+      coalesce(max(request_count) filter (where limit_group='read'), 0)::integer read_count,
+      coalesce(max(request_count) filter (where limit_group='write'), 0)::integer write_count
+      from internal.rate_limit_buckets
+      where actor_user_id='${f.owner}' and oauth_client_id='${client}'`,
+  );
+  check(afterPage.read_count === 0 && afterPage.write_count > 0, 'AUTH_PROBE_CONSUMED_READ_LIMIT');
+
+  const updatePageInput = {
+    ...write(),
+    page_public_id: createdPageId,
+    expected_page_updated_at: createdPage.page.updated_at,
+    page_patch: { name: 'Batch A MCP Page updated' },
+  };
+  const updatedPage = await call('update_page', updatePageInput);
+  check(updatedPage.replayed === false, 'UPDATE_PAGE_INITIAL');
+  const updateReplay = await call('update_page', updatePageInput);
+  check(updateReplay.replayed === true, 'UPDATE_PAGE_REPLAY');
+  await call(
+    'update_page',
+    { ...updatePageInput, page_patch: { name: 'Different name under same key' } },
+    'OPERATION_KEY_REUSED',
+  );
+  await call(
+    'update_page',
+    {
+      ...write(),
+      page_public_id: createdPageId,
+      expected_page_updated_at: createdPage.page.updated_at,
+      page_patch: { name: 'stale update' },
+    },
+    'PAGE_VERSION_CONFLICT',
+  );
+
+  const scheduledAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+  const createPlanInput = {
+    ...write(),
+    page_public_id: createdPageId,
+    niche_key: 'trivia',
+    config_schema_version: 1,
+    plan_intent: 'Batch A public MCP plan proof.',
+    items: [{
+      position: 1,
+      scheduled_at: scheduledAt,
+      topic_key: 'animals',
+      format_key: 'single_subject_fast',
+      interaction_goal: 'share',
+      item_config: {},
+    }],
+  };
+  const createdPublicPlan = await call('create_content_plan', createPlanInput);
+  check(createdPublicPlan.replayed === false, 'CREATE_PLAN_INITIAL');
+  const createdPublicPlanId = createdPublicPlan.plan.plan_public_id;
+  const planReplay = await call('create_content_plan', createPlanInput);
+  check(
+    planReplay.replayed === true && planReplay.plan.plan_public_id === createdPublicPlanId,
+    'CREATE_PLAN_REPLAY',
+  );
+  await call(
+    'create_content_plan',
+    { ...createPlanInput, plan_intent: 'Changed plan intent under same key' },
+    'OPERATION_KEY_REUSED',
+  );
+  await call(
+    'create_content_plan',
+    {
+      ...write(),
+      page_public_id: createdPageId,
+      niche_key: 'trivia',
+      config_schema_version: 1,
+      plan_intent: 'Schedule collision proof.',
+      items: createPlanInput.items,
+    },
+    'SCHEDULE_CONFLICT',
+  );
+  console.info(
+    'Public MCP→PostgREST→database Page/create/update and plan/create: owner scope, replay, payload mismatch, CAS, slug/schedule conflicts PASS.',
+  );
+
   const p = createPlan(f, 2);
   const planId = p.data.plan.plan_public_id;
   const claimInput = { ...write(), plan_public_id: planId, limit: 1, lease_minutes: 30 };
   const claimed = await call('claim_content_plan_items', claimInput);
+  const claimReplay = await call('claim_content_plan_items', claimInput);
+  check(
+    claimReplay.replayed === true &&
+      claimReplay.claimed_items[0].claim_token === claimed.claimed_items[0].claim_token,
+    'CLAIM_REPLAY_TOKEN',
+  );
+  await call(
+    'claim_content_plan_items',
+    { ...claimInput, limit: 2 },
+    'OPERATION_KEY_REUSED',
+  );
   const c = claimed.claimed_items[0];
   await call('report_content_plan_item_failure', {
     ...write(),

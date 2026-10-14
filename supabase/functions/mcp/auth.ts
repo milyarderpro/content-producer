@@ -11,7 +11,7 @@ export interface RequestContext {
   requestId: string;
   actorUserId: string;
   oauthClientId: string;
-  workspacePublicId: string;
+  workspacePublicId: string | null;
   accessToken: string; // Original validated user token, never log.
   supabaseUrl: string;
   publishableKey: string;
@@ -173,45 +173,6 @@ async function verifyJwt(token: string, config: OAuthConfig, deps: AuthDependenc
     throw new AuthRejection(401);
   return { actor: claims.sub, client: claims.client_id };
 }
-// Existing Phase 5 RPC checks auth.uid(), OAuth client, active workspace,
-// and RLS; no direct table read or service-role credential.
-async function probeOwner(
-  config: OAuthConfig,
-  token: string,
-  actor: string,
-): Promise<string | null> {
-  const res = await fetch(config.supabaseUrl + '/rest/v1/rpc/get_account_profile', {
-    method: 'POST',
-    redirect: 'error',
-    signal: AbortSignal.timeout(3500),
-    headers: {
-      apikey: config.publishableKey,
-      Authorization: 'Bearer ' + token,
-      'Content-Type': 'application/json',
-      'Accept-Profile': 'api',
-      'Content-Profile': 'api',
-    },
-    body: JSON.stringify({ p_request_schema_version: 1 }),
-  });
-  if (!res.ok) return null;
-  const data: unknown = await res.json();
-  if (!data || typeof data !== 'object' || !('data' in data)) return null;
-  const profile = (
-    data as {
-      data?: {
-        profile?: {
-          id?: unknown;
-          workspace_public_id?: unknown;
-        };
-      };
-    }
-  ).data?.profile;
-  return profile?.id === actor &&
-    typeof profile.workspace_public_id === 'string' &&
-    uuid.test(profile.workspace_public_id)
-    ? profile.workspace_public_id
-    : null;
-}
 export async function authenticateRequest(
   request: Request,
   config: OAuthConfig,
@@ -222,13 +183,15 @@ export async function authenticateRequest(
   const token = match[1]!;
   const { actor, client } = await verifyJwt(token, config, deps);
   if (actor !== config.ownerUserId) throw new AuthRejection(403);
-  let workspace: string | null;
-  try {
-    workspace = await (deps.checkOwner || probeOwner)(config, token, actor);
-  } catch {
-    throw new AuthRejection(503);
+  let workspace: string | null = null;
+  if (deps.checkOwner) {
+    try {
+      workspace = await deps.checkOwner(config, token, actor);
+    } catch {
+      throw new AuthRejection(503);
+    }
+    if (!workspace || !uuid.test(workspace)) throw new AuthRejection(403);
   }
-  if (!workspace || !uuid.test(workspace)) throw new AuthRejection(403);
   return {
     requestId: crypto.randomUUID(),
     actorUserId: actor,

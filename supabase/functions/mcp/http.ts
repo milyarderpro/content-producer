@@ -26,6 +26,20 @@ function jsonResponse(body: object, status: number, extra: Record<string, string
 function metadataUrl(resource: string): string {
   return resource + '/oauth-protected-resource';
 }
+function ownerDenied(): Response {
+  return jsonResponse(
+    {
+      response_schema_version: 1,
+      error: {
+        code: 'OWNER_ACCESS_REQUIRED',
+        message: 'Only the connected workspace owner may access this resource.',
+        retryable: false,
+        recovery: 'Use the authorized owner account.',
+      },
+    },
+    403,
+  );
+}
 function challenge(resource: string, status: number): Response {
   const header = 'Bearer resource_metadata="' + metadataUrl(resource) + '"';
   return jsonResponse(
@@ -114,6 +128,6 @@ export async function handleHttpRequest(
   } catch (error) {
     const status = error instanceof AuthRejection ? error.status : 503;
     safeLog(id, 'auth_denied', status);
-    return challenge(config.resource, status);
+    return status === 403 ? ownerDenied() : challenge(config.resource, status);
   }
 }

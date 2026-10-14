@@ -5,6 +5,7 @@ import {
   type OAuthConfig,
 } from './auth.ts';
 import { handleHttpRequest } from './http.ts';
+import { createEdgeHandler } from './edge.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
 
 function assert(condition: unknown, detail: string): asserts condition {
@@ -156,6 +157,27 @@ Deno.test(
       tamperDenied = error instanceof AuthRejection && error.status === 401;
     }
     assert(tamperDenied, 'invalid signature accepted');
+    const noProbe = await authenticateRequest(withToken(valid), config, {
+      loadKeys: dependencies.loadKeys,
+      now: dependencies.now,
+    });
+    assert(noProbe.workspacePublicId === null, 'authentication must not probe a rate-limited read RPC');
+
+    const outsider = await sign({ ...claims, sub: other });
+    const ownerDenied = await handleHttpRequest(
+      new Request(config.resource, {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + outsider, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' }),
+      }),
+      { config, dependencies },
+    );
+    const denial = await ownerDenied.json();
+    assert(
+      ownerDenied.status === 403 && denial.error?.code === 'OWNER_ACCESS_REQUIRED',
+      'non-owner denial must expose stable safe code without an OAuth relink challenge',
+    );
+
     let nonOwnerDenied = false;
     try {
       await authenticateRequest(withToken(valid), config, {
@@ -218,5 +240,68 @@ Deno.test(
         'invalid transport response',
       );
     }
+  },
+);
+
+Deno.test(
+  '6.2 public Supabase middleware pipeline gates MCP and serves protected-resource metadata',
+  async () => {
+    const { claims, dependencies, sign } = await fixture();
+    const jwks = await dependencies.loadKeys!(config.jwksUrl);
+    const handle = createEdgeHandler(config, jwks);
+    const metadata = await handle(
+      new Request(config.resource + '/oauth-protected-resource', { method: 'GET' }),
+    );
+    const metadataBody = await metadata.json();
+    assert(metadata.status === 200, 'protected-resource metadata must be public');
+    assert(metadataBody.resource === config.resource, 'metadata resource mismatch');
+    assert(
+      metadataBody.authorization_servers?.[0] === config.issuer,
+      'metadata issuer mismatch',
+    );
+
+    const ownerToken = await sign(claims);
+    const listed = await handle(
+      new Request(config.resource, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + ownerToken,
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/event-stream',
+        },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' }),
+      }),
+    );
+    assert(listed.status === 200, 'owner token must pass Supabase user middleware');
+
+    const noToken = await handle(
+      new Request(config.resource, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }),
+      }),
+    );
+    assert(
+      noToken.status === 401 && noToken.headers.has('WWW-Authenticate'),
+      'missing token must receive protected-resource challenge',
+    );
+
+    const outsider = await sign({ ...claims, sub: other });
+    const denied = await handle(
+      new Request(config.resource, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + outsider,
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/event-stream',
+        },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'tools/list' }),
+      }),
+    );
+    const denial = await denied.json();
+    assert(
+      denied.status === 403 && denial.error?.code === 'OWNER_ACCESS_REQUIRED',
+      'valid non-owner must receive stable owner denial',
+    );
   },
 );

@@ -1,3 +1,4 @@
-// Supabase Edge Function entrypoint. OAuth is required before MCP transport.
-import { handleHttpRequest } from './http.ts';
-Deno.serve((request) => handleHttpRequest(request));
+// Supabase Edge Function entrypoint. OAuth middleware precedes user-auth middleware.
+import { createEdgeHandler } from './edge.ts';
+
+Deno.serve(createEdgeHandler());
