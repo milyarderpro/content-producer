@@ -172,9 +172,9 @@ async function mcp(method: string, params?: object) {
 async function call(name: string, args: object) {
   return (await mcp('tools/call', { name, arguments: args })).result;
 }
-Deno.test('6.9: post schemas remain closed among 30 OAuth tools', async () => {
+Deno.test('6.9: post schemas remain closed among 33 OAuth tools', async () => {
   const tools = (await mcp('tools/list')).result.tools;
-  check(MCP_TOOL_COUNT === 30 && tools.length === 30, 'EXACT_30');
+  check(MCP_TOOL_COUNT === 33 && tools.length === 33, 'EXACT_33');
   for (const name of POST_BASE_TOOL_NAMES) {
     const t = tools.find((x: { name: string }) => x.name === name);
     check(t?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
