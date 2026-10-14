@@ -114,7 +114,7 @@ Deno.test(
   '6.11: exactly 30 OAuth tools with closed approval/discard schemas and exact annotations',
   async () => {
     const tools = (await mcp('tools/list')).result.tools;
-    check(MCP_TOOL_COUNT === 30 && tools.length === 30, 'EXACT_30');
+    check(MCP_TOOL_COUNT === 33 && tools.length === 33, 'EXACT_33');
     for (const name of POST_APPROVAL_TOOL_NAMES) {
       const tool = tools.find((entry: { name: string }) => entry.name === name);
       check(tool?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
