@@ -264,7 +264,7 @@ try {
     'INITIALIZE',
   );
   const tools = (await rpcHttp('tools/list')).body.result.tools;
-  check(tools.length === 25, 'EXACT_TWENTY_FIVE_TOOLS');
+  check(tools.length === 28, 'EXACT_TWENTY_EIGHT_TOOLS');
   const defaultConfig = row<{ config: object }>(
     'select internal.default_trivia_config_v1() config',
   ).config;
@@ -319,7 +319,7 @@ try {
   const unauth = await fetch(resource, { method: 'POST', body: '{}' });
   check(unauth.status === 401, 'MISSING_TOKEN_DENIAL');
   console.info(
-    'Public HTTP auth, initialize, exact 20-tool census: PASS; original RS256 user JWT accepted by real local PostgREST.',
+    'Public HTTP auth, initialize, exact 28-tool census: PASS; original RS256 user JWT accepted by real local PostgREST.',
   );
 
   const createPageInput = {
