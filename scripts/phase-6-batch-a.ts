@@ -198,7 +198,7 @@ try {
   );
   host = spawn('deno', [
     'run',
-    '--allow-env=NODE_ENV',
+    '--allow-env=NODE_ENV,AI_AGENT',
     '--allow-net=127.0.0.1:54329,127.0.0.1:54330',
     '--allow-read=' + fixtureFile,
     '--config',
