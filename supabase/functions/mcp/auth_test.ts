@@ -259,6 +259,14 @@ Deno.test(
       metadataBody.authorization_servers?.[0] === config.issuer,
       'metadata issuer mismatch',
     );
+    assert(
+      JSON.stringify(metadataBody.scopes_supported) === JSON.stringify(['openid', 'email']),
+      'metadata scopes mismatch',
+    );
+    assert(
+      JSON.stringify(metadataBody.bearer_methods_supported) === JSON.stringify(['header']),
+      'metadata bearer method mismatch',
+    );
 
     const ownerToken = await sign(claims);
     const listed = await handle(

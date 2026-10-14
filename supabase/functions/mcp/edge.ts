@@ -48,6 +48,34 @@ export function createEdgeHandler(
         (innerRequest) => handleHttpRequest(innerRequest, { config }),
       );
     }
-    return protectedHandler(request);
+    const response = await protectedHandler(request);
+    if (
+      request.method === 'GET' &&
+      (path.endsWith('/oauth-protected-resource') ||
+        path === '/.well-known/oauth-protected-resource')
+    ) {
+      try {
+        const metadata = await response.json();
+        if (metadata && typeof metadata === 'object' && !Array.isArray(metadata)) {
+          const headers = new Headers(response.headers);
+          headers.delete('content-length');
+          headers.delete('content-encoding');
+          headers.set('content-type', 'application/json; charset=utf-8');
+          return Response.json(
+            {
+              ...(metadata as Record<string, unknown>),
+              resource: config.resource,
+              authorization_servers: [config.issuer],
+              scopes_supported: ['openid', 'email'],
+              bearer_methods_supported: ['header'],
+            },
+            { status: response.status, statusText: response.statusText, headers },
+          );
+        }
+      } catch {
+        // Keep the middleware response intact if its metadata is not JSON.
+      }
+    }
+    return response;
   };
 }
