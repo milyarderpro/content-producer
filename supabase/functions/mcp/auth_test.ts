@@ -181,6 +181,24 @@ Deno.test(
       'non-owner denial must expose stable safe code without an OAuth relink challenge',
     );
 
+    const inactiveWorkspaceDenied = await handleHttpRequest(
+      new Request(config.resource, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + valid,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }),
+      }),
+      { config, dependencies: { ...dependencies, checkOwner: () => Promise.resolve(null) } },
+    );
+    const inactiveDenial = await inactiveWorkspaceDenied.json();
+    assert(
+      inactiveWorkspaceDenied.status === 403 &&
+        inactiveDenial.error?.code === 'OWNER_ACCESS_REQUIRED',
+      'allowlisted owner without an active workspace must not list tools',
+    );
+
     let nonOwnerDenied = false;
     try {
       await authenticateRequest(withToken(valid), config, {
@@ -251,7 +269,7 @@ Deno.test(
   async () => {
     const { claims, dependencies, sign } = await fixture();
     const jwks = await dependencies.loadKeys!(config.jwksUrl);
-    const handle = createEdgeHandler(config, jwks);
+    const handle = createEdgeHandler(config, jwks, dependencies.checkOwner!);
     const metadata = await handle(
       new Request(config.resource + '/oauth-protected-resource', { method: 'GET' }),
     );
