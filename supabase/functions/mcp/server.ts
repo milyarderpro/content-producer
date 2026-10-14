@@ -9,9 +9,11 @@ export function createMcpServer(context?: RequestContext): McpServer {
     {
       capabilities: { tools: {} },
       instructions:
-        'Content Producer manages an owner-scoped trivia production workflow. ' +
-        'Business tools require OAuth, workspace ownership, and explicit user intent. ' +
-        'Tools are introduced only in the corresponding Phase 6 checkpoints.',
+        'Resolve the authenticated workspace and Page before writes. Read Page generation context before drafting. ' +
+        'Research occurs outside this server. Check trivia candidates, then reserve verified facts before saving a draft. ' +
+        'Never approve, discard, mark posted, archive, cancel, replace, or correct facts without explicit user intent. ' +
+        'On conflicts, read current state rather than silently overwriting; release unused reservations. ' +
+        'Record only user-supplied Facebook metrics, never infer missing values or causal winners.',
     },
   );
   registerTools(server, context);
