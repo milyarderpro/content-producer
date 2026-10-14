@@ -201,7 +201,7 @@ const metricSnapshot = z.strictObject({
   anomaly_flags: z.array(z.string().max(100)).max(50),
   created_at: timestamp,
 });
-const contentPayload = z.strictObject({
+export const contentPayload = z.strictObject({
   schema_version: version,
   hook: z.string().min(1).max(120),
   body: z.strictObject({
@@ -223,7 +223,7 @@ const contentPayload = z.strictObject({
   render_style: z.enum(['plain_lines', 'numbered']),
   text_metrics: z.union([z.strictObject({}), textMetrics]),
 });
-const generationSnapshot = z.strictObject({
+export const generationSnapshot = z.strictObject({
   schema_version: version,
   module_version: version,
   config_schema_version: version,
@@ -251,7 +251,7 @@ const generationSnapshot = z.strictObject({
   target_video_seconds: z.literal(13),
   override_reason: z.string().min(1).max(500).nullable(),
 });
-const bindingInput = z.strictObject({
+export const bindingInput = z.strictObject({
   position: z.number().int().min(1).max(9),
   fact_public_id: uuid,
   fact_role: z.enum([
@@ -265,7 +265,7 @@ const bindingInput = z.strictObject({
   ]),
   rendered_text: z.string().min(1).max(90),
 });
-const editorialInput = z.strictObject({
+export const editorialInput = z.strictObject({
   rubric_version: version,
   evaluator_label: z.string().min(1).max(120).optional(),
   overall_status: z.enum(['pass', 'fail', 'needs_review']),
@@ -385,7 +385,7 @@ const bindingOutput = bindingInput.extend({
   allocation_state: z.enum(['allocated', 'published', 'released']),
   source_snapshot: sourceSnapshot.optional(),
 });
-const postPackage = z.strictObject({
+export const postPackage = z.strictObject({
   post_public_id: uuid,
   page_public_id: uuid,
   niche_key: key,

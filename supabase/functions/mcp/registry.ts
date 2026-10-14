@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { POST_BASE_TOOL_NAMES, registerPostBaseTools } from './post_base.ts';
+import { POST_EDIT_TOOL_NAMES, registerPostEditTools } from './post_edit.ts';
 import { FOUNDATION_TOOL_NAMES, registerFoundationTools } from './foundation.ts';
 import { PAGE_PLAN_TOOL_NAMES, registerPagePlanTools } from './page_plan.ts';
 import { PLAN_CLAIM_TOOL_NAMES, registerPlanClaimTools } from './plan_claim.ts';
@@ -19,7 +20,8 @@ export const MCP_TOOL_COUNT =
   PLAN_RECOVERY_TOOL_NAMES.length +
   TRIVIA_FACT_TOOL_NAMES.length +
   TRIVIA_CORRECTION_TOOL_NAMES.length +
-  POST_BASE_TOOL_NAMES.length;
+  POST_BASE_TOOL_NAMES.length +
+  POST_EDIT_TOOL_NAMES.length;
 export function registerTools(server: McpServer, context?: RequestContext): void {
   registerFoundationTools(server, context);
   registerPagePlanTools(server, context);
@@ -28,4 +30,5 @@ export function registerTools(server: McpServer, context?: RequestContext): void
   registerTriviaFactTools(server, context);
   registerTriviaCorrectionTools(server, context);
   registerPostBaseTools(server, context);
+  registerPostEditTools(server, context);
 }
