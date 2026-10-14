@@ -4,23 +4,21 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-  cleanup,
   completeFixtureItem,
-  createFixture,
   createPlan,
   insertPost,
   row,
   sql,
   stateDigest,
 } from '../supabase/tests/database/helpers/plan-lifecycle.js';
-import { candidate, factInput } from '../supabase/tests/database/helpers/trivia-rpc.js';
+import { candidate, cleanup, factInput, fixture } from '../supabase/tests/database/helpers/trivia-rpc.js';
 
 // No remote URL or cloud project accepted. Reuse only the local stack's image/network/DB URI.
 const resource = 'http://127.0.0.1:54330/mcp';
 const issuer = 'http://127.0.0.1:54330/auth/v1';
 const dir = mkdtempSync(join(tmpdir(), 'phase-6-batch-a-'));
 const container = 'phase-6-batch-a-postgrest';
-const f = createFixture();
+const f = fixture();
 const { publicKey, privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const jwks = {
   keys: [
@@ -826,9 +824,6 @@ try {
     'HTTP_LOG_PRIVACY',
   );
   timings.sort((a, b) => a - b);
-  console.info(
-    `Phase 6.7 ${process.argv.includes('--preflight') ? 'preflight: real HTTP recovery/race' : 'gate: Inspector initialize/list, 18/18 valid and 18/18 invalid tool calls'} PASS; HTTP log privacy PASS; typical local latency median ${Math.round(timings[Math.floor(timings.length / 2)])}ms, max ${Math.round(timings.at(-1)!)}ms (fixture scope).`,
-  );
 } catch (error) {
   // Print safe assertion labels only, never raw child stdout, SQL or payloads.
   console.error(
@@ -842,4 +837,10 @@ try {
   spawnSync('docker', ['rm', '-f', container], { stdio: 'ignore' });
   cleanup(f);
   rmSync(dir, { recursive: true, force: true });
+}
+
+if (process.exitCode !== 1) {
+  console.info(
+    `Phase 6.7 ${process.argv.includes('--preflight') ? 'preflight: real HTTP recovery/race' : 'gate: Inspector initialize/list, 18/18 valid and 18/18 invalid tool calls'} PASS; HTTP log privacy PASS; typical local latency median ${Math.round(timings[Math.floor(timings.length / 2)])}ms, max ${Math.round(timings.at(-1)!)}ms (fixture scope).`,
+  );
 }
