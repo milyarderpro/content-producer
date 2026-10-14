@@ -95,7 +95,7 @@ async function call(name: string, input: object, error?: string) {
   if (error) {
     check(
       result?.isError === true && result.structuredContent?.error?.code === error,
-      'EXPECTED_' + error,
+      'EXPECTED_' + error + '_GOT_' + (/^[A-Z_]{1,60}$/.test(String(result?.structuredContent?.error?.code)) ? result.structuredContent.error.code : 'NO_SAFE_ERROR'),
     );
   } else
     check(
