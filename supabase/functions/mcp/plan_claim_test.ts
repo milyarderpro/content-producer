@@ -132,10 +132,10 @@ async function call(name: string, args: object) {
   return response.result;
 }
 
-Deno.test('6.5 claims retain OAuth and annotations after 6.7 expansion', async () => {
+Deno.test('6.5 claims retain OAuth and annotations after 6.8 expansion', async () => {
   const listed = await mcp('tools/list');
   const tools = listed.result?.tools ?? [];
-  assert(MCP_TOOL_COUNT === 18 && tools.length === 18, 'exact 18 registered tools');
+  assert(MCP_TOOL_COUNT === 20 && tools.length === 20, 'exact 20 registered tools');
   for (const name of PLAN_CLAIM_TOOL_NAMES) {
     const tool = tools.find((t) => t.name === name);
     assert(tool, 'missing claim tool ' + name);

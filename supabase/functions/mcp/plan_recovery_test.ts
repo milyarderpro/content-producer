@@ -106,7 +106,7 @@ const envelope = (value: object) => ({ response_schema_version: 1, data: value }
 
 Deno.test('6.6 recovery schemas and destructive cancellation metadata survive 6.7', async () => {
   const tools = (await mcp('tools/list')).result.tools;
-  assert(MCP_TOOL_COUNT === 18 && tools.length === 18, 'exact eighteen tools');
+  assert(MCP_TOOL_COUNT === 20 && tools.length === 20, 'exact twenty tools');
   for (const name of PLAN_RECOVERY_TOOL_NAMES) {
     const tool = tools.find((t: { name: string }) => t.name === name);
     assert(tool && tool._meta.securitySchemes[0].type === 'oauth2', 'OAuth');

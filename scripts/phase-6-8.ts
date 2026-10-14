@@ -715,7 +715,9 @@ try {
   };
   const refreshedCreated = await call('trivia_register_and_reserve_facts', refreshReservation);
   const refreshId = refreshedCreated.facts[0].fact_public_id;
-  const identityBefore = row<{ hash: string }>(`select md5(row(claim_text,claim_hash,structured_key,structured_hash)::text) hash
+  const identityBefore = row<{
+    hash: string;
+  }>(`select md5(row(claim_text,claim_hash,structured_key,structured_hash)::text) hash
     from public.trivia_facts where public_id='${refreshId}'`).hash;
   const oldCas = time(refreshId);
   const reverifyInput = {
@@ -731,27 +733,49 @@ try {
     review_note: 'Confirmed unchanged meaning with new sources.',
   };
   const refreshed = await call('trivia_reverify_fact', reverifyInput);
-  check(refreshed.replayed === false && refreshed.verification_status === 'verified', 'REVERIFY_CURRENT');
+  check(
+    refreshed.replayed === false && refreshed.verification_status === 'verified',
+    'REVERIFY_CURRENT',
+  );
   check(refreshed.fact_updated_at !== oldCas, 'REVERIFY_ADVANCES_CAS');
   check(
-    row<{ hash: string }>(`select md5(row(claim_text,claim_hash,structured_key,structured_hash)::text) hash
+    row<{
+      hash: string;
+    }>(`select md5(row(claim_text,claim_hash,structured_key,structured_hash)::text) hash
     from public.trivia_facts where public_id='${refreshId}'`).hash === identityBefore,
     'REVERIFY_IDENTITY_UNCHANGED',
   );
   check((await call('trivia_reverify_fact', reverifyInput)).replayed === true, 'REVERIFY_REPLAY');
   await call('trivia_reverify_fact', { ...reverifyInput, ...write() }, 'FACT_CORRECTION_CONFLICT');
-  await call('trivia_reverify_fact',
-    { ...reverifyInput, ...write(), expected_fact_updated_at: refreshed.fact_updated_at,
-      confirmed_claim_text: 'This changes the proposition.' }, 'FACT_CORRECTION_REQUIRED');
-  await call('trivia_reverify_fact',
-    { ...reverifyInput, review_note: 'Different source review.' }, 'OPERATION_KEY_REUSED');
-  const reverifyDenied = await rpcHttp('tools/call',
-    { name: 'trivia_reverify_fact', arguments: { ...reverifyInput, ...write() } }, foreignBearer);
-  check(reverifyDenied.status === 403 ||
-    reverifyDenied.body.result?.structuredContent?.error?.code === 'OWNER_ACCESS_REQUIRED',
-    'REVERIFY_OWNER_DENIED');
+  await call(
+    'trivia_reverify_fact',
+    {
+      ...reverifyInput,
+      ...write(),
+      expected_fact_updated_at: refreshed.fact_updated_at,
+      confirmed_claim_text: 'This changes the proposition.',
+    },
+    'FACT_CORRECTION_REQUIRED',
+  );
+  await call(
+    'trivia_reverify_fact',
+    { ...reverifyInput, review_note: 'Different source review.' },
+    'OPERATION_KEY_REUSED',
+  );
+  const reverifyDenied = await rpcHttp(
+    'tools/call',
+    { name: 'trivia_reverify_fact', arguments: { ...reverifyInput, ...write() } },
+    foreignBearer,
+  );
+  check(
+    reverifyDenied.status === 403 ||
+      reverifyDenied.body.result?.structuredContent?.error?.code === 'OWNER_ACCESS_REQUIRED',
+    'REVERIFY_OWNER_DENIED',
+  );
   await call('trivia_release_facts', {
-    ...write(), page_public_id: f.page, reservation_token: refreshReservation.reservation_token,
+    ...write(),
+    page_public_id: f.page,
+    reservation_token: refreshReservation.reservation_token,
     reason: 'Release before post snapshot fixtures.',
   });
   const draftPost = postFixture(f, refreshId);
@@ -773,15 +797,22 @@ try {
     explicit_correction: true,
   };
   const invalidated = await call('trivia_correct_fact', correctionInput);
-  check(invalidated.old_status === 'invalidated' && invalidated.successor_public_id === null,
-    'CORRECTION_INVALIDATE');
-  check(invalidated.affected_posts.draft.count === 1 &&
-    invalidated.affected_posts.ready.count === 1 &&
-    invalidated.affected_posts.posted.count === 2, 'CORRECTION_CROSS_PAGE_COUNTS');
-  check(row<{ count: number }>(`select count(*)::integer count from public.posts
+  check(
+    invalidated.old_status === 'invalidated' && invalidated.successor_public_id === null,
+    'CORRECTION_INVALIDATE',
+  );
+  check(
+    invalidated.affected_posts.draft.count === 1 &&
+      invalidated.affected_posts.ready.count === 1 &&
+      invalidated.affected_posts.posted.count === 2,
+    'CORRECTION_CROSS_PAGE_COUNTS',
+  );
+  check(
+    row<{ count: number }>(`select count(*)::integer count from public.posts
     where public_id in ('${draftPost}','${readyPost}') and status='draft'
       and quality_status='failed' and revision=2 and approval_snapshot is null`).count === 2,
-    'CORRECTION_REVOKES_READY');
+    'CORRECTION_REVOKES_READY',
+  );
   const historyAfter = row<{ hash: string }>(`select md5((
       (select jsonb_agg(to_jsonb(p) order by p.id) from public.posts p
        where p.public_id in ('${postedPost}','${archivedPost}'))::text ||
@@ -789,25 +820,40 @@ try {
        where j.fact_id=(select id from public.trivia_facts where public_id='${refreshId}'))::text
     ) hash`).hash;
   check(historyBefore === historyAfter, 'IMMUTABLE_POSTED_ARCHIVED_SNAPSHOTS');
-  check((await call('trivia_correct_fact', correctionInput)).replayed === true,
-    'CORRECTION_REPLAY');
-  await call('trivia_correct_fact',
-    { ...correctionInput, correction_reason: 'Altered reason.' }, 'OPERATION_KEY_REUSED');
-  await call('trivia_correct_fact',
+  check(
+    (await call('trivia_correct_fact', correctionInput)).replayed === true,
+    'CORRECTION_REPLAY',
+  );
+  await call(
+    'trivia_correct_fact',
+    { ...correctionInput, correction_reason: 'Altered reason.' },
+    'OPERATION_KEY_REUSED',
+  );
+  await call(
+    'trivia_correct_fact',
     { ...correctionInput, ...write(), expected_fact_updated_at: oldCas },
-    'FACT_CORRECTION_CONFLICT');
-  await call('trivia_correct_fact',
+    'FACT_CORRECTION_CONFLICT',
+  );
+  await call(
+    'trivia_correct_fact',
     { ...correctionInput, ...write(), expected_fact_updated_at: time(refreshId) },
-    'FACT_NOT_ELIGIBLE');
+    'FACT_NOT_ELIGIBLE',
+  );
   const supersedeCandidate = candidate();
-  const oldFact = (await call('trivia_register_and_reserve_facts', {
-    ...write(), page_public_id: f.page, reservation_token: randomUUID(),
-    expected_config_updated_at: configTime, fact_reuse_scope: 'workspace_unique',
-    reservation_ttl_minutes: 30, facts: [factInput(supersedeCandidate)],
-  })).facts[0].fact_public_id;
+  const oldFact = (
+    await call('trivia_register_and_reserve_facts', {
+      ...write(),
+      page_public_id: f.page,
+      reservation_token: randomUUID(),
+      expected_config_updated_at: configTime,
+      fact_reuse_scope: 'workspace_unique',
+      reservation_ttl_minutes: 30,
+      facts: [factInput(supersedeCandidate)],
+    })
+  ).facts[0].fact_public_id;
   const correctedCandidate = {
     ...supersedeCandidate,
-    candidate_key: 'corrected-' + randomUUID().replaceAll('-', '').slice(0,12),
+    candidate_key: 'corrected-' + randomUUID().replaceAll('-', '').slice(0, 12),
     claim_text: randomUUID().replaceAll('-', ''),
     object_key: '4',
     numbers: [{ value: '4', unit: 'count', role: 'count' }],
@@ -815,17 +861,28 @@ try {
   const successor = factInput(correctedCandidate);
   delete successor.position;
   const superseded = await call('trivia_correct_fact', {
-    ...write(), fact_public_id: oldFact, expected_fact_updated_at: time(oldFact),
-    action: 'supersede', correction_reason: 'A different proposition is correct.',
-    successor, explicit_correction: true,
+    ...write(),
+    fact_public_id: oldFact,
+    expected_fact_updated_at: time(oldFact),
+    action: 'supersede',
+    correction_reason: 'A different proposition is correct.',
+    successor,
+    explicit_correction: true,
   });
-  check(superseded.old_status === 'superseded' && !!superseded.successor_public_id,
-    'CORRECTION_SUCCESSOR');
-  check(row<{ count: number }>(`select count(*)::integer count from public.trivia_facts n
+  check(
+    superseded.old_status === 'superseded' && !!superseded.successor_public_id,
+    'CORRECTION_SUCCESSOR',
+  );
+  check(
+    row<{ count: number }>(`select count(*)::integer count from public.trivia_facts n
     join public.trivia_facts o on n.supersedes_fact_id=o.id
-    where o.public_id='${oldFact}' and n.public_id='${superseded.successor_public_id}'`).count === 1,
-    'CORRECTION_LINEAGE');
-  console.info('Phase 6.8 public MCP correction: CAS/replay/semantic denial, owner isolation, lineage, draft-ready transition, posted-archived immutability PASS.');
+    where o.public_id='${oldFact}' and n.public_id='${superseded.successor_public_id}'`).count ===
+      1,
+    'CORRECTION_LINEAGE',
+  );
+  console.info(
+    'Phase 6.8 public MCP correction: CAS/replay/semantic denial, owner isolation, lineage, draft-ready transition, posted-archived immutability PASS.',
+  );
 
   clearFixtureBuckets();
   if (!process.argv.includes('--preflight')) {
@@ -951,19 +1008,26 @@ try {
       reason: 'Abandon Inspector fixture.',
     });
     const inspectorFactId = inspectorReserved.facts[0].fact_public_id;
-    const verifiedInspector = (await inspector('tools/call', 'trivia_reverify_fact', {
-      ...write(), fact_public_id: inspectorFactId,
-      expected_fact_updated_at: time(inspectorFactId),
-      confirmed_claim_text: String(inspectorCandidate.claim_text),
-      sources: [source('A', 'inspector-fresh')],
-      freshness_class: 'stable', as_of_date: null,
-      requested_expires_at: '2027-01-11T00:00:00Z', risk_class: 'standard',
-      review_note: 'Inspector verified the same proposition.',
-    })).structuredContent.data;
+    const verifiedInspector = (
+      await inspector('tools/call', 'trivia_reverify_fact', {
+        ...write(),
+        fact_public_id: inspectorFactId,
+        expected_fact_updated_at: time(inspectorFactId),
+        confirmed_claim_text: String(inspectorCandidate.claim_text),
+        sources: [source('A', 'inspector-fresh')],
+        freshness_class: 'stable',
+        as_of_date: null,
+        requested_expires_at: '2027-01-11T00:00:00Z',
+        risk_class: 'standard',
+        review_note: 'Inspector verified the same proposition.',
+      })
+    ).structuredContent.data;
     await inspector('tools/call', 'trivia_correct_fact', {
-      ...write(), fact_public_id: inspectorFactId,
+      ...write(),
+      fact_public_id: inspectorFactId,
       expected_fact_updated_at: verifiedInspector.fact_updated_at,
-      action: 'invalidate', correction_reason: 'Inspector correction fixture.',
+      action: 'invalidate',
+      correction_reason: 'Inspector correction fixture.',
       explicit_correction: true,
     });
     clearFixtureBuckets();

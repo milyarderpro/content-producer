@@ -132,24 +132,27 @@ async function mcp(method: string, params?: object) {
 async function call(name: string, args = inputs[name]) {
   return (await mcp('tools/call', { name, arguments: args })).result;
 }
-Deno.test('6.7 6.7 trivia tools among 20 OAuth tools, closed schemas and correct annotations', async () => {
-  const listed = (await mcp('tools/list')).result.tools;
-  check(MCP_TOOL_COUNT === 20 && listed.length === 20, 'EXACT_TWENTY_TOOLS');
-  for (const name of TRIVIA_FACT_TOOL_NAMES) {
-    const tool = listed.find((value: { name: string }) => value.name === name);
-    check(tool && tool._meta.securitySchemes[0].type === 'oauth2', 'OAUTH_REQUIRED');
-    check(tool._meta.securitySchemes[0].scopes.join(' ') === 'openid email', 'OAUTH_SCOPES');
-    check(tool.annotations.openWorldHint === false, 'CLOSED_WORLD');
-    check(
-      tool.annotations.readOnlyHint === (name === 'trivia_find_similar_facts'),
-      'READ_ANNOTATION',
-    );
-    check(tool.annotations.destructiveHint === false, 'NON_DESTRUCTIVE');
-    check(tool.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
-    check(tool.outputSchema.additionalProperties === false, 'CLOSED_OUTPUT');
-    check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
-  }
-});
+Deno.test(
+  '6.7 6.7 trivia tools among 20 OAuth tools, closed schemas and correct annotations',
+  async () => {
+    const listed = (await mcp('tools/list')).result.tools;
+    check(MCP_TOOL_COUNT === 20 && listed.length === 20, 'EXACT_TWENTY_TOOLS');
+    for (const name of TRIVIA_FACT_TOOL_NAMES) {
+      const tool = listed.find((value: { name: string }) => value.name === name);
+      check(tool && tool._meta.securitySchemes[0].type === 'oauth2', 'OAUTH_REQUIRED');
+      check(tool._meta.securitySchemes[0].scopes.join(' ') === 'openid email', 'OAUTH_SCOPES');
+      check(tool.annotations.openWorldHint === false, 'CLOSED_WORLD');
+      check(
+        tool.annotations.readOnlyHint === (name === 'trivia_find_similar_facts'),
+        'READ_ANNOTATION',
+      );
+      check(tool.annotations.destructiveHint === false, 'NON_DESTRUCTIVE');
+      check(tool.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
+      check(tool.outputSchema.additionalProperties === false, 'CLOSED_OUTPUT');
+      check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
+    }
+  },
+);
 Deno.test(
   '6.7 authenticated public MCP forwards original JWT, ordered facts, token and unchanged keys',
   async () => {

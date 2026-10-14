@@ -295,6 +295,16 @@ const safeErrors = {
     false,
     'Review the candidate identity.',
   ],
+  FACT_CORRECTION_REQUIRED: [
+    'This claim changes the meaning of the canonical fact.',
+    false,
+    'Use an explicit correction with fresh verified evidence.',
+  ],
+  FACT_CORRECTION_CONFLICT: [
+    'The canonical fact changed since the supplied version.',
+    false,
+    'Read its current version and confirm the intended operation.',
+  ],
   INTERNAL_ERROR: [
     'The operation could not be confirmed.',
     false,

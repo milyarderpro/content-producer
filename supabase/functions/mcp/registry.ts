@@ -6,7 +6,10 @@ import { PLAN_CLAIM_TOOL_NAMES, registerPlanClaimTools } from './plan_claim.ts';
 
 import { PLAN_RECOVERY_TOOL_NAMES, registerPlanRecoveryTools } from './plan_recovery.ts';
 import { TRIVIA_FACT_TOOL_NAMES, registerTriviaFactTools } from './trivia_fact.ts';
-import { TRIVIA_CORRECTION_TOOL_NAMES, registerTriviaCorrectionTools } from './trivia_correction.ts';
+import {
+  TRIVIA_CORRECTION_TOOL_NAMES,
+  registerTriviaCorrectionTools,
+} from './trivia_correction.ts';
 
 export const MCP_TOOL_COUNT =
   FOUNDATION_TOOL_NAMES.length +

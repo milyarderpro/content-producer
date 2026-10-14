@@ -217,12 +217,12 @@ const payloads: Record<string, object> = {
   get_content_plan: envelope({ plan, items: [item], next_cursor: null, has_more: false }),
 };
 
-Deno.test('6.4 Page/plan metadata survives the 6.7 expansion; no anonymous tools', async () => {
+Deno.test('6.4 Page/plan metadata survives the 6.8 expansion; no anonymous tools', async () => {
   const text = await request('tools/list');
-  assert(MCP_TOOL_COUNT === 18, 'cumulative registry count must be 18');
+  assert(MCP_TOOL_COUNT === 20, 'cumulative registry count must be 18');
   for (const tool of PAGE_PLAN_TOOL_NAMES) assert(text.includes(tool), 'missing ' + tool);
-  assert((text.match(/"oauth2"/g) || []).length === 18, 'every tool requires OAuth');
-  assert((text.match(/"openWorldHint":false/g) || []).length === 18, 'open world hint');
+  assert((text.match(/"oauth2"/g) || []).length === 20, 'every tool requires OAuth');
+  assert((text.match(/"openWorldHint":false/g) || []).length === 20, 'open world hint');
   assert((text.match(/"readOnlyHint":true/g) || []).length === 7, 'seven read tools');
   assert((text.match(/"readOnlyHint":false/g) || []).length === 11, 'eleven writes');
   assert(

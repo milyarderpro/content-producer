@@ -111,7 +111,7 @@ Deno.test('6.2 discovery and 401 WWW-Authenticate bind exact resource', async ()
     ).status === 204,
     'preflight closed',
   );
-  assert(MCP_TOOL_COUNT === 18, '6.7 must have eighteen owner-scoped tools');
+  assert(MCP_TOOL_COUNT === 20, '6.8 must have twenty owner-scoped tools');
 });
 
 Deno.test(

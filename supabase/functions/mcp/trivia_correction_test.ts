@@ -81,8 +81,16 @@ const correct = {
 };
 const affectedPosts = {
   draft: { count: 0, items: [], truncated: false },
-  ready: { count: 1, items: [{ post_public_id: factId, status: 'draft', revision: 2 }], truncated: false },
-  posted: { count: 1, items: [{ post_public_id: successorId, status: 'archived', revision: 1 }], truncated: false },
+  ready: {
+    count: 1,
+    items: [{ post_public_id: factId, status: 'draft', revision: 2 }],
+    truncated: false,
+  },
+  posted: {
+    count: 1,
+    items: [{ post_public_id: successorId, status: 'archived', revision: 1 }],
+    truncated: false,
+  },
 };
 const outputs: Record<string, object> = {
   trivia_reverify_fact: {
@@ -139,85 +147,118 @@ Deno.test('6.8 exactly 20 authenticated tools with closed correction schemas', a
     check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
   }
 });
-Deno.test('6.8 public MCP forwards exact CAS, evidence, successor and unmodified user JWT', async () => {
-  const original = globalThis.fetch;
-  const seen: Array<{ name: string; args: Record<string, unknown> }> = [];
-  globalThis.fetch = ((input: Request | URL | string, init?: RequestInit) => {
-    const name = String(input).split('/').pop()!;
-    const headers = new Headers(init?.headers);
-    check(headers.get('Authorization') === 'Bearer ' + context.accessToken, 'ORIGINAL_JWT');
-    check(headers.get('Content-Profile') === 'api', 'PUBLIC_SCHEMA');
-    check(headers.get('apikey') === context.publishableKey, 'PUBLIC_API_KEY');
-    seen.push({ name, args: JSON.parse(String(init?.body)) });
-    return Promise.resolve(Response.json({ response_schema_version: 1, data: outputs[name] }));
-  }) as typeof fetch;
-  try {
-    for (const [name, args] of [
-      ['trivia_reverify_fact', reverify],
-      ['trivia_correct_fact', correct],
-    ] as const) {
-      const result = await call(name, args);
-      check(result?.isError !== true, 'VALID_TOOL_' + name);
-      check(result.structuredContent.data.fact_public_id === factId, 'STRUCTURED_FACT');
-      check(!JSON.stringify(result.content).includes(operationKey), 'TEXT_KEY_LEAK');
+Deno.test(
+  '6.8 public MCP forwards exact CAS, evidence, successor and unmodified user JWT',
+  async () => {
+    const original = globalThis.fetch;
+    const seen: Array<{ name: string; args: Record<string, unknown> }> = [];
+    globalThis.fetch = ((input: Request | URL | string, init?: RequestInit) => {
+      const name = String(input).split('/').pop()!;
+      const headers = new Headers(init?.headers);
+      check(headers.get('Authorization') === 'Bearer ' + context.accessToken, 'ORIGINAL_JWT');
+      check(headers.get('Content-Profile') === 'api', 'PUBLIC_SCHEMA');
+      check(headers.get('apikey') === context.publishableKey, 'PUBLIC_API_KEY');
+      seen.push({ name, args: JSON.parse(String(init?.body)) });
+      return Promise.resolve(Response.json({ response_schema_version: 1, data: outputs[name] }));
+    }) as typeof fetch;
+    try {
+      for (const [name, args] of [
+        ['trivia_reverify_fact', reverify],
+        ['trivia_correct_fact', correct],
+      ] as const) {
+        const result = await call(name, args);
+        check(result?.isError !== true, 'VALID_TOOL_' + name);
+        check(result.structuredContent.data.fact_public_id === factId, 'STRUCTURED_FACT');
+        check(!JSON.stringify(result.content).includes(operationKey), 'TEXT_KEY_LEAK');
+      }
+      check(
+        seen.map((x) => x.name).join(',') === TRIVIA_CORRECTION_TOOL_NAMES.join(','),
+        'RPC_NAMES',
+      );
+      check(
+        seen.every((x) => x.args.p_expected_fact_updated_at === stamp),
+        'EXACT_CAS',
+      );
+      check(
+        seen.every((x) => x.args.p_operation_key === operationKey),
+        'OPERATION_KEY',
+      );
+      check(
+        seen.every((x) => x.args.p_workspace_public_id === workspace),
+        'OWNER_SCOPE',
+      );
+      check(seen[0].args.p_sources !== undefined, 'SOURCE_EVIDENCE');
+      check(seen[1].args.p_successor !== undefined, 'SUCCESSOR_EVIDENCE');
+      check(seen[1].args.p_explicit_correction === true, 'EXPLICIT_INTENT');
+      check(
+        seen.every(
+          (x) => !Object.keys(x.args).some((key) => /p_owner|p_actor|p_client|p_oauth/.test(key)),
+        ),
+        'IDENTITY_OVERRIDE',
+      );
+    } finally {
+      globalThis.fetch = original;
     }
-    check(seen.map((x) => x.name).join(',') === TRIVIA_CORRECTION_TOOL_NAMES.join(','), 'RPC_NAMES');
-    check(seen.every((x) => x.args.p_expected_fact_updated_at === stamp), 'EXACT_CAS');
-    check(seen.every((x) => x.args.p_operation_key === operationKey), 'OPERATION_KEY');
-    check(seen.every((x) => x.args.p_workspace_public_id === workspace), 'OWNER_SCOPE');
-    check(seen[0].args.p_sources !== undefined, 'SOURCE_EVIDENCE');
-    check(seen[1].args.p_successor !== undefined, 'SUCCESSOR_EVIDENCE');
-    check(seen[1].args.p_explicit_correction === true, 'EXPLICIT_INTENT');
-    check(seen.every((x) => !Object.keys(x.args).some((key) => /p_owner|p_actor|p_client|p_oauth/.test(key))), 'IDENTITY_OVERRIDE');
-  } finally {
-    globalThis.fetch = original;
-  }
-});
-Deno.test('6.8 rejects stale-shaped, unauthorized and semantically invalid corrections before RPC', async () => {
-  const original = globalThis.fetch;
-  let invoked = 0;
-  globalThis.fetch = (() => {
-    invoked++;
-    return Promise.resolve(Response.json({}));
-  }) as typeof fetch;
-  try {
-    const badInputs: Array<[string, object]> = [
-      ['trivia_reverify_fact', { ...reverify, expected_fact_updated_at: 'invalid' }],
-      ['trivia_reverify_fact', { ...reverify, sources: [] }],
-      ['trivia_reverify_fact', { ...reverify, confirmed_claim_text: '' }],
-      ['trivia_reverify_fact', { ...reverify, actor_user_id: context.actorUserId }],
-      ['trivia_reverify_fact', { ...reverify, workspace_public_id: successorId }],
-      ['trivia_correct_fact', { ...correct, explicit_correction: false }],
-      ['trivia_correct_fact', { ...correct, action: 'invalidate' }],
-      ['trivia_correct_fact', { ...correct, action: 'supersede', successor: undefined }],
-      ['trivia_correct_fact', { ...correct, successor: { ...successor, candidate: { ...candidate, ontology_version: 2 } } }],
-      ['trivia_correct_fact', { ...correct, correction_reason: '' }],
-    ];
-    for (const [name, args] of badInputs) {
-      const result = await call(name, args);
-      check(result?.isError === true, 'REJECT_' + name);
+  },
+);
+Deno.test(
+  '6.8 rejects stale-shaped, unauthorized and semantically invalid corrections before RPC',
+  async () => {
+    const original = globalThis.fetch;
+    let invoked = 0;
+    globalThis.fetch = (() => {
+      invoked++;
+      return Promise.resolve(Response.json({}));
+    }) as typeof fetch;
+    try {
+      const badInputs: Array<[string, object]> = [
+        ['trivia_reverify_fact', { ...reverify, expected_fact_updated_at: 'invalid' }],
+        ['trivia_reverify_fact', { ...reverify, sources: [] }],
+        ['trivia_reverify_fact', { ...reverify, confirmed_claim_text: '' }],
+        ['trivia_reverify_fact', { ...reverify, actor_user_id: context.actorUserId }],
+        ['trivia_reverify_fact', { ...reverify, workspace_public_id: successorId }],
+        ['trivia_correct_fact', { ...correct, explicit_correction: false }],
+        ['trivia_correct_fact', { ...correct, action: 'invalidate' }],
+        ['trivia_correct_fact', { ...correct, action: 'supersede', successor: undefined }],
+        [
+          'trivia_correct_fact',
+          {
+            ...correct,
+            successor: { ...successor, candidate: { ...candidate, ontology_version: 2 } },
+          },
+        ],
+        ['trivia_correct_fact', { ...correct, correction_reason: '' }],
+      ];
+      for (const [name, args] of badInputs) {
+        const result = await call(name, args);
+        check(result?.isError === true, 'REJECT_' + name);
+      }
+      check(invoked === 0, 'INVALID_REQUEST_REACHED_RPC');
+    } finally {
+      globalThis.fetch = original;
     }
-    check(invoked === 0, 'INVALID_REQUEST_REACHED_RPC');
-  } finally {
-    globalThis.fetch = original;
-  }
-});
+  },
+);
 Deno.test('6.8 keeps safe RPC errors and rejects unexpected correction projections', async () => {
   const original = globalThis.fetch;
   try {
     globalThis.fetch = (() =>
-      Promise.resolve(new Response(JSON.stringify({ message: 'FACT_CORRECTION_CONFLICT' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      }))) as typeof fetch;
+      Promise.resolve(
+        new Response(JSON.stringify({ message: 'FACT_CORRECTION_CONFLICT' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      )) as typeof fetch;
     const stale = await call('trivia_reverify_fact', reverify);
     check(stale?.isError === true, 'STALE_CAS_DENIAL');
     check(stale.structuredContent.error.code === 'FACT_CORRECTION_CONFLICT', 'STABLE_ERROR_CODE');
     globalThis.fetch = (() =>
-      Promise.resolve(Response.json({
-        response_schema_version: 1,
-        data: { ...outputs.trivia_correct_fact, internal_id: 12345 },
-      }))) as typeof fetch;
+      Promise.resolve(
+        Response.json({
+          response_schema_version: 1,
+          data: { ...outputs.trivia_correct_fact, internal_id: 12345 },
+        }),
+      )) as typeof fetch;
     const leaked = await call('trivia_correct_fact', correct);
     check(leaked?.isError === true, 'INVALID_OUTPUT_REJECTED');
     check(!JSON.stringify(leaked).includes('12345'), 'INTERNAL_ID_LEAK');

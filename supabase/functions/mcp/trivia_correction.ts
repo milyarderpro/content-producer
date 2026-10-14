@@ -35,27 +35,31 @@ const reverifyInput = z.strictObject({
 const successor = z.strictObject({
   candidate,
   dedup_reviews: z.array(
-    z.strictObject({
-      candidate_fact_public_id: uuid.optional(),
-      decision: z.enum(['same', 'distinct']),
-      reason: z.string().trim().min(1).max(500),
-      material_differences: z.array(
-        z.enum([
-          'relation',
-          'negation',
-          'number',
-          'unit',
-          'time',
-          'location',
-          'population',
-          'condition',
-          'comparison_direction',
-          'method',
-          'scope',
-          'other',
-        ]),
-      ).max(10),
-    }).refine((r) => r.decision !== 'same' || r.candidate_fact_public_id !== undefined),
+    z
+      .strictObject({
+        candidate_fact_public_id: uuid.optional(),
+        decision: z.enum(['same', 'distinct']),
+        reason: z.string().trim().min(1).max(500),
+        material_differences: z
+          .array(
+            z.enum([
+              'relation',
+              'negation',
+              'number',
+              'unit',
+              'time',
+              'location',
+              'population',
+              'condition',
+              'comparison_direction',
+              'method',
+              'scope',
+              'other',
+            ]),
+          )
+          .max(10),
+      })
+      .refine((r) => r.decision !== 'same' || r.candidate_fact_public_id !== undefined),
   ),
   ...freshness,
   verification_note: z.string().trim().min(1).max(1000),

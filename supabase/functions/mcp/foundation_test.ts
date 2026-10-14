@@ -227,9 +227,9 @@ Deno.test(
     const listed = await request('tools/list');
     for (const name of FOUNDATION_TOOL_NAMES) assert(listed.includes(name), 'missing ' + name);
     assert((listed.match(/"readOnlyHint":true/g) || []).length === 7, 'seven read-only tools');
-    assert((listed.match(/"openWorldHint":false/g) || []).length === 18, 'open world must be off');
+    assert((listed.match(/"openWorldHint":false/g) || []).length === 20, 'open world must be off');
     assert(listed.split('"openai/profile":true').length === 2, 'one profile metadata');
-    assert((listed.match(/"oauth2"/g) || []).length === 18, 'eighteen OAuth security schemes');
+    assert((listed.match(/"oauth2"/g) || []).length === 20, 'twenty OAuth security schemes');
     assert(listed.includes('create_page'), '6.4 tool must be present');
   },
 );
@@ -240,7 +240,7 @@ Deno.test('All registered tool input/output object schemas are closed recursivel
   assert(frame, 'tools/list must return an MCP data frame');
   const parsed = JSON.parse(frame.slice(6));
   const tools = parsed.result?.tools ?? [];
-  assert(tools.length === MCP_TOOL_COUNT && tools.length === 18, 'exact 18 schemas');
+  assert(tools.length === MCP_TOOL_COUNT && tools.length === 20, 'exact 20 schemas');
   for (const tool of tools) {
     assertClosedObjects(tool.inputSchema, tool.name + '.input');
     assertClosedObjects(tool.outputSchema, tool.name + '.output');
