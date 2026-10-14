@@ -219,10 +219,10 @@ const payloads: Record<string, object> = {
 
 Deno.test('6.4 Page/plan metadata survives the 6.8 expansion; no anonymous tools', async () => {
   const text = await request('tools/list');
-  assert(MCP_TOOL_COUNT === 20, 'cumulative registry count must be 20');
+  assert(MCP_TOOL_COUNT === 23, 'cumulative registry count must be 23');
   for (const tool of PAGE_PLAN_TOOL_NAMES) assert(text.includes(tool), 'missing ' + tool);
-  assert((text.match(/"oauth2"/g) || []).length === 20, 'every tool requires OAuth');
-  assert((text.match(/"openWorldHint":false/g) || []).length === 20, 'open world hint');
+  assert((text.match(/"oauth2"/g) || []).length === 23, 'every tool requires OAuth');
+  assert((text.match(/"openWorldHint":false/g) || []).length === 23, 'open world hint');
   assert((text.match(/"readOnlyHint":true/g) || []).length === 7, 'seven read tools');
   assert((text.match(/"readOnlyHint":false/g) || []).length === 13, 'thirteen writes');
   assert(
