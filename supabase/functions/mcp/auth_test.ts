@@ -280,7 +280,14 @@ Deno.test(
         body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' }),
       }),
     );
-    assert(listed.status === 200, 'owner token must pass Supabase user middleware');
+    const listedBody = await listed.text();
+    assert(
+      listed.status === 200,
+      'owner token must pass Supabase user middleware; status=' +
+        listed.status +
+        ' body=' +
+        listedBody,
+    );
 
     const noToken = await handle(
       new Request(config.resource, {
