@@ -156,10 +156,12 @@ jobs:
             supabase/tests/database/api-post-save-revise.test.ts \
             supabase/tests/database/api-post-concurrency.test.ts \
             supabase/tests/database/api-post-render-quality.test.ts \
+            supabase/tests/database/api-post-approval-quality.test.ts \
             supabase/tests/database/api-post-lifecycle.test.ts \
+            supabase/tests/database/api-post-lifecycle-concurrency.test.ts \
             supabase/tests/database/operation-ledger-and-rate-limit-buckets.test.ts
           code=$?
-          echo "Focused Phase 5/trivia/correction regression: exit code $code; elapsed $((SECONDS - started))s"
+          echo "Focused Phase 5/trivia/correction/approval+lifecycle-race regression: exit code $code; elapsed $((SECONDS - started))s"
           exit "$code"
 
       - name: Batch A - short real HTTP recovery preflight, then fresh clean reset
@@ -276,7 +278,7 @@ jobs:
             echo '| Clean reset | `pnpm run supabase:reset` | '"$RESET_OUTCOME"' |'
             echo '| Internal MCP | `pnpm run test:mcp` | '"$MCP_OUTCOME"' |'
             echo '| Black-box HTTP | `supabase functions serve mcp --no-verify-jwt` + HTTP smoke | '"$HTTP_OUTCOME"' |'
-            echo '| Focused regression | Phase 5 acceptance/reads/security/rate limits, trivia correction and post save/concurrency, baseline | '"$REGRESSION_OUTCOME"' |'
+            echo '| Focused regression | Phase 5 acceptance/reads/security/rate limits, trivia correction, approval quality, lifecycle races and post save/concurrency, baseline | '"$REGRESSION_OUTCOME"' |'
             echo
             echo '| Phase 6.11 public MCP/Inspector | 28-tool census, approval/revoke/discard valid/invalid, exact intent/CAS, replay, allocation release, owner isolation and lifecycle regression | '"$TRIVIA_HTTP_OUTCOME"' |'
             echo "| Short real HTTP recovery preflight + fresh reset | MCP, recovery/race, clean reset | $PREFLIGHT_OUTCOME |"
