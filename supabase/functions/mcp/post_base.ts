@@ -145,11 +145,15 @@ const sourceSnapshot = z.strictObject({
   subject_key: z.string().max(120),
   relation_key: z.string().max(120),
   object_key: z.string().max(300),
-  numbers: z.array(z.strictObject({
-    value: z.string().max(80),
-    unit: z.string().nullable(),
-    role: z.string().max(80),
-  })).max(10),
+  numbers: z
+    .array(
+      z.strictObject({
+        value: z.string().max(80),
+        unit: z.string().nullable(),
+        role: z.string().max(80),
+      }),
+    )
+    .max(10),
   qualifiers: qualifier,
   ontology_version: version,
   structured_key: z.string().nullable(),
@@ -160,7 +164,11 @@ const sourceSnapshot = z.strictObject({
   source_schema_version: version,
   sources: z.array(sourceEntry).max(8),
   verification_status: z.enum([
-    'needs_review', 'verified', 'rejected', 'invalidated', 'superseded',
+    'needs_review',
+    'verified',
+    'rejected',
+    'invalidated',
+    'superseded',
   ]),
   verified_at: timestamp.nullable(),
   as_of_date: z.string().nullable(),
@@ -390,9 +398,7 @@ const postPackage = z.strictObject({
   scheduled_at: timestamp.nullable(),
   published_at: timestamp.nullable(),
   content_payload: contentPayload,
-  system_checks: z.union([
-    computedChecks, projectedChecks, z.strictObject({}), z.null(),
-  ]),
+  system_checks: z.union([computedChecks, projectedChecks, z.strictObject({}), z.null()]),
   editorial_checks: z.union([editorialEvidence, z.strictObject({}), z.null()]),
   quality_status: quality,
   fact_bindings: z.array(bindingOutput).max(200),
@@ -409,12 +415,17 @@ const listOutput = envelope(
 const getOutput = envelope(
   z.strictObject({
     post: postPackage,
-    approval: z.strictObject({
-    status: z.literal('approved'),
-    revision: z.number().int().min(1).optional(),
-    content_hash: z.string().regex(/^[0-9a-f]{64}$/).optional(),
-    approved_at: timestamp.optional(),
-  }).nullable(),
+    approval: z
+      .strictObject({
+        status: z.literal('approved'),
+        revision: z.number().int().min(1).optional(),
+        content_hash: z
+          .string()
+          .regex(/^[0-9a-f]{64}$/)
+          .optional(),
+        approved_at: timestamp.optional(),
+      })
+      .nullable(),
     plan_item_public_id: uuid.nullable(),
     current_fact_warnings: z
       .array(
