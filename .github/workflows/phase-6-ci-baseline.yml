@@ -68,17 +68,6 @@ jobs:
           pnpm install --frozen-lockfile
           echo "Exit code: 0 (pnpm install --frozen-lockfile)"
 
-      - name: Temporary formatting diagnostic (no source commit)
-        run: |
-          pnpm exec prettier --write supabase/functions/mcp/post_metrics.ts supabase/functions/mcp/post_metrics_test.ts scripts/phase-6-13.ts
-          for file in supabase/functions/mcp/post_metrics.ts supabase/functions/mcp/post_metrics_test.ts scripts/phase-6-13.ts; do
-            echo "FORMAT_BEGIN:$file"
-            base64 -w 2000 "$file"
-            echo
-            echo "FORMAT_END:$file"
-          done
-          exit 1
-
       - name: Required project check
         id: check
         if: env.FULL_GATE != 'true' || env.REUSE_FULL_SUITES == 'true'
