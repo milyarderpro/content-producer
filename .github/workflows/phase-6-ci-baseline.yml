@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   checkpoint:
-    name: Phase 6.6 checkpoint and Batch A gate (15 MCP tools)
+    name: Phase 6.7 checkpoint (18 MCP tools); Batch A full gate remains 6.6-only
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
@@ -90,7 +90,7 @@ jobs:
           test "$(pnpm exec supabase --version)" = "2.120.0"
           echo "Supabase CLI: 2.120.0 (verified)"
 
-      - name: Checkpoint 6.6 - internal MCP tests
+      - name: Checkpoint 6.7 - internal MCP tests
         id: mcp
         if: env.FULL_GATE != 'true'
         run: |
@@ -121,7 +121,7 @@ jobs:
           echo "Migration SQL count: $(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
           exit "$code"
 
-      - name: Checkpoint 6.6 - local HTTP fail-closed smoke
+      - name: Checkpoint 6.7 - local HTTP fail-closed smoke
         id: http
         shell: bash
         run: |
@@ -132,7 +132,7 @@ jobs:
           pnpm exec tsx scripts/phase-6-1-http-smoke.ts
           echo "Exit code: 0 (local MCP HTTP smoke)"
 
-      - name: Focused database regression - Phase 5 claim/lease/failure, plan race, Page/plan and security
+      - name: Focused database regression - Phase 5 plans, trivia facts/contention and security
         id: regression
         if: env.FULL_GATE != 'true'
         shell: bash
@@ -152,6 +152,13 @@ jobs:
           code=$?
           echo "Focused Phase 5 regression: exit code $code; elapsed $((SECONDS - started))s"
           exit "$code"
+
+      - name: Phase 6.7 - authenticated MCP trivia HTTP and Inspector with real local RPCs
+        id: trivia_http
+        if: env.FULL_GATE != 'true'
+        run: |
+          pnpm exec tsx scripts/phase-6-7.ts
+          echo "Exit code: 0 (Phase 6.7 public MCP trivia search/reserve/release, Inspector, replay and contention)"
 
       - name: Batch A - short real HTTP recovery preflight, then fresh clean reset
         id: preflight
@@ -242,17 +249,18 @@ jobs:
           INSPECTOR_OUTCOME: ${{ steps.inspector.outcome }}
           DIFF_OUTCOME: ${{ steps.diff.outcome }}
           REGRESSION_OUTCOME: ${{ steps.regression.outcome }}
+          TRIVIA_HTTP_OUTCOME: ${{ steps.trivia_http.outcome }}
         run: |
           mkdir -p "$RUNNER_TEMP/phase-6-evidence"
-          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.6.md"
+          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.7.md"
           {
-            echo "# Phase 6.6 checkpoint / Batch A gate CI"
+            echo "# Phase 6.7 checkpoint CI (Batch A gate remains historical)"
             echo
             echo "- Commit: $(git rev-parse HEAD)"
             echo "- Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             echo "- Started UTC: ${STARTED_UTC:-not recorded}"
             echo "- Finished UTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            echo "- New tools: 3; cumulative tools: **15/33**"
+            echo "- New tools: 3; cumulative tools: **18/33**"
             echo "- Local Supabase only, no remote project, secrets, or deployment"
             echo
             echo "| Stage | Actual command / scope | GitHub step outcome |"
@@ -268,6 +276,7 @@ jobs:
             echo '| Black-box HTTP | `supabase functions serve mcp --no-verify-jwt` + HTTP smoke | '"$HTTP_OUTCOME"' |'
             echo '| Focused regression | Phase 5 plan lifecycle/claims, concurrency, Page/plan, security/catalog, metrics/rate limits, baseline | '"$REGRESSION_OUTCOME"' |'
             echo
+            echo '| Phase 6.7 public MCP/Inspector | 18-tool census, 3 new tools valid/invalid, replay, owner, token privacy, reservation race | '"$TRIVIA_HTTP_OUTCOME"' |'
             echo "| Short real HTTP recovery preflight + fresh reset | MCP, recovery/race, clean reset | $PREFLIGHT_OUTCOME |"
             echo "| Reuse proof (audit-only repair) | prior full-suite PASS + unchanged product/SQL/config/tests | $REUSE_OUTCOME |"
             echo "| Full test-all (includes check/MCP/migration names/database) | sequential after clean reset | $FULL_OUTCOME |"
@@ -287,7 +296,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase-6-6-ci-evidence
+          name: phase-6-7-ci-evidence
           path: ${{ runner.temp }}/phase-6-evidence/
           if-no-files-found: error
           retention-days: 14
