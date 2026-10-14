@@ -207,6 +207,76 @@ const safeErrors = {
     'Review current Page posts.',
   ],
   POST_NOT_FOUND: ['Post is not available.', false, 'Read current Page posts.'],
+  REVISION_CONFLICT: [
+    'The post revision has changed.',
+    false,
+    'Read the current post revision and review edits before retrying.',
+  ],
+  CONTENT_HASH_CONFLICT: [
+    'The post content changed since it was reviewed.',
+    false,
+    'Read the current post content and hash before retrying.',
+  ],
+  INVALID_STATUS_TRANSITION: [
+    'The current post status does not allow this action.',
+    false,
+    'Read the post and choose an allowed state transition.',
+  ],
+  QUALITY_EVIDENCE_STALE: [
+    'The post quality evidence is no longer current.',
+    false,
+    'Refresh the post and its quality evidence.',
+  ],
+  CONTENT_PAYLOAD_INVALID: [
+    'The content payload is invalid.',
+    false,
+    'Review the rendered content and required evidence.',
+  ],
+  CONTENT_RENDER_MISMATCH: [
+    'The rendered content does not match the submitted facts.',
+    false,
+    'Regenerate the content package using the required renderer.',
+  ],
+  TEXT_BUDGET_EXCEEDED: [
+    'The content exceeds its text budget.',
+    false,
+    'Shorten the copy to match the Page configuration.',
+  ],
+  READABILITY_LIMIT_EXCEEDED: [
+    'The content exceeds the readability limit.',
+    false,
+    'Revise the content for the configured display and duration.',
+  ],
+  QUALITY_SYSTEM_CHECK_FAILED: [
+    'Blocking system quality checks failed.',
+    false,
+    'Review the post quality checks and correct the content.',
+  ],
+  QUALITY_EDITORIAL_INCOMPLETE: [
+    'The editorial quality evidence is incomplete.',
+    false,
+    'Complete the required editorial review.',
+  ],
+  MODULE_RELATION_INVALID: [
+    'The linked plan or Page context is inconsistent.',
+    false,
+    'Refresh the linked content plan and post before retrying.',
+  ],
+  APPROVAL_STALE: [
+    'The stored approval is no longer current.',
+    false,
+    'Read the current post and its approval state.',
+  ],
+  APPROVAL_REQUIRED: [
+    'Current explicit approval is required.',
+    false,
+    'Review the post and request approval before proceeding.',
+  ],
+  WAIVER_NOT_ALLOWED: [
+    'The requested quality waiver is not permitted.',
+    false,
+    'Resolve the blocking quality checks.',
+  ],
   PLAN_ITEM_REPLACEMENT_BLOCKED: [
     'This output cannot be replaced.',
     false,
