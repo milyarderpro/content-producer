@@ -1310,12 +1310,12 @@ try {
     reason: 'Abandon this pre-publication post.',
     explicit_discard: true,
   };
-  const discarded = await call('discard_post', discardArgs);
+  const discardResult = await call('discard_post', discardArgs);
   check(
-    discarded.status === 'discarded' &&
-      discarded.revision === reapproved.revision + 1 &&
-      discarded.released_fact_public_ids.length === draft.fact_bindings.length &&
-      discarded.plan_item === null,
+    discardResult.status === 'discarded' &&
+      discardResult.revision === reapproved.revision + 1 &&
+      discardResult.released_fact_public_ids.length === draft.fact_bindings.length &&
+      discardResult.plan_item === null,
     'DISCARD_RELEASES_ALLOCATIONS',
   );
   check((await call('discard_post', discardArgs)).replayed, 'DISCARD_REPLAY');
@@ -1324,7 +1324,7 @@ try {
     {
       ...write(),
       post_public_id: saved.post.post_public_id,
-      expected_revision: discarded.revision,
+      expected_revision: discardResult.revision,
       reason: 'Discard again.',
       explicit_discard: true,
     },
