@@ -90,7 +90,7 @@ async function rpcHttp(method: string, params?: object, auth = bearer) {
 }
 async function call(name: string, input: object, error?: string) {
   const response = await rpcHttp('tools/call', { name, arguments: input });
-  check(response.status === 230, 'MCP_TOOL_HTTP_STATUS');
+  check(response.status === 200, 'MCP_TOOL_HTTP_STATUS');
   const result = response.body.result;
   if (error) {
     check(
@@ -254,7 +254,7 @@ try {
         capabilities: {},
         clientInfo: { name: 'batch-a', version: '1' },
       })
-    ).status === 230,
+    ).status === 200,
     'INITIALIZE',
   );
   const tools = (await rpcHttp('tools/list')).body.result.tools;
@@ -537,7 +537,7 @@ try {
     }),
   ]);
   check(
-    raced.every((r) => r.status === 230),
+    raced.every((r) => r.status === 200),
     'RACE_HTTP',
   );
   check(raced[1].body.result.isError !== true, 'RACE_CANCEL_FAILED');
@@ -587,7 +587,7 @@ try {
     arguments: reservationInput,
   });
   check(
-    firstReserve.status === 230 && firstReserve.body.result?.isError !== true,
+    firstReserve.status === 200 && firstReserve.body.result?.isError !== true,
     'TRIVIA_RESERVE',
   );
   const reservedTrivia = firstReserve.body.result.structuredContent.data;
@@ -687,7 +687,7 @@ try {
     ),
   );
   check(
-    raceResults.every((r) => r.status === 230),
+    raceResults.every((r) => r.status === 200),
     'TRIVIA_RACE_HTTP',
   );
   check(
