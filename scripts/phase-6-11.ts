@@ -106,6 +106,15 @@ async function call(name: string, input: object, error?: string) {
     );
   return result?.structuredContent?.data;
 }
+async function rejectToolInput(name: string, input: object) {
+  const response = await rpcHttp('tools/call', { name, arguments: input });
+  check(response.status === 200, 'MCP_INVALID_TOOL_HTTP_STATUS');
+  const result = response.body.result;
+  check(
+    result?.isError === true && !result?.structuredContent?.data,
+    'INVALID_TOOL_INPUT_NOT_REJECTED',
+  );
+}
 const common = () => ({ request_schema_version: 1, workspace_public_id: f.workspace });
 const write = () => ({ ...common(), operation_key: randomUUID() });
 const itemArgs = (id: string) => ({
@@ -1251,7 +1260,7 @@ try {
     explicit_approval: true,
     accepted_warning_ids: [],
   };
-  await call('approve_post', { ...approvalArgs, explicit_approval: false }, 'APPROVAL_REQUIRED');
+  await rejectToolInput('approve_post', { ...approvalArgs, explicit_approval: false });
   await call('approve_post', { ...approvalArgs, expected_revision: 999 }, 'REVISION_CONFLICT');
   await call(
     'approve_post',
