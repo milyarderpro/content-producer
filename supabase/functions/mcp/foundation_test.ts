@@ -226,7 +226,7 @@ Deno.test(
   async () => {
     const listed = await request('tools/list');
     for (const name of FOUNDATION_TOOL_NAMES) assert(listed.includes(name), 'missing ' + name);
-    assert((listed.match(/"readOnlyHint":true/g) || []).length === 9, 'nine read-only tools');
+    assert((listed.match(/"readOnlyHint":true/g) || []).length === 11, 'eleven read-only tools');
     assert((listed.match(/"openWorldHint":false/g) || []).length === 33, 'open world must be off');
     assert(listed.split('"openai/profile":true').length === 2, 'one profile metadata');
     assert((listed.match(/"oauth2"/g) || []).length === 33, '33 OAuth security schemes');
@@ -240,7 +240,7 @@ Deno.test('All registered tool input/output object schemas are closed recursivel
   assert(frame, 'tools/list must return an MCP data frame');
   const parsed = JSON.parse(frame.slice(6));
   const tools = parsed.result?.tools ?? [];
-  assert(tools.length === MCP_TOOL_COUNT && tools.length === 33, 'exact 30 schemas');
+  assert(tools.length === MCP_TOOL_COUNT && tools.length === 33, 'exact 33 schemas');
   for (const tool of tools) {
     assertClosedObjects(tool.inputSchema, tool.name + '.input');
     assertClosedObjects(tool.outputSchema, tool.name + '.output');
