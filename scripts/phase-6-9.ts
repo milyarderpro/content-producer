@@ -952,8 +952,8 @@ try {
   );
   const saveReplay = await call('save_post', draft);
   check(
-    replay.replayed === true &&
-      replay.post.post_public_id === saved.post.post_public_id &&
+    saveReplay.replayed === true &&
+      saveReplay.post.post_public_id === saved.post.post_public_id &&
       postsBefore() === beforeSave + 1,
     'SAVE_REPLAY_DEDUP',
   );
