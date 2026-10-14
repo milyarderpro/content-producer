@@ -18,6 +18,8 @@ The contract placement is reconciled in [CR-017](decisions/2026-10-14-phase-6-ba
 - The real create/replay tool path verifies exactly one read bucket charge for the workspace discovery check, not one charge per business operation.
 - The test-only injected checker keeps unit tests independent from database state; production defaults to the PostgREST workspace check.
 
+- Existing Phase 5 rate-limit test fixtures now seed the current and next minute for disposable OAuth clients. This removes a CI minute-boundary race while preserving the production thresholds and the denial assertions.
+
 ## Gate status
 
 A full Batch A gate was requested for this remediation commit. Its result must be read from the linked GitHub Actions run; this note alone does not mark the gate or the independent audit as passed.
