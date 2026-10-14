@@ -1513,59 +1513,120 @@ try {
     { ...metricArgs, metrics: { views: -1 } },
     { ...metricArgs, metrics: { views: 1, secret: 3 } },
     { ...metricArgs, source: { ...metricSource, metric_definition_version: 2 } },
-  ]) await rejectToolInput('record_post_performance', bad);
+  ])
+    await rejectToolInput('record_post_performance', bad);
   const beforeMetrics = preservedEvidence();
   const recorded = await call('record_post_performance', metricArgs);
-  check(recorded.metrics.views === 100 && recorded.metrics.reach === null &&
-    recorded.metrics.watch_time_seconds === 0 && !recorded.replayed, 'METRIC_NULL_VERSUS_ZERO');
+  check(
+    recorded.metrics.views === 100 &&
+      recorded.metrics.reach === null &&
+      recorded.metrics.watch_time_seconds === 0 &&
+      !recorded.replayed,
+    'METRIC_NULL_VERSUS_ZERO',
+  );
   const replayed = await call('record_post_performance', metricArgs);
-  check(replayed.replayed && replayed.metric_snapshot_public_id === recorded.metric_snapshot_public_id, 'METRIC_EXACT_REPLAY');
-  await call('record_post_performance', { ...metricArgs, metrics: { views: 101 } }, 'OPERATION_KEY_REUSED');
+  check(
+    replayed.replayed && replayed.metric_snapshot_public_id === recorded.metric_snapshot_public_id,
+    'METRIC_EXACT_REPLAY',
+  );
+  await call(
+    'record_post_performance',
+    { ...metricArgs, metrics: { views: 101 } },
+    'OPERATION_KEY_REUSED',
+  );
   await call('record_post_performance', { ...metricArgs, ...write() }, 'METRIC_SNAPSHOT_CONFLICT');
   const next = await call('record_post_performance', {
-    ...write(), post_public_id: manualPostId, captured_at: observedLater,
+    ...write(),
+    post_public_id: manualPostId,
+    captured_at: observedLater,
     metrics: { views: 80, reactions: 11, likes: 10 },
     source: metricSource,
   });
   check(next.metrics.views === 80, 'METRIC_APPEND_SECOND_SNAPSHOT');
   const count = row<{ count: number }>(
     "select count(*)::integer count from public.post_metrics where post_id=(select id from public.posts where public_id='" +
-      manualPostId + "')",
+      manualPostId +
+      "')",
   ).count;
   check(count === 2 && preservedEvidence() === beforeMetrics, 'METRICS_APPEND_ONLY_POST_IMMUTABLE');
-  const first = await call('get_post_performance', { ...common(), post_public_id: manualPostId, limit: 1 });
-  check(first.snapshots.length === 1 && first.has_more === true && first.next_cursor &&
-    first.latest_snapshot.metric_snapshot_public_id === next.metric_snapshot_public_id &&
-    first.snapshots[0].metrics.views === 80 && first.snapshots[0].anomaly_flags.includes('negative_cumulative_delta'),
-    'METRIC_HISTORY_LATEST_AND_FLAGS');
-  const secondPage = await call('get_post_performance', {
-    ...common(), post_public_id: manualPostId, limit: 1, cursor: first.next_cursor,
+  const first = await call('get_post_performance', {
+    ...common(),
+    post_public_id: manualPostId,
+    limit: 1,
   });
-  check(secondPage.snapshots.length === 1 && !secondPage.has_more &&
-    secondPage.snapshots[0].metrics.views === 100 &&
-    secondPage.snapshots[0].metrics.reach === null, 'METRIC_HISTORY_PAGINATION');
-  const full = await call('get_post_performance', { ...common(), post_public_id: manualPostId, limit: 100 });
-  check(full.compatible_deltas.length === 1 &&
-    full.compatible_deltas[0].delta.views === -20 &&
-    full.compatible_deltas[0].negative_delta === true, 'METRIC_SIGNED_COMPATIBLE_DELTAS');
+  check(
+    first.snapshots.length === 1 &&
+      first.has_more === true &&
+      first.next_cursor &&
+      first.latest_snapshot.metric_snapshot_public_id === next.metric_snapshot_public_id &&
+      first.snapshots[0].metrics.views === 80 &&
+      first.snapshots[0].anomaly_flags.includes('negative_cumulative_delta'),
+    'METRIC_HISTORY_LATEST_AND_FLAGS',
+  );
+  const secondPage = await call('get_post_performance', {
+    ...common(),
+    post_public_id: manualPostId,
+    limit: 1,
+    cursor: first.next_cursor,
+  });
+  check(
+    secondPage.snapshots.length === 1 &&
+      !secondPage.has_more &&
+      secondPage.snapshots[0].metrics.views === 100 &&
+      secondPage.snapshots[0].metrics.reach === null,
+    'METRIC_HISTORY_PAGINATION',
+  );
+  const full = await call('get_post_performance', {
+    ...common(),
+    post_public_id: manualPostId,
+    limit: 100,
+  });
+  check(
+    full.compatible_deltas.length === 1 &&
+      full.compatible_deltas[0].delta.views === -20 &&
+      full.compatible_deltas[0].negative_delta === true,
+    'METRIC_SIGNED_COMPATIBLE_DELTAS',
+  );
   const insightsArgs = {
-    ...common(), page_public_id: f.page, niche_key: 'trivia',
-    dimensions: ['format'], metric: 'views', minimum_sample_size: 5, limit: 20,
+    ...common(),
+    page_public_id: f.page,
+    niche_key: 'trivia',
+    dimensions: ['format'],
+    metric: 'views',
+    minimum_sample_size: 5,
+    limit: 20,
   };
   const insights = await call('get_performance_insights', insightsArgs);
-  check(insights.scope.page_public_id === f.page &&
-    insights.eligible_post_count >= 1 && insights.excluded_post_count >= 1 &&
-    insights.groups.some((g: { evidence_strength: string; caveats: string[] }) =>
-      g.evidence_strength === 'insufficient' && g.caveats.some(x => /causal/i.test(x))) &&
-    insights.eligible_post_count + insights.excluded_post_count >= 2,
-    'INSIGHTS_SAMPLE_EXCLUSIONS_CAVEATS');
-  await rejectToolInput('get_performance_insights', { ...insightsArgs, dimensions: ['format', 'format'] });
-  await rejectToolInput('get_post_performance', { ...common(), post_public_id: manualPostId, limit: 101 });
-  const foreignMetrics = await rpcHttp('tools/call',
-    { name: 'get_post_performance', arguments: { ...common(), post_public_id: manualPostId } }, foreignBearer);
+  check(
+    insights.scope.page_public_id === f.page &&
+      insights.eligible_post_count >= 1 &&
+      insights.excluded_post_count >= 1 &&
+      insights.groups.some(
+        (g: { evidence_strength: string; caveats: string[] }) =>
+          g.evidence_strength === 'insufficient' && g.caveats.some((x) => /causal/i.test(x)),
+      ) &&
+      insights.eligible_post_count + insights.excluded_post_count >= 2,
+    'INSIGHTS_SAMPLE_EXCLUSIONS_CAVEATS',
+  );
+  await rejectToolInput('get_performance_insights', {
+    ...insightsArgs,
+    dimensions: ['format', 'format'],
+  });
+  await rejectToolInput('get_post_performance', {
+    ...common(),
+    post_public_id: manualPostId,
+    limit: 101,
+  });
+  const foreignMetrics = await rpcHttp(
+    'tools/call',
+    { name: 'get_post_performance', arguments: { ...common(), post_public_id: manualPostId } },
+    foreignBearer,
+  );
   check(foreignMetrics.status === 403, 'FOREIGN_METRICS_DENIED');
   clearFixtureBuckets();
-  console.info('6.13 owner JWT metrics: immutable append/replay, null/zero, likes subset, signed deltas, pagination, insufficient insights and owner denial PASS.');
+  console.info(
+    '6.13 owner JWT metrics: immutable append/replay, null/zero, likes subset, signed deltas, pagination, insufficient insights and owner denial PASS.',
+  );
 
   clearFixtureBuckets();
   if (!process.argv.includes('--preflight')) {
@@ -1857,30 +1918,48 @@ try {
     // Phase 6.13: three remaining Inspector valid calls on the archived published post.
     const inspectorMetric = (
       await inspector('tools/call', 'record_post_performance', {
-        ...write(), post_public_id: publishedInspectorSave.post.post_public_id,
+        ...write(),
+        post_public_id: publishedInspectorSave.post.post_public_id,
         captured_at: new Date(Date.parse(inspectorPosted.published_at) + 60_000).toISOString(),
-        metrics: { views: 0, reactions: 2, likes: 1 }, source: metricSource,
+        metrics: { views: 0, reactions: 2, likes: 1 },
+        source: metricSource,
       })
     ).structuredContent.data;
-    check(inspectorMetric.metrics.views === 0 && inspectorMetric.metrics.likes === 1,
-      'INSPECTOR_METRIC_RECORD');
+    check(
+      inspectorMetric.metrics.views === 0 && inspectorMetric.metrics.likes === 1,
+      'INSPECTOR_METRIC_RECORD',
+    );
     const inspectedHistory = (
       await inspector('tools/call', 'get_post_performance', {
-        ...common(), post_public_id: publishedInspectorSave.post.post_public_id, limit: 10,
+        ...common(),
+        post_public_id: publishedInspectorSave.post.post_public_id,
+        limit: 10,
       })
     ).structuredContent.data;
-    check(inspectedHistory.snapshots.some((s: { metric_snapshot_public_id: string }) =>
-      s.metric_snapshot_public_id === inspectorMetric.metric_snapshot_public_id),
-      'INSPECTOR_METRIC_HISTORY');
+    check(
+      inspectedHistory.snapshots.some(
+        (s: { metric_snapshot_public_id: string }) =>
+          s.metric_snapshot_public_id === inspectorMetric.metric_snapshot_public_id,
+      ),
+      'INSPECTOR_METRIC_HISTORY',
+    );
     const inspectedInsights = (
       await inspector('tools/call', 'get_performance_insights', {
-        ...common(), page_public_id: f.page, niche_key: 'trivia',
-        dimensions: ['format'], metric: 'views', minimum_sample_size: 5,
+        ...common(),
+        page_public_id: f.page,
+        niche_key: 'trivia',
+        dimensions: ['format'],
+        metric: 'views',
+        minimum_sample_size: 5,
       })
     ).structuredContent.data;
-    check(inspectedInsights.groups.every((g: { evidence_strength: string; caveats: string[] }) =>
-      g.evidence_strength === 'insufficient' && g.caveats.length > 0),
-      'INSPECTOR_METRIC_INSIGHTS');
+    check(
+      inspectedInsights.groups.every(
+        (g: { evidence_strength: string; caveats: string[] }) =>
+          g.evidence_strength === 'insufficient' && g.caveats.length > 0,
+      ),
+      'INSPECTOR_METRIC_INSIGHTS',
+    );
 
     clearFixtureBuckets();
     for (const tool of tools) await inspector('tools/call', tool.name, {}, 5);
