@@ -896,6 +896,8 @@ try {
   );
 
   // 6.9: real authenticated Streamable HTTP -> public PostgREST -> Phase 5 RPCs.
+  // Local fixture hygiene only; production rate-limit thresholds remain unchanged.
+  clearFixtureBuckets();
   const postsBefore = () =>
     row<{ count: number }>(
       `select count(*)::integer count from public.posts where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`,
