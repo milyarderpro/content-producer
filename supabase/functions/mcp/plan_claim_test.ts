@@ -133,32 +133,32 @@ async function call(name: string, args: object) {
 }
 
 Deno.test('6.5 claims retain OAuth and annotations after 6.7 expansion', async () => {
-    const listed = await mcp('tools/list');
-    const tools = listed.result?.tools ?? [];
-    assert(MCP_TOOL_COUNT === 18 && tools.length === 18, 'exact 18 registered tools');
-    for (const name of PLAN_CLAIM_TOOL_NAMES) {
-      const tool = tools.find((t) => t.name === name);
-      assert(tool, 'missing claim tool ' + name);
-      const meta = tool._meta as { securitySchemes?: Array<{ type: string; scopes: string[] }> };
-      assert(meta?.securitySchemes?.[0]?.type === 'oauth2', 'OAuth scheme');
-      assert(meta?.securitySchemes?.[0]?.scopes?.join(' ') === 'openid email', 'OAuth scopes');
-      const annotations = tool.annotations as Record<string, boolean>;
-      assert(annotations.readOnlyHint === false, 'claim tool must be a write');
-      assert(
-        annotations.destructiveHint === false && annotations.openWorldHint === false,
-        'annotations',
-      );
-      assert(!Object.hasOwn(meta, 'openai/profile'), 'claim tool cannot be profile');
-      assert(
-        (tool.inputSchema as { additionalProperties?: boolean }).additionalProperties === false,
-        'closed input',
-      );
-      assert(
-        (tool.outputSchema as { additionalProperties?: boolean }).additionalProperties === false,
-        'closed output',
-      );
-    }
-    assert(!tools.some((t) => t.name === 'trivia_find_similar_facts'), '6.7 not yet registered');
+  const listed = await mcp('tools/list');
+  const tools = listed.result?.tools ?? [];
+  assert(MCP_TOOL_COUNT === 18 && tools.length === 18, 'exact 18 registered tools');
+  for (const name of PLAN_CLAIM_TOOL_NAMES) {
+    const tool = tools.find((t) => t.name === name);
+    assert(tool, 'missing claim tool ' + name);
+    const meta = tool._meta as { securitySchemes?: Array<{ type: string; scopes: string[] }> };
+    assert(meta?.securitySchemes?.[0]?.type === 'oauth2', 'OAuth scheme');
+    assert(meta?.securitySchemes?.[0]?.scopes?.join(' ') === 'openid email', 'OAuth scopes');
+    const annotations = tool.annotations as Record<string, boolean>;
+    assert(annotations.readOnlyHint === false, 'claim tool must be a write');
+    assert(
+      annotations.destructiveHint === false && annotations.openWorldHint === false,
+      'annotations',
+    );
+    assert(!Object.hasOwn(meta, 'openai/profile'), 'claim tool cannot be profile');
+    assert(
+      (tool.inputSchema as { additionalProperties?: boolean }).additionalProperties === false,
+      'closed input',
+    );
+    assert(
+      (tool.outputSchema as { additionalProperties?: boolean }).additionalProperties === false,
+      'closed output',
+    );
+  }
+  assert(tools.some((t) => t.name === 'trivia_find_similar_facts'), '6.7 tool registered');
 });
 
 Deno.test(
