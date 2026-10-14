@@ -921,7 +921,9 @@ try {
       editorial_checks: r.editorial,
     };
   }
+  console.info('POST_P0_FIXTURE_BEGIN');
   const draftRequest = postRequest(f);
+  console.info('POST_P1_FIXTURE_READY');
   const draft = draftArgs(draftRequest);
   const beforeSave = postsBefore();
   await call(
@@ -942,7 +944,9 @@ try {
     'PLAN_ITEM_NOT_FOUND',
   );
   check(postsBefore() === beforeSave, 'SAVE_BAD_PLAN_ROLLBACK');
+  console.info('POST_P2_NEGATIVE_CASES_PASSED');
   const saved = await call('save_post', draft);
+  console.info('POST_P3_DRAFT_SAVED');
   check(
     saved.post.status === 'draft' &&
       saved.post.revision === 1 &&
@@ -961,6 +965,7 @@ try {
   );
   await call('save_post', { ...draft, topic_key: 'geography' }, 'OPERATION_KEY_REUSED');
   check(postsBefore() === beforeSave + 1, 'SAVE_KEY_MISMATCH_ROLLBACK');
+  console.info('POST_P4_REPLAY_PASSED');
   const fetched = await call('get_post', {
     ...common(),
     post_public_id: saved.post.post_public_id,
@@ -990,9 +995,11 @@ try {
       !JSON.stringify(fetched).includes(bearer),
     'GET_PRIVATE_TOKEN_REDACTION',
   );
+  console.info('POST_P5_POST_READ_PASSED');
   const another = postRequest(f);
   const second = await call('save_post', draftArgs(another));
   check(second.post.status === 'draft', 'SECOND_DRAFT');
+  console.info('POST_P6_SECOND_DRAFT_SAVED');
   const pageList = await call('list_posts', {
     ...common(),
     page_public_id: f.page,
@@ -1050,6 +1057,7 @@ try {
       'POST_FOREIGN_OWNER_DENIAL',
     );
   }
+  console.info('POST_P7_READ_AND_ISOLATION_PASSED');
   // Real claimed plan item: save converts reservation and finishes only the claimed slot.
   const planForSave = await call('create_content_plan', {
     ...write(),
@@ -1084,6 +1092,7 @@ try {
       claim_token: lease.claim_token,
     },
   };
+  console.info('POST_P8_PLAN_CLAIM_READY');
   const completedDraft = await call('save_post', claimedArgs);
   check(
     completedDraft.post.status === 'draft' &&
