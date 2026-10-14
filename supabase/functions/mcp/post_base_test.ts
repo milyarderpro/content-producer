@@ -115,9 +115,7 @@ const post = {
   system_checks: {},
   editorial_checks: {},
   quality_status: 'pending',
-  fact_bindings: [
-    { ...factBindings[0], allocation_state: 'allocated' },
-  ],
+  fact_bindings: [{ ...factBindings[0], allocation_state: 'allocated' }],
   created_at: stamp,
   updated_at: stamp,
 };
