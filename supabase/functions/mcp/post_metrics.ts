@@ -145,7 +145,7 @@ const deltaMetrics = z.strictObject({
   average_watch_time_seconds: signed,
 });
 const sourceRead = z.strictObject({
-  source_type: z.enum(['facebook_ui', 'facebook_export', 'user_reported', 'other']).nullable(),
+  source_type: z.string().max(80).nullable(),
   metric_definition_version: version.nullable(),
   source_reported_at: timestamp.nullable(),
   timezone: z.string().nullable(),
