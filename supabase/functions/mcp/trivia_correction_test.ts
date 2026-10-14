@@ -132,9 +132,9 @@ async function mcp(method: string, params?: object) {
 async function call(name: string, input: object) {
   return (await mcp('tools/call', { name, arguments: input })).result;
 }
-Deno.test('6.9 23 authenticated tools with closed correction schemas', async () => {
+Deno.test('6.9 correction schemas remain closed among 28 authenticated tools', async () => {
   const tools = (await mcp('tools/list')).result.tools;
-  check(MCP_TOOL_COUNT === 25 && tools.length === 25, 'EXACT_TWENTY_TOOLS');
+  check(MCP_TOOL_COUNT === 28 && tools.length === 28, 'EXACT_TWENTY_EIGHT_TOOLS');
   for (const name of TRIVIA_CORRECTION_TOOL_NAMES) {
     const tool = tools.find((x: { name: string }) => x.name === name);
     check(tool && tool._meta.securitySchemes[0].type === 'oauth2', 'OAUTH_REQUIRED');
