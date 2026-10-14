@@ -11,7 +11,10 @@ import {
   sql,
   stateDigest,
 } from '../supabase/tests/database/helpers/plan-lifecycle.js';
-import { request as postRequest, cleanup as postCleanup } from '../supabase/tests/database/helpers/post-rpc.js';
+import {
+  request as postRequest,
+  cleanup as postCleanup,
+} from '../supabase/tests/database/helpers/post-rpc.js';
 import {
   candidate,
   factInput,
@@ -892,11 +895,11 @@ try {
     'Phase 6.9 public MCP correction: CAS/replay/semantic denial, owner isolation, lineage, draft-ready transition, posted-archived immutability PASS.',
   );
 
-
   // 6.9: real authenticated Streamable HTTP -> public PostgREST -> Phase 5 RPCs.
-  const postsBefore = () => row<{ count: number }>(
-    `select count(*)::integer count from public.posts where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`,
-  ).count;
+  const postsBefore = () =>
+    row<{ count: number }>(
+      `select count(*)::integer count from public.posts where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`,
+    ).count;
   function draftArgs(r: ReturnType<typeof postRequest>) {
     return {
       ...write(),
@@ -919,92 +922,155 @@ try {
   const draftRequest = postRequest(f);
   const draft = draftArgs(draftRequest);
   const beforeSave = postsBefore();
-  await call('save_post', {
-    ...draft, reservation_token: randomUUID(),
-  }, 'FACT_RESERVATION_MISMATCH');
+  await call(
+    'save_post',
+    {
+      ...draft,
+      reservation_token: randomUUID(),
+    },
+    'FACT_RESERVATION_MISMATCH',
+  );
   check(postsBefore() === beforeSave, 'SAVE_BAD_TOKEN_ROLLBACK');
-  await call('save_post', {
-    ...draft, plan_item: { plan_item_public_id: randomUUID(), claim_token: randomUUID() },
-  }, 'PLAN_ITEM_NOT_FOUND');
+  await call(
+    'save_post',
+    {
+      ...draft,
+      plan_item: { plan_item_public_id: randomUUID(), claim_token: randomUUID() },
+    },
+    'PLAN_ITEM_NOT_FOUND',
+  );
   check(postsBefore() === beforeSave, 'SAVE_BAD_PLAN_ROLLBACK');
   const saved = await call('save_post', draft);
-  check(saved.post.status === 'draft' && saved.post.revision === 1 &&
-    saved.post.fact_bindings.length === draftRequest.bindings.length &&
-    saved.post.quality_status !== undefined &&
-    saved.plan === null && saved.replayed === false, 'SAVE_ONLY_DRAFT');
+  check(
+    saved.post.status === 'draft' &&
+      saved.post.revision === 1 &&
+      saved.post.fact_bindings.length === draftRequest.bindings.length &&
+      saved.post.quality_status !== undefined &&
+      saved.plan === null &&
+      saved.replayed === false,
+    'SAVE_ONLY_DRAFT',
+  );
   const replay = await call('save_post', draft);
-  check(replay.replayed === true &&
-    replay.post.post_public_id === saved.post.post_public_id &&
-    postsBefore() === beforeSave + 1, 'SAVE_REPLAY_DEDUP');
+  check(
+    replay.replayed === true &&
+      replay.post.post_public_id === saved.post.post_public_id &&
+      postsBefore() === beforeSave + 1,
+    'SAVE_REPLAY_DEDUP',
+  );
   await call('save_post', { ...draft, topic_key: 'geography' }, 'OPERATION_KEY_REUSED');
   check(postsBefore() === beforeSave + 1, 'SAVE_KEY_MISMATCH_ROLLBACK');
   const fetched = await call('get_post', {
-    ...common(), post_public_id: saved.post.post_public_id,
+    ...common(),
+    post_public_id: saved.post.post_public_id,
   });
-  check(fetched.post.status === 'draft' &&
-    fetched.post.content_hash === saved.post.content_hash &&
-    fetched.post.content_payload.canva_copy === draftRequest.content.canva_copy &&
-    fetched.post.fact_bindings.length === draftRequest.bindings.length &&
-    fetched.latest_metrics === null && fetched.approval === null,
-    'GET_FULL_OWNER_PACKAGE');
+  check(
+    fetched.post.status === 'draft' &&
+      fetched.post.content_hash === saved.post.content_hash &&
+      fetched.post.content_payload.canva_copy === draftRequest.content.canva_copy &&
+      fetched.post.fact_bindings.length === draftRequest.bindings.length &&
+      fetched.latest_metrics === null &&
+      fetched.approval === null,
+    'GET_FULL_OWNER_PACKAGE',
+  );
   const noSources = await call('get_post', {
-    ...common(), post_public_id: saved.post.post_public_id,
-    include_sources: false, include_checks: false,
+    ...common(),
+    post_public_id: saved.post.post_public_id,
+    include_sources: false,
+    include_checks: false,
     include_latest_metrics: false,
   });
-  check(noSources.post.fact_bindings.every((b: Record<string, unknown>) =>
-    !('source_snapshot' in b)), 'GET_SOURCES_REDACTED');
-  check(!JSON.stringify(fetched).includes(draftRequest.token) &&
-    !JSON.stringify(fetched).includes(bearer), 'GET_PRIVATE_TOKEN_REDACTION');
+  check(
+    noSources.post.fact_bindings.every((b: Record<string, unknown>) => !('source_snapshot' in b)),
+    'GET_SOURCES_REDACTED',
+  );
+  check(
+    !JSON.stringify(fetched).includes(draftRequest.token) &&
+      !JSON.stringify(fetched).includes(bearer),
+    'GET_PRIVATE_TOKEN_REDACTION',
+  );
   const another = postRequest(f);
   const second = await call('save_post', draftArgs(another));
   check(second.post.status === 'draft', 'SECOND_DRAFT');
   const pageList = await call('list_posts', {
-    ...common(), page_public_id: f.page, niche_key: 'trivia',
-    statuses: ['draft'], limit: 1,
+    ...common(),
+    page_public_id: f.page,
+    niche_key: 'trivia',
+    statuses: ['draft'],
+    limit: 1,
   });
-  check(pageList.items.length === 1 && pageList.has_more &&
-    !!pageList.next_cursor, 'LIST_BOUNDED_CURSOR');
+  check(
+    pageList.items.length === 1 && pageList.has_more && !!pageList.next_cursor,
+    'LIST_BOUNDED_CURSOR',
+  );
   const next = await call('list_posts', {
-    ...common(), page_public_id: f.page, niche_key: 'trivia',
-    statuses: ['draft'], limit: 1, cursor: pageList.next_cursor,
+    ...common(),
+    page_public_id: f.page,
+    niche_key: 'trivia',
+    statuses: ['draft'],
+    limit: 1,
+    cursor: pageList.next_cursor,
   });
-  check(next.items.length === 1 &&
-    next.items[0].post_public_id !== pageList.items[0].post_public_id,
-    'LIST_NEXT_PAGE_UNIQUE');
+  check(
+    next.items.length === 1 && next.items[0].post_public_id !== pageList.items[0].post_public_id,
+    'LIST_NEXT_PAGE_UNIQUE',
+  );
   const emptyPosts = await call('list_posts', {
-    ...common(), query: 'no-such-hook-6-9-fixture', limit: 1,
+    ...common(),
+    query: 'no-such-hook-6-9-fixture',
+    limit: 1,
   });
   check(emptyPosts.items.length === 0 && !emptyPosts.has_more, 'LIST_EMPTY');
-  await call('get_post', {
-    ...common(), post_public_id: randomUUID(),
-  }, 'POST_NOT_FOUND');
-  await call('list_posts', {
-    ...common(), limit: 1, cursor: 'malformed',
-  }, 'VALIDATION_FAILED');
+  await call(
+    'get_post',
+    {
+      ...common(),
+      post_public_id: randomUUID(),
+    },
+    'POST_NOT_FOUND',
+  );
+  await call(
+    'list_posts',
+    {
+      ...common(),
+      limit: 1,
+      cursor: 'malformed',
+    },
+    'VALIDATION_FAILED',
+  );
   for (const [name, args] of [
     ['list_posts', { ...common() }],
     ['get_post', { ...common(), post_public_id: saved.post.post_public_id }],
     ['save_post', draft],
   ] as const) {
     const denied = await rpcHttp('tools/call', { name, arguments: args }, foreignBearer);
-    check(denied.status === 403 &&
-      denied.body.error?.code === 'OWNER_ACCESS_REQUIRED',
-      'POST_FOREIGN_OWNER_DENIAL');
+    check(
+      denied.status === 403 && denied.body.error?.code === 'OWNER_ACCESS_REQUIRED',
+      'POST_FOREIGN_OWNER_DENIAL',
+    );
   }
   // Real claimed plan item: save converts reservation and finishes only the claimed slot.
   const planForSave = await call('create_content_plan', {
-    ...write(), page_public_id: f.page, niche_key: 'trivia',
-    config_schema_version: 1, plan_intent: '6.9 local claim-to-draft acceptance.',
-    items: [{
-      position: 1, topic_key: 'animals',
-      format_key: 'single_subject_fast', interaction_goal: 'share',
-      item_config: {}, scheduled_at: null,
-    }],
+    ...write(),
+    page_public_id: f.page,
+    niche_key: 'trivia',
+    config_schema_version: 1,
+    plan_intent: '6.9 local claim-to-draft acceptance.',
+    items: [
+      {
+        position: 1,
+        topic_key: 'animals',
+        format_key: 'single_subject_fast',
+        interaction_goal: 'share',
+        item_config: {},
+        scheduled_at: null,
+      },
+    ],
   });
   const claimForSave = await call('claim_content_plan_items', {
-    ...write(), plan_public_id: planForSave.plan.plan_public_id,
-    lease_minutes: 30, limit: 1,
+    ...write(),
+    plan_public_id: planForSave.plan.plan_public_id,
+    lease_minutes: 30,
+    limit: 1,
   });
   const lease = claimForSave.claimed_items[0];
   check(!!lease?.claim_token, 'CLAIM_FOR_DRAFT');
@@ -1017,14 +1083,21 @@ try {
     },
   };
   const completedDraft = await call('save_post', claimedArgs);
-  check(completedDraft.post.status === 'draft' &&
-    completedDraft.plan?.progress.completed === 1 &&
-    completedDraft.plan.status === 'completed', 'CLAIM_COMPLETE_DRAFT');
+  check(
+    completedDraft.post.status === 'draft' &&
+      completedDraft.plan?.progress.completed === 1 &&
+      completedDraft.plan.status === 'completed',
+    'CLAIM_COMPLETE_DRAFT',
+  );
   const claimedReplay = await call('save_post', claimedArgs);
-  check(claimedReplay.replayed &&
-    claimedReplay.post.post_public_id === completedDraft.post.post_public_id,
-    'CLAIM_SAVE_REPLAY');
-  console.info('6.9 authenticated public HTTP: save draft, atomic rollback, replay, plan claim, safe reads, pagination and foreign denial PASS.');
+  check(
+    claimedReplay.replayed &&
+      claimedReplay.post.post_public_id === completedDraft.post.post_public_id,
+    'CLAIM_SAVE_REPLAY',
+  );
+  console.info(
+    '6.9 authenticated public HTTP: save draft, atomic rollback, replay, plan claim, safe reads, pagination and foreign denial PASS.',
+  );
 
   clearFixtureBuckets();
   if (!process.argv.includes('--preflight')) {
@@ -1175,19 +1248,29 @@ try {
 
     clearFixtureBuckets();
     const inspectedRequest = postRequest(f);
-    const inspectedSave = (await inspector('tools/call', 'save_post',
-      draftArgs(inspectedRequest))).structuredContent.data;
+    const inspectedSave = (await inspector('tools/call', 'save_post', draftArgs(inspectedRequest)))
+      .structuredContent.data;
     check(inspectedSave.post.status === 'draft', 'INSPECTOR_DRAFT_STATUS');
-    const inspectedList = (await inspector('tools/call', 'list_posts', {
-      ...common(), page_public_id: f.page, statuses: ['draft'], limit: 2,
-    })).structuredContent.data;
+    const inspectedList = (
+      await inspector('tools/call', 'list_posts', {
+        ...common(),
+        page_public_id: f.page,
+        statuses: ['draft'],
+        limit: 2,
+      })
+    ).structuredContent.data;
     check(inspectedList.items.length > 0, 'INSPECTOR_LIST_POSTS');
-    const inspectedGet = (await inspector('tools/call', 'get_post', {
-      ...common(), post_public_id: inspectedSave.post.post_public_id,
-      include_sources: false,
-    })).structuredContent.data;
-    check(inspectedGet.post.post_public_id === inspectedSave.post.post_public_id,
-      'INSPECTOR_GET_POST');
+    const inspectedGet = (
+      await inspector('tools/call', 'get_post', {
+        ...common(),
+        post_public_id: inspectedSave.post.post_public_id,
+        include_sources: false,
+      })
+    ).structuredContent.data;
+    check(
+      inspectedGet.post.post_public_id === inspectedSave.post.post_public_id,
+      'INSPECTOR_GET_POST',
+    );
     clearFixtureBuckets();
     for (const tool of tools) await inspector('tools/call', tool.name, {}, 5);
   }
