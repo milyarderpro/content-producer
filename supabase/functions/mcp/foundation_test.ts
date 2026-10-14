@@ -226,7 +226,7 @@ Deno.test(
   async () => {
     const listed = await request('tools/list');
     for (const name of FOUNDATION_TOOL_NAMES) assert(listed.includes(name), 'missing ' + name);
-    assert((listed.match(/"readOnlyHint":true/g) || []).length === 7, 'seven read-only tools');
+    assert((listed.match(/"readOnlyHint":true/g) || []).length === 9, 'nine read-only tools');
     assert((listed.match(/"openWorldHint":false/g) || []).length === 23, 'open world must be off');
     assert(listed.split('"openai/profile":true').length === 2, 'one profile metadata');
     assert((listed.match(/"oauth2"/g) || []).length === 23, 'twenty-three OAuth security schemes');

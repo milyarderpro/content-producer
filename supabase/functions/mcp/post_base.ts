@@ -42,10 +42,157 @@ const securitySchemes = [{ type: 'oauth2', scopes: ['openid', 'email'] }];
 const envelope = <T extends z.ZodType>(data: T) =>
   z.strictObject({ response_schema_version: version, data });
 
-// Nested server-calculated evidence remains an opaque bounded JSON object, never
-// something the caller may set directly. The public RPC validates its contracts;
-// invoke() also enforces 256 KiB response size and forbidden private output keys.
-const serverEvidence = z.record(z.string(), z.unknown());
+// Strict, allowlisted evidence shapes. Computed values are always built by
+// Phase 5 RPCs. No caller-supplied system checks or private snapshot keys.
+const smallCount = z.number().int().min(0);
+const factMetric = z.array(smallCount).max(9);
+const textMetrics = z.strictObject({
+  hook_chars: smallCount,
+  fact_chars: factMetric,
+  facts_total_chars: smallCount,
+  cta_chars: smallCount,
+  canva_total_chars: smallCount,
+  word_count: smallCount,
+  fact_word_counts: factMetric,
+  line_count: smallCount,
+  fact_line_counts: factMetric,
+  hook_word_count: smallCount,
+  cta_word_count: smallCount,
+  hook_line_count: smallCount,
+  cta_line_count: smallCount,
+  estimated_read_seconds: z.number().min(0),
+  replay_ratio: z.number().min(0),
+  estimated_loops: smallCount,
+});
+const checkEntry = z.strictObject({
+  id: z.string().min(1).max(120),
+  severity: z.enum(['blocking', 'warning']),
+  status: z.enum(['passed', 'failed', 'needs_review']),
+  expected: z.unknown(),
+  actual: z.unknown(),
+  evidence: z.array(z.string().max(200)).max(20),
+});
+const computedChecks = z.strictObject({
+  schema_version: version,
+  gate_version: version,
+  evaluated_at: timestamp,
+  evaluator: z.literal('server'),
+  post_revision: z.number().int().min(1),
+  content_hash: z.string().regex(/^[0-9a-f]{64}$/),
+  config_version: version,
+  renderer_version: version,
+  overall_status: z.enum(['passed', 'failed']),
+  checks: z.array(checkEntry).max(50),
+});
+const projectedChecks = z.strictObject({
+  schema_version: version,
+  content_hash: z.string().regex(/^[0-9a-f]{64}$/),
+  overall_status: z.string().min(1).max(30),
+  checks: z.array(checkEntry).max(50),
+});
+const editorialCriterion = z.strictObject({
+  id: z.string().min(1).max(120),
+  severity: z.enum(['critical', 'noncritical']),
+  status: z.enum(['pass', 'fail', 'needs_review']),
+  note: z.string().max(500),
+  evidence_paths: z.array(z.string().max(200)).max(20),
+});
+const editorialEvidence = z.strictObject({
+  schema_version: version,
+  rubric_version: version,
+  evaluated_at: timestamp,
+  evaluator: z.literal('chatgpt'),
+  evaluator_label: z.string().max(120).optional(),
+  post_revision: z.number().int().min(1),
+  content_hash: z.string().regex(/^[0-9a-f]{64}$/),
+  overall_status: z.enum(['pass', 'fail', 'needs_review']),
+  criteria: z.array(editorialCriterion).max(30),
+  risk_flags: z.array(z.string().max(80)).max(20),
+});
+const sourceEntry = z.strictObject({
+  schema_version: version,
+  url: z.url().max(2048),
+  canonical_url: z.url().max(2048),
+  title: z.string().max(300),
+  publisher: z.string().max(200),
+  tier: z.enum(['A', 'B', 'C', 'D']),
+  source_type: z.string().min(1).max(80),
+  accessed_at: timestamp,
+  published_at: z.string().nullable(),
+  updated_at: z.string().nullable(),
+  as_of: z.string().nullable(),
+  language: z.string().max(35),
+  supports: z.string().max(500),
+  independence_group: z.string().max(120),
+});
+const qualifier = z.strictObject({
+  negated: z.boolean(),
+  comparison_direction: z.string().nullable().optional(),
+  time: z.string().nullable().optional(),
+  location: z.string().nullable().optional(),
+  population: z.string().nullable().optional(),
+  condition: z.string().nullable().optional(),
+  method: z.string().nullable().optional(),
+  scope: z.string().nullable().optional(),
+  estimate: z.boolean().optional(),
+});
+const sourceSnapshot = z.strictObject({
+  schema_version: version,
+  canonical_claim: z.string().min(1).max(500),
+  normalized_claim: z.string().min(1).max(500),
+  normalization_version: version,
+  claim_hash: z.string().regex(/^[0-9a-f]{64}$/),
+  subject_key: z.string().max(120),
+  relation_key: z.string().max(120),
+  object_key: z.string().max(300),
+  numbers: z.array(z.strictObject({
+    value: z.string().max(80),
+    unit: z.string().nullable(),
+    role: z.string().max(80),
+  })).max(10),
+  qualifiers: qualifier,
+  ontology_version: version,
+  structured_key: z.string().nullable(),
+  structured_hash: z.string().nullable(),
+  structured_match_eligible: z.boolean(),
+  topic_key: key,
+  risk_class: z.enum(['standard', 'sensitive']),
+  source_schema_version: version,
+  sources: z.array(sourceEntry).max(8),
+  verification_status: z.enum([
+    'needs_review', 'verified', 'rejected', 'invalidated', 'superseded',
+  ]),
+  verified_at: timestamp.nullable(),
+  as_of_date: z.string().nullable(),
+  expires_at: timestamp.nullable(),
+  dedup_review_schema_version: version,
+});
+const metricSnapshot = z.strictObject({
+  metric_snapshot_public_id: uuid,
+  post_public_id: uuid,
+  captured_at: timestamp,
+  metrics: z.strictObject({
+    views: smallCount.optional(),
+    reach: smallCount.optional(),
+    reactions: smallCount.optional(),
+    likes: smallCount.optional(),
+    comments: smallCount.optional(),
+    shares: smallCount.optional(),
+    saves: smallCount.optional(),
+    follows: smallCount.optional(),
+    watch_time_seconds: z.number().min(0).optional(),
+    average_watch_time_seconds: z.number().min(0).optional(),
+  }),
+  source: z.strictObject({
+    source_type: z.string().max(80).optional(),
+    source_reported_at: z.string().max(100).optional(),
+    timezone: z.string().max(100).optional(),
+    metric_definition_version: z.number().int().min(1),
+    note: z.string().max(500).optional(),
+  }),
+  anomaly_flags: z.array(z.string().max(100)).max(50),
+  created_at: timestamp,
+});
 const contentPayload = z.strictObject({
   schema_version: version,
   hook: z.string().min(1).max(120),
@@ -66,7 +213,7 @@ const contentPayload = z.strictObject({
   caption: z.string().max(500),
   hashtags: z.array(z.string().min(1).max(80)).max(5),
   render_style: z.enum(['plain_lines', 'numbered']),
-  text_metrics: serverEvidence,
+  text_metrics: z.union([z.strictObject({}), textMetrics]),
 });
 const generationSnapshot = z.strictObject({
   schema_version: version,
@@ -228,7 +375,7 @@ const getInput = z.strictObject({
 });
 const bindingOutput = bindingInput.extend({
   allocation_state: z.enum(['allocated', 'published', 'released']),
-  source_snapshot: serverEvidence.optional(),
+  source_snapshot: sourceSnapshot.optional(),
 });
 const postPackage = z.strictObject({
   post_public_id: uuid,
@@ -243,8 +390,10 @@ const postPackage = z.strictObject({
   scheduled_at: timestamp.nullable(),
   published_at: timestamp.nullable(),
   content_payload: contentPayload,
-  system_checks: serverEvidence,
-  editorial_checks: serverEvidence,
+  system_checks: z.union([
+    computedChecks, projectedChecks, z.strictObject({}), z.null(),
+  ]),
+  editorial_checks: z.union([editorialEvidence, z.strictObject({}), z.null()]),
   quality_status: quality,
   fact_bindings: z.array(bindingOutput).max(200),
   created_at: timestamp,
@@ -260,7 +409,12 @@ const listOutput = envelope(
 const getOutput = envelope(
   z.strictObject({
     post: postPackage,
-    approval: serverEvidence.nullable(),
+    approval: z.strictObject({
+    status: z.literal('approved'),
+    revision: z.number().int().min(1).optional(),
+    content_hash: z.string().regex(/^[0-9a-f]{64}$/).optional(),
+    approved_at: timestamp.optional(),
+  }).nullable(),
     plan_item_public_id: uuid.nullable(),
     current_fact_warnings: z
       .array(
@@ -271,7 +425,7 @@ const getOutput = envelope(
         }),
       )
       .max(200),
-    latest_metrics: serverEvidence.nullable(),
+    latest_metrics: metricSnapshot.nullable(),
   }),
 );
 const saveOutput = envelope(

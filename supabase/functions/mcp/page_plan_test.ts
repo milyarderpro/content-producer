@@ -223,8 +223,8 @@ Deno.test('6.4 Page/plan metadata survives the 6.8 expansion; no anonymous tools
   for (const tool of PAGE_PLAN_TOOL_NAMES) assert(text.includes(tool), 'missing ' + tool);
   assert((text.match(/"oauth2"/g) || []).length === 23, 'every tool requires OAuth');
   assert((text.match(/"openWorldHint":false/g) || []).length === 23, 'open world hint');
-  assert((text.match(/"readOnlyHint":true/g) || []).length === 7, 'seven read tools');
-  assert((text.match(/"readOnlyHint":false/g) || []).length === 13, 'thirteen writes');
+  assert((text.match(/"readOnlyHint":true/g) || []).length === 9, 'nine read tools');
+  assert((text.match(/"readOnlyHint":false/g) || []).length === 14, 'fourteen writes');
   assert(
     (text.match(/"destructiveHint":true/g) || []).length === 4,
     'update_page, cancel and two trivia correction tools are destructive',
