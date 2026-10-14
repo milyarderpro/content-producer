@@ -247,10 +247,39 @@ try {
   );
   const tools = (await rpcHttp('tools/list')).body.result.tools;
   check(tools.length === 15, 'EXACT_FIFTEEN_TOOLS');
+  const defaultConfig = row<{ config: object }>(
+    'select internal.default_trivia_config_v1() config',
+  ).config;
   const inactiveWorkspaceListing = await (async () => {
     sql(`update public.workspaces set is_active=false where public_id='${f.workspace}'`);
     try {
-      return await rpcHttp('tools/list');
+      const before = stateDigest(f);
+      const pageCount = () =>
+        row<{ count: number }>(
+          `select count(*)::integer count from public.pages
+           where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`,
+        ).count;
+      const pagesBefore = pageCount();
+      const listing = await rpcHttp('tools/list');
+      // A direct tools/call must remain owner-scoped even without prior tools/list.
+      await call('get_account_profile', { request_schema_version: 1 }, 'OWNER_ACCESS_REQUIRED');
+      await call(
+        'create_page',
+        {
+          ...write(),
+          name: 'Inactive workspace must not create a Page',
+          slug: f.prefix + '-inactive-denied',
+          timezone: 'UTC',
+          target_markets: ['US'],
+          niche_key: 'trivia',
+          config_schema_version: 1,
+          config: defaultConfig,
+          make_default: false,
+        },
+        'OWNER_ACCESS_REQUIRED',
+      );
+      check(stateDigest(f) === before && pageCount() === pagesBefore, 'INACTIVE_WORKSPACE_MUTATED');
+      return listing;
     } finally {
       sql(`update public.workspaces set is_active=true where public_id='${f.workspace}'`);
     }
@@ -275,9 +304,6 @@ try {
     'Public HTTP auth, initialize, exact 15-tool census: PASS; original RS256 user JWT accepted by real local PostgREST.',
   );
 
-  const defaultConfig = row<{ config: object }>(
-    'select internal.default_trivia_config_v1() config',
-  ).config;
   const createPageInput = {
     ...write(),
     name: 'Batch A MCP Page',

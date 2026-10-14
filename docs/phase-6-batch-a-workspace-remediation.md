@@ -9,10 +9,12 @@ This note records the remediation for the independent Batch A re-audit finding t
 - Business tool invocations continue to be authorized by their owner-scoped public RPCs. The active-workspace discovery check does not run on every business tool call, avoiding an extra read-rate-limit charge per operation.
 - No database migration, RPC contract, or rate limit was changed.
 
+The contract placement is reconciled in [CR-017](decisions/2026-10-14-phase-6-batch-a-owner-workspace-reconciliation.md). Direct tool calls remain protected by owner-scoped public RPCs under RLS.
+
 ## Regression evidence
 
 - HTTP regression covers an allowlisted identity whose workspace check returns no active workspace; discovery returns HTTP 403 with the safe owner error.
-- The Batch A real HTTP → PostgREST → local database test disables the active workspace, verifies the same denial through the public endpoint, then restores the fixture in a `finally` block.
+- The Batch A real HTTP → PostgREST → local database test disables the active workspace, verifies discovery denial plus direct read and write `tools/call` denials, checks no Page or ledger mutation, then restores the fixture in a `finally` block.
 - The real create/replay tool path verifies exactly one read bucket charge for the workspace discovery check, not one charge per business operation.
 - The test-only injected checker keeps unit tests independent from database state; production defaults to the PostgREST workspace check.
 
