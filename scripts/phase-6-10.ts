@@ -1166,8 +1166,10 @@ try {
     revisionRead.post.revision === 2 &&
       revisionRead.post.content_hash === revised.post.content_hash &&
       revisionRead.post.content_payload.caption === 'Revised caption for checkpoint 6.10.' &&
-      revisionRead.post.system_checks.post_revision === 2 &&
-      revisionRead.post.editorial_checks.post_revision === 2 &&
+      revised.post.system_checks.post_revision === 2 &&
+      revised.post.editorial_checks.post_revision === 2 &&
+      revisionRead.post.system_checks.content_hash === revised.post.content_hash &&
+      revisionRead.post.editorial_checks.content_hash === revised.post.content_hash &&
       !revisionRead.post.fact_bindings.some((b: Record<string, unknown>) => 'source_snapshot' in b),
     'REVISE_QUALITY_SOURCE_PRIVACY',
   );
