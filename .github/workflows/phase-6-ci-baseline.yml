@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   checkpoint:
-    name: Phase 6.9 checkpoint (23 MCP tools); Full test-all reserved for 6.6/6.13
+    name: Phase 6.10 checkpoint (25 MCP tools); Full test-all reserved for 6.6/6.13
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
@@ -90,7 +90,7 @@ jobs:
           test "$(pnpm exec supabase --version)" = "2.120.0"
           echo "Supabase CLI: 2.120.0 (verified)"
 
-      - name: Checkpoint 6.9 - internal MCP tests
+      - name: Checkpoint 6.10 - internal MCP tests
         id: mcp
         if: env.FULL_GATE != 'true'
         run: |
@@ -121,7 +121,7 @@ jobs:
           echo "Migration SQL count: $(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
           exit "$code"
 
-      - name: Checkpoint 6.9 - local HTTP fail-closed smoke
+      - name: Checkpoint 6.10 - local HTTP fail-closed smoke
         id: http
         shell: bash
         run: |
@@ -132,12 +132,12 @@ jobs:
           pnpm exec tsx scripts/phase-6-1-http-smoke.ts
           echo "Exit code: 0 (local MCP HTTP smoke)"
 
-      - name: Phase 6.9 - authenticated MCP trivia HTTP and Inspector with real local RPCs
+      - name: Phase 6.10 - authenticated MCP trivia HTTP and Inspector with real local RPCs
         id: trivia_http
         if: env.FULL_GATE != 'true'
         run: |
-          pnpm exec tsx scripts/phase-6-9.ts
-          echo "Exit code: 0 (Phase 6.9 public MCP trivia correction/reverify, Inspector, exact CAS, lineage, replay and immutable snapshots)"
+          pnpm exec tsx scripts/phase-6-10.ts
+          echo "Exit code: 0 (Phase 6.10 public MCP trivia correction/reverify, Inspector, exact CAS, lineage, replay and immutable snapshots)"
 
       - name: Focused database regression - Phase 5 plans, trivia correction/contention and security
         id: regression
@@ -254,15 +254,15 @@ jobs:
           TRIVIA_HTTP_OUTCOME: ${{ steps.trivia_http.outcome }}
         run: |
           mkdir -p "$RUNNER_TEMP/phase-6-evidence"
-          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.9.md"
+          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.10.md"
           {
-            echo "# Phase 6.9 checkpoint CI (Batch A gate remains historical)"
+            echo "# Phase 6.10 checkpoint CI (Batch A gate remains historical)"
             echo
             echo "- Commit: $(git rev-parse HEAD)"
             echo "- Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             echo "- Started UTC: ${STARTED_UTC:-not recorded}"
             echo "- Finished UTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            echo "- New tools: 3; cumulative tools: **23/33**"
+            echo "- New tools: 2; cumulative tools: **25/33**"
             echo "- Local Supabase only, no remote project, secrets, or deployment"
             echo
             echo "| Stage | Actual command / scope | GitHub step outcome |"
@@ -278,7 +278,7 @@ jobs:
             echo '| Black-box HTTP | `supabase functions serve mcp --no-verify-jwt` + HTTP smoke | '"$HTTP_OUTCOME"' |'
             echo '| Focused regression | Phase 5 acceptance/reads/security/rate limits, trivia correction and post save/concurrency, baseline | '"$REGRESSION_OUTCOME"' |'
             echo
-            echo '| Phase 6.9 public MCP/Inspector | 23-tool census, 3 new post tools valid/invalid, save draft, replay, plan claim, owner, pagination, token privacy and correction lineage | '"$TRIVIA_HTTP_OUTCOME"' |'
+            echo '| Phase 6.10 public MCP/Inspector | 25-tool census, 3 new post tools valid/invalid, save draft, replay, plan claim, owner, pagination, token privacy and correction lineage | '"$TRIVIA_HTTP_OUTCOME"' |'
             echo "| Short real HTTP recovery preflight + fresh reset | MCP, recovery/race, clean reset | $PREFLIGHT_OUTCOME |"
             echo "| Reuse proof (audit-only repair) | prior full-suite PASS + unchanged product/SQL/config/tests | $REUSE_OUTCOME |"
             echo "| Full test-all (includes check/MCP/migration names/database) | sequential after clean reset | $FULL_OUTCOME |"

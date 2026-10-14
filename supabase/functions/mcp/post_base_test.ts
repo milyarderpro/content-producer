@@ -174,7 +174,7 @@ async function call(name: string, args: object) {
 }
 Deno.test('6.9: exactly 23 OAuth tools with closed post schemas and annotations', async () => {
   const tools = (await mcp('tools/list')).result.tools;
-  check(MCP_TOOL_COUNT === 23 && tools.length === 23, 'EXACT_23');
+  check(MCP_TOOL_COUNT === 25 && tools.length === 25, 'EXACT_23');
   for (const name of POST_BASE_TOOL_NAMES) {
     const t = tools.find((x: { name: string }) => x.name === name);
     check(t?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
