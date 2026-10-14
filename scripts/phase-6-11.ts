@@ -433,7 +433,7 @@ try {
     'SCHEDULE_CONFLICT',
   );
   console.info(
-    'Public MCP→PostgREST→database Page/create/update and plan/create: owner scope, replay, payload mismatch, CAS, slug/schedule conflicts PASS.',
+    'Public MCPâPostgRESTâdatabase Page/create/update and plan/create: owner scope, replay, payload mismatch, CAS, slug/schedule conflicts PASS.',
   );
 
   const p = createPlan(f, 2);
@@ -1241,7 +1241,6 @@ try {
   console.info(
     '6.11 real public HTTP post revise/reschedule: CAS, quality, source privacy, replay, schedule conflict, clear and rollback PASS.',
   );
-
 
   clearFixtureBuckets();
   const approvalArgs = {

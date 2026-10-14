@@ -122,10 +122,7 @@ Deno.test(
       check(tool?._meta.securitySchemes[0].type === 'oauth2', 'OAUTH');
       check(tool.annotations.readOnlyHint === false, 'WRITE_TOOL');
       check(tool.annotations.openWorldHint === false, 'CLOSED_WORLD');
-      check(
-        tool.annotations.destructiveHint === (name === 'discard_post'),
-        'DESTRUCTIVE_HINT',
-      );
+      check(tool.annotations.destructiveHint === (name === 'discard_post'), 'DESTRUCTIVE_HINT');
       check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE');
     }
   },
@@ -143,9 +140,7 @@ Deno.test(
       check(headers.get('apikey') === context.publishableKey, 'PUBLIC_KEY');
       check(headers.get('Content-Profile') === 'api', 'PUBLIC_RPC');
       calls.push({ name, params: JSON.parse(String(init?.body)) });
-      return Promise.resolve(
-        Response.json({ response_schema_version: 1, data: response[name] }),
-      );
+      return Promise.resolve(Response.json({ response_schema_version: 1, data: response[name] }));
     }) as typeof fetch;
     try {
       const approved = await call('approve_post', approveArgs);

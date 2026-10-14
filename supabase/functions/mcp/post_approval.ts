@@ -124,10 +124,7 @@ export const POST_APPROVAL_TOOL_NAMES = [
   'discard_post',
 ] as const;
 
-export function registerPostApprovalTools(
-  server: McpServer,
-  context?: RequestContext,
-): void {
+export function registerPostApprovalTools(server: McpServer, context?: RequestContext): void {
   if (!context) return;
   const scoped = context;
   server.registerTool(
