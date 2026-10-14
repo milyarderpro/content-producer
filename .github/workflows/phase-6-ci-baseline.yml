@@ -68,6 +68,15 @@ jobs:
           pnpm install --frozen-lockfile
           echo "Exit code: 0 (pnpm install --frozen-lockfile)"
 
+      - name: Temporary canonical post-read probe formatting
+        run: |
+          pnpm exec prettier --write scripts/phase-6-9.ts supabase/functions/mcp/post_base.ts
+          for path in scripts/phase-6-9.ts supabase/functions/mcp/post_base.ts; do
+            echo "POST69_FORMAT_BEGIN:${path}"
+            base64 -w 192 "$path" | sed 's/^/POST69_B64:/'
+            echo "POST69_FORMAT_END:${path}"
+          done
+
       - name: Required project check
         id: check
         if: env.FULL_GATE != 'true' || env.REUSE_FULL_SUITES == 'true'
