@@ -268,6 +268,9 @@ Deno.test(
       'metadata bearer method mismatch',
     );
 
+    const unknown = await handle(new Request('http://127.0.0.1:54321/functions/v1/unknown'));
+    assert(unknown.status === 404, 'unknown route must remain not found before auth middleware');
+
     const ownerToken = await sign(claims);
     const listed = await handle(
       new Request(config.resource, {

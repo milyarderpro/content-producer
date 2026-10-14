@@ -36,7 +36,7 @@ export function createEdgeHandler(
 ): (request: Request) => Promise<Response> {
   return async (request) => {
     const path = new URL(request.url).pathname.replace(/\/+$/, '') || '/';
-    if (path.endsWith('/health')) {
+    if (['/health', '/mcp/health', '/functions/v1/mcp/health'].includes(path)) {
       return handleHttpRequest(request, { config: configured });
     }
     let config: OAuthConfig;
@@ -44,6 +44,18 @@ export function createEdgeHandler(
       config = configured ?? runtimeOAuthConfig();
     } catch {
       return handleHttpRequest(request);
+    }
+    const resourcePath = new URL(config.resource).pathname;
+    const isMcpPath = [resourcePath, '/mcp', '/functions/v1/mcp'].includes(path);
+    const isDiscoveryPath = [
+      resourcePath + '/oauth-protected-resource',
+      '/mcp/oauth-protected-resource',
+      '/oauth-protected-resource',
+      '/.well-known/oauth-protected-resource' + resourcePath,
+      '/.well-known/oauth-protected-resource',
+    ].includes(path);
+    if (!isMcpPath && !isDiscoveryPath) {
+      return handleHttpRequest(request, { config });
     }
     let body: ArrayBuffer | null = null;
     if (request.method === 'POST') {
