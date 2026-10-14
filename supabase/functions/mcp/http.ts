@@ -68,6 +68,24 @@ function safeLog(id: string, stage: string, status: number): void {
   // Never log request URLs, headers, tokens, user claims, bodies or RPC results.
   console.info(JSON.stringify({ event: 'mcp_request', request_id: id, stage, status }));
 }
+function includesToolsList(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(includesToolsList);
+  return (
+    !!value &&
+    typeof value === 'object' &&
+    'method' in value &&
+    (value as { method: unknown }).method === 'tools/list'
+  );
+}
+async function isToolsListRequest(request: Request): Promise<boolean> {
+  if (request.method !== 'POST') return false;
+  try {
+    return includesToolsList(await request.clone().json());
+  } catch {
+    return false;
+  }
+}
+const publicIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 export async function handleHttpRequest(
   request: Request,
   options: HttpOptions = {},
@@ -125,7 +143,15 @@ export async function handleHttpRequest(
   if (path !== expectedPath) return challenge(config.resource, 401);
   const id = crypto.randomUUID();
   try {
-    const context = await authenticateRequest(request, config, options.dependencies);
+    const { checkOwner, ...jwtDependencies } = options.dependencies ?? {};
+    const context = await authenticateRequest(request, config, jwtDependencies);
+    if (checkOwner && (await isToolsListRequest(request))) {
+      const workspacePublicId = await checkOwner(config, context.accessToken, context.actorUserId);
+      if (!workspacePublicId || !publicIdPattern.test(workspacePublicId)) {
+        throw new AuthRejection(403);
+      }
+      context.workspacePublicId = workspacePublicId;
+    }
     const response = await createAuthenticatedTransport(context).fetch(request);
     safeLog(id, 'mcp', response.status);
     return response;
