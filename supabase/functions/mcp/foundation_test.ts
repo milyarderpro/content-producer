@@ -236,7 +236,9 @@ Deno.test(
 
 Deno.test('Batch A all tool input/output object schemas are closed recursively', async () => {
   const raw = await request('tools/list');
-  const parsed = JSON.parse(raw);
+  const frame = raw.split('\n').find((line) => line.startsWith('data: '));
+  assert(frame, 'tools/list must return an MCP data frame');
+  const parsed = JSON.parse(frame.slice(6));
   const tools = parsed.result?.tools ?? [];
   assert(tools.length === MCP_TOOL_COUNT && tools.length === 15, 'exact 15 schemas');
   for (const tool of tools) {
