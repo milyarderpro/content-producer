@@ -1184,7 +1184,7 @@ try {
   const moved = await call('reschedule_post', move);
   check(
     moved.revision === 3 &&
-      moved.scheduled_at === movedAt &&
+      Date.parse(moved.scheduled_at) === Date.parse(movedAt) &&
       moved.content_hash_unchanged &&
       moved.plan_item_schedule === null,
     'RESCHEDULE_EXACT_REVISION_AND_HASH',
