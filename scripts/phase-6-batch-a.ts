@@ -196,16 +196,28 @@ try {
     }),
     { mode: 0o600 },
   );
-  host = spawn('deno', [
-    'run',
-    '--allow-env=NODE_ENV,AI_AGENT',
-    '--allow-net=127.0.0.1:54329,127.0.0.1:54330',
-    '--allow-read=' + fixtureFile,
-    '--config',
-    'supabase/functions/deno.json',
-    'supabase/functions/batch_a_server.ts',
-    fixtureFile,
-  ]);
+  host = spawn(
+    'deno',
+    [
+      'run',
+      '--allow-env=NODE_ENV,AI_AGENT,APPVEYOR,CI,DEBUG,TEST,MODE,MINIMAL,NO_COLOR,FORCE_COLOR,TERM',
+      '--allow-net=127.0.0.1:54329,127.0.0.1:54330',
+      '--allow-read=' + fixtureFile,
+      '--config',
+      'supabase/functions/deno.json',
+      'supabase/functions/batch_a_server.ts',
+      fixtureFile,
+    ],
+    {
+      env: {
+        PATH: process.env.PATH,
+        HOME: process.env.HOME,
+        NODE_ENV: 'test',
+        AI_AGENT: 'none',
+        APPVEYOR: '1',
+      },
+    },
+  );
   host.stdout?.on('data', (chunk) => {
     logs += String(chunk);
   });
