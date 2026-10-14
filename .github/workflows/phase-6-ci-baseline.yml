@@ -168,14 +168,14 @@ jobs:
           echo "Focused Phase 5/trivia/correction/approval+lifecycle-race regression: exit code $code; elapsed $((SECONDS - started))s"
           exit "$code"
 
-      - name: Batch B - short real HTTP recovery preflight, then fresh clean reset
+      - name: Batch B - public HTTP metrics/recovery preflight, then fresh clean reset
         id: preflight
         if: env.FULL_GATE == 'true'
         run: |
           pnpm run test:mcp
           pnpm exec tsx scripts/phase-6-13.ts --preflight
           pnpm run supabase:reset > "$RUNNER_TEMP/phase-6-supabase-gate-reset.log" 2>&1
-          echo "Exit code: 0 (focused MCP + real HTTP recovery preflight + fresh clean reset)"
+          echo "Exit code: 0 (focused MCP + real HTTP metrics/recovery preflight + fresh clean reset)"
 
       - name: Verify previous full-suite PASS and exact audit-only source diff
         id: reuse
@@ -187,7 +187,7 @@ jobs:
           pnpm exec tsx scripts/phase-6-reuse-suites.ts
           echo "Exit code: 0 (unchanged product source and verified prior full-suite PASS)"
 
-      # Full gate runs only for the tagged Batch B commit or explicit 6.6 dispatch.
+      # Full gate runs only for the tagged Batch B commit or explicit 6.13 dispatch.
       # Earlier checkpoint pushes retain targeted CI; test-all is reserved for this gate.
       - name: Batch B - test-all after clean reset (includes check, migration names, MCP, database)
         id: full
@@ -262,7 +262,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/phase-6-evidence"
           report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.13.md"
           {
-            echo "# Phase 6.13 checkpoint CI (Batch B gate remains historical)"
+            echo "# Phase 6.13 CI (focused checkpoint or explicit Batch B gate)"
             echo
             echo "- Commit: $(git rev-parse HEAD)"
             echo "- Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
@@ -284,17 +284,17 @@ jobs:
             echo '| Black-box HTTP | `supabase functions serve mcp --no-verify-jwt` + HTTP smoke | '"$HTTP_OUTCOME"' |'
             echo '| Focused regression | Phase 5 acceptance/reads/security/rate limits, post approval/lifecycle, all metrics/insights/concurrency regressions | '"$REGRESSION_OUTCOME"' |'
             echo
-            echo '| Phase 6.13 public MCP/Inspector | 33-tool census, publish/archive valid/invalid, exact intent/CAS, replay, provenance, immutable history, owner isolation and lifecycle regression | '"$TRIVIA_HTTP_OUTCOME"' |'
+            echo '| Phase 6.13 public MCP/Inspector | 33-tool census, metrics append/replay, null-vs-zero, likes subset, deltas/pagination, evidence-backed insights, owner denial, 33 positive/negative Inspector calls | '"$TRIVIA_HTTP_OUTCOME"' |'
             echo "| Short real HTTP recovery preflight + fresh reset | MCP, recovery/race, clean reset | $PREFLIGHT_OUTCOME |"
             echo "| Reuse proof (audit-only repair) | prior full-suite PASS + unchanged product/SQL/config/tests | $REUSE_OUTCOME |"
             echo "| Full test-all (includes check/MCP/migration names/database) | sequential after clean reset | $FULL_OUTCOME |"
             echo "| Smoke (duplicates database suite) | pnpm run smoke-test | $SMOKE_OUTCOME |"
             echo "| Migration history | pnpm run supabase:verify | $HISTORY_OUTCOME |"
             echo "| Security/catalog/cleanup | phase-6-catalog-audit.ts (accepted 67-migration baseline) | $AUDIT_OUTCOME |"
-            echo "| Inspector 2.5.0 + real DB public HTTP | 33 valid / 33 invalid tool calls, auth, recovery and race | $INSPECTOR_OUTCOME |"
+            echo "| Inspector 2.5.0 + real DB public HTTP | 33 valid / 33 invalid tool calls, auth, recovery, metrics and race | $INSPECTOR_OUTCOME |"
             echo "| Whitespace | git diff --check | $DIFF_OUTCOME |"
-            echo "Full gate requested: $FULL_GATE. test-all includes check/MCP and smoke repeats database tests; these are not independent evidence."
-            echo "Hosted OAuth/PKCE/consent/DCR/refresh/relink/ChatGPT 2xx: deferred Phase 9–10. Independent Batch B audit PASS at 3cceb4710ea5b9019da019f5535ab64321713aed."
+            echo "Full gate requested: $FULL_GATE. test-all includes check/MCP/migration-name verification and smoke repeats database tests; these are not independent evidence."
+            echo "Hosted OAuth/PKCE/consent/DCR/refresh/relink/ChatGPT 2xx: deferred Phase 9–10. Independent Batch B audit remains PENDING; historical Batch A audit PASS at 3cceb4710ea5b9019da019f5535ab64321713aed."
             echo "Full suites reused: no; Batch B invokes one fresh sequential full gate."
             echo "Numerical exit codes and exact assertions are in Actions step logs. A skipped stage is not a pass."
           } > "$report"
