@@ -68,6 +68,17 @@ jobs:
           pnpm install --frozen-lockfile
           echo "Exit code: 0 (pnpm install --frozen-lockfile)"
 
+      - name: Format Phase 6.11 diagnostic
+        id: format_diag
+        run: |
+          pnpm exec prettier --write scripts/phase-6-11.ts supabase/functions/mcp/post_approval.ts supabase/functions/mcp/post_approval_test.ts
+          for file in scripts/phase-6-11.ts supabase/functions/mcp/post_approval.ts supabase/functions/mcp/post_approval_test.ts; do
+            echo "FORMATTED_BEGIN:$file"
+            base64 -w0 "$file"
+            echo
+            echo "FORMATTED_END:$file"
+          done
+
       - name: Required project check
         id: check
         if: env.FULL_GATE != 'true' || env.REUSE_FULL_SUITES == 'true'
@@ -256,7 +267,7 @@ jobs:
           TRIVIA_HTTP_OUTCOME: ${{ steps.trivia_http.outcome }}
         run: |
           mkdir -p "$RUNNER_TEMP/phase-6-evidence"
-          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.10.md"
+          report="$RUNNER_TEMP/phase-6-evidence/checkpoint-6.11.md"
           {
             echo "# Phase 6.11 checkpoint CI (Batch A gate remains historical)"
             echo
