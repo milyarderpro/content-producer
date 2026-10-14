@@ -1258,7 +1258,8 @@ try {
     expected_revision: finalRead.post.revision,
     expected_content_hash: finalRead.post.content_hash,
     explicit_approval: true,
-    accepted_warning_ids: [],
+    accepted_warning_ids: ['trivia.profile.preferred_band'],
+    warning_acceptance_reason: 'Accept the reviewed preferred profile warning.',
   };
   await rejectToolInput('approve_post', { ...approvalArgs, explicit_approval: false });
   await call('approve_post', { ...approvalArgs, expected_revision: 999 }, 'REVISION_CONFLICT');
@@ -1310,7 +1311,8 @@ try {
     expected_revision: revoked.revision,
     expected_content_hash: finalRead.post.content_hash,
     explicit_approval: true,
-    accepted_warning_ids: [],
+    accepted_warning_ids: ['trivia.profile.preferred_band'],
+    warning_acceptance_reason: 'Accept the reviewed preferred profile warning.',
   });
   const discardArgs = {
     ...write(),
@@ -1568,7 +1570,8 @@ try {
         expected_revision: inspectedSchedule.revision,
         expected_content_hash: inspectedRevised.post.content_hash,
         explicit_approval: true,
-        accepted_warning_ids: [],
+        accepted_warning_ids: ['trivia.profile.preferred_band'],
+        warning_acceptance_reason: 'Accept the reviewed preferred profile warning.',
       })
     ).structuredContent.data;
     check(
