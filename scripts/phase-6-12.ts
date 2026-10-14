@@ -1357,7 +1357,6 @@ try {
     '6.12 real public HTTP approval/revoke/discard: explicit intent, CAS, current evidence, replay and allocation release PASS.',
   );
 
-
   // Phase 6.12: a separate ready post is manually recorded, never sent to Facebook.
   clearFixtureBuckets();
   const manualRequest = postRequest(f);
@@ -1400,7 +1399,11 @@ try {
     published_url: 'http://insecure.test/post',
   });
   await call('mark_post_posted', { ...publicationArgs, expected_revision: 1 }, 'REVISION_CONFLICT');
-  await call('mark_post_posted', { ...publicationArgs, expected_content_hash: '0'.repeat(64) }, 'CONTENT_HASH_CONFLICT');
+  await call(
+    'mark_post_posted',
+    { ...publicationArgs, expected_content_hash: '0'.repeat(64) },
+    'CONTENT_HASH_CONFLICT',
+  );
   const manualPosted = await call('mark_post_posted', publicationArgs);
   check(
     manualPosted.status === 'posted' &&
@@ -1408,7 +1411,7 @@ try {
       manualPosted.platform_post_id === 'manual-612' &&
       manualPosted.published_url === publicationArgs.published_url &&
       Date.parse(manualPosted.published_at) === Date.parse(publicationArgs.published_at) &&
-      manualPosted.published_fact_public_ids.length === manualSaved.post.fact_bindings.length,
+      manualPosted.published_fact_public_ids.length === manualRequest.bindings.length,
     'PUBLICATION_PROVENANCE_AND_FACTS',
   );
   check((await call('mark_post_posted', publicationArgs)).replayed, 'PUBLICATION_REPLAY');
@@ -1419,7 +1422,8 @@ try {
   );
   const manualUsageCount = row<{ count: number }>(
     "select count(*)::integer count from public.trivia_post_facts j join public.posts p on p.id=j.post_id where p.public_id='" +
-      manualPostId + "' and j.is_current and j.allocation_state='published'",
+      manualPostId +
+      "' and j.is_current and j.allocation_state='published'",
   ).count;
   check(
     manualUsageCount === manualPosted.published_fact_public_ids.length,
@@ -1428,7 +1432,8 @@ try {
   const preservedEvidence = () =>
     row<{ digest: string }>(
       "select md5(row(system_checks,editorial_checks,approval_snapshot,quality_status,ready_at,published_at,platform_post_id,published_url,content_hash,content_payload,generation_snapshot)::text) digest from public.posts where public_id='" +
-        manualPostId + "'",
+        manualPostId +
+        "'",
     ).digest;
   const beforeArchive = preservedEvidence();
   const archiveArgs = {
@@ -1449,12 +1454,27 @@ try {
     'ARCHIVE_IMMUTABLE_PUBLICATION_EVIDENCE',
   );
   check((await call('archive_post', archiveArgs)).replayed, 'ARCHIVE_REPLAY');
-  await call('archive_post', { ...archiveArgs, reason: 'Different archive intent.' }, 'OPERATION_KEY_REUSED');
-  await call('archive_post', { ...write(), post_public_id: manualPostId, expected_revision: archived.revision, reason: 'Archive twice.', explicit_archive: true }, 'INVALID_STATUS_TRANSITION');
+  await call(
+    'archive_post',
+    { ...archiveArgs, reason: 'Different archive intent.' },
+    'OPERATION_KEY_REUSED',
+  );
+  await call(
+    'archive_post',
+    {
+      ...write(),
+      post_public_id: manualPostId,
+      expected_revision: archived.revision,
+      reason: 'Archive twice.',
+      explicit_archive: true,
+    },
+    'INVALID_STATUS_TRANSITION',
+  );
   check(
     row<{ count: number }>(
       "select count(*)::integer count from public.trivia_post_facts j join public.posts p on p.id=j.post_id where p.public_id='" +
-        manualPostId + "' and j.is_current and j.allocation_state='published'",
+        manualPostId +
+        "' and j.is_current and j.allocation_state='published'",
     ).count === manualUsageCount,
     'ARCHIVE_PRESERVES_PUBLISHED_FACT_USAGE',
   );
@@ -1470,7 +1490,9 @@ try {
     foreignBearer,
   );
   check(foreignPublication.status === 403, 'FOREIGN_ARCHIVE_DENIED');
-  console.info('6.12 public MCP manual publication/archival: approval, CAS, provenance, replay, immutable evidence, permanent usage and owner privacy PASS.');
+  console.info(
+    '6.12 public MCP manual publication/archival: approval, CAS, provenance, replay, immutable evidence, permanent usage and owner privacy PASS.',
+  );
 
   clearFixtureBuckets();
   if (!process.argv.includes('--preflight')) {
@@ -1758,7 +1780,6 @@ try {
       })
     ).structuredContent.data;
     check(inspectorArchived.status === 'archived', 'INSPECTOR_ARCHIVED');
-
 
     clearFixtureBuckets();
     for (const tool of tools) await inspector('tools/call', tool.name, {}, 5);

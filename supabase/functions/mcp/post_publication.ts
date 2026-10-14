@@ -10,12 +10,16 @@ const version = z.literal(1);
 const timestamp = z.string().datetime({ offset: true });
 const revision = z.number().int().min(1);
 const hash = z.string().regex(/^[0-9a-f]{64}$/);
-const platformId = z.string().min(1).max(200).regex(/^[^\x00-\x1f\x7f]+$/);
+const platformId = z
+  .string()
+  .min(1)
+  .max(200)
+  .regex(/^[^\p{Cc}]+$/u);
 const httpsUrl = z
   .string()
   .min(9)
   .max(2048)
-  .regex(/^https:\/\/[A-Za-z0-9][A-Za-z0-9.-]*(?::[0-9]{1,5})?(?:[/?#][^\s\x00-\x1f\x7f]*)?$/);
+  .regex(/^https:\/\/[A-Za-z0-9][A-Za-z0-9.-]*(?::[0-9]{1,5})?(?:[/?#][^\s\p{Cc}]*)?$/u);
 const common = {
   request_schema_version: version,
   workspace_public_id: uuid,

@@ -79,20 +79,23 @@ const archiveInput = {
   explicit_archive: true,
 };
 
-Deno.test('6.12: exactly 30 OAuth tools with closed publication schemas and destructive hints', async () => {
-  const tools = (await mcp('tools/list')).result.tools;
-  check(MCP_TOOL_COUNT === 30 && tools.length === 30, 'EXACT_30');
-  for (const name of POST_PUBLICATION_TOOL_NAMES) {
-    const tool = tools.find((entry: { name: string }) => entry.name === name);
-    check(tool?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
-    check(tool?.outputSchema.additionalProperties === false, 'CLOSED_OUTPUT');
-    check(tool?._meta.securitySchemes[0].type === 'oauth2', 'OAUTH');
-    check(tool.annotations.readOnlyHint === false, 'WRITE_TOOL');
-    check(tool.annotations.destructiveHint === true, 'DESTRUCTIVE_HINT');
-    check(tool.annotations.openWorldHint === false, 'CLOSED_WORLD');
-    check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE');
-  }
-});
+Deno.test(
+  '6.12: exactly 30 OAuth tools with closed publication schemas and destructive hints',
+  async () => {
+    const tools = (await mcp('tools/list')).result.tools;
+    check(MCP_TOOL_COUNT === 30 && tools.length === 30, 'EXACT_30');
+    for (const name of POST_PUBLICATION_TOOL_NAMES) {
+      const tool = tools.find((entry: { name: string }) => entry.name === name);
+      check(tool?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
+      check(tool?.outputSchema.additionalProperties === false, 'CLOSED_OUTPUT');
+      check(tool?._meta.securitySchemes[0].type === 'oauth2', 'OAUTH');
+      check(tool.annotations.readOnlyHint === false, 'WRITE_TOOL');
+      check(tool.annotations.destructiveHint === true, 'DESTRUCTIVE_HINT');
+      check(tool.annotations.openWorldHint === false, 'CLOSED_WORLD');
+      check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE');
+    }
+  },
+);
 
 Deno.test('6.12: forwards exact manual publication/archival data with original JWT', async () => {
   const previous = globalThis.fetch;
@@ -104,9 +107,7 @@ Deno.test('6.12: forwards exact manual publication/archival data with original J
     check(headers.get('apikey') === context.publishableKey, 'PUBLIC_KEY');
     check(headers.get('Content-Profile') === 'api', 'PUBLIC_RPC');
     calls.push({ name, params: JSON.parse(String(init?.body)) });
-    return Promise.resolve(
-      Response.json({ response_schema_version: 1, data: responses[name] }),
-    );
+    return Promise.resolve(Response.json({ response_schema_version: 1, data: responses[name] }));
   }) as typeof fetch;
   try {
     const publication = await call('mark_post_posted', postedInput);
@@ -122,7 +123,9 @@ Deno.test('6.12: forwards exact manual publication/archival data with original J
     check(calls[1].params.p_explicit_archive === true, 'EXPLICIT_ARCHIVE');
     check(calls[1].params.p_reason === archiveInput.reason, 'ARCHIVE_REASON');
     check(
-      calls.every((c) => !Object.keys(c.params).some((k) => /^p_(owner|actor|client|oauth)/.test(k))),
+      calls.every(
+        (c) => !Object.keys(c.params).some((k) => /^p_(owner|actor|client|oauth)/.test(k)),
+      ),
       'NO_IDENTITY_OVERRIDES',
     );
     check(!JSON.stringify(archived.content).includes(context.accessToken), 'TOKEN_PRIVACY');
@@ -162,23 +165,30 @@ Deno.test('6.12: no implicit publication, insecure URL or unsafe archive reaches
   }
 });
 
-Deno.test('6.12: fail closed on injected backend fields and untrusted publication URL', async () => {
-  const previous = globalThis.fetch;
-  let data: Record<string, unknown> = { ...responses.mark_post_posted, owner_user_id: context.actorUserId };
-  globalThis.fetch = (() => Promise.resolve(Response.json({ response_schema_version: 1, data }))) as typeof fetch;
-  try {
-    const injected = await call('mark_post_posted', postedInput);
-    check(
-      injected.isError && injected.structuredContent.error.code === 'DATABASE_UNAVAILABLE',
-      'INJECTED_OUTPUT_REJECTED',
-    );
-    data = { ...responses.mark_post_posted, published_url: 'http://insecure.test/post' };
-    const untrusted = await call('mark_post_posted', postedInput);
-    check(
-      untrusted.isError && untrusted.structuredContent.error.code === 'DATABASE_UNAVAILABLE',
-      'INSECURE_OUTPUT_REJECTED',
-    );
-  } finally {
-    globalThis.fetch = previous;
-  }
-});
+Deno.test(
+  '6.12: fail closed on injected backend fields and untrusted publication URL',
+  async () => {
+    const previous = globalThis.fetch;
+    let data: Record<string, unknown> = {
+      ...responses.mark_post_posted,
+      owner_user_id: context.actorUserId,
+    };
+    globalThis.fetch = (() =>
+      Promise.resolve(Response.json({ response_schema_version: 1, data }))) as typeof fetch;
+    try {
+      const injected = await call('mark_post_posted', postedInput);
+      check(
+        injected.isError && injected.structuredContent.error.code === 'DATABASE_UNAVAILABLE',
+        'INJECTED_OUTPUT_REJECTED',
+      );
+      data = { ...responses.mark_post_posted, published_url: 'http://insecure.test/post' };
+      const untrusted = await call('mark_post_posted', postedInput);
+      check(
+        untrusted.isError && untrusted.structuredContent.error.code === 'DATABASE_UNAVAILABLE',
+        'INSECURE_OUTPUT_REJECTED',
+      );
+    } finally {
+      globalThis.fetch = previous;
+    }
+  },
+);
