@@ -158,7 +158,10 @@ Deno.test('6.5 claims retain OAuth and annotations after 6.7 expansion', async (
       'closed output',
     );
   }
-  assert(tools.some((t) => t.name === 'trivia_find_similar_facts'), '6.7 tool registered');
+  assert(
+    tools.some((t) => t.name === 'trivia_find_similar_facts'),
+    '6.7 tool registered',
+  );
 });
 
 Deno.test(
