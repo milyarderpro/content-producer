@@ -11,7 +11,12 @@ import {
   sql,
   stateDigest,
 } from '../supabase/tests/database/helpers/plan-lifecycle.js';
-import { candidate, cleanup, factInput, fixture } from '../supabase/tests/database/helpers/trivia-rpc.js';
+import {
+  candidate,
+  cleanup,
+  factInput,
+  fixture,
+} from '../supabase/tests/database/helpers/trivia-rpc.js';
 
 // No remote URL or cloud project accepted. Reuse only the local stack's image/network/DB URI.
 const resource = 'http://127.0.0.1:54330/mcp';
