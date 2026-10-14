@@ -12,7 +12,6 @@ import {
   stateDigest,
 } from '../supabase/tests/database/helpers/plan-lifecycle.js';
 import {
-  rpc as postRpc,
   request as postRequest,
   cleanup as postCleanup,
 } from '../supabase/tests/database/helpers/post-rpc.js';
@@ -970,24 +969,6 @@ try {
   );
   await call('save_post', { ...draft, topic_key: 'geography' }, 'OPERATION_KEY_REUSED');
   check(postsBefore() === beforeSave + 1, 'SAVE_KEY_MISMATCH_ROLLBACK');
-  const directGet = postRpc(
-    f,
-    `api.get_post(1,'${f.workspace}','${saved.post.post_public_id}',true,true,false)`,
-  );
-  const validateCode = [
-    "import { getPostOutputSchema } from './supabase/functions/mcp/post_base.ts';",
-    "const obj = JSON.parse(await new Response(Deno.stdin.readable).text());",
-    "const parsed = getPostOutputSchema.safeParse(obj);",
-    "console.log(parsed.success ? 'SHAPE_VALID' : parsed.error.issues.slice(0,30).map(i=>i.path.join('.') + ':' + i.code).join('|'));",
-  ].join(' ');
-  const validation = spawnSync(
-    'deno', ['eval', '--config', 'supabase/functions/deno.json', validateCode], {
-      input: JSON.stringify(directGet),
-      encoding: 'utf8',
-    },
-  );
-  check(validation.status === 0, 'LOCAL_RESPONSE_DIAGNOSTIC_FAILURE');
-  console.info('GET_POST_SCHEMA_PATHS_' + validation.stdout.trim());
   console.info('POST_P4_REPLAY_PASSED');
   const fetched = await call('get_post', {
     ...common(),

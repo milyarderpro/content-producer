@@ -118,9 +118,9 @@ const sourceEntry = z.strictObject({
   tier: z.enum(['A', 'B', 'C', 'D']),
   source_type: z.string().min(1).max(80),
   accessed_at: timestamp,
-  published_at: z.string().nullable(),
-  updated_at: z.string().nullable(),
-  as_of: z.string().nullable(),
+  published_at: z.string().nullable().optional(),
+  updated_at: z.string().nullable().optional(),
+  as_of: z.string().nullable().optional(),
   language: z.string().max(35),
   supports: z.string().max(500),
   independence_group: z.string().max(120),
@@ -171,7 +171,7 @@ const sourceSnapshot = z.strictObject({
     'superseded',
   ]),
   verified_at: timestamp.nullable(),
-  as_of_date: z.string().nullable(),
+  as_of_date: z.string().nullable().optional(),
   expires_at: timestamp.nullable(),
   dedup_review_schema_version: version,
 });
@@ -549,5 +549,3 @@ export function registerPostBaseTools(server: McpServer, context?: RequestContex
       ),
   );
 }
-
-export const getPostOutputSchema = getOutput;
