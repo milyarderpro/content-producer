@@ -433,7 +433,7 @@ try {
     'SCHEDULE_CONFLICT',
   );
   console.info(
-    'Public MCPâPostgRESTâdatabase Page/create/update and plan/create: owner scope, replay, payload mismatch, CAS, slug/schedule conflicts PASS.',
+    'Public MCP→PostgREST→database Page/create/update and plan/create: owner scope, replay, payload mismatch, CAS, slug/schedule conflicts PASS.',
   );
 
   const p = createPlan(f, 2);
