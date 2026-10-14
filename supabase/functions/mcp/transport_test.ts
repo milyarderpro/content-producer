@@ -33,7 +33,7 @@ Deno.test('6.3 internal transport is functional, but lists no unauthenticated to
   const listBody = await listed.text();
   assert(listed.status === 200, `internal tools/list: ${listed.status}`);
   assert(/"tools"\s*:\s*\[\s*\]/.test(listBody), 'unauthed registry must be empty');
-  assert(MCP_TOOL_COUNT === 15, 'checkpoint 6.6 must register exactly fifteen tools for owners');
+  assert(MCP_TOOL_COUNT === 18, 'checkpoint 6.7 must register exactly eighteen tools for owners');
 });
 
 Deno.test('6.1 internal protocol errors are structured', async () => {
