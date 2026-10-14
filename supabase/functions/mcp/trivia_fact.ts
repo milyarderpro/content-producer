@@ -42,7 +42,7 @@ const number = z.strictObject({
   unit: z.string().min(1).max(80).nullable(),
   role: z.string().min(1).max(80),
 });
-const candidate = z.strictObject({
+export const candidate = z.strictObject({
   candidate_key: z.string().regex(/^[A-Za-z0-9_-]{1,64}$/),
   claim_text: z.string().trim().min(1).max(500),
   subject_key: z.string().trim().min(1).max(120),
@@ -76,7 +76,7 @@ const review = z
     material_differences: z.array(difference).max(10),
   })
   .refine((d) => d.decision !== 'same' || d.candidate_fact_public_id !== undefined);
-const source = z.strictObject({
+export const source = z.strictObject({
   schema_version: z.literal(1),
   url: z.url().startsWith('https://').max(2048),
   canonical_url: z.url().startsWith('https://').max(2048),
