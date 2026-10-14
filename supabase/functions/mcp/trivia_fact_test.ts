@@ -56,33 +56,59 @@ const inputs: Record<string, Record<string, unknown>> = {
     expected_config_updated_at: stamp,
     fact_reuse_scope: 'workspace_unique',
     reservation_ttl_minutes: 30,
-    facts: [{
-      position: 1, candidate, dedup_reviews: [], sources: [source],
-      freshness_class: 'stable', as_of_date: null,
-      requested_expires_at: '2026-12-11T00:00:00Z',
-      risk_class: 'standard', verification_note: 'Checked against primary research.',
-    }],
+    facts: [
+      {
+        position: 1,
+        candidate,
+        dedup_reviews: [],
+        sources: [source],
+        freshness_class: 'stable',
+        as_of_date: null,
+        requested_expires_at: '2026-12-11T00:00:00Z',
+        risk_class: 'standard',
+        verification_note: 'Checked against primary research.',
+      },
+    ],
   },
-  trivia_release_facts: { ...write, reservation_token: reservationToken, reason: 'Abandoned before save.' },
+  trivia_release_facts: {
+    ...write,
+    reservation_token: reservationToken,
+    reason: 'Abandoned before save.',
+  },
 };
 const responses: Record<string, object> = {
-  trivia_find_similar_facts: { candidates: [{
-    candidate_key: candidate.candidate_key,
-    normalized_preview: 'a tested atomic proposition',
-    matches: [],
-    review_required: false,
-  }] },
+  trivia_find_similar_facts: {
+    candidates: [
+      {
+        candidate_key: candidate.candidate_key,
+        normalized_preview: 'a tested atomic proposition',
+        matches: [],
+        review_required: false,
+      },
+    ],
+  },
   trivia_register_and_reserve_facts: {
-    reservation_token: reservationToken, page_public_id: page,
-    fact_reuse_scope: 'workspace_unique', reserved_until: stamp,
-    facts: [{
-      position: 1, fact_public_id: factId,
-      canonical_claim: candidate.claim_text, canonical_action: 'created_new',
-      verification_status: 'verified', expires_at: '2026-12-11T00:00:00Z',
-    }],
+    reservation_token: reservationToken,
+    page_public_id: page,
+    fact_reuse_scope: 'workspace_unique',
+    reserved_until: stamp,
+    facts: [
+      {
+        position: 1,
+        fact_public_id: factId,
+        canonical_claim: candidate.claim_text,
+        canonical_action: 'created_new',
+        verification_status: 'verified',
+        expires_at: '2026-12-11T00:00:00Z',
+      },
+    ],
     replayed: false,
   },
-  trivia_release_facts: { released_fact_public_ids: [factId], already_inactive_count: 0, replayed: false },
+  trivia_release_facts: {
+    released_fact_public_ids: [factId],
+    already_inactive_count: 0,
+    replayed: false,
+  },
 };
 function check(condition: unknown, label: string): asserts condition {
   if (!condition) throw new Error(label);
@@ -91,7 +117,10 @@ async function mcp(method: string, params?: object) {
   const http = await createAuthenticatedTransport(context).fetch(
     new Request('http://localhost/functions/v1/mcp', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/event-stream',
+      },
       body: JSON.stringify({ jsonrpc: '2.0', id: 67, method, ...(params ? { params } : {}) }),
     }),
   );
@@ -111,106 +140,180 @@ Deno.test('6.7 exactly 18 OAuth tools, closed schemas and correct annotations', 
     check(tool && tool._meta.securitySchemes[0].type === 'oauth2', 'OAUTH_REQUIRED');
     check(tool._meta.securitySchemes[0].scopes.join(' ') === 'openid email', 'OAUTH_SCOPES');
     check(tool.annotations.openWorldHint === false, 'CLOSED_WORLD');
-    check(tool.annotations.readOnlyHint === (name === 'trivia_find_similar_facts'), 'READ_ANNOTATION');
+    check(
+      tool.annotations.readOnlyHint === (name === 'trivia_find_similar_facts'),
+      'READ_ANNOTATION',
+    );
     check(tool.annotations.destructiveHint === false, 'NON_DESTRUCTIVE');
     check(tool.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
     check(tool.outputSchema.additionalProperties === false, 'CLOSED_OUTPUT');
     check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
   }
 });
-Deno.test('6.7 authenticated public MCP forwards original JWT, ordered facts, token and unchanged keys', async () => {
-  const original = globalThis.fetch;
-  const seen: Array<{ name: string; args: Record<string, unknown> }> = [];
-  globalThis.fetch = ((input: Request | URL | string, init?: RequestInit) => {
-    const name = String(input).split('/').pop()!;
-    const headers = new Headers(init?.headers);
-    check(headers.get('Authorization') === 'Bearer ' + context.accessToken, 'ORIGINAL_JWT');
-    check(headers.get('Content-Profile') === 'api', 'PUBLIC_RPC_SCHEMA');
-    check(headers.get('apikey') === context.publishableKey, 'PUBLIC_API_KEY');
-    seen.push({ name, args: JSON.parse(String(init?.body)) });
-    return Promise.resolve(Response.json({ response_schema_version: 1, data: responses[name] }));
-  }) as typeof fetch;
-  try {
-    for (const name of TRIVIA_FACT_TOOL_NAMES) {
-      const result = await call(name);
-      check(result?.isError !== true, 'VALID_TOOL_' + name);
-      if (name === 'trivia_register_and_reserve_facts') {
-        check(result.structuredContent.data.reservation_token === reservationToken, 'STRUCTURED_RESERVATION_TOKEN');
-        check(!JSON.stringify(result.content).includes(reservationToken), 'TEXT_TOKEN_LEAK');
-      }
-    }
-    check(seen.map((x) => x.name).join(',') === TRIVIA_FACT_TOOL_NAMES.join(','), 'RPC_NAMES');
-    check(seen[0].args.p_max_matches_per_candidate === 10, 'SEARCH_DEFAULT');
-    check(seen[1].args.p_reservation_token === reservationToken, 'TOKEN_FORWARD');
-    check(seen[1].args.p_operation_key === operationKey, 'KEY_FORWARD');
-    check((seen[1].args.p_facts as unknown[]).length === 1, 'ORDERED_SET');
-    check(seen[2].args.p_reason === inputs.trivia_release_facts.reason, 'RELEASE_REASON');
-    check(seen.every((x) => x.args.p_workspace_public_id === workspace), 'OWNER_SCOPE');
-    check(seen.every((x) => !Object.keys(x.args).some((k) => /p_owner|p_actor|p_client|p_oauth/.test(k))), 'IDENTITY_OVERRIDE');
-  } finally {
-    globalThis.fetch = original;
-  }
-});
-Deno.test('6.7 malformed candidates, unsafe release, foreign workspace and hidden identity rejected before RPC', async () => {
-  const original = globalThis.fetch;
-  let invoked = 0;
-  globalThis.fetch = (() => { invoked++; return Promise.resolve(Response.json({})); }) as typeof fetch;
-  try {
-    for (const [name, patch] of [
-      ['trivia_find_similar_facts', { candidates: [] }],
-      ['trivia_find_similar_facts', { candidates: [candidate, candidate] }],
-      ['trivia_find_similar_facts', { candidates: [{ ...candidate, ontology_version: 2 }] }],
-      ['trivia_register_and_reserve_facts', { facts: [] }],
-      ['trivia_register_and_reserve_facts', { facts: [{ ...(inputs.trivia_register_and_reserve_facts.facts as object[])[0], position: 2 }] }],
-      ['trivia_register_and_reserve_facts', { reservation_token: 'invalid' }],
-      ['trivia_register_and_reserve_facts', { reservation_ttl_minutes: 4 }],
-      ['trivia_release_facts', { reason: 'Bearer token=secret' }],
-      ['trivia_release_facts', { reason: 'SQLSTATE 42501' }],
-      ['trivia_release_facts', { reservation_token: 'invalid' }],
-    ] as const) {
-      check((await call(name, { ...inputs[name], ...patch }))?.isError === true, 'INVALID_' + name);
-    }
-    for (const name of TRIVIA_FACT_TOOL_NAMES) {
-      check((await call(name, { ...inputs[name], actor_user_id: context.actorUserId }))?.isError === true, 'INJECTED_ACTOR');
-      check((await call(name, { ...inputs[name], workspace_public_id: '55555555-5555-4555-8555-555555555555' }))?.isError === true, 'FOREIGN_SCOPE');
-    }
-    check(invoked === 0, 'UNSAFE_INPUT_REACHED_RPC');
-  } finally {
-    globalThis.fetch = original;
-  }
-});
-Deno.test('6.7 RPC replay stays historical and token never leaks into errors or text; malformed output fails closed', async () => {
-  const original = globalThis.fetch;
-  try {
-    let replayed = false;
-    globalThis.fetch = ((input: Request | URL | string) => {
+Deno.test(
+  '6.7 authenticated public MCP forwards original JWT, ordered facts, token and unchanged keys',
+  async () => {
+    const original = globalThis.fetch;
+    const seen: Array<{ name: string; args: Record<string, unknown> }> = [];
+    globalThis.fetch = ((input: Request | URL | string, init?: RequestInit) => {
       const name = String(input).split('/').pop()!;
-      return Promise.resolve(Response.json({
-        response_schema_version: 1,
-        data: { ...responses[name], ...(name !== 'trivia_find_similar_facts' ? { replayed } : {}) },
-      }));
+      const headers = new Headers(init?.headers);
+      check(headers.get('Authorization') === 'Bearer ' + context.accessToken, 'ORIGINAL_JWT');
+      check(headers.get('Content-Profile') === 'api', 'PUBLIC_RPC_SCHEMA');
+      check(headers.get('apikey') === context.publishableKey, 'PUBLIC_API_KEY');
+      seen.push({ name, args: JSON.parse(String(init?.body)) });
+      return Promise.resolve(Response.json({ response_schema_version: 1, data: responses[name] }));
     }) as typeof fetch;
-    for (const name of ['trivia_register_and_reserve_facts', 'trivia_release_facts']) {
-      const first = (await call(name)).structuredContent.data;
-      replayed = true;
-      const second = (await call(name)).structuredContent.data;
-      check(second.replayed === true, 'REPLAY_FLAG');
-      check(JSON.stringify(first) === JSON.stringify({ ...second, replayed: false }), 'HISTORICAL_RESULT');
-      replayed = false;
+    try {
+      for (const name of TRIVIA_FACT_TOOL_NAMES) {
+        const result = await call(name);
+        check(result?.isError !== true, 'VALID_TOOL_' + name);
+        if (name === 'trivia_register_and_reserve_facts') {
+          check(
+            result.structuredContent.data.reservation_token === reservationToken,
+            'STRUCTURED_RESERVATION_TOKEN',
+          );
+          check(!JSON.stringify(result.content).includes(reservationToken), 'TEXT_TOKEN_LEAK');
+        }
+      }
+      check(seen.map((x) => x.name).join(',') === TRIVIA_FACT_TOOL_NAMES.join(','), 'RPC_NAMES');
+      check(seen[0].args.p_max_matches_per_candidate === 10, 'SEARCH_DEFAULT');
+      check(seen[1].args.p_reservation_token === reservationToken, 'TOKEN_FORWARD');
+      check(seen[1].args.p_operation_key === operationKey, 'KEY_FORWARD');
+      check((seen[1].args.p_facts as unknown[]).length === 1, 'ORDERED_SET');
+      check(seen[2].args.p_reason === inputs.trivia_release_facts.reason, 'RELEASE_REASON');
+      check(
+        seen.every((x) => x.args.p_workspace_public_id === workspace),
+        'OWNER_SCOPE',
+      );
+      check(
+        seen.every(
+          (x) => !Object.keys(x.args).some((k) => /p_owner|p_actor|p_client|p_oauth/.test(k)),
+        ),
+        'IDENTITY_OVERRIDE',
+      );
+    } finally {
+      globalThis.fetch = original;
     }
-    globalThis.fetch = (() => Promise.resolve(Response.json({
-      code: 'P0001', message: 'FACT_RESERVATION_CONFLICT',
-      details: 'SQLSTATE internal_id=42 token=secret',
-    }, { status: 400 }))) as typeof fetch;
-    const conflict = await call('trivia_register_and_reserve_facts');
-    check(conflict.isError === true && conflict.structuredContent.error.code === 'FACT_RESERVATION_CONFLICT', 'SAFE_CONFLICT');
-    check(!JSON.stringify(conflict).includes('SQLSTATE') && !JSON.stringify(conflict).includes('token=secret'), 'ERROR_REDACTION');
-    globalThis.fetch = (() => Promise.resolve(Response.json({
-      response_schema_version: 1,
-      data: { ...responses.trivia_register_and_reserve_facts, leaked: 'secret' },
-    }))) as typeof fetch;
-    check((await call('trivia_register_and_reserve_facts')).isError === true, 'CLOSED_OUTPUT');
-  } finally {
-    globalThis.fetch = original;
-  }
-});
+  },
+);
+Deno.test(
+  '6.7 malformed candidates, unsafe release, foreign workspace and hidden identity rejected before RPC',
+  async () => {
+    const original = globalThis.fetch;
+    let invoked = 0;
+    globalThis.fetch = (() => {
+      invoked++;
+      return Promise.resolve(Response.json({}));
+    }) as typeof fetch;
+    try {
+      for (const [name, patch] of [
+        ['trivia_find_similar_facts', { candidates: [] }],
+        ['trivia_find_similar_facts', { candidates: [candidate, candidate] }],
+        ['trivia_find_similar_facts', { candidates: [{ ...candidate, ontology_version: 2 }] }],
+        ['trivia_register_and_reserve_facts', { facts: [] }],
+        [
+          'trivia_register_and_reserve_facts',
+          {
+            facts: [
+              { ...(inputs.trivia_register_and_reserve_facts.facts as object[])[0], position: 2 },
+            ],
+          },
+        ],
+        ['trivia_register_and_reserve_facts', { reservation_token: 'invalid' }],
+        ['trivia_register_and_reserve_facts', { reservation_ttl_minutes: 4 }],
+        ['trivia_release_facts', { reason: 'Bearer token=secret' }],
+        ['trivia_release_facts', { reason: 'SQLSTATE 42501' }],
+        ['trivia_release_facts', { reservation_token: 'invalid' }],
+      ] as const) {
+        check(
+          (await call(name, { ...inputs[name], ...patch }))?.isError === true,
+          'INVALID_' + name,
+        );
+      }
+      for (const name of TRIVIA_FACT_TOOL_NAMES) {
+        check(
+          (await call(name, { ...inputs[name], actor_user_id: context.actorUserId }))?.isError ===
+            true,
+          'INJECTED_ACTOR',
+        );
+        check(
+          (
+            await call(name, {
+              ...inputs[name],
+              workspace_public_id: '55555555-5555-4555-8555-555555555555',
+            })
+          )?.isError === true,
+          'FOREIGN_SCOPE',
+        );
+      }
+      check(invoked === 0, 'UNSAFE_INPUT_REACHED_RPC');
+    } finally {
+      globalThis.fetch = original;
+    }
+  },
+);
+Deno.test(
+  '6.7 RPC replay stays historical and token never leaks into errors or text; malformed output fails closed',
+  async () => {
+    const original = globalThis.fetch;
+    try {
+      let replayed = false;
+      globalThis.fetch = ((input: Request | URL | string) => {
+        const name = String(input).split('/').pop()!;
+        return Promise.resolve(
+          Response.json({
+            response_schema_version: 1,
+            data: {
+              ...responses[name],
+              ...(name !== 'trivia_find_similar_facts' ? { replayed } : {}),
+            },
+          }),
+        );
+      }) as typeof fetch;
+      for (const name of ['trivia_register_and_reserve_facts', 'trivia_release_facts']) {
+        const first = (await call(name)).structuredContent.data;
+        replayed = true;
+        const second = (await call(name)).structuredContent.data;
+        check(second.replayed === true, 'REPLAY_FLAG');
+        check(
+          JSON.stringify(first) === JSON.stringify({ ...second, replayed: false }),
+          'HISTORICAL_RESULT',
+        );
+        replayed = false;
+      }
+      globalThis.fetch = (() =>
+        Promise.resolve(
+          Response.json(
+            {
+              code: 'P0001',
+              message: 'FACT_RESERVATION_CONFLICT',
+              details: 'SQLSTATE internal_id=42 token=secret',
+            },
+            { status: 400 },
+          ),
+        )) as typeof fetch;
+      const conflict = await call('trivia_register_and_reserve_facts');
+      check(
+        conflict.isError === true &&
+          conflict.structuredContent.error.code === 'FACT_RESERVATION_CONFLICT',
+        'SAFE_CONFLICT',
+      );
+      check(
+        !JSON.stringify(conflict).includes('SQLSTATE') &&
+          !JSON.stringify(conflict).includes('token=secret'),
+        'ERROR_REDACTION',
+      );
+      globalThis.fetch = (() =>
+        Promise.resolve(
+          Response.json({
+            response_schema_version: 1,
+            data: { ...responses.trivia_register_and_reserve_facts, leaked: 'secret' },
+          }),
+        )) as typeof fetch;
+      check((await call('trivia_register_and_reserve_facts')).isError === true, 'CLOSED_OUTPUT');
+    } finally {
+      globalThis.fetch = original;
+    }
+  },
+);

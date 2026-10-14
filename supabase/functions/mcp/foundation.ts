@@ -240,17 +240,61 @@ const safeErrors = {
     false,
     'Choose another schedule explicitly.',
   ],
-  ONTOLOGY_VERSION_UNSUPPORTED: ['The candidate ontology version is unsupported.', false, 'Use ontology version 1.'],
-  FACT_REVIEW_REQUIRED: ['Semantic deduplication needs explicit review.', false, 'Review matching canonical facts before reserving.'],
-  FACT_RESERVATION_CONFLICT: ['A fact is reserved by another attempt.', true, 'Search again and resolve the conflict.'],
-  FACT_RESERVATION_MISMATCH: ['The reservation token does not match this Page or operation.', false, 'Do not reuse a token across attempts.'],
-  FACT_RESERVATION_EXPIRED: ['The reservation has expired.', false, 'Search and reserve again using a new logical operation.'],
-  FACT_RESERVATION_CONTEXT_CHANGED: ['Page configuration changed during reservation.', false, 'Refresh Page context and retry with a new operation.'],
-  FACT_NOT_ELIGIBLE: ['This canonical fact is not eligible.', false, 'Choose a verified eligible fact.'],
-  FACT_SOURCE_INSUFFICIENT: ['Source evidence is insufficient.', false, 'Verify evidence with acceptable independent sources.'],
-  FACT_FRESHNESS_EXPIRED: ['The fact evidence has expired.', false, 'Refresh evidence before reserving.'],
-  FACT_REUSE_BLOCKED: ['The reuse policy forbids this fact.', false, 'Choose another fact or Page.'],
-  FACT_HASH_COLLISION: ['The canonical identity conflicts with another record.', false, 'Review the candidate identity.'],
+  ONTOLOGY_VERSION_UNSUPPORTED: [
+    'The candidate ontology version is unsupported.',
+    false,
+    'Use ontology version 1.',
+  ],
+  FACT_REVIEW_REQUIRED: [
+    'Semantic deduplication needs explicit review.',
+    false,
+    'Review matching canonical facts before reserving.',
+  ],
+  FACT_RESERVATION_CONFLICT: [
+    'A fact is reserved by another attempt.',
+    true,
+    'Search again and resolve the conflict.',
+  ],
+  FACT_RESERVATION_MISMATCH: [
+    'The reservation token does not match this Page or operation.',
+    false,
+    'Do not reuse a token across attempts.',
+  ],
+  FACT_RESERVATION_EXPIRED: [
+    'The reservation has expired.',
+    false,
+    'Search and reserve again using a new logical operation.',
+  ],
+  FACT_RESERVATION_CONTEXT_CHANGED: [
+    'Page configuration changed during reservation.',
+    false,
+    'Refresh Page context and retry with a new operation.',
+  ],
+  FACT_NOT_ELIGIBLE: [
+    'This canonical fact is not eligible.',
+    false,
+    'Choose a verified eligible fact.',
+  ],
+  FACT_SOURCE_INSUFFICIENT: [
+    'Source evidence is insufficient.',
+    false,
+    'Verify evidence with acceptable independent sources.',
+  ],
+  FACT_FRESHNESS_EXPIRED: [
+    'The fact evidence has expired.',
+    false,
+    'Refresh evidence before reserving.',
+  ],
+  FACT_REUSE_BLOCKED: [
+    'The reuse policy forbids this fact.',
+    false,
+    'Choose another fact or Page.',
+  ],
+  FACT_HASH_COLLISION: [
+    'The canonical identity conflicts with another record.',
+    false,
+    'Review the candidate identity.',
+  ],
   INTERNAL_ERROR: [
     'The operation could not be confirmed.',
     false,
@@ -292,7 +336,9 @@ function forbiddenOutputKeys(
 ): boolean {
   if (!value || typeof value !== 'object') return false;
   if (Array.isArray(value))
-    return value.some((entry) => forbiddenOutputKeys(entry, allowClaimToken, path + '.*', allowReservationToken));
+    return value.some((entry) =>
+      forbiddenOutputKeys(entry, allowClaimToken, path + '.*', allowReservationToken),
+    );
   return Object.entries(value).some(([key, nested]) => {
     const at = path ? path + '.' + key : key;
     // A token is intentionally returned ONLY in the authenticated claim tool's

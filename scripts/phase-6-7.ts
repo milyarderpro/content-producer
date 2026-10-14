@@ -549,7 +549,9 @@ try {
   clearFixtureBuckets();
   const triviaCandidate = candidate();
   const findInput = {
-    ...common(), page_public_id: f.page, candidates: [triviaCandidate],
+    ...common(),
+    page_public_id: f.page,
+    candidates: [triviaCandidate],
     max_matches_per_candidate: 10,
   };
   const beforeTrivia = stateDigest(f);
@@ -561,45 +563,80 @@ try {
     from public.page_niche_configs n join public.pages p on p.id=n.page_id
     where p.public_id='${f.page}' and n.niche_key='trivia'`).t;
   const reservationInput = {
-    ...write(), page_public_id: f.page, reservation_token: randomUUID(),
+    ...write(),
+    page_public_id: f.page,
+    reservation_token: randomUUID(),
     expected_config_updated_at: configTime,
-    fact_reuse_scope: 'workspace_unique', reservation_ttl_minutes: 30,
+    fact_reuse_scope: 'workspace_unique',
+    reservation_ttl_minutes: 30,
     facts: [factInput(triviaCandidate)],
   };
   const firstReserve = await rpcHttp('tools/call', {
-    name: 'trivia_register_and_reserve_facts', arguments: reservationInput,
+    name: 'trivia_register_and_reserve_facts',
+    arguments: reservationInput,
   });
-  check(firstReserve.status === 200 && firstReserve.body.result?.isError !== true, 'TRIVIA_RESERVE');
+  check(
+    firstReserve.status === 200 && firstReserve.body.result?.isError !== true,
+    'TRIVIA_RESERVE',
+  );
   const reservedTrivia = firstReserve.body.result.structuredContent.data;
   check(reservedTrivia.reservation_token === reservationInput.reservation_token, 'RESERVE_TOKEN');
-  check(!JSON.stringify(firstReserve.body.result.content).includes(reservationInput.reservation_token), 'RESERVE_TEXT_PRIVACY');
+  check(
+    !JSON.stringify(firstReserve.body.result.content).includes(reservationInput.reservation_token),
+    'RESERVE_TEXT_PRIVACY',
+  );
   check(reservedTrivia.facts.length === 1 && reservedTrivia.replayed === false, 'RESERVE_ATOMIC');
   const replayReserve = await call('trivia_register_and_reserve_facts', reservationInput);
-  check(replayReserve.replayed === true &&
-    replayReserve.reservation_token === reservationInput.reservation_token, 'RESERVE_REPLAY');
-  await call('trivia_register_and_reserve_facts', {
-    ...reservationInput, reservation_ttl_minutes: 31,
-  }, 'OPERATION_KEY_REUSED');
+  check(
+    replayReserve.replayed === true &&
+      replayReserve.reservation_token === reservationInput.reservation_token,
+    'RESERVE_REPLAY',
+  );
+  await call(
+    'trivia_register_and_reserve_facts',
+    {
+      ...reservationInput,
+      reservation_ttl_minutes: 31,
+    },
+    'OPERATION_KEY_REUSED',
+  );
   const conflicting = {
-    ...reservationInput, operation_key: randomUUID(), reservation_token: randomUUID(),
+    ...reservationInput,
+    operation_key: randomUUID(),
+    reservation_token: randomUUID(),
   };
   await call('trivia_register_and_reserve_facts', conflicting, 'FACT_RESERVATION_CONFLICT');
   const foundReserved = await call('trivia_find_similar_facts', findInput);
-  check(foundReserved.candidates[0].matches.some(
-    (m: { reuse_eligibility: string }) => m.reuse_eligibility === 'actively_reserved',
-  ), 'SEARCH_RESERVATION_SIGNAL');
-  const denied = await rpcHttp('tools/call', {
-    name: 'trivia_release_facts',
-    arguments: { ...write(), page_public_id: f.page,
-      reservation_token: reservationInput.reservation_token, reason: 'Abandon the attempt.' },
-  }, foreignBearer);
-  check(denied.status === 403 ||
-    (denied.body.result?.isError === true &&
-      denied.body.result.structuredContent.error.code === 'OWNER_ACCESS_REQUIRED'),
-    'TRIVIA_OWNER_DENIAL');
+  check(
+    foundReserved.candidates[0].matches.some(
+      (m: { reuse_eligibility: string }) => m.reuse_eligibility === 'actively_reserved',
+    ),
+    'SEARCH_RESERVATION_SIGNAL',
+  );
+  const denied = await rpcHttp(
+    'tools/call',
+    {
+      name: 'trivia_release_facts',
+      arguments: {
+        ...write(),
+        page_public_id: f.page,
+        reservation_token: reservationInput.reservation_token,
+        reason: 'Abandon the attempt.',
+      },
+    },
+    foreignBearer,
+  );
+  check(
+    denied.status === 403 ||
+      (denied.body.result?.isError === true &&
+        denied.body.result.structuredContent.error.code === 'OWNER_ACCESS_REQUIRED'),
+    'TRIVIA_OWNER_DENIAL',
+  );
   const releaseInput = {
-    ...write(), page_public_id: f.page,
-    reservation_token: reservationInput.reservation_token, reason: 'Abandon the attempt.',
+    ...write(),
+    page_public_id: f.page,
+    reservation_token: reservationInput.reservation_token,
+    reason: 'Abandon the attempt.',
   };
   const releasedTrivia = await call('trivia_release_facts', releaseInput);
   check(releasedTrivia.released_fact_public_ids.length === 1, 'RELEASE_TOKEN_BOUND');
@@ -615,21 +652,46 @@ try {
   clearFixtureBuckets();
   const raceCandidate = candidate();
   const raceBase = {
-    ...write(), page_public_id: f.page, reservation_token: randomUUID(),
-    expected_config_updated_at: configTime, fact_reuse_scope: 'workspace_unique',
-    reservation_ttl_minutes: 30, facts: [factInput(raceCandidate)],
+    ...write(),
+    page_public_id: f.page,
+    reservation_token: randomUUID(),
+    expected_config_updated_at: configTime,
+    fact_reuse_scope: 'workspace_unique',
+    reservation_ttl_minutes: 30,
+    facts: [factInput(raceCandidate)],
   };
-  const raceResults = await Promise.all([raceBase, {
-    ...raceBase, operation_key: randomUUID(), reservation_token: randomUUID(),
-  }].map((input) => rpcHttp('tools/call', {
-    name: 'trivia_register_and_reserve_facts', arguments: input,
-  })));
-  check(raceResults.every((r) => r.status === 200), 'TRIVIA_RACE_HTTP');
-  check(raceResults.filter((r) => r.body.result?.isError !== true).length === 1, 'TRIVIA_RACE_ONE_WINNER');
-  check(raceResults.filter((r) =>
-    r.body.result?.structuredContent?.error?.code === 'FACT_RESERVATION_CONFLICT').length === 1,
-  'TRIVIA_RACE_CONFLICT');
-  console.info('Public MCP trivia search/read-only, reserve/replay/mismatch, release/replay, owner and ledger token privacy, contention: PASS.');
+  const raceResults = await Promise.all(
+    [
+      raceBase,
+      {
+        ...raceBase,
+        operation_key: randomUUID(),
+        reservation_token: randomUUID(),
+      },
+    ].map((input) =>
+      rpcHttp('tools/call', {
+        name: 'trivia_register_and_reserve_facts',
+        arguments: input,
+      }),
+    ),
+  );
+  check(
+    raceResults.every((r) => r.status === 200),
+    'TRIVIA_RACE_HTTP',
+  );
+  check(
+    raceResults.filter((r) => r.body.result?.isError !== true).length === 1,
+    'TRIVIA_RACE_ONE_WINNER',
+  );
+  check(
+    raceResults.filter(
+      (r) => r.body.result?.structuredContent?.error?.code === 'FACT_RESERVATION_CONFLICT',
+    ).length === 1,
+    'TRIVIA_RACE_CONFLICT',
+  );
+  console.info(
+    'Public MCP trivia search/read-only, reserve/replay/mismatch, release/replay, owner and ledger token privacy, contention: PASS.',
+  );
   clearFixtureBuckets();
   if (!process.argv.includes('--preflight')) {
     await inspector('initialize');
@@ -727,20 +789,29 @@ try {
     });
     const inspectorCandidate = candidate();
     await inspector('tools/call', 'trivia_find_similar_facts', {
-      ...common(), page_public_id: f.page, candidates: [inspectorCandidate],
+      ...common(),
+      page_public_id: f.page,
+      candidates: [inspectorCandidate],
     });
     const inspectorReservation = {
-      ...write(), page_public_id: f.page, reservation_token: randomUUID(),
-      expected_config_updated_at: configTime, fact_reuse_scope: 'workspace_unique',
-      reservation_ttl_minutes: 30, facts: [factInput(inspectorCandidate)],
+      ...write(),
+      page_public_id: f.page,
+      reservation_token: randomUUID(),
+      expected_config_updated_at: configTime,
+      fact_reuse_scope: 'workspace_unique',
+      reservation_ttl_minutes: 30,
+      facts: [factInput(inspectorCandidate)],
     };
-    const inspectorReserved = (await inspector(
-      'tools/call', 'trivia_register_and_reserve_facts', inspectorReservation,
-    )).structuredContent.data;
-    check(inspectorReserved.reservation_token === inspectorReservation.reservation_token,
-      'INSPECTOR_TRIVIA_TOKEN');
+    const inspectorReserved = (
+      await inspector('tools/call', 'trivia_register_and_reserve_facts', inspectorReservation)
+    ).structuredContent.data;
+    check(
+      inspectorReserved.reservation_token === inspectorReservation.reservation_token,
+      'INSPECTOR_TRIVIA_TOKEN',
+    );
     await inspector('tools/call', 'trivia_release_facts', {
-      ...write(), page_public_id: f.page,
+      ...write(),
+      page_public_id: f.page,
       reservation_token: inspectorReservation.reservation_token,
       reason: 'Abandon Inspector fixture.',
     });
