@@ -217,17 +217,17 @@ const payloads: Record<string, object> = {
   get_content_plan: envelope({ plan, items: [item], next_cursor: null, has_more: false }),
 };
 
-Deno.test('6.4 Page/plan metadata survives the 6.8 expansion; no anonymous tools', async () => {
+Deno.test('6.4 Page/plan metadata survives the 6.11 expansion; no anonymous tools', async () => {
   const text = await request('tools/list');
-  assert(MCP_TOOL_COUNT === 25, 'cumulative registry count must be 23');
+  assert(MCP_TOOL_COUNT === 28, 'cumulative registry count must be 28');
   for (const tool of PAGE_PLAN_TOOL_NAMES) assert(text.includes(tool), 'missing ' + tool);
-  assert((text.match(/"oauth2"/g) || []).length === 25, 'every tool requires OAuth');
-  assert((text.match(/"openWorldHint":false/g) || []).length === 25, 'open world hint');
+  assert((text.match(/"oauth2"/g) || []).length === 28, 'every tool requires OAuth');
+  assert((text.match(/"openWorldHint":false/g) || []).length === 28, 'open world hint');
   assert((text.match(/"readOnlyHint":true/g) || []).length === 9, 'nine read tools');
-  assert((text.match(/"readOnlyHint":false/g) || []).length === 16, 'sixteen writes');
+  assert((text.match(/"readOnlyHint":false/g) || []).length === 19, 'nineteen writes');
   assert(
-    (text.match(/"destructiveHint":true/g) || []).length === 6,
-    'update_page, cancel, two trivia correction and two post edit tools are destructive',
+    (text.match(/"destructiveHint":true/g) || []).length === 7,
+    'update_page, cancel, two trivia correction, two post edit and discard are destructive',
   );
   assert(text.split('"openai/profile":true').length === 2, 'profile only');
   assert(text.includes('claim_content_plan_items'), '6.5 claim tool must be registered');
