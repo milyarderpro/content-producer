@@ -715,6 +715,7 @@ try {
   };
   const refreshedCreated = await call('trivia_register_and_reserve_facts', refreshReservation);
   const refreshId = refreshedCreated.facts[0].fact_public_id;
+  console.info('6.8 HTTP stage A: reserved reverify fixture');
   const identityBefore = row<{
     hash: string;
   }>(`select md5(row(claim_text,claim_hash,structured_key,structured_hash)::text) hash
@@ -733,6 +734,7 @@ try {
     review_note: 'Confirmed unchanged meaning with new sources.',
   };
   const refreshed = await call('trivia_reverify_fact', reverifyInput);
+  console.info('6.8 HTTP stage B: refreshed canonical evidence');
   check(
     refreshed.replayed === false && refreshed.verification_status === 'verified',
     'REVERIFY_CURRENT',
@@ -778,6 +780,7 @@ try {
     reservation_token: refreshReservation.reservation_token,
     reason: 'Release before post snapshot fixtures.',
   });
+  console.info('6.8 HTTP stage C: reverify denial/release verified');
   const draftPost = postFixture(f, refreshId);
   const readyPost = postFixture(secondPage(f), refreshId, 'ready');
   const postedPost = postFixture(secondPage(f), refreshId, 'posted');
@@ -788,6 +791,7 @@ try {
       (select jsonb_agg(to_jsonb(j) order by j.id) from public.trivia_post_facts j
        where j.fact_id=(select id from public.trivia_facts where public_id='${refreshId}'))::text
     )) hash`).hash;
+  console.info('6.8 HTTP stage D: post snapshots recorded');
   const correctionInput = {
     ...write(),
     fact_public_id: refreshId,
@@ -797,6 +801,7 @@ try {
     explicit_correction: true,
   };
   const invalidated = await call('trivia_correct_fact', correctionInput);
+  console.info('6.8 HTTP stage E: invalidation RPC succeeded');
   check(
     invalidated.old_status === 'invalidated' && invalidated.successor_public_id === null,
     'CORRECTION_INVALIDATE',
@@ -839,6 +844,7 @@ try {
     { ...correctionInput, ...write(), expected_fact_updated_at: time(refreshId) },
     'FACT_NOT_ELIGIBLE',
   );
+  console.info('6.8 HTTP stage F: correction replay/CAS/immutable snapshots verified');
   const supersedeCandidate = candidate();
   const oldFact = (
     await call('trivia_register_and_reserve_facts', {
@@ -880,6 +886,7 @@ try {
       1,
     'CORRECTION_LINEAGE',
   );
+  console.info('6.8 HTTP stage G: correction successor lineage verified');
   console.info(
     'Phase 6.8 public MCP correction: CAS/replay/semantic denial, owner isolation, lineage, draft-ready transition, posted-archived immutability PASS.',
   );
