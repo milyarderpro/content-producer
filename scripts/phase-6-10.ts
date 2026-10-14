@@ -1114,7 +1114,6 @@ try {
     '6.10 authenticated public HTTP: save draft, atomic rollback, replay, plan claim, safe reads, pagination and foreign denial PASS.',
   );
 
-
   // Phase 6.10: public MCP -> verified user JWT -> real local PostgREST RPC.
   clearFixtureBuckets();
   const revisionInput = {
@@ -1134,7 +1133,11 @@ try {
     revision_reason: 'Improve the reviewed caption.',
   };
   await call('revise_post', { ...revisionInput, expected_revision: 999 }, 'REVISION_CONFLICT');
-  await call('revise_post', { ...revisionInput, expected_content_hash: '0'.repeat(64) }, 'CONTENT_HASH_CONFLICT');
+  await call(
+    'revise_post',
+    { ...revisionInput, expected_content_hash: '0'.repeat(64) },
+    'CONTENT_HASH_CONFLICT',
+  );
   const revised = await call('revise_post', revisionInput);
   check(
     revised.post.revision === 2 &&
@@ -1146,9 +1149,17 @@ try {
     'REVISE_EXACT_CAS_AND_QUALITY',
   );
   check((await call('revise_post', revisionInput)).replayed, 'REVISE_EXACT_REPLAY');
-  await call('revise_post', { ...revisionInput, revision_reason: 'Changed reason.' }, 'OPERATION_KEY_REUSED');
+  await call(
+    'revise_post',
+    { ...revisionInput, revision_reason: 'Changed reason.' },
+    'OPERATION_KEY_REUSED',
+  );
   await call('revise_post', { ...revisionInput, ...write() }, 'REVISION_CONFLICT');
-  const revisionRead = await call('get_post', { ...common(), post_public_id: saved.post.post_public_id, include_sources: false });
+  const revisionRead = await call('get_post', {
+    ...common(),
+    post_public_id: saved.post.post_public_id,
+    include_sources: false,
+  });
   check(
     revisionRead.post.revision === 2 &&
       revisionRead.post.content_hash === revised.post.content_hash &&
@@ -1177,23 +1188,55 @@ try {
   check((await call('reschedule_post', move)).replayed, 'RESCHEDULE_REPLAY');
   await call('reschedule_post', { ...move, reason: 'Different reason.' }, 'OPERATION_KEY_REUSED');
   await call('reschedule_post', { ...move, ...write() }, 'REVISION_CONFLICT');
-  await call('reschedule_post', {
-    ...write(), post_public_id: second.post.post_public_id,
-    expected_revision: second.post.revision, scheduled_at: movedAt, reason: 'Colliding slot.',
-  }, 'SCHEDULE_CONFLICT');
+  await call(
+    'reschedule_post',
+    {
+      ...write(),
+      post_public_id: second.post.post_public_id,
+      expected_revision: second.post.revision,
+      scheduled_at: movedAt,
+      reason: 'Colliding slot.',
+    },
+    'SCHEDULE_CONFLICT',
+  );
   const cleared = await call('reschedule_post', {
-    ...write(), post_public_id: saved.post.post_public_id,
-    expected_revision: moved.revision, scheduled_at: null, reason: 'Clear the planned slot.',
+    ...write(),
+    post_public_id: saved.post.post_public_id,
+    expected_revision: moved.revision,
+    scheduled_at: null,
+    reason: 'Clear the planned slot.',
   });
-  check(cleared.revision === 4 && cleared.scheduled_at === null && cleared.content_hash_unchanged, 'CLEAR_SCHEDULE');
-  const finalRead = await call('get_post', { ...common(), post_public_id: saved.post.post_public_id });
-  check(finalRead.post.content_hash === revised.post.content_hash && finalRead.post.revision === 4, 'SCHEDULE_DOES_NOT_CHANGE_CONTENT');
-  await call('revise_post', { ...revisionInput, ...write(), post_public_id: randomUUID() }, 'POST_NOT_FOUND');
-  await call('reschedule_post', {
-    ...write(), post_public_id: randomUUID(), expected_revision: 1,
-    scheduled_at: null, reason: 'Reject unknown post.',
-  }, 'POST_NOT_FOUND');
-  console.info('6.10 real public HTTP post revise/reschedule: CAS, quality, source privacy, replay, schedule conflict, clear and rollback PASS.');
+  check(
+    cleared.revision === 4 && cleared.scheduled_at === null && cleared.content_hash_unchanged,
+    'CLEAR_SCHEDULE',
+  );
+  const finalRead = await call('get_post', {
+    ...common(),
+    post_public_id: saved.post.post_public_id,
+  });
+  check(
+    finalRead.post.content_hash === revised.post.content_hash && finalRead.post.revision === 4,
+    'SCHEDULE_DOES_NOT_CHANGE_CONTENT',
+  );
+  await call(
+    'revise_post',
+    { ...revisionInput, ...write(), post_public_id: randomUUID() },
+    'POST_NOT_FOUND',
+  );
+  await call(
+    'reschedule_post',
+    {
+      ...write(),
+      post_public_id: randomUUID(),
+      expected_revision: 1,
+      scheduled_at: null,
+      reason: 'Reject unknown post.',
+    },
+    'POST_NOT_FOUND',
+  );
+  console.info(
+    '6.10 real public HTTP post revise/reschedule: CAS, quality, source privacy, replay, schedule conflict, clear and rollback PASS.',
+  );
 
   clearFixtureBuckets();
   if (!process.argv.includes('--preflight')) {
@@ -1384,9 +1427,8 @@ try {
       editorial_checks: inspectedRequest.editorial,
       revision_reason: 'Inspector caption revision.',
     };
-    const inspectedRevised = (
-      await inspector('tools/call', 'revise_post', inspectorRevision)
-    ).structuredContent.data;
+    const inspectedRevised = (await inspector('tools/call', 'revise_post', inspectorRevision))
+      .structuredContent.data;
     check(inspectedRevised.post.revision === 2, 'INSPECTOR_REVISE');
     const inspectedSchedule = (
       await inspector('tools/call', 'reschedule_post', {
@@ -1397,7 +1439,10 @@ try {
         reason: 'Inspector schedule cleared.',
       })
     ).structuredContent.data;
-    check(inspectedSchedule.revision === 3 && inspectedSchedule.content_hash_unchanged, 'INSPECTOR_RESCHEDULE');
+    check(
+      inspectedSchedule.revision === 3 && inspectedSchedule.content_hash_unchanged,
+      'INSPECTOR_RESCHEDULE',
+    );
     clearFixtureBuckets();
     for (const tool of tools) await inspector('tools/call', tool.name, {}, 5);
   }

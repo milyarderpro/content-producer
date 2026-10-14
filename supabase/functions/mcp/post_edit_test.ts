@@ -215,85 +215,134 @@ response.reschedule_post = {
   replayed: false,
 };
 
-Deno.test('6.10: exactly 25 OAuth tools, closed post-edit schemas and destructive annotations', async () => {
-  const tools = (await mcp('tools/list')).result.tools;
-  check(MCP_TOOL_COUNT === 25 && tools.length === 25, 'EXACT_25');
-  for (const name of POST_EDIT_TOOL_NAMES) {
-    const tool = tools.find((x: { name: string }) => x.name === name);
-    check(tool?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
-    check(tool?.outputSchema.additionalProperties === false, 'CLOSED_OUTPUT');
-    check(tool?._meta.securitySchemes[0].type === 'oauth2', 'OAUTH');
-    check(tool.annotations.openWorldHint === false && tool.annotations.destructiveHint === true, 'ANNOTATIONS');
-    check(tool.annotations.readOnlyHint === false, 'WRITE_TOOL');
-    check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE');
-  }
-});
-Deno.test('6.10: forward original owner JWT, strict CAS and null schedule to exact public RPCs', async () => {
-  const oldFetch = globalThis.fetch;
-  const calls: Array<{ name: string; params: Record<string, unknown> }> = [];
-  globalThis.fetch = ((input: Request | URL | string, init?: RequestInit) => {
-    const name = String(input).split('/').pop()!;
-    const headers = new Headers(init?.headers);
-    check(headers.get('Authorization') === 'Bearer ' + context.accessToken, 'ORIGINAL_JWT');
-    check(headers.get('apikey') === context.publishableKey, 'PUBLIC_KEY');
-    check(headers.get('Content-Profile') === 'api', 'PUBLIC_RPC');
-    calls.push({ name, params: JSON.parse(String(init?.body)) });
-    return Promise.resolve(Response.json({ response_schema_version: 1, data: response[name] }));
-  }) as typeof fetch;
-  try {
-    const revised = await call('revise_post', reviseArgs);
-    check(!revised.isError && revised.structuredContent.data.post.revision === 2, 'REVISE_OK');
-    const moved = await call('reschedule_post', scheduleArgs);
-    check(!moved.isError && moved.structuredContent.data.content_hash_unchanged, 'SCHEDULE_OK');
-    const cleared = await call('reschedule_post', { ...scheduleArgs, scheduled_at: null });
-    check(!cleared.isError, 'NULL_SCHEDULE_ACCEPTED');
-    check(calls.map((c) => c.name).join(',') === 'revise_post,reschedule_post,reschedule_post', 'EXACT_RPCS');
-    check(calls[0].params.p_expected_revision === 1 && calls[0].params.p_expected_content_hash === 'a'.repeat(64), 'CAS_FORWARDED');
-    check(calls[0].params.p_reservation_token === null, 'NULL_RESERVATION');
-    check(calls[0].params.p_revision_reason === 'Improve the caption.', 'SAFE_REASON');
-    check(calls[1].params.p_scheduled_at === scheduleArgs.scheduled_at && calls[2].params.p_scheduled_at === null, 'SCHEDULE_EXPLICIT_NULL');
-    check(calls.every((c) => !Object.keys(c.params).some((key) => /^p_(actor|client|oauth|owner)/.test(key))), 'NO_IDENTITY_OVERRIDES');
-    check(!JSON.stringify(revised.content).includes(context.accessToken), 'NO_TOKEN_LEAK');
-  } finally {
-    globalThis.fetch = oldFetch;
-  }
-});
-Deno.test('6.10: malformed CAS, mismatched facts, foreign owner and secret keys fail before RPC', async () => {
-  const oldFetch = globalThis.fetch;
-  let hits = 0;
-  globalThis.fetch = (() => { hits++; return Promise.resolve(Response.json({})); }) as typeof fetch;
-  try {
-    for (const [name, args] of [
-      ['revise_post', { ...reviseArgs, expected_revision: 0 }],
-      ['revise_post', { ...reviseArgs, expected_content_hash: 'bad' }],
-      ['revise_post', { ...reviseArgs, reservation_token: 'bad' }],
-      ['revise_post', { ...reviseArgs, content_payload: { ...payload, body: { facts: [{ position: 1, text: 'Different text' }] } } }],
-      ['revise_post', { ...reviseArgs, system_checks: {} }],
-      ['revise_post', { ...reviseArgs, owner_user_id: context.actorUserId }],
-      ['revise_post', { ...reviseArgs, revision_reason: 'secret=private' }],
-      ['reschedule_post', { ...scheduleArgs, expected_revision: -1 }],
-      ['reschedule_post', { ...scheduleArgs, scheduled_at: 'not a time' }],
-      ['reschedule_post', { ...scheduleArgs, access_token: context.accessToken }],
-      ['reschedule_post', { ...scheduleArgs, workspace_public_id: postId }],
-    ] as const) {
-      const result = await call(name, args);
-      check(result.isError === true, 'REJECT_' + name);
+Deno.test(
+  '6.10: exactly 25 OAuth tools, closed post-edit schemas and destructive annotations',
+  async () => {
+    const tools = (await mcp('tools/list')).result.tools;
+    check(MCP_TOOL_COUNT === 25 && tools.length === 25, 'EXACT_25');
+    for (const name of POST_EDIT_TOOL_NAMES) {
+      const tool = tools.find((x: { name: string }) => x.name === name);
+      check(tool?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
+      check(tool?.outputSchema.additionalProperties === false, 'CLOSED_OUTPUT');
+      check(tool?._meta.securitySchemes[0].type === 'oauth2', 'OAUTH');
+      check(
+        tool.annotations.openWorldHint === false && tool.annotations.destructiveHint === true,
+        'ANNOTATIONS',
+      );
+      check(tool.annotations.readOnlyHint === false, 'WRITE_TOOL');
+      check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE');
     }
-    check(hits === 0, 'INVALID_DID_NOT_REACH_RPC');
-  } finally {
-    globalThis.fetch = oldFetch;
-  }
-});
-Deno.test('6.10: post-edit output stays strictly closed and fails on backend injection', async () => {
-  const oldFetch = globalThis.fetch;
-  globalThis.fetch = (() => Promise.resolve(Response.json({
-    response_schema_version: 1,
-    data: { ...response.revise_post, owner_user_id: context.actorUserId },
-  }))) as typeof fetch;
-  try {
-    const result = await call('revise_post', reviseArgs);
-    check(result.isError && result.structuredContent.error.code === 'DATABASE_UNAVAILABLE', 'BACKEND_RESPONSE_REJECTED');
-  } finally {
-    globalThis.fetch = oldFetch;
-  }
-});
+  },
+);
+Deno.test(
+  '6.10: forward original owner JWT, strict CAS and null schedule to exact public RPCs',
+  async () => {
+    const oldFetch = globalThis.fetch;
+    const calls: Array<{ name: string; params: Record<string, unknown> }> = [];
+    globalThis.fetch = ((input: Request | URL | string, init?: RequestInit) => {
+      const name = String(input).split('/').pop()!;
+      const headers = new Headers(init?.headers);
+      check(headers.get('Authorization') === 'Bearer ' + context.accessToken, 'ORIGINAL_JWT');
+      check(headers.get('apikey') === context.publishableKey, 'PUBLIC_KEY');
+      check(headers.get('Content-Profile') === 'api', 'PUBLIC_RPC');
+      calls.push({ name, params: JSON.parse(String(init?.body)) });
+      return Promise.resolve(Response.json({ response_schema_version: 1, data: response[name] }));
+    }) as typeof fetch;
+    try {
+      const revised = await call('revise_post', reviseArgs);
+      check(!revised.isError && revised.structuredContent.data.post.revision === 2, 'REVISE_OK');
+      const moved = await call('reschedule_post', scheduleArgs);
+      check(!moved.isError && moved.structuredContent.data.content_hash_unchanged, 'SCHEDULE_OK');
+      const cleared = await call('reschedule_post', { ...scheduleArgs, scheduled_at: null });
+      check(!cleared.isError, 'NULL_SCHEDULE_ACCEPTED');
+      check(
+        calls.map((c) => c.name).join(',') === 'revise_post,reschedule_post,reschedule_post',
+        'EXACT_RPCS',
+      );
+      check(
+        calls[0].params.p_expected_revision === 1 &&
+          calls[0].params.p_expected_content_hash === 'a'.repeat(64),
+        'CAS_FORWARDED',
+      );
+      check(calls[0].params.p_reservation_token === null, 'NULL_RESERVATION');
+      check(calls[0].params.p_revision_reason === 'Improve the caption.', 'SAFE_REASON');
+      check(
+        calls[1].params.p_scheduled_at === scheduleArgs.scheduled_at &&
+          calls[2].params.p_scheduled_at === null,
+        'SCHEDULE_EXPLICIT_NULL',
+      );
+      check(
+        calls.every(
+          (c) => !Object.keys(c.params).some((key) => /^p_(actor|client|oauth|owner)/.test(key)),
+        ),
+        'NO_IDENTITY_OVERRIDES',
+      );
+      check(!JSON.stringify(revised.content).includes(context.accessToken), 'NO_TOKEN_LEAK');
+    } finally {
+      globalThis.fetch = oldFetch;
+    }
+  },
+);
+Deno.test(
+  '6.10: malformed CAS, mismatched facts, foreign owner and secret keys fail before RPC',
+  async () => {
+    const oldFetch = globalThis.fetch;
+    let hits = 0;
+    globalThis.fetch = (() => {
+      hits++;
+      return Promise.resolve(Response.json({}));
+    }) as typeof fetch;
+    try {
+      for (const [name, args] of [
+        ['revise_post', { ...reviseArgs, expected_revision: 0 }],
+        ['revise_post', { ...reviseArgs, expected_content_hash: 'bad' }],
+        ['revise_post', { ...reviseArgs, reservation_token: 'bad' }],
+        [
+          'revise_post',
+          {
+            ...reviseArgs,
+            content_payload: {
+              ...payload,
+              body: { facts: [{ position: 1, text: 'Different text' }] },
+            },
+          },
+        ],
+        ['revise_post', { ...reviseArgs, system_checks: {} }],
+        ['revise_post', { ...reviseArgs, owner_user_id: context.actorUserId }],
+        ['revise_post', { ...reviseArgs, revision_reason: 'secret=private' }],
+        ['reschedule_post', { ...scheduleArgs, expected_revision: -1 }],
+        ['reschedule_post', { ...scheduleArgs, scheduled_at: 'not a time' }],
+        ['reschedule_post', { ...scheduleArgs, access_token: context.accessToken }],
+        ['reschedule_post', { ...scheduleArgs, workspace_public_id: postId }],
+      ] as const) {
+        const result = await call(name, args);
+        check(result.isError === true, 'REJECT_' + name);
+      }
+      check(hits === 0, 'INVALID_DID_NOT_REACH_RPC');
+    } finally {
+      globalThis.fetch = oldFetch;
+    }
+  },
+);
+Deno.test(
+  '6.10: post-edit output stays strictly closed and fails on backend injection',
+  async () => {
+    const oldFetch = globalThis.fetch;
+    globalThis.fetch = (() =>
+      Promise.resolve(
+        Response.json({
+          response_schema_version: 1,
+          data: { ...response.revise_post, owner_user_id: context.actorUserId },
+        }),
+      )) as typeof fetch;
+    try {
+      const result = await call('revise_post', reviseArgs);
+      check(
+        result.isError && result.structuredContent.error.code === 'DATABASE_UNAVAILABLE',
+        'BACKEND_RESPONSE_REJECTED',
+      );
+    } finally {
+      globalThis.fetch = oldFetch;
+    }
+  },
+);

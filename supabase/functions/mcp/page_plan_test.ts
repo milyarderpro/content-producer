@@ -224,10 +224,10 @@ Deno.test('6.4 Page/plan metadata survives the 6.8 expansion; no anonymous tools
   assert((text.match(/"oauth2"/g) || []).length === 25, 'every tool requires OAuth');
   assert((text.match(/"openWorldHint":false/g) || []).length === 25, 'open world hint');
   assert((text.match(/"readOnlyHint":true/g) || []).length === 9, 'nine read tools');
-  assert((text.match(/"readOnlyHint":false/g) || []).length === 14, 'fourteen writes');
+  assert((text.match(/"readOnlyHint":false/g) || []).length === 16, 'sixteen writes');
   assert(
-    (text.match(/"destructiveHint":true/g) || []).length === 4,
-    'update_page, cancel and two trivia correction tools are destructive',
+    (text.match(/"destructiveHint":true/g) || []).length === 6,
+    'update_page, cancel, two trivia correction and two post edit tools are destructive',
   );
   assert(text.split('"openai/profile":true').length === 2, 'profile only');
   assert(text.includes('claim_content_plan_items'), '6.5 claim tool must be registered');

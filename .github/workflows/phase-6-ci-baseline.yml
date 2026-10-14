@@ -68,15 +68,6 @@ jobs:
           pnpm install --frozen-lockfile
           echo "Exit code: 0 (pnpm install --frozen-lockfile)"
 
-      - name: Normalize checkpoint files for patch recovery
-        run: |
-          pnpm exec prettier --write scripts/phase-6-10.ts supabase/functions/mcp/post_edit.ts supabase/functions/mcp/post_edit_test.ts
-          for source in scripts/phase-6-10.ts supabase/functions/mcp/post_edit.ts supabase/functions/mcp/post_edit_test.ts; do
-            echo "BEGIN_FORMATTED:$source"
-            base64 "$source"
-            echo "END_FORMATTED:$source"
-          done
-
       - name: Required project check
         id: check
         if: env.FULL_GATE != 'true' || env.REUSE_FULL_SUITES == 'true'
@@ -287,7 +278,7 @@ jobs:
             echo '| Black-box HTTP | `supabase functions serve mcp --no-verify-jwt` + HTTP smoke | '"$HTTP_OUTCOME"' |'
             echo '| Focused regression | Phase 5 acceptance/reads/security/rate limits, trivia correction and post save/concurrency, baseline | '"$REGRESSION_OUTCOME"' |'
             echo
-            echo '| Phase 6.10 public MCP/Inspector | 25-tool census, 3 new post tools valid/invalid, save draft, replay, plan claim, owner, pagination, token privacy and correction lineage | '"$TRIVIA_HTTP_OUTCOME"' |'
+            echo '| Phase 6.10 public MCP/Inspector | 25-tool census, 2 new post tools valid/invalid, save draft, replay, plan claim, owner, pagination, token privacy and correction lineage | '"$TRIVIA_HTTP_OUTCOME"' |'
             echo "| Short real HTTP recovery preflight + fresh reset | MCP, recovery/race, clean reset | $PREFLIGHT_OUTCOME |"
             echo "| Reuse proof (audit-only repair) | prior full-suite PASS + unchanged product/SQL/config/tests | $REUSE_OUTCOME |"
             echo "| Full test-all (includes check/MCP/migration names/database) | sequential after clean reset | $FULL_OUTCOME |"
@@ -307,7 +298,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phase-6-9-ci-evidence
+          name: phase-6-10-ci-evidence
           path: ${{ runner.temp }}/phase-6-evidence/
           if-no-files-found: error
           retention-days: 14
