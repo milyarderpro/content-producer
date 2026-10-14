@@ -20,6 +20,7 @@ import {
   factInput,
   fixture,
   postFixture,
+  secondPage,
   source,
   time,
 } from '../supabase/tests/database/helpers/trivia-rpc.js';
@@ -1534,14 +1535,14 @@ try {
     'OPERATION_KEY_REUSED',
   );
   await call('record_post_performance', { ...metricArgs, ...write() }, 'METRIC_SNAPSHOT_CONFLICT');
-  const next = await call('record_post_performance', {
+  const nextMetric = await call('record_post_performance', {
     ...write(),
     post_public_id: manualPostId,
     captured_at: observedLater,
     metrics: { views: 80, reactions: 11, likes: 10 },
     source: metricSource,
   });
-  check(next.metrics.views === 80, 'METRIC_APPEND_SECOND_SNAPSHOT');
+  check(nextMetric.metrics.views === 80, 'METRIC_APPEND_SECOND_SNAPSHOT');
   const count = row<{ count: number }>(
     "select count(*)::integer count from public.post_metrics where post_id=(select id from public.posts where public_id='" +
       manualPostId +
@@ -1557,22 +1558,22 @@ try {
     first.snapshots.length === 1 &&
       first.has_more === true &&
       first.next_cursor &&
-      first.latest_snapshot.metric_snapshot_public_id === next.metric_snapshot_public_id &&
+      first.latest_snapshot.metric_snapshot_public_id === nextMetric.metric_snapshot_public_id &&
       first.snapshots[0].metrics.views === 80 &&
       first.snapshots[0].anomaly_flags.includes('negative_cumulative_delta'),
     'METRIC_HISTORY_LATEST_AND_FLAGS',
   );
-  const secondPage = await call('get_post_performance', {
+  const metricsSecondPage = await call('get_post_performance', {
     ...common(),
     post_public_id: manualPostId,
     limit: 1,
     cursor: first.next_cursor,
   });
   check(
-    secondPage.snapshots.length === 1 &&
-      !secondPage.has_more &&
-      secondPage.snapshots[0].metrics.views === 100 &&
-      secondPage.snapshots[0].metrics.reach === null,
+    metricsSecondPage.snapshots.length === 1 &&
+      !metricsSecondPage.has_more &&
+      metricsSecondPage.snapshots[0].metrics.views === 100 &&
+      metricsSecondPage.snapshots[0].metrics.reach === null,
     'METRIC_HISTORY_PAGINATION',
   );
   const full = await call('get_post_performance', {
