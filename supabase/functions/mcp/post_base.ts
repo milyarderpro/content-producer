@@ -549,3 +549,5 @@ export function registerPostBaseTools(server: McpServer, context?: RequestContex
       ),
   );
 }
+
+export const getPostOutputSchema = getOutput;
