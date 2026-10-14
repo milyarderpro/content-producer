@@ -97,7 +97,7 @@ async function call(name: string, input: object, error?: string) {
       result?.isError === true && result.structuredContent?.error?.code === error,
       'EXPECTED_' + error,
     );
-  } else check(result?.isError !== true && result?.structuredContent?.data, 'TOOL_FAILED_' + name);
+  } else check(result?.isError !== true && result?.structuredContent?.data, 'TOOL_FAILED_' + name.toUpperCase());
   return result?.structuredContent?.data;
 }
 const common = () => ({ request_schema_version: 1, workspace_public_id: f.workspace });
