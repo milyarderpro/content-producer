@@ -950,7 +950,7 @@ try {
       saved.replayed === false,
     'SAVE_ONLY_DRAFT',
   );
-  const replay = await call('save_post', draft);
+  const saveReplay = await call('save_post', draft);
   check(
     replay.replayed === true &&
       replay.post.post_public_id === saved.post.post_public_id &&
