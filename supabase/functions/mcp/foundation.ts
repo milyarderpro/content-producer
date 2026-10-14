@@ -207,6 +207,21 @@ const safeErrors = {
     'Review current Page posts.',
   ],
   POST_NOT_FOUND: ['Post is not available.', false, 'Read current Page posts.'],
+  POST_NOT_PUBLISHED: [
+    'Performance snapshots require a published or archived post.',
+    false,
+    'Confirm manual publication before recording metrics.',
+  ],
+  METRIC_DEFINITION_AMBIGUOUS: [
+    'Metric definition or source is ambiguous.',
+    false,
+    'Supply a compatible metric source and definition.',
+  ],
+  METRIC_SNAPSHOT_CONFLICT: [
+    'A performance snapshot already exists at this capture timestamp.',
+    false,
+    'Read the existing snapshot and use a different observation time for new evidence.',
+  ],
   REVISION_CONFLICT: [
     'The post revision has changed.',
     false,
