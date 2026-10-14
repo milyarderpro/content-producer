@@ -247,6 +247,19 @@ try {
   );
   const tools = (await rpcHttp('tools/list')).body.result.tools;
   check(tools.length === 15, 'EXACT_FIFTEEN_TOOLS');
+  const inactiveWorkspaceListing = await (async () => {
+    sql(`update public.workspaces set is_active=false where public_id='${f.workspace}'`);
+    try {
+      return await rpcHttp('tools/list');
+    } finally {
+      sql(`update public.workspaces set is_active=true where public_id='${f.workspace}'`);
+    }
+  })();
+  check(
+    inactiveWorkspaceListing.status === 403 &&
+      inactiveWorkspaceListing.body.error?.code === 'OWNER_ACCESS_REQUIRED',
+    'INACTIVE_WORKSPACE_LIST_DENIAL',
+  );
   const foreignDenied = await rpcHttp('tools/list', undefined, foreignBearer);
   check(
     foreignDenied.status === 403 && foreignDenied.body.error?.code === 'OWNER_ACCESS_REQUIRED',
@@ -301,7 +314,10 @@ try {
       from internal.rate_limit_buckets
       where actor_user_id='${f.owner}' and oauth_client_id='${client}'`,
   );
-  check(afterPage.read_count === 0 && afterPage.write_count > 0, 'AUTH_PROBE_CONSUMED_READ_LIMIT');
+  check(
+    afterPage.read_count === 1 && afterPage.write_count > 0,
+    'WORKSPACE_DISCOVERY_MUST_USE_ONE_READ_AND_NOT_PROBE_EACH_TOOL_CALL',
+  );
 
   const updatePageInput = {
     ...write(),
