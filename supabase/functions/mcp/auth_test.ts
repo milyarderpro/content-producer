@@ -161,7 +161,10 @@ Deno.test(
       loadKeys: dependencies.loadKeys,
       now: dependencies.now,
     });
-    assert(noProbe.workspacePublicId === null, 'authentication must not probe a rate-limited read RPC');
+    assert(
+      noProbe.workspacePublicId === null,
+      'authentication must not probe a rate-limited read RPC',
+    );
 
     const outsider = await sign({ ...claims, sub: other });
     const ownerDenied = await handleHttpRequest(
@@ -255,10 +258,7 @@ Deno.test(
     const metadataBody = await metadata.json();
     assert(metadata.status === 200, 'protected-resource metadata must be public');
     assert(metadataBody.resource === config.resource, 'metadata resource mismatch');
-    assert(
-      metadataBody.authorization_servers?.[0] === config.issuer,
-      'metadata issuer mismatch',
-    );
+    assert(metadataBody.authorization_servers?.[0] === config.issuer, 'metadata issuer mismatch');
     assert(
       JSON.stringify(metadataBody.scopes_supported) === JSON.stringify(['openid', 'email']),
       'metadata scopes mismatch',

@@ -323,14 +323,16 @@ try {
     niche_key: 'trivia',
     config_schema_version: 1,
     plan_intent: 'Batch A public MCP plan proof.',
-    items: [{
-      position: 1,
-      scheduled_at: scheduledAt,
-      topic_key: 'animals',
-      format_key: 'single_subject_fast',
-      interaction_goal: 'share',
-      item_config: {},
-    }],
+    items: [
+      {
+        position: 1,
+        scheduled_at: scheduledAt,
+        topic_key: 'animals',
+        format_key: 'single_subject_fast',
+        interaction_goal: 'share',
+        item_config: {},
+      },
+    ],
   };
   const createdPublicPlan = await call('create_content_plan', createPlanInput);
   check(createdPublicPlan.replayed === false, 'CREATE_PLAN_INITIAL');
@@ -371,11 +373,7 @@ try {
       claimReplay.claimed_items[0].claim_token === claimed.claimed_items[0].claim_token,
     'CLAIM_REPLAY_TOKEN',
   );
-  await call(
-    'claim_content_plan_items',
-    { ...claimInput, limit: 2 },
-    'OPERATION_KEY_REUSED',
-  );
+  await call('claim_content_plan_items', { ...claimInput, limit: 2 }, 'OPERATION_KEY_REUSED');
   const c = claimed.claimed_items[0];
   await call('report_content_plan_item_failure', {
     ...write(),

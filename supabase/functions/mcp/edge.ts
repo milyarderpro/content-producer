@@ -1,8 +1,5 @@
 import { pipeline } from 'npm:@supabase/middleware@1.0.0';
-import {
-  withOAuthProtectedResource,
-  withSupabase,
-} from 'npm:@supabase/server@1.9.0';
+import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1.9.0';
 import { runtimeOAuthConfig, type OAuthConfig } from './auth.ts';
 import { handleHttpRequest } from './http.ts';
 
@@ -12,9 +9,7 @@ export function createEdgeHandler(
   configured?: OAuthConfig,
   fixtureJwks?: FixtureJwks,
 ): (request: Request) => Promise<Response> {
-  let protectedHandler:
-    | ((request: Request) => Promise<Response>)
-    | undefined;
+  let protectedHandler: ((request: Request) => Promise<Response>) | undefined;
   return async (request) => {
     const path = new URL(request.url).pathname.replace(/\/+$/, '') || '/';
     if (path.endsWith('/health')) {
