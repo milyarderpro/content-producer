@@ -50,8 +50,8 @@ async function checkActiveOwnerWorkspace(
   if (!profile || typeof profile !== 'object') return null;
   const value = profile as { id?: unknown; workspace_public_id?: unknown };
   return value.id === actor &&
-      typeof value.workspace_public_id === 'string' &&
-      publicIdPattern.test(value.workspace_public_id)
+    typeof value.workspace_public_id === 'string' &&
+    publicIdPattern.test(value.workspace_public_id)
     ? value.workspace_public_id
     : null;
 }
