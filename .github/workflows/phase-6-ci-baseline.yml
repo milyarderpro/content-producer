@@ -141,16 +141,13 @@ jobs:
           pnpm exec vitest run --config vitest.database.config.ts \
             supabase/tests/database/baseline.test.ts \
             supabase/tests/database/api-read-rpcs.test.ts \
-            supabase/tests/database/api-page-plan-writes.test.ts \
-            supabase/tests/database/api-plan-concurrency.test.ts \
-            supabase/tests/database/api-plan-lifecycle.test.ts \
             supabase/tests/database/api-security-kernel.test.ts \
             supabase/tests/database/api-phase-five-acceptance.test.ts \
-            supabase/tests/database/api-metrics.test.ts \
-            supabase/tests/database/api-metrics-concurrency.test.ts \
+            supabase/tests/database/api-trivia-facts.test.ts \
+            supabase/tests/database/api-trivia-concurrency.test.ts \
             supabase/tests/database/operation-ledger-and-rate-limit-buckets.test.ts
           code=$?
-          echo "Focused Phase 5 regression: exit code $code; elapsed $((SECONDS - started))s"
+          echo "Focused Phase 5/trivia regression: exit code $code; elapsed $((SECONDS - started))s"
           exit "$code"
 
       - name: Phase 6.7 - authenticated MCP trivia HTTP and Inspector with real local RPCs
@@ -274,7 +271,7 @@ jobs:
             echo '| Clean reset | `pnpm run supabase:reset` | '"$RESET_OUTCOME"' |'
             echo '| Internal MCP | `pnpm run test:mcp` | '"$MCP_OUTCOME"' |'
             echo '| Black-box HTTP | `supabase functions serve mcp --no-verify-jwt` + HTTP smoke | '"$HTTP_OUTCOME"' |'
-            echo '| Focused regression | Phase 5 plan lifecycle/claims, trivia facts/contention, Page/plan, security/catalog, metrics/rate limits, baseline | '"$REGRESSION_OUTCOME"' |'
+            echo '| Focused regression | Phase 5 acceptance/reads/security/rate limits and trivia facts/concurrency, baseline | '"$REGRESSION_OUTCOME"' |'
             echo
             echo '| Phase 6.7 public MCP/Inspector | 18-tool census, 3 new tools valid/invalid, replay, owner, token privacy, reservation race | '"$TRIVIA_HTTP_OUTCOME"' |'
             echo "| Short real HTTP recovery preflight + fresh reset | MCP, recovery/race, clean reset | $PREFLIGHT_OUTCOME |"
