@@ -132,14 +132,14 @@ jobs:
           pnpm exec tsx scripts/phase-6-1-http-smoke.ts
           echo "Exit code: 0 (local MCP HTTP smoke)"
 
-      - name: Phase 6.12 - authenticated MCP trivia HTTP and Inspector with real local RPCs
+      - name: Phase 6.12 - authenticated MCP publication HTTP and Inspector with real local RPCs
         id: trivia_http
         if: env.FULL_GATE != 'true'
         run: |
           pnpm exec tsx scripts/phase-6-12.ts
           echo "Exit code: 0 (Phase 6.12 public MCP manual post publication/archive, Inspector, explicit intent, approval provenance, immutable history, replay and fact usage)"
 
-      - name: Focused database regression - Phase 5 plans, trivia correction/contention and security
+      - name: Focused database regression - Phase 5 post lifecycle, quality, security and races
         id: regression
         if: env.FULL_GATE != 'true'
         shell: bash
