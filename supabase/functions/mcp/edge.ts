@@ -1,15 +1,39 @@
 import { pipeline } from 'npm:@supabase/middleware@1.0.0';
 import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1.9.0';
 import { runtimeOAuthConfig, type OAuthConfig } from './auth.ts';
-import { handleHttpRequest } from './http.ts';
+import { handleHttpRequest, oversizedRequestResponse } from './http.ts';
 
 type FixtureJwks = { keys: Array<JsonWebKey & { kid?: string }> };
+const MAX_REQUEST_BYTES = 256 * 1024;
+
+async function readBoundedBody(request: Request): Promise<ArrayBuffer | null | 'too_large'> {
+  if (!request.body) return null;
+  const reader = request.clone().body!.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > MAX_REQUEST_BYTES) {
+      await reader.cancel();
+      return 'too_large';
+    }
+    chunks.push(value);
+  }
+  const body = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return body.buffer;
+}
 
 export function createEdgeHandler(
   configured?: OAuthConfig,
   fixtureJwks?: FixtureJwks,
 ): (request: Request) => Promise<Response> {
-  let protectedHandler: ((request: Request) => Promise<Response>) | undefined;
   return async (request) => {
     const path = new URL(request.url).pathname.replace(/\/+$/, '') || '/';
     if (path.endsWith('/health')) {
@@ -21,33 +45,45 @@ export function createEdgeHandler(
     } catch {
       return handleHttpRequest(request);
     }
-    if (!protectedHandler) {
-      const authDependencies = fixtureJwks
-        ? { loadKeys: () => Promise.resolve(fixtureJwks) }
-        : undefined;
-      protectedHandler = pipeline(
-        [
-          withOAuthProtectedResource({
-            resourceServer: config.resource,
-            authorizationServer: config.issuer,
-          }),
-          withSupabase({
-            auth: 'user',
-            audience: config.resource,
-            issuer: config.issuer,
-            env: {
-              url: config.supabaseUrl,
-              publishableKeys: { default: config.publishableKey },
-              secretKeys: {},
-              jwks: fixtureJwks ?? new URL(config.jwksUrl),
-            },
-          }),
-        ],
-        (innerRequest) =>
-          handleHttpRequest(innerRequest, { config, dependencies: authDependencies }),
-      );
+    let body: ArrayBuffer | null = null;
+    if (request.method === 'POST') {
+      try {
+        const read = await readBoundedBody(request);
+        if (read === 'too_large') return oversizedRequestResponse();
+        body = read;
+      } catch {
+        return handleHttpRequest(request, { config });
+      }
     }
-    const response = await protectedHandler(request);
+    const authDependencies = fixtureJwks
+      ? { loadKeys: () => Promise.resolve(fixtureJwks) }
+      : undefined;
+    const forwardedRequest = new Request(request, { body: body?.slice(0) ?? null });
+    const protectedHandler = pipeline(
+      [
+        withOAuthProtectedResource({
+          resourceServer: config.resource,
+          authorizationServer: config.issuer,
+        }),
+        withSupabase({
+          auth: 'user',
+          audience: config.resource,
+          issuer: config.issuer,
+          env: {
+            url: config.supabaseUrl,
+            publishableKeys: { default: config.publishableKey },
+            secretKeys: {},
+            jwks: fixtureJwks ?? new URL(config.jwksUrl),
+          },
+        }),
+      ],
+      (innerRequest) =>
+        handleHttpRequest(new Request(innerRequest, { body: body?.slice() ?? null }), {
+          config,
+          dependencies: authDependencies,
+        }),
+    );
+    const response = await protectedHandler(forwardedRequest);
     if (
       request.method === 'GET' &&
       (path.endsWith('/oauth-protected-resource') ||

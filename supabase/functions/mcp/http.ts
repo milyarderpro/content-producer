@@ -23,6 +23,10 @@ export interface HttpOptions {
 function jsonResponse(body: object, status: number, extra: Record<string, string> = {}): Response {
   return Response.json(body, { status, headers: { ...publicHeaders, ...extra } });
 }
+
+export function oversizedRequestResponse(): Response {
+  return jsonResponse({ error: 'request_too_large' }, 413);
+}
 function metadataUrl(resource: string): string {
   return resource + '/oauth-protected-resource';
 }

@@ -289,6 +289,15 @@ Deno.test(
         listedBody,
     );
 
+    const oversized = await handle(
+      new Request(config.resource, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: 'x'.repeat(256 * 1024 + 1),
+      }),
+    );
+    assert(oversized.status === 413, 'oversized body must be rejected before authentication');
+
     const noToken = await handle(
       new Request(config.resource, {
         method: 'POST',
