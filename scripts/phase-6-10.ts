@@ -93,9 +93,11 @@ async function call(name: string, input: object, error?: string) {
   check(response.status === 200, 'MCP_TOOL_HTTP_STATUS');
   const result = response.body.result;
   if (error) {
+    const received = String(result?.structuredContent?.error?.code ?? 'NONE');
+    const safeReceived = /^[A-Z_]{1,60}$/.test(received) ? received : 'NO_SAFE_ERROR';
     check(
       result?.isError === true && result.structuredContent?.error?.code === error,
-      'EXPECTED_' + error + '_GOT_' + (/^[A-Z_]{1,60}$/.test(String(result?.structuredContent?.error?.code)) ? result.structuredContent.error.code : 'NO_SAFE_ERROR'),
+      'EXPECTED_' + error + '_GOT_' + safeReceived,
     );
   } else
     check(
