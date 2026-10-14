@@ -20,7 +20,6 @@ import {
   factInput,
   fixture,
   postFixture,
-  secondPage,
   source,
   time,
 } from '../supabase/tests/database/helpers/trivia-rpc.js';
