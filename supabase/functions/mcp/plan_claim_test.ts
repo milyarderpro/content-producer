@@ -133,11 +133,11 @@ async function call(name: string, args: object) {
 }
 
 Deno.test(
-  '6.5 registry exposes exactly fifteen OAuth tools and no profile/annotation drift',
+  '6.5 claims retain OAuth and annotations after 6.7 expansion',
   async () => {
     const listed = await mcp('tools/list');
     const tools = listed.result?.tools ?? [];
-    assert(MCP_TOOL_COUNT === 15 && tools.length === 15, 'exact 15 registered tools');
+    assert(MCP_TOOL_COUNT === 18 && tools.length === 18, 'exact 18 registered tools');
     for (const name of PLAN_CLAIM_TOOL_NAMES) {
       const tool = tools.find((t) => t.name === name);
       assert(tool, 'missing claim tool ' + name);

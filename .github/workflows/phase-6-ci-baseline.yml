@@ -274,7 +274,7 @@ jobs:
             echo '| Clean reset | `pnpm run supabase:reset` | '"$RESET_OUTCOME"' |'
             echo '| Internal MCP | `pnpm run test:mcp` | '"$MCP_OUTCOME"' |'
             echo '| Black-box HTTP | `supabase functions serve mcp --no-verify-jwt` + HTTP smoke | '"$HTTP_OUTCOME"' |'
-            echo '| Focused regression | Phase 5 plan lifecycle/claims, concurrency, Page/plan, security/catalog, metrics/rate limits, baseline | '"$REGRESSION_OUTCOME"' |'
+            echo '| Focused regression | Phase 5 plan lifecycle/claims, trivia facts/contention, Page/plan, security/catalog, metrics/rate limits, baseline | '"$REGRESSION_OUTCOME"' |'
             echo
             echo '| Phase 6.7 public MCP/Inspector | 18-tool census, 3 new tools valid/invalid, replay, owner, token privacy, reservation race | '"$TRIVIA_HTTP_OUTCOME"' |'
             echo "| Short real HTTP recovery preflight + fresh reset | MCP, recovery/race, clean reset | $PREFLIGHT_OUTCOME |"
@@ -286,7 +286,7 @@ jobs:
             echo "| Inspector 2.5.0 + real DB public HTTP | 15 valid / 15 invalid tool calls, auth, recovery and race | $INSPECTOR_OUTCOME |"
             echo "| Whitespace | git diff --check | $DIFF_OUTCOME |"
             echo "Full gate requested: $FULL_GATE. test-all includes check/MCP and smoke repeats database tests; these are not independent evidence."
-            echo "Hosted OAuth/PKCE/consent/DCR/refresh/relink/ChatGPT 2xx: deferred Phase 9–10. Independent Batch A audit still pending."
+            echo "Hosted OAuth/PKCE/consent/DCR/refresh/relink/ChatGPT 2xx: deferred Phase 9–10. Independent Batch A audit PASS at 3cceb4710ea5b9019da019f5535ab64321713aed."
             echo "Full suites reused: $REUSE_FULL_SUITES; when true, reused-full-suites.json records the verified prior SHA/run and unchanged-source proof."
             echo "Numerical exit codes and exact assertions are in Actions step logs. A skipped stage is not a pass."
           } > "$report"

@@ -105,10 +105,10 @@ async function call(name: string, input = args[name]) {
 const envelope = (value: object) => ({ response_schema_version: 1, data: value });
 
 Deno.test(
-  '6.6 exactly fifteen OAuth tools; recovery schemas and destructive cancellation metadata',
+  '6.6 recovery schemas and destructive cancellation metadata survive 6.7',
   async () => {
     const tools = (await mcp('tools/list')).result.tools;
-    assert(MCP_TOOL_COUNT === 15 && tools.length === 15, 'exact fifteen tools');
+    assert(MCP_TOOL_COUNT === 18 && tools.length === 18, 'exact eighteen tools');
     for (const name of PLAN_RECOVERY_TOOL_NAMES) {
       const tool = tools.find((t: { name: string }) => t.name === name);
       assert(tool && tool._meta.securitySchemes[0].type === 'oauth2', 'OAuth');
