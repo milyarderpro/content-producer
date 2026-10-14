@@ -1,10 +1,60 @@
 import { pipeline } from 'npm:@supabase/middleware@1.0.0';
 import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1.9.0';
-import { runtimeOAuthConfig, type OAuthConfig } from './auth.ts';
+import { runtimeOAuthConfig, type AuthDependencies, type OAuthConfig } from './auth.ts';
 import { handleHttpRequest, oversizedRequestResponse } from './http.ts';
 
 type FixtureJwks = { keys: Array<JsonWebKey & { kid?: string }> };
 const MAX_REQUEST_BYTES = 256 * 1024;
+const publicIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+
+async function checkActiveOwnerWorkspace(
+  config: OAuthConfig,
+  token: string,
+  actor: string,
+): Promise<string | null> {
+  const response = await fetch(config.supabaseUrl + '/rest/v1/rpc/get_account_profile', {
+    method: 'POST',
+    redirect: 'error',
+    signal: AbortSignal.timeout(10000),
+    headers: {
+      apikey: config.publishableKey,
+      Authorization: 'Bearer ' + token,
+      'Content-Type': 'application/json',
+      'Accept-Profile': 'api',
+      'Content-Profile': 'api',
+    },
+    body: JSON.stringify({ p_request_schema_version: 1 }),
+  });
+  const body = await response.text();
+  if (new TextEncoder().encode(body).byteLength > 8192) {
+    throw new Error('Workspace check response too large');
+  }
+  let result: unknown;
+  try {
+    result = JSON.parse(body);
+  } catch {
+    throw new Error('Invalid workspace check response');
+  }
+  if (!response.ok) {
+    const message =
+      result && typeof result === 'object' && 'message' in result
+        ? (result as { message: unknown }).message
+        : null;
+    if (message === 'OWNER_ACCESS_REQUIRED') return null;
+    throw new Error('Workspace check unavailable');
+  }
+  if (!result || typeof result !== 'object' || !('data' in result)) return null;
+  const data = (result as { data: unknown }).data;
+  if (!data || typeof data !== 'object' || !('profile' in data)) return null;
+  const profile = (data as { profile: unknown }).profile;
+  if (!profile || typeof profile !== 'object') return null;
+  const value = profile as { id?: unknown; workspace_public_id?: unknown };
+  return value.id === actor &&
+      typeof value.workspace_public_id === 'string' &&
+      publicIdPattern.test(value.workspace_public_id)
+    ? value.workspace_public_id
+    : null;
+}
 
 async function readBoundedBody(request: Request): Promise<ArrayBuffer | null | 'too_large'> {
   if (!request.body) return null;
@@ -33,6 +83,7 @@ async function readBoundedBody(request: Request): Promise<ArrayBuffer | null | '
 export function createEdgeHandler(
   configured?: OAuthConfig,
   fixtureJwks?: FixtureJwks,
+  checkOwner: NonNullable<AuthDependencies['checkOwner']> = checkActiveOwnerWorkspace,
 ): (request: Request) => Promise<Response> {
   return async (request) => {
     const path = new URL(request.url).pathname.replace(/\/+$/, '') || '/';
@@ -67,9 +118,10 @@ export function createEdgeHandler(
         return handleHttpRequest(request, { config });
       }
     }
-    const authDependencies = fixtureJwks
-      ? { loadKeys: () => Promise.resolve(fixtureJwks) }
-      : undefined;
+    const authDependencies: AuthDependencies = {
+      ...(fixtureJwks ? { loadKeys: () => Promise.resolve(fixtureJwks) } : {}),
+      checkOwner,
+    };
     const forwardedRequest = new Request(request, { body: body?.slice(0) ?? null });
     const protectedHandler = pipeline(
       [
