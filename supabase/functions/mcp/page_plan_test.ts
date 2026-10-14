@@ -217,9 +217,7 @@ const payloads: Record<string, object> = {
   get_content_plan: envelope({ plan, items: [item], next_cursor: null, has_more: false }),
 };
 
-Deno.test(
-  '6.4 Page/plan metadata survives the 6.7 expansion; no anonymous tools',
-  async () => {
+Deno.test('6.4 Page/plan metadata survives the 6.7 expansion; no anonymous tools', async () => {
     const text = await request('tools/list');
     assert(MCP_TOOL_COUNT === 18, 'cumulative registry count must be 18');
     for (const tool of PAGE_PLAN_TOOL_NAMES) assert(text.includes(tool), 'missing ' + tool);
@@ -233,8 +231,7 @@ Deno.test(
     );
     assert(text.split('"openai/profile":true').length === 2, 'profile only');
     assert(text.includes('claim_content_plan_items'), '6.5 claim tool must be registered');
-  },
-);
+});
 
 Deno.test(
   '6.4 tools call only corresponding api RPC with owner-bound original JWT and unmodified write fields',

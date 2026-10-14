@@ -132,9 +132,7 @@ async function call(name: string, args: object) {
   return response.result;
 }
 
-Deno.test(
-  '6.5 claims retain OAuth and annotations after 6.7 expansion',
-  async () => {
+Deno.test('6.5 claims retain OAuth and annotations after 6.7 expansion', async () => {
     const listed = await mcp('tools/list');
     const tools = listed.result?.tools ?? [];
     assert(MCP_TOOL_COUNT === 18 && tools.length === 18, 'exact 18 registered tools');
@@ -161,8 +159,7 @@ Deno.test(
       );
     }
     assert(!tools.some((t) => t.name === 'trivia_find_similar_facts'), '6.7 not yet registered');
-  },
-);
+});
 
 Deno.test(
   '6.5 public MCP calls forward only allowlisted api RPCs with original JWT, lease, key, token and safe failure',

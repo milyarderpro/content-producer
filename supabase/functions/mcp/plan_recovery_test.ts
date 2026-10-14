@@ -104,9 +104,7 @@ async function call(name: string, input = args[name]) {
 }
 const envelope = (value: object) => ({ response_schema_version: 1, data: value });
 
-Deno.test(
-  '6.6 recovery schemas and destructive cancellation metadata survive 6.7',
-  async () => {
+Deno.test('6.6 recovery schemas and destructive cancellation metadata survive 6.7', async () => {
     const tools = (await mcp('tools/list')).result.tools;
     assert(MCP_TOOL_COUNT === 18 && tools.length === 18, 'exact eighteen tools');
     for (const name of PLAN_RECOVERY_TOOL_NAMES) {
@@ -128,8 +126,7 @@ Deno.test(
       );
       assert(!Object.hasOwn(tool._meta, 'openai/profile'), 'profile metadata');
     }
-  },
-);
+});
 
 Deno.test(
   '6.6 public MCP forwards original JWT, operation key, distinct retry/replacement and explicit cancellation',
