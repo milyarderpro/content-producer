@@ -40,7 +40,8 @@ export function createEdgeHandler(
             },
           }),
         ],
-        (innerRequest) => handleHttpRequest(innerRequest, { config }),
+        (innerRequest) =>
+          handleHttpRequest(innerRequest, { config, dependencies: authDependencies }),
       );
     }
     const response = await protectedHandler(request);
