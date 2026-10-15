@@ -1,0 +1,44 @@
+name: Phase 9.1 - temporary formatting diagnostics
+
+on:
+  push:
+    branches: [codex/phase-9-deployment]
+
+permissions:
+  contents: read
+
+jobs:
+  format-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Emit Prettier-normalized source for follow-up commit
+        shell: bash
+        run: |
+          set -eu
+          files=(
+            auth-frontend/src/app.js
+            auth-frontend/src/auth.js
+            auth-frontend/src/index.html
+            auth-frontend/src/style.css
+            auth-frontend/tests/auth.test.mjs
+            docs/phase-9/inventory-9.0.md
+            eslint.config.mjs
+            scripts/check.ts
+          )
+          pnpm exec prettier --write "${files[@]}" >/dev/null
+          for f in "${files[@]}"; do
+            printf 'FMT_BEGIN:%s\n' "$f"
+            base64 -w0 "$f"
+            printf '\nFMT_END:%s\n' "$f"
+          done
