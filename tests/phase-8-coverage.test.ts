@@ -90,9 +90,9 @@ describe('Phase 8.0 contract coverage (design only)', () => {
     );
     expect(ac).toHaveLength(14);
     expect(map.acceptance_criteria.map((entry) => entry.id)).toEqual(ac);
-    expect(
-      map.acceptance_criteria.every((entry) => entry.phase_8_status === 'NOT_EVALUATED'),
-    ).toBe(true);
+    expect(map.acceptance_criteria.every((entry) => entry.phase_8_status === 'NOT_EVALUATED')).toBe(
+      true,
+    );
     for (const id of ['AC-001', 'AC-012']) {
       expect(map.acceptance_criteria.find((entry) => entry.id === id)?.production_scope).toBe(
         'DEFERRED-to-Phase-9/10',

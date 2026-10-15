@@ -14,8 +14,8 @@ paths**, and **14 acceptance criteria** to the frozen contracts. No frozen
 prompt wording or expected behavior is copied or modified.
 
 The `revoke_post_approval` boundary uses an ambiguous-reference variant,
-and `get_post_performance` uses an empty/history variant. These are *planned
-variants*, not completed frozen case runs. Every case/tool/AC remains marked
+and `get_post_performance` uses an empty/history variant. These are _planned
+variants_, not completed frozen case runs. Every case/tool/AC remains marked
 `NOT_EXECUTED` or `NOT_EVALUATED`. The deployment-dependent portions of
 `AC-001` and `AC-012` remain `DEFERRED-to-Phase-9/10`.
 No `PASS-final-MVP` claimed.
@@ -25,7 +25,7 @@ No `PASS-final-MVP` claimed.
 1. **Source and prior deterministic CI — VERIFIED AS HISTORICAL EVIDENCE.**
    The Phase 7 portable candidate, connection-input schema, 33-tool
    contract, and GitHub Actions local-Supabase testing precedent exist.
-   This is *not* evidence of live ChatGPT staging or a Phase 8 test pass.
+   This is _not_ evidence of live ChatGPT staging or a Phase 8 test pass.
 2. **Supabase project discovery — READ-ONLY OBSERVED.** The connected
    account listed one remote project marked `INACTIVE`. No project was
    explicitly identified and verified as isolated Phase 8 staging.
@@ -63,7 +63,7 @@ No `PASS-final-MVP` claimed.
    test-owner identities, HTTPS MCP and minimum auth frontend. Keep OAuth
    secrets and staging registration in secure host configuration, never
    in GitHub or the production package. Prove that production is isolated.
-2. Connect one ChatGPT *custom MCP* to E3 staging with owner login.
+2. Connect one ChatGPT _custom MCP_ to E3 staging with owner login.
    Verify live OAuth discovery/PKCE/consent and a read-only
    `get_account_profile` call, visible selected tool, sanitized result,
    request identifiers, 33-tool discovery, and safe denial/relink.
@@ -75,7 +75,7 @@ No `PASS-final-MVP` claimed.
    digest and repeatable reset/check commands. Prove an allowed state
    read-back before testing writes, never against an unclassified project.
 5. Demonstrate **at least two distinct fresh conversations** and several
-   *sample non-frozen read-only prompts*, collecting complete tool order,
+   _sample non-frozen read-only prompts_, collecting complete tool order,
    sanitized args/results, safe state snapshots, host/model/plugin/MCP
    versions, digest, time, outcomes and provenance. Show how evidence
    capture and fixture reset scale without the owner manually executing
@@ -83,7 +83,7 @@ No `PASS-final-MVP` claimed.
 
 **Owner actions, bounded to onboarding:** identify/authorize isolated
 staging; approve connection and installation of E3 custom MCP and E4
-private *test* plugin; complete their login/OAuth flows personally.
+private _test_ plugin; complete their login/OAuth flows personally.
 Do not send passwords, codes, or tokens into chat. If a permitted host
 automation or UI capability is needed for conversation orchestration and
 trace export, that must be explicitly available and demonstrated.
