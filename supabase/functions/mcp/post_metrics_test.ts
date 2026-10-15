@@ -267,7 +267,7 @@ Deno.test('6.13: poisoned backend projections are rejected without leaking data'
 });
 
 // Audit Batch B: every metrics projection has one closed, DB-aligned flag allowlist.
-Deno.test('6.13: record and history output flags reject unknown values and arrays over five', async () => {
+Deno.test('6.13: metrics anomaly flags are closed', async () => {
   const old = globalThis.fetch;
   const known = [
     'negative_cumulative_delta',
@@ -298,7 +298,10 @@ Deno.test('6.13: record and history output flags reject unknown values and array
       flags = ['unrecognized'];
       const unknown = await call(name, args);
       check(unknown.isError === true, 'UNKNOWN_FLAG_ACCEPTED_' + name);
-      check(unknown.structuredContent.error.code === 'DATABASE_UNAVAILABLE', 'SAFE_REJECTION_' + name);
+      check(
+        unknown.structuredContent.error.code === 'DATABASE_UNAVAILABLE',
+        'SAFE_REJECTION_' + name,
+      );
       flags = [...known, known[0]];
       check((await call(name, args)).isError === true, 'TOO_MANY_FLAGS_' + name);
       flags = known;

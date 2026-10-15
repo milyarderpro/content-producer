@@ -302,7 +302,7 @@ Deno.test(
 );
 
 // Audit Batch B: comparisons use absolute instants, not RFC 3339 string order.
-Deno.test('6.9: list_posts accepts offset-aware ranges and rejects reversed instants', async () => {
+Deno.test('6.9: offset ranges compare instants through MCP', async () => {
   const old = globalThis.fetch;
   const calls: Record<string, unknown>[] = [];
   globalThis.fetch = ((_input: Request | URL | string, init?: RequestInit) => {
@@ -320,7 +320,10 @@ Deno.test('6.9: list_posts accepts offset-aware ranges and rejects reversed inst
         [`${prefix}_to`]: laterUtc,
       };
       const accepted = await call('list_posts', good);
-      check(!accepted.isError && accepted.structuredContent.data.items.length === 1, 'OFFSET_ACCEPT_' + prefix);
+      check(
+        !accepted.isError && accepted.structuredContent.data.items.length === 1,
+        'OFFSET_ACCEPT_' + prefix,
+      );
       const forwarded = calls.at(-1)!;
       check(
         forwarded[`p_${prefix}_from`] === earlyWithOffset &&
@@ -342,7 +345,7 @@ Deno.test('6.9: list_posts accepts offset-aware ranges and rejects reversed inst
   }
 });
 
-Deno.test('6.9: get_post latest metrics enforce the Phase 5 anomaly allowlist', async () => {
+Deno.test('6.9: latest post metrics restrict anomaly flags', async () => {
   const old = globalThis.fetch;
   const known = [
     'negative_cumulative_delta',
@@ -371,13 +374,22 @@ Deno.test('6.9: get_post latest metrics enforce the Phase 5 anomaly allowlist', 
       }),
     )) as typeof fetch;
   try {
-    check(!(await call('get_post', { ...base, post_public_id: postId })).isError, 'KNOWN_LATEST_FLAGS');
+    check(
+      !(await call('get_post', { ...base, post_public_id: postId })).isError,
+      'KNOWN_LATEST_FLAGS',
+    );
     flags = ['unknown_flag'];
     const denied = await call('get_post', { ...base, post_public_id: postId });
     check(denied.isError === true, 'UNKNOWN_LATEST_FLAG_ACCEPTED');
-    check(denied.structuredContent.error.code === 'DATABASE_UNAVAILABLE', 'INVALID_LATEST_SAFE');
+    check(
+      denied.structuredContent.error.code === 'DATABASE_UNAVAILABLE',
+      'INVALID_LATEST_SAFE',
+    );
     flags = [...known, known[0]];
-    check((await call('get_post', { ...base, post_public_id: postId })).isError === true, 'LATEST_OVER_LIMIT');
+    check(
+      (await call('get_post', { ...base, post_public_id: postId })).isError === true,
+      'LATEST_OVER_LIMIT',
+    );
   } finally {
     globalThis.fetch = old;
   }
