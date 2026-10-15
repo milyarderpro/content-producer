@@ -43,7 +43,7 @@ Untuk setiap checkpoint, catat baseline/head SHA, file berubah, perintah dan exi
 1. Implementasikan frontend kecil di auth-frontend/ dengan rute /login, /oauth/consent, /logout, dan error aman. Gunakan build statis yang sesuai repository; kunci dependency dan lockfile. Jika memakai Vite, pastikan build/typecheck frontend sendiri terhubung ke pemeriksaan proyek karena tsconfig root saat ini tidak mencakup auth-frontend/.
 2. Pertahankan authorization_id saat redirect ke login dan kembali ke consent. Tampilkan identitas client dan scope dari Supabase Auth; sediakan tindakan approve serta deny yang eksplisit. Jangan menyetujui otomatis.
 3. Periksa validasi URL redirect, state error/expired request, logout, dan refresh langsung pada setiap rute. Bila SPA dipilih, sertakan fallback route pada konfigurasi Vercel dan uji bahwa /oauth/consent dapat dibuka langsung.
-4. Pakai hanya project URL dan publishable key sebagai konfigurasi browser. Jangan masukkan secret ke VITE_*, NEXT_PUBLIC_*, source, bundle, atau CI artifact.
+4. Pakai hanya project URL dan publishable key sebagai konfigurasi browser. Jangan masukkan secret ke `VITE_*`, `NEXT_PUBLIC_*`, source, bundle, atau CI artifact.
 5. Uji route, pelestarian authorization_id, approve/deny, error state, dan ketiadaan secret. Jalankan pnpm run check setelah TypeScript/config berubah, serta build/typecheck frontend yang eksplisit.
 
 **Selesai bila:** UI dan tes lulus secara lokal/CI ringan; belum ada URL Vercel production atau login production yang diklaim terbukti.
