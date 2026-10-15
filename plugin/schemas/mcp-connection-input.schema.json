@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Content Producer verified MCP connection input",
+  "description": "Phase 10 connection data for the Phase 7 generator; never a stored credential or registered connection mapping.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["serverName", "endpointUrl", "oauth"],
+  "properties": {
+    "serverName": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+    },
+    "endpointUrl": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://"
+    },
+    "oauth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": { "const": "discovery" }
+      }
+    }
+  }
+}
