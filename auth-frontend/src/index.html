@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; connect-src https: http://127.0.0.1:* http://localhost:*; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'self'"
+    />
+    <title>Content Producer — Masuk</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <main class="panel">
+      <header>
+        <p class="eyebrow">CONTENT PRODUCER</p>
+        <h1 id="title">Autentikasi</h1>
+      </header>
+      <p id="status" role="status" aria-live="polite"></p>
+      <section id="login" hidden>
+        <p>Masuk dengan akun yang sudah diundang. Pendaftaran publik tidak tersedia.</p>
+        <form id="login-form">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="username" required />
+          <label for="password">Kata sandi</label>
+          <input id="password" type="password" autocomplete="current-password" required />
+          <button type="submit">Masuk</button>
+        </form>
+      </section>
+      <section id="consent" hidden>
+        <p>Permintaan izin akses dari aplikasi:</p>
+        <strong id="client-name"></strong>
+        <p class="muted" id="client-id"></p>
+        <p>Izin yang diminta:</p>
+        <ul id="scope-list"></ul>
+        <p class="muted">
+          Pilih Izinkan hanya jika Anda mengenali aplikasi dan izin di atas.
+        </p>
+        <div class="actions">
+          <button id="approve" type="button">Izinkan</button>
+          <button id="deny" class="secondary" type="button">Tolak</button>
+        </div>
+      </section>
+      <section id="logout" hidden>
+        <p>Akhiri sesi pada perangkat ini?</p>
+        <button id="logout-button" type="button">Keluar</button>
+      </section>
+      <section id="error" hidden>
+        <p id="safe-error" role="alert">Permintaan tidak dapat diproses.</p>
+        <a href="/login">Kembali ke halaman masuk</a>
+      </section>
+    </main>
+  </body>
+</html>

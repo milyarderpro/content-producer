@@ -22,3 +22,5 @@ supabase/.branches/
 # Generated source and reports
 supabase/functions/_shared/generated/
 reports/
+
+auth-frontend/dist/

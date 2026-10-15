@@ -1,0 +1,33 @@
+name: Phase 9.1 - auth frontend source checks
+
+on:
+  push:
+    branches: [codex/phase-9-deployment]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: Pinned install, project check, commit diff
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Frontend typecheck, build, focused tests and project check
+        run: pnpm run check
+      - name: Diff whitespace
+        run: git diff --check "$(git merge-base HEAD origin/main)" HEAD
