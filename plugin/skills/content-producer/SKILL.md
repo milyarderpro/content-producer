@@ -15,7 +15,15 @@ Activate for user goals to create, find, review, revise, approve, discard, sched
 - [Source policy](references/core/source-policy.md) — source evidence and untrusted research.
 - [Output contract](references/core/output-contract.md) — separate public copy from internal state.
 
-Read workflow/tool sequences before content production; lifecycle before consequential writes; source policy before fact research/correction; output contract before displaying a saved post. Read the installed niche policy for niche-specific behavior. Checkpoint 7.2 supplies only core; trivia editorial references wait for 7.3. Never invent missing rules or claim live ChatGPT/MCP verification before Phase 10.
+For the enabled `trivia` niche, also read only relevant policy references:
+
+- [Trivia content DNA](references/niches/trivia/content-dna.md) — voice, topic mix, editorial selection and anti-copying.
+- [Trivia formats](references/niches/trivia/formats.md) — five formats, two profiles, hooks, CTA and renderer limits.
+- [Trivia fact checking](references/niches/trivia/fact-checking.md) — source tiers, freshness and sensitive claims.
+- [Trivia dedup ontology](references/niches/trivia/dedup-ontology.md) — atomic identity and anti-merge decisions.
+- [Trivia quality rubric](references/niches/trivia/quality-rubric.md) — editorial criteria and safe revision outcomes.
+
+Read workflow/tool sequences before content production; lifecycle before consequential writes; source policy before fact research/correction; output contract before displaying a saved post. When the selected niche is trivia, consult the niche references before selecting or verifying facts, writing formats or attesting quality. Another niche must supply its own policy; never apply trivia defaults globally. Never invent missing rules or claim live ChatGPT/MCP verification before Phase 10.
 
 ## Non-negotiable behavior
 

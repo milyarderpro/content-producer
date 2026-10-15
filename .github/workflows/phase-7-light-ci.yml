@@ -52,6 +52,9 @@ jobs:
       - name: Run focused Phase 7.2 core skill tests
         run: pnpm exec vitest run tests/plugin-skill.test.ts
 
+      - name: Run focused Phase 7.3 trivia editorial reference tests
+        run: pnpm exec vitest run tests/plugin-trivia.test.ts
+
       - name: Run project check (format, lint, types, unit tests)
         run: pnpm run check
 
