@@ -1,4 +1,11 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -12,7 +19,10 @@ import {
 } from '../scripts/plugin-config.js';
 
 const root = join(process.cwd(), 'plugin');
-const manifest = JSON.parse(readFileSync(join(root, 'plugin.json'), 'utf8')) as Record<string, unknown>;
+const manifest = JSON.parse(readFileSync(join(root, 'plugin.json'), 'utf8')) as Record<
+  string,
+  unknown
+>;
 const connection = {
   serverName: 'content-producer',
   endpointUrl: 'https://mcp-fixture.integration-tools.net/functions/v1/mcp',
@@ -107,14 +117,18 @@ describe('Phase 7.1 portable MCP generator', () => {
 
   it('rejects invalid portable configurations and never writes final MCP source', () => {
     const generated = generatePortableMcpConfig(connection);
-    expect(() => validatePortableMcpConfig({
-      ...generated,
-      mcpServers: { x: { type: 'sse', url: connection.endpointUrl } },
-    })).toThrow();
-    expect(() => validatePortableMcpConfig({
-      ...generated,
-      mcpServers: { x: { type: 'streamable-http', url: connection.endpointUrl, oauth: {} } },
-    })).toThrow();
+    expect(() =>
+      validatePortableMcpConfig({
+        ...generated,
+        mcpServers: { x: { type: 'sse', url: connection.endpointUrl } },
+      }),
+    ).toThrow();
+    expect(() =>
+      validatePortableMcpConfig({
+        ...generated,
+        mcpServers: { x: { type: 'streamable-http', url: connection.endpointUrl, oauth: {} } },
+      }),
+    ).toThrow();
     expect(existsSync(join(root, 'mcp.json'))).toBe(false);
   });
 });

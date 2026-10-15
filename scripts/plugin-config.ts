@@ -70,7 +70,9 @@ function httpsEndpoint(value: unknown): string {
     url.hash ||
     url.href !== input
   ) {
-    throw new Error('endpointUrl must be a canonical, public HTTPS MCP URL without credentials, query or fragment.');
+    throw new Error(
+      'endpointUrl must be a canonical, public HTTPS MCP URL without credentials, query or fragment.',
+    );
   }
   return input;
 }
@@ -128,16 +130,26 @@ export function validatePortableManifest(value: unknown, pluginRoot: string): vo
   const presentation = object(openai.interface, 'OpenAI interface');
   keys(
     presentation,
-    ['displayName', 'shortDescription', 'developerName', 'category', 'capabilities',
-      'composerIcon', 'logo', 'screenshots'],
+    [
+      'displayName',
+      'shortDescription',
+      'developerName',
+      'category',
+      'capabilities',
+      'composerIcon',
+      'logo',
+      'screenshots',
+    ],
     'OpenAI interface',
   );
   for (const key of ['displayName', 'shortDescription', 'developerName', 'category']) {
     nonEmpty(presentation[key], key);
   }
-  if (!Array.isArray(presentation.capabilities) ||
-      !presentation.capabilities.length ||
-      presentation.capabilities.some((item: unknown) => item !== 'Read' && item !== 'Write')) {
+  if (
+    !Array.isArray(presentation.capabilities) ||
+    !presentation.capabilities.length ||
+    presentation.capabilities.some((item: unknown) => item !== 'Read' && item !== 'Write')
+  ) {
     throw new Error('OpenAI capabilities must be Read and/or Write.');
   }
   for (const key of ['composerIcon', 'logo']) {
