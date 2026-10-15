@@ -40,11 +40,13 @@ Check the linked target in the CLI and dashboard; do not infer it from a local d
         pnpm exec supabase db push --linked --dry-run
 
    Compare the dry-run pending versions and order against the repository files. For a truly fresh target expect no previously applied application migration versions. Any unexpected remote version, reorder, missing source file or difference is a hard stop. Save **redacted** counts/version IDs, not connection strings.
+
 4. Only with matching target, confirmed backup decision and owner authorization, apply the **repository migration source in order**:
 
         pnpm exec supabase db push --linked
 
    Then repeat migration list. Cross-check source/applied count and identifiers and inspect schema api, 33 RPC signatures, 15 RLS tables/policies, grants, default privileges, owner workspace isolation and forbidden anonymous permissions using reviewed SELECT-only catalog queries. The local audit in scripts/phase-6-catalog-audit.ts is evidence for the frozen source; run equivalent read-only catalog inspection against hosted SQL through the owner's authorized safe interface, without assuming local scripts select the hosted database.
+
 5. Run the hosted Security Advisor via Supabase Dashboard (or approved read-only advisor tool) and review findings with the owner. Resolve critical/high findings before continuing; do not downgrade warnings silently. Schema/history and advisor findings are saved as redacted evidence. Seed local test fixtures are NOT production data and must never be pushed.
 
 ## 4. Backup and restore decision (9.4 only)
@@ -84,17 +86,17 @@ For an incident, switch back to a verified earlier Edge Function version if one 
 
 ## 8. Redacted gate/deployment evidence template
 
-| Evidence item | Actual record | Status |
-| --- | --- | --- |
-| GitHub main frozen SHA / technical run / artifact | Pending 9.3 | N/A |
-| Pinned CLI and local clean reset / test-all | Pending 9.3 | N/A |
-| Local migration + 33 RPC catalog + RLS/grants + non-owner/Inspector | Pending 9.3 | N/A |
-| Hosted project ref, organization, region, data/history | Project not created | N/A |
-| Owner backup/recovery verification | No target yet | N/A |
-| Hosted Security Advisor / RLS / migration comparison | No target yet | N/A |
-| Function source SHA, version, resource URL, /health | Not deployed | N/A |
-| Vercel personal project, immutable deploy ID, HTTPS domain, route refresh | Not provisioned | N/A |
-| OAuth Site URL, authorization path, PKCE, owner/deny, no-token exposure | Not configured | N/A |
-| Rollback decision / operator / verification | Not required at 9.2 | N/A |
+| Evidence item                                                             | Actual record       | Status |
+| ------------------------------------------------------------------------- | ------------------- | ------ |
+| GitHub main frozen SHA / technical run / artifact                         | Pending 9.3         | N/A    |
+| Pinned CLI and local clean reset / test-all                               | Pending 9.3         | N/A    |
+| Local migration + 33 RPC catalog + RLS/grants + non-owner/Inspector       | Pending 9.3         | N/A    |
+| Hosted project ref, organization, region, data/history                    | Project not created | N/A    |
+| Owner backup/recovery verification                                        | No target yet       | N/A    |
+| Hosted Security Advisor / RLS / migration comparison                      | No target yet       | N/A    |
+| Function source SHA, version, resource URL, /health                       | Not deployed        | N/A    |
+| Vercel personal project, immutable deploy ID, HTTPS domain, route refresh | Not provisioned     | N/A    |
+| OAuth Site URL, authorization path, PKCE, owner/deny, no-token exposure   | Not configured      | N/A    |
+| Rollback decision / operator / verification                               | Not required at 9.2 | N/A    |
 
 Sources (re-check at execution): Supabase CLI reference https://supabase.com/docs/reference/cli/supabase-db-push ; OAuth 2.1 https://supabase.com/docs/guides/auth/oauth-server/getting-started ; CLI dump/restore https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore ; Vercel build/root https://vercel.com/docs/builds/configure-a-build . No actual project references, tokens or dashboard settings are recorded in this runbook.
