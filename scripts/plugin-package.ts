@@ -38,11 +38,13 @@ function assertNoSymlinks(root: string): void {
 }
 
 function listFiles(root: string, base = root): string[] {
-  return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
-    const path = join(root, entry.name);
-    if (entry.isDirectory()) return listFiles(path, base);
-    return [relative(base, path).split(sep).join('/')];
-  }).sort();
+  return readdirSync(root, { withFileTypes: true })
+    .flatMap((entry) => {
+      const path = join(root, entry.name);
+      if (entry.isDirectory()) return listFiles(path, base);
+      return [relative(base, path).split(sep).join('/')];
+    })
+    .sort();
 }
 
 function read(root: string, path: string): string {
@@ -94,22 +96,30 @@ function checkSensitive(path: string, content: string): void {
   }
 }
 
-export function validatePluginSource(projectRoot: string, pluginRoot = join(projectRoot, 'plugin')): void {
+export function validatePluginSource(
+  projectRoot: string,
+  pluginRoot = join(projectRoot, 'plugin'),
+): void {
   if (!existsSync(pluginRoot)) throw new Error('Required plugin root is missing.');
   assertNoSymlinks(pluginRoot);
   for (const path of CANDIDATE_FILES) {
-    if (!existsSync(join(pluginRoot, path))) throw new Error('Required plugin file missing: ' + path);
-    if (!lstatSync(join(pluginRoot, path)).isFile()) throw new Error('Invalid plugin file: ' + path);
+    if (!existsSync(join(pluginRoot, path)))
+      throw new Error('Required plugin file missing: ' + path);
+    if (!lstatSync(join(pluginRoot, path)).isFile())
+      throw new Error('Invalid plugin file: ' + path);
   }
   for (const deferred of ['mcp.json', 'connections.json', 'connection-mapping.json']) {
-    if (existsSync(join(pluginRoot, deferred))) throw new Error('Deferred connection configuration is forbidden: ' + deferred);
+    if (existsSync(join(pluginRoot, deferred)))
+      throw new Error('Deferred connection configuration is forbidden: ' + deferred);
   }
 
   const manifest = JSON.parse(read(pluginRoot, 'plugin.json')) as unknown;
   validatePortableManifest(manifest, pluginRoot);
-  const presentation = (manifest as {
-    extensions: { 'com.openai': { interface: Record<string, unknown> } };
-  }).extensions['com.openai'].interface;
+  const presentation = (
+    manifest as {
+      extensions: { 'com.openai': { interface: Record<string, unknown> } };
+    }
+  ).extensions['com.openai'].interface;
   for (const key of ['composerIcon', 'logo', 'screenshots']) {
     const value = presentation[key];
     if (value !== undefined) {
@@ -121,18 +131,30 @@ export function validatePluginSource(projectRoot: string, pluginRoot = join(proj
     }
   }
 
-  const inputSchema = JSON.parse(readFileSync(join(projectRoot, 'plugin/schemas/mcp-connection-input.schema.json'), 'utf8')) as {
+  const inputSchema = JSON.parse(
+    readFileSync(join(projectRoot, 'plugin/schemas/mcp-connection-input.schema.json'), 'utf8'),
+  ) as {
     $schema?: string;
     additionalProperties?: boolean;
     required?: string[];
-    properties?: Record<string, { additionalProperties?: boolean; required?: string[]; properties?: Record<string, { const?: string }> }>;
+    properties?: Record<
+      string,
+      {
+        additionalProperties?: boolean;
+        required?: string[];
+        properties?: Record<string, { const?: string }>;
+      }
+    >;
   };
-  if (inputSchema.$schema !== 'https://json-schema.org/draft/2020-12/schema' ||
-      inputSchema.additionalProperties !== false ||
-      JSON.stringify(inputSchema.required) !== JSON.stringify(['serverName', 'endpointUrl', 'oauth']) ||
-      inputSchema.properties?.oauth?.additionalProperties !== false ||
-      JSON.stringify(inputSchema.properties?.oauth?.required) !== JSON.stringify(['mode']) ||
-      inputSchema.properties?.oauth?.properties?.mode?.const !== 'discovery') {
+  if (
+    inputSchema.$schema !== 'https://json-schema.org/draft/2020-12/schema' ||
+    inputSchema.additionalProperties !== false ||
+    JSON.stringify(inputSchema.required) !==
+      JSON.stringify(['serverName', 'endpointUrl', 'oauth']) ||
+    inputSchema.properties?.oauth?.additionalProperties !== false ||
+    JSON.stringify(inputSchema.properties?.oauth?.required) !== JSON.stringify(['mode']) ||
+    inputSchema.properties?.oauth?.properties?.mode?.const !== 'discovery'
+  ) {
     throw new Error('MCP connection-input generator schema drift.');
   }
 
@@ -140,15 +162,21 @@ export function validatePluginSource(projectRoot: string, pluginRoot = join(proj
   if (!/^---\nname: content-producer\ndescription: [^\n]{70,}\n---\n/.test(skill)) {
     throw new Error('Invalid skill frontmatter.');
   }
-  for (const path of CANDIDATE_FILES.filter((name) => name.endsWith('.md') && name !== skillRoot + 'SKILL.md')) {
+  for (const path of CANDIDATE_FILES.filter(
+    (name) => name.endsWith('.md') && name !== skillRoot + 'SKILL.md',
+  )) {
     if (!skill.includes('(' + path.slice(skillRoot.length) + ')')) {
       throw new Error('SKILL.md does not link required reference ' + path);
     }
   }
-  for (const path of CANDIDATE_FILES.filter((name) => name.endsWith('.md'))) checkLinks(pluginRoot, path);
+  for (const path of CANDIDATE_FILES.filter((name) => name.endsWith('.md')))
+    checkLinks(pluginRoot, path);
 
   const frozen = readFileSync(join(projectRoot, 'plans/tool-inventory.md'), 'utf8');
-  const names = Array.from(frozen.matchAll(/^\|\s*\d+\s*\|\s*\x60([a-z_]+)\x60\s*\|/gm), (m) => m[1]);
+  const names = Array.from(
+    frozen.matchAll(/^\|\s*\d+\s*\|\s*\x60([a-z_]+)\x60\s*\|/gm),
+    (m) => m[1],
+  );
   const sequence = read(pluginRoot, skillRoot + 'references/core/tool-sequences.md');
   const listed = Array.from(sequence.matchAll(/^\|\s*\d+\s*\|\s*([a-z_]+)\s*\|/gm), (m) => m[1]);
   if (names.length !== 33 || JSON.stringify(names) !== JSON.stringify(listed)) {
@@ -157,14 +185,46 @@ export function validatePluginSource(projectRoot: string, pluginRoot = join(proj
 
   const policy: Record<string, string[]> = {
     'core/workflow.md': ['maximum 3', '30-minute', 'save_post'],
-    'core/lifecycle.md': ['explicit_approval=true', 'OPERATION_KEY_REUSED', 'expected_content_hash'],
+    'core/lifecycle.md': [
+      'explicit_approval=true',
+      'OPERATION_KEY_REUSED',
+      'expected_content_hash',
+    ],
     'core/source-policy.md': ['independence_group', 'untrusted data'],
     'core/output-contract.md': ['CANVA COPY', 'FACEBOOK CAPTION', 'HASHTAGS', 'INFORMASI INTERNAL'],
     'niches/trivia/content-dna.md': ['en-US', 'approval', 'topic_key'],
-    'niches/trivia/formats.md': ['single_subject_fast', 'themed_utility', 'emotional_animal_collection', 'comparison', 'myth_vs_fact', 'fast_trivia', 'practical_utility'],
-    'niches/trivia/fact-checking.md': ['Tier D', '24 months', '12 months', '30 days', '90 days', '180 days'],
-    'niches/trivia/dedup-ontology.md': ['SAME', 'DISTINCT', 'UNCERTAIN', 'trivia_find_similar_facts'],
-    'niches/trivia/quality-rubric.md': ['trivia.meaning_preserved', 'trivia.source_supported', 'trivia.time_context_valid', 'trivia.safety_appropriate', 'trivia.caption_no_new_claim', 'trivia.substantial_copying_absent', 'express owner approval'],
+    'niches/trivia/formats.md': [
+      'single_subject_fast',
+      'themed_utility',
+      'emotional_animal_collection',
+      'comparison',
+      'myth_vs_fact',
+      'fast_trivia',
+      'practical_utility',
+    ],
+    'niches/trivia/fact-checking.md': [
+      'Tier D',
+      '24 months',
+      '12 months',
+      '30 days',
+      '90 days',
+      '180 days',
+    ],
+    'niches/trivia/dedup-ontology.md': [
+      'SAME',
+      'DISTINCT',
+      'UNCERTAIN',
+      'trivia_find_similar_facts',
+    ],
+    'niches/trivia/quality-rubric.md': [
+      'trivia.meaning_preserved',
+      'trivia.source_supported',
+      'trivia.time_context_valid',
+      'trivia.safety_appropriate',
+      'trivia.caption_no_new_claim',
+      'trivia.substantial_copying_absent',
+      'express owner approval',
+    ],
   };
   for (const [name, terms] of Object.entries(policy)) {
     expectTerms(read(pluginRoot, skillRoot + 'references/' + name), terms, name);
@@ -175,7 +235,11 @@ export function validatePluginSource(projectRoot: string, pluginRoot = join(proj
 function fileIndex(root: string): CandidateIndex {
   const files = CANDIDATE_FILES.map((path) => {
     const data = readFileSync(join(root, path));
-    return { path, bytes: data.byteLength, sha256: createHash('sha256').update(data).digest('hex') };
+    return {
+      path,
+      bytes: data.byteLength,
+      sha256: createHash('sha256').update(data).digest('hex'),
+    };
   });
   return { schema_version: 1, file_count: files.length, files };
 }

@@ -1,8 +1,21 @@
-import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { CANDIDATE_FILES, createCandidate, validatePluginSource, verifyCandidate } from '../scripts/plugin-package.js';
+import {
+  CANDIDATE_FILES,
+  createCandidate,
+  validatePluginSource,
+  verifyCandidate,
+} from '../scripts/plugin-package.js';
 
 const root = process.cwd();
 const fixtures: string[] = [];
@@ -17,7 +30,7 @@ function setup(): string {
 function change(path: string, before: string, after: string): void {
   const original = readFileSync(path, 'utf8');
   if (!original.includes(before)) throw new Error('Bad test fixture: ' + before);
-  writeFileSync(path, original.replace(before, after));
+  writeFileSync(path, original.replaceAll(before, after));
 }
 afterEach(() => {
   for (const dir of fixtures.splice(0)) rmSync(dir, { recursive: true, force: true });
@@ -37,7 +50,9 @@ describe('Phase 7.4 generated package and source safety', () => {
     expect(index.file_count).toBe(12);
     expect(index.files.every((entry) => entry.sha256.length === 64 && entry.bytes > 0)).toBe(true);
     expect(verifyCandidate(dir, out)).toEqual(index);
-    expect(readFileSync(join(out, 'plugin.json'), 'utf8')).toBe(readFileSync(join(dir, 'plugin/plugin.json'), 'utf8'));
+    expect(readFileSync(join(out, 'plugin.json'), 'utf8')).toBe(
+      readFileSync(join(dir, 'plugin/plugin.json'), 'utf8'),
+    );
     writeFileSync(join(out, 'unexpected.json'), '{}');
     expect(() => verifyCandidate(dir, out)).toThrow(/strict allowlist/);
   });
@@ -75,10 +90,16 @@ describe('Phase 7.4 generated package and source safety', () => {
     change(seq, '|   1 | get_account_profile', '|   1 | list_pages        ');
     expect(() => validatePluginSource(dir)).toThrow(/inventory order/);
     cpSync(join(root, 'plugin/skills/content-producer/references/core/tool-sequences.md'), seq);
-    const rubric = join(dir, 'plugin/skills/content-producer/references/niches/trivia/quality-rubric.md');
+    const rubric = join(
+      dir,
+      'plugin/skills/content-producer/references/niches/trivia/quality-rubric.md',
+    );
     change(rubric, 'trivia.source_supported', 'trivia.source_ignored');
     expect(() => validatePluginSource(dir)).toThrow(/frozen policy/);
-    cpSync(join(root, 'plugin/skills/content-producer/references/niches/trivia/quality-rubric.md'), rubric);
+    cpSync(
+      join(root, 'plugin/skills/content-producer/references/niches/trivia/quality-rubric.md'),
+      rubric,
+    );
     const outside = join(dir, 'outside.md');
     writeFileSync(outside, 'unsafe');
     symlinkSync(outside, join(dir, 'plugin/skills/content-producer/references/core/outside.md'));
@@ -95,7 +116,10 @@ describe('Phase 7.4 generated package and source safety', () => {
     writeFileSync(workflow, readFileSync(workflow, 'utf8') + '\n-----BEGIN PRIVATE KEY-----');
     expect(() => validatePluginSource(dir)).toThrow(/credential/);
     cpSync(join(root, 'plugin/skills/content-producer/references/core/workflow.md'), workflow);
-    writeFileSync(workflow, readFileSync(workflow, 'utf8') + '\nhttps://fake.example.net/functions/v1/mcp');
+    writeFileSync(
+      workflow,
+      readFileSync(workflow, 'utf8') + '\nhttps://fake.example.net/functions/v1/mcp',
+    );
     expect(() => validatePluginSource(dir)).toThrow(/endpoint/);
   });
 });

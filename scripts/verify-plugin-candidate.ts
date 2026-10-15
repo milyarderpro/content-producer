@@ -10,4 +10,6 @@ const saved = JSON.parse(
 if (JSON.stringify(saved) !== JSON.stringify(index)) {
   throw new Error('Candidate file list/hash evidence is stale or altered.');
 }
-console.log('Verified generated candidate contents and hash report: ' + index.file_count + ' files.');
+console.log(
+  'Verified generated candidate contents and hash report: ' + index.file_count + ' files.',
+);
