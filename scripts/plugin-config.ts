@@ -82,7 +82,10 @@ export function validatePluginRelativePath(value: unknown, pluginRoot: string): 
   if (
     !path.startsWith('./') ||
     path.includes('\\') ||
-    path.slice(2).split('/').some((part) => !part || part === '.' || part === '..')
+    path
+      .slice(2)
+      .split('/')
+      .some((part) => !part || part === '.' || part === '..')
   ) {
     throw new Error('Asset path must be a contained ./ path without traversal.');
   }
