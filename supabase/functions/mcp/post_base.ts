@@ -4,6 +4,7 @@ import * as z from 'npm:zod@4.3.6';
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { invoke } from './foundation.ts';
+import { metricAnomalyFlags } from './post_metrics.ts';
 import { planSummary } from './page_plan.ts';
 import { triviaConfig } from './schemas.ts';
 
@@ -198,7 +199,7 @@ const metricSnapshot = z.strictObject({
     metric_definition_version: z.number().int().min(1),
     note: z.string().max(500).optional(),
   }),
-  anomaly_flags: z.array(z.string().max(100)).max(50),
+  anomaly_flags: metricAnomalyFlags,
   created_at: timestamp,
 });
 export const contentPayload = z.strictObject({
@@ -370,8 +371,10 @@ const listInput = z
   })
   .refine(
     (p) =>
-      (!p.scheduled_from || !p.scheduled_to || p.scheduled_from <= p.scheduled_to) &&
-      (!p.created_from || !p.created_to || p.created_from <= p.created_to),
+      (!p.scheduled_from ||
+        !p.scheduled_to ||
+        Date.parse(p.scheduled_from) <= Date.parse(p.scheduled_to)) &&
+      (!p.created_from || !p.created_to || Date.parse(p.created_from) <= Date.parse(p.created_to)),
     'Date range start must not exceed end',
   );
 const getInput = z.strictObject({

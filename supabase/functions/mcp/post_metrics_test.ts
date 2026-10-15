@@ -265,3 +265,45 @@ Deno.test('6.13: poisoned backend projections are rejected without leaking data'
     globalThis.fetch = previous;
   }
 });
+
+// Audit Batch B: every metrics projection has one closed, DB-aligned flag allowlist.
+Deno.test('6.13: record and history output flags reject unknown values and arrays over five', async () => {
+  const old = globalThis.fetch;
+  const known = [
+    'negative_cumulative_delta',
+    'source_incompatible',
+    'source_metadata_missing',
+    'capture_before_publication',
+    'capture_in_future',
+  ];
+  let flags = known;
+  globalThis.fetch = ((input: Request | URL | string) => {
+    const name = String(input).split('/').pop()!;
+    const data =
+      name === 'record_post_performance'
+        ? { ...outputs.record_post_performance, anomaly_flags: flags }
+        : {
+            ...outputs.get_post_performance,
+            snapshots: [{ ...snapshot, anomaly_flags: flags }],
+            latest_snapshot: { ...snapshot, anomaly_flags: flags },
+          };
+    return Promise.resolve(Response.json({ response_schema_version: 1, data }));
+  }) as typeof fetch;
+  try {
+    for (const [name, args] of [
+      ['record_post_performance', recordInput],
+      ['get_post_performance', historyInput],
+    ] as const) {
+      check(!(await call(name, args)).isError, 'KNOWN_FLAGS_' + name);
+      flags = ['unrecognized'];
+      const unknown = await call(name, args);
+      check(unknown.isError === true, 'UNKNOWN_FLAG_ACCEPTED_' + name);
+      check(unknown.structuredContent.error.code === 'DATABASE_UNAVAILABLE', 'SAFE_REJECTION_' + name);
+      flags = [...known, known[0]];
+      check((await call(name, args)).isError === true, 'TOO_MANY_FLAGS_' + name);
+      flags = known;
+    }
+  } finally {
+    globalThis.fetch = old;
+  }
+});

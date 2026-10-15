@@ -1388,7 +1388,7 @@ Implementasi MVP selesai hanya jika:
 
 ## 16. Phase tracker
 
-Status terkini per 13 Oktober 2026. Bagian ini adalah tracker yang diperbarui
+Status terkini per 15 Oktober 2026. Bagian ini adalah tracker yang diperbarui
 seiring kemajuan proyek; scope, kontrak, dan verification gate fase di atas
 tetap berlaku. Runbook checkpoint dan laporan lama mencatat keadaan pada saat
 ditulis, bukan status terkini.
@@ -1401,7 +1401,7 @@ ditulis, bukan status terkini.
 | 3 — Core database | Complete | Core tests lulus | `1e3bd9c` |
 | 4 — Trivia database | Complete | Dedup/reuse tests lulus | `f513286`, `cb3568a` |
 | 5 — RPC dan security | Complete | Security/concurrency lulus | `04f6373`; [final local verification](../docs/phase-5-batch-b-remediation-p2-03-report.md) |
-| 6 — MCP Edge Function | In progress | Inspector/contract lulus | Checkpoint 6.0 CI baseline pada branch `codex/phase-6-mcp`; MCP belum diimplementasikan, local function tetap disabled |
+| 6 — MCP Edge Function | In progress | Full Batch B gate dan audit independen ulang belum lulus | 33/33 MCP tools telah diimplementasikan pada draft PR #2 (`codex/phase-6-mcp`). [Gate historis pada `9515b60` sukses](https://github.com/milyarderpro/content-producer/actions/runs/38590283424), tetapi audit independen menemukan tiga temuan (rentang timestamp offset, schema anomaly flags, status tracker); **Batch B belum lulus** sampai gate remediasi dan audit ulang independen berhasil. Lihat Issue #1. |
 | 7 — Plugin skill/package source | Not started | Source/package candidate validation lulus | — |
 | 8 — Full verification | Not started | Acceptance criteria lulus | — |
 | 9 — Production deployment | Not started | Production smoke lulus | — |
@@ -1413,7 +1413,7 @@ perubahan di-commit sebagai `04f6373`. Laporan remediasi yang lebih awal masih
 menyebut independent re-audit pending karena laporan itu adalah handoff pada
 waktu penulisan. Repository ini belum memuat dokumen pengesahan audit independen
 terakhir; status `Complete` di sini tidak mengklaim adanya dokumen tersebut.
-Phase 6 dimulai dengan checkpoint 6.0 (CI baseline); status ini bukan bukti gate Phase 6 lulus. MCP belum diimplementasikan dan gate Phase 6 tetap wajib diuji.
+Phase 6 telah mengimplementasikan tepat 33 MCP tools dan menyelesaikan checkpoint 6.13. Gate Batch B pada SHA `9515b60` berhasil secara teknis, tetapi audit independen menemukan tiga temuan; perbaikan dan full gate baru belum membuktikan kelulusan audit ulang. Phase 6 tetap `In progress` dan **Batch B belum lulus**. Tidak memulai Phase 7 sebelum audit independen menyetujui remediasi.
 
 Status yang digunakan:
 

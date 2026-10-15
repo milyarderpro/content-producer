@@ -300,3 +300,85 @@ Deno.test(
     }
   },
 );
+
+// Audit Batch B: comparisons use absolute instants, not RFC 3339 string order.
+Deno.test('6.9: list_posts accepts offset-aware ranges and rejects reversed instants', async () => {
+  const old = globalThis.fetch;
+  const calls: Record<string, unknown>[] = [];
+  globalThis.fetch = ((_input: Request | URL | string, init?: RequestInit) => {
+    calls.push(JSON.parse(String(init?.body)));
+    return Promise.resolve(Response.json({ response_schema_version: 1, data: response.list_posts }));
+  }) as typeof fetch;
+  try {
+    const earlyWithOffset = '2026-10-15T12:00:00+12:00'; // 00:00 UTC
+    const laterUtc = '2026-10-15T03:00:00Z';
+    const earlierUtc = '2026-10-15T01:00:00Z';
+    for (const prefix of ['scheduled', 'created'] as const) {
+      const good = {
+        ...base,
+        [`${prefix}_from`]: earlyWithOffset,
+        [`${prefix}_to`]: laterUtc,
+      };
+      const accepted = await call('list_posts', good);
+      check(!accepted.isError && accepted.structuredContent.data.items.length === 1, 'OFFSET_ACCEPT_' + prefix);
+      const forwarded = calls.at(-1)!;
+      check(
+        forwarded[`p_${prefix}_from`] === earlyWithOffset &&
+          forwarded[`p_${prefix}_to`] === laterUtc,
+        'OFFSET_FORWARDED_' + prefix,
+      );
+      const priorCalls = calls.length;
+      const rejected = await call('list_posts', {
+        ...base,
+        [`${prefix}_from`]: earlierUtc,
+        [`${prefix}_to`]: earlyWithOffset,
+      }); // 01:00 UTC is after 00:00 UTC despite lexical order.
+      check(rejected.isError === true, 'OFFSET_REJECT_' + prefix);
+      check(calls.length === priorCalls, 'INVALID_OFFSET_REACHED_RPC_' + prefix);
+    }
+    check(calls.length === 2, 'EXACT_VALID_RANGES');
+  } finally {
+    globalThis.fetch = old;
+  }
+});
+
+Deno.test('6.9: get_post latest metrics enforce the Phase 5 anomaly allowlist', async () => {
+  const old = globalThis.fetch;
+  const known = [
+    'negative_cumulative_delta',
+    'source_incompatible',
+    'source_metadata_missing',
+    'capture_before_publication',
+    'capture_in_future',
+  ];
+  let flags = known;
+  globalThis.fetch = (() =>
+    Promise.resolve(
+      Response.json({
+        response_schema_version: 1,
+        data: {
+          ...response.get_post,
+          latest_metrics: {
+            metric_snapshot_public_id: token,
+            post_public_id: postId,
+            captured_at: stamp,
+            metrics: { views: 0 },
+            source: { metric_definition_version: 1 },
+            anomaly_flags: flags,
+            created_at: stamp,
+          },
+        },
+      }),
+    )) as typeof fetch;
+  try {
+    check(!(await call('get_post', { ...base, post_public_id: postId })).isError, 'KNOWN_LATEST_FLAGS');
+    flags = ['unknown_flag'];
+    const denied = await call('get_post', { ...base, post_public_id: postId });
+    check(denied.isError === true, 'UNKNOWN_LATEST_FLAG_ACCEPTED');
+    check(denied.structuredContent.error.code === 'DATABASE_UNAVAILABLE', 'INVALID_LATEST_SAFE');
+    flags = [...known, known[0]];
+    check((await call('get_post', { ...base, post_public_id: postId })).isError === true, 'LATEST_OVER_LIMIT');
+  } finally {
+    globalThis.fetch = old;
+  }
+});

@@ -10,6 +10,18 @@ const uuid = z.string().uuid();
 const timestamp = z.string().datetime({ offset: true });
 const cursor = z.string().min(1).max(512);
 const count = z.number().int().min(0);
+// Phase 5 post_metrics_recorded_flags_check permits only these five values.
+export const metricAnomalyFlags = z
+  .array(
+    z.enum([
+      'negative_cumulative_delta',
+      'source_incompatible',
+      'source_metadata_missing',
+      'capture_before_publication',
+      'capture_in_future',
+    ]),
+  )
+  .max(5);
 const integerFields = {
   views: count.nullable(),
   reach: count.nullable(),
@@ -157,7 +169,7 @@ const snapshot = z.strictObject({
   captured_at: timestamp,
   metrics: allMetrics,
   source: sourceRead,
-  anomaly_flags: z.array(z.string().max(100)).max(50),
+  anomaly_flags: metricAnomalyFlags,
   created_at: timestamp,
 });
 const envelope = <T extends z.ZodType>(data: T) =>
@@ -168,7 +180,7 @@ const recordOutput = envelope(
     post_public_id: uuid,
     captured_at: timestamp,
     metrics: allMetrics,
-    anomaly_flags: z.array(z.string().max(100)).max(50),
+    anomaly_flags: metricAnomalyFlags,
     replayed: z.boolean(),
   }),
 );
