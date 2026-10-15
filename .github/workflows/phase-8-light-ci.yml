@@ -34,6 +34,11 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Focused Phase 8.0 coverage
         run: pnpm exec vitest run tests/phase-8-coverage.test.ts
+      - name: Emit required formatting patch (temporary diagnostic)
+        run: |
+          pnpm exec prettier --write docs/phase-8/preflight-8.0.md tests/phase-8-coverage.test.ts
+          git diff -- docs/phase-8/preflight-8.0.md tests/phase-8-coverage.test.ts
+          exit 1
       - name: Project check
         run: pnpm run check
       - name: Commit whitespace check
