@@ -40,8 +40,13 @@ describe('Checkpoint 5.7 public explicit lifecycle', () => {
         if (builder === archive) p = posted(f, p);
         const group = builder === discard || builder === publish ? 'contention_write' : 'write';
         const client = randomUUID();
+        // The RPC uses clock_timestamp(); seed both adjacent windows so a minute
+        // rollover between fixture setup and the call cannot bypass the limit.
         sql(`insert into internal.rate_limit_buckets(actor_user_id,oauth_client_id,limit_group,window_start,request_count)
-          values('${f.owner}','${client}','${group}',date_trunc('minute',now()),${group === 'write' ? 30 : 20})`);
+          select '${f.owner}','${client}','${group}',
+            (date_trunc('minute',clock_timestamp() at time zone 'UTC') at time zone 'UTC')+offsets.delta,
+            ${group === 'write' ? 30 : 20}
+          from (values(interval '0 minutes'),(interval '1 minute')) offsets(delta)`);
         const before = state(f);
         const call = builder(f, p);
         expect(() => lifecycleRpc(f, call, f.owner, client)).toThrow(/^RATE_LIMITED$/);

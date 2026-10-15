@@ -246,12 +246,31 @@ describe('5.8 RPC-METRIC public append and replay', () => {
         ],
       ] as const) {
         const client = randomUUID();
+        // Saturate the current AND next minute for this disposable client. The
+        // RPC limiter uses clock_timestamp(), so CI may cross a minute boundary
+        // between seeding and the call. This keeps every production threshold
+        // unchanged and still requires denial for all three exact rate groups.
         sql(
-          `insert into internal.rate_limit_buckets values('${f.owner}','${client}','${group}',date_trunc('minute',now()),${limit},now())`,
+          `insert into internal.rate_limit_buckets
+            (actor_user_id, oauth_client_id, limit_group, window_start, request_count, updated_at)
+            select '${f.owner}', '${client}', '${group}',
+              date_trunc('minute', clock_timestamp() at time zone 'UTC') at time zone 'UTC'
+                + (minute_offset * interval '1 minute'),
+              ${limit}, clock_timestamp()
+            from generate_series(0, 1) as windows(minute_offset)`,
         );
         const before = metricState(f);
-        expect(() => metricRpc(f, expression, f.owner, client)).toThrow(/^RATE_LIMITED$/);
+        expect(() => metricRpc(f, expression, f.owner, client), group).toThrow(/^RATE_LIMITED$/);
         expect(metricState(f)).toEqual(before);
+        // A rejected RPC must roll back the attempted bucket increment, too.
+        expect(
+          row<{ count: number; minimum: number; maximum: number }>(
+            `select count(*)::integer as count, min(request_count) as minimum,
+              max(request_count) as maximum from internal.rate_limit_buckets
+              where actor_user_id='${f.owner}' and oauth_client_id='${client}'
+                and limit_group='${group}'`,
+          ),
+        ).toEqual({ count: 2, minimum: limit, maximum: limit });
       }
       metricRpc(f, record(f, p));
       const i = insights(f);

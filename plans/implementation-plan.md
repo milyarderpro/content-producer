@@ -1388,7 +1388,7 @@ Implementasi MVP selesai hanya jika:
 
 ## 16. Phase tracker
 
-Status terkini per 13 Oktober 2026. Bagian ini adalah tracker yang diperbarui
+Status terkini per 15 Oktober 2026. Bagian ini adalah tracker yang diperbarui
 seiring kemajuan proyek; scope, kontrak, dan verification gate fase di atas
 tetap berlaku. Runbook checkpoint dan laporan lama mencatat keadaan pada saat
 ditulis, bukan status terkini.
@@ -1401,7 +1401,7 @@ ditulis, bukan status terkini.
 | 3 — Core database | Complete | Core tests lulus | `1e3bd9c` |
 | 4 — Trivia database | Complete | Dedup/reuse tests lulus | `f513286`, `cb3568a` |
 | 5 — RPC dan security | Complete | Security/concurrency lulus | `04f6373`; [final local verification](../docs/phase-5-batch-b-remediation-p2-03-report.md) |
-| 6 — MCP Edge Function | Not started | Inspector/contract lulus | `supabase/functions/mcp/index.ts` belum ada; local function disabled |
+| 6 — MCP Edge Function | Complete | Gate akhir dan audit independen Batch B lulus | 33/33 MCP tools pada PR #2 (`codex/phase-6-mcp`). [Gate akhir pada `88738a84` sukses](https://github.com/milyarderpro/content-producer/actions/runs/38679123776): 58/58 tes MCP, 172/172 tes database, audit katalog/keamanan, dan Inspector 33 panggilan valid + 33 invalid. Audit ulang independen pada SHA yang sama menutup ketiga temuan Batch B; lihat Issue #1. Bukti hosted OAuth dan koneksi ChatGPT tetap pada Phase 9–10. |
 | 7 — Plugin skill/package source | Not started | Source/package candidate validation lulus | — |
 | 8 — Full verification | Not started | Acceptance criteria lulus | — |
 | 9 — Production deployment | Not started | Production smoke lulus | — |
@@ -1413,7 +1413,7 @@ perubahan di-commit sebagai `04f6373`. Laporan remediasi yang lebih awal masih
 menyebut independent re-audit pending karena laporan itu adalah handoff pada
 waktu penulisan. Repository ini belum memuat dokumen pengesahan audit independen
 terakhir; status `Complete` di sini tidak mengklaim adanya dokumen tersebut.
-Phase 6 belum dimulai dan tetap harus melewati gate-nya sendiri.
+Phase 6 telah mengimplementasikan tepat 33 MCP tools dan menyelesaikan checkpoint 6.13. Tiga temuan audit Batch B ditutup dan diverifikasi ulang secara independen pada SHA `88738a84`; gate akhir pada SHA yang sama lulus. Phase 6 berstatus `Complete`. Bukti hosted OAuth dan koneksi ChatGPT tetap dijadwalkan pada Phase 9–10.
 
 Status yang digunakan:
 

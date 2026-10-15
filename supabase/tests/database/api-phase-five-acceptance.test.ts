@@ -15,7 +15,7 @@ import {
 } from './helpers/metrics-rpc.js';
 
 describe('5.9 phase-wide public surface and scope acceptance', () => {
-  it('SEC-* exact 33 RPCs, owner policies/default ACL, historical replay security and no Phase 6 implementation', () => {
+  it('SEC-* exact 33 RPCs, owner policies/default ACL, historical replay security and Phase 6.1 bootstrap', () => {
     const a = JSON.parse(sql(readFileSync('docs/phase-5-8-catalog-audit.sql', 'utf8'))) as Record<
       string,
       unknown
@@ -76,11 +76,15 @@ describe('5.9 phase-wide public surface and scope acceptance', () => {
     for (const op of phaseFiveOperationMap)
       expect(existsSync(`supabase/tests/database/${op.testOwner}`), op.name).toBe(true);
     const config = readFileSync('supabase/config.toml', 'utf8');
-    expect(config).toMatch(/\[functions\.mcp\]\s*enabled = false/);
-    for (const path of ['supabase/functions/mcp', 'auth-frontend/src']) {
-      const files = existsSync(path) ? readdirSync(path) : [];
-      expect(files.filter((x) => x !== '.gitkeep')).toEqual([]);
-    }
+    // Phase 6.1 enables the local HTTP entrypoint, but the public MCP route
+    // remains fail-closed until the OAuth middleware is implemented in 6.2.
+    expect(config).toMatch(/\[functions\.mcp\]\s*enabled = true\s*verify_jwt = false/);
+    expect(existsSync('supabase/functions/mcp/index.ts')).toBe(true);
+    expect(existsSync('supabase/functions/mcp/http.ts')).toBe(true);
+    expect(existsSync('supabase/functions/mcp/registry.ts')).toBe(true);
+    expect(existsSync('supabase/functions/mcp/transport_test.ts')).toBe(true);
+    const frontendFiles = existsSync('auth-frontend/src') ? readdirSync('auth-frontend/src') : [];
+    expect(frontendFiles.filter((x) => x !== '.gitkeep')).toEqual([]);
     expect(readdirSync('plugin/.codex-plugin').filter((x) => x !== '.gitkeep')).toEqual([]);
     expect(readFileSync('supabase/seed.sql', 'utf8')).not.toMatch(/\b(insert|update|delete)\b/i);
     const allowed = new Set(phaseFiveOperationMap.map((x) => x.name));

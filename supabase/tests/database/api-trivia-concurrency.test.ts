@@ -221,7 +221,9 @@ describe('Checkpoint 5.5 authenticated trivia races and security', () => {
       const rateClient = randomUUID();
       const read = `api.trivia_find_similar_facts(1,'${f.workspace}','${f.page}',${json([c])},1)`;
       sql(`insert into internal.rate_limit_buckets(actor_user_id,oauth_client_id,limit_group,window_start,request_count)
-        values('${f.owner}','${rateClient}','expensive_read',date_trunc('minute',now()),20);`);
+        select '${f.owner}','${rateClient}','expensive_read',
+          (date_trunc('minute',clock_timestamp() at time zone 'UTC') at time zone 'UTC')+offsets.delta,20
+        from (values(interval '0 minutes'),(interval '1 minute')) offsets(delta);`);
       expect(() => rpc(f, read, f.owner, rateClient)).toThrow('RATE_LIMITED');
       expect(() =>
         rpc(
@@ -233,7 +235,9 @@ describe('Checkpoint 5.5 authenticated trivia races and security', () => {
       ).toThrow('RATE_LIMITED');
       const group = randomUUID();
       sql(`insert into internal.rate_limit_buckets(actor_user_id,oauth_client_id,limit_group,window_start,request_count)
-        values('${f.owner}','${group}','contention_write',date_trunc('minute',now()),20);`);
+        select '${f.owner}','${group}','contention_write',
+          (date_trunc('minute',clock_timestamp() at time zone 'UTC') at time zone 'UTC')+offsets.delta,20
+        from (values(interval '0 minutes'),(interval '1 minute')) offsets(delta);`);
       const before = state(f);
       expect(() => rpc(f, release(f, r.data.reservation_token as string), f.owner, group)).toThrow(
         'RATE_LIMITED',

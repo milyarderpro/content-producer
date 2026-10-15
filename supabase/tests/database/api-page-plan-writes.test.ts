@@ -1066,7 +1066,7 @@ describe('Phase 5.3 page and content-plan write RPCs', () => {
     }
   }, 60_000);
 
-  it('rate-limits all three public write paths before mutation, including replay requests', async () => {
+  it('rate-limits all three public write paths before mutation, including replay requests', () => {
     const f = createFixture();
     try {
       const created = rpc(f.owner, createPageExpression(f, randomUUID(), 'rate'));
@@ -1076,14 +1076,22 @@ describe('Phase 5.3 page and content-plan write RPCs', () => {
         planExpression(f, created.data.page.page_public_id),
       ];
       for (const expression of calls) {
-        const result = await psqlAsync(`begin;set local role authenticated;
-          select set_config('request.jwt.claims',${sqlJson({ sub: f.owner, role: 'authenticated', client_id: randomUUID() })}::text,true);
-          do $rate$ begin
-            for i in 1..30 loop perform ${expression}; end loop;
-            begin perform ${expression}; raise exception 'rate limit did not reject';
-            exception when sqlstate 'P0001' then if sqlerrm <> 'RATE_LIMITED' then raise; end if; end;
-          end $rate$; commit;`);
-        expect(result.code, result.output).toBe(0);
+        const client = randomUUID();
+        rpc(f.owner, expression, client);
+        const before = state(f);
+        // Saturate both adjacent windows for this disposable client. The
+        // limiter uses clock_timestamp(), so a CI minute rollover cannot
+        // turn the replay denial into an unrelated success.
+        runCli(`insert into internal.rate_limit_buckets
+          (actor_user_id,oauth_client_id,limit_group,window_start,request_count)
+          select '${f.owner}','${client}','write',
+            (date_trunc('minute',clock_timestamp() at time zone 'UTC') at time zone 'UTC')+offsets.delta,
+            30
+          from (values(interval '0 minutes'),(interval '1 minute')) offsets(delta)
+          on conflict (actor_user_id,oauth_client_id,limit_group,window_start)
+          do update set request_count=excluded.request_count`);
+        expectRpcError(f.owner, expression, 'RATE_LIMITED', client);
+        expect(state(f)).toEqual(before);
       }
       expect(state(f)).toEqual({
         page_count: 2,
