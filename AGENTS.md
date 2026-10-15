@@ -12,10 +12,12 @@ reports record their status at the time they were written. A GitHub Issue may
 track Phase 6 checkpoints, but it does not override the frozen contracts.
 For Phase 6, work on exactly one checkpoint per task in order, and stop for
 independent audits after the first 15 tools and after all 33 tools.
-For Phase 8, follow `plans/works/phase-8-implementation-plan.md` one
-checkpoint per task. CR-018 governs its staging evidence and pre-production
-gate; Phase 8 completion does not certify the production acceptance deferred
-to Phases 9–10.
+CR-019 defers the Phase 8 live evaluation checkpoints and supersedes the
+CR-018 staging gate. Do not mark Phase 8 complete or treat the 101 frozen
+prompts as executed. Before Phase 9 production deployment, pass the technical
+and security gate in CR-019; after the final plugin is installed in Phase 10,
+run its guided core manual acceptance. Keep the 101 cases as a regression
+inventory.
 
 ## Boundaries
 

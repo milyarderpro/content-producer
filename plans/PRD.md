@@ -1366,10 +1366,10 @@ OAuth client menerima seluruh respons sukses token `2xx`; implementasi tidak men
 ### 29.3 Staging
 
 Hosted staging project tidak wajib pada MVP. Staging dapat ditambahkan ketika perubahan menjadi lebih sering, pengguna bertambah, atau risiko deployment meningkat.
-Untuk proyek ini, CR-018 memilih staging terisolasi pada Phase 8 agar koneksi
-ChatGPT, OAuth, tool selection, dan skill dapat diuji dengan fixture sebelum
-production disentuh. Pilihan verifikasi ini tidak menjadikan staging sebagai
-komponen produk yang wajib dipertahankan setelah pengujian.
+CR-018 semula memilih staging terisolasi untuk evaluasi Phase 8. CR-019
+menunda evaluasi itu dan tidak mensyaratkan staging untuk jalur MVP yang aktif.
+Gate teknis lokal di CI mendahului deployment Phase 9; koneksi dan uji manual
+plugin final dibuktikan pada Phase 9–10.
 
 ### 29.4 Hosting frontend autentikasi
 
@@ -1420,11 +1420,11 @@ Views, reach, dan engagement tidak menjadi acceptance metric karena dipengaruhi 
 
 ## 31. Syarat penerimaan MVP
 
-Kriteria `AC-001..014` di bawah adalah penerimaan **MVP final**, bukan klaim
-bahwa semua resource production sudah tersedia pada Phase 8. Sesuai CR-018,
-Phase 8 membuktikan porsi pre-production pada staging dan mencatat porsi
-`AC-001`/`AC-012` yang memerlukan deployment serta plugin/pilot final sebagai
-deferred ke Phases 9–10. Tidak ada kriteria akhir yang dihapus atau dilonggarkan.
+Kriteria `AC-001..014` di bawah adalah penerimaan **MVP final**. CR-019
+menetapkan gate teknis/keamanan sebelum deployment Phase 9, bukti hosted
+deployment dan OAuth pada Phase 9, lalu uji manual skenario inti setelah
+plugin final terpasang pada Phase 10. Bukti yang belum tersedia tetap `PENDING`;
+Phase 8 tidak diklaim lulus. Tidak ada kriteria akhir yang dihapus.
 
 ### AC-001 — Koneksi plugin
 
@@ -1637,7 +1637,10 @@ Evaluation set harus mencakup:
 
 ### 32.6 Prompt dan tool-selection evaluation
 
-`plans/use-case-inventory.md` menetapkan 31 supported/clarification user goals dan 101 frozen prompt cases. Phase 8 wajib menjalankan seluruh suite dengan target:
+`plans/use-case-inventory.md` menetapkan 31 supported/clarification user goals
+dan 101 frozen prompt cases. Seluruh kasus dan target suite berikut disimpan
+sebagai inventaris regresi lengkap; menurut CR-019, eksekusi live 101 kasus
+tidak menjadi gate MVP:
 
 - Direct requests: 100% pass.
 - Indirect requests: minimal 90% pass.
@@ -1645,13 +1648,14 @@ Evaluation set harus mencakup:
 - Hard fail: 0.
 - 33/33 tools memiliki positive path dan boundary/recovery path.
 
-Generated paraphrases boleh ditambahkan untuk robustness, tetapi tidak mengganti frozen prompts atau expected behavior.
-Phase 8 menjalankan kasus ChatGPT dengan custom MCP staging, lalu private test
-plugin yang memuat skill dan memakai koneksi staging, sesuai CR-018 dan
-`plans/use-case-inventory.md`. Hasil staging tidak membuktikan koneksi atau
-paket final production; Phase 10 menjalankan regresi representatif pada host
-production. Seluruh 101 kasus, threshold, dan hard-fail rule tetap wajib pada
-gate pre-production Phase 8.
+Generated paraphrases boleh ditambahkan untuk robustness jika suite lengkap
+kelak dijalankan; prompt frozen dan expected behavior tidak diubah. Gate MVP
+aktif mewajibkan cakupan deterministic positive/boundary/auth untuk 33 tools,
+serta skenario manual inti pada plugin final. ID, prompt, expected behavior,
+larangan hard fail, dan hasil skenario inti dibekukan pada panduan Phase 10
+sebelum dieksekusi. Semua skenario terpilih harus lulus tanpa unauthorized
+write, kebocoran lintas owner/secret, klaim publikasi palsu, atau bypass quality
+gate. Kasus publikasi dan metrik hanya lulus dengan observasi sungguhan.
 
 ---
 
@@ -1698,9 +1702,8 @@ Perubahan fitur atau limit pada ChatGPT Plus dan Supabase berada di luar kendali
 Urutan ekspansi yang disarankan setelah MVP stabil:
 
 Butir hosted staging di bawah berarti lingkungan staging produk yang
-dipertahankan untuk pengembangan rutin. Staging uji sementara Phase 8 yang
-dipilih CR-018 hanya untuk verifikasi pre-production dan tidak mengubah
-urutan ekspansi produk ini.
+dipertahankan untuk pengembangan rutin. CR-019 tidak mensyaratkan staging
+sementara Phase 8 untuk MVP dan tidak mengubah urutan ekspansi produk ini.
 
 1. Hosted staging environment.
 2. Analytics dan rekomendasi performa yang lebih matang.
@@ -1745,7 +1748,8 @@ MVP dinyatakan selesai apabila:
 11. OAuth, ownership check, RLS, dan Data API exposure telah diverifikasi.
 12. Pengguna dapat mencatat performa dan mengambil insight dasar melalui chat.
 13. Dokumentasi database, workflow, module contract, trivia DNA, tool inventory, use-case inventory, traceability, dan implementation plan sudah selaras dengan PRD ini.
-14. Seluruh 33 MCP tools lulus contract tests dan seluruh 101 frozen prompts memenuhi threshold evaluasi.
+14. Seluruh 33 MCP tools lulus contract tests dan skenario manual inti pada
+    plugin final lulus sesuai CR-019; 101 frozen prompts tetap inventaris regresi.
 
 ---
 

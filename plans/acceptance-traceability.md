@@ -379,19 +379,19 @@ Cleanup setelah kegagalan dibuktikan oleh `RPC-ROLLBACK-001`, `CON-REPLAY-001`, 
 | AC | Requirement coverage | Schema/operation owner | Phase | Automated evidence | Content/prompt/manual evidence | Status |
 |---|---|---|---|---|---|---|
 | `AC-001` | OAuth, owner, MCP connect/discovery | S-AUTH, O-CONTEXT, `/health` | P2/P5–P10 | SEC-OAUTH-001/008, MCP-DISC-001/004 | EV-RC-001/004, MAN-CONNECT-001 | specified |
-| `AC-002` | Multi-Page/config/reuse/defaults | S-PAGE | P3/P5/P6/P8 | DB-PAGE-001/006, RPC-PAGE-001/004 | EV-DR-003/004 | specified |
-| `AC-003` | Single production-ready post | S-PAGE/S-FACT/S-JUNCTION/S-POST/S-QUALITY | P3–P8 | WF-POST-001, RPC-SAVE-001, RPC-APPROVAL-001 | CE-DNA-001, EV-DR-005/006/011, MAN-EDITORIAL-001 | specified |
-| `AC-004` | Exact/paraphrase dedup + reuse modes | S-FACT/S-JUNCTION | P4/P5/P8 | DB-DEDUP-001/004, DB-REUSE-001/003 | CE-DEDUP-001/004, EV-CL-008 | specified |
-| `AC-005` | 10-way reservation | S-FACT | P4/P5/P8 | CON-RESERVE-001 | EV-RC-015 | specified |
-| `AC-006` | Meaning-safe CAS revision | S-POST/S-FACT/S-JUNCTION/S-OPS | P4/P5/P8 | CON-REVISION-001, RPC-REVISE-001/003 | CE-MEANING-001, EV-DR-009/IN-006 | specified |
-| `AC-007` | Batch, checkpoint, resume | S-PLAN/S-POST/S-OPS | P3/P5/P6/P8 | WF-BATCH-001, RPC-PLAN-RESUME-001, CON-LEASE-001 | EV-DR-016, EV-FU-006/007 | specified |
-| `AC-008` | Seven-day calendar, unique slots, progress | S-PLAN/S-POST | P3/P5/P6/P8 | WF-CALENDAR-001, CON-SCHEDULE-001 | EV-DR-010/016, EV-IN-004 | specified |
-| `AC-009` | Explicit lifecycle; no FB upload | S-POST/S-JUNCTION/S-QUALITY | P5/P6/P8 | RPC-LIFE-001/007, ST-TOOL-BOUNDARY-001 | EV-DR-011–015, EV-NG-001/002 | specified |
-| `AC-010` | American English + global clarity + usable copy | S-QUALITY | P7/P8/P10 | CE-LANGUAGE-001/004, CE-OUTPUT-001 | MAN-EDITORIAL-003, pilot sample | specified |
-| `AC-011` | No OpenAI API/embeddings/vector DB | dependency/network boundary | P1/P6–P8 | ST-NETWORK-001, ST-DEPS-002, ST-SECRET-001 | EV-NG-007 | specified |
+| `AC-002` | Multi-Page/config/reuse/defaults | S-PAGE | P3/P5/P6/P9/P10 | DB-PAGE-001/006, RPC-PAGE-001/004 | EV-DR-003/004 | specified |
+| `AC-003` | Single production-ready post | S-PAGE/S-FACT/S-JUNCTION/S-POST/S-QUALITY | P3–P7/P9/P10 | WF-POST-001, RPC-SAVE-001, RPC-APPROVAL-001 | CE-DNA-001, EV-DR-005/006/011, MAN-EDITORIAL-001 | specified |
+| `AC-004` | Exact/paraphrase dedup + reuse modes | S-FACT/S-JUNCTION | P4/P5/P9/P10 | DB-DEDUP-001/004, DB-REUSE-001/003 | CE-DEDUP-001/004, EV-CL-008 | specified |
+| `AC-005` | 10-way reservation | S-FACT | P4/P5/P9 | CON-RESERVE-001 | EV-RC-015 | specified |
+| `AC-006` | Meaning-safe CAS revision | S-POST/S-FACT/S-JUNCTION/S-OPS | P4/P5/P9/P10 | CON-REVISION-001, RPC-REVISE-001/003 | CE-MEANING-001, EV-DR-009/IN-006 | specified |
+| `AC-007` | Batch, checkpoint, resume | S-PLAN/S-POST/S-OPS | P3/P5/P6/P9/P10 | WF-BATCH-001, RPC-PLAN-RESUME-001, CON-LEASE-001 | EV-DR-016, EV-FU-006/007 | specified |
+| `AC-008` | Seven-day calendar, unique slots, progress | S-PLAN/S-POST | P3/P5/P6/P9/P10 | WF-CALENDAR-001, CON-SCHEDULE-001 | EV-DR-010/016, EV-IN-004 | specified |
+| `AC-009` | Explicit lifecycle; no FB upload | S-POST/S-JUNCTION/S-QUALITY | P5/P6/P9/P10 | RPC-LIFE-001/007, ST-TOOL-BOUNDARY-001 | EV-DR-011–015, EV-NG-001/002 | specified |
+| `AC-010` | American English + global clarity + usable copy | S-QUALITY | P7/P9/P10 | CE-LANGUAGE-001/004, CE-OUTPUT-001 | MAN-EDITORIAL-003, pilot sample | specified |
+| `AC-011` | No OpenAI API/embeddings/vector DB | dependency/network boundary | P1/P6/P7/P9 | ST-NETWORK-001, ST-DEPS-002, ST-SECRET-001 | EV-NG-007 | specified |
 | `AC-012` | Supabase Edge MCP; minimal auth frontend; no product dashboard | runtime/deployment | P2/P6/P9/P10 | ST-ARCH-002, MCP-DISC-001 | MAN-CONNECT-001 | specified |
-| `AC-013` | Manual performance snapshots + cautious insights | S-METRIC | P3/P5/P6/P8 | DB-METRIC-001, RPC-METRIC-001/002, RPC-INSIGHT-001 | EV-DR-017/018, EV-FU-010 | specified |
-| `AC-014` | Multi-niche core, trivia-specific data | module boundary | P1/P3/P4/P8 | ST-MODULE-001/004 | module conformance fixture | specified |
+| `AC-013` | Manual performance snapshots + cautious insights | S-METRIC | P3/P5/P6/P9/P10 | DB-METRIC-001, RPC-METRIC-001/002, RPC-INSIGHT-001 | EV-DR-017/018, EV-FU-010 | specified |
+| `AC-014` | Multi-niche core, trivia-specific data | module boundary | P1/P3/P4/P9 | ST-MODULE-001/004 | module conformance fixture | specified |
 
 Catatan `AC-001`: baseline PRD lama menyebut tool `health_check`; keputusan `TOOL-001` menghapus tool tersebut dan menetapkan HTTP `GET /health` plus MCP initialize/list-tools sebagai bukti availability. PRD telah disinkronkan pada 0.11.
 
@@ -399,16 +399,14 @@ Catatan `AC-012`: “tidak ada dashboard produk” tetap berlaku, sedangkan kepu
 
 Coverage: **14/14 acceptance criteria** mempunyai implementation owner, phase, automated evidence, dan content/prompt/manual evidence. Tidak ada row `sync_pending` setelah sinkronisasi 0.11.
 
-CR-018 mengatur **waktu pembuktian**, bukan mengubah requirement pada tabel.
-Pada laporan Phase 8, setiap row `AC-001..014` diberi evidence dan status
-terpisah: `PASS-pre-production`, `DEFERRED-to-Phase-9/10`, atau
-`PASS-final-MVP`. `AC-001` dapat membuktikan discovery/OAuth/owner dan tool
-selection pada staging, tetapi URL/koneksi production dan plugin final tetap
-tertunda. `AC-012` dapat membuktikan arsitektur serta Edge Function/frontend
-uji, tetapi deployment production baru dibuktikan pada Phase 9. Paket private
-test E4 dan persetujuan editorial staging tidak dihitung sebagai final plugin
-atau E5 pilot Phase 10. Tidak ada `PASS-final-MVP` tanpa bukti production yang
-diwajibkan oleh PRD.
+CR-019 mengganti alokasi waktu pembuktian CR-018 tanpa menghapus requirement
+`AC-001..014`. Phase 8 dan E3/E4 staging ditunda dan tidak mendapat status
+`PASS`. Gate teknis/keamanan pada SHA deployment mendahului write Phase 9;
+OAuth, owner/non-owner, Edge Function/frontend dan smoke dibuktikan pada
+production Phase 9. Koneksi plugin final, skill, workflow natural-language,
+dan editorial pilot dibuktikan lewat skenario manual inti Phase 10. Setiap
+row AC diberi bukti aktual atau `PENDING`; tidak ada `PASS-final-MVP` dari
+coverage map, Inspector, atau log server saja.
 
 ---
 
@@ -427,19 +425,19 @@ diwajibkan oleh PRD.
 | `CORE-006` | Expected revision CAS | P3/P5 | CON-REVISION-001 |
 | `CORE-007` | RPC-only `api` boundary | P5 | SEC-GRANT-001/004 |
 | `CORE-008` | Database-backed rate limits | P5/P6 | SEC-RATE-001/004 |
-| `FACT-001..002` | Canonical identity + semantic decision boundary | P4/P8 | DB-DEDUP suite, CE-DEDUP suite |
+| `FACT-001..002` | Canonical identity + semantic decision boundary | P4/P9/P10 | DB-DEDUP suite, CE-DEDUP suite |
 | `FACT-003` | Correction/invalidation/supersession lineage | P4/P5/P6 | RPC-CORRECT-001/005 |
 | `FACT-004..005` | Reservation and reuse lifecycle | P4/P5 | CON-RESERVE suite, DB-REUSE suite |
-| `FACT-006` | Freshness/source snapshots | P4/P5/P8 | DB-SOURCE suite, CE-TIME suite |
-| `FACT-007` | Gold dedup fixtures | P4/P8 | CE-DEDUP gold report |
-| `QUALITY-001..002` | Canonical renderer, budgets, readability | P3/P5/P8 | RPC-BUDGET suite, CE-READ suite |
-| `QUALITY-003..005` | Three authorities, evidence, lifecycle | P3/P5/P6/P8 | RPC-APPROVAL suite, WF-APPROVAL-001 |
+| `FACT-006` | Freshness/source snapshots | P4/P5/P9/P10 | DB-SOURCE suite, CE-TIME suite |
+| `FACT-007` | Gold dedup fixtures | P4/P9 | CE-DEDUP gold report |
+| `QUALITY-001..002` | Canonical renderer, budgets, readability | P3/P5/P9/P10 | RPC-BUDGET suite, CE-READ suite |
+| `QUALITY-003..005` | Three authorities, evidence, lifecycle | P3/P5/P6/P9/P10 | RPC-APPROVAL suite, WF-APPROVAL-001 |
 | `QUALITY-006` | Cumulative metrics semantics | P3/P5/P6 | DB-METRIC-001, RPC-METRIC suite |
-| `MODULE-001` | Module interface/conformance | P1/P3/P4/P7/P8 | ST-MODULE suite |
-| `DNA-001` | Trivia editorial behavior | P7/P8/P10 | CE-DNA report, MAN-EDITORIAL suite |
-| `TOOL-001..002` | 33 exact MCP contracts | P6/P8 | MCP-CONTRACT suite, 33/33 discovery/schema coverage |
-| `USECASE-001` | 31 goals, 101 frozen prompts | P7/P8/P10 | prompt evaluation report; direct 100%, indirect ≥90%, overall ≥95%, zero hard fail |
-| `TRACE-001` | Dokumen ini + Phase 8 acceptance report | P0/P8 | trace coverage audit dan final test report |
+| `MODULE-001` | Module interface/conformance | P1/P3/P4/P7/P9 | ST-MODULE suite |
+| `DNA-001` | Trivia editorial behavior | P7/P9/P10 | CE-DNA report, MAN-EDITORIAL suite |
+| `TOOL-001..002` | 33 exact MCP contracts | P6/P9 | MCP-CONTRACT suite, 33/33 discovery/schema coverage |
+| `USECASE-001` | 31 goals, 101 frozen prompts | P7/P9/P10 | 101-case inventory tetap utuh; technical gate 33 tools dan laporan skenario manual inti plugin final, semua terpilih lulus, zero hard fail (CR-019) |
+| `TRACE-001` | Dokumen ini + laporan acceptance final | P0/P9/P10 | trace coverage audit, technical report, dan final manual/pilot report |
 | `FREEZE-001..005` | Frozen baseline, tenant-scoped audit FK, approval shape, eligible structured dedup, lineage safety | P0/P3/P4/P5 | static freeze audit, DB-SCOPE-LEDGER-001, DB-QUALITY-SHAPE-001, DB-DEDUP-ELIGIBLE-001, RPC-CORRECT-001/005 |
 
 ---
@@ -453,18 +451,23 @@ diwajibkan oleh PRD.
 - 31 supported/clarification use cases tercatat.
 - 101 frozen prompt cases tercatat: 21 direct, 12 indirect, 10 follow-up, 8 clarification, 36 recovery/concurrency, dan 14 negative/out-of-scope.
 
-Phase 8 wajib menghasilkan tiga laporan terpisah:
+CR-019 memindahkan laporan gate MVP ke Phase 9–10:
 
-1. **Deterministic report** — static, database, RPC, security, concurrency, MCP contract, dan performance.
-2. **Prompt/workflow report** — 101 frozen cases, generated paraphrases, exact tools, confirmation, and state assertions.
-3. **Content evaluation report** — five formats, two profiles, all allowlisted topic groups, language, sources, safety, budgets, readability, dedup/anti-dedup, copying, dan owner pilot review.
+1. **Pre-deployment technical report** — static, database, RPC, security,
+   concurrency, MCP contract, Inspector, dan performance pada SHA deployment.
+2. **Installed-plugin manual report** — ID/prompt/expected result yang dibekukan,
+   exact visible tools, confirmation, state, dan keputusan reviewer untuk
+   semua skenario inti; kebutuhan publikasi/metrik asli tetap `PENDING` sampai ada.
+3. **Content evaluation report** — five formats, two profiles, allowlisted
+   topic groups, language, sources, safety, budgets, readability,
+   dedup/anti-dedup, copying, dan owner pilot review.
 
 Satu jenis laporan tidak dapat menggantikan yang lain. Tool-selection pass tidak membuktikan database integrity atau kualitas editorial; content rubric pass tidak membuktikan authorization atau atomicity.
-Ketiga laporan Phase 8 harus memakai klasifikasi CR-018 untuk membedakan
-bukti CI lokal, E3/E4 staging, dan bukti production yang belum tersedia.
+Laporan memisahkan bukti CI lokal, production, dan ChatGPT plugin final.
 Jumlah 42/42 functional requirements, 14/14 acceptance criteria, 33/33
-positive/boundary tool paths, dan 101/101 frozen prompts tetap utuh;
-`DEFERRED-to-Phase-9/10` tidak boleh dihitung sebagai final pass.
+positive/boundary tool paths, dan inventaris 101/101 frozen prompts tetap
+utuh; pemetaan dokumen tidak boleh dihitung sebagai live execution atau
+final pass. Phase 8 berstatus `Deferred by CR-019`.
 
 ---
 
