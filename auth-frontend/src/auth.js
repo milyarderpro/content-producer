@@ -70,9 +70,11 @@ export function createAuth(config, storage = sessionStorage, request = fetch) {
   async function refresh() {
     if (!session?.refresh_token) return null;
     try {
-      save(await api('token?grant_type=refresh_token', 'POST', {
-        refresh_token: session.refresh_token,
-      }));
+      save(
+        await api('token?grant_type=refresh_token', 'POST', {
+          refresh_token: session.refresh_token,
+        }),
+      );
       return session.access_token;
     } catch {
       clear();

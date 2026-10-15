@@ -24,8 +24,7 @@ function mockAuth() {
     const relative = url.pathname + url.search;
     calls.push({ relative, options });
     const data =
-      relative.endsWith('grant_type=password') ||
-      relative.endsWith('grant_type=refresh_token')
+      relative.endsWith('grant_type=password') || relative.endsWith('grant_type=refresh_token')
         ? { access_token: 'access-test', refresh_token: 'refresh-test', expires_in: 3600 }
         : relative.endsWith('/user')
           ? { id: 'user-id' }
@@ -119,7 +118,11 @@ test('missing config and privileged keys fail closed', () => {
     );
   }
   assert.throws(
-    () => createAuth({ url: 'https://user:pass@foo.supabase.co', publishableKey: config.publishableKey }, storage),
+    () =>
+      createAuth(
+        { url: 'https://user:pass@foo.supabase.co', publishableKey: config.publishableKey },
+        storage,
+      ),
     /Konfigurasi/,
   );
 });

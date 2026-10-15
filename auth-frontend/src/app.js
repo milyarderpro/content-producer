@@ -102,9 +102,7 @@ async function start() {
     $('client-name').textContent = details.client.name || 'Aplikasi tanpa nama';
     $('client-id').textContent = 'Client ID: ' + details.client.id;
     const scopes =
-      typeof details.scope === 'string'
-        ? details.scope.split(/\s+/).filter(Boolean)
-        : [];
+      typeof details.scope === 'string' ? details.scope.split(/\s+/).filter(Boolean) : [];
     $('scope-list').replaceChildren(
       ...(scopes.length ? scopes : ['Tidak ada scope yang dinyatakan']).map((scope) => {
         const li = document.createElement('li');

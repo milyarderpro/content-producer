@@ -4,7 +4,13 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['artifacts/**', 'coverage/**', 'node_modules/**', 'supabase/.branches/**', 'auth-frontend/dist/**'],
+    ignores: [
+      'artifacts/**',
+      'coverage/**',
+      'node_modules/**',
+      'supabase/.branches/**',
+      'auth-frontend/dist/**',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
