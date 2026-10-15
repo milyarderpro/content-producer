@@ -1,0 +1,57 @@
+name: Phase 7 - lightweight checkpoint CI
+
+on:
+  push:
+    branches: [codex/phase-7-plugin]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase-7-light-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checkpoint:
+    name: Pinned install, project check, committed diff
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout Phase 7 commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install pinned pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+
+      - name: Set up pinned project Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Record commit and toolchain
+        run: |
+          echo "Commit: $(git rev-parse HEAD)"
+          echo "Node: $(node --version)"
+          echo "pnpm: $(pnpm --version)"
+          test "$(pnpm --version)" = "10.33.2"
+
+      - name: Install frozen project dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run project check (format, lint, types, unit tests)
+        run: pnpm run check
+
+      - name: Check committed branch diff
+        run: |
+          base="$(git merge-base HEAD origin/main)"
+          echo "Merge-base: $base"
+          git diff --check "$base" HEAD
+          echo "Exit code: 0 (git diff --check)"

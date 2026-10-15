@@ -1402,7 +1402,7 @@ ditulis, bukan status terkini.
 | 4 — Trivia database | Complete | Dedup/reuse tests lulus | `f513286`, `cb3568a` |
 | 5 — RPC dan security | Complete | Security/concurrency lulus | `04f6373`; [final local verification](../docs/phase-5-batch-b-remediation-p2-03-report.md) |
 | 6 — MCP Edge Function | Complete | Gate akhir dan audit independen Batch B lulus | 33/33 MCP tools pada PR #2 (`codex/phase-6-mcp`). [Gate akhir pada `88738a84` sukses](https://github.com/milyarderpro/content-producer/actions/runs/38679123776): 58/58 tes MCP, 172/172 tes database, audit katalog/keamanan, dan Inspector 33 panggilan valid + 33 invalid. Audit ulang independen pada SHA yang sama menutup ketiga temuan Batch B; lihat Issue #1. Bukti hosted OAuth dan koneksi ChatGPT tetap pada Phase 9–10. |
-| 7 — Plugin skill/package source | Not started | Source/package candidate validation lulus | — |
+| 7 — Plugin skill/package source | In progress | Source/package candidate validation lulus (gate 7.4; belum dijalankan) | Checkpoint 7.0 dimulai dari `main` `19ce0b876f6a0fcc91d05f23ebed812ae54f9bc4` pada `codex/phase-7-plugin`; bukti CI dan draft PR dilacak di [Issue #3](https://github.com/milyarderpro/content-producer/issues/3). |
 | 8 — Full verification | Not started | Acceptance criteria lulus | — |
 | 9 — Production deployment | Not started | Production smoke lulus | — |
 | 10 — MCP connection/package/pilot | Not started | Remote MCP, final plugin, dan end-to-end pilot lulus | — |
