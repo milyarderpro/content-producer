@@ -49,6 +49,9 @@ jobs:
       - name: Run focused Phase 7.1 manifest and generator tests
         run: pnpm exec vitest run tests/plugin-config.test.ts
 
+      - name: Run focused Phase 7.2 core skill tests
+        run: pnpm exec vitest run tests/plugin-skill.test.ts
+
       - name: Run project check (format, lint, types, unit tests)
         run: pnpm run check
 
