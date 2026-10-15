@@ -1,0 +1,32 @@
+name: Phase 9.1 - temporary route test formatter
+
+on:
+  push:
+    branches: [codex/phase-9-deployment]
+
+permissions:
+  contents: read
+
+jobs:
+  format-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Emit the formatted test file
+        shell: bash
+        run: |
+          pnpm exec prettier --write auth-frontend/tests/direct-routes.test.mjs >/dev/null
+          echo 'FMT_BEGIN:auth-frontend/tests/direct-routes.test.mjs'
+          base64 -w0 auth-frontend/tests/direct-routes.test.mjs
+          echo
+          echo 'FMT_END:auth-frontend/tests/direct-routes.test.mjs'
