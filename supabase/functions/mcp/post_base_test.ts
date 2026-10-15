@@ -383,10 +383,7 @@ Deno.test('6.9: latest post metrics restrict anomaly flags', async () => {
     flags = ['unknown_flag'];
     const denied = await call('get_post', { ...base, post_public_id: postId });
     check(denied.isError === true, 'UNKNOWN_LATEST_FLAG_ACCEPTED');
-    check(
-      denied.structuredContent.error.code === 'DATABASE_UNAVAILABLE',
-      'INVALID_LATEST_SAFE',
-    );
+    check(denied.structuredContent.error.code === 'DATABASE_UNAVAILABLE', 'INVALID_LATEST_SAFE');
     flags = [...known, known[0]];
     check(
       (await call('get_post', { ...base, post_public_id: postId })).isError === true,
