@@ -1,6 +1,6 @@
 # Trivia formats, profiles and rendering
 
-Frozen authority: `plans/trivia-content-dna.md` ``7–9, 11–15, 24 and `plans/phase-0-decision-register.md` QUALITY-001/002. Use only the five named `format_key` values permitted by current Page config. `architecture` describes the collection (`single_subject`, `themed`, `mixed`); it does not replace `format_key`.
+Frozen authority: `plans/trivia-content-dna.md` sections 7–9, 11–15, 24 and `plans/phase-0-decision-register.md` QUALITY-001/002. Use only the five named `format_key` values permitted by current Page config. `architecture` describes the collection (`single_subject`, `themed`, `mixed`); it does not replace `format_key`.
 
 ## Five format contracts
 

@@ -14,16 +14,13 @@ const names = [
 const read = (path: string) => readFileSync(join(root, path), 'utf8');
 const cases = (source: string) =>
   new Map(
-    Array.from(
-      source.matchAll(/^- `([A-Z]+-\d{2})` \| ([^\n]+)$/gm),
-      (match) => {
-        const fields = match[2].split(' | ');
-        const outcome = fields.find((field) =>
-          /^(ALLOW_WITH_VERIFICATION|SAME|DISTINCT|UNCERTAIN|HOLD|REVISE|REJECT)$/.test(field),
-        );
-        return [match[1], outcome] as const;
-      },
-    ),
+    Array.from(source.matchAll(/^- `([A-Z]+-\d{2})` \| ([^\n]+)$/gm), (match) => {
+      const fields = match[2].split(' | ');
+      const outcome = fields.find((field) =>
+        /^(ALLOW_WITH_VERIFICATION|SAME|DISTINCT|UNCERTAIN|HOLD|REVISE|REJECT)$/.test(field),
+      );
+      return [match[1], outcome] as const;
+    }),
   );
 
 describe('Phase 7.3 trivia editorial reference contract', () => {
@@ -82,9 +79,17 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     const dna = read(niche + 'content-dna.md');
     const evidence = read(niche + 'fact-checking.md');
     for (const topic of [
-      'animals', 'pet_safety', 'human_body', 'food_science', 'food_storage_home',
-      'practical_utility', 'geography', 'nature_science', 'history_origins',
-      'inventions_everyday', 'general_trivia',
+      'animals',
+      'pet_safety',
+      'human_body',
+      'food_science',
+      'food_storage_home',
+      'practical_utility',
+      'geography',
+      'nature_science',
+      'history_origins',
+      'inventions_everyday',
+      'general_trivia',
     ]) {
       expect(dna).toContain(String.fromCharCode(96) + topic + String.fromCharCode(96));
     }
@@ -92,9 +97,17 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
       expect(dna.toLowerCase()).toContain(term.toLowerCase());
     }
     for (const evidenceRule of [
-      'required_per_item', 'one A or B', 'one A plus independent A/B',
-      '24 months', '12 months', '30 days', '90 days', '180 days',
-      'independence_group', 'as_of_date', 'Tier D',
+      'required_per_item',
+      'one A or B',
+      'one A plus independent A/B',
+      '24 months',
+      '12 months',
+      '30 days',
+      '90 days',
+      '180 days',
+      'independence_group',
+      'as_of_date',
+      'Tier D',
     ]) {
       expect(evidence).toContain(evidenceRule);
     }
@@ -143,16 +156,24 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     const seen = cases(rubric);
     expect(seen.size).toBe(9);
     for (const [id, decision] of [
-      ['QUAL-01', 'REJECT'], ['QUAL-02', 'HOLD'], ['QUAL-03', 'REJECT'],
-      ['QUAL-04', 'REVISE'], ['QUAL-05', 'REVISE'], ['QUAL-06', 'REVISE'],
-      ['QUAL-07', 'REVISE'], ['QUAL-08', 'HOLD'],
+      ['QUAL-01', 'REJECT'],
+      ['QUAL-02', 'HOLD'],
+      ['QUAL-03', 'REJECT'],
+      ['QUAL-04', 'REVISE'],
+      ['QUAL-05', 'REVISE'],
+      ['QUAL-06', 'REVISE'],
+      ['QUAL-07', 'REVISE'],
+      ['QUAL-08', 'HOLD'],
       ['QUAL-09', 'ALLOW_WITH_VERIFICATION'],
     ]) {
       expect(seen.get(id)).toBe(decision);
     }
     for (const criterion of [
-      'trivia.meaning_preserved', 'trivia.source_supported', 'trivia.time_context_valid',
-      'trivia.safety_appropriate', 'trivia.caption_no_new_claim',
+      'trivia.meaning_preserved',
+      'trivia.source_supported',
+      'trivia.time_context_valid',
+      'trivia.safety_appropriate',
+      'trivia.caption_no_new_claim',
       'trivia.substantial_copying_absent',
     ]) {
       expect(rubric).toContain(criterion);

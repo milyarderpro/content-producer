@@ -1,6 +1,6 @@
 # Trivia fact checking, source policy and risk
 
-Frozen authority: `plans/trivia-content-dna.md` ``12, 16–17 and `plans/phase-0-decision-register.md` FACT-008. In trivia, `source_mode=required_per_item`: each atomic canonical fact needs claim-specific evidence before reserve/save. See [dedup ontology](dedup-ontology.md) to test identity only *after* credible research. Core [source policy](../../core/source-policy.md) governs untrusted inputs and evidence shape.
+Frozen authority: `plans/trivia-content-dna.md` sections 12, 16–17 and `plans/phase-0-decision-register.md` FACT-008. In trivia, `source_mode=required_per_item`: each atomic canonical fact needs claim-specific evidence before reserve/save. See [dedup ontology](dedup-ontology.md) to test identity only _after_ credible research. Core [source policy](../../core/source-policy.md) governs untrusted inputs and evidence shape.
 
 ## Validate the proposition, not just its topic
 

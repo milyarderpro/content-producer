@@ -58,12 +58,6 @@ jobs:
       - name: Run project check (format, lint, types, unit tests)
         run: pnpm run check
 
-      - name: Show formatting diff after a failed check
-        if: failure()
-        run: |
-          pnpm exec prettier --write plugin/skills/content-producer tests/plugin-trivia.test.ts
-          git diff -- plugin/skills/content-producer tests/plugin-trivia.test.ts
-
       - name: Check committed branch diff
         run: |
           base="$(git merge-base HEAD origin/main)"

@@ -1,6 +1,6 @@
 # Trivia canonical identity and dedup decisions
 
-Frozen authority: `plans/trivia-content-dna.md` `18, `plans/phase-0-decision-register.md` FACT-007 and `plans/database-design.md` `11. Facts are reusable **atomic propositions**; hooks, CTA, caption wording, theme, and style are not canonical fact identity. No embeddings, vector search or automatic semantic certainty is permitted.
+Frozen authority: `plans/trivia-content-dna.md` section 18, `plans/phase-0-decision-register.md` FACT-007 and `plans/database-design.md` section 11. Facts are reusable **atomic propositions**; hooks, CTA, caption wording, theme, and style are not canonical fact identity. No embeddings, vector search or automatic semantic certainty is permitted.
 
 ## Material identity
 

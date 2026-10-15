@@ -1,6 +1,6 @@
 # Trivia editorial rubric and safe outcomes
 
-Frozen authority: `plans/trivia-content-dna.md` `19–21 and `plans/phase-0-decision-register.md` QUALITY-003/004. Apply after [fact checking](fact-checking.md), [dedup review](dedup-ontology.md) and [format selection](formats.md), before attesting the current saved revision. The [core lifecycle](../../core/lifecycle.md) governs approval and state transitions.
+Frozen authority: `plans/trivia-content-dna.md` sections 19–21 and `plans/phase-0-decision-register.md` QUALITY-003/004. Apply after [fact checking](fact-checking.md), [dedup review](dedup-ontology.md) and [format selection](formats.md), before attesting the current saved revision. The [core lifecycle](../../core/lifecycle.md) governs approval and state transitions.
 
 ## Three separate authorities
 

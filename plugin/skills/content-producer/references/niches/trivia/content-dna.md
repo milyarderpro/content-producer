@@ -21,7 +21,7 @@ Allowed `topic_key` values: `animals`, `pet_safety`, `food_science`, `food_stora
 
 ## Choose and write
 
-Score each *verified* candidate informally from 0–2 for familiar anchor, surprise, specificity, visualizability, utility/emotion, compactness and fit. This editorial score cannot override source, freshness, dedup or safety failures. Start with an independently understandable strong fact, vary relations and openings, and end with a memorable fact; do not add low-value filler. Aim for at least two high-surprise facts in a 5–6-fact post or three in a 7–9-fact post; at most one low-surprise context fact. These are editorial preferences, not deterministic server checks.
+Score each _verified_ candidate informally from 0–2 for familiar anchor, surprise, specificity, visualizability, utility/emotion, compactness and fit. This editorial score cannot override source, freshness, dedup or safety failures. Start with an independently understandable strong fact, vary relations and openings, and end with a memorable fact; do not add low-value filler. Aim for at least two high-surprise facts in a 5–6-fact post or three in a 7–9-fact post; at most one low-surprise context fact. These are editorial preferences, not deterministic server checks.
 
 Default hook: `Did you know?` Alternative hooks must truthfully match the subject, count and format. A fact line conveys one principal proposition; compress by removing filler, not qualifiers. Choose a replacement fact when a critical qualifier cannot fit. Use a single CTA aligned to `share`, `save`, `comment` or `follow`. Facebook caption reinforces the theme without new unsourced claims; hashtags are relevant, non-spammy and separate from Canva copy. See [formats](formats.md) for exact length/layout limits.
 
