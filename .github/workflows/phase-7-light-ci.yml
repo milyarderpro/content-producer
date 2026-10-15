@@ -55,24 +55,6 @@ jobs:
       - name: Run project check (format, lint, types, unit tests)
         run: pnpm run check
 
-      - name: Print exact Prettier-formatted source on failure
-        if: failure()
-        run: |
-          pnpm exec prettier --write plugin/skills/content-producer tests/plugin-skill.test.ts
-          node <<'NODE'
-          const fs = require('node:fs');
-          const paths = [
-            'plugin/skills/content-producer/SKILL.md',
-            'plugin/skills/content-producer/references/core/workflow.md',
-            'plugin/skills/content-producer/references/core/lifecycle.md',
-            'plugin/skills/content-producer/references/core/tool-sequences.md',
-            'plugin/skills/content-producer/references/core/source-policy.md',
-            'plugin/skills/content-producer/references/core/output-contract.md',
-            'tests/plugin-skill.test.ts',
-          ];
-          for (const p of paths) console.log('FORMATTED_FILE ' + p + ' ' + JSON.stringify(fs.readFileSync(p, 'utf8')));
-          NODE
-
       - name: Check committed branch diff
         run: |
           base="$(git merge-base HEAD origin/main)"

@@ -25,10 +25,7 @@ describe('Phase 7.2 core skill source contract', () => {
   });
 
   it('links five real core references without escaping the skill root', () => {
-    const paths = [
-      'SKILL.md',
-      ...names.map((name) => 'references/core/' + name),
-    ];
+    const paths = ['SKILL.md', ...names.map((name) => 'references/core/' + name)];
     for (const name of names) {
       expect(read('SKILL.md')).toContain('(references/core/' + name + ')');
     }
@@ -45,18 +42,13 @@ describe('Phase 7.2 core skill source contract', () => {
   });
 
   it('matches the exact frozen 33-tool inventory in order', () => {
-    const inventory = readFileSync(
-      join(process.cwd(), 'plans', 'tool-inventory.md'),
-      'utf8',
-    );
+    const inventory = readFileSync(join(process.cwd(), 'plans', 'tool-inventory.md'), 'utf8');
     const frozen = Array.from(
       inventory.matchAll(/^\|\s*\d+\s*\|\s*\x60([a-z_]+)\x60\s*\|/gm),
       (match) => match[1],
     );
     const listed = Array.from(
-      read('references/core/tool-sequences.md').matchAll(
-        /^\|\s*\d+\s*\|\s*([a-z_]+)\s*\|/gm,
-      ),
+      read('references/core/tool-sequences.md').matchAll(/^\|\s*\d+\s*\|\s*([a-z_]+)\s*\|/gm),
       (match) => match[1],
     );
     expect(frozen).toHaveLength(33);
