@@ -34,7 +34,7 @@ Untuk setiap checkpoint, catat baseline/head SHA, file berubah, perintah dan exi
 5. Tentukan strategi export/backup sebelum perubahan bila ada data, cara memverifikasi hasilnya, urutan migration, serta titik berhenti bila kondisi remote berbeda dari source.
 6. Buka Issue Phase 9 dan draft PR source. Ubah tracker §16 menjadi In progress hanya saat pekerjaan 9.0 benar-benar dimulai; belum menandai gate lulus.
 
-**Selesai bila:** identitas target dan kondisi awal terdokumentasi, pilihan Vercel tercatat, jalur backup/rollback masuk akal, serta tidak ada tindakan remote yang mengubah state. Bila target belum pasti, 9.0 tetap PENDING dan pekerjaan kode independen boleh dipersiapkan tanpa deployment.
+**Selesai bila:** identitas target dan kondisi awal terdokumentasi, pilihan Vercel tercatat, jalur backup/rollback masuk akal, serta tidak ada tindakan remote yang mengubah state. Bila target belum pasti, 9.0 tetap PENDING; jangan menandai checkpoint berikutnya selesai.
 
 ## 4. Checkpoint 9.1 — Frontend autentikasi minimal
 
@@ -53,7 +53,7 @@ Untuk setiap checkpoint, catat baseline/head SHA, file berubah, perintah dan exi
 **Scope:** source, workflow, dan instruksi operator; belum cloud write.
 
 1. Siapkan workflow gate teknis yang hanya memakai Supabase **lokal sementara** pada GitHub-hosted runner. Jangan menaruh kredensial production pada job tes.
-2. Periksa versi Supabase CLI yang dipin serta output --help untuk perintah yang akan dipakai. Bekukan urutan deployment database dari migration source, dry-run/diff history, aturan menghentikan drift, dan audit katalog pascadeploy. Jangan mengedit migration lama atau menjalankan remote reset.
+2. Periksa versi Supabase CLI yang dipin serta output --help untuk perintah yang akan dipakai. Bekukan urutan deployment database dari migration source melalui CLI, dry-run/diff history, aturan menghentikan drift, dan audit katalog pascadeploy. Plugin Supabase dapat membantu inventaris, advisor, dan pemeriksaan hasil; jangan mengganti replay file migration dengan SQL ad hoc. Jangan mengedit migration lama atau menjalankan remote reset.
 3. Tentukan cara men-deploy Edge Function dari source yang sama, termasuk seluruh dependency dan verify_jwt = false yang memang diwajibkan PRD agar discovery/challenge mencapai middleware. Pastikan middleware function tetap memvalidasi token, audience/resource, OAuth client, dan owner; flag ini bukan izin anonymous tools/call.
 4. Siapkan petunjuk Vercel untuk pemilik: import repository GitHub, pilih Root Directory auth-frontend/, pastikan Production Branch main, periksa build/output sesuai implementasi 9.1, masukkan hanya URL Supabase dan publishable key ke environment Production, lalu catat domain HTTPS stabil. Jangan import atau deploy production sebelum gate 9.3.
 5. Siapkan urutan pengaturan Supabase Auth: Site URL memakai origin Vercel, authorization path /oauth/consent, login owner, public signup disabled, OAuth client/redirect policy yang sesuai dokumentasi saat eksekusi, dan token success 2xx. Siapkan langkah verifikasi tanpa menyalin token ke laporan.
@@ -80,9 +80,9 @@ Untuk setiap checkpoint, catat baseline/head SHA, file berubah, perintah dan exi
 1. Pemilik mengonfirmasi identitas project Supabase production dan akun/team Vercel, lalu menyelesaikan login dengan akunnya. Secret diisi melalui dashboard/secure prompt milik penyedia, bukan melalui chat.
 2. Ambil export/backup sebelum perubahan bila project sudah berisi data; verifikasi file dan prosedur restore. Untuk project kosong, catat bukti kondisi kosong dan strategi backup setelah inisialisasi.
 3. Dari SHA gate yang lulus, cek target link, migration history, dan daftar migration yang akan diterapkan. Jalankan dry-run resmi bila didukung CLI yang dipin. Jika muncul drift atau migration tak dikenal, berhenti. Jalankan migration berurutan **dari file repository**, satu pelaksana saja; jangan remote db reset, SQL editor ad hoc, atau replay manual yang menghilangkan history. Cocokkan daftar applied dengan source.
-4. Verifikasi schema api, policy RLS, owner/grants, default privilege, niche trivia dan workspace owner melalui jalur provisioning aman yang sudah ditinjau. Jangan mendorong seed fixture lokal ke production secara otomatis.
+4. Verifikasi schema api, policy RLS, owner/grants, dan default privilege. Seed niche trivia hanya melalui jalur production yang telah ditinjau; jangan mendorong seed fixture lokal secara otomatis.
 5. Di Vercel, impor repository dengan Root Directory auth-frontend/, masukkan environment browser-safe, deploy Production dari SHA/kode frontend yang telah lulus, dan uji /login, /oauth/consent, /logout termasuk direct refresh. Catat domain HTTPS final. Jika Vercel auto-deploy saat impor atau perubahan main, lakukan impor hanya pada tahap ini.
-6. Atur Site URL, authorization path, consent/deny, client policy, owner login, dan setting keamanan Supabase Auth sesuai dokumen resmi terkini. URL callback/redirect harus tepat; jangan memakai wildcard sebagai jalan pintas.
+6. Atur Site URL, authorization path, consent/deny, client policy, owner login, dan setting keamanan Supabase Auth sesuai dokumen resmi terkini. Setelah identitas owner tersedia, buat workspace owner melalui provisioning aman yang telah ditinjau; public signup tetap disabled. URL callback/redirect harus tepat; jangan memakai wildcard sebagai jalan pintas.
 7. Deploy Edge Function mcp dari source kandidat, dengan verify_jwt = false dan middleware OAuth/owner yang sudah diuji. Catat function version dan URL. Konfigurasi secret function yang memang diperlukan hanya melalui jalur aman; jangan log nilainya.
 8. Setelah tiap perubahan, jalankan verifikasi terkait. Hentikan rangkaian bila migration, Auth, frontend, atau function berbeda dari ekspektasi; jangan menutupi kegagalan dengan perubahan tak tercatat.
 
@@ -91,11 +91,11 @@ Untuk setiap checkpoint, catat baseline/head SHA, file berubah, perintah dan exi
 ## 8. Checkpoint 9.5 — Gate hosted dan penutupan Phase 9
 
 1. Uji /health; MCP initialize/list menunjukkan tepat 33 tools. Request tanpa token, token salah audience/resource, dan owner yang tidak diizinkan tidak boleh menjalankan tools. Denial lintas owner yang authenticated wajib telah dibuktikan otomatis pada 9.3; uji production dengan identitas kedua hanya jika tersedia secara sah dan aman.
-2. Uji discovery OAuth, PKCE, consent approve/deny, refresh/relink, seluruh respons sukses token 2xx, owner context, serta error aman. Jangan menyimpan token dalam bukti.
+2. Uji discovery OAuth, PKCE, consent approve/deny, refresh dan otorisasi ulang, seluruh respons sukses token 2xx, owner context, serta error aman dengan klien OAuth uji yang sah. Ini membuktikan mekanisme hosted; koneksi custom MCP dan relink di ChatGPT tetap dibuktikan pada Phase 10. Jangan menyimpan token dalam bukti.
 3. Verifikasi migration history source = applied, audit katalog 33 API RPC, RLS/privilege production sesuai kontrak, dan Security Advisor. Periksa log secara teredaksi.
 4. Lakukan smoke baca-saja pada Page/workspace owner. Setelah pemeriksaan baca-saja lulus, pilot write kecil hanya pada Page/data yang disetujui pemilik; cek tidak ada reservation/ledger bocor. Jangan membuat publication atau metrics palsu. Kartu MAN-01..MAN-11 tetap Phase 10.
-5. Buktikan rollback frontend/function ke versi sebelumnya dan strategi forward-fix/restore migration tanpa melakukan restore destruktif pada data nyata. Catat biaya/usage baseline dan siapa yang akan merespons insiden.
-6. Tulis laporan final dengan deployment SHA, frontend package SHA, URL aman, hasil setiap gate, waktu, pembatasan, dan evidence 14 AC yang masih PENDING. Minta audit independen pada hasil Phase 9 sebelum mulai Phase 10; implementer tidak menyatakan audit sendiri lulus.
+5. Periksa jalur rollback frontend/function ke versi sebelumnya jika tersedia; pada deployment pertama, siapkan cara menonaktifkan endpoint atau kembali ke respons aman. Dokumentasikan forward-fix/restore migration dan uji prosedur pada lingkungan aman tanpa restore destruktif pada data production. Catat biaya/usage baseline dan siapa yang akan merespons insiden.
+6. Tulis laporan final dengan deployment SHA, frontend package SHA, URL aman, hasil setiap gate, waktu, pembatasan, dan matriks 14 AC dengan status PASS/PENDING serta bukti masing-masing. Minta audit independen pada hasil Phase 9 sebelum mulai Phase 10; implementer tidak menyatakan audit sendiri lulus.
 
 **Selesai bila:** gate hosted lulus, laporan dan rollback siap, tidak ada defect keamanan/data-integrity kritis atau high, serta audit independen menyetujui hasil. Phase 9 boleh Complete; status Pilot-ready menunggu plugin final dan MAN-01..MAN-09 pada Phase 10. MVP Complete menunggu MAN-10..MAN-11 dengan kejadian sungguhan serta Phase 11.
 
