@@ -572,6 +572,14 @@ No threshold can compensate for a hard fail. A critical case must pass all repea
 4. Refresh custom MCP connection setelah metadata berubah.
 5. Mulai conversation baru untuk case independen.
 
+Pada Phase 8, live L4/L5 menggunakan staging terisolasi menurut CR-018:
+custom MCP lebih dahulu, kemudian private **test** plugin yang memuat skill
+dan terhubung hanya ke staging. Record tetap menyebut `environment`,
+`host_surface`, model, plugin/MCP version, dan schema digest yang benar;
+`staging_chatgpt` + `installed_plugin` berarti instalasi uji, bukan paket
+production final. Jika kemampuan host atau reset fixture belum terbukti,
+kasus belum dijalankan dan tidak diberi hasil `pass`.
+
 ### 21.2 Saat run
 
 1. Kirim exact prompt.
@@ -598,11 +606,17 @@ Production data tidak dipakai untuk destructive evaluation. Production pilot han
 |---|---|---|
 | E1 | Unit/local database | L1–L2 deterministic suite lulus |
 | E2 | Local Edge Function + Inspector | 33 tools valid/invalid/auth cases lulus |
-| E3 | Remote staging custom MCP | OAuth, tool selection, structured results lulus |
-| E4 | Installed private plugin | Skill+tool full workflow suite lulus |
-| E5 | Production pilot | Owner menyetujui sample editorial dan operational behavior |
+| E3 | Remote staging custom MCP pada Phase 8 | OAuth, tool selection, structured results lulus pada fixture staging |
+| E4 | Installed private **test** plugin pada Phase 8 | Skill+tool full workflow suite lulus pada fixture staging; bukan paket final production |
+| E5 | Production pilot pada Phase 10 | Owner menyetujui sample editorial dan operational behavior production |
 
 Tidak boleh melompat ke E4 hanya karena individual tools berhasil di Inspector. Tidak boleh melompat ke production karena prompt suite lulus tanpa database/security suite.
+Approval owner terhadap sampel editorial staging pada Phase 8 tidak
+menggantikan persetujuan E5. Production MCP/OAuth/frontend diverifikasi pada
+Phase 9 dan final private plugin dihubungkan/dipasang pada Phase 10. Seluruh
+101 frozen cases dan aturan repetition/threshold di atas tetap menjadi gate
+pre-production Phase 8; hasil relevan diregresikan pada host production pada
+Phase 10 menurut CR-018.
 
 ---
 

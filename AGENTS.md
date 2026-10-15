@@ -12,6 +12,10 @@ reports record their status at the time they were written. A GitHub Issue may
 track Phase 6 checkpoints, but it does not override the frozen contracts.
 For Phase 6, work on exactly one checkpoint per task in order, and stop for
 independent audits after the first 15 tools and after all 33 tools.
+For Phase 8, follow `plans/works/phase-8-implementation-plan.md` one
+checkpoint per task. CR-018 governs its staging evidence and pre-production
+gate; Phase 8 completion does not certify the production acceptance deferred
+to Phases 9–10.
 
 ## Boundaries
 

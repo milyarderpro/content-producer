@@ -142,7 +142,7 @@ AI harus menyiapkan instruksi manual yang singkat, spesifik, dan hanya diberikan
 | Batch | Active-turn, claim default satu/maksimal tiga, checkpoint di content plan |
 | Publishing | Manual ke Canva dan Facebook |
 | Metrics | Manual melalui chat |
-| Hosted staging | Tidak wajib pada MVP |
+| Hosted staging | Tidak wajib sebagai komponen produk; CR-018 memilih staging uji terisolasi untuk Phase 8 |
 | Local environment | Supabase local development |
 | Production | Satu Supabase Free project |
 | Idempotency | Global `internal.operation_ledger` |
@@ -295,7 +295,13 @@ Menggunakan satu Supabase Free project untuk:
 
 Satu static HTTPS frontend terpisah hanya menangani login, OAuth consent/deny, logout, dan safe error state. Frontend bukan dashboard produk dan hanya memakai publishable key.
 
-Tidak ada hosted staging pada baseline MVP. Local environment menjadi staging teknis. Hosted staging dapat memakai project Free kedua hanya jika dibutuhkan dan kuota organisasi masih memungkinkan.
+Baseline MVP semula memakai local environment sebagai staging teknis. CR-018
+memilih staging terisolasi untuk evaluasi ChatGPT Phase 8 karena tool choice dan
+skill behavior tidak dapat dibuktikan oleh GitHub Actions/Inspector saja.
+Runner GitHub tetap menjalankan Supabase lokal sementara untuk tes
+deterministik. Staging uji terpisah dari production dan hanya memakai fixture;
+resource serta secret-nya tidak dibuat pada tahap perencanaan. Ketersediaan
+project, kuota, OAuth, dan kemampuan host dibuktikan pada preflight Phase 8.
 
 ### 8.3 Free Plan constraints
 
@@ -916,7 +922,11 @@ Membuat workflow skill dan package source yang siap difinalkan setelah remote MC
 
 ## Tujuan
 
-Membuktikan seluruh acceptance criteria sebelum production disentuh.
+Membuktikan seluruh acceptance pre-production sebelum production disentuh,
+menurut CR-018. Matriks tetap memuat seluruh 14 acceptance criteria PRD:
+komponen yang memerlukan endpoint/OAuth production atau paket/pilot final
+ditandai `DEFERRED-to-Phase-9/10`, bukan diklaim lulus dari staging. Final
+MVP acceptance tetap menunggu bukti Phases 9–10.
 
 ## Pekerjaan AI
 
@@ -993,6 +1003,10 @@ Membuktikan seluruh acceptance criteria sebelum production disentuh.
 - Direct pass 100%, indirect minimal 90%, overall minimal 95%, dan hard fail 0.
 - Buktikan 33/33 positive paths dan 33/33 boundary/recovery paths.
 - Jalankan generated paraphrases sebagai robustness supplement tanpa mengganti frozen cases.
+- Gunakan custom MCP pada staging terisolasi untuk E3, kemudian private test
+  plugin yang memuat skill dan terhubung hanya ke staging untuk E4. Ikuti
+  repetition, scoring, fresh-conversation, dan fixture-reset policy frozen.
+  Koneksi/paket uji bukan koneksi/paket final production Phase 10.
 
 ### Content evaluation
 
@@ -1033,16 +1047,22 @@ Membuktikan seluruh acceptance criteria sebelum production disentuh.
 
 ## Verification gate
 
-- Seluruh acceptance criteria PRD lulus.
+- Seluruh porsi pre-production acceptance criteria PRD lulus; porsi
+  deployment-dependent `AC-001`/`AC-012` dan E5 dicatat secara eksplisit
+  sebagai deferred ke Phase 9–10 menurut CR-018. Status Phase 8 `Complete`
+  bukan status final acceptance MVP.
 - Seluruh requirement trace mempunyai evidence dan threshold prompt suite tercapai.
 - Tidak ada security issue kritis/high yang belum diterima.
 - Tidak ada data-integrity failure.
-- Output editorial pilot disetujui.
+- Output editorial sampel staging disetujui pengguna; pilot production
+  memerlukan penilaian tersendiri pada Phase 10.
 - Seluruh command dapat diulang dari fresh checkout.
 
 ## Rollback
 
-- Tetap di local environment.
+- Tes deterministik tetap memakai local environment sementara di runner.
+  Reset/dispose fixture dan koneksi staging uji bila E3/E4 gagal; production
+  tidak disentuh oleh rollback Phase 8.
 - Perbaiki fase pemilik defect; jangan patch test agar menutupi defect.
 
 ---
@@ -1055,7 +1075,8 @@ Men-deploy database dan MCP ke satu Supabase Free project secara aman dan dapat 
 
 ## Prasyarat
 
-- Phase 8 lulus.
+- Gate pre-production Phase 8 lulus menurut CR-018; final MVP acceptance
+  masih menunggu bukti production Phase 9 dan plugin/pilot Phase 10.
 - Supabase production project tersedia.
 - Owner menyelesaikan login.
 - Backup/export strategy disetujui.
@@ -1123,6 +1144,10 @@ Men-deploy database dan MCP ke satu Supabase Free project secara aman dan dapat 
 ## Tujuan
 
 Membuktikan remote MCP sebagai custom server terlebih dahulu, lalu memfinalkan plugin private dan menyelesaikan satu siklus produksi nyata.
+
+Koneksi MCP dan private test plugin Phase 8 memakai staging saja. Bukti E3/E4
+staging itu tidak menggantikan koneksi, paket final, dan pilot production di
+fase ini; hasil frozen prompt yang relevan diregresikan pada host production.
 
 ## Pekerjaan AI
 
@@ -1403,7 +1428,7 @@ ditulis, bukan status terkini.
 | 5 — RPC dan security | Complete | Security/concurrency lulus | `04f6373`; [final local verification](../docs/phase-5-batch-b-remediation-p2-03-report.md) |
 | 6 — MCP Edge Function | Complete | Gate akhir dan audit independen Batch B lulus | 33/33 MCP tools pada PR #2 (`codex/phase-6-mcp`). [Gate akhir pada `88738a84` sukses](https://github.com/milyarderpro/content-producer/actions/runs/38679123776): 58/58 tes MCP, 172/172 tes database, audit katalog/keamanan, dan Inspector 33 panggilan valid + 33 invalid. Audit ulang independen pada SHA yang sama menutup ketiga temuan Batch B; lihat Issue #1. Bukti hosted OAuth dan koneksi ChatGPT tetap pada Phase 9–10. |
 | 7 — Plugin skill/package source | Complete | Source/package candidate validation dan audit independen lulus | Checkpoint 7.0–7.4 lulus pada `codex/phase-7-plugin`. [Gate akhir pada `b2766bfd` sukses](https://github.com/milyarderpro/content-producer/actions/runs/38707892003): 27/27 unit tests, 58/58 MCP tests, 172/172 database tests, clean reset 67 migration, dan validasi kandidat 12 file. [Audit independen pada SHA yang sama lulus](https://github.com/milyarderpro/content-producer/pull/4#issuecomment-6188726374). Koneksi hosted dan paket final tetap pada Phase 9–10; lihat [Issue #3](https://github.com/milyarderpro/content-producer/issues/3). |
-| 8 — Full verification | Not started | Acceptance criteria lulus | — |
+| 8 — Full verification | Not started | Gate pre-production CR-018 dan audit independen lulus; bukti production tetap deferred | — |
 | 9 — Production deployment | Not started | Production smoke lulus | — |
 | 10 — MCP connection/package/pilot | Not started | Remote MCP, final plugin, dan end-to-end pilot lulus | — |
 | 11 — Stabilization | Not started | Production readiness disetujui | — |

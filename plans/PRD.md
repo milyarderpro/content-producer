@@ -1366,6 +1366,10 @@ OAuth client menerima seluruh respons sukses token `2xx`; implementasi tidak men
 ### 29.3 Staging
 
 Hosted staging project tidak wajib pada MVP. Staging dapat ditambahkan ketika perubahan menjadi lebih sering, pengguna bertambah, atau risiko deployment meningkat.
+Untuk proyek ini, CR-018 memilih staging terisolasi pada Phase 8 agar koneksi
+ChatGPT, OAuth, tool selection, dan skill dapat diuji dengan fixture sebelum
+production disentuh. Pilihan verifikasi ini tidak menjadikan staging sebagai
+komponen produk yang wajib dipertahankan setelah pengujian.
 
 ### 29.4 Hosting frontend autentikasi
 
@@ -1415,6 +1419,12 @@ Views, reach, dan engagement tidak menjadi acceptance metric karena dipengaruhi 
 ---
 
 ## 31. Syarat penerimaan MVP
+
+Kriteria `AC-001..014` di bawah adalah penerimaan **MVP final**, bukan klaim
+bahwa semua resource production sudah tersedia pada Phase 8. Sesuai CR-018,
+Phase 8 membuktikan porsi pre-production pada staging dan mencatat porsi
+`AC-001`/`AC-012` yang memerlukan deployment serta plugin/pilot final sebagai
+deferred ke Phases 9–10. Tidak ada kriteria akhir yang dihapus atau dilonggarkan.
 
 ### AC-001 — Koneksi plugin
 
@@ -1636,6 +1646,12 @@ Evaluation set harus mencakup:
 - 33/33 tools memiliki positive path dan boundary/recovery path.
 
 Generated paraphrases boleh ditambahkan untuk robustness, tetapi tidak mengganti frozen prompts atau expected behavior.
+Phase 8 menjalankan kasus ChatGPT dengan custom MCP staging, lalu private test
+plugin yang memuat skill dan memakai koneksi staging, sesuai CR-018 dan
+`plans/use-case-inventory.md`. Hasil staging tidak membuktikan koneksi atau
+paket final production; Phase 10 menjalankan regresi representatif pada host
+production. Seluruh 101 kasus, threshold, dan hard-fail rule tetap wajib pada
+gate pre-production Phase 8.
 
 ---
 
@@ -1680,6 +1696,11 @@ Perubahan fitur atau limit pada ChatGPT Plus dan Supabase berada di luar kendali
 ## 35. Pengembangan setelah MVP
 
 Urutan ekspansi yang disarankan setelah MVP stabil:
+
+Butir hosted staging di bawah berarti lingkungan staging produk yang
+dipertahankan untuk pengembangan rutin. Staging uji sementara Phase 8 yang
+dipilih CR-018 hanya untuk verifikasi pre-production dan tidak mengubah
+urutan ekspansi produk ini.
 
 1. Hosted staging environment.
 2. Analytics dan rekomendasi performa yang lebih matang.

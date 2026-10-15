@@ -399,6 +399,17 @@ Catatan `AC-012`: “tidak ada dashboard produk” tetap berlaku, sedangkan kepu
 
 Coverage: **14/14 acceptance criteria** mempunyai implementation owner, phase, automated evidence, dan content/prompt/manual evidence. Tidak ada row `sync_pending` setelah sinkronisasi 0.11.
 
+CR-018 mengatur **waktu pembuktian**, bukan mengubah requirement pada tabel.
+Pada laporan Phase 8, setiap row `AC-001..014` diberi evidence dan status
+terpisah: `PASS-pre-production`, `DEFERRED-to-Phase-9/10`, atau
+`PASS-final-MVP`. `AC-001` dapat membuktikan discovery/OAuth/owner dan tool
+selection pada staging, tetapi URL/koneksi production dan plugin final tetap
+tertunda. `AC-012` dapat membuktikan arsitektur serta Edge Function/frontend
+uji, tetapi deployment production baru dibuktikan pada Phase 9. Paket private
+test E4 dan persetujuan editorial staging tidak dihitung sebagai final plugin
+atau E5 pilot Phase 10. Tidak ada `PASS-final-MVP` tanpa bukti production yang
+diwajibkan oleh PRD.
+
 ---
 
 ## 11. Keputusan Phase 0 ke bukti implementasi
@@ -449,6 +460,11 @@ Phase 8 wajib menghasilkan tiga laporan terpisah:
 3. **Content evaluation report** — five formats, two profiles, all allowlisted topic groups, language, sources, safety, budgets, readability, dedup/anti-dedup, copying, dan owner pilot review.
 
 Satu jenis laporan tidak dapat menggantikan yang lain. Tool-selection pass tidak membuktikan database integrity atau kualitas editorial; content rubric pass tidak membuktikan authorization atau atomicity.
+Ketiga laporan Phase 8 harus memakai klasifikasi CR-018 untuk membedakan
+bukti CI lokal, E3/E4 staging, dan bukti production yang belum tersedia.
+Jumlah 42/42 functional requirements, 14/14 acceptance criteria, 33/33
+positive/boundary tool paths, dan 101/101 frozen prompts tetap utuh;
+`DEFERRED-to-Phase-9/10` tidak boleh dihitung sebagai final pass.
 
 ---
 
