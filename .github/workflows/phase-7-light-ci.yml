@@ -46,6 +46,9 @@ jobs:
       - name: Install frozen project dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Run focused Phase 7.1 manifest and generator tests
+        run: pnpm exec vitest run tests/plugin-config.test.ts
+
       - name: Run project check (format, lint, types, unit tests)
         run: pnpm run check
 
