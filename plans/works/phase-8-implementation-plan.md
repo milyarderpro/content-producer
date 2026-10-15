@@ -1,7 +1,16 @@
 # Phase 8 — Full verification suite: rencana implementasi
 
-Status: rencana eksekusi; Phase 8 belum dimulai. CR-018 sudah Accepted dan
-menetapkan lingkungan serta gate pre-production. Baseline yang telah di-merge
+> **Status terkini: DEFERRED BY CR-019.** Checkpoint 8.0–8.13 di bawah adalah
+> rencana historis yang tidak lagi menjadi gate MVP. 8.0 berhenti `BLOCKED`;
+> coverage map dan laporan preflight tetap bukti persiapan, bukan acceptance.
+> Jangan memulai 8.1 atau mengklaim E3/E4/101 prompt lulus. Gate teknis sebelum
+> deployment pindah ke Phase 9, dan uji manual skenario inti dijalankan setelah
+> plugin final terpasang pada Phase 10. Lihat CR-019 dan tracker §16 untuk
+> aturan aktif; CR-020 memperjelas satu gate teknis pada SHA rilis, 11 kartu
+> manual, dan status `Pilot-ready` versus `MVP Complete`.
+
+Status saat ditulis (historis): CR-018 sudah Accepted dan semula menetapkan
+lingkungan serta gate pre-production. Baseline yang telah di-merge
 adalah `main` `69b3ad06346e084cd2242dd0e9ccfdf6192953f5` (Phase 7). Catat
 ulang SHA `main` saat 8.0 dimulai. Pembagian checkpoint di sini mengatur cara
 kerja, bukan mengurangi acceptance criteria frozen.

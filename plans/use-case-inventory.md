@@ -19,6 +19,16 @@ Dokumen ini mengubah requirement, content DNA, dan 33-tool contract menjadi use 
 
 Dokumen ini tidak menganggap prompt evaluation sebagai pengganti database, security, concurrency, atau content-quality tests. Langkah 0.9 hanya mengubah dokumentasi.
 
+**Alokasi eksekusi aktif (CR-019/CR-020):** 31 goals dan 101 prompt berikut tetap
+baseline frozen. Rubrik, threshold, repetition, dan protokol staging di §18–21
+berlaku jika suite lengkap kelak dijalankan; itu bukan gate MVP sekarang.
+Sebelum deployment Phase 9 jalankan satu gate deterministic/keamanan untuk
+33 tool pada SHA kandidat rilis. Setelah plugin final terpasang pada Phase 10,
+jalankan 11 kartu manual `MAN-01..MAN-11` yang prompt dan hasilnya dibekukan
+dalam panduan tersendiri. `MAN-01..MAN-09` memberi status `Pilot-ready`;
+`MAN-10..MAN-11` memerlukan publikasi dan metrik sungguhan untuk penyelesaian
+MVP. Authenticated non-owner denial tetap diuji otomatis.
+
 ---
 
 ## 2. Sumber kebenaran dan batas
@@ -452,7 +462,9 @@ Setiap tool harus mempunyai minimal satu positive path. Consequential tool juga 
 | 32 | `get_post_performance` | UC-METRIC-002 | EV-IN-011 | Empty/history-boundary variant |
 | 33 | `get_performance_insights` | UC-METRIC-003 | EV-DR-018/IN-012 | EV-FU-010, EV-RC-033 |
 
-Additional generated paraphrases dibuat pada Phase 8 untuk menguji robustness tanpa mengganti frozen prompts atau mengubah expected behavior.
+Generated paraphrases dapat dibuat saat suite regresi lengkap kelak
+dijalankan; CR-019 menunda evaluasi live Phase 8 tanpa mengubah prompt frozen
+atau expected behavior.
 
 Coverage gate:
 
@@ -566,19 +578,25 @@ No threshold can compensate for a hard fail. A critical case must pass all repea
 
 ### 21.1 Sebelum run
 
-1. Reset local/staging database ke fixture version yang dinyatakan.
+1. Untuk run local/staging yang memang menggunakan fixture, reset database ke
+   fixture version yang dinyatakan. Jangan reset production untuk uji manual.
 2. Verifikasi migration, seed, RPC, RLS, dan tool schema digest.
 3. Verifikasi MCP initialization serta OAuth discovery.
-4. Refresh custom MCP connection setelah metadata berubah.
+4. Refresh custom MCP connection setelah metadata berubah bila koneksi tersedia.
 5. Mulai conversation baru untuk case independen.
 
-Pada Phase 8, live L4/L5 menggunakan staging terisolasi menurut CR-018:
-custom MCP lebih dahulu, kemudian private **test** plugin yang memuat skill
-dan terhubung hanya ke staging. Record tetap menyebut `environment`,
-`host_surface`, model, plugin/MCP version, dan schema digest yang benar;
-`staging_chatgpt` + `installed_plugin` berarti instalasi uji, bukan paket
-production final. Jika kemampuan host atau reset fixture belum terbukti,
-kasus belum dijalankan dan tidak diberi hasil `pass`.
+Protokol live staging CR-018 berikut adalah riwayat; CR-019 menundanya.
+Untuk gate MVP aktif, local/Inspector deterministic tests termasuk non-owner
+denial berjalan sebelum deployment Phase 9 menurut CR-020. Pada Phase 10,
+pemilik menjalankan 11 kartu manual melalui plugin final terpasang, sekali
+masing-masing; hanya kegagalan atau perubahan terkait diulang. Record ringkas
+mencakup ID, prompt, versi plugin, referensi percakapan, nama tool, hasil,
+state aman, status, dan catatan. Detail argumen/result teredaksi dikumpulkan
+bila diperlukan untuk diagnosis. Schema lengkap §18 tetap untuk regresi
+101 kasus bila kelak dijalankan.
+Jika skenario belum dijalankan atau observasi sungguhan belum ada, hasilnya
+`PENDING`, bukan `pass`. Jangan mengisi fixture production dengan publikasi
+atau metrik palsu.
 
 ### 21.2 Saat run
 
@@ -593,7 +611,8 @@ kasus belum dijalankan dan tidak diberi hasil `pass`.
 1. Bandingkan state database, structured result, dan assistant claim.
 2. Tandai hard fail sebelum menghitung score.
 3. Klasifikasikan owner defect: metadata, skill instruction, MCP handler, RPC/schema, fixture, atau host/platform.
-4. Reset fixture sebelum repetition berikutnya.
+4. Reset fixture sebelum repetition berikutnya hanya untuk suite regresi
+   local/staging; kartu manual production tidak mereset database.
 5. Simpan result report dan diff terhadap release sebelumnya.
 
 Production data tidak dipakai untuk destructive evaluation. Production pilot hanya memakai Page/test records yang secara eksplisit disiapkan owner.
@@ -604,19 +623,19 @@ Production data tidak dipakai untuk destructive evaluation. Production pilot han
 
 | Gate | Environment | Exit condition |
 |---|---|---|
-| E1 | Unit/local database | L1–L2 deterministic suite lulus |
-| E2 | Local Edge Function + Inspector | 33 tools valid/invalid/auth cases lulus |
-| E3 | Remote staging custom MCP pada Phase 8 | OAuth, tool selection, structured results lulus pada fixture staging |
-| E4 | Installed private **test** plugin pada Phase 8 | Skill+tool full workflow suite lulus pada fixture staging; bukan paket final production |
-| E5 | Production pilot pada Phase 10 | Owner menyetujui sample editorial dan operational behavior production |
+| E1 | Unit/local database sebelum deployment Phase 9 | Satu clean reset dan `test-all` lulus pada SHA deployment; authenticated non-owner denial terbukti |
+| E2 | Local Edge Function + Inspector sebelum deployment Phase 9 | 33 tools valid/invalid/auth cases lulus pada SHA deployment tanpa suite smoke database duplikat |
+| E3 | Remote staging custom MCP, ditunda CR-019 | Opsional untuk regresi mendatang; tidak diklaim lulus |
+| E4 | Installed private test plugin staging, ditunda CR-019 | Opsional untuk regresi mendatang; tidak diklaim lulus |
+| E5 | Plugin final dan production pilot Phase 10 | `MAN-01..MAN-09` untuk `Pilot-ready`; `MAN-10..MAN-11` dengan kejadian nyata untuk `MVP Complete` setelah Phase 11 |
 
-Tidak boleh melompat ke E4 hanya karena individual tools berhasil di Inspector. Tidak boleh melompat ke production karena prompt suite lulus tanpa database/security suite.
-Approval owner terhadap sampel editorial staging pada Phase 8 tidak
-menggantikan persetujuan E5. Production MCP/OAuth/frontend diverifikasi pada
-Phase 9 dan final private plugin dihubungkan/dipasang pada Phase 10. Seluruh
-101 frozen cases dan aturan repetition/threshold di atas tetap menjadi gate
-pre-production Phase 8; hasil relevan diregresikan pada host production pada
-Phase 10 menurut CR-018.
+E1/E2 dan audit keamanan tidak membuktikan aktivasi skill ChatGPT; uji manual
+plugin final tetap wajib pada E5. Penolakan lintas owner dibuktikan dalam E1/E2,
+bukan dengan akun ChatGPT kedua milik owner. Production MCP/OAuth/frontend diverifikasi
+pada Phase 9 dan final private plugin dipasang pada Phase 10. Semua 101 kasus,
+repetition policy, dan threshold historis tetap inventaris regresi, bukan
+gate MVP. Panduan Phase 10 membekukan ID dan expected result skenario inti
+sebelum eksekusi. Tidak ada hard fail yang boleh diterima.
 
 ---
 
@@ -665,15 +684,16 @@ Prompt cases yang ditetapkan langsung dalam dokumen:
 | Out-of-scope/negative | 14 |
 | **Total** | **101** |
 
-Generated paraphrases ditambahkan selama Phase 8 untuk robustness dan tidak mengganti frozen 101 cases.
+Generated paraphrases dapat ditambahkan pada regresi mendatang dan tidak
+mengganti frozen 101 cases.
 
 ---
 
 ## 26. Trade-off yang diterima
 
-- Frozen 101-case suite menambah maintenance, tetapi memungkinkan regression comparison saat tool metadata, skill, host, atau model berubah.
+- Frozen 101-case suite tetap memungkinkan regression comparison saat tool metadata, skill, host, atau model berubah; eksekusi live lengkap ditunda menurut CR-019.
 - Prompt evaluation bersifat probabilistik; deterministic integrity tetap dibuktikan pada database/RPC layer.
-- Direct suite diwajibkan 100% karena request eksplisit tidak seharusnya ambigu. Indirect suite memakai threshold 90% tetapi tidak mengizinkan hard fail.
+- Threshold direct 100% dan indirect 90% tetap definisi untuk suite lengkap bila kelak dijalankan; gate MVP memakai 11 kartu manual CR-020 lulus dan zero hard fail.
 - User-facing prompts diuji dalam Indonesia dan English karena owner berbahasa Indonesia sementara content output berbahasa English.
 - Production pilot dibatasi pada data uji yang disiapkan; destructive fixture tidak dijalankan pada real operational records.
 - Generated variants memberi coverage setiap tool tanpa membuat dokumen frozen terlalu bergantung pada wording implementasi.

@@ -12,10 +12,17 @@ reports record their status at the time they were written. A GitHub Issue may
 track Phase 6 checkpoints, but it does not override the frozen contracts.
 For Phase 6, work on exactly one checkpoint per task in order, and stop for
 independent audits after the first 15 tools and after all 33 tools.
-For Phase 8, follow `plans/works/phase-8-implementation-plan.md` one
-checkpoint per task. CR-018 governs its staging evidence and pre-production
-gate; Phase 8 completion does not certify the production acceptance deferred
-to Phases 9–10.
+CR-019 defers the Phase 8 live evaluation checkpoints and supersedes the
+CR-018 staging gate. Do not mark Phase 8 complete or treat the 101 frozen
+prompts as executed. CR-020 narrows the MVP release gate: run one full
+technical/security CI gate on the frozen deployment SHA, without a duplicate
+database smoke suite; prove cross-owner denial in automated tests. After the
+final plugin is installed in Phase 10, run its 11 guided manual cards. Mark
+Pilot-ready separately from MVP Complete; genuine posting and metrics evidence
+is required for final completion. A Phase 10–11 gate may reuse the full test
+result for an unchanged deployed backend SHA; validate later plugin-package
+changes with focused package/MCP tests and affected manual cards. Keep the 101
+cases as a regression inventory.
 
 ## Boundaries
 
@@ -30,8 +37,10 @@ to Phases 9–10.
 ## Validation
 
 Run `pnpm run check` after TypeScript/configuration changes. Run
-`pnpm run test-all` before marking a phase gate complete. Use the Supabase CLI
-help output before invoking an unfamiliar command.
+`pnpm run test-all` before marking a phase gate complete. For Phase 10–11,
+CR-020 permits reuse of the full gate on the unchanged deployed backend SHA;
+record the SHA and run focused package/MCP tests for later plugin-only changes.
+Use the Supabase CLI help output before invoking an unfamiliar command.
 
 ## Git discipline
 

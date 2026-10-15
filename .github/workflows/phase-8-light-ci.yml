@@ -1,0 +1,42 @@
+name: Phase 8 - focused preflight and coverage
+
+on:
+  push:
+    branches: [codex/phase-8-verification]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase-8-light-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coverage:
+    name: Locked install, coverage tests, project check, diff
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Frozen install
+        run: pnpm install --frozen-lockfile
+      - name: Focused Phase 8.0 coverage
+        run: pnpm exec vitest run tests/phase-8-coverage.test.ts
+      - name: Project check
+        run: pnpm run check
+      - name: Commit whitespace check
+        run: git diff --check "$(git merge-base HEAD origin/main)" HEAD
+      - name: Boundary
+        run: echo "E3/E4 hosted preflight BLOCKED; no staging, production, or frozen prompts tested."
