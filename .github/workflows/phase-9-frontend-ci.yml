@@ -27,6 +27,10 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Produce reviewable formatter output for runbook (temporary)
+        run: |
+          pnpm exec prettier docs/phase-9/deployment-9.2.md | base64 -w0 | sed 's/^/PHASE9_FORMATTED_BASE64=/'
+          echo
       - name: Project check (includes frontend typecheck, build, focused tests)
         run: pnpm run check
       - name: Confirm pinned Supabase CLI commands without using a project

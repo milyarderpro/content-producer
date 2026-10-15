@@ -29,14 +29,14 @@ jobs:
       - name: Checkout dispatched main SHA
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }
+          ref: ${{ github.sha }}
           fetch-depth: 2
           persist-credentials: false
 
       - name: Refuse wrong branch or candidate SHA
         shell: bash
         env:
-          CANDIDATE_SHA: ${{ inputs.candidate_sha }
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
         run: |
           set -euo pipefail
           [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
@@ -163,16 +163,16 @@ jobs:
         if: always()
         shell: bash
         env:
-          INSTALL_RESULT: ${{ steps.install.outcome }
-          START_RESULT: ${{ steps.start.outcome }
-          RESET_RESULT: ${{ steps.reset.outcome }
-          FULL_RESULT: ${{ steps.full.outcome }
-          HISTORY_RESULT: ${{ steps.history.outcome }
-          LINT_RESULT: ${{ steps.lint.outcome }
-          AUDIT_RESULT: ${{ steps.audit.outcome }
-          INSPECTOR_RESULT: ${{ steps.inspector.outcome }
-          AUDIT_AFTER_RESULT: ${{ steps.audit_after.outcome }
-          DIFF_RESULT: ${{ steps.diff.outcome }
+          INSTALL_RESULT: ${{ steps.install.outcome }}
+          START_RESULT: ${{ steps.start.outcome }}
+          RESET_RESULT: ${{ steps.reset.outcome }}
+          FULL_RESULT: ${{ steps.full.outcome }}
+          HISTORY_RESULT: ${{ steps.history.outcome }}
+          LINT_RESULT: ${{ steps.lint.outcome }}
+          AUDIT_RESULT: ${{ steps.audit.outcome }}
+          INSPECTOR_RESULT: ${{ steps.inspector.outcome }}
+          AUDIT_AFTER_RESULT: ${{ steps.audit_after.outcome }}
+          DIFF_RESULT: ${{ steps.diff.outcome }}
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/phase-9-evidence"
@@ -209,6 +209,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: phase-9-technical-gate
-          path: ${{ runner.temp }/phase-9-evidence/
+          path: ${{ runner.temp }}/phase-9-evidence/
           if-no-files-found: error
           retention-days: 30
