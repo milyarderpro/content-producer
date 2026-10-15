@@ -1,6 +1,6 @@
 # Trivia content DNA — editorial decisions
 
-This policy applies only when the selected, enabled niche is `trivia`. Read [formats](formats.md), [fact checking](fact-checking.md), [dedup ontology](dedup-ontology.md), and [quality rubric](quality-rubric.md) as needed. The generic [core workflow](../../core/workflow.md) owns Page selection, authorization boundaries, reservations and post lifecycle. Frozen authority: `plans/trivia-content-dna.md` ``3–7, 10–14, 22–24; `plans/module-contract.md`.
+This policy applies only when the selected, enabled niche is `trivia`. Read [formats](formats.md), [fact checking](fact-checking.md), [dedup ontology](dedup-ontology.md), and [quality rubric](quality-rubric.md) as needed. The generic [core workflow](../../core/workflow.md) owns Page selection, authorization boundaries, reservations and post lifecycle. Frozen authority: `plans/trivia-content-dna.md` sections 3–7, 10–14, 22–24; `plans/module-contract.md`.
 
 ## Editorial purpose
 
@@ -29,4 +29,4 @@ Default hook: `Did you know?` Alternative hooks must truthfully match the subjec
 
 The 176 Curious Mind, dyk and Daily Facts examples in the frozen reference dataset show rhythm, formats and failure patterns only. They are **not** factual citations, valid copying templates, proof of causal engagement, or a license to closely paraphrase. Research every new claim from independent eligible sources under [fact checking](fact-checking.md). Never paste a dataset/source passage into output. Report uncertain, unverified or duplicative claims as needing review or replacement.
 
-System checks are deterministic server work; ChatGPT supplies semantic editorial judgment and attestation for the exact content hash; only the authenticated owner may expressly approve a draft. No policy paragraph or estimated score replaces these three authorities.
+System checks are deterministic server work; ChatGPT supplies semantic editorial judgment and attestation for the exact content hash; only the authenticated owner may provide explicit approval of a draft. No policy paragraph or estimated score replaces these three authorities.
