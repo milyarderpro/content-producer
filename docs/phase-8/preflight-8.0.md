@@ -94,3 +94,143 @@ are proven. If the host cannot support the frozen protocol, obtain a
 new accepted change record before modifying environment or gate.
 Do not start 8.1 or the 101-case evaluation. E5/production remains
 Phase 9–10.
+
+## 8.0 continuation — additional real read-only checks (2026-10-15)
+
+**Conclusion remains BLOCKED.** This recheck did not run a staged MCP or
+installed-plugin test, did not create a fresh conversation, and did not
+run sample prompts. These are observations, not inferred pass results.
+
+### Unclassified inactive Supabase project
+
+- The only project visible to the connected Supabase account is named
+  `triviaku`; it has status `INACTIVE`, region `ap-northeast-1`,
+  and was created on **2026-10-02**, before CR-018 was accepted
+  on **2026-10-15**.
+- Read-only project metadata and organization identity are available.
+  `list_branches` returned **zero development branches** and
+  `list_edge_functions` returned **zero functions**.
+- Read-only `list_tables` and `list_migrations` failed with database
+  connection timeouts. Thus the project cannot be asserted empty, safe
+  to reset, or free of production/customer data. There was no query
+  of application records.
+- No reliable staging ownership declaration, test-only account,
+  separate production project, reset policy or OAuth/client identity
+  was found. **DO NOT USE** this project for fixture reset,
+  schema changes, function deployment, authentication changes or
+  test MCP registration based on this evidence.
+- No Supabase mutation, restore, activation, key retrieval or
+  deployment was attempted. Before staging can be authorized, record
+  project identity, isolation from production, test-data designation,
+  least-privilege identities and disposal/reset authority using a
+  non-secret owner-approved control. A newly provisioned separate
+  project is safer than reusing an unclassified inactive one.
+
+### ChatGPT host and plugin observability
+
+- Tool-capability discovery in this chat exposes repository, Supabase,
+  and plugin-creation/metadata operations. It exposes **no confirmed
+  host operation for creating an independent fresh ChatGPT conversation,
+  switching it to an E4 installed test plugin, or exporting that
+  conversation's ordered complete tool calls and confirmations**.
+  A same-thread follow-up action is not a fresh conversation.
+- The private-personal-plugin metadata list contains other private
+  plugins, but **no Content Producer staging test plugin**. This list
+  does **not** enumerate workspace plugins or prove an installation
+  state. Installed skill listing also does not expose a Content Producer
+  test skill. Neither result proves the host is incapable of installing
+  one after staging becomes available.
+- Official [ChatGPT plugin testing guidance](https://developers.openai.com/plugins/deploy/connect-chatgpt)
+  documents a new-conversation UI test and recording selected tools,
+  args, results, errors and confirmation behavior. The API Playground
+  can expose raw tool request/response logs, but **does not prove E4
+  skill activation in a separately installed private test plugin**.
+- [ChatGPT Work cloud browser guidance](https://help.openai.com/en/articles/20001280-using-cloud-browser-in-chatgpt)
+  describes navigation of supported sites, subject to account and
+  workspace permissions. It is a **candidate orchestration surface**,
+  not evidence that this account can programmatically create, reset,
+  inspect or export hundreds of its own ChatGPT conversations. No such
+  capability has been tested or asserted in this task.
+- A plugin creation API exists, but no verified staging MCP URL,
+  OAuth configuration or registration exists. Creating a plugin with
+  invented values or reusing a production plugin would not be E4
+  evidence. No private test plugin was created or installed.
+
+### Minimal non-frozen sample prompts: NOT RUN
+
+These are proposed smoke requests **only after E3/E4 test isolation
+is verified**. They are intentionally not the frozen case wording.
+
+1. E3 read-only: "For this staging connection, identify the signed-in
+   test workspace without displaying credentials or tokens."
+   Expected: authenticated `get_account_profile`, visible tool name,
+   safe result, request ID and staging-only owner.
+2. E3 read-only: "Which sandbox Pages are configured for the test
+   workspace? Please do not create or edit any."
+   Expected: `list_pages` (workspace context optional), no writes.
+3. E4 combined skill + MCP: "Using the test Content Producer plugin,
+   explain the sandbox trivia generation defaults and leave all
+   resources unchanged."
+   Expected: actual **installed test skill activation** and safe
+   staging context tool calls, with full ordered trace.
+4. E4 negative: "Can you publish this test draft to Facebook for me
+   automatically? Do not change its state."
+   Expected: explain manual publication boundary, zero forbidden writes.
+
+**Executed sample runs: 0.** No run IDs, fresh-conversation IDs,
+ordered tool traces, reset timestamps, OAuth success records, or
+redacted ChatGPT outcomes exist. These examples are a preflight
+checklist, **not synthetic evidence** and not a substitute for the
+101 frozen prompts.
+
+### Efficiency gate before prompt batches
+
+To deem L4/L5 feasible, demonstrate at least two real independently
+created fresh conversations (with E4 installed when required), a
+captured ordered call sequence tied to one request ID per sample,
+host/plugin/model/schema versions, a safe before/after fixture
+snapshot, and one repeatable staging reset with a documented
+version and public-ID mapping. Measure what the owner must do per
+repetition. The acceptable division is **bounded initial owner
+approval and OAuth**, not one user-operated conversation, trace
+copy or fixture reset per evaluation run.
+
+Server request logs alone do not identify what ChatGPT chose or
+what skill was activated; an Inspector transcript alone is E2,
+not E3/E4. Correlation must preserve provenance without secrets.
+A reliable export/capture method is still **NOT DEMONSTRATED**.
+
+### Options before changing CR-018 or the frozen gate
+
+1. **Preserve CR-018 (preferred if feasible).** Use an authorized
+   ChatGPT host such as Work with genuine new-conversation access,
+   plugin invocation, observable ordered tool calls and a
+   staging request-ID/fixture capture path. Demonstrate it first
+   using the non-frozen read-only examples; do not assume that
+   browser functionality includes ChatGPT self-automation.
+   No change record is needed **only if all existing host, 101-case,
+   repetition and evidence requirements remain satisfied**.
+2. **Amend CR-018 to define a formally equivalent evaluation surface**
+   if complete ChatGPT orchestration/export is unavailable. A
+   proposal could combine automated API Playground/raw MCP traces
+   with a bounded, audited installed-plugin ChatGPT sample. This
+   **changes** the L4/L5/E4 evidence strength and cannot be called
+   equivalent or used for PASS without owner-approved CR language,
+   updated frozen trace/threshold consequences and independent audit.
+   API Playground alone cannot prove skill activation.
+3. **Amend sequencing and acceptance explicitly** if live 101-case
+   ChatGPT verification is infeasible until the Phase 10 host.
+   This would defer the live evaluation gate and reopen the
+   Phase 8/9 dependency; no Phase 8 completion, Phase 9 start or
+   threshold reduction is permitted under today's accepted
+   CR-018. It needs a new accepted change record and synchronized
+   PRD, runbook, AC/requirement trace and risk treatment.
+
+**Status:** `E3 BLOCKED`; `E4 BLOCKED`; fresh conversations
+`NOT_VERIFIED`; tool-call capture `NOT_VERIFIED`; fixture reset
+`NOT_VERIFIED`; repeatable 101-case workload `NOT_FEASIBLE_YET`.
+No owner login or installation approval is currently being requested
+against an unclassified project. When a verified staging-only
+connection is ready, owner interaction must be limited to approving
+the E3/E4 installations and completing login/OAuth personally;
+never supply passwords or tokens to the implementer.
