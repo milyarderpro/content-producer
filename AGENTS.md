@@ -14,10 +14,15 @@ For Phase 6, work on exactly one checkpoint per task in order, and stop for
 independent audits after the first 15 tools and after all 33 tools.
 CR-019 defers the Phase 8 live evaluation checkpoints and supersedes the
 CR-018 staging gate. Do not mark Phase 8 complete or treat the 101 frozen
-prompts as executed. Before Phase 9 production deployment, pass the technical
-and security gate in CR-019; after the final plugin is installed in Phase 10,
-run its guided core manual acceptance. Keep the 101 cases as a regression
-inventory.
+prompts as executed. CR-020 narrows the MVP release gate: run one full
+technical/security CI gate on the frozen deployment SHA, without a duplicate
+database smoke suite; prove cross-owner denial in automated tests. After the
+final plugin is installed in Phase 10, run its 11 guided manual cards. Mark
+Pilot-ready separately from MVP Complete; genuine posting and metrics evidence
+is required for final completion. A Phase 10–11 gate may reuse the full test
+result for an unchanged deployed backend SHA; validate later plugin-package
+changes with focused package/MCP tests and affected manual cards. Keep the 101
+cases as a regression inventory.
 
 ## Boundaries
 
@@ -32,8 +37,10 @@ inventory.
 ## Validation
 
 Run `pnpm run check` after TypeScript/configuration changes. Run
-`pnpm run test-all` before marking a phase gate complete. Use the Supabase CLI
-help output before invoking an unfamiliar command.
+`pnpm run test-all` before marking a phase gate complete. For Phase 10–11,
+CR-020 permits reuse of the full gate on the unchanged deployed backend SHA;
+record the SHA and run focused package/MCP tests for later plugin-only changes.
+Use the Supabase CLI help output before invoking an unfamiliar command.
 
 ## Git discipline
 

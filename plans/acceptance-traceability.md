@@ -402,11 +402,19 @@ Coverage: **14/14 acceptance criteria** mempunyai implementation owner, phase, a
 CR-019 mengganti alokasi waktu pembuktian CR-018 tanpa menghapus requirement
 `AC-001..014`. Phase 8 dan E3/E4 staging ditunda dan tidak mendapat status
 `PASS`. Gate teknis/keamanan pada SHA deployment mendahului write Phase 9;
-OAuth, owner/non-owner, Edge Function/frontend dan smoke dibuktikan pada
-production Phase 9. Koneksi plugin final, skill, workflow natural-language,
+authenticated non-owner denial dibuktikan otomatis pada gate itu. OAuth,
+owner, unauthenticated denial, Edge Function/frontend, dan smoke dibuktikan
+pada production Phase 9. Koneksi plugin final, skill, workflow natural-language,
 dan editorial pilot dibuktikan lewat skenario manual inti Phase 10. Setiap
 row AC diberi bukti aktual atau `PENDING`; tidak ada `PASS-final-MVP` dari
 coverage map, Inspector, atau log server saja.
+
+CR-020 memperjelas bahwa denial lintas owner adalah bukti otomatis pada
+local/server/RPC, bukan kartu manual yang meminta akun kedua dari owner.
+`MAN-01..MAN-09` pada plugin final ditambah gate Phase 9 memberi status
+`Pilot-ready`, bukan final acceptance. `MAN-10..MAN-11` memakai publikasi
+Facebook dan metrik sungguhan; setelah itu Phase 11 menutup operasional,
+backup/rollback, handoff, dan matriks 14 AC sebelum `MVP Complete`.
 
 ---
 
@@ -436,7 +444,7 @@ coverage map, Inspector, atau log server saja.
 | `MODULE-001` | Module interface/conformance | P1/P3/P4/P7/P9 | ST-MODULE suite |
 | `DNA-001` | Trivia editorial behavior | P7/P9/P10 | CE-DNA report, MAN-EDITORIAL suite |
 | `TOOL-001..002` | 33 exact MCP contracts | P6/P9 | MCP-CONTRACT suite, 33/33 discovery/schema coverage |
-| `USECASE-001` | 31 goals, 101 frozen prompts | P7/P9/P10 | 101-case inventory tetap utuh; technical gate 33 tools dan laporan skenario manual inti plugin final, semua terpilih lulus, zero hard fail (CR-019) |
+| `USECASE-001` | 31 goals, 101 frozen prompts | P7/P9/P10 | 101-case inventory tetap utuh; satu technical gate 33 tools dan laporan 11 kartu manual plugin final, semua lulus, zero hard fail (CR-020) |
 | `TRACE-001` | Dokumen ini + laporan acceptance final | P0/P9/P10 | trace coverage audit, technical report, dan final manual/pilot report |
 | `FREEZE-001..005` | Frozen baseline, tenant-scoped audit FK, approval shape, eligible structured dedup, lineage safety | P0/P3/P4/P5 | static freeze audit, DB-SCOPE-LEDGER-001, DB-QUALITY-SHAPE-001, DB-DEDUP-ELIGIBLE-001, RPC-CORRECT-001/005 |
 
@@ -451,13 +459,16 @@ coverage map, Inspector, atau log server saja.
 - 31 supported/clarification use cases tercatat.
 - 101 frozen prompt cases tercatat: 21 direct, 12 indirect, 10 follow-up, 8 clarification, 36 recovery/concurrency, dan 14 negative/out-of-scope.
 
-CR-019 memindahkan laporan gate MVP ke Phase 9–10:
+CR-019/CR-020 memindahkan laporan gate MVP ke Phase 9–11:
 
-1. **Pre-deployment technical report** — static, database, RPC, security,
-   concurrency, MCP contract, Inspector, dan performance pada SHA deployment.
-2. **Installed-plugin manual report** — ID/prompt/expected result yang dibekukan,
-   exact visible tools, confirmation, state, dan keputusan reviewer untuk
-   semua skenario inti; kebutuhan publikasi/metrik asli tetap `PENDING` sampai ada.
+1. **Pre-deployment technical report** — satu clean reset, `test-all`, static,
+   database, RPC, authenticated non-owner security, concurrency, MCP contract,
+   Inspector, dan performance pada SHA deployment; jangan mengulang database
+   suite melalui `smoke-test` dalam gate yang sama.
+2. **Installed-plugin manual report** — 11 kartu `MAN-01..MAN-11` dengan prompt,
+   tool terpilih, hasil, state aman, dan keputusan reviewer ringkas. Sembilan
+   kartu awal diperlukan untuk `Pilot-ready`; publikasi/metrik asli pada dua
+   kartu akhir tetap `PENDING` sampai benar-benar ada.
 3. **Content evaluation report** — five formats, two profiles, allowlisted
    topic groups, language, sources, safety, budgets, readability,
    dedup/anti-dedup, copying, dan owner pilot review.

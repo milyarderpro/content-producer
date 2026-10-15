@@ -1082,13 +1082,21 @@ Men-deploy database dan MCP ke satu Supabase Free project secara aman dan dapat 
 
 ## Prasyarat
 
-- CR-019 dan dokumen sinkron telah di-merge ke `main`. Phase 8 berstatus
+- CR-019/CR-020 dan dokumen sinkron telah di-merge ke `main`. Phase 8 berstatus
   `Deferred`, bukan gate yang telah lulus.
-- Sebelum migration atau deployment pertama ke production, GitHub Actions pada
-  SHA yang persis akan di-deploy harus lulus frozen install, clean Supabase
-  local reset, `pnpm run test-all`, verifikasi migration history, security
-  advisors, audit katalog 33 API RPC dan 33 MCP tools beserta RLS/grants,
-  MCP Inspector valid/invalid/auth, dan `git diff --check`. Defect security
+- Bekukan satu SHA kandidat deployment setelah kode backend, migration,
+  konfigurasi, dan dokumen selesai. Paket plugin final dapat difinalkan
+  sesudah koneksi production terbukti pada Phase 10. Sebelum migration,
+  konfigurasi/secret write, atau
+  deployment pertama ke production, jalankan **satu** GitHub Actions gate
+  pada SHA itu: frozen install, satu clean Supabase local reset,
+  `pnpm run test-all` (termasuk `check`, nama migration, MCP, dan database),
+  verifikasi source/applied migration, security advisors, audit katalog 33
+  API RPC dan 33 MCP tools beserta RLS/grants, MCP Inspector valid/invalid/auth,
+  dan `git diff --check`. Uji authenticated non-owner melalui jalur server/RPC
+  terhadap Supabase lokal sementara. Jangan jalankan `smoke-test` yang
+  menduplikasi suite database pada gate yang sama. Setelah perbaikan, jalankan
+  tes terfokus lalu gate penuh sekali pada SHA final baru. Defect security
   critical/high dan data-integrity diselesaikan sebelum production write.
 - Supabase production project tersedia.
 - Owner menyelesaikan login.
@@ -1137,6 +1145,8 @@ Men-deploy database dan MCP ke satu Supabase Free project secara aman dan dapat 
 - HTTP `/health`, MCP initialize, dan 33-tool discovery production berhasil.
 - Request tanpa auth ditolak.
 - Owner request berhasil.
+- Denial lintas owner terbukti pada tes authenticated non-owner otomatis;
+  uji produksi dengan identitas kedua hanya bila tersedia secara aman.
 - OAuth discovery, PKCE consent/deny, refresh/relink, dan token `2xx` berhasil.
 - RLS production sesuai local.
 - Semua migration tercatat.
@@ -1158,11 +1168,12 @@ Men-deploy database dan MCP ke satu Supabase Free project secara aman dan dapat 
 
 Membuktikan remote MCP sebagai custom server terlebih dahulu, lalu memfinalkan plugin private dan menyelesaikan satu siklus produksi nyata.
 
-CR-019 menunda koneksi staging dan private test plugin Phase 8. Koneksi MCP
-production dan plugin private final dibuktikan di fase ini. Uji ChatGPT
-dilaksanakan pengguna memakai panduan skenario inti dengan prompt dan expected
-behavior yang dibekukan sebelum eksekusi; AI menyiapkan panduan dan menilai
-bukti teredaksi. Inventaris 101 prompt tidak wajib dijalankan live untuk MVP.
+CR-019 menunda koneksi staging dan private test plugin Phase 8. CR-020
+menetapkan 11 kartu manual setelah plugin final terpasang. Koneksi MCP
+production dan plugin private final dibuktikan di fase ini. Pemilik menjalankan
+prompt persis dari panduan; AI menyiapkan panduan dan menilai bukti seperlunya.
+Inventaris 101 prompt tidak wajib dijalankan live untuk MVP. Kartu lintas
+owner tidak dibebankan pada pemilik; denial tersebut dibuktikan otomatis.
 
 ## Pekerjaan AI
 
@@ -1171,27 +1182,19 @@ bukti teredaksi. Inventaris 101 prompt tidak wajib dijalankan live untuk MVP.
 3. Memeriksa custom server dengan prompt koneksi/owner terfokus dan mencatat hasilnya sebelum memfinalkan plugin.
 4. Setelah koneksi terbukti, memfinalkan `plugin/mcp.json`, portable package, dan bila diperlukan registered MCP mapping dengan technical ID yang benar.
 5. Memvalidasi, membuat artifact final, lalu membimbing instalasi private plugin.
-6. Menyiapkan panduan uji manual yang membekukan ID skenario inti, prompt
-   persis, prasyarat, expected tool/behavior, hasil terlarang, bukti aman,
-   dan langkah recovery/reset. Panduan mencakup:
-   - Connection.
-   - Authentication.
-   - List/create Page.
-   - Generate single post.
-   - Revise.
-   - Approve.
-   - Discard.
-   - Generate replacement.
-   - Create plan.
-   - Interrupt/resume.
-   - Mark posted.
-   - Record metrics dan insight, hanya dari observasi sungguhan.
-   - Ambiguitas, penolakan lintas owner, dan permintaan di luar scope atau
-     sumber berbahaya.
-7. Membimbing pengguna menjalankan skenario inti pada plugin terpasang,
-   dengan chat baru bila skenario memerlukan konteks segar. Catat tool call,
-   hasil, state, dan review pengguna secara teredaksi; jangan mengklaim PASS
-   dari log server saja.
+6. Menyiapkan tepat 11 kartu `MAN-01..MAN-11` menurut CR-020. Bekukan prompt
+   atau urutan singkat, prasyarat, expected tool/behavior, hasil terlarang,
+   pemeriksaan state yang sederhana, dan recovery sebelum uji dimulai.
+   `MAN-01..MAN-09` mencakup koneksi/owner, Page, draft dan sumber, revisi/
+   approval, plan dan jadwal, resume chat baru, copy/editorial, ambiguitas,
+   serta permintaan publikasi otomatis atau sumber berbahaya. `MAN-10` hanya
+   setelah publikasi Facebook nyata; `MAN-11` hanya dengan metrik nyata.
+7. Membimbing pemilik menjalankan tiap kartu sekali pada plugin terpasang,
+   dengan chat baru bila skenario memerlukan konteks segar. Ulangi hanya
+   kartu gagal atau terdampak perbaikan. Catat ID, prompt, versi plugin,
+   referensi percakapan, nama tool terpilih, hasil, state aman, status, dan
+   catatan singkat; detail argumen/result teredaksi hanya bila diperlukan.
+   Jangan mengklaim PASS dari log server saja.
 8. Memperbaiki instructions atau descriptions bila model memilih tool salah,
    lalu ulangi skenario yang gagal atau terpengaruh dan tes teknis terkait.
 9. Membuat Page pertama dan config trivia.
@@ -1215,21 +1218,30 @@ bukti teredaksi. Inventaris 101 prompt tidak wajib dijalankan live untuk MVP.
 - Page production pertama.
 - Pilot posts.
 - End-to-end test report.
-- Panduan dan laporan skenario manual inti; kasus yang memerlukan publikasi
-  atau metrik sungguhan tetap `PENDING` sampai ada observasi tersebut.
+- Panduan dan laporan 11 kartu manual. `MAN-10..MAN-11` tetap `PENDING`
+  sampai ada publikasi dan metrik sungguhan.
 
 ## Verification gate
 
 - Owner dapat menggunakan bahasa natural tanpa memilih tool manual.
 - Draft tersimpan sebelum dinyatakan berhasil.
-- Revisi, approval, discard, dan publish state benar.
+- Revisi dan approval benar; discard dan lifecycle lain dibuktikan pada
+  kontrak/RPC otomatis serta pilot bila benar-benar digunakan.
 - Plan dapat dilanjutkan pada chat baru.
 - Canva copy dapat dipakai tanpa pembersihan wajib.
 - Source internal tersedia.
-- Tidak ada data Page lain atau internal secret terekspos.
-- Seluruh skenario manual terpilih lulus tanpa unauthorized write, kebocoran
-  lintas owner/secret, klaim publikasi palsu, atau bypass blocking quality
-  check. Bukti yang belum ada tetap `PENDING`, bukan `PASS`.
+- Tidak ada data Page lain atau internal secret terekspos; cross-owner denial
+  dibuktikan dalam gate otomatis, bukan dengan meminta akun kedua dari owner.
+- `MAN-01..MAN-09` lulus tanpa unauthorized write, secret leak, klaim
+  publikasi palsu, atau bypass blocking quality check. Ini memberi status
+  `Pilot-ready` setelah gate Phase 9 lulus, belum `MVP Complete`.
+- `MAN-10..MAN-11` lulus hanya dengan publikasi/metrik asli. Yang belum ada
+  tetap `PENDING`, bukan `PASS`.
+- Bila backend deployment SHA tetap sama dan hanya paket/instruksi plugin
+  berubah setelah gate Phase 9, gunakan bukti gate backend yang sudah lulus,
+  lalu jalankan validasi paket serta tes MCP/skill dan kartu manual terdampak.
+  Catat SHA backend dan SHA paket final; perubahan backend/security menuntut
+  gate penuh baru.
 
 ## Rollback
 
@@ -1286,6 +1298,9 @@ Menjadikan sistem siap digunakan rutin dan mudah dipelihara oleh AI pada iterasi
 - User workflow terdokumentasi.
 - AI dapat melanjutkan maintenance dari repository tanpa konteks chat lama.
 - Pengguna menyetujui production readiness.
+- `MAN-10..MAN-11` dan seluruh acceptance criteria PRD memiliki bukti nyata
+  atau otomatis yang sesuai sebelum `MVP Complete`; pilot terbatas boleh
+  berjalan lebih dahulu dengan status `Pilot-ready`.
 
 ## Rollback
 
@@ -1436,8 +1451,9 @@ Implementasi MVP selesai hanya jika:
 16. Backup/export dan restore procedure tersedia.
 17. Tidak ada defect security/data-integrity kritis.
 18. Dokumentasi sesuai source code dan acceptance trace report lengkap.
-19. Skenario manual inti pada plugin final lulus sesuai CR-019 dengan zero
-    hard fail; 101 frozen prompts tetap inventaris regresi.
+19. Sebelas kartu manual plugin final lulus sesuai CR-020 dengan zero hard
+    fail; `MAN-10..MAN-11` memakai publikasi/metrik nyata. Seratus satu
+    frozen prompts tetap inventaris regresi.
 20. Tidak ada OpenAI API, embeddings, product dashboard, atau auto-posting dalam runtime MVP; frontend auth minimal diperbolehkan.
 
 ---
@@ -1445,8 +1461,8 @@ Implementasi MVP selesai hanya jika:
 ## 16. Phase tracker
 
 Status terkini per 15 Oktober 2026. Bagian ini adalah tracker yang diperbarui
-seiring kemajuan proyek; CR-019 mengesampingkan gate Phase 8 historis di atas
-dan memindahkan bukti teknis/manual ke Phase 9–10. Runbook checkpoint dan
+seiring kemajuan proyek; CR-019 mengesampingkan gate Phase 8 historis di atas,
+sedangkan CR-020 memperjelas gate Phase 9–11 dan status pilot. Runbook dan
 laporan lama mencatat keadaan pada saat ditulis, bukan status terkini.
 
 | Phase | Status terkini | Gate | Bukti status |
@@ -1460,9 +1476,9 @@ laporan lama mencatat keadaan pada saat ditulis, bukan status terkini.
 | 6 — MCP Edge Function | Complete | Gate akhir dan audit independen Batch B lulus | 33/33 MCP tools pada PR #2 (`codex/phase-6-mcp`). [Gate akhir pada `88738a84` sukses](https://github.com/milyarderpro/content-producer/actions/runs/38679123776): 58/58 tes MCP, 172/172 tes database, audit katalog/keamanan, dan Inspector 33 panggilan valid + 33 invalid. Audit ulang independen pada SHA yang sama menutup ketiga temuan Batch B; lihat Issue #1. Bukti hosted OAuth dan koneksi ChatGPT tetap pada Phase 9–10. |
 | 7 — Plugin skill/package source | Complete | Source/package candidate validation dan audit independen lulus | Checkpoint 7.0–7.4 lulus pada `codex/phase-7-plugin`. [Gate akhir pada `b2766bfd` sukses](https://github.com/milyarderpro/content-producer/actions/runs/38707892003): 27/27 unit tests, 58/58 MCP tests, 172/172 database tests, clean reset 67 migration, dan validasi kandidat 12 file. [Audit independen pada SHA yang sama lulus](https://github.com/milyarderpro/content-producer/pull/4#issuecomment-6188726374). Koneksi hosted dan paket final tetap pada Phase 9–10; lihat [Issue #3](https://github.com/milyarderpro/content-producer/issues/3). |
 | 8 — Full verification | Deferred by CR-019 | Gate CR-018 tidak lagi menjadi syarat MVP; 8.0 tetap BLOCKED, bukan PASS | [CR-019](../docs/decisions/2026-10-15-phase-8-manual-acceptance-resequencing.md); [8.0 preflight](../docs/phase-8/preflight-8.0.md) dan coverage map dipertahankan sebagai bukti persiapan; live E3/E4/101 belum dijalankan (Issue #5). |
-| 9 — Production deployment | Not started | Gate teknis CI pada SHA deployment sebelum write; hosted OAuth, security, dan smoke production setelahnya | CR-019; belum ada deployment. |
-| 10 — MCP connection/package/pilot | Not started | Plugin final terpasang; skenario manual inti dan pilot sungguhan lulus | CR-019; panduan dan bukti belum dibuat. |
-| 11 — Stabilization | Not started | Production readiness disetujui | — |
+| 9 — Production deployment | Not started | Satu gate teknis CI pada SHA deployment sebelum write; hosted OAuth, security, dan smoke production setelahnya | [CR-020](../docs/decisions/2026-10-15-phase-9-10-risk-based-mvp-acceptance.md); belum ada deployment. |
+| 10 — MCP connection/package/pilot | Not started | Plugin final terpasang; `MAN-01..MAN-09` untuk `Pilot-ready`, `MAN-10..MAN-11` setelah kejadian nyata | CR-020; panduan dan bukti belum dibuat. |
+| 11 — Stabilization | Not started | Operasional, backup/rollback, handoff, seluruh AC dan `MVP Complete` disetujui | CR-020; belum dimulai. |
 
 Phase 5 ditutup atas keputusan pengguna setelah gate lokal terakhir lulus dan
 perubahan di-commit sebagai `04f6373`. Laporan remediasi yang lebih awal masih

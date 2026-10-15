@@ -1426,6 +1426,15 @@ deployment dan OAuth pada Phase 9, lalu uji manual skenario inti setelah
 plugin final terpasang pada Phase 10. Bukti yang belum tersedia tetap `PENDING`;
 Phase 8 tidak diklaim lulus. Tidak ada kriteria akhir yang dihapus.
 
+CR-020 membedakan `Pilot-ready` dari `MVP Complete`. Gate teknis penuh
+dijalankan satu kali pada kandidat rilis yang dibekukan, tanpa suite smoke
+database duplikat. Sebelas kartu uji manual plugin final menggantikan
+keharusan menjalankan 101 prompt live; penolakan lintas owner tetap wajib
+dibuktikan lewat tes autentikasi otomatis. `Pilot-ready` membolehkan pilot
+terkendali setelah gate hosted dan sembilan kartu awal lulus. `MVP Complete`
+memerlukan publikasi manual dan metrik sungguhan, seluruh AC yang berlaku,
+serta penutupan operasional Phase 11.
+
 ### AC-001 — Koneksi plugin
 
 - ChatGPT dapat terhubung ke URL MCP Supabase.
@@ -1650,12 +1659,16 @@ tidak menjadi gate MVP:
 
 Generated paraphrases boleh ditambahkan untuk robustness jika suite lengkap
 kelak dijalankan; prompt frozen dan expected behavior tidak diubah. Gate MVP
-aktif mewajibkan cakupan deterministic positive/boundary/auth untuk 33 tools,
-serta skenario manual inti pada plugin final. ID, prompt, expected behavior,
-larangan hard fail, dan hasil skenario inti dibekukan pada panduan Phase 10
-sebelum dieksekusi. Semua skenario terpilih harus lulus tanpa unauthorized
-write, kebocoran lintas owner/secret, klaim publikasi palsu, atau bypass quality
-gate. Kasus publikasi dan metrik hanya lulus dengan observasi sungguhan.
+aktif mewajibkan cakupan deterministic positive/boundary/auth untuk 33 tools
+serta 11 kartu manual `MAN-01..MAN-11` pada plugin final sesuai CR-020.
+Prompt persis, expected behavior, dan hasil terlarang dibekukan pada panduan
+Phase 10 sebelum dieksekusi. Setiap kartu dijalankan sekali; hanya yang gagal
+atau terdampak perbaikan diulang. `MAN-01..MAN-09` harus lulus untuk
+`Pilot-ready`; `MAN-10..MAN-11` memerlukan kejadian publikasi dan metrik
+sungguhan untuk `MVP Complete`. Penolakan lintas owner dibuktikan secara
+otomatis, bukan oleh owner melalui akun ChatGPT kedua. Tidak ada unauthorized
+write, kebocoran lintas owner/secret, klaim publikasi palsu, atau bypass
+blocking quality gate yang boleh diterima.
 
 ---
 
@@ -1735,6 +1748,11 @@ Niche baru tidak boleh dipaksakan menggunakan `trivia_facts` jika model datanya 
 
 MVP dinyatakan selesai apabila:
 
+`Pilot-ready` adalah status antara: gate teknis dan hosted Phase 9 lulus,
+plugin final terpasang, `MAN-01..MAN-09` lulus, dan tidak ada defect
+security/data-integrity kritis atau high. Status ini membolehkan pilot owner
+terkendali, tetapi belum memenuhi Definition of Done di bawah.
+
 1. Semua acceptance criteria lulus.
 2. Database dapat dibuat dari migration pada environment kosong.
 3. MCP dapat dideploy ke Supabase Edge Functions.
@@ -1748,8 +1766,11 @@ MVP dinyatakan selesai apabila:
 11. OAuth, ownership check, RLS, dan Data API exposure telah diverifikasi.
 12. Pengguna dapat mencatat performa dan mengambil insight dasar melalui chat.
 13. Dokumentasi database, workflow, module contract, trivia DNA, tool inventory, use-case inventory, traceability, dan implementation plan sudah selaras dengan PRD ini.
-14. Seluruh 33 MCP tools lulus contract tests dan skenario manual inti pada
-    plugin final lulus sesuai CR-019; 101 frozen prompts tetap inventaris regresi.
+14. Seluruh 33 MCP tools lulus contract tests; 11 kartu manual plugin final
+    lulus sesuai CR-020, termasuk `MAN-10..MAN-11` dengan bukti nyata. Seratus
+    satu frozen prompts tetap inventaris regresi.
+15. Phase 11 menutup pemeriksaan backup/rollback, operasional, dan handoff;
+    owner menyetujui hasil pilot editorial.
 
 ---
 

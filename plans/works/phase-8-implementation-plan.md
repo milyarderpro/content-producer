@@ -6,7 +6,8 @@
 > Jangan memulai 8.1 atau mengklaim E3/E4/101 prompt lulus. Gate teknis sebelum
 > deployment pindah ke Phase 9, dan uji manual skenario inti dijalankan setelah
 > plugin final terpasang pada Phase 10. Lihat CR-019 dan tracker §16 untuk
-> aturan aktif.
+> aturan aktif; CR-020 memperjelas satu gate teknis pada SHA rilis, 11 kartu
+> manual, dan status `Pilot-ready` versus `MVP Complete`.
 
 Status saat ditulis (historis): CR-018 sudah Accepted dan semula menetapkan
 lingkungan serta gate pre-production. Baseline yang telah di-merge
