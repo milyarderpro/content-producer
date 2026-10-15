@@ -307,7 +307,9 @@ Deno.test('6.9: offset ranges compare instants through MCP', async () => {
   const calls: Record<string, unknown>[] = [];
   globalThis.fetch = ((_input: Request | URL | string, init?: RequestInit) => {
     calls.push(JSON.parse(String(init?.body)));
-    return Promise.resolve(Response.json({ response_schema_version: 1, data: response.list_posts }));
+    return Promise.resolve(
+      Response.json({ response_schema_version: 1, data: response.list_posts }),
+    );
   }) as typeof fetch;
   try {
     const earlyWithOffset = '2026-10-15T12:00:00+12:00'; // 00:00 UTC
