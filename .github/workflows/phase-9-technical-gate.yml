@@ -1,0 +1,214 @@
+name: Phase 9.3 - frozen main technical gate
+
+# Deliberately manual-only. This workflow must exist on main before dispatch.
+# It must never run on Phase 9.2 pushes, PRs, or unreviewed branches.
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: Exact 40-character main SHA approved for deployment
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase-9-technical-gate
+  cancel-in-progress: false
+
+jobs:
+  technical-gate:
+    name: One local reset, full suites, security, 33-tool Inspector, non-owner
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      SUPABASE_TELEMETRY_DISABLED: '1'
+    steps:
+      - name: Checkout dispatched main SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Refuse wrong branch or candidate SHA
+        shell: bash
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }
+        run: |
+          set -euo pipefail
+          [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$GITHUB_REF" = refs/heads/main
+          test "$GITHUB_SHA" = "$CANDIDATE_SHA"
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          echo "Frozen main SHA: $CANDIDATE_SHA"
+          echo "GATE_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+
+      - name: Set up pinned pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+
+      - name: Set up pinned Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Set up pinned Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version-file: .deno-version
+
+      - name: Verify local runtime and Docker
+        run: |
+          set -euo pipefail
+          test "$(pnpm --version)" = 10.33.2
+          docker info --format '{{.ServerVersion}}'
+          node --version
+          deno --version | head -1
+
+      - name: Locked dependency install and CLI preflight
+        id: install
+        run: |
+          set -euo pipefail
+          start=$SECONDS
+          pnpm install --frozen-lockfile
+          test "$(pnpm exec supabase --version)" = 2.120.0
+          pnpm exec supabase db reset --help > /dev/null
+          pnpm exec supabase migration list --help > /dev/null
+          pnpm exec supabase db lint --help > /dev/null
+          echo "install/help exit=0 elapsed=$((SECONDS-start))s"
+
+      - name: Start ephemeral local Supabase only
+        id: start
+        shell: bash
+        run: |
+          set -euo pipefail
+          start=$SECONDS
+          pnpm run supabase:start > "$RUNNER_TEMP/phase-9-local-start.log" 2>&1
+          echo "local start exit=0 elapsed=$((SECONDS-start))s (credentials redacted)"
+
+      - name: One explicit clean local migration reset
+        id: reset
+        shell: bash
+        run: |
+          set -euo pipefail
+          start=$SECONDS
+          pnpm run supabase:reset > "$RUNNER_TEMP/phase-9-local-reset.log" 2>&1
+          echo "one local reset exit=0 elapsed=$((SECONDS-start))s"
+          echo "source migration count=$(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
+
+      - name: Full project suite (includes check, migration validation, MCP, DB, frontend)
+        id: full
+        run: |
+          set -euo pipefail
+          start=$SECONDS
+          pnpm run test-all
+          echo "test-all exit=0 elapsed=$((SECONDS-start))s"
+
+      - name: Applied/source migration history
+        id: history
+        run: |
+          set -euo pipefail
+          start=$SECONDS
+          pnpm run supabase:verify
+          echo "migration list exit=0 elapsed=$((SECONDS-start))s"
+
+      - name: Local DB lint (not hosted Security Advisor)
+        id: lint
+        run: |
+          set -euo pipefail
+          start=$SECONDS
+          pnpm exec supabase db lint --local --fail-on error
+          echo "local db lint exit=0 elapsed=$((SECONDS-start))s"
+
+      - name: Catalog, grants, RLS, privilege and fixture audit
+        id: audit
+        run: |
+          set -euo pipefail
+          start=$SECONDS
+          pnpm exec tsx scripts/phase-6-catalog-audit.ts
+          echo "local security/catalog audit exit=0 elapsed=$((SECONDS-start))s"
+
+      - name: Authenticated MCP HTTP, 33 Inspector valid/invalid, non-owner denial
+        id: inspector
+        run: |
+          set -euo pipefail
+          start=$SECONDS
+          # Existing Phase 6.13 harness exercises original owner/non-owner JWTs
+          # over local HTTP to PostgREST/RPC; does not call a hosted project.
+          pnpm exec tsx scripts/phase-6-13.ts
+          echo "local 33-tool Inspector and authenticated non-owner denial exit=0 elapsed=$((SECONDS-start))s"
+
+      - name: Post-Inspector catalog and clean fixture check
+        id: audit_after
+        run: |
+          set -euo pipefail
+          pnpm exec tsx scripts/phase-6-catalog-audit.ts
+          echo "post-Inspector catalog exit=0"
+
+      - name: Whitespace check on frozen commit
+        id: diff
+        run: |
+          set -euo pipefail
+          git diff --check HEAD^ HEAD
+          git diff --check
+          echo "git diff --check exit=0"
+
+      - name: Write non-sensitive evidence even on failure
+        if: always()
+        shell: bash
+        env:
+          INSTALL_RESULT: ${{ steps.install.outcome }
+          START_RESULT: ${{ steps.start.outcome }
+          RESET_RESULT: ${{ steps.reset.outcome }
+          FULL_RESULT: ${{ steps.full.outcome }
+          HISTORY_RESULT: ${{ steps.history.outcome }
+          LINT_RESULT: ${{ steps.lint.outcome }
+          AUDIT_RESULT: ${{ steps.audit.outcome }
+          INSPECTOR_RESULT: ${{ steps.inspector.outcome }
+          AUDIT_AFTER_RESULT: ${{ steps.audit_after.outcome }
+          DIFF_RESULT: ${{ steps.diff.outcome }
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/phase-9-evidence"
+          {
+            echo "# Phase 9.3 — local technical gate (not hosted acceptance)"
+            echo
+            echo "SHA: $(git rev-parse HEAD)"
+            echo "GitHub run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "Started UTC: ${GATE_STARTED_UTC:-not recorded}"
+            echo "Finished UTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "Ephemeral local Supabase only; no production project or hosted secrets."
+            echo
+            echo "| Stage | GitHub outcome |"
+            echo "| --- | --- |"
+            echo "| Pinned install / CLI help | $INSTALL_RESULT |"
+            echo "| Local start | $START_RESULT |"
+            echo "| One clean reset | $RESET_RESULT |"
+            echo "| test-all | $FULL_RESULT |"
+            echo "| Migration history | $HISTORY_RESULT |"
+            echo "| Local db lint | $LINT_RESULT |"
+            echo "| Catalog/RLS/grants | $AUDIT_RESULT |"
+            echo "| Inspector 33 valid/invalid + non-owner | $INSPECTOR_RESULT |"
+            echo "| Post-Inspector catalog | $AUDIT_AFTER_RESULT |"
+            echo "| git diff --check | $DIFF_RESULT |"
+            echo
+            echo "Hosted Security Advisor, OAuth/PKCE and production verification: N/A until 9.4/9.5; not PASS."
+          } > "$RUNNER_TEMP/phase-9-evidence/technical-gate.md"
+          if [ -f artifacts/phase-6-batch-a-catalog.json ]; then
+            cp artifacts/phase-6-batch-a-catalog.json "$RUNNER_TEMP/phase-9-evidence/local-catalog.json"
+          fi
+
+      - name: Upload redacted gate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-9-technical-gate
+          path: ${{ runner.temp }/phase-9-evidence/
+          if-no-files-found: error
+          retention-days: 30

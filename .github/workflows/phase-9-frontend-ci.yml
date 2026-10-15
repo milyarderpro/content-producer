@@ -1,4 +1,4 @@
-name: Phase 9.1 - auth frontend source checks
+name: Phase 9 - source and deployment preflight (light only)
 
 on:
   push:
@@ -9,8 +9,8 @@ permissions:
   contents: read
 
 jobs:
-  frontend:
-    name: Pinned install, project check, commit diff
+  source-checks:
+    name: Locked install, project check, CLI help, commit diff (no local DB)
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -27,7 +27,18 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Frontend typecheck, build, focused tests and project check
+      - name: Project check (includes frontend typecheck, build, focused tests)
         run: pnpm run check
+      - name: Confirm pinned Supabase CLI commands without using a project
+        run: |
+          set -euo pipefail
+          test "$(pnpm exec supabase --version)" = 2.120.0
+          pnpm exec supabase db reset --help > /dev/null
+          pnpm exec supabase db push --help > /dev/null
+          pnpm exec supabase migration list --help > /dev/null
+          pnpm exec supabase db lint --help > /dev/null
+          pnpm exec supabase db dump --help > /dev/null
+          pnpm exec supabase functions deploy --help > /dev/null
+          echo "Pinned CLI 2.120.0 and help checks: exit 0"
       - name: Diff whitespace
         run: git diff --check "$(git merge-base HEAD origin/main)" HEAD
