@@ -40,7 +40,13 @@ Setelah konfigurasi OAuth Server di checkpoint **9.4**, Supabase mengirim
 mempertahankan ID tersebut saat menuju `/login`, lalu kembali ke consent
 setelah login. Identitas client dan scope didapat dari Supabase Auth.
 Persetujuan eksplisit `Izinkan` dan penolakan eksplisit `Tolak` memanggil
-endpoint resmi Auth; callback hanya dari respons Auth, dibatasi HTTPS
+endpoint resmi Auth: `GET /auth/v1/oauth/authorizations/{id}` untuk detail dan
+`POST /auth/v1/oauth/authorizations/{id}/consent` dengan JSON
+`{"action":"approve"}` atau `{"action":"deny"}` untuk keputusan.
+Rute `/oauth/authorize/{id}/approve|deny` **bukan** kontrak consent Supabase.
+Referensi: [source resmi Supabase Auth](https://github.com/supabase/auth/blob/master/internal/api/oauthserver/authorize.go)
+dan [panduan resmi](https://supabase.com/docs/guides/auth/oauth-server/oauth-flows);
+callback hanya dari respons Auth; callback hanya dari respons Auth, dibatasi HTTPS
 (atau HTTP loopback untuk tes lokal) dan disamakan dengan callback terdaftar
 bila detail redirect tersedia. Query `redirect` arbitrary tidak digunakan.
 Pesan error tidak meneruskan rincian server atau token.

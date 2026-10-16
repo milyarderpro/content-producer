@@ -115,13 +115,13 @@ export function createAuth(config, storage = sessionStorage, request = fetch) {
     async authorizationDetails(id) {
       const bearer = await token();
       if (!bearer) throw new Error('Sesi habis.');
-      return api('oauth/authorize/' + encodeURIComponent(id), 'GET', undefined, bearer);
+      return api('oauth/authorizations/' + encodeURIComponent(id), 'GET', undefined, bearer);
     },
     async decide(id, decision) {
       if (!['approve', 'deny'].includes(decision)) throw new Error('Keputusan tidak valid.');
       const bearer = await token();
       if (!bearer) throw new Error('Sesi habis.');
-      return api('oauth/authorize/' + encodeURIComponent(id) + '/' + decision, 'POST', {}, bearer);
+      return api('oauth/authorizations/' + encodeURIComponent(id) + '/consent', 'POST', { action: decision }, bearer);
     },
     async signOut() {
       const bearer = await token();

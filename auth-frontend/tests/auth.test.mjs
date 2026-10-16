@@ -23,24 +23,37 @@ function mockAuth() {
   const request = async (url, options) => {
     const relative = url.pathname + url.search;
     calls.push({ relative, options });
-    const data =
-      relative.endsWith('grant_type=password') || relative.endsWith('grant_type=refresh_token')
-        ? { access_token: 'access-test', refresh_token: 'refresh-test', expires_in: 3600 }
-        : relative.endsWith('/user')
-          ? { id: 'user-id' }
-          : relative.endsWith('/approve')
-            ? { redirect_url: 'https://client.example/callback?code=approved' }
-            : relative.endsWith('/deny')
-              ? { redirect_url: 'https://client.example/callback?error=access_denied' }
-              : relative.endsWith('/oauth/authorize/example_1')
-                ? {
-                    authorization_id: 'example_1',
-                    client: { id: 'client-id', name: 'Test Client' },
-                    scope: 'email profile',
-                    redirect_uri: 'https://client.example/callback',
-                  }
-                : {};
-    return { ok: true, json: async () => data };
+    let data;
+    if (relative === '/auth/v1/token?grant_type=password' || relative === '/auth/v1/token?grant_type=refresh_token') {
+      data = { access_token: 'access-test', refresh_token: 'refresh-test', expires_in: 3600 };
+    } else if (relative === '/auth/v1/user' && options.method === 'GET') {
+      data = { id: 'user-id' };
+    } else if (relative === '/auth/v1/oauth/authorizations/example_1' && options.method === 'GET') {
+      data = {
+        authorization_id: 'example_1',
+        client: { id: 'client-id', name: 'Test Client' },
+        scope: 'email profile',
+        redirect_uri: 'https://client.example/callback',
+      };
+    } else if (
+      relative === '/auth/v1/oauth/authorizations/example_1/consent' &&
+      options.method === 'POST'
+    ) {
+      const payload = JSON.parse(options.body);
+      assert.deepEqual(Object.keys(payload), ['action']);
+      if (payload.action === 'approve') {
+        data = { redirect_url: 'https://client.example/callback?code=approved' };
+      } else if (payload.action === 'deny') {
+        data = { redirect_url: 'https://client.example/callback?error=access_denied' };
+      } else {
+        throw new Error('Unexpected consent action');
+      }
+    } else if (relative === '/auth/v1/logout' && options.method === 'POST') {
+      data = {};
+    } else {
+      throw new Error('Unexpected mock Auth endpoint or HTTP method: ' + relative);
+    }
+    return { ok: true, status: 200, json: async () => data };
   };
   return { client: createAuth(config, storage, request), calls, values };
 }
@@ -100,8 +113,49 @@ test('login, authorization details, explicit approve/deny and logout', async () 
   assert.match((await client.decide('example_1', 'approve')).redirect_url, /code=approved/);
   assert.match((await client.decide('example_1', 'deny')).redirect_url, /error=access_denied/);
   await assert.rejects(() => client.decide('example_1', 'auto'), /Keputusan/);
-  assert.equal(calls.filter((call) => call.relative.endsWith('/approve')).length, 1);
-  assert.equal(calls.filter((call) => call.relative.endsWith('/deny')).length, 1);
+  // Pin the exact Supabase Auth REST contract, not path suffixes.
+  const oauthCalls = calls.filter((call) => call.relative.includes('/oauth/'));
+  assert.deepEqual(
+    oauthCalls.map(({ relative, options }) => ({
+      relative,
+      method: options.method,
+      body: options.body,
+    })),
+    [
+      {
+        relative: '/auth/v1/oauth/authorizations/example_1',
+        method: 'GET',
+        body: undefined,
+      },
+      {
+        relative: '/auth/v1/oauth/authorizations/example_1/consent',
+        method: 'POST',
+        body: '{"action":"approve"}',
+      },
+      {
+        relative: '/auth/v1/oauth/authorizations/example_1/consent',
+        method: 'POST',
+        body: '{"action":"deny"}',
+      },
+    ],
+  );
+  assert.deepEqual(
+    oauthCalls.map((call) => call.relative.replace('/auth/v1', config.url + '/auth/v1')),
+    [
+      'https://test.supabase.co/auth/v1/oauth/authorizations/example_1',
+      'https://test.supabase.co/auth/v1/oauth/authorizations/example_1/consent',
+      'https://test.supabase.co/auth/v1/oauth/authorizations/example_1/consent',
+    ],
+  );
+  for (const [index, call] of oauthCalls.entries()) {
+    assert.equal(call.options.headers.Authorization, 'Bearer access-test');
+    if (index === 0) {
+      assert.equal(call.options.headers['Content-Type'], undefined);
+    } else {
+      assert.equal(call.options.headers['Content-Type'], 'application/json');
+      assert.deepEqual(JSON.parse(call.options.body), { action: index === 1 ? 'approve' : 'deny' });
+    }
+  }
   assert.ok(calls.every((call) => call.options.headers.apikey === config.publishableKey));
   assert.ok(calls.every((call) => call.options.redirect === 'error'));
   await client.signOut();
