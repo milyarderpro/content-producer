@@ -4,8 +4,8 @@ import { deepStrictEqual, strict as assert } from 'node:assert';
 import { format, resolveConfig } from 'prettier';
 import { row, sql } from '../supabase/tests/database/helpers/plan-lifecycle.js';
 
-// SELECT-only Phase 6 audit against the accepted 67-migration CR-016 catalog.
-// Historical Phase 5 evidence remains immutable.
+// SELECT-only audit: retain the accepted 67-migration CR-016 baseline while
+// checking the additive CR-021 hook and 68th migration independently.
 const expected = JSON.parse(
   readFileSync('docs/phase-5-batch-b-remediation-final-catalog.json', 'utf8'),
 );
@@ -21,6 +21,8 @@ const manifest = readdirSync('supabase/migrations')
       .update(readFileSync(`supabase/migrations/${file}`))
       .digest('hex'),
   }));
+assert.equal(manifest.length, 68);
+deepStrictEqual(manifest.slice(0, 67), expected.manifest);
 const applied = row<{ versions: string[] }>(
   'select array_agg(version order by version) versions from supabase_migrations.schema_migrations',
 ).versions;
@@ -105,6 +107,35 @@ const extra = row(`select
   (select jsonb_build_object('owner',pg_get_userbyid(proowner),'definer',prosecdef,'settings',proconfig,'api_owner_execute',has_function_privilege('content_producer_api_owner',oid,'EXECUTE'))
     from pg_proc where oid='internal.normalize_unapproved_drafts_v1()'::regprocedure) normalization_helper,
   current_setting('enable_seqscan') enable_seqscan,version() postgres`);
+const hook = row<{
+  owner: string;
+  definer: boolean;
+  settings: string[];
+  auth_admin_execute: boolean;
+  caller_execute: boolean;
+  auth_admin_schema_usage: boolean;
+}>(`select pg_get_userbyid(proowner) owner, prosecdef definer, proconfig settings,
+  has_function_privilege('supabase_auth_admin',oid,'execute') auth_admin_execute,
+  (has_function_privilege('anon',oid,'execute')
+    or has_function_privilege('authenticated',oid,'execute')
+    or has_function_privilege('service_role',oid,'execute')) caller_execute,
+  has_schema_privilege('supabase_auth_admin','internal','usage') auth_admin_schema_usage
+  from pg_proc where oid='internal.mcp_oauth_resource_audience_v1(jsonb)'::regprocedure`);
+deepStrictEqual(hook, {
+  owner: 'postgres',
+  definer: false,
+  settings: ['search_path=""'],
+  auth_admin_execute: true,
+  caller_execute: false,
+  auth_admin_schema_usage: true,
+});
+const hookFunction = (extra.functions as { signature: string }[]).find(
+  (x) => x.signature === 'internal.mcp_oauth_resource_audience_v1(jsonb)',
+);
+assert.ok(hookFunction, 'CR-021 hook is missing from catalog');
+extra.functions = (extra.functions as { signature: string }[]).filter(
+  (x) => x.signature !== 'internal.mcp_oauth_resource_audience_v1(jsonb)',
+);
 for (const key of [
   'auth_users',
   'storage_objects',
@@ -140,9 +171,9 @@ deepStrictEqual(legacy.history_app_privileges, old.legacy.history_privileges);
 const evidence = {
   baseline,
   original_migration_count: 63,
-  migration_count: manifest.length,
-  manifest,
-  applied,
+  migration_count: 67,
+  manifest: manifest.slice(0, 67),
+  applied: applied.slice(0, 67),
   audit,
   legacy: {
     post_update_columns: legacy.post_update_columns,
@@ -157,11 +188,20 @@ deepStrictEqual(
   expected,
   'Accepted 67-migration source, catalog, function definitions/ACL and cleanup must reproduce exactly.',
 );
-const file = 'artifacts/phase-6-batch-a-catalog.json';
+const file = 'artifacts/phase-9-5-catalog.json';
 writeFileSync(
   file,
-  await format(JSON.stringify(evidence), { ...(await resolveConfig(file)), parser: 'json' }),
+  await format(
+    JSON.stringify({
+      ...evidence,
+      migration_count: manifest.length,
+      manifest,
+      applied,
+      oauth_hook: { ...hook, function: hookFunction },
+    }),
+    { ...(await resolveConfig(file)), parser: 'json' },
+  ),
 );
 console.info(
-  'Phase 6 catalog: 67 source/applied migrations, 33 RPCs, 15/15 RLS, unchanged definitions/ACL, owner/bridge/admin boundary, metrics immutability and zero fixtures/faults: PASS.',
+  'Phase 9.5 catalog: 68 source/applied migrations, 33 RPCs, 15/15 RLS, unchanged 67-migration baseline, private Auth hook, owner/bridge/admin boundary and zero fixtures/faults: PASS.',
 );
