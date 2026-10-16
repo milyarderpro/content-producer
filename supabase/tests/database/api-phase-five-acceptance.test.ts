@@ -84,7 +84,8 @@ describe('5.9 phase-wide public surface and scope acceptance', () => {
     expect(existsSync('supabase/functions/mcp/registry.ts')).toBe(true);
     expect(existsSync('supabase/functions/mcp/transport_test.ts')).toBe(true);
     const frontendFiles = existsSync('auth-frontend/src') ? readdirSync('auth-frontend/src') : [];
-    expect(frontendFiles.filter((x) => x !== '.gitkeep')).toEqual([]);
+    // Phase 9.1 populated the auth frontend; its behavior has dedicated tests.
+    expect(frontendFiles).toContain('auth.js');
     expect(readdirSync('plugin/.codex-plugin').filter((x) => x !== '.gitkeep')).toEqual([]);
     expect(readFileSync('supabase/seed.sql', 'utf8')).not.toMatch(/\b(insert|update|delete)\b/i);
     const allowed = new Set(phaseFiveOperationMap.map((x) => x.name));
