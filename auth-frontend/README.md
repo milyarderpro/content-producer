@@ -45,8 +45,8 @@ endpoint resmi Auth: `GET /auth/v1/oauth/authorizations/{id}` untuk detail dan
 `{"action":"approve"}` atau `{"action":"deny"}` untuk keputusan.
 Rute `/oauth/authorize/{id}/approve|deny` **bukan** kontrak consent Supabase.
 Referensi: [source resmi Supabase Auth](https://github.com/supabase/auth/blob/master/internal/api/oauthserver/authorize.go)
-dan [panduan resmi](https://supabase.com/docs/guides/auth/oauth-server/oauth-flows);
-callback hanya dari respons Auth; callback hanya dari respons Auth, dibatasi HTTPS
+dan [panduan resmi](https://supabase.com/docs/guides/auth/oauth-server/oauth-flows).
+Callback hanya dari respons Auth, dibatasi HTTPS
 (atau HTTP loopback untuk tes lokal) dan disamakan dengan callback terdaftar
 bila detail redirect tersedia. Query `redirect` arbitrary tidak digunakan.
 Pesan error tidak meneruskan rincian server atau token.

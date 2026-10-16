@@ -22,9 +22,12 @@ function mockAuth() {
   const calls = [];
   const request = async (url, options) => {
     const relative = url.pathname + url.search;
-    calls.push({ relative, options });
+    calls.push({ relative, url: url.href, options });
     let data;
-    if (relative === '/auth/v1/token?grant_type=password' || relative === '/auth/v1/token?grant_type=refresh_token') {
+    if (
+      relative === '/auth/v1/token?grant_type=password' ||
+      relative === '/auth/v1/token?grant_type=refresh_token'
+    ) {
       data = { access_token: 'access-test', refresh_token: 'refresh-test', expires_in: 3600 };
     } else if (relative === '/auth/v1/user' && options.method === 'GET') {
       data = { id: 'user-id' };
@@ -116,35 +119,27 @@ test('login, authorization details, explicit approve/deny and logout', async () 
   // Pin the exact Supabase Auth REST contract, not path suffixes.
   const oauthCalls = calls.filter((call) => call.relative.includes('/oauth/'));
   assert.deepEqual(
-    oauthCalls.map(({ relative, options }) => ({
-      relative,
+    oauthCalls.map(({ url, options }) => ({
+      url,
       method: options.method,
       body: options.body,
     })),
     [
       {
-        relative: '/auth/v1/oauth/authorizations/example_1',
+        url: 'https://test.supabase.co/auth/v1/oauth/authorizations/example_1',
         method: 'GET',
         body: undefined,
       },
       {
-        relative: '/auth/v1/oauth/authorizations/example_1/consent',
+        url: 'https://test.supabase.co/auth/v1/oauth/authorizations/example_1/consent',
         method: 'POST',
         body: '{"action":"approve"}',
       },
       {
-        relative: '/auth/v1/oauth/authorizations/example_1/consent',
+        url: 'https://test.supabase.co/auth/v1/oauth/authorizations/example_1/consent',
         method: 'POST',
         body: '{"action":"deny"}',
       },
-    ],
-  );
-  assert.deepEqual(
-    oauthCalls.map((call) => call.relative.replace('/auth/v1', config.url + '/auth/v1')),
-    [
-      'https://test.supabase.co/auth/v1/oauth/authorizations/example_1',
-      'https://test.supabase.co/auth/v1/oauth/authorizations/example_1/consent',
-      'https://test.supabase.co/auth/v1/oauth/authorizations/example_1/consent',
     ],
   );
   for (const [index, call] of oauthCalls.entries()) {
@@ -153,7 +148,9 @@ test('login, authorization details, explicit approve/deny and logout', async () 
       assert.equal(call.options.headers['Content-Type'], undefined);
     } else {
       assert.equal(call.options.headers['Content-Type'], 'application/json');
-      assert.deepEqual(JSON.parse(call.options.body), { action: index === 1 ? 'approve' : 'deny' });
+      assert.deepEqual(JSON.parse(call.options.body), {
+        action: index === 1 ? 'approve' : 'deny',
+      });
     }
   }
   assert.ok(calls.every((call) => call.options.headers.apikey === config.publishableKey));
