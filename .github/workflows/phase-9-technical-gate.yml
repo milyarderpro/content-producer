@@ -200,8 +200,8 @@ jobs:
             echo
             echo "Hosted Security Advisor, OAuth/PKCE and production verification: N/A until 9.4/9.5; not PASS."
           } > "$RUNNER_TEMP/phase-9-evidence/technical-gate.md"
-          if [ -f artifacts/phase-6-batch-a-catalog.json ]; then
-            cp artifacts/phase-6-batch-a-catalog.json "$RUNNER_TEMP/phase-9-evidence/local-catalog.json"
+          if [ -f artifacts/phase-9-5-catalog.json ]; then
+            cp artifacts/phase-9-5-catalog.json "$RUNNER_TEMP/phase-9-evidence/local-catalog.json"
           fi
 
       - name: Upload redacted gate evidence
