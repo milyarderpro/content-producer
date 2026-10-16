@@ -1,5 +1,6 @@
 import {
   authenticateRequest,
+  authenticateVerifiedRequest,
   AuthRejection,
   type AuthDependencies,
   type OAuthConfig,
@@ -264,6 +265,50 @@ Deno.test(
   },
 );
 
+Deno.test('9.5 upstream-verified claims retain exact MCP and owner checks', async () => {
+  const { claims, dependencies, sign } = await fixture();
+  const token = await sign(claims);
+  const context = await authenticateVerifiedRequest(withToken(token), config, claims, dependencies);
+  assert(
+    context.actorUserId === owner && context.workspacePublicId === workspace,
+    'verified owner context missing',
+  );
+  for (const invalid of [
+    { ...claims, aud: 'authenticated' },
+    { ...claims, iss: 'https://wrong.example/auth/v1' },
+    { ...claims, scope: 'openid' },
+    { ...claims, client_id: undefined },
+    { ...claims, sub: other },
+  ]) {
+    let denied = false;
+    try {
+      await authenticateVerifiedRequest(withToken(token), config, invalid, dependencies);
+    } catch (error) {
+      denied = error instanceof AuthRejection;
+    }
+    assert(denied, 'invalid verified claims accepted');
+  }
+  let missingDenied = false;
+  try {
+    await authenticateVerifiedRequest(new Request(config.resource), config, claims, dependencies);
+  } catch (error) {
+    missingDenied = error instanceof AuthRejection && error.status === 401;
+  }
+  assert(missingDenied, 'verified claims must still require a Bearer header');
+  let oversizedDenied = false;
+  try {
+    await authenticateVerifiedRequest(
+      new Request(config.resource, { headers: { Authorization: 'Bearer ' + 'a'.repeat(16385) } }),
+      config,
+      claims,
+      dependencies,
+    );
+  } catch (error) {
+    oversizedDenied = error instanceof AuthRejection && error.status === 401;
+  }
+  assert(oversizedDenied, 'verified claims must still reject oversized Bearer tokens');
+});
+
 Deno.test(
   '6.2 public Supabase middleware pipeline gates MCP and serves protected-resource metadata',
   async () => {
@@ -330,6 +375,23 @@ Deno.test(
       noToken.status === 401 && noToken.headers.has('WWW-Authenticate'),
       'missing token must receive protected-resource challenge',
     );
+
+    for (const invalidToken of [
+      await sign(claims, true),
+      await sign({ ...claims, aud: 'authenticated' }),
+    ]) {
+      const invalidResponse = await handle(
+        new Request(config.resource, {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer ' + invalidToken,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ jsonrpc: '2.0', id: 4, method: 'tools/list' }),
+        }),
+      );
+      assert(invalidResponse.status === 401, 'upstream signature/audience gate bypassed');
+    }
 
     const outsider = await sign({ ...claims, sub: other });
     const denied = await handle(

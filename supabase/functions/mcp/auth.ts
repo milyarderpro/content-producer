@@ -107,8 +107,34 @@ async function remoteKeys(url: string): Promise<JwkSet> {
     throw Error('Bad JWKS');
   return result as JwkSet;
 }
+function validateClaims(
+  claims: Record<string, unknown>,
+  config: OAuthConfig,
+  now: number,
+): { actor: string; client: string } {
+  const scopes = typeof claims.scope === 'string' ? claims.scope.split(/\s+/) : [];
+  if (
+    claims.iss !== config.issuer ||
+    claims.aud !== config.resource || // disallow default "authenticated" audience
+    typeof claims.exp !== 'number' ||
+    !Number.isFinite(claims.exp) ||
+    claims.exp <= now ||
+    typeof claims.iat !== 'number' ||
+    claims.iat > now + 60 ||
+    (claims.nbf !== undefined && (typeof claims.nbf !== 'number' || claims.nbf > now)) ||
+    claims.role !== 'authenticated' ||
+    !scopes.includes('openid') ||
+    !scopes.includes('email') ||
+    typeof claims.sub !== 'string' ||
+    !uuid.test(claims.sub) ||
+    typeof claims.client_id !== 'string' ||
+    !uuid.test(claims.client_id)
+  )
+    throw new AuthRejection(401);
+  return { actor: claims.sub, client: claims.client_id };
+}
+
 async function verifyJwt(token: string, config: OAuthConfig, deps: AuthDependencies) {
-  if (token.length > 16384) throw new AuthRejection(401);
   const parts = token.split('.');
   if (parts.length !== 3) throw new AuthRejection(401);
   const [h64, p64, s64] = parts as [string, string, string];
@@ -151,37 +177,19 @@ async function verifyJwt(token: string, config: OAuthConfig, deps: AuthDependenc
   } catch {
     throw new AuthRejection(401);
   }
-  const now = (deps.now || Date.now)() / 1000;
-  const scopes = typeof claims.scope === 'string' ? claims.scope.split(/\s+/) : [];
-  if (
-    claims.iss !== config.issuer ||
-    claims.aud !== config.resource || // disallow default "authenticated" audience
-    typeof claims.exp !== 'number' ||
-    !Number.isFinite(claims.exp) ||
-    claims.exp <= now ||
-    typeof claims.iat !== 'number' ||
-    claims.iat > now + 60 ||
-    (claims.nbf !== undefined && (typeof claims.nbf !== 'number' || claims.nbf > now)) ||
-    claims.role !== 'authenticated' ||
-    !scopes.includes('openid') ||
-    !scopes.includes('email') ||
-    typeof claims.sub !== 'string' ||
-    !uuid.test(claims.sub) ||
-    typeof claims.client_id !== 'string' ||
-    !uuid.test(claims.client_id)
-  )
-    throw new AuthRejection(401);
-  return { actor: claims.sub, client: claims.client_id };
+  return validateClaims(claims, config, (deps.now || Date.now)() / 1000);
 }
-export async function authenticateRequest(
+async function authorizeIdentity(
   request: Request,
   config: OAuthConfig,
-  deps: AuthDependencies = {},
+  deps: AuthDependencies,
+  identity: (token: string) => Promise<{ actor: string; client: string }>,
 ): Promise<RequestContext> {
   const match = /^Bearer ([A-Za-z0-9_.-]+)$/.exec(request.headers.get('Authorization') || '');
   if (!match) throw new AuthRejection(401);
   const token = match[1]!;
-  const { actor, client } = await verifyJwt(token, config, deps);
+  if (token.length > 16384) throw new AuthRejection(401);
+  const { actor, client } = await identity(token);
   if (actor !== config.ownerUserId) throw new AuthRejection(403);
   let workspace: string | null = null;
   if (deps.checkOwner) {
@@ -201,4 +209,25 @@ export async function authenticateRequest(
     supabaseUrl: config.supabaseUrl,
     publishableKey: config.publishableKey,
   };
+}
+
+export function authenticateRequest(
+  request: Request,
+  config: OAuthConfig,
+  deps: AuthDependencies = {},
+): Promise<RequestContext> {
+  return authorizeIdentity(request, config, deps, (token) => verifyJwt(token, config, deps));
+}
+
+// Only the upstream withSupabase user gate may supply these signature-verified
+// claims. Recheck the frozen MCP claims, owner, and active workspace here.
+export function authenticateVerifiedRequest(
+  request: Request,
+  config: OAuthConfig,
+  verifiedClaims: Record<string, unknown>,
+  deps: AuthDependencies = {},
+): Promise<RequestContext> {
+  return authorizeIdentity(request, config, deps, () =>
+    Promise.resolve(validateClaims(verifiedClaims, config, (deps.now || Date.now)() / 1000)),
+  );
 }

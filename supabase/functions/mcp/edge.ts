@@ -141,10 +141,11 @@ export function createEdgeHandler(
           },
         }),
       ],
-      (innerRequest) =>
+      (innerRequest, context) =>
         handleHttpRequest(new Request(innerRequest, { body: body?.slice() ?? null }), {
           config,
           dependencies: authDependencies,
+          verifiedClaims: context.jwtClaims ?? undefined,
         }),
     );
     const response = await protectedHandler(forwardedRequest);
