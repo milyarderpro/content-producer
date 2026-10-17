@@ -215,8 +215,7 @@ const MCP_DEFAULT_MAX_BYTES = 256 * 1024;
 const MCP_TOOLS_LIST_MAX_BYTES = 4 * 1024 * 1024;
 
 export async function boundedMcpResult(response, method) {
-  const limit =
-    method === 'tools/list' ? MCP_TOOLS_LIST_MAX_BYTES : MCP_DEFAULT_MAX_BYTES;
+  const limit = method === 'tools/list' ? MCP_TOOLS_LIST_MAX_BYTES : MCP_DEFAULT_MAX_BYTES;
   const type = response.headers.get('content-type') || '';
   const isEventStream = type.includes('text/event-stream');
   if (!isEventStream && !type.includes('application/json')) throw new Error('mcp_format');
