@@ -207,3 +207,55 @@ export function resultRedirect() {
   const url = new URL('/api/phase-9-5/result', CALLBACK);
   return url.href;
 }
+// MCP tool catalogues contain 33 full JSON Schemas and legitimately exceed
+// the small business-result cap. Keep a separate, finite metadata-only budget.
+// Count bytes while streaming: Content-Length and JavaScript string lengths
+// alone cannot safely bound chunked or multibyte responses.
+const MCP_DEFAULT_MAX_BYTES = 256 * 1024;
+const MCP_TOOLS_LIST_MAX_BYTES = 4 * 1024 * 1024;
+
+export async function boundedMcpResult(response, method) {
+  const limit = method === 'tools/list' ? MCP_TOOLS_LIST_MAX_BYTES : MCP_DEFAULT_MAX_BYTES;
+  const type = response.headers.get('content-type') || '';
+  const isEventStream = type.includes('text/event-stream');
+  if (!isEventStream && !type.includes('application/json')) throw new Error('mcp_format');
+  const declaredLength = response.headers.get('content-length');
+  if (declaredLength !== null && /^\d+$/.test(declaredLength) && Number(declaredLength) > limit)
+    throw new Error('mcp_size');
+
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error('mcp_format');
+  const decoder = new TextDecoder('utf-8', { fatal: true });
+  let raw = '';
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > limit) throw new Error('mcp_size');
+      raw += decoder.decode(value, { stream: true });
+    }
+    raw += decoder.decode();
+  } catch (error) {
+    if (error?.message === 'mcp_size') throw error;
+    throw new Error('mcp_format', { cause: error });
+  } finally {
+    await reader.cancel().catch(() => {});
+    reader.releaseLock();
+  }
+  let body;
+  try {
+    if (isEventStream) {
+      const data = raw.split(/\r?\n/).filter((line) => line.startsWith('data:'));
+      if (data.length !== 1) throw new Error('mcp_format');
+      body = JSON.parse(data[0].slice(5).trim());
+    } else {
+      body = JSON.parse(raw);
+    }
+  } catch {
+    throw new Error('mcp_format');
+  }
+  if (body?.error || !body?.result) throw new Error('mcp_result');
+  return body.result;
+}

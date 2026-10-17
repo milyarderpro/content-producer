@@ -4,6 +4,7 @@ import test from 'node:test';
 import { GET as callback } from '../api/phase-9-5/callback.js';
 import { POST as start } from '../api/phase-9-5/start.js';
 import {
+  boundedMcpResult,
   callbackParams,
   challenge,
   constants,
@@ -71,6 +72,122 @@ async function jwt(subject = ownerId, audience = constants.RESOURCE) {
 function json(data, status = 200) {
   return Response.json(data, { status });
 }
+
+function richTools() {
+  const names = [
+    'get_account_profile',
+    'get_workspace_context',
+    'list_pages',
+    ...Array.from({ length: 30 }, (_, i) => 'other_' + i),
+  ];
+  return names.map((name) => ({
+    name,
+    description: 'Production-style MCP tool metadata for ' + name,
+    inputSchema: {
+      type: 'object',
+      additionalProperties: false,
+      properties: Object.fromEntries(
+        Array.from({ length: 64 }, (_, index) => [
+          'input_field_' + index,
+          {
+            type: 'string',
+            description: ('Detailed schema for ' + name + ' property ' + index).padEnd(180, '.'),
+          },
+        ]),
+      ),
+    },
+  }));
+}
+
+function mcpListResponse() {
+  return { jsonrpc: '2.0', id: 2, result: { tools: richTools() } };
+}
+
+test('33 realistic tool schemas exceed the old guard but fit the metadata-only bound', async () => {
+  const body = JSON.stringify(mcpListResponse());
+  assert.ok(Buffer.byteLength(body) > 262144);
+  assert.ok(Buffer.byteLength(body) < 4 * 1024 * 1024);
+  const result = await boundedMcpResult(
+    new Response(body, { headers: { 'Content-Type': 'application/json' } }),
+    'tools/list',
+  );
+  assert.equal(result.tools.length, 33);
+  assert.equal(new Set(result.tools.map((tool) => tool.name)).size, 33);
+  const sse = await boundedMcpResult(
+    new Response('data: ' + body + '\n\n', {
+      headers: { 'Content-Type': 'text/event-stream' },
+    }),
+    'tools/list',
+  );
+  assert.equal(sse.tools.length, 33);
+});
+
+test('metadata over 4 MiB is rejected, including chunked streams and forged length', async () => {
+  const max = 4 * 1024 * 1024;
+  const oversized = JSON.stringify({
+    jsonrpc: '2.0',
+    id: 2,
+    result: { tools: richTools(), padding: 'x'.repeat(max) },
+  });
+  await assert.rejects(
+    boundedMcpResult(
+      new Response(oversized, { headers: { 'Content-Type': 'application/json' } }),
+      'tools/list',
+    ),
+    /mcp_size/,
+  );
+  let chunksRead = 0;
+  const stream = new ReadableStream({
+    pull(controller) {
+      chunksRead++;
+      controller.enqueue(new Uint8Array(128 * 1024));
+      if (chunksRead > 50) controller.close();
+    },
+  });
+  await assert.rejects(
+    boundedMcpResult(
+      new Response(stream, { headers: { 'Content-Type': 'application/json' } }),
+      'tools/list',
+    ),
+    /mcp_size/,
+  );
+  assert.ok(chunksRead <= 34, 'reader must stop near the byte limit');
+  await assert.rejects(
+    boundedMcpResult(
+      new Response('{}', {
+        headers: { 'Content-Type': 'application/json', 'Content-Length': String(max + 1) },
+      }),
+      'tools/list',
+    ),
+    /mcp_size/,
+  );
+});
+
+test('business tool results retain a strict 256 KiB byte limit', async () => {
+  const body = JSON.stringify({ jsonrpc: '2.0', id: 3, result: { data: 'x'.repeat(270000) } });
+  await assert.rejects(
+    boundedMcpResult(
+      new Response(body, { headers: { 'Content-Type': 'application/json' } }),
+      'tools/call',
+    ),
+    /mcp_size/,
+  );
+  // UTF-8 bytes, not JavaScript character count, determine the budget.
+  const multi = JSON.stringify({
+    jsonrpc: '2.0',
+    id: 3,
+    result: { data: '🎯'.repeat(70000) },
+  });
+  assert.ok(multi.length < 262144);
+  assert.ok(Buffer.byteLength(multi) > 262144);
+  await assert.rejects(
+    boundedMcpResult(
+      new Response(multi, { headers: { 'Content-Type': 'application/json' } }),
+      'tools/call',
+    ),
+    /mcp_size/,
+  );
+});
 
 test('configuration is disabled by default and fixed URLs never include a token', () => {
   assert.equal(settings({}), null);
@@ -237,19 +354,7 @@ test('approve uses only five read-only MCP calls and no browser secret output', 
     calls.push({ kind: 'mcp', method: body.method, name: body.params?.name });
     if (body.method === 'initialize')
       return json({ jsonrpc: '2.0', id: body.id, result: { serverInfo: { name: 'test' } } });
-    if (body.method === 'tools/list')
-      return json({
-        jsonrpc: '2.0',
-        id: body.id,
-        result: {
-          tools: [
-            'get_account_profile',
-            'get_workspace_context',
-            'list_pages',
-            ...Array.from({ length: 30 }, (_, i) => 'other_' + i),
-          ].map((name) => ({ name })),
-        },
-      });
+    if (body.method === 'tools/list') return json(mcpListResponse());
     const profile = body.params.name === 'get_account_profile';
     return json({
       jsonrpc: '2.0',
@@ -272,6 +377,19 @@ test('approve uses only five read-only MCP calls and no browser secret output', 
     );
     assert.equal(response.status, 303);
     assert.equal(response.headers.get('location'), resultRedirect());
+    const resultCookie = /__Host-cp-phase95-result=([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)/.exec(
+      response.headers.get('set-cookie') || '',
+    );
+    assert.ok(resultCookie, 'safe result must be present');
+    const safeResult = await unseal(resultCookie[1], config.key);
+    assert.deepEqual(
+      {
+        status: safeResult.status,
+        tool_count: safeResult.tool_count,
+        owner_reads: safeResult.owner_reads,
+      },
+      { status: 'owner_read_pass', tool_count: 33, owner_reads: 3 },
+    );
     assert.deepEqual(calls, [
       { kind: 'token', grant: 'authorization_code' },
       { kind: 'token', grant: 'refresh_token' },
