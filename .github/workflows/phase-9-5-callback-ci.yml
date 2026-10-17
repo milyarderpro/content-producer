@@ -6,6 +6,9 @@ on:
     paths:
       - 'auth-frontend/api/phase-9-5/**'
       - 'auth-frontend/tests/phase95.test.mjs'
+      - 'auth-frontend/src/app.js'
+      - 'auth-frontend/src/index.html'
+      - 'auth-frontend/vercel.json'
       - '.github/workflows/phase-9-5-callback-ci.yml'
 
 permissions:
@@ -31,9 +34,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Verify exact Prettier output for touched sources
         run: |
-          pnpm exec prettier --write auth-frontend/api/phase-9-5/_shared.js auth-frontend/api/phase-9-5/callback.js auth-frontend/tests/phase95.test.mjs
-          git diff -- auth-frontend/api/phase-9-5/_shared.js auth-frontend/api/phase-9-5/callback.js auth-frontend/tests/phase95.test.mjs
-          git diff --exit-code -- auth-frontend/api/phase-9-5/_shared.js auth-frontend/api/phase-9-5/callback.js auth-frontend/tests/phase95.test.mjs
+          pnpm exec prettier --write docs/decisions/2026-10-17-phase-9-5-one-approved-owner-pilot.md auth-frontend/api/phase-9-5/*.js auth-frontend/tests/phase95.test.mjs auth-frontend/src/app.js auth-frontend/src/index.html auth-frontend/vercel.json
+          git diff -- docs/decisions/2026-10-17-phase-9-5-one-approved-owner-pilot.md auth-frontend/api/phase-9-5/ auth-frontend/tests/phase95.test.mjs auth-frontend/src/app.js auth-frontend/src/index.html auth-frontend/vercel.json
+          git diff --exit-code -- docs/decisions/2026-10-17-phase-9-5-one-approved-owner-pilot.md auth-frontend/api/phase-9-5/ auth-frontend/tests/phase95.test.mjs auth-frontend/src/app.js auth-frontend/src/index.html auth-frontend/vercel.json
       - name: Focused Phase 9.5 callback tests
         run: node --test --test-concurrency=1 auth-frontend/tests/phase95.test.mjs
       - name: Project source checks

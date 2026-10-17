@@ -28,6 +28,11 @@ export function settings(env = process.env) {
   return { clientId, ownerId, publishableKey, key: Buffer.from(key, 'base64url') };
 }
 
+// Separate server-side permission: the existing owner read test never implies write access.
+export function pilotEnabled(env = process.env) {
+  return env.PHASE95_WRITE_ENABLED === '1' && settings(env) !== null;
+}
+
 export function safeHeaders(extra = {}) {
   return {
     'Cache-Control': 'no-store',

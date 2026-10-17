@@ -12,7 +12,7 @@ function message(value) {
 }
 
 function page(name, title) {
-  for (const id of ['login', 'consent', 'logout', 'error', 'phase95']) {
+  for (const id of ['login', 'consent', 'logout', 'error', 'phase95', 'phase95pilot']) {
     $(id).hidden = id !== name;
   }
   $('title').textContent = title;
@@ -33,7 +33,17 @@ function navigate(path) {
 async function start() {
   const path = window.location.pathname;
   const id = authorizationId(window.location.search);
-  if (!['/', '/login', '/oauth/consent', '/logout', '/error', '/phase-9-5'].includes(path)) {
+  if (
+    ![
+      '/',
+      '/login',
+      '/oauth/consent',
+      '/logout',
+      '/error',
+      '/phase-9-5',
+      '/phase-9-5/pilot',
+    ].includes(path)
+  ) {
     return error();
   }
   if (path === '/error') return error();
@@ -59,18 +69,26 @@ async function start() {
     return;
   }
 
-  if (path === '/phase-9-5') {
+  if (path === '/phase-9-5' || path === '/phase-9-5/pilot') {
+    const isPilot = path === '/phase-9-5/pilot';
     if (window.location.search) return error();
-    page('phase95', 'Uji owner Phase 9.5');
-    button('phase95-start').addEventListener('click', async () => {
-      button('phase95-start').disabled = true;
+    page(
+      isPilot ? 'phase95pilot' : 'phase95',
+      isPilot ? 'Pilot create_page terbatas' : 'Uji owner Phase 9.5',
+    );
+    const startButton = button(isPilot ? 'phase95-pilot-start' : 'phase95-start');
+    startButton.addEventListener('click', async () => {
+      startButton.disabled = true;
       message('Menyiapkan permintaan izin…');
       try {
         const bearer = await auth.ownerTestToken();
-        if (!bearer) return navigate('/login?test=phase95');
+        if (!bearer) return navigate(isPilot ? '/login?test=phase95-pilot' : '/login?test=phase95');
         const response = await fetch('/api/phase-9-5/start', {
           method: 'POST',
-          headers: { Authorization: 'Bearer ' + bearer },
+          headers: {
+            Authorization: 'Bearer ' + bearer,
+            ...(isPilot ? { 'X-Phase95-Intent': 'approved-create-page' } : {}),
+          },
           cache: 'no-store',
           redirect: 'error',
         });
@@ -85,7 +103,7 @@ async function start() {
         navigate(authorize.href);
       } catch {
         message('Uji belum tersedia. Silakan coba lagi nanti.');
-        button('phase95-start').disabled = false;
+        startButton.disabled = false;
       }
     });
     return;
@@ -93,7 +111,8 @@ async function start() {
 
   if (path === '/login' || path === '/') {
     const phase95Login = window.location.search === '?test=phase95';
-    if (window.location.search && !id && !phase95Login) return error();
+    const pilotLogin = window.location.search === '?test=phase95-pilot';
+    if (window.location.search && !id && !phase95Login && !pilotLogin) return error();
     page('login', 'Masuk');
     $('login-form').addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -102,7 +121,15 @@ async function start() {
       message('Memeriksa akun…');
       try {
         await auth.signIn(field('email').value, field('password').value);
-        navigate(id ? consentPath(id) : phase95Login ? '/phase-9-5' : '/logout');
+        navigate(
+          id
+            ? consentPath(id)
+            : pilotLogin
+              ? '/phase-9-5/pilot'
+              : phase95Login
+                ? '/phase-9-5'
+                : '/logout',
+        );
       } catch {
         message('Tidak dapat masuk. Periksa kredensial atau coba lagi.');
         submit.disabled = false;
