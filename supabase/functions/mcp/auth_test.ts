@@ -412,3 +412,41 @@ Deno.test(
     );
   },
 );
+
+Deno.test(
+  '9.5 Supabase gateway path accepts a verified owner without widening audience',
+  async () => {
+    const { claims, dependencies, sign } = await fixture();
+    const jwks = await dependencies.loadKeys!(config.jwksUrl);
+    const handle = createEdgeHandler(config, jwks, dependencies.checkOwner!);
+    const gatewayUrl = 'http://127.0.0.1:54321/mcp';
+    const body = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' });
+    const request = (token: string) =>
+      new Request(gatewayUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/event-stream',
+        },
+        body,
+      });
+
+    const ownerResponse = await handle(request(await sign(claims)));
+    const ownerError =
+      ownerResponse.status === 200 ? 'none' : String((await ownerResponse.clone().json())?.error);
+    assert(
+      ownerResponse.status === 200,
+      'verified owner must reach MCP on gateway path; status=' +
+        ownerResponse.status +
+        ' error=' +
+        ownerError,
+    );
+
+    const wrongAudience = await handle(request(await sign({ ...claims, aud: 'authenticated' })));
+    assert(wrongAudience.status === 401, 'gateway path must retain exact resource audience');
+
+    const nonOwner = await handle(request(await sign({ ...claims, sub: other })));
+    assert(nonOwner.status === 403, 'gateway path must retain owner restriction');
+  },
+);

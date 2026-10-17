@@ -142,7 +142,8 @@ export async function handleHttpRequest(
     );
   }
   if (!isMcp) return jsonResponse({ error: 'not_found' }, 404);
-  if (path !== expectedPath) return challenge(config.resource, 401);
+  // The Supabase Edge gateway removes /functions/v1 before invoking this function.
+  if (path !== expectedPath && path !== '/mcp') return challenge(config.resource, 401);
   const id = crypto.randomUUID();
   try {
     const { checkOwner, ...jwtDependencies } = options.dependencies ?? {};
