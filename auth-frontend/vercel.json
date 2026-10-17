@@ -1,4 +1,7 @@
 {
+  "git": {
+    "deploymentEnabled": false
+  },
   "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
   "rewrites": [
@@ -16,6 +19,10 @@
     },
     {
       "source": "/error",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/phase-9-5",
       "destination": "/index.html"
     }
   ],

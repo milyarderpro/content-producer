@@ -61,15 +61,15 @@ function mockAuth() {
   return { client: createAuth(config, storage, request), calls, values };
 }
 
-test('all four routes have explicit static hosting fallbacks', () => {
+test('all auth and owner-test routes have explicit static hosting fallbacks', () => {
   const hosting = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
   assert.deepEqual(
     hosting.rewrites.map((entry) => entry.source),
-    ['/login', '/oauth/consent', '/logout', '/error'],
+    ['/login', '/oauth/consent', '/logout', '/error', '/phase-9-5'],
   );
   for (const entry of hosting.rewrites) assert.equal(entry.destination, '/index.html');
   const html = readFileSync(new URL('../src/index.html', import.meta.url), 'utf8');
-  for (const id of ['login', 'consent', 'logout', 'error']) {
+  for (const id of ['login', 'consent', 'logout', 'error', 'phase95']) {
     assert.match(html, new RegExp('id="' + id + '"'));
   }
 });
@@ -186,11 +186,15 @@ test('built browser assets include only allowlisted public values', () => {
       VITE_SUPABASE_URL: 'https://demo.supabase.co',
       VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_demo',
       PRIVATE_DATABASE_PASSWORD: 'must-not-be-in-bundle',
+      PHASE95_COOKIE_KEY: 'phase95-server-only-canary',
     },
   });
   const built = readFileSync(new URL('../dist/config.js', import.meta.url), 'utf8');
   assert.match(built, /sb_publishable_demo/);
-  assert.doesNotMatch(built, /must-not-be-in-bundle|PRIVATE_DATABASE_PASSWORD/);
+  assert.doesNotMatch(
+    built,
+    /must-not-be-in-bundle|PRIVATE_DATABASE_PASSWORD|phase95-server-only-canary/,
+  );
   const rejected = spawnSync(process.execPath, ['scripts/build.mjs'], {
     cwd: root,
     env: { ...process.env, VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_secret_wrong' },
