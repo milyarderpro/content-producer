@@ -239,7 +239,7 @@ export async function boundedMcpResult(response, method) {
     raw += decoder.decode();
   } catch (error) {
     if (error?.message === 'mcp_size') throw error;
-    throw new Error('mcp_format');
+    throw new Error('mcp_format', { cause: error });
   } finally {
     await reader.cancel().catch(() => {});
     reader.releaseLock();
