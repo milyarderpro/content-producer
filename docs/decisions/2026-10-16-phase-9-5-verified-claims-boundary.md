@@ -1,7 +1,7 @@
 # CR-022 — Use Supabase verified claims once at the hosted MCP boundary
 
-Date: 2026-10-16  
-Scope: Phase 9 checkpoint 9.5 only  
+Date: 2026-10-16
+Scope: Phase 9 checkpoint 9.5 only
 Status: Approved for implementation, pending a new full technical gate and hosted acceptance
 
 ## Evidence and reason
