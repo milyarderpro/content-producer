@@ -2,6 +2,7 @@ import { MCP_SERVICE_NAME, MCP_SERVICE_VERSION } from './server.ts';
 import { createAuthenticatedTransport } from './transport.ts';
 import {
   authenticateRequest,
+  authenticateVerifiedRequest,
   AuthRejection,
   runtimeOAuthConfig,
   type OAuthConfig,
@@ -19,6 +20,7 @@ const publicHeaders = {
 export interface HttpOptions {
   config?: OAuthConfig;
   dependencies?: AuthDependencies;
+  verifiedClaims?: Record<string, unknown>;
 }
 function jsonResponse(body: object, status: number, extra: Record<string, string> = {}): Response {
   return Response.json(body, { status, headers: { ...publicHeaders, ...extra } });
@@ -144,7 +146,9 @@ export async function handleHttpRequest(
   const id = crypto.randomUUID();
   try {
     const { checkOwner, ...jwtDependencies } = options.dependencies ?? {};
-    const context = await authenticateRequest(request, config, jwtDependencies);
+    const context = options.verifiedClaims
+      ? await authenticateVerifiedRequest(request, config, options.verifiedClaims, jwtDependencies)
+      : await authenticateRequest(request, config, jwtDependencies);
     if (checkOwner && (await isToolsListRequest(request))) {
       const workspacePublicId = await checkOwner(config, context.accessToken, context.actorUserId);
       if (!workspacePublicId || !publicIdPattern.test(workspacePublicId)) {
