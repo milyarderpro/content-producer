@@ -1,3 +1,4 @@
+import { approvedPilotPayload } from './approved-pilot.js';
 import {
   boundedJson,
   boundedMcpResult,
@@ -7,6 +8,7 @@ import {
   cookieValue,
   exactRequest,
   resultRedirect,
+  pilotEnabled,
   safeHeaders,
   seal,
   setCookie,
@@ -104,7 +106,7 @@ async function readOnlyGate(token) {
     );
     if (!toolOk(result)) throw new Error(name === 'list_pages' ? 'pages' : 'workspace');
   }
-  return { tool_count: 33, owner_reads: 3 };
+  return { tool_count: 33, owner_reads: 3, workspace_public_id: workspaceId };
 }
 
 async function finish(config, result) {
@@ -124,6 +126,10 @@ export async function GET(request) {
   const outcome = callbackParams(request.url, flow);
   if (outcome.kind === 'invalid') return finish(config, { status: 'invalid_flow' });
   if (outcome.kind === 'denied') return finish(config, { status: 'denied' });
+  if (flow.intent !== undefined && flow.intent !== 'read' && flow.intent !== 'pilot')
+    return finish(config, { status: 'invalid_flow' });
+  const isPilot = flow.intent === 'pilot';
+  if (isPilot && !pilotEnabled()) return finish(config, { status: 'pilot_disabled' });
   try {
     const first = await tokenRequest(
       {
@@ -145,11 +151,39 @@ export async function GET(request) {
     if (!(await verifyJwt(renewed.access, config)))
       return finish(config, { status: 'invalid_refresh' });
     const gate = await readOnlyGate(renewed.access);
+    if (isPilot) {
+      if (gate.workspace_public_id !== approvedPilotPayload.workspace_public_id)
+        throw new Error('pilot_workspace');
+      // This is the only business-write call in the entire temporary callback.
+      // Fixed server-side arguments and operation_key, never a browser body.
+      const result = await rpc(
+        renewed.access,
+        'tools/call',
+        { name: 'create_page', arguments: approvedPilotPayload },
+        6,
+        'pilot',
+      );
+      if (
+        !toolOk(result) ||
+        result.structuredContent?.data?.page?.slug !== approvedPilotPayload.slug ||
+        result.structuredContent?.data?.page?.name !== approvedPilotPayload.name ||
+        result.structuredContent?.data?.config?.niche_key !== approvedPilotPayload.niche_key
+      ) throw new Error('pilot_uncertain');
+      return finish(config, {
+        status: 'pilot_write_pass',
+        token_http: first.status,
+        refresh_http: renewed.status,
+        tool_count: gate.tool_count,
+        owner_reads: gate.owner_reads,
+        replayed: result.structuredContent.data.replayed === true,
+      });
+    }
     return finish(config, {
       status: 'owner_read_pass',
       token_http: first.status,
       refresh_http: renewed.status,
-      ...gate,
+      tool_count: gate.tool_count,
+      owner_reads: gate.owner_reads,
     });
   } catch (error) {
     const allowed = new Set([
@@ -161,7 +195,9 @@ export async function GET(request) {
       'profile',
       'workspace',
       'pages',
-      ...['initialize', 'list', 'profile', 'workspace', 'pages'].flatMap((stage) => [
+      'pilot_workspace',
+      'pilot_uncertain',
+      ...['initialize', 'list', 'profile', 'workspace', 'pages', 'pilot'].flatMap((stage) => [
         'mcp_401_' + stage,
         'mcp_http_' + stage,
       ]),
