@@ -4,6 +4,7 @@ import {
   authenticateRequest,
   authenticateVerifiedRequest,
   AuthRejection,
+  WorkspaceCheckFailure,
   runtimeOAuthConfig,
   type OAuthConfig,
   type AuthDependencies,
@@ -66,9 +67,22 @@ function discoveryPath(path: string, resourcePath: string): boolean {
     path === '/.well-known/oauth-protected-resource'
   );
 }
-function safeLog(id: string, stage: string, status: number): void {
+function safeLog(id: string, stage: string, status: number, failure?: WorkspaceCheckFailure): void {
   // Never log request URLs, headers, tokens, user claims, bodies or RPC results.
-  console.info(JSON.stringify({ event: 'mcp_request', request_id: id, stage, status }));
+  console.info(
+    JSON.stringify({
+      event: 'mcp_request',
+      request_id: id,
+      stage,
+      status,
+      ...(failure
+        ? {
+            workspace_check: failure.kind,
+            ...(failure.kind === 'rpc_status' ? { rpc_status: failure.rpcStatus } : {}),
+          }
+        : {}),
+    }),
+  );
 }
 function includesToolsList(value: unknown): boolean {
   if (Array.isArray(value)) return value.some(includesToolsList);
@@ -162,7 +176,7 @@ export async function handleHttpRequest(
     return response;
   } catch (error) {
     const status = error instanceof AuthRejection ? error.status : 503;
-    safeLog(id, 'auth_denied', status);
+    safeLog(id, 'auth_denied', status, error instanceof WorkspaceCheckFailure ? error : undefined);
     return status === 403 ? ownerDenied() : challenge(config.resource, status);
   }
 }

@@ -1,39 +1,55 @@
 import { pipeline } from 'npm:@supabase/middleware@1.0.0';
 import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1.9.0';
-import { runtimeOAuthConfig, type AuthDependencies, type OAuthConfig } from './auth.ts';
+import {
+  runtimeOAuthConfig,
+  WorkspaceCheckFailure,
+  type AuthDependencies,
+  type OAuthConfig,
+} from './auth.ts';
 import { handleHttpRequest, oversizedRequestResponse } from './http.ts';
 
 type FixtureJwks = { keys: Array<JsonWebKey & { kid?: string }> };
 const MAX_REQUEST_BYTES = 256 * 1024;
 const publicIdPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 
-async function checkActiveOwnerWorkspace(
+export async function checkActiveOwnerWorkspace(
   config: OAuthConfig,
   token: string,
   actor: string,
 ): Promise<string | null> {
-  const response = await fetch(config.supabaseUrl + '/rest/v1/rpc/get_account_profile', {
-    method: 'POST',
-    redirect: 'error',
-    signal: AbortSignal.timeout(10000),
-    headers: {
-      apikey: config.publishableKey,
-      Authorization: 'Bearer ' + token,
-      'Content-Type': 'application/json',
-      'Accept-Profile': 'api',
-      'Content-Profile': 'api',
-    },
-    body: JSON.stringify({ p_request_schema_version: 1 }),
-  });
-  const body = await response.text();
+  let response: Response;
+  try {
+    response = await fetch(config.supabaseUrl + '/rest/v1/rpc/get_account_profile', {
+      method: 'POST',
+      redirect: 'error',
+      signal: AbortSignal.timeout(10000),
+      headers: {
+        apikey: config.publishableKey,
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        'Accept-Profile': 'api',
+        'Content-Profile': 'api',
+      },
+      body: JSON.stringify({ p_request_schema_version: 1 }),
+    });
+  } catch {
+    throw new WorkspaceCheckFailure('fetch');
+  }
+  let body: string;
+  try {
+    body = await response.text();
+  } catch {
+    throw new WorkspaceCheckFailure('response');
+  }
   if (new TextEncoder().encode(body).byteLength > 8192) {
-    throw new Error('Workspace check response too large');
+    throw new WorkspaceCheckFailure('response');
   }
   let result: unknown;
   try {
     result = JSON.parse(body);
   } catch {
-    throw new Error('Invalid workspace check response');
+    if (!response.ok) throw new WorkspaceCheckFailure('rpc_status', response.status);
+    throw new WorkspaceCheckFailure('response');
   }
   if (!response.ok) {
     const message =
@@ -41,13 +57,17 @@ async function checkActiveOwnerWorkspace(
         ? (result as { message: unknown }).message
         : null;
     if (message === 'OWNER_ACCESS_REQUIRED') return null;
-    throw new Error('Workspace check unavailable');
+    throw new WorkspaceCheckFailure('rpc_status', response.status);
   }
-  if (!result || typeof result !== 'object' || !('data' in result)) return null;
+  if (!result || typeof result !== 'object' || !('data' in result)) {
+    throw new WorkspaceCheckFailure('response');
+  }
   const data = (result as { data: unknown }).data;
-  if (!data || typeof data !== 'object' || !('profile' in data)) return null;
+  if (!data || typeof data !== 'object' || !('profile' in data)) {
+    throw new WorkspaceCheckFailure('response');
+  }
   const profile = (data as { profile: unknown }).profile;
-  if (!profile || typeof profile !== 'object') return null;
+  if (!profile || typeof profile !== 'object') throw new WorkspaceCheckFailure('response');
   const value = profile as { id?: unknown; workspace_public_id?: unknown };
   return value.id === actor &&
     typeof value.workspace_public_id === 'string' &&

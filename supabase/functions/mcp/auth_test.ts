@@ -2,11 +2,12 @@ import {
   authenticateRequest,
   authenticateVerifiedRequest,
   AuthRejection,
+  WorkspaceCheckFailure,
   type AuthDependencies,
   type OAuthConfig,
 } from './auth.ts';
 import { handleHttpRequest } from './http.ts';
-import { createEdgeHandler } from './edge.ts';
+import { checkActiveOwnerWorkspace, createEdgeHandler } from './edge.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
 
 function assert(condition: unknown, detail: string): asserts condition {
@@ -78,6 +79,102 @@ async function fixture() {
 function withToken(token: string) {
   return new Request(config.resource, { headers: { Authorization: 'Bearer ' + token } });
 }
+
+Deno.test(
+  '9.5 workspace check classifies fetch, RPC status, and response failures safely',
+  async () => {
+    const originalFetch = globalThis.fetch;
+    const run = (reply: () => Promise<Response>) => {
+      globalThis.fetch = (_input, init) => {
+        const headers = new Headers(init?.headers);
+        assert(headers.get('Accept-Profile') === 'api', 'workspace check must use api profile');
+        return reply();
+      };
+      return checkActiveOwnerWorkspace(config, 'synthetic-token', owner);
+    };
+    const failure = async (
+      reply: () => Promise<Response>,
+      kind: WorkspaceCheckFailure['kind'],
+      rpcStatus?: number,
+    ) => {
+      let caught: unknown;
+      try {
+        await run(reply);
+      } catch (error) {
+        caught = error;
+      }
+      assert(caught instanceof WorkspaceCheckFailure, 'expected classified workspace failure');
+      assert(caught.kind === kind && caught.rpcStatus === rpcStatus, 'wrong failure class');
+    };
+    try {
+      await failure(() => Promise.reject(new Error('private fetch failure')), 'fetch');
+      await failure(
+        () =>
+          Promise.resolve(
+            Response.json({ code: 'PGRST106', message: 'Invalid schema: api' }, { status: 406 }),
+          ),
+        'rpc_status',
+        406,
+      );
+      await failure(() => Promise.resolve(new Response('not-json')), 'response');
+      await failure(() => Promise.resolve(Response.json({ data: {} })), 'response');
+      const denied = await run(() =>
+        Promise.resolve(Response.json({ message: 'OWNER_ACCESS_REQUIRED' }, { status: 403 })),
+      );
+      assert(denied === null, 'owner denial must remain a denial');
+      const valid = await run(() =>
+        Promise.resolve(
+          Response.json({ data: { profile: { id: owner, workspace_public_id: workspace } } }),
+        ),
+      );
+      assert(valid === workspace, 'valid owner workspace was rejected');
+      const wrongOwner = await run(() =>
+        Promise.resolve(
+          Response.json({ data: { profile: { id: other, workspace_public_id: workspace } } }),
+        ),
+      );
+      assert(wrongOwner === null, 'different owner was accepted');
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  },
+);
+
+Deno.test('9.5 workspace diagnostic logs only category and HTTP status', async () => {
+  const { claims } = await fixture();
+  const lines: string[] = [];
+  const originalInfo = console.info;
+  console.info = (...items) => lines.push(items.map(String).join(' '));
+  try {
+    const result = await handleHttpRequest(
+      new Request(config.resource, {
+        method: 'POST',
+        headers: { Authorization: 'Bearer synthetic-token', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' }),
+      }),
+      {
+        config,
+        verifiedClaims: claims,
+        dependencies: {
+          checkOwner: () => Promise.reject(new WorkspaceCheckFailure('rpc_status', 406)),
+        },
+      },
+    );
+    assert(result.status === 503, 'unavailable RPC must fail closed');
+  } finally {
+    console.info = originalInfo;
+  }
+  assert(lines.length === 1, 'expected one safe log');
+  const entry = JSON.parse(lines[0]!);
+  assert(
+    entry.stage === 'auth_denied' &&
+      entry.status === 503 &&
+      entry.workspace_check === 'rpc_status' &&
+      entry.rpc_status === 406,
+    'workspace diagnostic missing',
+  );
+  assert(!lines[0]!.includes(owner) && !lines[0]!.includes('synthetic-token'), 'sensitive log');
+});
 
 Deno.test('6.2 discovery and 401 WWW-Authenticate bind exact resource', async () => {
   const metadataUrl = config.resource + '/oauth-protected-resource';

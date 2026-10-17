@@ -96,7 +96,12 @@ test('state, PKCE cookie and Deny are strict', async () => {
   const item = flow();
   const sealed = await seal(item, config.key);
   assert.deepEqual(await unseal(sealed, config.key), item);
-  assert.equal(await unseal(sealed.slice(0, -1) + 'x', config.key), null);
+  const ciphertextStart = sealed.indexOf('.') + 1;
+  const tampered =
+    sealed.slice(0, ciphertextStart) +
+    (sealed[ciphertextStart] === 'A' ? 'B' : 'A') +
+    sealed.slice(ciphertextStart + 1);
+  assert.equal(await unseal(tampered, config.key), null);
   const base = constants.CALLBACK + '?state=' + item.state;
   assert.equal(callbackParams(base + '&error=access_denied', item).kind, 'denied');
   assert.equal(callbackParams(base + '&code=' + fakeCode, item).kind, 'approved');
