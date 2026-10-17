@@ -33,6 +33,12 @@ const labels = {
   pages: 'Pembacaan daftar Page owner gagal.',
   test_error: 'Pengujian belum dapat diselesaikan.',
   owner_read_pass: 'Tiga pembacaan owner berhasil; tepat 33 tool terdaftar.',
+  pilot_write_pass: 'Permintaan create_page dikonfirmasi MCP; periksa hasil audit database sebelum menyimpulkan PASS.',
+  pilot_disabled: 'Jalur pilot write tidak aktif.',
+  pilot_workspace: 'Workspace owner tidak sama dengan workspace yang disetujui.',
+  pilot_uncertain: 'Hasil create_page tidak dapat dipastikan. Jangan mencoba ulang; periksa database dan ledger terlebih dahulu.',
+  mcp_401_pilot: 'MCP menolak pilot owner dengan HTTP 401.',
+  mcp_http_pilot: 'Pemanggilan create_page gagal. Periksa database dan ledger sebelum mengulang.',
 };
 
 export async function GET(request) {
