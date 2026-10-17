@@ -1,7 +1,7 @@
 # CR-024 — Proposed first-party HTTPS owner test client for Phase 9.5
 
-Date: 2026-10-17  
-Scope: checkpoint 9.5 only  
+Date: 2026-10-17
+Scope: checkpoint 9.5 only
 Status: **NARROW LOGGING EXCEPTION APPROVED; hosted dummy canary pending**
 
 ## Baseline and reason
