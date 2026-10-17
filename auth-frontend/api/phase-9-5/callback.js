@@ -168,7 +168,8 @@ export async function GET(request) {
         result.structuredContent?.data?.page?.slug !== approvedPilotPayload.slug ||
         result.structuredContent?.data?.page?.name !== approvedPilotPayload.name ||
         result.structuredContent?.data?.config?.niche_key !== approvedPilotPayload.niche_key
-      ) throw new Error('pilot_uncertain');
+      )
+        throw new Error('pilot_uncertain');
       return finish(config, {
         status: 'pilot_write_pass',
         token_http: first.status,
