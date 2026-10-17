@@ -419,14 +419,15 @@ test('CR-026 fixed pilot configuration and deny-by-default owner write gate', as
     PHASE95_PUBLISHABLE_KEY: 'sb_publishable_test',
     PHASE95_COOKIE_KEY: keyText,
   };
-  const pilotRequest = () => new Request(new URL('/api/phase-9-5/start', constants.CALLBACK), {
-    method: 'POST',
-    headers: {
-      Origin: new URL(constants.CALLBACK).origin,
-      Authorization: 'Bearer dummy-browser-session',
-      'X-Phase95-Intent': 'approved-create-page',
-    },
-  });
+  const pilotRequest = () =>
+    new Request(new URL('/api/phase-9-5/start', constants.CALLBACK), {
+      method: 'POST',
+      headers: {
+        Origin: new URL(constants.CALLBACK).origin,
+        Authorization: 'Bearer dummy-browser-session',
+        'X-Phase95-Intent': 'approved-create-page',
+      },
+    });
   try {
     Object.assign(process.env, env);
     delete process.env.PHASE95_WRITE_ENABLED;
@@ -448,7 +449,10 @@ test('CR-026 fixed pilot configuration and deny-by-default owner write gate', as
     assert.equal((await unseal(sealedFlow, config.key)).intent, 'pilot');
     const readRequest = new Request(new URL('/api/phase-9-5/start', constants.CALLBACK), {
       method: 'POST',
-      headers: { Origin: new URL(constants.CALLBACK).origin, Authorization: 'Bearer dummy-browser-session' },
+      headers: {
+        Origin: new URL(constants.CALLBACK).origin,
+        Authorization: 'Bearer dummy-browser-session',
+      },
     });
     const read = await start(readRequest);
     assert.equal(read.status, 200);
@@ -456,7 +460,11 @@ test('CR-026 fixed pilot configuration and deny-by-default owner write gate', as
     assert.equal((await unseal(readFlow, config.key)).intent, 'read');
     const unknownRequest = new Request(new URL('/api/phase-9-5/start', constants.CALLBACK), {
       method: 'POST',
-      headers: { Origin: new URL(constants.CALLBACK).origin, Authorization: 'Bearer dummy-browser-session', 'X-Phase95-Intent': 'arbitrary-write' },
+      headers: {
+        Origin: new URL(constants.CALLBACK).origin,
+        Authorization: 'Bearer dummy-browser-session',
+        'X-Phase95-Intent': 'arbitrary-write',
+      },
     });
     assert.equal((await start(unknownRequest)).status, 403);
   } finally {
@@ -487,39 +495,59 @@ test('approved owner pilot invokes exactly one fixed MCP create_page; read mode 
     assert.equal(String(url), constants.RESOURCE);
     const body = JSON.parse(options.body);
     calls.push(body.method === 'tools/call' ? 'tool:' + body.params.name : body.method);
-    if (body.method === 'initialize') return json({ jsonrpc: '2.0', id: body.id, result: { serverInfo: { name: 'test' } } });
+    if (body.method === 'initialize')
+      return json({ jsonrpc: '2.0', id: body.id, result: { serverInfo: { name: 'test' } } });
     if (body.method === 'tools/list') return json(mcpListResponse());
     assert.equal(body.method, 'tools/call');
     if (body.params.name === 'create_page') {
       assert.deepEqual(body.params.arguments, approvedPilotPayload);
       assert.equal(options.headers.Authorization, 'Bearer ' + signed.token);
       return json({
-        jsonrpc: '2.0', id: body.id, result: { structuredContent: {
-          response_schema_version: 1,
-          data: { page: { name: approvedPilotPayload.name, slug: approvedPilotPayload.slug },
-                  config: { niche_key: 'trivia' }, replayed: false },
-        } },
+        jsonrpc: '2.0',
+        id: body.id,
+        result: {
+          structuredContent: {
+            response_schema_version: 1,
+            data: {
+              page: { name: approvedPilotPayload.name, slug: approvedPilotPayload.slug },
+              config: { niche_key: 'trivia' },
+              replayed: false,
+            },
+          },
+        },
       });
     }
-    assert.ok(['get_account_profile', 'get_workspace_context', 'list_pages'].includes(body.params.name));
+    assert.ok(
+      ['get_account_profile', 'get_workspace_context', 'list_pages'].includes(body.params.name),
+    );
     return json({
-      jsonrpc: '2.0', id: body.id, result: { structuredContent: {
-        response_schema_version: 1,
-        data: body.params.name === 'get_account_profile'
-          ? { profile: { workspace_public_id: approvedPilotPayload.workspace_public_id } }
-          : body.params.name === 'list_pages' ? { items: [] } : {},
-      } },
+      jsonrpc: '2.0',
+      id: body.id,
+      result: {
+        structuredContent: {
+          response_schema_version: 1,
+          data:
+            body.params.name === 'get_account_profile'
+              ? { profile: { workspace_public_id: approvedPilotPayload.workspace_public_id } }
+              : body.params.name === 'list_pages'
+                ? { items: [] }
+                : {},
+        },
+      },
     });
   };
   const run = async (intent) => {
     const item = { ...flow(), intent };
     const cookie = await seal(item, config.key);
-    const response = await callback(new Request(
-      constants.CALLBACK + '?state=' + item.state + '&code=' + fakeCode,
-      { headers: { cookie: constants.COOKIE_FLOW + '=' + cookie } },
-    ));
+    const response = await callback(
+      new Request(constants.CALLBACK + '?state=' + item.state + '&code=' + fakeCode, {
+        headers: { cookie: constants.COOKIE_FLOW + '=' + cookie },
+      }),
+    );
     assert.equal(response.status, 303);
-    const match = /__Host-cp-phase95-result=([A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+)/.exec(response.headers.get('set-cookie') || '');
+    const match = /__Host-cp-phase95-result=([A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+)/.exec(
+      response.headers.get('set-cookie') || '',
+    );
     assert.ok(match);
     return { result: await unseal(match[1], config.key), response };
   };
@@ -529,13 +557,31 @@ test('approved owner pilot invokes exactly one fixed MCP create_page; read mode 
     assert.equal(calls.includes('tool:create_page'), false);
     calls.length = 0;
     let pilot = await run('pilot');
-    assert.deepEqual({ status: pilot.result.status, tool_count: pilot.result.tool_count, owner_reads: pilot.result.owner_reads, replayed: pilot.result.replayed },
-      { status: 'pilot_write_pass', tool_count: 33, owner_reads: 3, replayed: false });
-    assert.deepEqual(calls, ['oauth:authorization_code', 'oauth:refresh_token', 'initialize', 'tools/list',
-      'tool:get_account_profile', 'tool:get_workspace_context', 'tool:list_pages', 'tool:create_page']);
+    assert.deepEqual(
+      {
+        status: pilot.result.status,
+        tool_count: pilot.result.tool_count,
+        owner_reads: pilot.result.owner_reads,
+        replayed: pilot.result.replayed,
+      },
+      { status: 'pilot_write_pass', tool_count: 33, owner_reads: 3, replayed: false },
+    );
+    assert.deepEqual(calls, [
+      'oauth:authorization_code',
+      'oauth:refresh_token',
+      'initialize',
+      'tools/list',
+      'tool:get_account_profile',
+      'tool:get_workspace_context',
+      'tool:list_pages',
+      'tool:create_page',
+    ]);
     assert.equal(JSON.stringify([...pilot.response.headers]).includes(signed.token), false);
     assert.equal(JSON.stringify([...pilot.response.headers]).includes(fakeCode), false);
-    assert.equal(JSON.stringify([...pilot.response.headers]).includes(approvedPilotPayload.slug), false);
+    assert.equal(
+      JSON.stringify([...pilot.response.headers]).includes(approvedPilotPayload.slug),
+      false,
+    );
     calls.length = 0;
     process.env.PHASE95_WRITE_ENABLED = '0';
     const blocked = await run('pilot');
@@ -544,10 +590,11 @@ test('approved owner pilot invokes exactly one fixed MCP create_page; read mode 
     calls.length = 0;
     process.env.PHASE95_WRITE_ENABLED = '1';
     const item = { ...flow(), intent: 'pilot' };
-    const denial = await callback(new Request(
-      constants.CALLBACK + '?state=' + item.state + '&error=access_denied',
-      { headers: { cookie: constants.COOKIE_FLOW + '=' + await seal(item, config.key) } },
-    ));
+    const denial = await callback(
+      new Request(constants.CALLBACK + '?state=' + item.state + '&error=access_denied', {
+        headers: { cookie: constants.COOKIE_FLOW + '=' + (await seal(item, config.key)) },
+      }),
+    );
     assert.equal(denial.status, 303);
     assert.deepEqual(calls, []);
   } finally {
