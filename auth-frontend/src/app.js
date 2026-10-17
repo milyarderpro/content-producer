@@ -33,7 +33,17 @@ function navigate(path) {
 async function start() {
   const path = window.location.pathname;
   const id = authorizationId(window.location.search);
-  if (!['/', '/login', '/oauth/consent', '/logout', '/error', '/phase-9-5', '/phase-9-5/pilot'].includes(path)) {
+  if (
+    ![
+      '/',
+      '/login',
+      '/oauth/consent',
+      '/logout',
+      '/error',
+      '/phase-9-5',
+      '/phase-9-5/pilot',
+    ].includes(path)
+  ) {
     return error();
   }
   if (path === '/error') return error();
@@ -62,7 +72,10 @@ async function start() {
   if (path === '/phase-9-5' || path === '/phase-9-5/pilot') {
     const isPilot = path === '/phase-9-5/pilot';
     if (window.location.search) return error();
-    page(isPilot ? 'phase95pilot' : 'phase95', isPilot ? 'Pilot create_page terbatas' : 'Uji owner Phase 9.5');
+    page(
+      isPilot ? 'phase95pilot' : 'phase95',
+      isPilot ? 'Pilot create_page terbatas' : 'Uji owner Phase 9.5',
+    );
     const startButton = button(isPilot ? 'phase95-pilot-start' : 'phase95-start');
     startButton.addEventListener('click', async () => {
       startButton.disabled = true;
@@ -72,7 +85,10 @@ async function start() {
         if (!bearer) return navigate(isPilot ? '/login?test=phase95-pilot' : '/login?test=phase95');
         const response = await fetch('/api/phase-9-5/start', {
           method: 'POST',
-          headers: { Authorization: 'Bearer ' + bearer, ...(isPilot ? { 'X-Phase95-Intent': 'approved-create-page' } : {}) },
+          headers: {
+            Authorization: 'Bearer ' + bearer,
+            ...(isPilot ? { 'X-Phase95-Intent': 'approved-create-page' } : {}),
+          },
           cache: 'no-store',
           redirect: 'error',
         });
@@ -105,7 +121,15 @@ async function start() {
       message('Memeriksa akun…');
       try {
         await auth.signIn(field('email').value, field('password').value);
-        navigate(id ? consentPath(id) : pilotLogin ? '/phase-9-5/pilot' : phase95Login ? '/phase-9-5' : '/logout');
+        navigate(
+          id
+            ? consentPath(id)
+            : pilotLogin
+              ? '/phase-9-5/pilot'
+              : phase95Login
+                ? '/phase-9-5'
+                : '/logout',
+        );
       } catch {
         message('Tidak dapat masuk. Periksa kredensial atau coba lagi.');
         submit.disabled = false;
