@@ -108,6 +108,8 @@ export function createAuth(config, storage = sessionStorage, request = fetch) {
   }
 
   return {
+    // Sent only to the same-origin, owner-gated Phase 9.5 start endpoint.
+    ownerTestToken: token,
     async signIn(email, password) {
       save(await api('token?grant_type=password', 'POST', { email, password }));
     },

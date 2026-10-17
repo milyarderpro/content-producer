@@ -34,7 +34,7 @@
     "supabase": "supabase",
     "frontend:typecheck": "tsc --noEmit --project auth-frontend/tsconfig.json",
     "frontend:build": "node auth-frontend/scripts/build.mjs",
-    "frontend:test": "node --test auth-frontend/tests/*.test.mjs"
+    "frontend:test": "node --test --test-concurrency=1 auth-frontend/tests/*.test.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

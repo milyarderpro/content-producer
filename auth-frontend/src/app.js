@@ -12,7 +12,7 @@ function message(value) {
 }
 
 function page(name, title) {
-  for (const id of ['login', 'consent', 'logout', 'error']) {
+  for (const id of ['login', 'consent', 'logout', 'error', 'phase95']) {
     $(id).hidden = id !== name;
   }
   $('title').textContent = title;
@@ -33,7 +33,7 @@ function navigate(path) {
 async function start() {
   const path = window.location.pathname;
   const id = authorizationId(window.location.search);
-  if (!['/', '/login', '/oauth/consent', '/logout', '/error'].includes(path)) {
+  if (!['/', '/login', '/oauth/consent', '/logout', '/error', '/phase-9-5'].includes(path)) {
     return error();
   }
   if (path === '/error') return error();
@@ -59,8 +59,41 @@ async function start() {
     return;
   }
 
+  if (path === '/phase-9-5') {
+    if (window.location.search) return error();
+    page('phase95', 'Uji owner Phase 9.5');
+    button('phase95-start').addEventListener('click', async () => {
+      button('phase95-start').disabled = true;
+      message('Menyiapkan permintaan izin…');
+      try {
+        const bearer = await auth.ownerTestToken();
+        if (!bearer) return navigate('/login?test=phase95');
+        const response = await fetch('/api/phase-9-5/start', {
+          method: 'POST',
+          headers: { Authorization: 'Bearer ' + bearer },
+          cache: 'no-store',
+          redirect: 'error',
+        });
+        if (!response.ok) throw new Error('Start unavailable');
+        const data = await response.json();
+        const authorize = new URL(data.authorize_url);
+        if (
+          authorize.origin !== new URL(config.url).origin ||
+          authorize.pathname !== '/auth/v1/oauth/authorize'
+        )
+          throw new Error('Unexpected authorization URL');
+        navigate(authorize.href);
+      } catch {
+        message('Uji belum tersedia. Silakan coba lagi nanti.');
+        button('phase95-start').disabled = false;
+      }
+    });
+    return;
+  }
+
   if (path === '/login' || path === '/') {
-    if (window.location.search && !id) return error();
+    const phase95Login = window.location.search === '?test=phase95';
+    if (window.location.search && !id && !phase95Login) return error();
     page('login', 'Masuk');
     $('login-form').addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -69,7 +102,7 @@ async function start() {
       message('Memeriksa akun…');
       try {
         await auth.signIn(field('email').value, field('password').value);
-        navigate(id ? consentPath(id) : '/logout');
+        navigate(id ? consentPath(id) : phase95Login ? '/phase-9-5' : '/logout');
       } catch {
         message('Tidak dapat masuk. Periksa kredensial atau coba lagi.');
         submit.disabled = false;

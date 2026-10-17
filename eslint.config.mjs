@@ -25,6 +25,10 @@ export default tseslint.config(
     languageOptions: { globals: globals.browser },
   },
   {
+    files: ['auth-frontend/api/**/*.js'],
+    languageOptions: { globals: globals.node },
+  },
+  {
     files: ['auth-frontend/scripts/**/*.mjs', 'auth-frontend/tests/**/*.mjs'],
     languageOptions: { globals: globals.node },
   },
