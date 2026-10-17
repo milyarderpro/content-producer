@@ -65,11 +65,11 @@ test('all auth and owner-test routes have explicit static hosting fallbacks', ()
   const hosting = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
   assert.deepEqual(
     hosting.rewrites.map((entry) => entry.source),
-    ['/login', '/oauth/consent', '/logout', '/error', '/phase-9-5'],
+    ['/phase-9-5/pilot', '/login', '/oauth/consent', '/logout', '/error', '/phase-9-5'],
   );
   for (const entry of hosting.rewrites) assert.equal(entry.destination, '/index.html');
   const html = readFileSync(new URL('../src/index.html', import.meta.url), 'utf8');
-  for (const id of ['login', 'consent', 'logout', 'error', 'phase95']) {
+  for (const id of ['login', 'consent', 'logout', 'error', 'phase95', 'phase95pilot']) {
     assert.match(html, new RegExp('id="' + id + '"'));
   }
 });
