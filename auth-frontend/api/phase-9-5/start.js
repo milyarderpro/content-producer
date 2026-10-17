@@ -8,6 +8,7 @@ import {
   seal,
   setCookie,
   settings,
+  pilotEnabled,
 } from './_shared.js';
 
 export async function POST(request) {
@@ -15,6 +16,11 @@ export async function POST(request) {
   if (!config || !exactRequest(request, '/api/phase-9-5/start')) {
     return new Response(null, { status: 404, headers: safeHeaders() });
   }
+  const intent = request.headers.get('x-phase95-intent');
+  if (intent !== null && intent !== 'approved-create-page')
+    return new Response(null, { status: 403, headers: safeHeaders() });
+  const pilot = intent === 'approved-create-page';
+  if (pilot && !pilotEnabled()) return new Response(null, { status: 404, headers: safeHeaders() });
   if (request.headers.get('origin') !== new URL(constants.CALLBACK).origin) {
     return new Response(null, { status: 403, headers: safeHeaders() });
   }
@@ -32,7 +38,7 @@ export async function POST(request) {
       return new Response(null, { status: 403, headers: safeHeaders() });
     const state = randomUrlSafe();
     const verifier = randomUrlSafe();
-    const flow = await seal({ state, verifier, createdAt: Date.now() }, config.key);
+    const flow = await seal({ state, verifier, createdAt: Date.now(), intent: pilot ? 'pilot' : 'read' }, config.key);
     const authorize = new URL(constants.SUPABASE + '/auth/v1/oauth/authorize');
     authorize.searchParams.set('response_type', 'code');
     authorize.searchParams.set('client_id', config.clientId);
