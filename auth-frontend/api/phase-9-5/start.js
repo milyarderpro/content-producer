@@ -38,7 +38,10 @@ export async function POST(request) {
       return new Response(null, { status: 403, headers: safeHeaders() });
     const state = randomUrlSafe();
     const verifier = randomUrlSafe();
-    const flow = await seal({ state, verifier, createdAt: Date.now(), intent: pilot ? 'pilot' : 'read' }, config.key);
+    const flow = await seal(
+      { state, verifier, createdAt: Date.now(), intent: pilot ? 'pilot' : 'read' },
+      config.key,
+    );
     const authorize = new URL(constants.SUPABASE + '/auth/v1/oauth/authorize');
     authorize.searchParams.set('response_type', 'code');
     authorize.searchParams.set('client_id', config.clientId);
