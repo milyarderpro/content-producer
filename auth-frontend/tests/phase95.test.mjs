@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { randomBytes, webcrypto } from 'node:crypto';
 import test from 'node:test';
+import { approvedPilotPayload } from '../api/phase-9-5/approved-pilot.js';
 import { GET as callback } from '../api/phase-9-5/callback.js';
 import { POST as start } from '../api/phase-9-5/start.js';
 import {
@@ -11,6 +12,7 @@ import {
   resultRedirect,
   seal,
   settings,
+  pilotEnabled,
   unseal,
   verifyJwt,
 } from '../api/phase-9-5/_shared.js';
@@ -401,6 +403,153 @@ test('approve uses only five read-only MCP calls and no browser secret output', 
     ]);
     assert.equal(JSON.stringify([...response.headers]).includes(fakeCode), false);
     assert.equal(JSON.stringify([...response.headers]).includes(signed.token), false);
+  } finally {
+    globalThis.fetch = oldFetch;
+    process.env = original;
+  }
+});
+
+test('CR-026 fixed pilot configuration and deny-by-default owner write gate', async () => {
+  const original = { ...process.env };
+  const oldFetch = globalThis.fetch;
+  const env = {
+    PHASE95_ENABLED: '1',
+    PHASE95_CLIENT_ID: clientId,
+    PHASE95_OWNER_USER_ID: ownerId,
+    PHASE95_PUBLISHABLE_KEY: 'sb_publishable_test',
+    PHASE95_COOKIE_KEY: keyText,
+  };
+  const pilotRequest = () => new Request(new URL('/api/phase-9-5/start', constants.CALLBACK), {
+    method: 'POST',
+    headers: {
+      Origin: new URL(constants.CALLBACK).origin,
+      Authorization: 'Bearer dummy-browser-session',
+      'X-Phase95-Intent': 'approved-create-page',
+    },
+  });
+  try {
+    Object.assign(process.env, env);
+    delete process.env.PHASE95_WRITE_ENABLED;
+    assert.equal(pilotEnabled(), false);
+    assert.equal((await start(pilotRequest())).status, 404);
+    assert.equal(approvedPilotPayload.operation_key, 'b9f08c05-ee8e-4adf-8fe4-6c863128b9f7');
+    assert.equal(approvedPilotPayload.workspace_public_id, 'cad2885e-952e-41b3-9eae-d2d9d75d533d');
+    assert.equal(approvedPilotPayload.name, 'Phase 9.5 Pilot - Trivia');
+    assert.equal(approvedPilotPayload.slug, 'phase-9-5-pilot-trivia');
+    assert.deepEqual(approvedPilotPayload.target_markets, ['US']);
+    process.env.PHASE95_WRITE_ENABLED = '1';
+    assert.equal(pilotEnabled(), true);
+    globalThis.fetch = async () => json({ id: otherId });
+    assert.equal((await start(pilotRequest())).status, 403, 'non-owner must not begin OAuth pilot');
+    globalThis.fetch = async () => json({ id: ownerId });
+    const enabled = await start(pilotRequest());
+    assert.equal(enabled.status, 200);
+    const sealedFlow = enabled.headers.get('set-cookie').split(';')[0].split('=')[1];
+    assert.equal((await unseal(sealedFlow, config.key)).intent, 'pilot');
+    const readRequest = new Request(new URL('/api/phase-9-5/start', constants.CALLBACK), {
+      method: 'POST',
+      headers: { Origin: new URL(constants.CALLBACK).origin, Authorization: 'Bearer dummy-browser-session' },
+    });
+    const read = await start(readRequest);
+    assert.equal(read.status, 200);
+    const readFlow = read.headers.get('set-cookie').split(';')[0].split('=')[1];
+    assert.equal((await unseal(readFlow, config.key)).intent, 'read');
+    const unknownRequest = new Request(new URL('/api/phase-9-5/start', constants.CALLBACK), {
+      method: 'POST',
+      headers: { Origin: new URL(constants.CALLBACK).origin, Authorization: 'Bearer dummy-browser-session', 'X-Phase95-Intent': 'arbitrary-write' },
+    });
+    assert.equal((await start(unknownRequest)).status, 403);
+  } finally {
+    globalThis.fetch = oldFetch;
+    process.env = original;
+  }
+});
+
+test('approved owner pilot invokes exactly one fixed MCP create_page; read mode stays read-only', async () => {
+  const original = { ...process.env };
+  const oldFetch = globalThis.fetch;
+  Object.assign(process.env, {
+    PHASE95_ENABLED: '1',
+    PHASE95_WRITE_ENABLED: '1',
+    PHASE95_CLIENT_ID: clientId,
+    PHASE95_OWNER_USER_ID: ownerId,
+    PHASE95_PUBLISHABLE_KEY: 'sb_publishable_test',
+    PHASE95_COOKIE_KEY: keyText,
+  });
+  const signed = await jwt();
+  const calls = [];
+  globalThis.fetch = async (url, options = {}) => {
+    if (String(url).endsWith('/oauth/token')) {
+      calls.push('oauth:' + new URLSearchParams(options.body).get('grant_type'));
+      return json({ access_token: signed.token, refresh_token: 'dummy-refresh' });
+    }
+    if (String(url).endsWith('/jwks.json')) return json({ keys: [signed.publicKey] });
+    assert.equal(String(url), constants.RESOURCE);
+    const body = JSON.parse(options.body);
+    calls.push(body.method === 'tools/call' ? 'tool:' + body.params.name : body.method);
+    if (body.method === 'initialize') return json({ jsonrpc: '2.0', id: body.id, result: { serverInfo: { name: 'test' } } });
+    if (body.method === 'tools/list') return json(mcpListResponse());
+    assert.equal(body.method, 'tools/call');
+    if (body.params.name === 'create_page') {
+      assert.deepEqual(body.params.arguments, approvedPilotPayload);
+      assert.equal(options.headers.Authorization, 'Bearer ' + signed.token);
+      return json({
+        jsonrpc: '2.0', id: body.id, result: { structuredContent: {
+          response_schema_version: 1,
+          data: { page: { name: approvedPilotPayload.name, slug: approvedPilotPayload.slug },
+                  config: { niche_key: 'trivia' }, replayed: false },
+        } },
+      });
+    }
+    assert.ok(['get_account_profile', 'get_workspace_context', 'list_pages'].includes(body.params.name));
+    return json({
+      jsonrpc: '2.0', id: body.id, result: { structuredContent: {
+        response_schema_version: 1,
+        data: body.params.name === 'get_account_profile'
+          ? { profile: { workspace_public_id: approvedPilotPayload.workspace_public_id } }
+          : body.params.name === 'list_pages' ? { items: [] } : {},
+      } },
+    });
+  };
+  const run = async (intent) => {
+    const item = { ...flow(), intent };
+    const cookie = await seal(item, config.key);
+    const response = await callback(new Request(
+      constants.CALLBACK + '?state=' + item.state + '&code=' + fakeCode,
+      { headers: { cookie: constants.COOKIE_FLOW + '=' + cookie } },
+    ));
+    assert.equal(response.status, 303);
+    const match = /__Host-cp-phase95-result=([A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+)/.exec(response.headers.get('set-cookie') || '');
+    assert.ok(match);
+    return { result: await unseal(match[1], config.key), response };
+  };
+  try {
+    let read = await run('read');
+    assert.equal(read.result.status, 'owner_read_pass');
+    assert.equal(calls.includes('tool:create_page'), false);
+    calls.length = 0;
+    let pilot = await run('pilot');
+    assert.deepEqual({ status: pilot.result.status, tool_count: pilot.result.tool_count, owner_reads: pilot.result.owner_reads, replayed: pilot.result.replayed },
+      { status: 'pilot_write_pass', tool_count: 33, owner_reads: 3, replayed: false });
+    assert.deepEqual(calls, ['oauth:authorization_code', 'oauth:refresh_token', 'initialize', 'tools/list',
+      'tool:get_account_profile', 'tool:get_workspace_context', 'tool:list_pages', 'tool:create_page']);
+    assert.equal(JSON.stringify([...pilot.response.headers]).includes(signed.token), false);
+    assert.equal(JSON.stringify([...pilot.response.headers]).includes(fakeCode), false);
+    assert.equal(JSON.stringify([...pilot.response.headers]).includes(approvedPilotPayload.slug), false);
+    calls.length = 0;
+    process.env.PHASE95_WRITE_ENABLED = '0';
+    const blocked = await run('pilot');
+    assert.equal(blocked.result.status, 'pilot_disabled');
+    assert.deepEqual(calls, []);
+    calls.length = 0;
+    process.env.PHASE95_WRITE_ENABLED = '1';
+    const item = { ...flow(), intent: 'pilot' };
+    const denial = await callback(new Request(
+      constants.CALLBACK + '?state=' + item.state + '&error=access_denied',
+      { headers: { cookie: constants.COOKIE_FLOW + '=' + await seal(item, config.key) } },
+    ));
+    assert.equal(denial.status, 303);
+    assert.deepEqual(calls, []);
   } finally {
     globalThis.fetch = oldFetch;
     process.env = original;
