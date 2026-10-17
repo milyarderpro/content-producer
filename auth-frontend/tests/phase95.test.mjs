@@ -73,7 +73,6 @@ function json(data, status = 200) {
   return Response.json(data, { status });
 }
 
-
 function richTools() {
   const names = [
     'get_account_profile',
