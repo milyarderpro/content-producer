@@ -1,5 +1,6 @@
 import {
   boundedJson,
+  boundedMcpResult,
   callbackParams,
   clearCookie,
   constants,
@@ -50,19 +51,7 @@ async function rpc(token, method, params, id, stage) {
   });
   if (!response.ok)
     throw new Error(response.status === 401 ? 'mcp_401_' + stage : 'mcp_http_' + stage);
-  const contentType = response.headers.get('content-type') || '';
-  const raw = await response.text();
-  if (raw.length > 262144) throw new Error('mcp_size');
-  let body;
-  if (contentType.includes('text/event-stream')) {
-    const data = raw.split(/\r?\n/).filter((line) => line.startsWith('data:'));
-    if (data.length !== 1) throw new Error('mcp_format');
-    body = JSON.parse(data[0].slice(5).trim());
-  } else if (contentType.includes('application/json')) {
-    body = JSON.parse(raw);
-  } else throw new Error('mcp_format');
-  if (body?.error || !body?.result) throw new Error('mcp_result');
-  return body.result;
+  return boundedMcpResult(response, method);
 }
 
 function toolOk(result) {
