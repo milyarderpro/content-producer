@@ -545,7 +545,7 @@ test('approved owner pilot invokes exactly one fixed MCP create_page; read mode 
       }),
     );
     assert.equal(response.status, 303);
-    const match = /__Host-cp-phase95-result=([A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+)/.exec(
+    const match = /__Host-cp-phase95-result=([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)/.exec(
       response.headers.get('set-cookie') || '',
     );
     assert.ok(match);
