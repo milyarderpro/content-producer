@@ -1,1 +1,1 @@
-One-shot formatter and focused MCP tests for CR-032 on draft PR #23; additive profile test retry #4.
+One-shot formatter and focused MCP tests for CR-032; immutable write lock and all affected test files (retry #5).
