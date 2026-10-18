@@ -1,0 +1,65 @@
+name: Phase 10.1 - read-only hosted MCP descriptor diagnostics
+on:
+  push:
+    branches: [codex/phase-10-plugin]
+    paths:
+      - '.github/workflows/phase-10-1-hosted-catalog-diagnostics.yml'
+permissions:
+  contents: read
+jobs:
+  diagnostics:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 7
+    steps:
+      - name: Run real production initialize and tools/list only (NO tools/call)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request, collections
+          url = "https://xjonnilnypchtxogtopb.supabase.co/functions/v1/mcp"
+          def call(method, i, params=None):
+              req = urllib.request.Request(
+                  url,
+                  data=json.dumps({"jsonrpc":"2.0","id":i,"method":method,**({"params":params} if params is not None else {})}).encode(),
+                  headers={"content-type":"application/json","accept":"application/json, text/event-stream",
+                           "mcp-protocol-version":"2025-06-18","user-agent":"phase-10-1-read-only-diagnostics/1.0"},
+                  method="POST")
+              with urllib.request.urlopen(req,timeout=45) as response:
+                  body=response.read(131072).decode()
+                  print("HTTP",method,response.status,"type",response.headers.get("content-type"),"bytes",len(body))
+                  if "text/event-stream" in response.headers.get("content-type",""):
+                      records=[json.loads(line[6:]) for line in body.splitlines() if line.startswith("data: ")]
+                      return records[-1]
+                  return json.loads(body)
+          init=call("initialize",1,{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"phase-10-1-host-readonly","version":"1.0"}})
+          info=init.get("result") or {}
+          print("INIT info:",json.dumps({"protocolVersion":info.get("protocolVersion"),"capabilities":info.get("capabilities"),"serverInfo":info.get("serverInfo"),"error":init.get("error")},ensure_ascii=False))
+          body=call("tools/list",2)
+          if "error" in body:
+              print("ERROR",body["error"])
+              raise SystemExit(1)
+          tools=(body.get("result") or {}).get("tools",[])
+          print("TOOLS count",len(tools),"unique",len(set(t.get("name","") for t in tools)))
+          print("ALL names:",[t.get("name") for t in tools])
+          print("TOPLEVEL keys:",dict(collections.Counter(str(k) for t in tools for k in t)))
+          print("META keys:",dict(collections.Counter(str(k) for t in tools for k in (t.get("_meta") or {}))))
+          print("ANNOTATIONS:",dict(collections.Counter(json.dumps(t.get("annotations"),sort_keys=True) for t in tools)))
+          print("SCHEMES:",dict(collections.Counter(json.dumps(t.get("securitySchemes"),sort_keys=True) for t in tools)))
+          anomalies=[]
+          for t in tools:
+              name=t.get("name")
+              schema=t.get("inputSchema")
+              if not isinstance(schema,dict) or schema.get("type")!="object": anomalies.append([name,"invalid input schema",str(schema)[:200]])
+              for field in ["title","description"]:
+                  if field in t and not isinstance(t[field],str): anomalies.append([name,"invalid "+field])
+              for k,v in (schema.get("properties") or {}).items():
+                  if not isinstance(v,dict): anomalies.append([name,"bad property schema",k])
+              if t.get("outputSchema") is not None and t["outputSchema"].get("type")!="object": anomalies.append([name,"invalid output schema"])
+              print("TOOL",name,"descLen",len(t.get("description") or ""),"inputKeys",list((schema or {}).keys()),"numProps",len((schema or {}).get("properties") or {}),"outKeys",list((t.get("outputSchema") or {}).keys()),"annotation",t.get("annotations"),"metaKeys",list((t.get("_meta") or {}).keys()))
+          print("ANOMALIES",json.dumps(anomalies,ensure_ascii=False))
+          assert len(tools)==33 and len(set(t["name"] for t in tools))==33
+          assert all(t.get("securitySchemes")==[{"type":"noauth"}] for t in tools)
+          assert all((t.get("_meta") or {}).get("securitySchemes")==[{"type":"noauth"}] for t in tools)
+          assert not anomalies
+          print("READ-ONLY HOSTED DESCRIPTORS PASS: 33 explicit noauth tool declarations; this alone does not prove ChatGPT plugin acceptance")
+          PY
