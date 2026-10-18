@@ -1,0 +1,4 @@
+Phase 10.1 final candidate marker
+Source and focused-test SHA: 21f2ec76df98db683af185439a2048f49855702d
+The marker commit itself changes no MCP, database, or Inspector code.
+Run the branch-local CR-020 technical gate once on the exact marker commit SHA.
