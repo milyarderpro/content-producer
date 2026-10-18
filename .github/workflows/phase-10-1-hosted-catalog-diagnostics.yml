@@ -10,7 +10,7 @@ permissions:
   contents: read
 jobs:
   format-cr033:
-    name: Format only CR-033 with pinned Prettier
+    name: Format CR-033 and pilot transport using pinned Prettier
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -33,16 +33,16 @@ jobs:
         run: |
           set -euo pipefail
           pnpm install --frozen-lockfile
-          pnpm exec prettier --write docs/decisions/2026-10-18-phase-10-1-chatgpt-catalog-budget.md
+          pnpm exec prettier --write docs/decisions/2026-10-18-phase-10-1-chatgpt-catalog-budget.md supabase/functions/mcp/transport.ts
           if git diff --quiet; then
-            echo "CR-033 already formatted"
+            echo "CR-033 and transport already formatted"
             exit 0
           fi
-          test "$(git diff --name-only)" = "docs/decisions/2026-10-18-phase-10-1-chatgpt-catalog-budget.md"
+          git diff --name-only | grep -Ev "^(docs/decisions/2026-10-18-phase-10-1-chatgpt-catalog-budget.md|supabase/functions/mcp/transport.ts)$" | grep . && exit 1 || true
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/decisions/2026-10-18-phase-10-1-chatgpt-catalog-budget.md
-          git commit -m "style(phase-10.1): apply pinned Prettier to CR-033"
+          git add docs/decisions/2026-10-18-phase-10-1-chatgpt-catalog-budget.md supabase/functions/mcp/transport.ts
+          git commit -m "style(phase-10.1): apply pinned Prettier to compact catalog metadata"
           git push origin HEAD:codex/phase-10-plugin
   catalog-focused:
     name: Local compact-catalog Deno checks (no remote writes)
