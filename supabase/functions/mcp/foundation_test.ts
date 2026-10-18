@@ -255,7 +255,8 @@ Deno.test('All registered tool input/output object schemas are closed recursivel
   const profile = tools.find((tool: { name: string }) => tool.name === 'get_account_profile');
   assert(profile?.inputSchema?.additionalProperties === false, 'profile input must be closed');
   assert(Object.keys(profile.inputSchema.properties).length === 0, 'profile must accept {}');
-  assert(profile.outputSchema.required.join(' ') === 'id', 'top-level profile id required');
+  assert(profile.outputSchema.required.includes('id'), 'top-level profile id required');
+  assert(profile.outputSchema.required.includes('workspace_public_id'), 'fixed workspace reference required');
   assert(profile.outputSchema.properties.id.type === 'string', 'profile id schema');
 });
 
