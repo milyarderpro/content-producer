@@ -4,6 +4,8 @@ on:
     branches: [codex/phase-10-plugin]
     paths:
       - '.github/workflows/phase-10-1-hosted-catalog-diagnostics.yml'
+      - 'supabase/functions/mcp/transport.ts'
+      - 'supabase/functions/mcp/pilot_db_test.ts'
 permissions:
   contents: read
 jobs:
