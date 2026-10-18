@@ -112,7 +112,7 @@ jobs:
             echo "- Archive SHA-256: $(sha256sum artifacts/phase-10-preflight-candidate.zip | cut -d ' ' -f1)"
             echo "- Source file-list: artifacts/plugin-candidate-filelist.json"
             echo "- Action: ZIP artifact upload only. **Not installed** and **not final**."
-            echo "- Host custom-MCP write and installation gate: **BLOCKED** pending account evidence."
+            echo "- CR-028: host write approval is a **10.1 gate**; final private install is a **10.2 gate** (not attempted at 10.0)."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload candidate and file hashes as private-to-run artifact
