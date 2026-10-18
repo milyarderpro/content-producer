@@ -24,8 +24,11 @@ function mirrorToolSchemes(value: unknown, pilot = false): unknown {
         const meta = tool._meta;
         if (!meta || typeof meta !== 'object') return item;
         if (pilot) {
-          const { securitySchemes: _toolSchemes, ...rest } = tool;
-          const { securitySchemes: _metaSchemes, 'openai/profile': _profileAuth, ...restMeta } = meta as Record<string, unknown>;
+          const rest = { ...tool };
+          delete rest.securitySchemes;
+          const restMeta = { ...(meta as Record<string, unknown>) };
+          delete restMeta.securitySchemes;
+          delete restMeta['openai/profile'];
           return { ...rest, _meta: restMeta }; // noauth tools must not advertise OAuth
         }
         const schemes = (meta as Record<string, unknown>).securitySchemes;
