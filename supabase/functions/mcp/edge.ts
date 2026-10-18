@@ -7,6 +7,7 @@ import {
   WorkspaceCheckFailure,
 } from './auth.ts';
 import { handleHttpRequest, oversizedRequestResponse } from './http.ts';
+import { fixedPilotOwnerId, resolvePilotWorkspace } from './pilot_db.ts';
 
 type FixtureJwks = { keys: Array<JsonWebKey & { kid?: string }> };
 const MAX_REQUEST_BYTES = 256 * 1024;
@@ -143,6 +144,32 @@ export function createEdgeHandler(
       checkOwner,
     };
     const forwardedRequest = new Request(request, { body: body?.slice(0) ?? null });
+    // The production ChatGPT connection is No authentication. All requests
+    // without a bearer use one server-fixed pilot identity and non-bypass RLS.
+    // Tests supplying configured OAuth fixtures retain the legacy path.
+    if (isMcpPath && !configured && request.method === 'POST' &&
+        !request.headers.has('Authorization')) {
+      try {
+        const actor = fixedPilotOwnerId();
+        const workspace = await resolvePilotWorkspace(actor);
+        return handleHttpRequest(forwardedRequest, {
+          config,
+          pilotContext: {
+            requestId: crypto.randomUUID(),
+            actorUserId: actor,
+            oauthClientId: 'phase-10-1-noauth-fixed-pilot',
+            workspacePublicId: workspace,
+            accessToken: '',
+            supabaseUrl: config.supabaseUrl,
+            publishableKey: config.publishableKey,
+            pilotMode: true,
+          },
+        });
+      } catch {
+        // No credential, internal DB result, or profile leaks to the caller.
+        return Response.json({ error: 'pilot_unavailable' }, { status: 503 });
+      }
+    }
     // Mixed authentication: protocol discovery is public; every business
     // tools/call still passes through the existing user and owner gates.
     if (isMcpPath && request.method === 'POST' && !request.headers.has('Authorization')) {
