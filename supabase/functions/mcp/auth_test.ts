@@ -358,6 +358,23 @@ Deno.test(
         method === 'initialize' ? body.includes('serverInfo') : body.includes('list_pages'),
         'invalid transport response',
       );
+      if (method === 'tools/list') {
+        const frame = body.split('\n').find((line) => line.startsWith('data: '));
+        assert(frame, 'signed owner tools/list frame missing');
+        const tools = JSON.parse(frame.slice(6)).result.tools;
+        assert(tools.length === 33, 'signed owner must see exactly 33 tools');
+        assert(
+          tools.some((tool: { name: string }) => tool.name === 'create_page'),
+          'write tool absent',
+        );
+        for (const tool of tools) {
+          assert(tool.securitySchemes?.[0]?.type === 'oauth2', 'top-level OAuth missing');
+          assert(
+            JSON.stringify(tool.securitySchemes) === JSON.stringify(tool._meta.securitySchemes),
+            'OAuth compatibility mirror differs',
+          );
+        }
+      }
     }
   },
 );

@@ -14,7 +14,9 @@ const timestamp = z.string().datetime({ offset: true });
 const cursor = z.string().min(1).max(512);
 const version = z.literal(1);
 const common = { request_schema_version: version, workspace_public_id: publicId };
-const profileInput = z.strictObject({ request_schema_version: version });
+// ChatGPT calls the designated profile tool with {}. Keep the versioned RPC
+// contract behind this MCP-only adapter.
+const profileInput = z.strictObject({});
 const workspaceInput = z.strictObject(common);
 const pagesInput = z.strictObject({
   ...common,
@@ -58,7 +60,7 @@ const pageFields = {
   enabled_niches: z.array(niche),
   updated_at: timestamp,
 };
-const profileOutput = response(
+const rpcProfileOutput = response(
   z.strictObject({
     profile: z.strictObject({
       id: z.string().min(1).max(200),
@@ -70,6 +72,11 @@ const profileOutput = response(
     }),
   }),
 );
+const profileOutput = z.strictObject({
+  id: z.string().min(1).max(200).regex(/\S/),
+  name: z.string().min(1).max(120).optional(),
+  nickname: z.string().min(1).max(120).optional(),
+});
 const moduleCatalog = z.strictObject({
   niche_key: nicheKey,
   display_name: z.string(),
@@ -542,15 +549,27 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
       annotations,
       _meta: { securitySchemes, 'openai/profile': true },
     },
-    (args) =>
-      invoke(
+    async () => {
+      const result = await invoke(
         'get_account_profile',
         scoped,
-        {
-          p_request_schema_version: args.request_schema_version,
-        },
-        profileOutput,
-      ),
+        { p_request_schema_version: 1 },
+        rpcProfileOutput,
+      );
+      if ('isError' in result) return result;
+      const rpc = rpcProfileOutput.safeParse(result.structuredContent);
+      if (!rpc.success) return failure('DATABASE_UNAVAILABLE');
+      const profile = profileOutput.safeParse({
+        id: rpc.data.data.profile.id,
+        name: rpc.data.data.profile.display_name,
+        nickname: rpc.data.data.profile.workspace_name,
+      });
+      if (!profile.success) return failure('DATABASE_UNAVAILABLE');
+      return {
+        structuredContent: profile.data,
+        content: [{ type: 'text' as const, text: JSON.stringify(profile.data) }],
+      };
+    },
   );
   server.registerTool(
     'get_workspace_context',

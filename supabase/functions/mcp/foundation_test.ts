@@ -229,7 +229,7 @@ Deno.test(
     assert((listed.match(/"readOnlyHint":true/g) || []).length === 11, 'eleven read-only tools');
     assert((listed.match(/"openWorldHint":false/g) || []).length === 33, 'open world must be off');
     assert(listed.split('"openai/profile":true').length === 2, 'one profile metadata');
-    assert((listed.match(/"oauth2"/g) || []).length === 33, '33 OAuth security schemes');
+    assert((listed.match(/"oauth2"/g) || []).length === 66, '33 OAuth schemes with mirrors');
     assert(listed.includes('create_page'), '6.4 tool must be present');
   },
 );
@@ -241,10 +241,22 @@ Deno.test('All registered tool input/output object schemas are closed recursivel
   const parsed = JSON.parse(frame.slice(6));
   const tools = parsed.result?.tools ?? [];
   assert(tools.length === MCP_TOOL_COUNT && tools.length === 33, 'exact 33 schemas');
+  assert(new Set(tools.map((tool: { name: string }) => tool.name)).size === 33, 'unique names');
   for (const tool of tools) {
     assertClosedObjects(tool.inputSchema, tool.name + '.input');
     assertClosedObjects(tool.outputSchema, tool.name + '.output');
+    assert(tool.securitySchemes?.[0]?.type === 'oauth2', tool.name + ' top-level OAuth');
+    assert(
+      JSON.stringify(tool.securitySchemes) === JSON.stringify(tool._meta?.securitySchemes),
+      tool.name + ' OAuth mirror mismatch',
+    );
+    assert(tool.securitySchemes[0].scopes.join(' ') === 'openid email', tool.name + ' scopes');
   }
+  const profile = tools.find((tool: { name: string }) => tool.name === 'get_account_profile');
+  assert(profile?.inputSchema?.additionalProperties === false, 'profile input must be closed');
+  assert(Object.keys(profile.inputSchema.properties).length === 0, 'profile must accept {}');
+  assert(profile.outputSchema.required.join(' ') === 'id', 'top-level profile id required');
+  assert(profile.outputSchema.properties.id.type === 'string', 'profile id schema');
 });
 
 Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation', async () => {
@@ -271,9 +283,19 @@ Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation',
   try {
     const profile = await request('tools/call', {
       name: 'get_account_profile',
-      arguments: { request_schema_version: 1 },
+      arguments: {},
     });
-    assert(profile.includes('o***@example.test'), 'masked hint must be available');
+    const profileFrame = profile.split('\n').find((line) => line.startsWith('data: '));
+    assert(profileFrame, 'profile must return MCP data frame');
+    const profileResult = JSON.parse(profileFrame.slice(6)).result;
+    assert(profileResult.structuredContent.id === owner, 'top-level owner identity');
+    assert(profileResult.structuredContent.name === 'Owner', 'profile display name');
+    assert(profileResult.structuredContent.nickname === 'Owner workspace', 'profile label');
+    assert(
+      profileResult.content[0].text === JSON.stringify(profileResult.structuredContent),
+      'profile text must match structured content',
+    );
+    assert(!profile.includes('o***@example.test'), 'masked hint must not masquerade as email');
     assert(!profile.includes('access_token'), 'must not expose tokens');
     const ws = await request('tools/call', {
       name: 'get_workspace_context',
@@ -305,6 +327,10 @@ Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation',
     });
     assert(generation.includes('eligible_fact_count'), 'generation result missing');
     assert(calls.length === 4, 'all 4 RPCs must be executed');
+    assert(
+      calls[0]?.name === 'get_account_profile' && calls[0]?.args.p_request_schema_version === 1,
+      'MCP profile adapter must preserve versioned RPC',
+    );
     assert(
       calls[2]?.args.p_query === 'Owner' && calls[2]?.args.p_limit === 1,
       'list_pages filters and pagination lost',
