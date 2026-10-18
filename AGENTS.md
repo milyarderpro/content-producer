@@ -24,17 +24,24 @@ Pilot-ready separately from MVP Complete. A Phase 10–11 gate may reuse the
 full test result for an unchanged deployed backend SHA; validate later plugin-package
 changes with focused package/MCP tests and affected manual cards. Keep the 101
 cases as a regression inventory.
-For Phase 10, follow `plans/works/phase-10-implementation-plan.md` and CR-028:
-one checkpoint per task. Check access to the custom MCP/OAuth form and the
-artifact-to-private-plugin delivery path in 10.0; inspect available write
-actions and owner-approval affordances immediately after private connection
-and OAuth in 10.1, **without executing a write**. Stop 10.1 if write support
-cannot be shown; install the final private plugin only in 10.2. Freeze the
-nine mandatory manual-card **procedures** in 10.0; bind owner-approved Page,
-content and plan values immediately before their respective cards and record
-the exact executable prompt before running it. First business write remains
-MAN-02 after owner approval of the exact Page payload. Phase 10 can become
-Pilot-ready only after independent audit; Phase 11 owns MVP Complete.
+For Phase 10, follow `plans/works/phase-10-implementation-plan.md` and CR-028,
+with the **explicit owner-approved CR-032 exception for checkpoint 10.1**:
+connect the existing production MCP through one PRIVATE ChatGPT custom plugin
+with **No authentication**, not end-user OAuth/login. Only the Edge Function
+may hold `SUPABASE_DB_URL`; bind exactly one active pilot workspace on the
+server and downgrade each database RPC transaction to `authenticated` under
+server-generated claims, preserving the existing 33 RPCs and RLS. Never grant
+`anon` direct RPC/table/sequence/helper privileges or call RPC using a
+bypass-RLS service role. This **public URL is callable by anyone**: reads are
+not owner-authenticated; server-block all business writes during 10.1 and
+record the public endpoint risk. Test the identity boundary before release.
+Run one CR-020 full gate on the final changed backend SHA before production
+deployment; then require exactly 33 visible tools (including `create_page`)
+and three live ChatGPT reads for 10.1 PASS. Do not invoke business writes.
+Keep the nine mandatory manual-card **procedures** frozen as `procedure-v1`;
+bind Page/content/plan only before their respective cards. The first business
+write remains MAN-02 after exact Page payload approval. Package install is
+10.2, independent Pilot-ready audit is 10.7, and MVP Complete is Phase 11.
 
 ## Boundaries
 
