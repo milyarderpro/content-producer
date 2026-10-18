@@ -16,17 +16,17 @@
 
 ### 10.0 evidence accounting
 
-| Gate | Current status | Boundary |
-| --- | --- | --- |
-| Owner's private custom MCP creation form / OAuth selector | **PROVEN** | UI only, no connection |
-| GitHub Actions artifact download + integrity | **PROVEN** | 12-file source candidate, not final |
-| PRIVATE plugin archive intake available for local ZIP/tar.gz | **PROVEN** | No plugin creation/upload attempted |
-| MAN-01..09 frozen rules, sequences, approval and recovery | **PROVEN** | `procedure-v1`; exact owner values remain JIT |
-| General plugin permissions / custom MCP write entitlement | **DEFERRED TO 10.1** | Must stop there if not verifiable without write |
-| Final plugin install/combined skill and MCP | **DEFERRED TO 10.2** | New verified `mcp.json`/version/hash |
-| Owner-selected Page/content/plan payloads | **DEFERRED TO CARDS** | New Page MAN-02; draft MAN-03; approval MAN-04; plan MAN-05 |
-| Business write | **DEFERRED TO MAN-02** | No write in 10.0, 10.1 or 10.2 |
-| CR-028, tracker, Issue/PR and changed-document CI | **PENDING CI on final SHA** | Record in Issue once run completes |
+| Gate                                                         | Current status              | Boundary                                                    |
+| ------------------------------------------------------------ | --------------------------- | ----------------------------------------------------------- |
+| Owner's private custom MCP creation form / OAuth selector    | **PROVEN**                  | UI only, no connection                                      |
+| GitHub Actions artifact download + integrity                 | **PROVEN**                  | 12-file source candidate, not final                         |
+| PRIVATE plugin archive intake available for local ZIP/tar.gz | **PROVEN**                  | No plugin creation/upload attempted                         |
+| MAN-01..09 frozen rules, sequences, approval and recovery    | **PROVEN**                  | `procedure-v1`; exact owner values remain JIT               |
+| General plugin permissions / custom MCP write entitlement    | **DEFERRED TO 10.1**        | Must stop there if not verifiable without write             |
+| Final plugin install/combined skill and MCP                  | **DEFERRED TO 10.2**        | New verified `mcp.json`/version/hash                        |
+| Owner-selected Page/content/plan payloads                    | **DEFERRED TO CARDS**       | New Page MAN-02; draft MAN-03; approval MAN-04; plan MAN-05 |
+| Business write                                               | **DEFERRED TO MAN-02**      | No write in 10.0, 10.1 or 10.2                              |
+| CR-028, tracker, Issue/PR and changed-document CI            | **PENDING CI on final SHA** | Record in Issue once run completes                          |
 
 The previous sections below are **historical pre-CR-028 10.0 preflight snapshots**. Their BLOCKED verdict, package-install requirement, and owner-data-before-guide-freeze interpretation are explicitly superseded; do not use them as the current 10.0 acceptance checklist. Historic Phase 9 risk limitations remain open.
 

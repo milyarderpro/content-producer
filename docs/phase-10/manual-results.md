@@ -7,14 +7,14 @@
 | Field                                                           | Recorded value                                                                                                                                                    |
 | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Repository baseline main SHA (10.0)                             | `ce87e15323a88abb82b1d9031ba8fef07dcf76b1`                                                                                                                        |
-| Guide version / frozen commit SHA                               | procedure-v1 under CR-028; final guide commit SHA recorded after 10.0 CI                                                                                                              |
+| Guide version / frozen commit SHA                               | procedure-v1 under CR-028; final guide commit SHA recorded after 10.0 CI                                                                                          |
 | ChatGPT workspace + plan + host/mode/model                      | Owner Plus UI shows Add custom MCP server and OAuth; write approval pending 10.1                                                                                  |
 | Final plugin name, manifest version and installed-release ID    | PENDING (source candidate is not an installed final package)                                                                                                      |
 | Final archive SHA-256 and GitHub Actions artifact ID/run/SHA    | PENDING — preflight CI candidate is not the final package                                                                                                         |
 | Verified custom MCP connection and OAuth owner test             | PENDING — 10.1, not performed in 10.0                                                                                                                             |
 | Backend release SHA and link to applicable full gate            | `be3bf04b703a4aff16510c496600c9796c13b57a` — https://github.com/milyarderpro/content-producer/actions/runs/39085571345 (Phase 9 historical evidence, no new gate) |
 | Production page baseline                                        | One owner pilot Page `phase-9-5-pilot-trivia` in Phase 9 independent audit; no new live state inspection in 10.0                                                  |
-| New Page name/slug/niche/timezone/market/config + approval link | JIT before MAN-02: PENDING owner approval of exact payload; not 10.0                                                                                                                                            |
+| New Page name/slug/niche/timezone/market/config + approval link | JIT before MAN-02: PENDING owner approval of exact payload; not 10.0                                                                                              |
 | Publication/metrics policy                                      | `MAN-10..11` DEFERRED — POST-MVP by CR-027                                                                                                                        |
 
 ## Per-card outcome table
