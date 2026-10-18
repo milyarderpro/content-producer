@@ -1,4 +1,6 @@
 Phase 10.1 final candidate marker
-Source and focused-test SHA: 21f2ec76df98db683af185439a2048f49855702d
+Source and focused-test SHA: c9017b916f6e0e91e25970c16a83b3f235e2d793
+CR-031 mixed-auth discovery candidate; 12 focused MCP tests and the project check passed.
+Light CI run 39124567247 passed on the source SHA.
 The marker commit itself changes no MCP, database, or Inspector code.
 Run the branch-local CR-020 technical gate once on the exact marker commit SHA.
