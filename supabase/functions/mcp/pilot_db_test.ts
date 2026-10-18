@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'npm:zod@4.3.6';
 import type { RequestContext } from './auth.ts';
 import { invoke } from './foundation.ts';
 import { buildPilotRpcStatement } from './pilot_db.ts';
