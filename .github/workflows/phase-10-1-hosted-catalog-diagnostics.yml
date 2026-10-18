@@ -41,6 +41,11 @@ jobs:
           tools=(body.get("result") or {}).get("tools",[])
           print("TOOLS count",len(tools),"unique",len(set(t.get("name","") for t in tools)))
           print("ALL names:",[t.get("name") for t in tools])
+          for field in ["name","title","description","inputSchema","outputSchema","annotations","securitySchemes","_meta"]:
+              total=sum(len(json.dumps(t.get(field),separators=(",",":"),ensure_ascii=False).encode()) for t in tools)
+              print("BYTES BY FIELD",field,total)
+          print("TOP 8 TOOLS BYTES:", sorted([(t.get("name"),len(json.dumps(t,separators=(",",":"),ensure_ascii=False).encode()),len(json.dumps(t.get("inputSchema"),separators=(",",":"),ensure_ascii=False).encode()),len(json.dumps(t.get("outputSchema"),separators=(",",":"),ensure_ascii=False).encode())) for t in tools],key=lambda x:-x[1])[:8])
+          print("COMPACT FULL TOOLS BYTES",len(json.dumps(tools,separators=(",",":"),ensure_ascii=False).encode()))
           print("TOPLEVEL keys:",dict(collections.Counter(str(k) for t in tools for k in t)))
           print("META keys:",dict(collections.Counter(str(k) for t in tools for k in (t.get("_meta") or {}))))
           print("ANNOTATIONS:",dict(collections.Counter(json.dumps(t.get("annotations"),sort_keys=True) for t in tools)))
