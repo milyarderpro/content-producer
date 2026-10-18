@@ -41,9 +41,16 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     'missing create_page',
   );
   for (const tool of tools) {
-    assert(!('securitySchemes' in tool), 'noauth tool must not declare OAuth at top level');
+    assert(
+      JSON.stringify(tool.securitySchemes) === JSON.stringify([{ type: 'noauth' }]),
+      'every pilot tool must explicitly advertise top-level noauth',
+    );
     const meta = tool._meta as Record<string, unknown> | undefined;
-    assert(!meta || !('securitySchemes' in meta), 'noauth tool must not advertise OAuth metadata');
+    assert(
+      JSON.stringify(meta?.securitySchemes) === JSON.stringify([{ type: 'noauth' }]),
+      'every pilot tool must explicitly advertise _meta noauth',
+    );
+    assert(!('openai/profile' in (meta ?? {})), 'pilot tools must not advertise OAuth profiles');
   }
 });
 Deno.test('10.1 default pilot write latch blocks business RPC before database access', async () => {
