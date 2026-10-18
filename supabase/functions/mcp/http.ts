@@ -1,4 +1,5 @@
 import { MCP_SERVICE_NAME, MCP_SERVICE_VERSION } from './server.ts';
+import type { RequestContext } from './auth.ts';
 import { createAuthenticatedTransport, fetchAnonymousDiscovery } from './transport.ts';
 import {
   type AuthDependencies,
@@ -23,6 +24,7 @@ export interface HttpOptions {
   dependencies?: AuthDependencies;
   verifiedClaims?: Record<string, unknown>;
   anonymousDiscovery?: boolean;
+  pilotContext?: RequestContext;
 }
 function jsonResponse(body: object, status: number, extra: Record<string, string> = {}): Response {
   return Response.json(body, { status, headers: { ...publicHeaders, ...extra } });
@@ -193,6 +195,11 @@ export async function handleHttpRequest(
   // The Supabase Edge gateway removes /functions/v1 before invoking this function.
   if (path !== expectedPath && path !== '/mcp') return challenge(config.resource, 401);
   const id = crypto.randomUUID();
+  if (options.pilotContext) {
+    const response = await createAuthenticatedTransport(options.pilotContext).fetch(request);
+    safeLog(id, 'fixed_pilot', response.status);
+    return response;
+  }
   if (options.anonymousDiscovery && !request.headers.has('Authorization')) {
     const response = await fetchAnonymousDiscovery(request);
     if (response.status !== 403 && response.status !== 400) {
