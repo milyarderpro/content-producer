@@ -1667,9 +1667,12 @@ kelak dijalankan; prompt frozen dan expected behavior tidak diubah. Gate MVP
 aktif mewajibkan cakupan deterministic positive/boundary/auth untuk 33 tools
 serta sembilan kartu manual wajib `MAN-01..MAN-09` pada plugin final sesuai
 CR-020 sebagaimana diubah CR-027.
-Prompt persis, expected behavior, dan hasil terlarang dibekukan pada panduan
-Phase 10 sebelum dieksekusi. Setiap kartu dijalankan sekali; hanya yang gagal
-atau terdampak perbaikan diulang. `MAN-01..MAN-09` harus lulus untuk
+Menurut CR-028, prosedur, expected behavior, hasil terlarang, dan batas
+persetujuan sembilan kartu dibekukan pada 10.0. Nilai Page, konten, dan
+jadwal diminta tepat sebelum kartu terkait; prompt persis hasil pengikatan
+nilai yang telah disetujui dibekukan dan direkam sebelum kartu itu dijalankan.
+Setiap kartu dijalankan sekali; hanya yang gagal atau terdampak perbaikan
+diulang. `MAN-01..MAN-09` harus lulus untuk
 `Pilot-ready`; `MAN-10..MAN-11` hanya dijalankan sebagai observasi opsional
 setelah MVP bila kejadian publikasi dan metrik sungguhan tersedia. Penolakan
 lintas owner dibuktikan secara otomatis, bukan oleh owner melalui akun ChatGPT
@@ -1714,12 +1717,15 @@ MVP bergantung pada:
 - Facebook untuk publikasi manual.
 
 Perubahan fitur atau limit pada ChatGPT Plus dan Supabase berada di luar kendali produk dan perlu diperiksa kembali saat implementasi.
-Sebelum Phase 10, verifikasi langsung bahwa akun/workspace pemilik mendukung
-**custom MCP private dengan aksi tulis** serta instalasi skill/plugin private.
-Konektor GitHub atau akses MCP baca saja tidak membuktikan kemampuan itu.
-Jika paket akun yang dipakai tidak mendukungnya, hentikan Phase 10 dan catat
-keputusan host/akun atau change record; jangan menganggap dependency ini
-terpenuhi hanya karena nama paket ChatGPT Plus tercantum di atas.
+CR-028 mengatur pembuktian bertahap: checkpoint 10.0 memverifikasi formulir
+custom MCP private/OAuth dan jalur artifact ke penerima paket private,
+**bukan** izin write atau instalasi final. Sesudah koneksi/OAuth pemilik pada
+awal 10.1, periksa ketersediaan tool write dan mekanisme persetujuan secara
+baca-saja tanpa memanggil write; jika tidak terbukti, berhenti sebelum
+membuat paket. Instalasi plugin final berada pada 10.2. Write bisnis pertama
+hanya `MAN-02` setelah payload Page persis disetujui pemilik. Konektor
+GitHub atau akses MCP baca saja tidak membuktikan kemampuan write dan tidak
+ada kewajiban mengganti paket ChatGPT berdasarkan asumsi.
 
 ---
 
