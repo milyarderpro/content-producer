@@ -1,17 +1,29 @@
-# Phase 10 — manual acceptance cards (10.0 preparatory draft)
+# Phase 10 — mandatory guided cards: frozen procedure-v1 (CR-028)
 
-**Status: NOT FROZEN / NOT EXECUTED — checkpoint 10.0 BLOCKED.** This guide is a reviewable draft, not permission to start 10.1–10.6, log in, install a plugin, or mutate production. The exact executable prompts must be compiled, reviewed by the owner and frozen **before** MAN-01. Any `<OWNER-...>` marker is an intentionally unfilled owner decision; **never** execute a prompt containing one. Record the freeze commit, revision, plugin version/hash and owner decision in `manual-results.md`.
+**Status: procedure-v1 FROZEN at 10.0; execution NOT STARTED.** The invariant steps, tool ordering, forbidden actions, state checks, recovery and approval boundaries below are frozen under CR-028. Content-bearing exact executable prompts remain unbound until the owner chooses values at the relevant card. This is **not** authority to perform any business write, start 10.1, or install a plugin.
+
+## Procedure freeze and per-card binding gates
+
+The text and rules in `MAN-01..MAN-09` are the frozen manual procedure `procedure-v1`. An `<OWNER-...>` marker is a **typed variable**, not a request for data now and never a value that may be executed. At each assigned checkpoint:
+
+1. Verify its preceding card's actual owner-scoped state, connection identity and installed final-plugin SHA/version.
+2. For a card needing new decisions, request **only its data at that time**. Validate against the real tool schema, module catalog and existing owner Page/config. Before `MAN-02`, show the **entire JSON payload and one operation key** for explicit owner approval, without writing. Before `MAN-03`, ask topic, format, sourcing and editorial bounds; before `MAN-04`, ask the revised hook and obtain **separate approval after exact final content/revision/hash review**; before `MAN-05`, ask plan name, intent and exact 1–3 slots. Never supply a production value on the owner's behalf.
+3. Substitute validated owner values or *actual read-back IDs* into the prescribed prompt, preserve every mandatory safety clause, and record the fully compiled exact prompt plus approval reference in `manual-results.md` **before running that card**. No unresolved variable, mock ID, or unreviewed data may be sent as a production write prompt.
+4. A card's approved operation key is stable for that exact semantic payload and is never reused for a different write. Lost-response recovery begins with owner-scoped state/ledger read-back, not a second create with a new key.
+5. No procedural edits after `procedure-v1` freeze without a dated numbered revision and rerunning only impacted cards. Values vary legitimately per card without changing frozen rules. `MAN-08` and `MAN-09` use their already complete static prompts.
+
+**Phase boundaries:** 10.0 proves creation form/OAuth selector and delivery route; **10.1 begins with read-only inspection of write-tool visibility and owner-approval ability immediately after connection/OAuth, with no invocation**. Failure stops 10.1 before owner reads or package work. 10.2 installs the final private archive. The **first production write** remains `MAN-02` only after its exact Page payload is approved. Source `plugin.json` declares `Read/Write`, but does not grant the host permission. No smoke/dummy write in 10.0–10.2.
 
 ## Safety and shared setup
 
-- Host: one owner-authorized ChatGPT web account/workspace with demonstrated **private custom MCP and write actions**, OAuth and private plugin installation. A GitHub connection or private skills-only plugin does not prove those capabilities. Do not proceed when any gate is missing.
+- Host: one owner-authorized ChatGPT web account/workspace. Custom MCP form/OAuth selector and private artifact intake are preflight proofs from 10.0; write-action visibility/approval is a mandatory 10.1 gate, and successful final-package installation is a 10.2 gate. A GitHub connection or private skills-only plugin proves neither write authorization nor production access.
 - Production MCP and authentication are **not** connected at 10.0. Require a verified single final plugin selection and owner-scoped OAuth during later checkpoints. Run each card only in its assigned phase: MAN-01..02 (10.3); MAN-03..04 (10.4); MAN-05..06 (10.5); MAN-07..09 (10.6). MAN-10..11 are **DEFERRED — POST-MVP** under CR-027.
 - Existing Phase 9 Page is **`phase-9-5-pilot-trivia`**; preserve its config, content and ledger. A _different_ owner-approved Page is used for MAN-02 onward. Never create a Page or post from test fixtures or execute SQL/service-role writes to bypass the host.
-- Owner decisions required before freeze: **new Page name, unique slug, niche `trivia`, IANA timezone, ISO target-market codes, exact supported trivia config** (fact-count mode, ranges, reuse scope, budget and editorial defaults), make-default choice, and separately the permitted topics, factual-content/editorial boundaries, draft count, plan name, exact slots/times and actions allowed. Config must be checked against `plans/tool-inventory.md` and `get_workspace_context`/`get_page_generation_context`; do not guess values. Do not reuse Phase 9.5 pilot operation key. No production Page decision has been supplied for this new Page.
+- Owner values are **not required to freeze procedure-v1**. Ask for new Page name/slug, niche `trivia`, IANA timezone, ISO markets, exact complete trivia config and make-default choice directly before MAN-02. Validate with `plans/tool-inventory.md` and real workspace/generation context; never reuse the Phase 9.5 pilot operation key. Ask for draft topic/format/profile/editorial limits before MAN-03 and exact plan slots before MAN-05. No production Page/content/plan decision is assumed now.
 - Each mutating tool call must be an owner-directed action with `request_schema_version=1`, owner workspace, a stable UUIDv4 `operation_key` reused **only for the same logical action/payload**, and tool-specific preconditions/CAS. For a lost response, read owner-visible state and operation ledger evidence where safely available, then replay the **same** key/payload only if necessary. Never create duplicate business records.
 - Record before/after safe counts or public IDs, not personal credentials. Owner reviews exact post revision/hash, source evidence and quality checks **before** approval. No automatic Facebook publishing, invented publication IDs, invented metrics, or silent background jobs. The owner should not expose token, login cookie, code, service-role key, raw OAuth logs or unrelated account content.
 
-## Required cards — draft exact prompts, pending owner substitutions
+## Required cards — frozen ordered steps and typed prompt templates
 
 ### MAN-01 — installed plugin, owner context and existing Page (read-only)
 
@@ -24,7 +36,7 @@
 
 ### MAN-02 — create exactly one additional Page (owner-authorized write)
 
-**Prompt to compile:** “Buat tepat satu Page Content Producer (bukan Facebook Page eksternal) bernama `<OWNER-PAGE-NAME>`, slug `<OWNER-PAGE-SLUG>`, niche trivia, timezone `<OWNER-IANA-TIMEZONE>`, target market `<OWNER-ISO-MARKETS>`, config trivia v1 `<OWNER-EXACT-CONFIG>`, dan make_default `<OWNER-TRUE-OR-FALSE>`. Gunakan operasi idempoten; jangan mengubah Page `phase-9-5-pilot-trivia` atau membuat konten lain.”
+**Just-in-time gate:** Ask for Page fields/config at MAN-02, validate them, display the **full exact `create_page` payload** including operation key, and secure approval before any write. **Prompt to compile:** “Buat tepat satu Page Content Producer (bukan Facebook Page eksternal) bernama `<OWNER-PAGE-NAME>`, slug `<OWNER-PAGE-SLUG>`, niche trivia, timezone `<OWNER-IANA-TIMEZONE>`, target market `<OWNER-ISO-MARKETS>`, config trivia v1 `<OWNER-EXACT-CONFIG>`, dan make_default `<OWNER-TRUE-OR-FALSE>`. Gunakan operasi idempoten; jangan mengubah Page `phase-9-5-pilot-trivia` atau membuat konten lain.”
 
 - **Prerequisite/target:** Page choice and all config values reviewed against `create_page` contract; exactly one newly authorized Page; no existing same-slug duplicate. **Approval:** sending the compiled prompt authorizes _one_ exact Page/config write; no additional permission implied.
 - **Expected:** owner context and `create_page` once, read back via `list_pages` / `get_page_generation_context`; one new Page/config/ledger and existing Page preserved.
@@ -33,7 +45,7 @@
 
 ### MAN-03 — research, dedup and save one draft
 
-**Prompt to compile:** “Untuk Page `<OWNER-PAGE-SLUG>`, buat satu draft trivia bertopik `<OWNER-TOPIC>` dengan batas `<OWNER-EDITORIAL-RULES>`. Teliti sumber publik yang dapat diverifikasi, periksa kemiripan fakta dan reuse, reservasi set fakta yang valid, simpan **draft saja**, lalu tampilkan sumber dan copy untuk saya tinjau. Jangan approve, jadwalkan, atau publish.”
+**Just-in-time gate:** Ask for the chosen topic, format/profile/interaction goal, sourcing constraints and allowed draft-only side effects immediately before MAN-03. **Prompt to compile:** “Untuk Page `<OWNER-PAGE-SLUG>`, buat satu draft trivia bertopik `<OWNER-TOPIC>` dengan batas `<OWNER-EDITORIAL-RULES>`. Teliti sumber publik yang dapat diverifikasi, periksa kemiripan fakta dan reuse, reservasi set fakta yang valid, simpan **draft saja**, lalu tampilkan sumber dan copy untuk saya tinjau. Jangan approve, jadwalkan, atau publish.”
 
 - **Prerequisite/target:** newly created Page and generation context; owner topic and factual/editorial limits frozen; browsing available. **Approval:** prompt authorizes only research/reservation/save draft.
 - **Expected:** `get_page_generation_context` → public research → `trivia_find_similar_facts` → `trivia_register_and_reserve_facts` → `save_post`, plus `get_post` for state if needed.
@@ -42,7 +54,7 @@
 
 ### MAN-04 — CAS revision, blocking checks and explicit approval
 
-**Prompts to compile (two-step gated):** (A) “Buka draft `<OWNER-POST-ID>`; revisi hook menjadi `<OWNER-REVISED-HOOK>` sambil menjaga makna fakta, gunakan revisi/hash terbaru, jalankan quality checks, dan tampilkan **teks/revisi/hash final** tanpa menyetujui.” (B) **Only after owner verifies exact revision and full green checks:** “Saya menyetujui tepat revisi `<OWNER-APPROVED-REVISION>` dan hash `<OWNER-APPROVED-HASH>` untuk post `<OWNER-POST-ID>`; ubah status ke ready saja, bukan posted.”
+**Just-in-time gate:** Ask for hook revision before part A; after actual read-back, let the owner review the exact final revision, hash, sources and blocking checks before separately approving part B. **Prompts to compile (two-step gated):** (A) “Buka draft `<OWNER-POST-ID>`; revisi hook menjadi `<OWNER-REVISED-HOOK>` sambil menjaga makna fakta, gunakan revisi/hash terbaru, jalankan quality checks, dan tampilkan **teks/revisi/hash final** tanpa menyetujui.” (B) **Only after owner verifies exact revision and full green checks:** “Saya menyetujui tepat revisi `<OWNER-APPROVED-REVISION>` dan hash `<OWNER-APPROVED-HASH>` untuk post `<OWNER-POST-ID>`; ubah status ke ready saja, bukan posted.”
 
 - **Prerequisite/target:** MAN-03 saved draft; owner supplies revised text, reviews source/editorial and checks. **Approval:** prompt A does not authorize approval; prompt B is independent express editorial approval.
 - **Expected:** `get_post` → `revise_post` with CAS → `get_post`/quality gate → (only B) `approve_post`. Blocking-quality rejection backed by deterministic test, not deliberate production invalid data.
@@ -51,7 +63,7 @@
 
 ### MAN-05 — one small persistent plan with exact owner slots
 
-**Prompt to compile:** “Untuk Page `<OWNER-PAGE-SLUG>`, buat hanya satu content plan bernama `<OWNER-PLAN-NAME>` dengan tepat `<OWNER-PLAN-ITEMS-1-TO-3>` yang masing-masing memuat tanggal/jam dengan offset timezone yang dikonfirmasi, topik, dan urutan. Simpan plan, tampilkan ID dan status; jangan membuat seluruh post otomatis, jangan menjalankan background worker.”
+**Just-in-time gate:** Ask for plan name, intent and exactly 1–3 dated/timezoned slots with topic/format/goal immediately before MAN-05; validate conflict rules. **Prompt to compile:** “Untuk Page `<OWNER-PAGE-SLUG>`, buat hanya satu content plan bernama `<OWNER-PLAN-NAME>` dengan tepat `<OWNER-PLAN-ITEMS-1-TO-3>` yang masing-masing memuat tanggal/jam dengan offset timezone yang dikonfirmasi, topik, dan urutan. Simpan plan, tampilkan ID dan status; jangan membuat seluruh post otomatis, jangan menjalankan background worker.”
 
 - **Prerequisite/target:** owner selects 1–3 plan slots (not seven production posts); timezone and topic confirmed. **Approval:** prompt authorizes plan creation only; any subsequent item claim/save requires separate explicit workflow request.
 - **Expected:** `create_content_plan` then `get_content_plan`; persisted exact slots. If owner later requests active-turn continuation, at most 1–3 items claimed with lease and the normal factual save flow.
@@ -106,6 +118,8 @@
 **Prompt to compile only with observations:** “Untuk post `<OWNER-POST-ID>` yang sungguh sudah dipublikasikan, catat snapshot kumulatif `<REAL-OBSERVATION-DATE-AND-NUMBERS>`; tampilkan history dan insights dengan ukuran sampel serta batas interpretasinya.”
 **Prerequisite/target:** genuine dated platform numbers, no fake analytics. **Expected:** `record_post_performance` → `get_post_performance` / `get_performance_insights`. **Forbidden:** invented metrics, causal guarantees, cross-owner reading. **Safe check:** one immutable snapshot of actual numbers and correct delta/sample. **Recovery:** stop on inconsistent observations; do not overwrite history. **Status:** DEFERRED — POST-MVP.
 
-## Freeze and traceability rule
+## Frozen procedure and traceability rule
 
-Before MAN-01, replace every `<OWNER-...>` marker with an explicit owner-selected value **only after validation**, capture the compiled complete prompt for each card and the two-step MAN-04, record owner signoff, freeze the guide commit SHA and test plugin version/archive SHA-256. After freeze, record changes in a numbered revision and rerun only affected cards. Do not mark any card PASS based on this draft, server Inspector alone, repository tests, or prior Phase 9 callback experiments. See `manual-results.md` for the evidence template.
+**The nine mandatory cards' procedures and safety gates are frozen now at `procedure-v1` (CR-028).** Exact owner-specific values are **not frozen and not requested at 10.0**. Before *each affected card*, ask only then for its required values, show exact payload where a write is involved, require owner approval appropriate to the action, compile its precise prompt and save that prompt plus the owner approval reference to the ledger. For MAN-04, save both turns and the separate owner editorial approval of final content/revision/hash. Static negative cards MAN-08/09 are already executable as written, but **must not be run before their assigned checkpoint**. The final plugin version/archive SHA-256 and source guide commit are entered into the ledger before MAN-01. On procedural change, record the revision and rerun only affected cards.
+
+No card PASS can be inferred from this procedural freeze, server Inspector alone, repository tests, or prior Phase 9 callback experiments.
