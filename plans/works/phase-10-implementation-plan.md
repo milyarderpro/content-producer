@@ -403,3 +403,52 @@ independen menyetujui. `MVP Complete` tetap menunggu Phase 11, bukan
 - [OpenAI — Connecting custom MCP servers in ChatGPT](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt)
   menjelaskan kebijakan akun/workspace yang dapat berubah. Bukti UI akun
   pemilik pada 10.0, bukan asumsi PRD lama, menentukan kelayakan jalur ini.
+
+## 15. Checkpoint 10.1 — final host acceptance, 18 Oktober 2026
+
+**10.1 PASS (CR-032/CR-033/CR-034), bukan Phase 10 Complete atau MVP
+Complete.** Owner berhasil membuat dan menyambungkan satu custom MCP
+**PRIVATE** di ChatGPT bernama `mcpku`, menggunakan **No authentication** dan
+production URL `https://xjonnilnypchtxogtopb.supabase.co/functions/v1/mcp`.
+Tangkapan layar dari UI owner memperlihatkan `Write 22` dan `Read 11` =
+**33 tools**. Ketersediaan nama `create_page` diverifikasi juga lewat
+registri tool langsung pada koneksi `mcpku`. Menampilkan tool Write **tidak**
+memberi izin mengeksekusi RPC write: pilot latch tetap default CLOSED.
+
+Pemulihan dari error ChatGPT `400 apps_sdk_error / mcp_validation` pada
+`mark_post_posted` didokumentasikan oleh CR-034: hanya metadata katalog
+No authentication mengganti tiga pola `\\p{Cc}` dengan rentang Unicode
+control equivalent, tanpa mengubah validator RPC/Zod atau domain contract.
+
+Bukti keamanan dan backend final:
+
+- [Full CR-020 gate #39142242292 SUCCESS](https://github.com/milyarderpro/content-producer/actions/runs/39142242292)
+  pada source SHA `14d4955e07a55d0d5040e647d210ddab5ca282cd`,
+  attempt 1, tanpa rerun.
+- Supabase production project tetap `xjonnilnypchtxogtopb`, Edge Function
+  `mcp` **v11 ACTIVE**, hash
+  `4b7b72da2e30ae3895b7b00e2eb6434a189b78aa2174e1807822bb9dae4fea2b`,
+  `verify_jwt=false` sesuai No authentication.
+- [Remote read-only hosted verification #39143625413 PASS](https://github.com/milyarderpro/content-producer/actions/runs/39143625413):
+  initialize/tools/list keduanya HTTP 200; 33 nama tool unik termasuk
+  `create_page`, 177/177 schema regex portabel, ukuran katalog 99.975 byte.
+- **Bukti nyata di host ChatGPT menggunakan plugin terpasang `mcpku`:**
+  `get_account_profile({})` **PASS**, mengembalikan profil owner-scoped dan
+  `workspace_public_id`; `get_workspace_context` **PASS**, mengembalikan
+  satu workspace dengan modul `trivia` aktif; `list_pages` **PASS**,
+  mengembalikan tepat satu existing pilot Page `phase-9-5-pilot-trivia`.
+  Ketiga pemanggilan dilakukan melalui connector `mcpku`, bukan SQL
+  administrator atau fixture. Tidak ada tool write dipanggil.
+- Pemeriksaan production setelah 3 live reads: **1 Page / 1 konfigurasi /
+  1 operation ledger / 0 post / 0 plan / 0 trivia fact / 0 metric**.
+  Tiga read dapat mencatat aktivitas rate limiter internal, tetapi tidak
+  menulis data bisnis.
+
+**Batas status:** Risiko endpoint publik No authentication yang dapat
+membaca workspace pilot tunggal tetap **OPEN**; RLS/fixed identity tidak
+mengautentikasi setiap pemanggil HTTP. Seluruh 14 MVP acceptance criteria
+`AC-001..014` tetap **PENDING**. Paket final/skill serta manifest dan
+pemasangan Phase 10.2 **BELUM DIKERJAKAN**, `MAN-01..MAN-09` tetap NOT RUN,
+first business write `MAN-02` hanya setelah approval payload persis owner,
+10.3–10.7 belum dimulai. Draft PR #23 tetap terbuka dan tidak di-merge
+sebelum audit independen 10.7.
