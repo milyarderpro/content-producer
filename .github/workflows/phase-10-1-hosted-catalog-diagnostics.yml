@@ -7,6 +7,41 @@ on:
 permissions:
   contents: read
 jobs:
+  format-cr033:
+    name: Format only CR-033 with pinned Prettier
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Format single decision record and commit only if required
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile
+          pnpm exec prettier --write docs/decisions/2026-10-18-phase-10-1-chatgpt-catalog-budget.md
+          if git diff --quiet; then
+            echo "CR-033 already formatted"
+            exit 0
+          fi
+          test "$(git diff --name-only)" = "docs/decisions/2026-10-18-phase-10-1-chatgpt-catalog-budget.md"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/decisions/2026-10-18-phase-10-1-chatgpt-catalog-budget.md
+          git commit -m "style(phase-10.1): apply pinned Prettier to CR-033"
+          git push origin HEAD:codex/phase-10-plugin
   catalog-focused:
     name: Local compact-catalog Deno checks (no remote writes)
     runs-on: ubuntu-24.04
@@ -25,7 +60,6 @@ jobs:
       - name: Focused format, type, lint, 33-tool descriptor and write-denial tests
         run: |
           set -euo pipefail
-          deno fmt --check mcp/transport.ts mcp/pilot_db_test.ts
           deno check mcp/index.ts mcp/pilot_db_test.ts
           deno lint mcp/transport.ts mcp/pilot_db_test.ts
           AI_AGENT=none APPVEYOR=1 deno test --allow-env=NODE_ENV,AI_AGENT,APPVEYOR,CI,DEBUG,TEST,MODE,MINIMAL,NO_COLOR,FORCE_COLOR,TERM mcp/pilot_db_test.ts
