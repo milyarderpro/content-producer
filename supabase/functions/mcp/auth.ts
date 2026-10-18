@@ -15,6 +15,7 @@ export interface RequestContext {
   accessToken: string; // Original validated user token, never log.
   supabaseUrl: string;
   publishableKey: string;
+  pilotMode?: boolean; // CR-032: anonymous HTTP, server-fixed database identity
 }
 interface JwkSet {
   keys: Array<JsonWebKey & { kid?: string }>;
