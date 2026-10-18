@@ -1,6 +1,6 @@
 # Phase 10 — Koneksi ChatGPT, plugin final, dan pilot: runbook implementasi
 
-**Status:** rencana, belum dieksekusi. Phase 9 `Complete`; Phase 10 `Not started`.
+**Status:** Phase 9 `Complete`; Phase 10 `In progress`, 10.0 mengikuti CR-028.
 Catat SHA `main` yang aktual ketika 10.0 dimulai. Rencana ini membagi Phase 10
 menjadi delapan task berurutan (10.0–10.7); satu task hanya mengerjakan satu
 checkpoint. Lulusnya Phase 10 memberi status **Pilot-ready**, bukan **MVP
@@ -15,8 +15,10 @@ Baca sebelum mengerjakan checkpoint:
 2. `docs/decisions/2026-10-15-phase-8-manual-acceptance-resequencing.md`
    (CR-019), `docs/decisions/2026-10-15-phase-9-10-risk-based-mvp-acceptance.md`
    (CR-020), dan
-   `docs/decisions/2026-10-18-phase-10-mvp-evidence-boundary.md` (CR-027).
-   CR-027 mengganti hanya kewajiban publikasi/metrik nyata dari CR-020.
+   `docs/decisions/2026-10-18-phase-10-mvp-evidence-boundary.md` (CR-027),
+   dan `docs/decisions/2026-10-18-phase-10-proof-sequencing.md` (CR-028).
+   CR-027 membatasi publikasi/metrik nyata; CR-028 mengatur waktu pembuktian
+   host, instalasi dan pengikatan data per kartu.
 3. `plans/tool-inventory.md`, `plans/workflow-users.md`,
    `plans/use-case-inventory.md`, `plans/acceptance-traceability.md`, dan
    `plugin/skills/content-producer/references/core/tool-sequences.md`.
@@ -40,25 +42,31 @@ regresi, tetapi tidak menjadi 101 percakapan live untuk MVP. Sembilan kartu
 dengan kejadian nyata. Cross-owner denial tetap dibuktikan oleh gate otomatis
 Phase 9, bukan dengan meminta pemilik menyediakan akun kedua.
 
-## 2. Prasyarat kemampuan host — jangan diasumsikan
+## 2. Prasyarat kemampuan host — dibuktikan bertahap menurut CR-028
 
-PRD §34 mencatat ChatGPT Plus dan menu plugin sebagai asumsi awal proyek.
-[Dokumentasi OpenAI tentang custom MCP](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt)
-yang diperiksa saat menulis runbook ini membedakan dukungan koneksi dan aksi
-tulis menurut jenis akun/workspace. Hak yang sebenarnya pada akun pemilik
-**belum terbukti**. Pengerjaan 10.0 harus memeriksa UI ChatGPT akun pemilik
-secara baca-saja: tersedia tidaknya pembuatan custom MCP private, alur OAuth,
-izin tool **write**, dan jalur memasang paket/skill private pada percakapan
-ChatGPT. Kemampuan menggunakan konektor GitHub atau membaca MCP tidak
-membuktikan izin write custom MCP. Nama menu dapat berubah; catat tampilan dan
-hasil aktual, bukan mengandalkan label lama.
+PRD §34 semula menganggap menu Plus sebagai syarat awal, bukan bukti izin
+write. Pada 10.0, screenshot akun pemilik menampilkan **Add custom MCP
+server**, pilihan **OAuth**, dan **Create as a plugin**. Jalur artefak
+GitHub Actions sudah diunduh dan hash diverifikasi; fasilitas Plugin Creator
+menerima arsip lokal ZIP/tar.gz menjadi plugin PRIVATE. Ini hanya bukti
+**formulir OAuth dan jalur delivery/intake**, bukan izin tool write atau
+instalasi final. Jangan mencentang peringatan risiko, membuat koneksi,
+login/OAuth, ataupun mengunggah paket di 10.0.
 
-Jika salah satu kemampuan wajib tidak tersedia, 10.0 tetap `BLOCKED` dengan
-bukti spesifik. Jangan mengubah PRD secara diam-diam, memakai SQL admin/API
-langsung sebagai pengganti plugin, atau memaksa write. Pemilik kemudian
-memilih host/akun yang mendukung kontrak atau menyetujui perubahan kontrak
-melalui change record sebelum pekerjaan berlanjut. Tidak ada kewajiban membeli
-paket baru tanpa keputusan pemilik.
+**Langkah pertama setelah koneksi private dan OAuth owner dibuat pada 10.1:**
+periksa tanpa write apakah registry host menampilkan tool mutasi, termasuk
+`create_page`, dan apakah izin/approval untuk tool write bisa diberikan.
+Periksa metadata `readOnlyHint: false`, izin host, dan affordance approval
+yang tersedia; metadata atau kebijakan default saja tidak membuktikan
+entitlement. Jangan memanggil tool write demi menampilkan dialog approval,
+termasuk dry-run. Jika tidak dapat dibuktikan tanpa invocation, hentikan 10.1
+dengan diagnosis spesifik, tanpa lanjut read umum atau membangun paket.
+Setelah lulus, barulah cek 33 tools dan tiga owner read seperti biasa.
+
+Jika write terbukti tidak tersedia pada akun yang terhubung, 10.1 harus
+`BLOCKED`, bukan 10.0 yang hanya menilai formulir dan delivery. Pilihan host
+berbeda atau perubahan kontrak memerlukan keputusan owner. Tidak ada
+kewajiban menaikkan paket tanpa bukti account-specific.
 
 ## 3. Alur GitHub, status, dan biaya pengujian
 
@@ -115,15 +123,20 @@ memasukkan metrik rekaan, menghubungkan Canva/Facebook API, atau menjalankan
 SQL admin sebagai jalan pintas. Jangan mengubah/mencabut dua OAuth client uji
 Phase 9 tanpa keputusan pemilik; review risikonya pada laporan akhir.
 
-Setiap kartu wajib memiliki dalam `docs/phase-10/manual-cards.md`: prompt
-**persis** atau urutan pendek yang dibekukan, prasyarat, Page/post/plan sasaran,
-tool atau perilaku yang diharapkan, tindakan/hasil terlarang, pemeriksaan state
-yang aman, recovery, dan batas persetujuan. Bekukan panduan sebelum kartu
-pertama dieksekusi; jika prompt berubah kemudian, catat revisi dan ulangi
-hanya kartu yang terpengaruh. Variabel Page, slug, zona waktu, target market,
-konten, slot, dan tindakan editorial yang memicu write harus diisi dari
-pilihan owner sebelum kartu terkait dimulai. Jangan meninggalkan placeholder
-yang memungkinkan implementer memilih data production sendiri.
+Setiap kartu wajib memiliki dalam `docs/phase-10/manual-cards.md`: urutan
+langkah dan template prompt, prasyarat, target Page/post/plan, tool yang
+diharapkan, perilaku terlarang, pemeriksaan state aman, recovery, dan batas
+persetujuan. **Bekukan seluruh prosedur dan guardrails MAN-01..MAN-09 di
+10.0** sebagai `procedure-v1`; tidak ada data bisnis production yang
+dipilih diam-diam. Parameter Page dan konfigurasi diminta tepat sebelum
+MAN-02, topik/sumber serta batas editorial sebelum MAN-03, revisi serta
+persetujuan tepat versi/hash pada MAN-04, dan nama plan serta slot jadwal
+sebelum MAN-05. ID baru dari kartu sebelumnya dibaca kembali lalu diikat
+pada kartu terkait. Sebelum setiap kartu dijalankan, validasi pilihan owner,
+rekam payload/approval yang diperlukan dan **bekukan prompt lengkap hasil
+substitusi**; placeholder tidak pernah dieksekusi. Perubahan prosedur
+setelah freeze memerlukan revisi bertanda dan rerun hanya kartu terdampak.
+Kartu negatif dengan prompt tetap (`MAN-08/09`) langsung dibekukan di 10.0.
 
 Laporan `docs/phase-10/manual-results.md` berisi per kartu: ID, prompt persis,
 versi/hash plugin, referensi chat, tool terpilih, hasil aktual, state aman
@@ -133,62 +146,72 @@ Tunjukkan link Issue/PR dan ringkasan bukti, bukan token atau konten pribadi
 yang tidak diperlukan. Bukti dari Inspector/server saja tidak menggantikan
 penggunaan plugin terpasang di ChatGPT.
 
-## 5. Checkpoint 10.0 — Preflight host dan panduan kartu
+## 5. Checkpoint 10.0 — Preflight host dan prosedur kartu
 
-**Scope:** baca-saja, keputusan data pilot, dan dokumen; tidak ada koneksi
-baru, OAuth, paket final, atau write bisnis.
+**Scope:** baca-saja, dokumen dan pembuktian transfer, tanpa koneksi baru,
+OAuth, instalasi paket atau write bisnis. CR-028 berlaku.
 
-1. Pastikan runbook dan CR-027 sudah berada pada `main`, lalu periksa status
-   Phase 9/audit, SHA `main`, deployment backend, 33 tool,
-   kondisi satu Page pilot, dan status sementara callback tetap sesuai bukti
-   terbaru. Buka Issue/branch/draft PR Phase 10; ubah tracker menjadi
-   `In progress` hanya saat pekerjaan sungguh dimulai.
-2. Di UI akun ChatGPT pemilik, buktikan tersedianya pembuatan custom MCP
-   private, alur OAuth, dan **izin/approval untuk write action**. Tetapkan
-   jalur nyata untuk memindahkan paket hasil GitHub Actions ke instalasi
-   private pada akun yang sama (misalnya upload arsip melalui fasilitas host
-   yang benar-benar tersedia), termasuk siapa yang dapat mengunduh artifact
-   dan memasangnya. Akses repository GitHub saja bukan bukti jalur instalasi.
-   Pemeriksaan ini tidak menjalankan tool write; keberhasilan write end-to-end
-   baru dibuktikan pada `MAN-02`. Catat batas akun/workspace tanpa rahasia.
-3. Susun dan bekukan `docs/phase-10/manual-cards.md` untuk sembilan kartu
-   wajib serta dua kartu opsional. Catat Page tambahan yang **akan** dibuat:
-   nama/slug, niche trivia, zona waktu, target market, dan konfigurasi Page
-   yang disetujui owner. Pastikan berbeda dari pilot Phase 9 dan valid menurut
-   tool contract. Bekukan juga batas data konten/plan dan titik persetujuan.
-4. Siapkan format evidence dan recovery; catat risiko residual Phase 9.
-5. Buat workflow CI ringan untuk branch/PR Phase 10: install terkunci,
-   pemeriksaan format/diff, dan `pnpm run check` ketika source TypeScript atau
-   konfigurasi berubah. Jangan menyalakan Supabase lokal atau menjalankan
-   `test-all` untuk perubahan panduan Markdown saja. Pastikan run terikat HEAD.
+1. Konfirmasi runbook, CR-027, Phase 9 audit/gate dan baseline `main`.
+   Gunakan satu branch dan satu draft PR; status tracker In progress.
+2. Buktikan dari UI akun pemilik bahwa formulir pembuatan custom MCP private
+   tersedia dan OAuth dapat dipilih. Bedakan UI form dari koneksi,
+   entitlement write, approval, dan keberhasilan write. Bukti izin tool
+   write **dipindah ke gate pertama 10.1** dan tidak diperlukan untuk PASS
+   10.0.
+3. Buktikan **jalur transfer/ingestion**, bukan instalasi akhir: unduh
+   artifact GitHub Actions dari run SHA yang lulus, periksa isi dan hash,
+   identifikasi pemegang akses unduh serta akses upload/private plugin
+   melalui Plugin Creator yang menerima ZIP/tar.gz. Tidak mengunggah atau
+   memasang arsip kandidat. Final `mcp.json`, versi/hash final, dan hasil
+   instalasi hanya dapat diuji pada 10.2.
+4. Bekukan prosedur, langkah, expected/forbidden tool, guardrails,
+   checkpoint persetujuan dan recovery untuk `MAN-01..MAN-09` sebagai
+   template `procedure-v1`; simpan prompt tetap `MAN-08/09`.
+   `MAN-10..11` tetap opsional post-MVP. **Tidak meminta semua nilai
+   Page, konten, atau jadwal pada 10.0**. Nilai disetujui dan prompt
+   executable dibekukan tepat sebelum kartu yang memakainya.
+5. Siapkan evidence ledger, risiko residual, dan workflow CI ringan
+   yang memeriksa perubahan relevan pada SHA HEAD. Gunakan bukti gate
+   berat Phase 9 selama backend/security/deployment SHA tidak berubah.
 
-**PASS bila:** kemampuan host dan jalur transfer/instalasi paket terbukti
-tersedia tanpa menjalankan write, data Page telah disetujui, panduan tidak
-memiliki placeholder untuk write, Issue/PR/CI ringan tersedia, dan belum ada
-business write.
-Jika kemampuan host tidak terbukti, berhenti di 10.0 dengan `BLOCKED`.
+**PASS 10.0 bila:** form custom MCP/OAuth terbukti pada UI owner; jalur
+artifact Actions ke penerima paket PRIVATE di akun owner dibuktikan
+(download, hash, host intake), prosedur dan kontrol sembilan kartu beku,
+runbook/CR/Issue/PR/tracker konsisten, CI ringan SHA final PASS, dan tidak
+ada OAuth, instalasi, koneksi baru atau business write. **Tidak
+mensyaratkan** izin write, plugin final terpasang, atau data Page sebelum
+10.1/10.2/10.3. Jika bukti tersebut tidak ada, beri BLOCKED spesifik.
 
-## 6. Checkpoint 10.1 — Custom MCP dan OAuth owner
+## 6. Checkpoint 10.1 — Custom MCP, OAuth owner, dan gate write read-only
 
-**Scope:** koneksi langsung sebelum paket final; seluruh tes bisnis baca-saja.
+**Scope:** koneksi langsung dan OAuth private owner, lalu pemeriksaan
+kemampuan write **tanpa mengeksekusi write**; semua tes bisnis read-only.
 
 1. Verifikasi URL HTTPS dan discovery OAuth production. Tambahkan custom MCP
-   secara private menurut UI resmi terkini. Jika perlu mendaftarkan OAuth
-   client khusus ChatGPT, gunakan redirect URI dan metadata yang benar-benar
-   diberikan host; jangan memakai ulang client callback Vercel 9.5 atau
-   menebak redirect. Simpan secret hanya di penyedia yang relevan.
-2. Pemilik menyelesaikan login dan consent. Pastikan `initialize`,
-   `tools/list` tepat 33 nama, `get_account_profile`,
-   `get_workspace_context`, dan `list_pages` berjalan sebagai owner. Pastikan
-   Page Phase 9 terlihat; tidak ada Page baru, plan, atau post dibuat.
-3. Periksa denial tanpa auth/akun salah dari bukti gate yang berlaku; jangan
-   mencoba akun kedua yang tidak tersedia. Catat registered connection ID
-   sebagai referensi host bila ada, bukan sebagai isi `mcp.json` portabel.
+   secara private menurut UI resmi. Jika host memerlukan OAuth client baru,
+   gunakan redirect dan metadata nyata, tidak menebak atau memakai kembali
+   callback Vercel 9.5. Owner menyelesaikan login dan consent. Simpan
+   rahasia hanya pada provider yang sesuai.
+2. **Tindakan pertama segera setelah koneksi/OAuth:** inspeksi tools/list
+   atau katalog koneksi, pastikan `create_page` dan tool write lain
+   terekspos sebagai `readOnlyHint: false` serta izin/approval untuk
+   write action bisa diminta melalui mekanisme host **tanpa memanggil tool
+   mutasi**. Lihat konfigurasi perizinan dan controls UI bila ada; catat
+   identitas koneksi yang aman. **Jika tool write hilang, dibatasi, atau
+   approval tidak dapat dibuktikan tanpa write, STOP dengan satu diagnosis
+   jelas; jangan lanjut baca profil atau membuat paket 10.2.** Jangan
+   memicu approval melalui dummy payload, dry-run atau request write.
+3. Hanya setelah gate write metadata/permission PASS, buktikan tepat
+   33 nama tool dan `get_account_profile`, `get_workspace_context`,
+   `list_pages` sebagai owner. Periksa Page pilot Phase 9, denial dari
+   gate berlaku, dan tidak ada perubahan data. Catat koneksi host tanpa
+   memasukkan ID koneksi atau token ke `mcp.json`.
 
-**PASS bila:** OAuth dari host yang dipilih dan ketiga read owner berhasil,
-33 tool tepat, tidak ada write, serta data owner tidak bocor. Jika koneksi
-gagal, diagnosis transport/OAuth/permission dahulu; jangan menyiapkan paket
-final dari koneksi yang belum terbukti.
+**PASS 10.1 bila:** gate keberadaan tool write dan kesiapan approval
+berhasil **tanpa eksekusi write**, OAuth owner dan 33 tool/ketiga read lulus,
+tanpa kebocoran atau mutasi. Keberhasilan satu write nyata **bukan** gate
+10.1; hanya di `MAN-02` setelah payload owner disetujui. Kegagalan gate
+awal menghentikan Phase 10 sebelum 10.2.
 
 ## 7. Checkpoint 10.2 — Paket final dan instalasi private
 
@@ -235,7 +258,10 @@ MCP saja belum memenuhi 10.2.
 
 ## 8. Checkpoint 10.3 — `MAN-01..MAN-02`: aktivasi dan Page
 
-Jalankan prompt beku pada plugin final. `MAN-01` membuktikan pemilihan plugin,
+Jalankan prosedur beku dengan prompt persis yang diikat dari data nyata tepat
+sebelum tiap kartu. Sebelum MAN-02, tampilkan seluruh payload Page baru
+termasuk config, zona waktu, market dan make_default; dapatkan persetujuan
+owner atas payload persis sebelum satu-satunya write `create_page`. `MAN-01` membuktikan pemilihan plugin,
 identitas owner, dan pembacaan Page pilot Phase 9 yang sudah ada. `MAN-02`
 membuat **satu Page
 tambahan** dengan konfigurasi trivia yang disetujui; gunakan `create_page`
@@ -255,7 +281,9 @@ terfokus dan biarkan bukti `AC-002` `PENDING` sampai lulus.
 
 ## 9. Checkpoint 10.4 — `MAN-03..MAN-04`: draft dan editorial
 
-Pada Page baru, jalankan prompt beku untuk penelitian trivia yang bersumber,
+Pada Page baru, minta pilihan owner tentang topik, sumber dan batas editorial
+tepat sebelum MAN-03, lalu ikat dan bekukan prompt kartu terkait. Jalankan
+prompt itu untuk penelitian trivia yang bersumber,
 pemeriksaan kemiripan, reservasi, `save_post`, dan pembacaan kembali draft
 (`MAN-03`). Sumber eksternal diperlakukan sebagai data tak tepercaya; fakta
 yang tidak dapat diverifikasi tidak dipaksakan menjadi konten. Lalu uji satu
@@ -340,9 +368,11 @@ independen menyetujui. `MVP Complete` tetap menunggu Phase 11, bukan
 
 ## 13. Pemulihan dan titik berhenti
 
-- Izin custom MCP/write/private plugin tidak tersedia: hentikan pada 10.0;
-  putuskan host/akun atau change record, jangan melewati plugin dengan API
-  admin.
+- Form custom MCP/OAuth atau jalur artifact ke intake private tidak tersedia:
+  hentikan pada 10.0. Jika setelah koneksi/OAuth tool write atau cara meminta
+  approval tidak dapat dibuktikan tanpa write, hentikan **10.1** sebelum
+  membaca data owner lain atau membuat paket. Putuskan host/akun dengan
+  owner, jangan melewati plugin melalui API admin.
 - OAuth salah owner, tool count bukan 33, scope terbuka, secret tampak, atau
   unauthorized write: nonaktifkan koneksi/plugin sementara dan selidiki
   sebelum melanjutkan.
