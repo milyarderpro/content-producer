@@ -1,6 +1,9 @@
-Phase 10.1 final candidate marker — CR-032 No authentication fixed pilot
-Validated source and formatted-test SHA: 2671db971359782cc96cbc2da6bac4d19e8196ff
-Focused check + 67/67 MCP tests PASS: https://github.com/milyarderpro/content-producer/actions/runs/39131559556
-This marker commit changes no MCP runtime, database migration, or Inspector harness.
-Run exactly one CR-020 full technical gate on the exact marker commit SHA.
-No production deployment, business write, ChatGPT PASS or Phase 10.2 is authorized by this marker alone.
+Phase 10.1 final candidate marker — No authentication explicit per-tool scheme fix
+Previous full security gate PASS: 3eeae7178bdb00ae26d6c09bc448346b89dd556a (run #39131737724).
+OpenAI-hosted UI rejected No authentication plugin despite initialize and tools/list both 200.
+Fix: 33 pilot tool descriptors explicitly declare [{type: "noauth"}] at top-level and _meta.
+Source-and-focused-test SHA: 512c5442671bbb4801323ae83cd3c29d46a03296
+Lightweight check + formatted source PASS: https://github.com/milyarderpro/content-producer/actions/runs/39134470084
+Run one CR-020 full technical gate on this final marker commit SHA before any redeployment.
+No production change or ChatGPT PASS is authorized by this marker alone.
+No business write, MCP package install or Phase 10.2.
