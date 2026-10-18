@@ -32,7 +32,12 @@ function responseJson(body: string): Record<string, unknown> {
 Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descriptors', async () => {
   const response = await createAuthenticatedTransport(context).fetch(request('tools/list'));
   assert(response.status === 200, 'catalog must succeed');
-  const listed = responseJson(await response.text());
+  const catalogBody = await response.text();
+  assert(
+    new TextEncoder().encode(catalogBody).byteLength < 100_000,
+    'CR-033 pilot catalog must remain under 100 KB without changing tool count',
+  );
+  const listed = responseJson(catalogBody);
   const tools = (listed.result as { tools: Array<Record<string, unknown>> }).tools;
   assert(MCP_TOOL_COUNT === 33 && tools.length === 33, 'exact 33 tools');
   assert(new Set(tools.map((tool) => tool.name)).size === 33, 'duplicate tool names');
@@ -51,6 +56,28 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
       'every pilot tool must explicitly advertise _meta noauth',
     );
     assert(!('openai/profile' in (meta ?? {})), 'pilot tools must not advertise OAuth profiles');
+    assert(!('outputSchema' in tool), 'pilot catalog must omit optional output metadata');
+    assert(!('title' in tool), 'pilot catalog must omit redundant display title');
+    const input = tool.inputSchema as Record<string, unknown>;
+    assert(input.type === 'object', 'pilot input schema must remain object');
+    assert(!('$schema' in input), 'omit optional input-schema dialect only');
+  }
+  const prior = await createAuthenticatedTransport({ ...context, pilotMode: false }).fetch(
+    request('tools/list'),
+  );
+  assert(prior.status === 200, 'legacy schema listing preserved');
+  const original = responseJson(await prior.text());
+  const originalTools = (original.result as { tools: Array<Record<string, unknown>> }).tools;
+  assert(originalTools.length === 33, 'legacy catalog tool count must remain 33');
+  for (const compact of tools) {
+    const full = originalTools.find((tool) => tool.name === compact.name);
+    assert(!!full && 'outputSchema' in full && 'title' in full, 'legacy full output retained');
+    const expandedInput = { ...(full.inputSchema as Record<string, unknown>) };
+    delete expandedInput.$schema;
+    assert(
+      JSON.stringify(compact.inputSchema) === JSON.stringify(expandedInput),
+      'input constraints, required fields and enums must be unchanged',
+    );
   }
 });
 Deno.test('10.1 default pilot write latch blocks business RPC before database access', async () => {
