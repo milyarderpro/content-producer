@@ -74,7 +74,18 @@ jobs:
           set -euo pipefail
           if [ -s "$RUNNER_TEMP/phase-10-formatted-paths" ]; then
             mapfile -t paths < "$RUNNER_TEMP/phase-10-formatted-paths"
-            pnpm exec prettier --check "${paths[@]}"
+            # Diagnostics-only formatter: output exact public-doc replacement bytes on failure.
+            pnpm exec prettier --write "${paths[@]}"
+            if [ -n "$(git diff --name-only -- docs/phase-10/)" ]; then
+              for path in docs/phase-10/manual-cards.md docs/phase-10/manual-results.md docs/phase-10/preflight-10.0.md; do
+                echo "FORMAT_FILE_BEGIN $path"
+                base64 -w0 "$path"
+                echo
+                echo "FORMAT_FILE_END $path"
+              done
+              echo "::error::Formatting corrections required in committed docs"
+              exit 1
+            fi
           else
             echo "No format-covered changed files"
           fi
