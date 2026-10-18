@@ -2,6 +2,23 @@ import { createMcpHandler } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { createMcpServer } from './server.ts';
 
+// CR-034: The host schema validator can reject Unicode property regex
+// escapes. Unicode General Category Cc is exactly U+0000..001F and
+// U+007F..009F. Rewrite only JSON Schema pattern metadata in the pilot
+// catalog; keep runtime Zod validation and all 33 tool contracts unchanged.
+function portablePilotPatterns(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(portablePilotPatterns);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>).map(([key, entry]) => [
+      key,
+      key === 'pattern' && typeof entry === 'string'
+        ? entry.replaceAll('\\p{Cc}', '\\x00-\\x1F\\x7F-\\x9F')
+        : portablePilotPatterns(entry),
+    ]),
+  );
+}
+
 // The pinned MCP SDK emits its tool auth schemes only from _meta. ChatGPT's
 // current descriptor contract also reads a top-level securitySchemes field.
 // Mirror the already-declared per-tool policy in tools/list without changing
@@ -47,7 +64,7 @@ function mirrorToolSchemes(value: unknown, pilot = false): unknown {
           ) {
             const input = { ...(published.inputSchema as Record<string, unknown>) };
             delete input.$schema;
-            published.inputSchema = input;
+            published.inputSchema = portablePilotPatterns(input);
           }
           return published;
         }
