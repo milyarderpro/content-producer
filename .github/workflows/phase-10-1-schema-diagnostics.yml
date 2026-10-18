@@ -7,6 +7,101 @@ on:
 permissions:
   contents: read
 jobs:
+  focused-check:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version-file: .deno-version
+      - name: Format and verify only three CR-034 files and affected MCP code
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile
+          pnpm exec prettier --write docs/decisions/2026-10-18-phase-10-1-portable-regex-catalog.md supabase/functions/mcp/transport.ts supabase/functions/mcp/pilot_db_test.ts
+          pnpm exec prettier --check docs/decisions/2026-10-18-phase-10-1-portable-regex-catalog.md supabase/functions/mcp/transport.ts supabase/functions/mcp/pilot_db_test.ts
+          pnpm run check
+          (
+            cd supabase/functions
+            deno check mcp/index.ts mcp/pilot_db_test.ts
+            deno lint mcp/transport.ts mcp/pilot_db_test.ts
+            AI_AGENT=none APPVEYOR=1 deno test --allow-env=NODE_ENV,AI_AGENT,APPVEYOR,CI,DEBUG,TEST,MODE,MINIMAL,NO_COLOR,FORCE_COLOR,TERM mcp/pilot_db_test.ts
+          )
+          if git diff --quiet; then
+            echo "Already formatted, no commit necessary"
+            exit 0
+          fi
+          git diff --name-only | grep -Ev '^(docs/decisions/2026-10-18-phase-10-1-portable-regex-catalog.md|supabase/functions/mcp/transport.ts|supabase/functions/mcp/pilot_db_test.ts)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Inspect hosted input schemas and regex compatibility (NO tools/call)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import urllib.request,json,re,collections
+          url="https://xjonnilnypchtxogtopb.supabase.co/functions/v1/mcp"
+          def rpc(method,number,params=None):
+              request=urllib.request.Request(url,data=json.dumps(dict(jsonrpc="2.0",id=number,method=method,**({'params':params} if params is not None else {}))).encode(),method="POST",headers={"Content-Type":"application/json","Accept":"application/json, text/event-stream","MCP-Protocol-Version":"2025-06-18","User-Agent":"phase10-schema-diagnostics/1.0"})
+              with urllib.request.urlopen(request,timeout=45) as response:
+                  assert response.status==200
+                  raw=response.read(1048576).decode()
+                  frames=[json.loads(row[6:]) for row in raw.splitlines() if row.startswith("data: ")]
+                  return frames[-1] if frames else json.loads(raw)
+          init=rpc('initialize',1,{'protocolVersion':'2025-06-18','capabilities':{},'clientInfo':{'name':'catalog-schema-audit','version':'1.0'}})
+          assert init.get('result',{}).get('protocolVersion')=='2025-06-18'
+          body=rpc('tools/list',2)
+          tools=(body.get('result') or {}).get('tools',[])
+          assert len(tools)==33
+          target=next(t for t in tools if t.get('name')=='mark_post_posted')
+          print('MARK_POST_POSTED_ON_WIRE_INPUT:',json.dumps(target['inputSchema'],sort_keys=True,ensure_ascii=True))
+          def visit(o,path=''):
+              if isinstance(o,dict):
+                  for k,v in o.items():
+                      if k=='pattern':yield path+'/pattern',v
+                      else: yield from visit(v,path+'/'+str(k))
+              if isinstance(o,list):
+                  for i,v in enumerate(o):yield from visit(v,path+'/'+str(i))
+          pattern_hits=[]
+          for tool in tools:
+              for where,pattern in visit(tool['inputSchema']):
+                  try:re.compile(pattern)
+                  except Exception as e:pattern_hits.append((tool['name'],where,pattern,str(e)[:160]))
+          print('PYTHON_REGEX_UNSUPPORTED_COUNT',len(pattern_hits))
+          print('PYTHON_REGEX_UNSUPPORTED:',json.dumps(pattern_hits,ensure_ascii=True))
+          allpattern=collections.defaultdict(list)
+          for tool in tools:
+              for path,pat in visit(tool['inputSchema']):
+                  allpattern[pat].append(tool['name']+path)
+          print('ALL_REGEX_PATTERNS',json.dumps(dict(allpattern),ensure_ascii=True))
+          for tool in tools:
+              schema=tool.get('inputSchema')
+              print('INPUT_SCHEMA_META',tool.get('name'), 'bytes',len(json.dumps(schema)),'required',list(schema.get('required') or []),'nonstandard',list(k for k in schema if k not in ('type','properties','required','additionalProperties','description','$defs')))
+          print('DONE: only initialize and tools/list; no tools/call and no credentials')
+          PY
+ && exit 1 || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/decisions/2026-10-18-phase-10-1-portable-regex-catalog.md supabase/functions/mcp/transport.ts supabase/functions/mcp/pilot_db_test.ts
+          git commit -m "style(phase-10.1): format portable-regex MCP catalog change"
+          git push origin HEAD:codex/phase-10-plugin
   inspect:
     runs-on: ubuntu-24.04
     timeout-minutes: 8
