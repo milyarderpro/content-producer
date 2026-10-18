@@ -4,34 +4,34 @@
 
 ## Immutable test identity (fill on freeze)
 
-| Field | Recorded value |
-|---|---|
-| Repository baseline main SHA (10.0) | `ce87e15323a88abb82b1d9031ba8fef07dcf76b1` |
-| Guide version / frozen commit SHA | PENDING — owner Page/content selection and host gate |
-| ChatGPT workspace + plan + host/mode/model | Account Plus reported; actual required custom-MCP/write entitlement not verified |
-| Final plugin name, manifest version and installed-release ID | PENDING (source candidate is not an installed final package) |
-| Final archive SHA-256 and GitHub Actions artifact ID/run/SHA | PENDING — preflight CI candidate is not the final package |
-| Verified custom MCP connection and OAuth owner test | PENDING — 10.1, not performed in 10.0 |
-| Backend release SHA and link to applicable full gate | `be3bf04b703a4aff16510c496600c9796c13b57a` — https://github.com/milyarderpro/content-producer/actions/runs/39085571345 (Phase 9 historical evidence, no new gate) |
-| Production page baseline | One owner pilot Page `phase-9-5-pilot-trivia` in Phase 9 independent audit; no new live state inspection in 10.0 |
-| New Page name/slug/niche/timezone/market/config + approval link | PENDING owner decision |
-| Publication/metrics policy | `MAN-10..11` DEFERRED — POST-MVP by CR-027 |
+| Field                                                           | Recorded value                                                                                                                                                    |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository baseline main SHA (10.0)                             | `ce87e15323a88abb82b1d9031ba8fef07dcf76b1`                                                                                                                        |
+| Guide version / frozen commit SHA                               | PENDING — owner Page/content selection and host gate                                                                                                              |
+| ChatGPT workspace + plan + host/mode/model                      | Account Plus reported; actual required custom-MCP/write entitlement not verified                                                                                  |
+| Final plugin name, manifest version and installed-release ID    | PENDING (source candidate is not an installed final package)                                                                                                      |
+| Final archive SHA-256 and GitHub Actions artifact ID/run/SHA    | PENDING — preflight CI candidate is not the final package                                                                                                         |
+| Verified custom MCP connection and OAuth owner test             | PENDING — 10.1, not performed in 10.0                                                                                                                             |
+| Backend release SHA and link to applicable full gate            | `be3bf04b703a4aff16510c496600c9796c13b57a` — https://github.com/milyarderpro/content-producer/actions/runs/39085571345 (Phase 9 historical evidence, no new gate) |
+| Production page baseline                                        | One owner pilot Page `phase-9-5-pilot-trivia` in Phase 9 independent audit; no new live state inspection in 10.0                                                  |
+| New Page name/slug/niche/timezone/market/config + approval link | PENDING owner decision                                                                                                                                            |
+| Publication/metrics policy                                      | `MAN-10..11` DEFERRED — POST-MVP by CR-027                                                                                                                        |
 
 ## Per-card outcome table
 
-| ID | Phase | Execution status | Chat reference | Source/plugin hash | Tool trace | State/ledger before→after | Reviewer | Outcome |
-|---|---|---|---|---|---|---|---|---|
-| MAN-01 | 10.3 | NOT RUN | — | — | — | — | — | PENDING |
-| MAN-02 | 10.3 | NOT RUN | — | — | — | — | — | PENDING |
-| MAN-03 | 10.4 | NOT RUN | — | — | — | — | — | PENDING |
-| MAN-04 | 10.4 | NOT RUN | — | — | — | — | — | PENDING |
-| MAN-05 | 10.5 | NOT RUN | — | — | — | — | — | PENDING |
-| MAN-06 | 10.5 | NOT RUN | — | — | — | — | — | PENDING |
-| MAN-07 | 10.6 | NOT RUN | — | — | — | — | — | PENDING |
-| MAN-08 | 10.6 | NOT RUN | — | — | — | — | — | PENDING |
-| MAN-09 | 10.6 | NOT RUN | — | — | — | — | — | PENDING |
-| MAN-10 | post-MVP | NOT RUN | — | — | — | — | — | DEFERRED — POST-MVP |
-| MAN-11 | post-MVP | NOT RUN | — | — | — | — | — | DEFERRED — POST-MVP |
+| ID     | Phase    | Execution status | Chat reference | Source/plugin hash | Tool trace | State/ledger before→after | Reviewer | Outcome             |
+| ------ | -------- | ---------------- | -------------- | ------------------ | ---------- | ------------------------- | -------- | ------------------- |
+| MAN-01 | 10.3     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
+| MAN-02 | 10.3     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
+| MAN-03 | 10.4     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
+| MAN-04 | 10.4     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
+| MAN-05 | 10.5     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
+| MAN-06 | 10.5     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
+| MAN-07 | 10.6     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
+| MAN-08 | 10.6     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
+| MAN-09 | 10.6     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
+| MAN-10 | post-MVP | NOT RUN          | —              | —                  | —          | —                         | —        | DEFERRED — POST-MVP |
+| MAN-11 | post-MVP | NOT RUN          | —              | —                  | —          | —                         | —        | DEFERRED — POST-MVP |
 
 ## Evidence record: copy once for each actual card/attempt
 
