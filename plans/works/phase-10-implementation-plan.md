@@ -53,20 +53,18 @@ menerima arsip lokal ZIP/tar.gz menjadi plugin PRIVATE. Ini hanya bukti
 instalasi final. Jangan mencentang peringatan risiko, membuat koneksi,
 login/OAuth, ataupun mengunggah paket di 10.0.
 
-**Langkah pertama setelah koneksi private dan OAuth owner dibuat pada 10.1:**
-periksa tanpa write apakah registry host menampilkan tool mutasi, termasuk
-`create_page`, dan apakah izin/approval untuk tool write bisa diberikan.
-Periksa metadata `readOnlyHint: false`, izin host, dan affordance approval
-yang tersedia; metadata atau kebijakan default saja tidak membuktikan
-entitlement. Jangan memanggil tool write demi menampilkan dialog approval,
-termasuk dry-run. Jika tidak dapat dibuktikan tanpa invocation, hentikan 10.1
-dengan diagnosis spesifik, tanpa lanjut read umum atau membangun paket.
-Setelah lulus, barulah cek 33 tools dan tiga owner read seperti biasa.
-
-Jika write terbukti tidak tersedia pada akun yang terhubung, 10.1 harus
-`BLOCKED`, bukan 10.0 yang hanya menilai formulir dan delivery. Pilihan host
-berbeda atau perubahan kontrak memerlukan keputusan owner. Tidak ada
-kewajiban menaikkan paket tanpa bukti account-specific.
+**CR-032 menggantikan gate OAuth tersebut hanya pada 10.1:**
+Pemilik memilih satu custom MCP **PRIVATE / No authentication** ke URL `mcp`
+production yang sama. Tidak ada user login, OAuth, atau consent. Edge Function
+menggunakan identitas satu workspace tetap dengan transaksi Postgres yang
+turun ke role `authenticated`; RLS dan 33 RPC yang ada tetap berlaku.
+Endpoint HTTPS-nya sendiri **publik**, meskipun plugin private, sehingga
+siapa pun dengan URL dapat meminta pembacaan. Semua tool write terlihat
+tetapi eksekusi RPC write ditolak selama 10.1. Pembuktian tool/approval
+OAuth historis CR-028/031 bukan lagi syarat koneksi ini. 10.1 PASS hanya
+bila host benar-benar menampilkan 33 tools termasuk `create_page` dan tiga
+read berhasil. Tidak ada business write sebelum MAN-02 dengan persetujuan
+payload tepat. Lihat [CR-032](../../docs/decisions/2026-10-18-phase-10-1-noauth-fixed-pilot.md).
 
 ## 3. Alur GitHub, status, dan biaya pengujian
 
@@ -81,7 +79,7 @@ kewajiban menaikkan paket tanpa bukti account-specific.
   `PASS`, `FAIL`, atau `BLOCKED/PENDING` yang spesifik. Centang hanya bila
   kriteria selesai terbukti. `PENDING` bukan `PASS`.
 - AI mengerjakan repository, paket, penilaian evidence, dan pemeriksaan
-  teknis. Pemilik melakukan login/consent di akunnya, mengaktifkan plugin,
+  teknis. Pemilik memilih koneksi No authentication 10.1 dan mengaktifkan plugin,
   menjalankan prompt kartu yang telah dibekukan, memberi data Page dan
   persetujuan editorial. Jangan meminta password, token, authorization code,
   client secret, service key, atau isi cookie di chat/Issue/PR/log.
@@ -101,8 +99,9 @@ kewajiban menaikkan paket tanpa bukti account-specific.
   [panduan OpenAI](https://developers.openai.com/plugins/deploy/connect-chatgpt).
   Catat source SHA, hash paket final, dan versi terpasang. Paket yang diuji
   harus sama dengan paket yang dinyatakan final.
-- Registrasi OAuth client khusus koneksi ChatGPT memakai policy backend yang
-  sudah dirilis: catat client, redirect persis, scope, dan uji OAuth/owner
+- Registrasi OAuth client adalah prosedur historis Phase 9 dan **tidak**
+  dipakai untuk koneksi No authentication CR-032. Apabila diaudit, policy backend
+  yang sudah dirilis: catat client, redirect persis, scope, dan uji OAuth/owner
   hosted secara terfokus. Jika setup itu memerlukan perubahan Auth policy,
   token claim hook, middleware, RLS, atau security config backend, perlakukan
   sebagai perubahan keamanan: review, gate penuh pada SHA rilis baru, lalu
@@ -111,7 +110,10 @@ kewajiban menaikkan paket tanpa bukti account-specific.
 
 ## 4. Batas tindakan dan evidence
 
-Hanya MCP dengan identitas owner yang sah boleh melakukan write bisnis.
+Selama 10.1 tidak ada write bisnis. Identitas fixed pilot di sisi server
+menggantikan OAuth owner untuk koneksi No authentication; hal ini tidak
+dapat mengotentikasi pemanggil publik. Pembukaan write setelah 10.1 butuh
+persetujuan payload dan keputusan operasional terpisah.
 Page tambahan, draft, revisi, approval, dan plan yang bertahan di production
 adalah data pilot sungguhan milik owner. Prompt kartu yang dikirim pemilik
 memberi otorisasi untuk tindakan tepat yang dijelaskan di kartu; jangan
@@ -182,36 +184,37 @@ ada OAuth, instalasi, koneksi baru atau business write. **Tidak
 mensyaratkan** izin write, plugin final terpasang, atau data Page sebelum
 10.1/10.2/10.3. Jika bukti tersebut tidak ada, beri BLOCKED spesifik.
 
-## 6. Checkpoint 10.1 — Custom MCP, OAuth owner, dan gate write read-only
+## 6. Checkpoint 10.1 — No authentication, fixed pilot dan tiga read
 
-**Scope:** koneksi langsung dan OAuth private owner, lalu pemeriksaan
-kemampuan write **tanpa mengeksekusi write**; semua tes bisnis read-only.
+**Scope:** adaptasi existing production MCP, satu koneksi plugin PRIVATE
+ChatGPT tanpa autentikasi pengguna, tanpa bisnis write ataupun final package.
+CR-032 mengesampingkan gate owner OAuth CR-028/031 untuk koneksi ini.
 
-1. Verifikasi URL HTTPS dan discovery OAuth production. Tambahkan custom MCP
-   secara private menurut UI resmi. Jika host memerlukan OAuth client baru,
-   gunakan redirect dan metadata nyata, tidak menebak atau memakai kembali
-   callback Vercel 9.5. Owner menyelesaikan login dan consent. Simpan
-   rahasia hanya pada provider yang sesuai.
-2. **Tindakan pertama segera setelah koneksi/OAuth:** inspeksi tools/list
-   atau katalog koneksi, pastikan `create_page` dan tool write lain
-   terekspos sebagai `readOnlyHint: false` serta izin/approval untuk
-   write action bisa diminta melalui mekanisme host **tanpa memanggil tool
-   mutasi**. Lihat konfigurasi perizinan dan controls UI bila ada; catat
-   identitas koneksi yang aman. **Jika tool write hilang, dibatasi, atau
-   approval tidak dapat dibuktikan tanpa write, STOP dengan satu diagnosis
-   jelas; jangan lanjut baca profil atau membuat paket 10.2.** Jangan
-   memicu approval melalui dummy payload, dry-run atau request write.
-3. Hanya setelah gate write metadata/permission PASS, buktikan tepat
-   33 nama tool dan `get_account_profile`, `get_workspace_context`,
-   `list_pages` sebagai owner. Periksa Page pilot Phase 9, denial dari
-   gate berlaku, dan tidak ada perubahan data. Catat koneksi host tanpa
-   memasukkan ID koneksi atau token ke `mcp.json`.
+1. Verifikasi SHA HEAD PR #23, catat CR-032 dan risiko endpoint publik **sebelum**
+   mengubah source. Buktikan lewat tes terfokus bahwa Edge-only DB connection,
+   `SET LOCAL ROLE authenticated` dan claims server-side membatasi satu
+   workspace pilot lewat RLS; `anon` tidak mendapat grant langsung pada
+   33 RPC, tabel, sequence atau helper. Bila identitas gagal, STOP.
+2. Pertahankan exactly 33 MCP tool/RPC, dengan `create_page` terdaftar,
+   descriptor tanpa OAuth, input schema tertutup, dan read-only adapter
+   profile yang mengembalikan public workspace id. Semua mutasi server-blocked
+   pada 10.1. Jalankan tes terfokus, `pnpm run check`, dan CI ringan.
+3. Jalankan **tepat satu** gate CR-020 lengkap pada SHA final; bila Actions
+   lama, catat URL/SHA dan STOP sampai `lanjutkan` untuk memeriksa run yang
+   sama. Deploy hanya setelah PASS ke project production Phase 9 yang sama,
+   bukan MCP demo atau project baru. Verifikasi secret tetap di Edge saja.
+4. Pemilik membuat **satu** koneksi/plugin PRIVATE dengan **No authentication**
+   ke URL production `mcp` yang ada. Katalog ChatGPT harus menampilkan tepat
+   33 tool unik termasuk `create_page`; gunakan hanya tiga tool baca
+   `get_account_profile`, `get_workspace_context`, dan `list_pages`.
+   Catat hasil aktual dan jumlah bisnis row/ledger tetap. Jangan menjalankan
+   write meskipun host menyediakannya.
 
-**PASS 10.1 bila:** gate keberadaan tool write dan kesiapan approval
-berhasil **tanpa eksekusi write**, OAuth owner dan 33 tool/ketiga read lulus,
-tanpa kebocoran atau mutasi. Keberhasilan satu write nyata **bukan** gate
-10.1; hanya di `MAN-02` setelah payload owner disetujui. Kegagalan gate
-awal menghentikan Phase 10 sebelum 10.2.
+**PASS 10.1 hanya bila:** gate final SHA dan deployment PASS, host private
+No authentication membuktikan 33 tool serta ketiga read, tanpa write bisnis.
+Bukti local/Inspector/HTTP terpisah bukan bukti host ChatGPT. Jika hosting
+atau konektor tidak bisa menjalankan salah satu tahap, beri satu tindakan
+manual yang jelas, tandai PENDING dan berhenti di 10.1; jangan mulai 10.2.
 
 ## 7. Checkpoint 10.2 — Paket final dan instalasi private
 
@@ -265,7 +268,7 @@ owner atas payload persis sebelum satu-satunya write `create_page`. `MAN-01` mem
 identitas owner, dan pembacaan Page pilot Phase 9 yang sudah ada. `MAN-02`
 membuat **satu Page
 tambahan** dengan konfigurasi trivia yang disetujui; gunakan `create_page`
-melalui OAuth owner, baca kembali Page/config, dan pastikan Page Phase 9 tetap
+melalui koneksi fixed pilot yang diotorisasi untuk MAN-02, baca kembali Page/config, dan pastikan Page Phase 9 tetap
 ada. Jangan membuat Page kedua jika respons write hilang: periksa state dan
 replay dengan operation key/payload yang sama. Catat public ID dan jumlah
 Page setelahnya tanpa menyimpan token.
