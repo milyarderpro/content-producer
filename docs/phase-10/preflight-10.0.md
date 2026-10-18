@@ -22,6 +22,27 @@
 | Host exposes and approves custom MCP **write** actions         | [Current official OpenAI help](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) lists full MCP/write for Business and Enterprise/Edu; Plus is **not** listed as supported full-MCP tier. This is a plan/entitlement blocker, not proof of an actual denied write attempt. No write test performed, as required by 10.0. | **BLOCKED**       |
 | Install a private plugin archive from GitHub Actions           | Available plugin creation capability accepts a local ZIP/tar.gz and creates a private plugin; owner's existing `USER / PRIVATE` plugin inventory corroborates general private packaging. **No Content Producer artifact fetched into local file, uploaded or installed**, so actual Actions-to-install path is **UNVERIFIED**.                                | PARTIAL / BLOCKED |
 
+### 10.0 continuation — separate documentation, UI, and unverified capability (2026-10-18)
+
+**Interpretation correction:** the official OpenAI [custom MCP connection guidance](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) currently lists ChatGPT Business and Enterprise/Edu for full custom MCP support, including write/modify actions. Plus is not a documented full-write tier. **This is NOT evidence that a particular Plus account was presented with a disabled/absent menu, and it is NOT an observed feature-denial response.** The earlier table's "plan/entitlement blocker" means lack of affirmative host capability evidence, not a confirmed account-specific denial. Do not treat a provider's account matrix as a screenshot of the owner's UI.
+
+Evidence by provenance:
+
+- **Documentation — supported policy, not account state:** the current official guide describes `Plugins → + → Add custom MCP server`, with no Developer Mode toggle required for the latest Plugins flow, and an authentication form. The guide names Business workspace admins/owners and Enterprise/Edu authorized members with RBAC for creation; write/modify actions are subject to app permission/risk confirmations. The [plugin testing guide](https://developers.openai.com/plugins/deploy/connect-chatgpt) describes the connection and private package evaluation flows. All steps remain unexecuted.
+- **Observed account UI — limited read-only:** the connected ChatGPT web tab exposes a **Plugins** sidebar button and a visible **Plus** plan label. The menu opened by the Plugins **+** button has **NOT been observed**, so the presence or absence of `Add custom MCP server` is **UNKNOWN**, not "absent". No screenshot of the MCP form, OAuth option, write-related permission, or private archive upload dialog has been supplied.
+- **Observed owner-specific capability — positive but narrower:** read-only private plugin inventory returns existing personal `USER / PRIVATE` releases, including `viral-producer` version `1.1.1`. This proves private plugin ownership and retrieval on this account, not that an MCP-capable Content Producer package can be installed or execute write actions. A Plugin Creator archive-upload operation exists, but **was not invoked**.
+- **Unverified / blocking:** account-specific `Add custom MCP server` availability, OAuth setup for custom MCP, tool-write approval, and complete Actions artifact → *installed MCP plugin* identity remain unproven. **Maintain checkpoint 10.0 BLOCKED, evidence pending**, rather than declaring a Plus-specific feature denial. If a UI control is actually missing or disabled, record the exact menu labels, workspace/role, and redacted screenshot or displayed error before concluding that it is unavailable.
+
+Read-only owner UI inspection protocol (STOP before creating any resource):
+
+1. In ChatGPT **web**, select the current personal/workspace scope and **Plugins** from the sidebar. Record the scope/plan and visible UI, omitting personal identifiers.
+2. Open the Plugins **+** menu only; record whether **Add custom MCP server** appears, is disabled with a reason, or is absent. If available, open its form **without entering the production endpoint, authenticating, accepting risk, or clicking Create**. Record only visible OAuth/connection/write-related controls and exit without saving.
+3. Return to Plugins and inspect **Plugin Creator / Upload plugin / Upload new or existing plugin** availability and whether private ZIP-based creation is offered. **Do not select, upload, install or publish** any package.
+4. Correlate a redacted screenshot/owner report to account scope and this date. Presence of a form is **not** a completed OAuth handshake, scanned 33-tool list, authorized write, or installed final plugin. A GitHub Actions ZIP download is not final installation proof.
+5. If actual owner UI denies full write, present supported Business admin/owner or Enterprise/Edu admin/authorized-developer workspace access (with applicable permission) as **possible host routes**, not an instruction to purchase or a silently approved contract change. Any other host must be independently proven against the frozen contract; otherwise a formal owner-approved change record is needed.
+
+The prior [PR CI run #39095321646](https://github.com/milyarderpro/content-producer/actions/runs/39095321646) on `7fe9317c9b079f5f515341e22279179745d01b7b` succeeded; the separate originally pending push run `#39095318478` subsequently also completed successfully. No replacement or heavy test is needed for either prior run. Any later docs-only commit gets its own *light* PR check, not a Phase 9 gate.
+
 The host help may evolve or account entitlement may be different in a separate workspace. The owner should provide **read-only evidence** of workspace identity/plan and available custom MCP/write controls before any connection. If the actual host cannot support write, the decision is owner-select an authorized supported host/workspace or approve a formal contract change; do not silently change PRD or substitute SQL/admin/API writes. No assumption that a purchase is required or already authorized.
 
 ## Artifact-transfer chain and access boundary
@@ -50,9 +71,10 @@ Carry forward unclosed Phase 9 risks: two active OAuth test clients, reviewed 33
 - [x] Main/runbook/CR-027 and audit history reviewed; branch created.
 - [x] Private personal plugin inventory observed (read-only).
 - [ ] Custom MCP private creation, hosted OAuth and **write** entitlement proved for selected host/workspace.
-- [ ] Actual GitHub Actions candidate artifact built, linked and downloaded/validated; end-to-end private install **proved** (only partial chain can be run in 10.0).
+- [x] GitHub Actions candidate built and downloaded: 12/12 allowlisted files/hash verification, artifact ID `12123959250`, prior exact-SHA PR CI SUCCESS.
+- [ ] Final Content Producer archive successfully installed as private plugin from the Actions path and its deployed identity verified (not authorized in 10.0).
 - [ ] Additional production Page/config and permitted content/plan decisions approved by owner.
 - [ ] Exact write-capable manual prompts frozen without owner markers.
-- [ ] Light CI on PR HEAD completed and evaluated.
+- [x] Light CI on original 10.0 PR HEAD completed and evaluated; a subsequent documentation-only update requires its own focused check.
 
 **Decision at time of authoring: BLOCKED; no PASS claim.** CI state and HEAD/PR reference are recorded separately in Issue #22 after the GitHub Actions run has been identified.
