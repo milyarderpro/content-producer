@@ -25,7 +25,7 @@ jobs:
                            "mcp-protocol-version":"2025-06-18","user-agent":"phase-10-1-read-only-diagnostics/1.0"},
                   method="POST")
               with urllib.request.urlopen(req,timeout=45) as response:
-                  body=response.read(131072).decode()
+                  body=response.read(2097152).decode()
                   print("HTTP",method,response.status,"type",response.headers.get("content-type"),"bytes",len(body))
                   if "text/event-stream" in response.headers.get("content-type",""):
                       records=[json.loads(line[6:]) for line in body.splitlines() if line.startswith("data: ")]
