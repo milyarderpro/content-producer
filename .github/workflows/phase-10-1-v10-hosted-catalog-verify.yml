@@ -1,0 +1,62 @@
+name: Phase 10.1 - v10 production catalog only
+on:
+  push:
+    branches: [codex/phase-10-plugin]
+    paths:
+      - '.github/workflows/phase-10-1-v10-hosted-catalog-verify.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Read-only external HTTP initialize plus tools/list (never tools/call)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import urllib.request
+          url='https://xjonnilnypchtxogtopb.supabase.co/functions/v1/mcp'
+          def req(method,id,params=None):
+              payload={'jsonrpc':'2.0','id':id,'method':method}
+              if params is not None:payload['params']=params
+              request=urllib.request.Request(
+                  url, method='POST',
+                  data=json.dumps(payload,separators=(',',':')).encode(),
+                  headers={'Content-Type':'application/json','Accept':'application/json, text/event-stream',
+                           'MCP-Protocol-Version':'2025-06-18','User-Agent':'phase10-v10-catalog-only/1.0'}
+              )
+              with urllib.request.urlopen(request,timeout=30) as response:
+                  raw=response.read(2*1024*1024)
+                  assert response.status==200
+                  content_type=response.headers.get('Content-Type','')
+                  if 'text/event-stream' in content_type:
+                      msgs=[json.loads(line[6:]) for line in raw.decode().splitlines() if line.startswith('data: ')]
+                      assert len(msgs)==1, 'unexpected SSE event count'
+                      message=msgs[0]
+                  else:
+                      message=json.loads(raw)
+                  print('METHOD',method,'HTTP',response.status,'SSE bytes',len(raw),'JSON result',bool(message.get('result')),'error',bool(message.get('error')))
+                  return raw,message
+          _,initial=req('initialize',1,{'protocolVersion':'2025-06-18','capabilities':{},'clientInfo':{'name':'phase10-readonly-catalog','version':'1.0.0'}})
+          assert initial.get('result',{}).get('protocolVersion')=='2025-06-18'
+          raw,list_message=req('tools/list',2)
+          tools=(list_message.get('result') or {}).get('tools')
+          assert isinstance(tools,list),'tools/list returned no tool array'
+          print('COUNT',len(tools),'UNIQUE',len(set(t.get('name') for t in tools)),'HAS_CREATE_PAGE',any(t.get('name')=='create_page' for t in tools))
+          print('CATALOG_BYTE_COUNTS',json.dumps({'sse':len(raw),'full_json':len(json.dumps(list_message,separators=(',',':')).encode()),'tools_only':len(json.dumps(tools,separators=(',',':')).encode())}))
+          assert len(tools)==33 and len(set(t['name'] for t in tools))==33
+          assert any(t['name']=='create_page' for t in tools)
+          assert len(raw)<100000, 'hosted SSE tool catalog exceeds CR-033 100kB target'
+          for tool in tools:
+              assert tool.get('securitySchemes')==[{'type':'noauth'}], 'noauth top-level mismatch'
+              assert (tool.get('_meta') or {}).get('securitySchemes')==[{'type':'noauth'}], 'noauth meta mismatch'
+              assert 'openai/profile' not in (tool.get('_meta') or {})
+              assert 'outputSchema' not in tool, 'optional bulky wire output schema leaked'
+              assert 'title' not in tool
+              schema=tool.get('inputSchema')
+              assert isinstance(schema,dict) and schema.get('type')=='object'
+          print('PASS: REAL PRODUCTION V10 catalog <100KB, 33 unique tools, create_page, explicit noauth, original input constraints; NO tools/call was sent')
+          PY
