@@ -19,15 +19,16 @@ Dokumen ini mengubah requirement, content DNA, dan 33-tool contract menjadi use 
 
 Dokumen ini tidak menganggap prompt evaluation sebagai pengganti database, security, concurrency, atau content-quality tests. Langkah 0.9 hanya mengubah dokumentasi.
 
-**Alokasi eksekusi aktif (CR-019/CR-020):** 31 goals dan 101 prompt berikut tetap
+**Alokasi eksekusi aktif (CR-019/CR-020/CR-027):** 31 goals dan 101 prompt berikut tetap
 baseline frozen. Rubrik, threshold, repetition, dan protokol staging di §18–21
 berlaku jika suite lengkap kelak dijalankan; itu bukan gate MVP sekarang.
 Sebelum deployment Phase 9 jalankan satu gate deterministic/keamanan untuk
 33 tool pada SHA kandidat rilis. Setelah plugin final terpasang pada Phase 10,
-jalankan 11 kartu manual `MAN-01..MAN-11` yang prompt dan hasilnya dibekukan
-dalam panduan tersendiri. `MAN-01..MAN-09` memberi status `Pilot-ready`;
-`MAN-10..MAN-11` memerlukan publikasi dan metrik sungguhan untuk penyelesaian
-MVP. Authenticated non-owner denial tetap diuji otomatis.
+jalankan sembilan kartu manual wajib `MAN-01..MAN-09` yang prompt dan hasilnya
+dibekukan dalam panduan tersendiri untuk status `Pilot-ready`.
+`MAN-10..MAN-11` hanya menjadi observasi opsional setelah MVP dengan publikasi
+dan metrik sungguhan. Kapabilitas posted dan metrik diuji deterministik pada
+database terisolasi; authenticated non-owner denial tetap diuji otomatis.
 
 ---
 
@@ -588,15 +589,16 @@ No threshold can compensate for a hard fail. A critical case must pass all repea
 Protokol live staging CR-018 berikut adalah riwayat; CR-019 menundanya.
 Untuk gate MVP aktif, local/Inspector deterministic tests termasuk non-owner
 denial berjalan sebelum deployment Phase 9 menurut CR-020. Pada Phase 10,
-pemilik menjalankan 11 kartu manual melalui plugin final terpasang, sekali
-masing-masing; hanya kegagalan atau perubahan terkait diulang. Record ringkas
+pemilik menjalankan sembilan kartu manual wajib melalui plugin final terpasang,
+sekali masing-masing; hanya kegagalan atau perubahan terkait diulang. Record ringkas
 mencakup ID, prompt, versi plugin, referensi percakapan, nama tool, hasil,
 state aman, status, dan catatan. Detail argumen/result teredaksi dikumpulkan
 bila diperlukan untuk diagnosis. Schema lengkap §18 tetap untuk regresi
 101 kasus bila kelak dijalankan.
-Jika skenario belum dijalankan atau observasi sungguhan belum ada, hasilnya
-`PENDING`, bukan `pass`. Jangan mengisi fixture production dengan publikasi
-atau metrik palsu.
+Jika kartu wajib belum dijalankan, hasilnya `PENDING`, bukan `PASS`.
+`MAN-10..MAN-11` yang belum memiliki kejadian sungguhan berstatus
+`DEFERRED — POST-MVP`, bukan blocker MVP. Jangan mengisi fixture production
+dengan publikasi atau metrik palsu.
 
 ### 21.2 Saat run
 
@@ -627,7 +629,7 @@ Production data tidak dipakai untuk destructive evaluation. Production pilot han
 | E2 | Local Edge Function + Inspector sebelum deployment Phase 9 | 33 tools valid/invalid/auth cases lulus pada SHA deployment tanpa suite smoke database duplikat |
 | E3 | Remote staging custom MCP, ditunda CR-019 | Opsional untuk regresi mendatang; tidak diklaim lulus |
 | E4 | Installed private test plugin staging, ditunda CR-019 | Opsional untuk regresi mendatang; tidak diklaim lulus |
-| E5 | Plugin final dan production pilot Phase 10 | `MAN-01..MAN-09` untuk `Pilot-ready`; `MAN-10..MAN-11` dengan kejadian nyata untuk `MVP Complete` setelah Phase 11 |
+| E5 | Plugin final dan production pilot Phase 10 | `MAN-01..MAN-09` untuk `Pilot-ready`; `MAN-10..MAN-11` opsional setelah MVP; `MVP Complete` memerlukan gate Phase 11 dan bukti AC yang sesuai |
 
 E1/E2 dan audit keamanan tidak membuktikan aktivasi skill ChatGPT; uji manual
 plugin final tetap wajib pada E5. Penolakan lintas owner dibuktikan dalam E1/E2,
@@ -693,7 +695,7 @@ mengganti frozen 101 cases.
 
 - Frozen 101-case suite tetap memungkinkan regression comparison saat tool metadata, skill, host, atau model berubah; eksekusi live lengkap ditunda menurut CR-019.
 - Prompt evaluation bersifat probabilistik; deterministic integrity tetap dibuktikan pada database/RPC layer.
-- Threshold direct 100% dan indirect 90% tetap definisi untuk suite lengkap bila kelak dijalankan; gate MVP memakai 11 kartu manual CR-020 lulus dan zero hard fail.
+- Threshold direct 100% dan indirect 90% tetap definisi untuk suite lengkap bila kelak dijalankan; gate MVP memakai sembilan kartu manual wajib CR-020/CR-027 lulus dan zero hard fail.
 - User-facing prompts diuji dalam Indonesia dan English karena owner berbahasa Indonesia sementara content output berbahasa English.
 - Production pilot dibatasi pada data uji yang disiapkan; destructive fixture tidak dijalankan pada real operational records.
 - Generated variants memberi coverage setiap tool tanpa membuat dokumen frozen terlalu bergantung pada wording implementasi.

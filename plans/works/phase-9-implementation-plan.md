@@ -1,5 +1,11 @@
 # Phase 9 — Production deployment: runbook implementasi
 
+> **Status terkini: COMPLETE.** Rencana dan kriteria di bawah merekam kontrak
+> saat Phase 9 dikerjakan. Audit independen 9.5 PASS; lihat tracker §16.
+> CR-027 sesudah Phase 9 mengubah gate manual Phase 10–11 menjadi sembilan
+> kartu wajib dan dua observasi opsional setelah MVP. Pernyataan lama tentang
+> 11 kartu atau publikasi/metrik nyata di bawah bersifat historis.
+
 Status: **rencana, belum dieksekusi**. Baseline dokumen adalah main setelah merge PR #6 (85a3778c82fdc0dddc2de7908dc21dee6a5c04ba). Catat ulang SHA main saat checkpoint 9.0 dimulai. Phase 8 tetap Deferred by CR-019; tidak ada E3/E4 atau 101 prompt live yang diklaim lulus.
 
 ## 1. Tujuan dan sumber kontrak

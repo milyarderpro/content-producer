@@ -17,12 +17,18 @@ CR-018 staging gate. Do not mark Phase 8 complete or treat the 101 frozen
 prompts as executed. CR-020 narrows the MVP release gate: run one full
 technical/security CI gate on the frozen deployment SHA, without a duplicate
 database smoke suite; prove cross-owner denial in automated tests. After the
-final plugin is installed in Phase 10, run its 11 guided manual cards. Mark
-Pilot-ready separately from MVP Complete; genuine posting and metrics evidence
-is required for final completion. A Phase 10–11 gate may reuse the full test
-result for an unchanged deployed backend SHA; validate later plugin-package
+final plugin is installed in Phase 10, run its nine mandatory guided manual
+cards. CR-027 defers `MAN-10..MAN-11` to optional post-MVP field validation;
+genuine Facebook publication and metrics are not MVP release gates. Mark
+Pilot-ready separately from MVP Complete. A Phase 10–11 gate may reuse the
+full test result for an unchanged deployed backend SHA; validate later plugin-package
 changes with focused package/MCP tests and affected manual cards. Keep the 101
 cases as a regression inventory.
+For Phase 10, follow `plans/works/phase-10-implementation-plan.md`: one
+checkpoint per task, verify the owner's ChatGPT custom MCP write capability
+before connecting or testing the plugin, and freeze the nine manual cards
+before execution. Phase 10 can become Pilot-ready only after independent
+audit; Phase 11 owns MVP Complete.
 
 ## Boundaries
 

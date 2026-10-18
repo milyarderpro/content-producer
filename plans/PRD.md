@@ -1355,7 +1355,9 @@ URL MCP produksi mengikuti bentuk:
 https://<project-ref>.supabase.co/functions/v1/mcp
 ```
 
-URL tersebut didaftarkan melalui menu ChatGPT Plugins → Create custom MCP server.
+URL tersebut didaftarkan sebagai custom MCP melalui UI resmi ChatGPT yang
+tersedia pada akun pemilik. Nama menu dan izin akun diperiksa pada preflight
+Phase 10; jangan menganggap konektor umum atau akses baca memberi izin tulis.
 
 Edge Function `mcp` memakai `verify_jwt = false` agar OAuth protected-resource discovery dan `WWW-Authenticate` challenge dapat mencapai middleware. Middleware di dalam function tetap wajib memvalidasi signature, issuer, audience/resource, expiration, scopes, OAuth client context, dan owner sebelum tool berjalan.
 
@@ -1426,14 +1428,17 @@ deployment dan OAuth pada Phase 9, lalu uji manual skenario inti setelah
 plugin final terpasang pada Phase 10. Bukti yang belum tersedia tetap `PENDING`;
 Phase 8 tidak diklaim lulus. Tidak ada kriteria akhir yang dihapus.
 
-CR-020 membedakan `Pilot-ready` dari `MVP Complete`. Gate teknis penuh
+CR-020 dan CR-027 membedakan `Pilot-ready` dari `MVP Complete`. Gate teknis penuh
 dijalankan satu kali pada kandidat rilis yang dibekukan, tanpa suite smoke
-database duplikat. Sebelas kartu uji manual plugin final menggantikan
+database duplikat. Sembilan kartu uji manual wajib pada plugin final menggantikan
 keharusan menjalankan 101 prompt live; penolakan lintas owner tetap wajib
 dibuktikan lewat tes autentikasi otomatis. `Pilot-ready` membolehkan pilot
-terkendali setelah gate hosted dan sembilan kartu awal lulus. `MVP Complete`
-memerlukan publikasi manual dan metrik sungguhan, seluruh AC yang berlaku,
-serta penutupan operasional Phase 11.
+terkendali setelah gate hosted dan sembilan kartu wajib lulus. `MVP Complete`
+memerlukan bukti seluruh AC yang berlaku dan penutupan operasional Phase 11.
+Kapabilitas lifecycle publikasi dan metrik diuji deterministik dengan fixture
+sintetis pada database terisolasi; publikasi Facebook dan observasi metrik
+sungguhan bukan gate MVP. `MAN-10..MAN-11` adalah kartu observasi opsional
+setelah MVP, tanpa membuat publikasi atau metrik palsu di production.
 
 ### AC-001 — Koneksi plugin
 
@@ -1660,13 +1665,15 @@ tidak menjadi gate MVP:
 Generated paraphrases boleh ditambahkan untuk robustness jika suite lengkap
 kelak dijalankan; prompt frozen dan expected behavior tidak diubah. Gate MVP
 aktif mewajibkan cakupan deterministic positive/boundary/auth untuk 33 tools
-serta 11 kartu manual `MAN-01..MAN-11` pada plugin final sesuai CR-020.
+serta sembilan kartu manual wajib `MAN-01..MAN-09` pada plugin final sesuai
+CR-020 sebagaimana diubah CR-027.
 Prompt persis, expected behavior, dan hasil terlarang dibekukan pada panduan
 Phase 10 sebelum dieksekusi. Setiap kartu dijalankan sekali; hanya yang gagal
 atau terdampak perbaikan diulang. `MAN-01..MAN-09` harus lulus untuk
-`Pilot-ready`; `MAN-10..MAN-11` memerlukan kejadian publikasi dan metrik
-sungguhan untuk `MVP Complete`. Penolakan lintas owner dibuktikan secara
-otomatis, bukan oleh owner melalui akun ChatGPT kedua. Tidak ada unauthorized
+`Pilot-ready`; `MAN-10..MAN-11` hanya dijalankan sebagai observasi opsional
+setelah MVP bila kejadian publikasi dan metrik sungguhan tersedia. Penolakan
+lintas owner dibuktikan secara otomatis, bukan oleh owner melalui akun ChatGPT
+kedua. Tidak ada unauthorized
 write, kebocoran lintas owner/secret, klaim publikasi palsu, atau bypass
 blocking quality gate yang boleh diterima.
 
@@ -1707,6 +1714,12 @@ MVP bergantung pada:
 - Facebook untuk publikasi manual.
 
 Perubahan fitur atau limit pada ChatGPT Plus dan Supabase berada di luar kendali produk dan perlu diperiksa kembali saat implementasi.
+Sebelum Phase 10, verifikasi langsung bahwa akun/workspace pemilik mendukung
+**custom MCP private dengan aksi tulis** serta instalasi skill/plugin private.
+Konektor GitHub atau akses MCP baca saja tidak membuktikan kemampuan itu.
+Jika paket akun yang dipakai tidak mendukungnya, hentikan Phase 10 dan catat
+keputusan host/akun atau change record; jangan menganggap dependency ini
+terpenuhi hanya karena nama paket ChatGPT Plus tercantum di atas.
 
 ---
 
@@ -1764,11 +1777,16 @@ terkendali, tetapi belum memenuhi Definition of Done di bawah.
 9. Pemakaian fakta selalu mengikuti `workspace_unique` atau `page_unique` milik Page tujuan.
 10. Tidak ada OpenAI API, embeddings, product dashboard, atau auto-posting dalam runtime MVP; frontend auth minimal diperbolehkan.
 11. OAuth, ownership check, RLS, dan Data API exposure telah diverifikasi.
-12. Pengguna dapat mencatat performa dan mengambil insight dasar melalui chat.
+12. Kapabilitas mencatat performa dan mengambil insight dasar melalui chat
+    dibuktikan dengan tes deterministik MCP/RPC pada database terisolasi.
+    Operasi pada data production menunggu metrik nyata dan bersifat opsional
+    setelah MVP menurut CR-027.
 13. Dokumentasi database, workflow, module contract, trivia DNA, tool inventory, use-case inventory, traceability, dan implementation plan sudah selaras dengan PRD ini.
-14. Seluruh 33 MCP tools lulus contract tests; 11 kartu manual plugin final
-    lulus sesuai CR-020, termasuk `MAN-10..MAN-11` dengan bukti nyata. Seratus
-    satu frozen prompts tetap inventaris regresi.
+14. Seluruh 33 MCP tools lulus contract tests dan sembilan kartu manual wajib
+    `MAN-01..MAN-09` pada plugin final lulus sesuai CR-020/CR-027.
+    Kapabilitas lifecycle posted dan metrik/insight dibuktikan secara
+    deterministik pada database terisolasi. `MAN-10..MAN-11` adalah observasi
+    opsional setelah MVP; 101 frozen prompts tetap inventaris regresi.
 15. Phase 11 menutup pemeriksaan backup/rollback, operasional, dan handoff;
     owner menyetujui hasil pilot editorial.
 
