@@ -25,6 +25,8 @@ Make one minimal candidate on the existing `codex/phase-10-plugin` branch and dr
 
 ## Single candidate before full gate
 
-The MCP-only adapter and dedicated `.github/workflows/phase-10-1-technical-gate.yml` are on the same candidate branch. The new workflow copies the CR-020 Phase 9 technical/security stages, runs on the exact pushed Phase 10.1 backend SHA, and does not alter the frozen `main` gate. It is triggered only by MCP source or its own workflow file, not later documentation/package-only pushes.
+The MCP-only adapter and dedicated `.github/workflows/phase-10-1-technical-gate.yml` are on the same candidate branch. The workflow copies the CR-020 Phase 9 technical/security stages, runs on the exact pushed Phase 10.1 backend SHA, and does not alter the frozen `main` gate. It is triggered by MCP source, the Inspector harness, or its own workflow file, not later documentation/package-only pushes.
+
+The first gate on `9583f2aaef13a967262553e1d0656a7cb37418ce` failed at `EXPECTED_OWNER_ACCESS_REQUIRED_GOT_NONE`: the Inspector harness still sent the former profile input `{ request_schema_version: 1 }`, which the new empty profile schema rejects before owner authorization. Both harness calls now send `{}`; this test adaptation does not change the MCP candidate or its database RPC.
 
 Focused local evidence: all **62 MCP tests PASS**, including signed synthetic owner JWT through the HTTP transport, 33 `tools/list` descriptors, `create_page` visibility, top-level/mirrored OAuth schemes, profile `{}` and top-level identity, unchanged owner JWT and versioned profile RPC, and non-owner denial. `pnpm run check` PASS. The candidate owner-context `tools/list` response is HTTP 200, **293,921 bytes**, with 33 unique tools, 33 top-level and 33 mirrored OAuth declarations. All 66 candidate input/output schemas pass Draft 2020-12 structural validation. This is local evidence; production deployment and ChatGPT discovery are still PENDING.

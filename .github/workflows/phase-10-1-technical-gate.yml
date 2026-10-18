@@ -7,6 +7,7 @@ on:
     branches: [codex/phase-10-plugin]
     paths:
       - 'supabase/functions/mcp/**'
+      - 'scripts/phase-6-13.ts'
       - '.github/workflows/phase-10-1-technical-gate.yml'
 
 permissions:

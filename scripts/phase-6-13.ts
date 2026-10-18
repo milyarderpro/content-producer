@@ -289,7 +289,7 @@ try {
       const pagesBefore = pageCount();
       const listing = await rpcHttp('tools/list');
       // A direct tools/call must remain owner-scoped even without prior tools/list.
-      await call('get_account_profile', { request_schema_version: 1 }, 'OWNER_ACCESS_REQUIRED');
+      await call('get_account_profile', {}, 'OWNER_ACCESS_REQUIRED');
       await call(
         'create_page',
         {
@@ -1633,7 +1633,7 @@ try {
     await inspector('initialize');
     const listed = await inspector('tools/list');
     check(listed.tools.length === 33, 'INSPECTOR_CENSUS');
-    await inspector('tools/call', 'get_account_profile', { request_schema_version: 1 });
+    await inspector('tools/call', 'get_account_profile', {});
     await inspector('tools/call', 'get_workspace_context', common());
     await inspector('tools/call', 'list_pages', common());
     await inspector('tools/call', 'get_page_generation_context', {
