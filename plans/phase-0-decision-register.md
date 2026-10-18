@@ -13,6 +13,15 @@
 | Niche implementasi MVP | Trivia |
 | Tujuan | Mencatat keputusan terbuka, konflik, dependensi, pemilik keputusan, dan bukti penutupan sebelum Phase 1 dimulai |
 
+**Pengecualian setelah freeze (CR-032, 2026-10-18):** Pemilik menetapkan
+koneksi MCP ChatGPT production **No authentication** pada checkpoint 10.1,
+dengan fixed pilot workspace identity di Edge Function, Postgres transaction
+`SET LOCAL ROLE authenticated`, RLS, dan risiko endpoint publik yang
+diterima. Ini mengesampingkan AUTH-001..006 hanya pada koneksi MCP ChatGPT
+10.1; kebijakan Supabase Auth Phase 9 dan 33 business RPC tetap historis
+berlaku. Tidak ada grant `anon`; first write hanya MAN-02 setelah approval.
+Lihat [CR-032](../docs/decisions/2026-10-18-phase-10-1-noauth-fixed-pilot.md).
+
 Dokumen ini adalah register pengendali selama Phase 0. Dokumen ini tidak menggantikan PRD, database design, module contract, trivia content DNA, atau implementation plan. Sebuah keputusan dalam register ini baru menjadi bagian spesifikasi final setelah berstatus `accepted`, diterapkan pada seluruh dokumen sumber yang terkait, dan lolos audit silang pada langkah 0.12.
 
 ---
