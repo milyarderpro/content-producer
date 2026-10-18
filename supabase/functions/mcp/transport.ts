@@ -24,12 +24,13 @@ function mirrorToolSchemes(value: unknown, pilot = false): unknown {
         const meta = tool._meta;
         if (!meta || typeof meta !== 'object') return item;
         if (pilot) {
-          const rest = { ...tool };
-          delete rest.securitySchemes;
+          // Explicit noauth is required: omission inherits the server's
+          // legacy OAuth defaults even when this ChatGPT plugin uses No auth.
+          const schemes = [{ type: 'noauth' }];
           const restMeta = { ...(meta as Record<string, unknown>) };
-          delete restMeta.securitySchemes;
+          restMeta.securitySchemes = schemes;
           delete restMeta['openai/profile'];
-          return { ...rest, _meta: restMeta }; // noauth tools must not advertise OAuth
+          return { ...tool, securitySchemes: schemes, _meta: restMeta };
         }
         const schemes = (meta as Record<string, unknown>).securitySchemes;
         return Array.isArray(schemes) ? { ...tool, securitySchemes: schemes } : item;
