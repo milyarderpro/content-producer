@@ -1,0 +1,22 @@
+# CR-033 — Bound ChatGPT No-auth MCP discovery size without changing business tool contracts
+
+- **Date:** 2026-10-18
+- **Status:** Diagnostic finding confirmed; narrowly scoped compatibility remediation, host acceptance still PENDING
+- **Source of authority:** Phase 10 checkpoint 10.1 CR-032, unchanged 33 tool names, existing 33 `api` RPCs, server-side default write lock and nine frozen manual procedures
+- **Repository:** `milyarderpro/content-producer`, branch `codex/phase-10-plugin`, draft PR #23
+
+## Reason: measured production + actual owner-host failure
+
+Owner entered the correct exact production MCP URL and **No authentication** in the ChatGPT “Add custom MCP server” form, acknowledged risk and clicked Create as a plugin twice. Both attempts returned the same `Some app settings were rejected` UI message; **no plugin was created**. On both attempts production `openai-mcp/1.0.0` sent `initialize` and `tools/list`, each HTTP 200 (version 8 at ~14:03 UTC; version 9 at ~14:30 UTC). Version 9 already explicitly advertised `securitySchemes: [{type:'noauth'}]` in tool and _meta. Therefore changing metadata auth alone did **not** fix owner-host acceptance.
+
+A read-only **hosted external** GitHub Actions probe (not a simulated JSON fixture) measured the full production `tools/list` on v9 at **292,199 bytes** SSE, 33 unique names, and syntactically valid top-level descriptors. Field subtotal: `outputSchema` **188,681 bytes**, `inputSchema` **88,605 bytes**; output schema is by far the largest fraction. Evidence: [run #39136621086](https://github.com/milyarderpro/content-producer/actions/runs/39136621086) and [run #39136726176](https://github.com/milyarderpro/content-producer/actions/runs/39136726176). Read-only projected-size test at [#39136821673](https://github.com/milyarderpro/content-producer/actions/runs/39136821673) shows omitting optional `outputSchema` metadata would reduce the listing to **102,923 bytes**, before removing redundant presentation/dialect metadata. Public community reports suggest ChatGPT can struggle with tool manifests near 100 KB; **OpenAI has not documented an authoritative size cap**, so this is a compatibility hypothesis to be proven by real ChatGPT UI, not a confirmed root cause.
+
+## Narrow decision
+
+Only in the existing CR-032 **No authentication pilot `tools/list` response**, advertise all **33 unchanged tool names**, preserved descriptions, `inputSchema.type/properties/required` and all input validation constraints, accurate safety annotations and explicit `noauth` on both tool and _meta. To create a bounded catalog, omit optional `outputSchema` from the *advertised* pilot catalog, omit the optional human-friendly `title` (name remains present) and remove the optional root `$schema` JSON Schema dialect declaration from the pilot `inputSchema`; do **not** remove any `inputSchema` parameters, properties, enum, required or validations. Target a total `tools/list` response less than **100,000 UTF-8 bytes**, verified with focused tests and a hosted read-only real HTTP probe.
+
+**Do not change** the actual Zod output validation, returned `structuredContent` or `content`, RPC input/output contracts, 33-tool registrations, persisted data, RLS/security/tenant checks, server-fixed identity, or default-locked business writes. Leave authenticated OAuth tool listing and internal harness unchanged, including full output schemas. This is an **on-wire catalog metadata compatibility exception** only during Phase 10.1; after host acceptance, review whether re-advertising `outputSchema` via a different size-safe representation is feasible. Tool output itself remains fully validated and available.
+
+## Release and rollback
+
+Modify only existing MCP transport, focused test(s) and this change record, and validate affected code and formatted source in light CI. Because the backend runtime changes, require one CR-020 full technical/security gate at final frozen SHA before redeployment to **the same** Supabase project `xjonnilnypchtxogtopb`. Check production status and read-only 33-tool catalog metadata via external HTTP before asking owner for **one** retry of plugin creation. If the attempt fails, do not make a success claim, do not execute any write, and stop to collect exact host error diagnostics. Preserve previous function v9 as rollback baseline. 10.1 PASS still requires ChatGPT host showing exactly 33 tools including `create_page` and three live read calls; Phase 10.2 not started.
