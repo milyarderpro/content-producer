@@ -13,6 +13,7 @@ The owner obtained an actual ChatGPT registration response using Chrome DevTools
 This identifies the ChatGPT host's registration schema validation layer; it is not a Supabase URL, name, or OAuth error. The production MCP v10 `initialize` and `tools/list` still returned HTTP 200 to ChatGPT. CR-033's size budget remains a separate, verified transport property, not an established cause of the refusal.
 
 A new **read-only live production tools/list** inspection [run #39141721020](https://github.com/milyarderpro/content-producer/actions/runs/39141721020) confirmed exactly 33 tools and identified precisely three `inputSchema.pattern` values containing Unicode property escapes `\\p{Cc}`, not compiled by Python standard `re` (`bad escape \\p`):
+
 1. `mark_post_posted.platform_post_id`: `^[^\\p{Cc}]+$`.
 2. `mark_post_posted.published_url`: `^https:...[^\\s\\p{Cc}]*...$`.
 3. `record_post_performance.source.note`: `^(?!...)[^\\p{Cc}]+$`.
