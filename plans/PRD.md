@@ -50,6 +50,18 @@ ChatGPT bertindak sebagai mesin penalaran, penelitian, penulisan, dan percakapan
 
 MVP tidak menggunakan OpenAI API, Embeddings API, dashboard produk, Canva API, atau Facebook Graph API. Satu frontend autentikasi minimal untuk login dan OAuth consent diperbolehkan dan bukan dashboard produk. Vendor hosting frontend dipilih saat deployment; Vercel tidak diwajibkan.
 
+**Pengecualian kontrak Phase 10.1 — CR-032 (owner-approved, 18 Oktober 2026):**
+Koneksi plugin ChatGPT production memakai **No authentication** tanpa login/OAuth
+pengguna. Identitas satu workspace pilot ditetapkan di server dan RPC
+dijalankan lewat transaksi dengan role `authenticated` di bawah RLS.
+Endpoint remote MCP tetap publik dan tidak membuktikan siapa pemanggil;
+risiko pembacaan data oleh pihak lain dan abuse diterima secara eksplisit.
+Selama checkpoint 10.1 seluruh business write terkunci. Frontend OAuth Phase 9
+tidak dihapus atau dideploy ulang hanya karena pengecualian ini.
+Tidak ada perubahan 33 tool/RPC atau acceptance approval untuk MAN-02.
+[CR-032](../docs/decisions/2026-10-18-phase-10-1-noauth-fixed-pilot.md)
+
+
 ---
 
 ## 3. Latar belakang
