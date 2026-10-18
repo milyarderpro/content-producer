@@ -30,7 +30,22 @@ function mirrorToolSchemes(value: unknown, pilot = false): unknown {
           const restMeta = { ...(meta as Record<string, unknown>) };
           restMeta.securitySchemes = schemes;
           delete restMeta['openai/profile'];
-          return { ...tool, securitySchemes: schemes, _meta: restMeta };
+          // CR-033: pilot ChatGPT discovery must fit the host tool-catalog
+          // budget. Output validation remains in the registered tool; only
+          // optional wire metadata is compacted. Input constraints are intact.
+          const published = { ...tool, securitySchemes: schemes, _meta: restMeta };
+          delete published.outputSchema;
+          delete published.title;
+          if (
+            published.inputSchema &&
+            typeof published.inputSchema === 'object' &&
+            !Array.isArray(published.inputSchema)
+          ) {
+            const input = { ...(published.inputSchema as Record<string, unknown>) };
+            delete input.$schema;
+            published.inputSchema = input;
+          }
+          return published;
         }
         const schemes = (meta as Record<string, unknown>).securitySchemes;
         return Array.isArray(schemes) ? { ...tool, securitySchemes: schemes } : item;
