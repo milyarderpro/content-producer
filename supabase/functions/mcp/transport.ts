@@ -91,6 +91,41 @@ async function mirrorToolsListResponse(response: Response): Promise<Response> {
 // Internal protocol harness has no authorization context.
 export const mcpTransport = createMcpHandler(() => createMcpServer());
 
+// Registration needs a context, but public discovery must never hold a real
+// identity or credential. The route and this transport both reject tool calls.
+const catalogContext: RequestContext = {
+  requestId: '00000000-0000-4000-8000-000000000000',
+  actorUserId: '00000000-0000-4000-8000-000000000000',
+  oauthClientId: '00000000-0000-4000-8000-000000000000',
+  workspacePublicId: null,
+  accessToken: '',
+  supabaseUrl: 'https://invalid.example',
+  publishableKey: '',
+};
+
+const catalogTransport = createMcpHandler(() => createMcpServer(catalogContext));
+export async function fetchAnonymousDiscovery(request: Request): Promise<Response> {
+  let method: unknown;
+  try {
+    const body: unknown = await request.clone().json();
+    method =
+      body && typeof body === 'object' && !Array.isArray(body)
+        ? (body as { method?: unknown }).method
+        : undefined;
+  } catch {
+    return new Response(null, { status: 400 });
+  }
+  if (
+    request.method !== 'POST' ||
+    typeof method !== 'string' ||
+    !['initialize', 'notifications/initialized', 'tools/list'].includes(method)
+  ) {
+    return new Response(null, { status: 403 });
+  }
+  const response = await catalogTransport.fetch(request);
+  return method === 'tools/list' ? mirrorToolsListResponse(response) : response;
+}
+
 // A new transport and server are created per authenticated request.
 // Never store a user's JWT or context in a process-global variable.
 export function createAuthenticatedTransport(context: RequestContext) {

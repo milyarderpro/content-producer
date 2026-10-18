@@ -1,10 +1,10 @@
 import { pipeline } from 'npm:@supabase/middleware@1.0.0';
 import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1.9.0';
 import {
-  runtimeOAuthConfig,
-  WorkspaceCheckFailure,
   type AuthDependencies,
   type OAuthConfig,
+  runtimeOAuthConfig,
+  WorkspaceCheckFailure,
 } from './auth.ts';
 import { handleHttpRequest, oversizedRequestResponse } from './http.ts';
 
@@ -143,6 +143,11 @@ export function createEdgeHandler(
       checkOwner,
     };
     const forwardedRequest = new Request(request, { body: body?.slice(0) ?? null });
+    // Mixed authentication: protocol discovery is public; every business
+    // tools/call still passes through the existing user and owner gates.
+    if (isMcpPath && request.method === 'POST' && !request.headers.has('Authorization')) {
+      return handleHttpRequest(forwardedRequest, { config, anonymousDiscovery: true });
+    }
     const protectedHandler = pipeline(
       [
         withOAuthProtectedResource({
