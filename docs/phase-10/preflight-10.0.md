@@ -1,6 +1,34 @@
 # Phase 10.0 — host/write and artifact-transfer preflight (2026-10-18)
 
-**Disposition: BLOCKED — preparation begun, checkpoint NOT PASS.** No OAuth, new custom-MCP connection, private plugin installation, business write, production change, backend deploy or heavyweight CI was performed in this task. This report is a snapshot of actual evidence and expressly does **not** green-light 10.1.
+**Historic disposition before CR-028: BLOCKED. Superseded by the CR-028 proof sequence and final 10.0 evidence below.** No OAuth, new custom-MCP connection, private plugin installation, business write, production change, backend deploy or heavyweight CI was performed in this task. This report is a snapshot of actual evidence and expressly does **not** green-light 10.1.
+
+## CR-028 superseding Phase 10.0 preflight disposition (2026-10-18)
+
+**Decision:** The owner accepted [CR-028](../decisions/2026-10-18-phase-10-proof-sequencing.md): 10.0 proves custom MCP/OAuth form and GitHub Actions artifact delivery to an account-accessible PRIVATE plugin archive intake. **Write entitlement and approval are not 10.0 gates**; inspect them first after connection/OAuth in 10.1, without invoking write, and stop before any owner read/package work if absent. A final installed package is proven **only in 10.2**, and first owner business write **only in MAN-02** after exact Page payload approval. No Page/content/plan values are required to freeze the invariant card procedures in 10.0; ask for them immediately before each relevant card.
+
+### Current 10.0 affirmative evidence, not later-stage success
+
+- **Owner Plus UI:** An owner-provided screenshot of `chatgpt.com/plugins` shows the **Add custom MCP server** form, selected **OAuth** authentication, Advanced OAuth settings, **Create as a plugin** (unclicked), and an unchecked risk acknowledgment. Creation form and OAuth selector are **OBSERVED**; write entitlement and OAuth handshake are **not**. The Plus tier matrix is not an account-specific write denial.
+- **GitHub Actions transfer:** Previously successful exact-SHA [PR CI #39095321646](https://github.com/milyarderpro/content-producer/actions/runs/39095321646), artifact `phase-10-preflight-candidate` ID `12123959250`, downloaded and inspected: outer SHA-256 `ed574508fe83a4f5a01b450f3497ed9f924234478a6614e1b05f9293a2ac17a6`; inner source ZIP SHA-256 `fc03a93cbe3ca2459b4659e0cf413f9df4364309f0ac8e9558e46e79c72b9567`. **12/12 files** matched their file hashes; manifest `0.1.0`, **no `mcp.json`**.
+- **Account-private receiving path:** Available **Plugin Creator `create_plugin`** accepts a host-uploaded **local ZIP/tar.gz** and creates a **PRIVATE** personal/workspace plugin. Four existing personal `USER/PRIVATE` releases are visible in owner inventory. Authorized operator/owner with repo Actions read can download and verify artifact, then the owner can use the private plugin-creation facility to import a later final ZIP. **The ingress path is verified as available, but this candidate has not been uploaded, and no final package has been installed**. 10.2 must prove acceptance of exact final bytes, release/version/hash and live plugin skill/MCP.
+- **Procedure freeze:** Nine required MAN-01..09 procedures are tagged `procedure-v1` in [manual-cards.md](manual-cards.md), including expected/forbidden tools, approval boundaries, owner state checks, recovery and JIT binding gates. Static MAN-08/09 prompts are fixed. The exact approved Page payload, factual draft choices, revision/approval and 1–3 plan slots are intentionally **not yet selected**; compilation and approval are per-card at MAN-02/03/04/05. MAN-10/11 remain post-MVP optional.
+- **10.1 hard-stop handoff:** Immediately after owner-private MCP connection/OAuth, inspect registered write tools and approval affordances **without invoking write**. If any feature is absent or cannot be verified without a write request, stop 10.1 with one concrete diagnosis. Do not proceed to the final package or MAN-02.
+
+### 10.0 evidence accounting
+
+| Gate | Current status | Boundary |
+| --- | --- | --- |
+| Owner's private custom MCP creation form / OAuth selector | **PROVEN** | UI only, no connection |
+| GitHub Actions artifact download + integrity | **PROVEN** | 12-file source candidate, not final |
+| PRIVATE plugin archive intake available for local ZIP/tar.gz | **PROVEN** | No plugin creation/upload attempted |
+| MAN-01..09 frozen rules, sequences, approval and recovery | **PROVEN** | `procedure-v1`; exact owner values remain JIT |
+| General plugin permissions / custom MCP write entitlement | **DEFERRED TO 10.1** | Must stop there if not verifiable without write |
+| Final plugin install/combined skill and MCP | **DEFERRED TO 10.2** | New verified `mcp.json`/version/hash |
+| Owner-selected Page/content/plan payloads | **DEFERRED TO CARDS** | New Page MAN-02; draft MAN-03; approval MAN-04; plan MAN-05 |
+| Business write | **DEFERRED TO MAN-02** | No write in 10.0, 10.1 or 10.2 |
+| CR-028, tracker, Issue/PR and changed-document CI | **PENDING CI on final SHA** | Record in Issue once run completes |
+
+The previous sections below are **historical pre-CR-028 10.0 preflight snapshots**. Their BLOCKED verdict, package-install requirement, and owner-data-before-guide-freeze interpretation are explicitly superseded; do not use them as the current 10.0 acceptance checklist. Historic Phase 9 risk limitations remain open.
 
 ## Repo and contract baseline
 
