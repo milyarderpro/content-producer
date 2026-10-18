@@ -509,7 +509,6 @@ export async function invoke(
       if (new TextEncoder().encode(rawText).byteLength > 256 * 1024) {
         return failure('DATABASE_UNAVAILABLE');
       }
-      let raw: unknown;
       try {
         raw = JSON.parse(rawText);
       } catch {
