@@ -48,6 +48,7 @@ jobs:
             supabase/functions/mcp/pilot_db_test.ts \
             supabase/functions/mcp/auth.ts \
             supabase/functions/mcp/foundation.ts \
+            supabase/functions/mcp/foundation_test.ts \
             supabase/functions/mcp/transport.ts \
             supabase/functions/mcp/http.ts supabase/functions/mcp/edge.ts \
             package.json
