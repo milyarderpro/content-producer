@@ -46,6 +46,20 @@ jobs:
               print("BYTES BY FIELD",field,total)
           print("TOP 8 TOOLS BYTES:", sorted([(t.get("name"),len(json.dumps(t,separators=(",",":"),ensure_ascii=False).encode()),len(json.dumps(t.get("inputSchema"),separators=(",",":"),ensure_ascii=False).encode()),len(json.dumps(t.get("outputSchema"),separators=(",",":"),ensure_ascii=False).encode())) for t in tools],key=lambda x:-x[1])[:8])
           print("COMPACT FULL TOOLS BYTES",len(json.dumps(tools,separators=(",",":"),ensure_ascii=False).encode()))
+          def compressed_schemas(tool, cap=None):
+              out=dict(tool)
+              out.pop("outputSchema",None)
+              if cap is not None:
+                  def transform(value):
+                      if isinstance(value,dict):
+                          return {k: (v[:cap] if k=="description" and isinstance(v,str) else transform(v)) for k,v in value.items()}
+                      if isinstance(value,list):return [transform(v) for v in value]
+                      return value
+                  out["inputSchema"]=transform(out["inputSchema"])
+              return out
+          for cap in [None, 160, 100, 64, 32]:
+              proposal=[compressed_schemas(t,cap) for t in tools]
+              print("PROJECTED WITHOUT OUTPUTSCHEMA INPUTDESC CAP",cap,"BYTES",len(json.dumps(proposal,separators=(",",":"),ensure_ascii=False).encode()))
           print("TOPLEVEL keys:",dict(collections.Counter(str(k) for t in tools for k in t)))
           print("META keys:",dict(collections.Counter(str(k) for t in tools for k in (t.get("_meta") or {}))))
           print("ANNOTATIONS:",dict(collections.Counter(json.dumps(t.get("annotations"),sort_keys=True) for t in tools)))
