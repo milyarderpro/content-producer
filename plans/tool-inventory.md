@@ -19,6 +19,24 @@ Dokumen ini adalah kontrak normatif untuk nama, tujuan, input, output, autentika
 
 Dokumen ini hanya menetapkan kontrak. Langkah 0.8 tidak membuat source code, migration, deployment, plugin package, atau resource cloud.
 
+**Phase 10.1 CR-032 override (owner-approved 18 Oktober 2026):**
+Nama, jumlah **33 tools** dan **33 existing api RPCs**, schemas RPC, business
+rules, ledger, RLS, ownership, idempotency, dan rate limits tetap sama.
+Berbeda dari baseline OAuth 7 Oktober, koneksi ChatGPT production memakai
+**No authentication** dengan identitas satu workspace pilot tetap di
+Supabase Edge Function. Descriptor MCP private No authentication tidak
+mengiklankan OAuth; keluaran MCP `get_account_profile` secara additive
+mencantumkan `workspace_public_id` supaya dua read berikutnya dapat
+memakai parameter workspace yang diwajibkan. Credential `SUPABASE_DB_URL`
+terbatas pada Edge Function; setiap invocation menurunkan transaction role
+ke `authenticated` (bukan bypass-RLS), dengan claims yang dibangun server.
+Tidak ada grant baru ke `anon`, tabel, sequence, helper, ataupun RPC.
+Endpoint **publik dapat dipanggil oleh siapa saja**, sehingga keamanan
+per-user OAuth tidak berlaku; selama 10.1 semua write tools terdaftar tetapi
+RPC mutasinya terkunci pada server. Write pertama tetap MAN-02 setelah
+persetujuan owner dan keputusan pembukaan write yang terpisah. Lihat
+[CR-032](../docs/decisions/2026-10-18-phase-10-1-noauth-fixed-pilot.md).
+
 ---
 
 ## 2. Kedudukan kontrak
