@@ -4,6 +4,7 @@ import * as z from 'npm:zod@4.3.6';
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { triviaConfig, workspaceSettings } from './schemas.ts';
+import { executePilotRpc } from './pilot_db.ts';
 
 const publicId = z
   .string()
@@ -178,6 +179,11 @@ const securitySchemes = [{ type: 'oauth2', scopes: ['openid', 'email'] }];
 const annotations = { readOnlyHint: true, destructiveHint: false, openWorldHint: false };
 const safeErrors = {
   AUTH_REQUIRED: ['Connection authentication is required.', false, 'Relink the account.'],
+  PILOT_WRITE_LOCKED: [
+    'Pilot business writes are disabled during Phase 10.1.',
+    false,
+    'Obtain action-specific owner approval at MAN-02 before enabling business writes.',
+  ],
   OWNER_ACCESS_REQUIRED: [
     'Only the connected workspace owner may access this resource.',
     false,
@@ -469,37 +475,54 @@ export async function invoke(
     params.p_workspace_public_id !== context.workspacePublicId
   )
     return failure('OWNER_ACCESS_REQUIRED');
+  if (context.pilotMode &&
+    !tool.startsWith('get_') &&
+    !tool.startsWith('list_') &&
+    tool !== 'trivia_find_similar_facts' &&
+    Deno.env.get('MCP_PILOT_ALLOW_BUSINESS_WRITES') !== 'true') {
+    return failure('PILOT_WRITE_LOCKED');
+  }
   try {
-    const rpc = await fetch(context.supabaseUrl + '/rest/v1/rpc/' + tool, {
-      method: 'POST',
-      redirect: 'error',
-      signal: AbortSignal.timeout(10000),
-      headers: {
-        apikey: context.publishableKey,
-        Authorization: 'Bearer ' + context.accessToken,
-        'Content-Type': 'application/json',
-        'Accept-Profile': 'api',
-        'Content-Profile': 'api',
-      },
-      body: JSON.stringify(params),
-    });
-    const rawText = await rpc.text();
-    if (new TextEncoder().encode(rawText).byteLength > 256 * 1024) {
-      return failure('DATABASE_UNAVAILABLE');
-    }
     let raw: unknown;
-    try {
-      raw = JSON.parse(rawText);
-    } catch {
-      return failure('DATABASE_UNAVAILABLE');
-    }
-    if (!rpc.ok) {
-      const message =
-        raw && typeof raw === 'object' && 'message' in raw
-          ? (raw as { message: unknown }).message
-          : null;
-      if (isSafeError(message)) return failure(message);
-      return failure(rpc.status === 401 ? 'AUTH_REQUIRED' : 'DATABASE_UNAVAILABLE');
+    if (context.pilotMode) {
+      try {
+        raw = await executePilotRpc(tool, params, context.actorUserId);
+      } catch (error) {
+        const safe = error instanceof Error ? error.message : '';
+        return failure(isSafeError(safe) ? safe : 'DATABASE_UNAVAILABLE');
+      }
+    } else {
+      const rpc = await fetch(context.supabaseUrl + '/rest/v1/rpc/' + tool, {
+        method: 'POST',
+        redirect: 'error',
+        signal: AbortSignal.timeout(10000),
+        headers: {
+          apikey: context.publishableKey,
+          Authorization: 'Bearer ' + context.accessToken,
+          'Content-Type': 'application/json',
+          'Accept-Profile': 'api',
+          'Content-Profile': 'api',
+        },
+        body: JSON.stringify(params),
+      });
+      const rawText = await rpc.text();
+      if (new TextEncoder().encode(rawText).byteLength > 256 * 1024) {
+        return failure('DATABASE_UNAVAILABLE');
+      }
+      let raw: unknown;
+      try {
+        raw = JSON.parse(rawText);
+      } catch {
+        return failure('DATABASE_UNAVAILABLE');
+      }
+      if (!rpc.ok) {
+        const message =
+          raw && typeof raw === 'object' && 'message' in raw
+            ? (raw as { message: unknown }).message
+            : null;
+        if (isSafeError(message)) return failure(message);
+        return failure(rpc.status === 401 ? 'AUTH_REQUIRED' : 'DATABASE_UNAVAILABLE');
+      }
     }
     const parsed = schema.safeParse(raw);
     if (
