@@ -6,8 +6,8 @@ import { createMcpServer } from './server.ts';
 // current descriptor contract also reads a top-level securitySchemes field.
 // Mirror the already-declared per-tool policy in tools/list without changing
 // handler authorization, RPCs, or the SDK's business-tool registrations.
-function mirrorToolSchemes(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(mirrorToolSchemes);
+function mirrorToolSchemes(value: unknown, pilot = false): unknown {
+  if (Array.isArray(value)) return value.map((item) => mirrorToolSchemes(item, pilot));
   if (!value || typeof value !== 'object') return value;
   const record = value as Record<string, unknown>;
   const result = record.result;
@@ -23,6 +23,11 @@ function mirrorToolSchemes(value: unknown): unknown {
         const tool = item as Record<string, unknown>;
         const meta = tool._meta;
         if (!meta || typeof meta !== 'object') return item;
+        if (pilot) {
+          const { securitySchemes: _toolSchemes, ...rest } = tool;
+          const { securitySchemes: _metaSchemes, ...restMeta } = meta as Record<string, unknown>;
+          return { ...rest, _meta: restMeta }; // noauth tools must not advertise OAuth
+        }
         const schemes = (meta as Record<string, unknown>).securitySchemes;
         return Array.isArray(schemes) ? { ...tool, securitySchemes: schemes } : item;
       }),
@@ -46,7 +51,7 @@ async function shouldMirrorToolsList(request: Request): Promise<boolean> {
   }
 }
 
-async function mirrorToolsListResponse(response: Response): Promise<Response> {
+async function mirrorToolsListResponse(response: Response, pilot = false): Promise<Response> {
   if (response.status !== 200) return response;
   let original: string;
   try {
@@ -62,7 +67,7 @@ async function mirrorToolsListResponse(response: Response): Promise<Response> {
       .map((line) => {
         if (!line.startsWith('data: ')) return line;
         try {
-          return 'data: ' + JSON.stringify(mirrorToolSchemes(JSON.parse(line.slice(6))));
+          return 'data: ' + JSON.stringify(mirrorToolSchemes(JSON.parse(line.slice(6)), pilot));
         } catch {
           return line;
         }
@@ -70,7 +75,7 @@ async function mirrorToolsListResponse(response: Response): Promise<Response> {
       .join('\n');
   } else if (contentType.includes('application/json')) {
     try {
-      updated = JSON.stringify(mirrorToolSchemes(JSON.parse(original)));
+      updated = JSON.stringify(mirrorToolSchemes(JSON.parse(original), pilot));
     } catch {
       updated = original;
     }
@@ -135,7 +140,7 @@ export function createAuthenticatedTransport(context: RequestContext) {
     fetch: async (request: Request) => {
       const mirror = await shouldMirrorToolsList(request);
       const response = await transport.fetch(request);
-      return mirror ? mirrorToolsListResponse(response) : response;
+      return mirror ? mirrorToolsListResponse(response, context.pilotMode === true) : response;
     },
   };
 }
