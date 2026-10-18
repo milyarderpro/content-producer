@@ -7,6 +7,28 @@ on:
 permissions:
   contents: read
 jobs:
+  catalog-focused:
+    name: Local compact-catalog Deno checks (no remote writes)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: supabase/functions
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version-file: .deno-version
+      - name: Focused format, type, lint, 33-tool descriptor and write-denial tests
+        run: |
+          set -euo pipefail
+          deno fmt --check mcp/transport.ts mcp/pilot_db_test.ts
+          deno check mcp/index.ts mcp/pilot_db_test.ts
+          deno lint mcp/transport.ts mcp/pilot_db_test.ts
+          AI_AGENT=none APPVEYOR=1 deno test --allow-env=NODE_ENV,AI_AGENT,APPVEYOR,CI,DEBUG,TEST,MODE,MINIMAL,NO_COLOR,FORCE_COLOR,TERM mcp/pilot_db_test.ts
   diagnostics:
     runs-on: ubuntu-24.04
     timeout-minutes: 7
