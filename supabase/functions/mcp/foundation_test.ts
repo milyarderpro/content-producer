@@ -408,6 +408,11 @@ Deno.test(
         },
       });
       assert(unknown.includes('error'), 'additional input properties forbidden');
+      const oldProfileInput = await request('tools/call', {
+        name: 'get_account_profile',
+        arguments: { request_schema_version: 1 },
+      });
+      assert(oldProfileInput.includes('error'), 'versioned MCP profile input must be rejected');
       assert(count === before, 'denied/invalid MCP inputs must never reach PostgREST');
     } finally {
       globalThis.fetch = original;

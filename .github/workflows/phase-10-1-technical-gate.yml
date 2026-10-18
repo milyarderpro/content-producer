@@ -1,14 +1,12 @@
 name: Phase 10.1 - CR-020 technical gate
 
-# Run the full gate for the single Phase 10.1 backend repair candidate on its
-# exact pushed SHA. Later documentation/package-only pushes do not retrigger it.
+# Run only when the final-candidate marker is deliberately added in a later
+# commit. This push trigger works while the workflow is absent from main.
 on:
   push:
     branches: [codex/phase-10-plugin]
     paths:
-      - 'supabase/functions/mcp/**'
-      - 'scripts/phase-6-13.ts'
-      - '.github/workflows/phase-10-1-technical-gate.yml'
+      - '.github/phase-10-1-final-candidate.txt'
 
 permissions:
   contents: read
@@ -40,6 +38,8 @@ jobs:
           test "$GITHUB_REF" = refs/heads/codex/phase-10-plugin
           [[ "$GITHUB_SHA" =~ ^[0-9a-f]{40}$ ]]
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -f .github/phase-10-1-final-candidate.txt
+          git diff --name-only HEAD^ HEAD | grep -Fxq .github/phase-10-1-final-candidate.txt
           echo "Phase 10.1 candidate SHA: $GITHUB_SHA"
           echo "GATE_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
 

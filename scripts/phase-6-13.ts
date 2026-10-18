@@ -178,7 +178,7 @@ async function inspector(method: string, name?: string, input?: object, expected
   check(!result.output.includes(bearer), 'INSPECTOR_BEARER_LEAK');
   check(
     result.code === expectedExit,
-    `INSPECTOR_EXIT_${method}_${name ?? 'handshake'}_${result.code}_EXPECTED_${expectedExit}`,
+    `INSPECTOR_EXIT_${method.replaceAll('/', '_').toUpperCase()}_${(name ?? 'handshake').toUpperCase()}_${result.code}_EXPECTED_${expectedExit}`,
   );
   const parsed = result.output.trim() ? JSON.parse(result.output) : {};
   console.info(`Inspector 2.5.0 ${method} ${name ?? ''}: exit ${result.code}`);
@@ -1962,7 +1962,11 @@ try {
     );
 
     clearFixtureBuckets();
-    for (const tool of tools) await inspector('tools/call', tool.name, {}, 5);
+    for (const tool of tools) {
+      // The marked ChatGPT profile tool accepts {}; retain one invalid call per tool.
+      const invalidArgs = tool.name === 'get_account_profile' ? { request_schema_version: 1 } : {};
+      await inspector('tools/call', tool.name, invalidArgs, 5);
+    }
   }
   check(
     !logs.includes(bearer) &&
