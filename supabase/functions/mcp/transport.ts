@@ -33,7 +33,7 @@ function mirrorToolSchemes(value: unknown, pilot = false): unknown {
           // CR-033: pilot ChatGPT discovery must fit the host tool-catalog
           // budget. Output validation remains in the registered tool; only
           // optional wire metadata is compacted. Input constraints are intact.
-          const published = { ...tool, securitySchemes: schemes, _meta: restMeta };
+          const published: Record<string, unknown> = { ...tool, securitySchemes: schemes, _meta: restMeta };
           delete published.outputSchema;
           delete published.title;
           if (
