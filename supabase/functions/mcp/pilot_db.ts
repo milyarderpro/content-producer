@@ -56,7 +56,7 @@ export async function executePilotRpc(
       });
       await tx`select pg_catalog.set_config('request.jwt.claims', ${claims}, true)`;
       await tx`set local role authenticated`;
-      const rows = await tx.unsafe(statement, values);
+      const rows = await tx.unsafe(statement, values as Parameters<typeof tx.unsafe>[1]);
       if (rows.length !== 1 || !Object.prototype.hasOwnProperty.call(rows[0], 'result')) {
         throw new Error('Unexpected RPC response');
       }
