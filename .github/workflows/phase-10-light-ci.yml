@@ -1,0 +1,125 @@
+name: Phase 10 - lightweight preflight and candidate artifact
+
+on:
+  push:
+    branches: [codex/phase-10-plugin]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase-10-light-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    name: Locked install, affected checks, verified candidate ZIP
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact commit and main for diff
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install pinned pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+
+      - name: Set up pinned Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Record SHA and classify changes
+        id: changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="$(git merge-base HEAD origin/main)"
+          echo "HEAD $(git rev-parse HEAD); base $base"
+          git diff --check "$base" HEAD
+          mapfile -t files < <(git diff --name-only --diff-filter=ACMR "$base" HEAD)
+          printf 'Changed: %s\n' "${files[*]}"
+          format=()
+          need_check=false
+          for file in "${files[@]}"; do
+            case "$file" in
+              *.md|*.json|*.yml|*.yaml|*.ts|*.tsx|*.js|*.mjs|*.cjs) format+=("$file") ;;
+            esac
+            case "$file" in
+              *.ts|*.tsx|*.js|*.mjs|*.cjs|package.json|pnpm-lock.yaml|tsconfig.json|.github/workflows/*.yml|.github/workflows/*.yaml)
+                need_check=true ;;
+            esac
+          done
+          if [ "${#format[@]}" -gt 0 ]; then
+            printf '%s\n' "${format[@]}" > "$RUNNER_TEMP/phase-10-formatted-paths"
+          fi
+          echo "need_check=$need_check" >> "$GITHUB_OUTPUT"
+
+      - name: Locked dependency installation
+        run: pnpm install --frozen-lockfile
+
+      - name: Formatting check for changed text
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -s "$RUNNER_TEMP/phase-10-formatted-paths" ]; then
+            mapfile -t paths < "$RUNNER_TEMP/phase-10-formatted-paths"
+            pnpm exec prettier --check "${paths[@]}"
+          else
+            echo "No format-covered changed files"
+          fi
+
+      - name: Project check for TypeScript or configuration changes
+        if: steps.changes.outputs.need_check == 'true'
+        run: pnpm run check
+
+      - name: Validate and build Phase 7 source candidate (not final MCP plugin)
+        run: |
+          set -euo pipefail
+          pnpm run package-plugin
+          pnpm exec tsx scripts/verify-plugin-candidate.ts
+          test "$(find artifacts/plugin-candidate -type f | wc -l)" -eq 12
+
+      - name: Archive candidate, inspect bytes and write safe summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          (
+            cd artifacts/plugin-candidate
+            find . -type f -print | LC_ALL=C sort | zip -X -q "../phase-10-preflight-candidate.zip" -@
+          )
+          test -s artifacts/phase-10-preflight-candidate.zip
+          unzip -t artifacts/phase-10-preflight-candidate.zip >/dev/null
+          test "$(unzip -Z1 artifacts/phase-10-preflight-candidate.zip | wc -l)" -eq 12
+          if unzip -Z1 artifacts/phase-10-preflight-candidate.zip | grep -Eq '(^|/)(mcp.json|connections.json|connection-mapping.json)$'; then
+            echo "Unexpected live connection configuration in preflight candidate"
+            exit 1
+          fi
+          {
+            echo "## Phase 10.0 candidate transfer preflight"
+            echo "- Commit SHA: $(git rev-parse HEAD)"
+            echo "- Archive: phase-10-preflight-candidate.zip (12 allowlisted files, **no mcp.json**)"
+            echo "- Archive SHA-256: $(sha256sum artifacts/phase-10-preflight-candidate.zip | cut -d ' ' -f1)"
+            echo "- Source file-list: artifacts/plugin-candidate-filelist.json"
+            echo "- Action: ZIP artifact upload only. **Not installed** and **not final**."
+            echo "- Host custom-MCP write and installation gate: **BLOCKED** pending account evidence."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload candidate and file hashes as private-to-run artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-10-preflight-candidate
+          path: |
+            artifacts/phase-10-preflight-candidate.zip
+            artifacts/plugin-candidate-filelist.json
+          if-no-files-found: error
+          retention-days: 14
