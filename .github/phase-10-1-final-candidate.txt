@@ -1,10 +1,10 @@
-Phase 10.1 final candidate marker — CR-033 bounded No authentication MCP catalog
-Prior v9 host failure: ChatGPT rejected plugin despite HTTP 200 initialize/tools/list.
-Measured real hosted catalog: 33 tools, 292199 SSE bytes; 188681 bytes optional outputSchema.
-CR-033 pilot-only serialization removes optional outputSchema, title, root input $schema.
-Thirty-three tool names, all input constraints, Zod output validation, RPCs, RLS and locked writes unchanged.
-Source SHA before marker: cb29d57c977661c10ec3b9d2d8254b123c4eb16e
-Focused Deno type/lint/security/catalog test PASS: https://github.com/milyarderpro/content-producer/actions/runs/39137518080
-Lightweight format/check and plugin candidate PASS: https://github.com/milyarderpro/content-producer/actions/runs/39137587990
-Run exactly ONE CR-020 full technical/security gate on this marker commit SHA, then if PASS redeploy same production mcp.
-No production write, new project, plugin creation, Phase 10.2, or MAN-02 authorized.
+Phase 10.1 final candidate marker — CR-034 portable Unicode Cc regex tool schemas
+ChatGPT exact registration failure: HTTP 400 apps_sdk_error mcp_validation, Invalid MCP tool schema for tool 'mark_post_posted'.
+Read-only production inspector detected exactly 3 \\p{Cc} Unicode regex patterns on mark_post_posted and record_post_performance: https://github.com/milyarderpro/content-producer/actions/runs/39141721020
+CR-034 normalizes only pilot-discovery JSON Schema regex metadata to equivalent portable control ranges.
+No Zod validators, 33 RPCs, 33 tool names, write lock, RLS, connection secrets or underlying output behavior changed.
+Local focused format/pnpm check/Deno tests 4 of 4 PASS: https://github.com/milyarderpro/content-producer/actions/runs/39142055150
+Clean source HEAD (after ephemeral diagnostic removal) = 33dcb0ce7a7769bea0c410eb8b3ba3d5e1a67008
+Light CI PASS on clean source SHA: https://github.com/milyarderpro/content-producer/actions/runs/39142160635
+Run ONE CR-020 full technical/security gate on this marker commit SHA before the same-production-mcp Edge deployment.
+No write, plugin creation, install, Phase 10.2, or PR merge is authorized by this marker.
