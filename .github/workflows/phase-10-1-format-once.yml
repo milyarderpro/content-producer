@@ -1,0 +1,68 @@
+name: Phase 10.1 - temporary formatter and focused MCP tests
+
+on:
+  push:
+    branches: [codex/phase-10-plugin]
+    paths:
+      - '.github/phase-10-1-format-once.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  format-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Checkout branch candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: true
+          fetch-depth: 2
+      - name: Pinned pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - name: Pinned Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Pinned Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version-file: .deno-version
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Apply only changed-text formatter
+        run: |
+          pnpm exec prettier --write \
+            .github/workflows/phase-10-1-format-once.yml \
+            AGENTS.md plans/PRD.md plans/phase-0-decision-register.md \
+            plans/tool-inventory.md plans/works/phase-10-implementation-plan.md \
+            plans/implementation-plan.md \
+            docs/decisions/2026-10-18-phase-10-1-noauth-fixed-pilot.md \
+            supabase/functions/mcp/pilot_db.ts \
+            supabase/functions/mcp/pilot_db_test.ts \
+            supabase/functions/mcp/auth.ts \
+            supabase/functions/mcp/foundation.ts \
+            supabase/functions/mcp/transport.ts \
+            supabase/functions/mcp/http.ts supabase/functions/mcp/edge.ts \
+            package.json
+      - name: Focused suite and repository quality
+        run: |
+          pnpm run check
+          pnpm run test:mcp
+      - name: Commit formatted candidate and remove formatter
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/phase-10-1-format-once.yml .github/phase-10-1-format-once.txt
+          git add -A
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'style(phase-10.1): formatted fixed-pilot source and focused tests'
+          git push origin HEAD:refs/heads/codex/phase-10-plugin
