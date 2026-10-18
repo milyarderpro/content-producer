@@ -36,7 +36,10 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   const tools = (listed.result as { tools: Array<Record<string, unknown>> }).tools;
   assert(MCP_TOOL_COUNT === 33 && tools.length === 33, 'exact 33 tools');
   assert(new Set(tools.map((tool) => tool.name)).size === 33, 'duplicate tool names');
-  assert(tools.some((tool) => tool.name === 'create_page'), 'missing create_page');
+  assert(
+    tools.some((tool) => tool.name === 'create_page'),
+    'missing create_page',
+  );
   for (const tool of tools) {
     assert(!('securitySchemes' in tool), 'noauth tool must not declare OAuth at top level');
     const meta = tool._meta as Record<string, unknown> | undefined;
@@ -45,26 +48,33 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
 });
 Deno.test('10.1 default pilot write latch blocks business RPC before database access', async () => {
   const result = await invoke(
-    'create_page', context, { p_request_schema_version: 1,
-      p_workspace_public_id: context.workspacePublicId }, z.unknown(),
+    'create_page',
+    context,
+    { p_request_schema_version: 1, p_workspace_public_id: context.workspacePublicId },
+    z.unknown(),
   );
   assert('isError' in result, 'business write must be blocked');
   assert(JSON.stringify(result).includes('PILOT_WRITE_LOCKED'), 'write latch error code');
 });
 Deno.test('10.1 foreign workspace must be rejected before SQL connection', async () => {
   const result = await invoke(
-    'list_pages', context, {
+    'list_pages',
+    context,
+    {
       p_request_schema_version: 1,
       p_workspace_public_id: '55555555-5555-4555-8555-555555555555',
-    }, z.unknown(),
+    },
+    z.unknown(),
   );
   assert('isError' in result, 'foreign workspace must fail');
   assert(JSON.stringify(result).includes('OWNER_ACCESS_REQUIRED'), 'wrong workspace error');
 });
 Deno.test('10.1 SQL statement builder allows only named parameters, never free SQL', () => {
   assert(
-    buildPilotRpcStatement('list_pages', { p_request_schema_version: 1,
-      p_workspace_public_id: context.workspacePublicId }) ===
+    buildPilotRpcStatement('list_pages', {
+      p_request_schema_version: 1,
+      p_workspace_public_id: context.workspacePublicId,
+    }) ===
       'select api."list_pages"("p_request_schema_version" => $1, "p_workspace_public_id" => $2) as result',
     'named parameter binding changed',
   );
@@ -74,7 +84,11 @@ Deno.test('10.1 SQL statement builder allows only named parameters, never free S
     ['public.workspaces', {}],
   ] as Array<[string, Record<string, unknown>]>) {
     let rejected = false;
-    try { buildPilotRpcStatement(name, params); } catch { rejected = true; }
+    try {
+      buildPilotRpcStatement(name, params);
+    } catch {
+      rejected = true;
+    }
     assert(rejected, 'unsafe dynamic identifier accepted');
   }
 });

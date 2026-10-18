@@ -476,10 +476,12 @@ export async function invoke(
     params.p_workspace_public_id !== context.workspacePublicId
   )
     return failure('OWNER_ACCESS_REQUIRED');
-  if (context.pilotMode &&
+  if (
+    context.pilotMode &&
     !tool.startsWith('get_') &&
     !tool.startsWith('list_') &&
-    tool !== 'trivia_find_similar_facts') {
+    tool !== 'trivia_find_similar_facts'
+  ) {
     return failure('PILOT_WRITE_LOCKED');
   }
   try {

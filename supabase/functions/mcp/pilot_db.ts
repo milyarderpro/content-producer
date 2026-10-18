@@ -40,9 +40,7 @@ export async function executePilotRpc(
   if (!url) throw new Error('Pilot database not configured');
   const statement = buildPilotRpcStatement(tool, params);
   const values = Object.values(params).map((value) =>
-    value && !Array.isArray(value) && typeof value === 'object'
-      ? JSON.stringify(value)
-      : value,
+    value && !Array.isArray(value) && typeof value === 'object' ? JSON.stringify(value) : value,
   );
   const sql = postgres(url, { max: 1, prepare: false, connect_timeout: 5, idle_timeout: 1 });
   try {

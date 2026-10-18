@@ -147,8 +147,12 @@ export function createEdgeHandler(
     // The production ChatGPT connection is No authentication. All requests
     // without a bearer use one server-fixed pilot identity and non-bypass RLS.
     // Tests supplying configured OAuth fixtures retain the legacy path.
-    if (isMcpPath && !configured && request.method === 'POST' &&
-        !request.headers.has('Authorization')) {
+    if (
+      isMcpPath &&
+      !configured &&
+      request.method === 'POST' &&
+      !request.headers.has('Authorization')
+    ) {
       try {
         const actor = fixedPilotOwnerId();
         const workspace = await resolvePilotWorkspace(actor);
