@@ -24,11 +24,17 @@ Pilot-ready separately from MVP Complete. A Phase 10–11 gate may reuse the
 full test result for an unchanged deployed backend SHA; validate later plugin-package
 changes with focused package/MCP tests and affected manual cards. Keep the 101
 cases as a regression inventory.
-For Phase 10, follow `plans/works/phase-10-implementation-plan.md`: one
-checkpoint per task, verify the owner's ChatGPT custom MCP write capability
-before connecting or testing the plugin, and freeze the nine manual cards
-before execution. Phase 10 can become Pilot-ready only after independent
-audit; Phase 11 owns MVP Complete.
+For Phase 10, follow `plans/works/phase-10-implementation-plan.md` and CR-028:
+one checkpoint per task. Check access to the custom MCP/OAuth form and the
+artifact-to-private-plugin delivery path in 10.0; inspect available write
+actions and owner-approval affordances immediately after private connection
+and OAuth in 10.1, **without executing a write**. Stop 10.1 if write support
+cannot be shown; install the final private plugin only in 10.2. Freeze the
+nine mandatory manual-card **procedures** in 10.0; bind owner-approved Page,
+content and plan values immediately before their respective cards and record
+the exact executable prompt before running it. First business write remains
+MAN-02 after owner approval of the exact Page payload. Phase 10 can become
+Pilot-ready only after independent audit; Phase 11 owns MVP Complete.
 
 ## Boundaries
 
