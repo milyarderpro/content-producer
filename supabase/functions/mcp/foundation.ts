@@ -1,5 +1,5 @@
 // Phase 6.3: read-only MCP facade over the frozen Phase 5 api RPC contracts.
-// No business SQL, service-role credential, identity override, or secondary rate limiter.
+// No business rules or service-role RPC bypass; CR-032 uses a scoped pilot DB adapter.
 import * as z from 'npm:zod@4.3.6';
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
@@ -77,6 +77,7 @@ const profileOutput = z.strictObject({
   id: z.string().min(1).max(200).regex(/\S/),
   name: z.string().min(1).max(120).optional(),
   nickname: z.string().min(1).max(120).optional(),
+  workspace_public_id: publicId, // required to pass the same workspace to subsequent reads
 });
 const moduleCatalog = z.strictObject({
   niche_key: nicheKey,
@@ -585,6 +586,7 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
         id: rpc.data.data.profile.id,
         name: rpc.data.data.profile.display_name,
         nickname: rpc.data.data.profile.workspace_name,
+        workspace_public_id: rpc.data.data.profile.workspace_public_id,
       });
       if (!profile.success) return failure('DATABASE_UNAVAILABLE');
       return {
