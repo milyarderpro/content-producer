@@ -479,8 +479,7 @@ export async function invoke(
   if (context.pilotMode &&
     !tool.startsWith('get_') &&
     !tool.startsWith('list_') &&
-    tool !== 'trivia_find_similar_facts' &&
-    Deno.env.get('MCP_PILOT_ALLOW_BUSINESS_WRITES') !== 'true') {
+    tool !== 'trivia_find_similar_facts') {
     return failure('PILOT_WRITE_LOCKED');
   }
   try {
