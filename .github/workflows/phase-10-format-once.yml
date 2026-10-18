@@ -1,0 +1,62 @@
+name: Phase 10 - one-time changed-docs formatting
+
+on:
+  push:
+    branches: [codex/phase-10-plugin]
+
+permissions:
+  contents: write
+
+jobs:
+  docs-format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout exact docs HEAD for formatting
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Install pinned pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Locked install and format only changed CR-028 documents
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile
+          pnpm exec prettier --write \
+            AGENTS.md \
+            plans/PRD.md \
+            plans/implementation-plan.md \
+            plans/works/phase-10-implementation-plan.md \
+            docs/decisions/2026-10-18-phase-10-proof-sequencing.md \
+            docs/phase-10/manual-cards.md \
+            docs/phase-10/manual-results.md \
+            docs/phase-10/preflight-10.0.md
+          git diff --check
+          git rm .github/workflows/phase-10-format-once.yml
+          git add -- \
+            AGENTS.md \
+            plans/PRD.md \
+            plans/implementation-plan.md \
+            plans/works/phase-10-implementation-plan.md \
+            docs/decisions/2026-10-18-phase-10-proof-sequencing.md \
+            docs/phase-10/manual-cards.md \
+            docs/phase-10/manual-results.md \
+            docs/phase-10/preflight-10.0.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style(phase-10): format changed CR-028 documentation"
+          git push origin HEAD:refs/heads/codex/phase-10-plugin
