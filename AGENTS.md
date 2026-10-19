@@ -40,8 +40,11 @@ deployment; then require exactly 33 visible tools (including `create_page`)
 and three live ChatGPT reads for 10.1 PASS. Do not invoke business writes.
 Keep the nine mandatory manual-card **procedures** frozen as `procedure-v1`;
 bind Page/content/plan only before their respective cards. The first business
-write remains MAN-02 after exact Page payload approval. Package install is
-10.2, independent Pilot-ready audit is 10.7, and MVP Complete is Phase 11.
+write remains MAN-02 after exact Page payload approval. Package installation at 10.2 follows CR-035 with root portable mcp.json,
+one public No-auth streamable-http server and no OAuth credentials; owner
+must verify the final installed skill + 33-tool MCP together and 3 real
+reads in a fresh chat before PASS. Independent Pilot-ready audit is 10.7,
+and MVP Complete is Phase 11.
 
 ## Boundaries
 

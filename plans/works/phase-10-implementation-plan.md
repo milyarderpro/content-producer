@@ -216,48 +216,47 @@ Bukti local/Inspector/HTTP terpisah bukan bukti host ChatGPT. Jika hosting
 atau konektor tidak bisa menjalankan salah satu tahap, beri satu tindakan
 manual yang jelas, tandai PENDING dan berhenti di 10.1; jangan mulai 10.2.
 
-## 7. Checkpoint 10.2 — Paket final dan instalasi private
+## 7. Checkpoint 10.2 — Paket final No authentication dan instalasi PRIVATE
 
-**Scope:** konfigurasi paket, validasi, instalasi, belum write bisnis.
+**Scope:** hanya generator, konfigurasi paket, validasi, transfer, instalasi
+owner dan uji baca-saja. CR-035 menyelaraskan paket dengan hasil 10.1 PASS.
 
-1. Hasilkan `plugin/mcp.json` dari URL/nama server yang terbukti di 10.1,
-   memakai schema/generator Phase 7. Bandingkan format dengan
-   [spesifikasi paket OpenAI](https://developers.openai.com/plugins/build/plugins)
-   saat eksekusi. Konfigurasi OAuth portabel harus sesuai format yang didukung
-   dan hasil handshake nyata; jangan menulis credential, ID koneksi host,
-   atau placeholder. Jika generator/schema lama tidak cukup, perbaiki secara
-   terfokus dan uji. **Source Phase 7 sekarang sengaja menolak `mcp.json`,
-   tidak memasukkannya dalam allowlist paket, melarang URL endpoint dalam
-   kandidat, dan validator/generator hanya menerima `type`/`url`.** Ubah
-   validator, allowlist, pemeriksaan sensitif, generator dan tes secara
-   terkendali untuk paket final: endpoint HTTPS publik yang terverifikasi
-   boleh masuk `mcp.json`, sementara credential/query/token tetap ditolak.
-   Jika host memerlukan deklarasi OAuth dalam paket, gunakan field schema
-   resmi yang dibuktikan pada koneksi live; jangan menganggap `oauth.mode =
-   discovery` pada input generator sebagai bukti auth paket. Catat change
-   record bila kontrak frozen berubah.
-2. Validasi manifest (termasuk `shortDescription` yang saat ini 45 karakter;
-   panduan paket host membatasi subtitle, sehingga pendekkan sesuai batas
-   host yang diverifikasi), semua
-   referensi skill, exact 33 tool, allowlist isi paket, path safety, dan hash
-   file. Naikkan versi manifest untuk paket final, bangun arsip sebagai
-   artifact CI dari workflow Phase 10 yang dapat diambil melalui jalur 10.0,
-   lalu verifikasi **isi
-   arsip hasil**, bukan hanya source. Catat SHA-256 arsip dan daftar file.
-   Paket tidak boleh berisi backup, dataset, secret, atau state lokal.
-3. Instal arsip terverifikasi melalui jalur private yang dibuktikan pada 10.0;
-   bila host tidak dapat menerima arsip/artifact itu, berhenti, bukan
-   mengklaim paket terpasang. Mulai chat baru, pilih
-   plugin, buktikan skill aktif dan tiga read owner tetap benar melalui paket
-   terpasang. Cocokkan hash/versi terpasang dengan kandidat. Jika koneksi
-   custom MCP 10.1 tampil sebagai plugin terpisah, jangan biarkan kedua plugin
-   terpilih pada kartu manual; gunakan hanya paket final dan verifikasi bahwa
-   satu koneksi MCP yang benar dipakai, baik melalui konfigurasi portabel
-   maupun mapping terdaftar yang telah dibuktikan host.
+1. Hasilkan root `plugin/mcp.json` sesuai portable Agent Plugins schema v1
+   dari satu server `streamable-http` pada URL MCP production **yang telah
+   terbukti** di ChatGPT. Input generator wajib `authentication.mode =
+   "none"`; jangan bawa field OAuth `extensions`, client, bearer token,
+   query URL, atau registered connection ID. Koneksi No authentication
+   tidak mengautentikasi pemanggil jaringan. Endpoint tetap publik;
+   write bisnis default-locked. Lihat
+   [spesifikasi plugin](https://developers.openai.com/plugins/build/plugins).
+2. Naikkan versi manifest v0.2.0 dan validasi satu `mcp.json` pinned,
+   exact 33 nama tool dalam referensi skill, seluruh link, strict 13-file
+   allowlist, symlink/path safety, dan nihil secret/backup/state. CI ringan
+   menjalankan tes paket terfokus dan `pnpm run check`, menyusun inner ZIP,
+   memeriksa `unzip -t` dan SHA-256 tiap file hasil ekstraksi terhadap
+   index artifact. Catat HEAD SHA, ZIP SHA-256 dan artifact run/ID dari
+   hasil nyata. Tidak mengulang gate penuh `test-all` untuk paket-only:
+   backend production tetap SHA
+   `14d4955e07a55d0d5040e647d210ddab5ca282cd`,
+   [CR-020 gate #39142242292](https://github.com/milyarderpro/content-producer/actions/runs/39142242292)
+   PASS; Edge `mcp` v11.
+3. Pemilik mengunduh artifact GitHub Actions, mengekstrak outer Actions
+   artifact bila perlu, lalu mengunggah **inner**
+   `content-producer-private-v0.2.0.zip` ke Plugin Creator sebagai
+   **PRIVATE**. Verifikasi metadata Content Producer v0.2.0, bukan source
+   preflight v0.1.0. Buka **chat baru**, pilih **hanya plugin final**,
+   bukan koneksi `mcpku` 10.1; buktikan skill Content Producer dan MCP
+   paket yang sama terpakai. Katalog harus tepat 11 Read + 22 Write = 33
+   tool termasuk `create_page`. Jalankan hanya tiga read
+   `get_account_profile({})`, `get_workspace_context`, `list_pages`
+   melalui paket final, menggunakan workspace ID yang dibaca. Rekam bukti
+   host/chat, versi, dan hasil. Bila mapping koneksi tidak dapat
+   dibuktikan, tetap PENDING; jangan jalankan write.
 
-**PASS bila:** paket final tervalidasi dan terpasang private, skill dan MCP
-bekerja bersama, 33 tool tersedia, dan belum ada write bisnis. Koneksi custom
-MCP saja belum memenuhi 10.2.
+**PASS 10.2 bila:** ZIP final valid dan benar-benar terpasang PRIVATE,
+skill + MCP aktif bersama dari paket terpilih dalam chat baru, 33 tools
+tersedia, 3/3 live read berhasil, tidak ada bisnis write, dan Issue/PR
+berisi bukti yang terkait paket. Jangan mulai 10.3 pada task ini.
 
 ## 8. Checkpoint 10.3 — `MAN-01..MAN-02`: aktivasi dan Page
 

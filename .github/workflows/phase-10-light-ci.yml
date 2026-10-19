@@ -1,4 +1,4 @@
-name: Phase 10 - lightweight preflight and candidate artifact
+name: Phase 10 - lightweight final package and artifact
 
 on:
   push:
@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   preflight:
-    name: Locked install, affected checks, verified candidate ZIP
+    name: Locked install, affected checks, verified final ZIP
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -83,44 +83,54 @@ jobs:
         if: steps.changes.outputs.need_check == 'true'
         run: pnpm run check
 
-      - name: Validate and build Phase 7 source candidate (not final MCP plugin)
+      - name: Focused package tests and final source validation
         run: |
           set -euo pipefail
+          pnpm exec vitest run tests/plugin-config.test.ts tests/plugin-package.test.ts tests/plugin-skill.test.ts tests/plugin-trivia.test.ts
           pnpm run package-plugin
           pnpm exec tsx scripts/verify-plugin-candidate.ts
-          test "$(find artifacts/plugin-candidate -type f | wc -l)" -eq 12
+          test "$(find artifacts/plugin-candidate -type f | wc -l)" -eq 13
 
-      - name: Archive candidate, inspect bytes and write safe summary
+      - name: Archive final package and verify extracted entries and SHA-256
         shell: bash
         run: |
           set -euo pipefail
           (
             cd artifacts/plugin-candidate
-            find . -type f -print | LC_ALL=C sort | zip -X -q "../phase-10-preflight-candidate.zip" -@
+            find . -type f -print | LC_ALL=C sort | zip -X -q "../content-producer-private-v0.2.0.zip" -@
           )
-          test -s artifacts/phase-10-preflight-candidate.zip
-          unzip -t artifacts/phase-10-preflight-candidate.zip >/dev/null
-          test "$(unzip -Z1 artifacts/phase-10-preflight-candidate.zip | wc -l)" -eq 12
-          if unzip -Z1 artifacts/phase-10-preflight-candidate.zip | grep -Eq '(^|/)(mcp.json|connections.json|connection-mapping.json)$'; then
-            echo "Unexpected live connection configuration in preflight candidate"
+          archive=artifacts/content-producer-private-v0.2.0.zip
+          test -s "$archive"
+          unzip -t "$archive" >/dev/null
+          test "$(unzip -Z1 "$archive" | wc -l)" -eq 13
+          test "$(unzip -Z1 "$archive" | grep -Fxc './mcp.json')" -eq 1
+          verify_dir="$(mktemp -d)"
+          trap 'rm -rf "$verify_dir"' EXIT
+          unzip -q "$archive" -d "$verify_dir"
+          diff -u <(find "$verify_dir" -type f | sed "s|^$verify_dir/||" | LC_ALL=C sort) <(jq -r '.files[].path' artifacts/plugin-candidate-filelist.json | LC_ALL=C sort)
+          while IFS=$'\t' read -r hash path; do
+            test "$(sha256sum "$verify_dir/$path" | cut -d ' ' -f1)" = "$hash"
+          done < <(jq -r '.files[] | [.sha256, .path] | @tsv' artifacts/plugin-candidate-filelist.json)
+          if grep -REn -- '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|sb_secret_|github_pat_|ghp_[[:alnum:]]{20}' "$verify_dir"; then
+            echo "Credential material must not appear in plugin ZIP"
             exit 1
           fi
           {
-            echo "## Phase 10.0 candidate transfer preflight"
+            echo "## Phase 10.2 final package (owner installation pending)"
             echo "- Commit SHA: $(git rev-parse HEAD)"
-            echo "- Archive: phase-10-preflight-candidate.zip (12 allowlisted files, **no mcp.json**)"
-            echo "- Archive SHA-256: $(sha256sum artifacts/phase-10-preflight-candidate.zip | cut -d ' ' -f1)"
-            echo "- Source file-list: artifacts/plugin-candidate-filelist.json"
-            echo "- Action: ZIP artifact upload only. **Not installed** and **not final**."
-            echo "- CR-028: host write approval is a **10.1 gate**; final private install is a **10.2 gate** (not attempted at 10.0)."
+            echo "- ZIP: content-producer-private-v0.2.0.zip (13 allowlisted files)"
+            echo "- ZIP SHA-256: $(sha256sum "$archive" | cut -d ' ' -f1)"
+            echo "- All 13 extracted files verified against artifact filelist SHA-256"
+            echo "- No authentication / public endpoint, no OAuth fields"
+            echo "- Owner Plugin Creator installation and fresh-chat skill + MCP proof pending. No business write."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload candidate and file hashes as private-to-run artifact
+      - name: Upload final verified ZIP and SHA-256 filelist
         uses: actions/upload-artifact@v4
         with:
-          name: phase-10-preflight-candidate
+          name: phase-10-final-plugin
           path: |
-            artifacts/phase-10-preflight-candidate.zip
+            artifacts/content-producer-private-v0.2.0.zip
             artifacts/plugin-candidate-filelist.json
           if-no-files-found: error
           retention-days: 14
