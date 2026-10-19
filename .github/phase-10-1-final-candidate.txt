@@ -14,3 +14,9 @@ Owner approved exactly one create_page for name corious facts, slug corious-fact
 Operation key: ad350ab5-e3a0-40c9-b7c9-1cb1d2bc07c0
 This marker requests one full local CR-020 technical/security gate for the final changed backend source on this SHA, including CR-037 default-locked digest allowlist tests and isolated three-Page configuration test.
 This marker does not install any grant, deploy production, create any Page, or authorize other writes. The public No-auth endpoint's write latch must remain CLOSED unless server-side exact-payload grant can be proven active and safely reversible.
+
+Phase 10.3 MAN-02 JSONB adapter remediation gate — 2026-10-19
+First approved plugin create_page attempt returned CONFIG_INVALID from PostgreSQL early config validator; no Page and zero approved-key ledger entries, production Page count stayed one. The exact owner-approved payload and UUIDv4 key remain unchanged.
+The old full gate SHA ddbb51d80888938982a7be2eeafaeda9bb3696c0 cannot cover the new isolated adapter fix. The new pilot_db.ts uses PostgreSQL text-to-jsonb cast only for create_page p_config to prevent postgres.js string JSONB scalar binding. Regression test covers the named SQL bindings; other RPCs unchanged.
+Previous final code SHA 4c8bb021f7a49c516401a722f2eb28abdd8e7519 had successful lightweight push #39234782688 and PR #39234788356. Request exactly one new CR-020 local technical/security gate on this marker commit.
+This marker authorizes NO production deployment or new plugin write; owner has been instructed to delete temporary MAN-02 approval secret after the failed attempt and its absence must be confirmed before deployment and any retry. No operation key regeneration, admin SQL writes, early 10.4 or PR merge.
