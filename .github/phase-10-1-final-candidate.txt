@@ -20,3 +20,12 @@ First approved plugin create_page attempt returned CONFIG_INVALID from PostgreSQ
 The old full gate SHA ddbb51d80888938982a7be2eeafaeda9bb3696c0 cannot cover the new isolated adapter fix. The new pilot_db.ts uses PostgreSQL text-to-jsonb cast only for create_page p_config to prevent postgres.js string JSONB scalar binding. Regression test covers the named SQL bindings; other RPCs unchanged.
 Previous final code SHA 4c8bb021f7a49c516401a722f2eb28abdd8e7519 had successful lightweight push #39234782688 and PR #39234788356. Request exactly one new CR-020 local technical/security gate on this marker commit.
 This marker authorizes NO production deployment or new plugin write; owner has been instructed to delete temporary MAN-02 approval secret after the failed attempt and its absence must be confirmed before deployment and any retry. No operation key regeneration, admin SQL writes, early 10.4 or PR merge.
+
+Phase 10.4 MAN-03/04 final backend/security candidate — 2026-10-19 (CR-038)
+Owner selected Moon phases nature_science / single_subject_fast / fast_trivia / seven preferred distinct verified facts (never force seven) / follow / en-US. Content direction and preparation ONLY.
+Final prepared source HEAD before marker: 9c420b0197bbe951ec66114c3eeafe59f129bcf4
+Light CI completed PASS: https://github.com/milyarderpro/content-producer/actions/runs/39247609134
+No new plugin ZIP or MCP tool names; 33 tools unchanged.
+CR-038 default-absent 2-hour stage permits, restricted to existing corious-facts Page, reserve/save draft and separately CAS revise/approve, plus explicitly parsed JSONB for dedup/reserve/save/revise and SQL NULL for missing plan item.
+Trigger exactly ONE CR-020 full local reset, full test/security/Inspector gate on THIS marker commit SHA before any production MCP deploy or owner-triggered manual MAN-03.
+This marker authorizes NO production secret/grant activation, fact registration, draft creation, approval, Facebook publication, new Page, extra gate or PR merge. Assistant will NOT execute Content Producer business writes; owner will send the frozen MAN-03 prompt only after gates and readiness.
