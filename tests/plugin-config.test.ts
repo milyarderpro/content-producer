@@ -38,13 +38,19 @@ describe('Phase 7.1 portable plugin manifest', () => {
   });
 
   it('rejects empty metadata, nonportable fields and incorrect schema', () => {
+    const openaiInterface = (manifest.extensions as { 'com.openai': { interface: unknown } })[
+      'com.openai'
+    ].interface;
     for (const bad of [
       { ...manifest, name: '' },
       { ...manifest, description: ' ' },
       { ...manifest, $schema: 'unknown' },
       { ...manifest, mcpServers: {} },
       { ...manifest, version: 'latest' },
-      { ...manifest, extensions: { 'com.openai': { interface: (manifest.extensions as { 'com.openai': { interface: unknown } })['com.openai'].interface, apps: './invalid.json' } } },
+      {
+        ...manifest,
+        extensions: { 'com.openai': { interface: openaiInterface, apps: './invalid.json' } },
+      },
     ]) {
       expect(() => validatePortableManifest(bad, root)).toThrow();
     }
