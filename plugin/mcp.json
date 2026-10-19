@@ -1,0 +1,9 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "content-producer": {
+      "type": "streamable-http",
+      "url": "https://xjonnilnypchtxogtopb.supabase.co/functions/v1/mcp"
+    }
+  }
+}
