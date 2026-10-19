@@ -1,4 +1,5 @@
 import * as z from 'npm:zod@4.3.6';
+import { createMcpHandler } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { invoke } from './foundation.ts';
 import { buildPilotRpcStatement } from './pilot_db.ts';
@@ -6,6 +7,7 @@ import { canonicalMan02RpcArguments, isApprovedMan02CreatePage } from './pilot_w
 import { isApprovedPilot104Write } from './pilot_write_10_4.ts';
 import { createAuthenticatedTransport } from './transport.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
+import { createMcpServer } from './server.ts';
 
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error(message);
@@ -76,36 +78,94 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     assert(input.type === 'object', 'pilot input schema must remain object');
     assert(!('$schema' in input), 'omit optional input-schema dialect only');
   }
-  const prior = await createAuthenticatedTransport({ ...context, pilotMode: false }).fetch(
-    request('tools/list'),
-  );
-  assert(prior.status === 200, 'legacy schema listing preserved');
-  const original = responseJson(await prior.text());
+  // Compare BOTH host catalogs against the original SDK descriptors.
+  // Changes must be limited to optional wire metadata and CR-034's
+  // character-class equivalent, never input constraints or auth schemes.
+  const rawTransport = createMcpHandler(() => createMcpServer({
+    ...context,
+    pilotMode: false,
+  }));
+  const rawResponse = await rawTransport.fetch(request('tools/list'));
+  assert(rawResponse.status === 200, 'raw SDK catalog available');
+  const original = responseJson(await rawResponse.text());
   const originalTools = (original.result as { tools: Array<Record<string, unknown>> }).tools;
-  assert(originalTools.length === 33, 'legacy catalog tool count must remain 33');
+  assert(originalTools.length === 33, 'SDK original contains 33 tools');
+
+  const oauthResponse = await createAuthenticatedTransport({
+    ...context,
+    pilotMode: false,
+  }).fetch(request('tools/list'));
+  assert(oauthResponse.status === 200, 'OAuth tools/list returns HTTP 200');
+  const oauthWire = await oauthResponse.text();
+  assert(new TextEncoder().encode(oauthWire).byteLength < 100_000,
+    'CR-033 OAuth catalog must be below the tested 100 KB target');
+  const oauth = responseJson(oauthWire);
+  const oauthTools = (oauth.result as { tools: Array<Record<string, unknown>> }).tools;
+  assert(oauthTools.length === 33, 'OAuth catalog must expose exactly 33 tools');
+  assert(new Set(oauthTools.map((tool) => tool.name)).size === 33, 'OAuth duplicate tool name');
+  assert(oauthTools.some((tool) => tool.name === 'mark_post_posted'),
+    'the historically rejected tool must remain available');
+
+  const scan = (value: unknown, patterns: string[]): void => {
+    if (Array.isArray(value)) {
+      value.forEach((item) => scan(item, patterns));
+      return;
+    }
+    if (!value || typeof value !== 'object') return;
+    for (const [key, entry] of Object.entries(value)) {
+      if (key === 'pattern' && typeof entry === 'string') {
+        patterns.push(entry);
+        assert(!entry.includes('\\\\p{Cc}'), 'OAuth input contains nonportable Cc escape');
+        new RegExp(entry); // Assert every advertised regex compiles as ordinary JS regex.
+      } else scan(entry, patterns);
+    }
+  };
+  const compiledPatterns: string[] = [];
   for (const compact of tools) {
     const full = originalTools.find((tool) => tool.name === compact.name);
-    assert(!!full && 'outputSchema' in full && 'title' in full, 'legacy full output retained');
+    const auth = oauthTools.find((tool) => tool.name === compact.name);
+    assert(!!full && !!auth, 'tool is missing in raw or OAuth catalog');
+    assert('outputSchema' in full && 'title' in full, 'raw SDK metadata intact');
     const expandedInput = { ...(full.inputSchema as Record<string, unknown>) };
     delete expandedInput.$schema;
     const portable = normalizeExpectedWirePatterns(expandedInput);
-    assert(
-      JSON.stringify(compact.inputSchema) === JSON.stringify(portable),
-      'CR-034: input schema differs beyond equivalent Cc regex patterns',
-    );
-    assert(
-      !JSON.stringify(compact.inputSchema).includes('\\\\p{Cc}'),
-      'no Unicode property escape in ChatGPT pilot schema',
-    );
+    assert(JSON.stringify(compact.inputSchema) === JSON.stringify(portable),
+      'No-auth input differs from SDK beyond CR-034 transforms');
+    assert(JSON.stringify(auth.inputSchema) === JSON.stringify(portable),
+      'OAuth input differs from SDK beyond CR-034 transforms');
+    assert(!('outputSchema' in auth) && !('title' in auth),
+      'OAuth optional metadata must be compact');
+    assert(!('$schema' in (auth.inputSchema as Record<string, unknown>)),
+      'OAuth root dialect must be omitted');
+    assert(JSON.stringify(auth.securitySchemes) ===
+      JSON.stringify((full._meta as Record<string, unknown>).securitySchemes),
+      'OAuth top-level security must equal SDK OAuth scheme');
+    assert(JSON.stringify((auth._meta as Record<string, unknown>).securitySchemes) ===
+      JSON.stringify((full._meta as Record<string, unknown>).securitySchemes),
+      'OAuth meta security must equal SDK OAuth scheme');
+    assert(JSON.stringify(auth.securitySchemes) !== JSON.stringify([{ type: 'noauth' }]),
+      'OAuth tool must NEVER be marked noauth');
+    assert(JSON.stringify((auth._meta as Record<string, unknown>)['openai/profile']) ===
+      JSON.stringify((full._meta as Record<string, unknown>)['openai/profile']),
+      'OAuth profile marker must not change');
+    assert(JSON.stringify(auth.description) === JSON.stringify(full.description),
+      'descriptions must not be rewritten');
+    scan(auth.inputSchema, compiledPatterns);
+    assert(!JSON.stringify(auth.inputSchema).includes('\\\\p{Cc}'),
+      'OAuth catalog must have no nonportable Unicode category pattern');
   }
+  assert(compiledPatterns.length > 0, 'compiled schema must contain patterns');
+  const profiles = oauthTools.filter((tool) =>
+    (tool._meta as Record<string, unknown>)['openai/profile'] === true);
+  assert(profiles.length === 1 && profiles[0]?.name === 'get_account_profile',
+    'exactly one OAuth get_account_profile marker required');
   const impactedTools = originalTools
     .filter((tool) => JSON.stringify(tool.inputSchema).includes('\\\\p{Cc}'))
     .map((tool) => tool.name);
-  assert(
-    JSON.stringify(impactedTools) ===
-      JSON.stringify(['mark_post_posted', 'record_post_performance']),
-    'unexpected tools have Python-incompatible Cc patterns',
-  );
+  assert(JSON.stringify(impactedTools) ===
+    JSON.stringify(['mark_post_posted', 'record_post_performance']),
+    'unexpected Cc rewrite target');
+
 });
 Deno.test('10.1 default pilot write latch blocks business RPC before database access', async () => {
   const result = await invoke(

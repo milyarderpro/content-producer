@@ -4,8 +4,8 @@ import { createMcpServer } from './server.ts';
 
 // CR-034: The host schema validator can reject Unicode property regex
 // escapes. Unicode General Category Cc is exactly U+0000..001F and
-// U+007F..009F. Rewrite only JSON Schema pattern metadata in the pilot
-// catalog; keep runtime Zod validation and all 33 tool contracts unchanged.
+// U+007F..009F. Rewrite only JSON Schema pattern metadata in OAuth and
+// No-auth catalogs; keep runtime Zod validation and all 33 tool contracts.
 function portablePilotPatterns(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(portablePilotPatterns);
   if (!value || typeof value !== 'object') return value;
@@ -40,36 +40,33 @@ function mirrorToolSchemes(value: unknown, pilot = false): unknown {
         const tool = item as Record<string, unknown>;
         const meta = tool._meta;
         if (!meta || typeof meta !== 'object') return item;
-        if (pilot) {
-          // Explicit noauth is required: omission inherits the server's
-          // legacy OAuth defaults even when this ChatGPT plugin uses No auth.
-          const schemes = [{ type: 'noauth' }];
-          const restMeta = { ...(meta as Record<string, unknown>) };
-          restMeta.securitySchemes = schemes;
-          delete restMeta['openai/profile'];
-          // CR-033: pilot ChatGPT discovery must fit the host tool-catalog
-          // budget. Output validation remains in the registered tool; only
-          // optional wire metadata is compacted. Input constraints are intact.
-          const published: Record<string, unknown> = {
-            ...tool,
-            securitySchemes: schemes,
-            _meta: restMeta,
-          };
-          delete published.outputSchema;
-          delete published.title;
-          if (
-            published.inputSchema &&
-            typeof published.inputSchema === 'object' &&
-            !Array.isArray(published.inputSchema)
-          ) {
-            const input = { ...(published.inputSchema as Record<string, unknown>) };
-            delete input.$schema;
-            published.inputSchema = portablePilotPatterns(input);
-          }
-          return published;
+        // CR-040: the host-facing catalog must be as portable and bounded
+        // under OAuth as under No-auth. Preserve each actual OAuth scheme,
+        // including the profile marker, and never alter registered validators.
+        const originalSchemes = (meta as Record<string, unknown>).securitySchemes;
+        if (!Array.isArray(originalSchemes)) return item;
+        const schemes = pilot ? [{ type: 'noauth' }] : originalSchemes;
+        const restMeta = { ...(meta as Record<string, unknown>), securitySchemes: schemes };
+        if (pilot) delete restMeta['openai/profile'];
+        const published: Record<string, unknown> = {
+          ...tool,
+          securitySchemes: schemes,
+          _meta: restMeta,
+        };
+        // Only optional catalog metadata is removed. Runtime output
+        // verification, tool input schemas and OAuth guards are unchanged.
+        delete published.outputSchema;
+        delete published.title;
+        if (
+          published.inputSchema &&
+          typeof published.inputSchema === 'object' &&
+          !Array.isArray(published.inputSchema)
+        ) {
+          const input = { ...(published.inputSchema as Record<string, unknown>) };
+          delete input.$schema;
+          published.inputSchema = portablePilotPatterns(input);
         }
-        const schemes = (meta as Record<string, unknown>).securitySchemes;
-        return Array.isArray(schemes) ? { ...tool, securitySchemes: schemes } : item;
+        return published;
       }),
     },
   };
