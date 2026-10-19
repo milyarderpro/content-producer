@@ -46,7 +46,10 @@ function mirrorToolSchemes(value: unknown, pilot = false): unknown {
         const originalSchemes = (meta as Record<string, unknown>).securitySchemes;
         if (!Array.isArray(originalSchemes)) return item;
         const schemes = pilot ? [{ type: 'noauth' }] : originalSchemes;
-        const restMeta = { ...(meta as Record<string, unknown>), securitySchemes: schemes };
+        const restMeta: Record<string, unknown> = {
+          ...(meta as Record<string, unknown>),
+          securitySchemes: schemes,
+        };
         if (pilot) delete restMeta['openai/profile'];
         const published: Record<string, unknown> = {
           ...tool,
