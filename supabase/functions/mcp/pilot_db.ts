@@ -65,7 +65,9 @@ export async function executePilotRpc(
   const statement = buildPilotRpcStatement(tool, params);
   const values = Object.entries(params).map(([key, value]) =>
     isPilotJsonbArgument(tool, key)
-      ? JSON.stringify(value)
+      ? value === null
+        ? null
+        : JSON.stringify(value)
       : value && !Array.isArray(value) && typeof value === 'object'
         ? JSON.stringify(value)
         : value,
