@@ -5,8 +5,7 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { triviaConfig, workspaceSettings } from './schemas.ts';
 import { executePilotRpc } from './pilot_db.ts';
-import { isApprovedMan02CreatePage } from './pilot_write.ts';
-import { isApprovedPilot104Write } from './pilot_write_10_4.ts';
+import { isPermittedMvpPilotRpc } from './pilot_mvp_write.ts';
 
 const publicId = z
   .string()
@@ -478,33 +477,8 @@ export async function invoke(
     params.p_workspace_public_id !== context.workspacePublicId
   )
     return failure('OWNER_ACCESS_REQUIRED');
-  if (
-    context.pilotMode &&
-    !tool.startsWith('get_') &&
-    !tool.startsWith('list_') &&
-    tool !== 'trivia_find_similar_facts'
-  ) {
-    // Default closed. Never accept a grant from tool arguments or HTTP.
-    // Only the Edge Function's server-side setting may authorize the exact
-    // MAN-02 create_page RPC, including the fixed workspace and operation key.
-    let grant = '';
-    try {
-      grant = Deno.env.get('MCP_MAN02_APPROVED_SHA256') ?? '';
-    } catch {
-      // Deno's restricted test runtime, or an unavailable env, stays locked.
-    }
-    // Each CR-038 stage has its own short-lived, default-absent, scoped permit.
-    // No grant is sent over HTTP. This does not authenticate the public caller.
-    const phase104Approved = await isApprovedPilot104Write(tool, params, (name) => {
-      try {
-        return Deno.env.get(name);
-      } catch {
-        return undefined;
-      }
-    });
-    if (!(await isApprovedMan02CreatePage(tool, params, grant)) && !phase104Approved) {
-      return failure('PILOT_WRITE_LOCKED');
-    }
+  if (context.pilotMode && !isPermittedMvpPilotRpc(tool, context.workspacePublicId, params)) {
+    return failure('OWNER_ACCESS_REQUIRED');
   }
   try {
     let raw: unknown;

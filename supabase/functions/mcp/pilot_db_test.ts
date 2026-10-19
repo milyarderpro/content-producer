@@ -4,6 +4,7 @@ import { invoke } from './foundation.ts';
 import { buildPilotRpcStatement } from './pilot_db.ts';
 import { canonicalMan02RpcArguments, isApprovedMan02CreatePage } from './pilot_write.ts';
 import { isApprovedPilot104Write } from './pilot_write_10_4.ts';
+import { isPermittedMvpPilotRpc } from './pilot_mvp_write.ts';
 import { createAuthenticatedTransport } from './transport.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
 
@@ -107,15 +108,32 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     'unexpected tools have Python-incompatible Cc patterns',
   );
 });
-Deno.test('10.1 default pilot write latch blocks business RPC before database access', async () => {
-  const result = await invoke(
-    'create_page',
-    context,
-    { p_request_schema_version: 1, p_workspace_public_id: context.workspacePublicId },
-    z.unknown(),
-  );
-  assert('isError' in result, 'business write must be blocked');
-  assert(JSON.stringify(result).includes('PILOT_WRITE_LOCKED'), 'write latch error code');
+Deno.test('CR-039 No-auth MVP write accepts one workspace, schema and operation key without grants', async () => {
+  const p = {
+    p_request_schema_version: 1,
+    p_workspace_public_id: context.workspacePublicId,
+    p_operation_key: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+    p_page_public_id: '66666666-6666-4666-8666-666666666666',
+    p_expected_config_updated_at: '2026-10-19T10:33:17.018070Z',
+    p_fact_reuse_scope: 'workspace_unique',
+  };
+  assert(isPermittedMvpPilotRpc('trivia_register_and_reserve_facts', context.workspacePublicId, p),
+    'no grant is needed for an owner-workspace operation');
+  assert(isPermittedMvpPilotRpc('save_post', context.workspacePublicId, p),
+    'save-post is open to Phase 5 RPC checks, not a temporary secret');
+  for (const wrong of [
+    { ...p, p_workspace_public_id: '55555555-5555-4555-8555-555555555555' },
+    { ...p, p_request_schema_version: 2 },
+    { ...p, p_operation_key: 'not-a-uuid' },
+    { ...p, p_operation_key: undefined },
+  ]) assert(!isPermittedMvpPilotRpc('save_post', context.workspacePublicId, wrong),
+    'cross-workspace or invalid operation must fail before DB');
+  assert(!isPermittedMvpPilotRpc('save_post', null, p), 'missing server-bound workspace denies');
+  const denied = await invoke('save_post', context,
+    { ...p, p_workspace_public_id: '55555555-5555-4555-8555-555555555555' },
+    z.unknown());
+  assert('isError' in denied && JSON.stringify(denied).includes('OWNER_ACCESS_REQUIRED'),
+    'cross-workspace write must fail before database');
 });
 
 Deno.test(
@@ -542,5 +560,16 @@ Deno.test('10.4 approval demands a new exact owner-reviewed RPC hash with no wai
       !(await isApprovedPilot104Write('approve_post', changed, read, now)),
       'stale or unreviewed approval must deny',
     );
+  }
+});
+
+Deno.test('CR-039 previously unhandled manual-card JSONB parameters have explicit casts', () => {
+  for (const [tool, key] of [
+    ['update_page','p_page_patch'], ['update_page','p_niche_config_patch'],
+    ['create_content_plan','p_items'], ['trivia_reverify_fact','p_sources'],
+    ['trivia_correct_fact','p_successor'], ['record_post_performance','p_metrics'],
+  ]) {
+    assert(buildPilotRpcStatement(tool, {[key]: { any: 'fixture' }}).includes('::text::jsonb'),
+      'expected explicit JSONB cast for ' + tool + ':' + key);
   }
 });

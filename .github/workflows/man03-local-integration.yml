@@ -34,6 +34,12 @@ jobs:
           cache: pnpm
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
+      - name: Setup pinned Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version-file: .deno-version
+      - name: Focused MCP validation with no temporary grants
+        run: pnpm run test:mcp
       - name: Start disposable local Supabase
         run: pnpm run supabase:start
       - name: Apply migrations to disposable local PostgreSQL
