@@ -1,3 +1,5 @@
+> **2026-10-19 CR-039 checkpoint 10.4:** prior MAN-03 local isolated PostgreSQL reservation/save/readback suite PASS; previous production reservation rejected `FACT_RESERVATION_CONTEXT_CHANGED`, with no draft. Both legacy MAN-03 grants revoked. Owner directs removal of per-card grants before one explicitly authorized reserve→save trial *only after final-SHA full backend gate and deployment*. This entry does NOT claim production success; MAN-04 NOT STARTED.
+
 # Phase 10 — installed-plugin manual evidence ledger
 
 **10.0 historical procedure freeze: MAN-01..MAN-09 procedure-v1 FROZEN under CR-028.** Template only: **no cards executed, no new production mutations, and no new MCP connection**. Host write permission will be inspected first after connection/OAuth in 10.1; final plugin installation is 10.2. Per-card owner values and exact compiled prompts are deliberately PENDING until immediately before the card concerned. This cannot be mistaken for an executed test or approved write.

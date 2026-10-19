@@ -109,6 +109,10 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   );
 });
 Deno.test('CR-039 No-auth MVP write accepts one workspace, schema and operation key without grants', async () => {
+  assert(isPermittedMvpPilotRpc('get_account_profile', context.workspacePublicId, {p_request_schema_version: 1}),
+    'profile read must stay available without workspace arg');
+  assert(isPermittedMvpPilotRpc('get_content_plan', context.workspacePublicId, {p_request_schema_version: 1}),
+    'plan read stays allowed');
   const p = {
     p_request_schema_version: 1,
     p_workspace_public_id: context.workspacePublicId,

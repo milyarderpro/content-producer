@@ -6,6 +6,7 @@ on:
     paths:
       - "supabase/tests/database/man03-local-integration.test.ts"
       - ".github/workflows/man03-local-integration.yml"
+      - "supabase/functions/mcp/**"
 
 permissions:
   contents: read

@@ -1,5 +1,7 @@
 # Phase 10 — Koneksi ChatGPT, plugin final, dan pilot: runbook implementasi
 
+> **CR-039 (2026-10-19) overrides historical grant-activation language below.** During this owner-accepted No-auth MVP, the fixed-workspace MCP permits RPC writes without temporary per-card grants, subject to all RPC/RLS/source/CAS/ledger/rate-limit/editorial constraints. A private plugin does not make the public URL secure. Do not ask the owner to activate/revoke grants. See [CR-039](../../docs/decisions/2026-10-19-phase-10-4-noauth-mvp-write-contract.md).
+
 **Status:** Phase 9 `Complete`; Phase 10 `In progress`, 10.0 mengikuti CR-028.
 Catat SHA `main` yang aktual ketika 10.0 dimulai. Rencana ini membagi Phase 10
 menjadi delapan task berurutan (10.0–10.7); satu task hanya mengerjakan satu
@@ -314,20 +316,27 @@ MVP tetap PENDING.
 
 ## 9. Checkpoint 10.4 — `MAN-03..MAN-04`: draft dan editorial
 
-**CR-038 owner selection and write separation (2026-10-19):** the owner chose
-Moon phases / `nature_science` / `single_subject_fast` / `fast_trivia`,
-preferred seven **distinct verified** claims (not forced), `follow`, and
-the Phase 10 trivia source/editorial policy. This is **only content direction
-and draft preparation**, not consent for assistant-executed business writes.
-Prepare the narrowly scoped revocable grants in
-[CR-038](../../docs/decisions/2026-10-19-phase-10-4-scoped-write-permits.md),
-and verify focused tests, one final-SHA full gate and deployment before
-showing the **complete MAN-03 prompt for the owner to submit via the installed
-plugin**. No assistant `trivia_register_and_reserve_facts`, `save_post`,
-`revise_post`, `approve_post`, plan or Facebook write in the preparation
-task. Grants are absent unless separately activated by the owner. Actual
-MAN-04 editorial approval is a later distinct, exact-revision/hash gate.
-Checkpoint remains PENDING until the real owner-triggered cards pass.
+**CR-039 owner-approved MVP No-auth write contract (2026-10-19):** CR-039
+supersedes CR-038 only for the *temporary grant requirement*. The existing
+PRIVATE plugin uses a publicly callable **No authentication** MCP. Owner
+explicitly accepts this MVP risk. The server still resolves one fixed workspace
+and checks workspace/schema/UUIDv4 operation key; RPC RLS, CAS, rate limiting,
+idempotent replay, fact verification and editorial quality remain authoritative.
+Because there is no caller authentication, approval flags cannot establish
+cryptographic owner consent; future production hardening is mandatory.
+
+MAN-03 target remains Moon phases / `nature_science` /
+`single_subject_fast` / `fast_trivia` / `follow`, with seven
+NASA-verified distinct stable facts and the previously frozen operation
+keys/token. No activation/revocation scripts, no new operation keys, no repeated
+owner prompt or duplicate reservation. Run local focused Deno tests and real
+local DB reserve→save→get_post tests; then one CR-020 full backend gate on
+final code SHA before deployment. The owner explicitly authorized **at most
+one** production reservation and one `save_post` in this conversation *after*
+the gate and deployment pass. If any write fails, STOP and capture real
+(non-secret) timestamp/scope, deployed Edge version, error code, readback and
+ledger evidence. No automatic write replay. MAN-04 remains NOT STARTED and
+requires separate owner approval for actual revision/content hash.
 
 
 Pada Page baru, minta pilihan owner tentang topik, sumber dan batas editorial
