@@ -1,0 +1,45 @@
+name: MAN-03 isolated local database integration
+
+on:
+  push:
+    branches: [codex/man03-local-integration]
+    paths:
+      - "supabase/tests/database/man03-local-integration.test.ts"
+      - ".github/workflows/man03-local-integration.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  one-local-flow:
+    name: Seven NASA facts reserve and save (ephemeral local Postgres)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      SUPABASE_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Checkout test-only branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - name: Setup pinned Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Start disposable local Supabase
+        run: pnpm run supabase:start
+      - name: Apply migrations to disposable local PostgreSQL
+        run: pnpm run supabase:reset
+      - name: Execute ONLY MAN-03 focused actual DB integration test
+        run: pnpm exec vitest run --config vitest.database.config.ts supabase/tests/database/man03-local-integration.test.ts
+      - name: Stop local Supabase
+        if: always()
+        run: pnpm run supabase:stop
