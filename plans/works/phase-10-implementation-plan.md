@@ -260,6 +260,16 @@ skill+MCP actually work together, exactly 33 tools and three reads succeed,
 and evidence is recorded in Issue #22/PR #23.** A valid ZIP or installed
 version alone is not sufficient. Keep PR draft and do not begin 10.3 here.
 
+### 10.2 signoff — 2026-10-19: PASS
+
+Owner confirmed v0.2.1 works in ChatGPT Work web and the phone's web
+browser (native mobile app not tested). Fresh web chat used the installed
+skill and registered mcpku's 33 tools together: 3 Read PASS, 0 Write.
+Plugin Creator verified v0.2.1, PRIVATE and the same release ID.
+Final ZIP/hash and CI proof are recorded in Issue #22 and PR #23.
+The public No-auth read risk remains; 10.3–10.7 and 14 MVP ACs are PENDING.
+
+
 ## 8. Checkpoint 10.3 — `MAN-01..MAN-02`: aktivasi dan Page
 
 Jalankan prosedur beku dengan prompt persis yang diikat dari data nyata tepat
