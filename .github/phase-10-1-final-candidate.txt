@@ -8,3 +8,9 @@ Clean source HEAD (after ephemeral diagnostic removal) = 33dcb0ce7a7769bea0c410e
 Light CI PASS on clean source SHA: https://github.com/milyarderpro/content-producer/actions/runs/39142160635
 Run ONE CR-020 full technical/security gate on this marker commit SHA before the same-production-mcp Edge deployment.
 No write, plugin creation, install, Phase 10.2, or PR merge is authorized by this marker.
+
+Phase 10.3 MAN-02 exact-payload gate — 2026-10-19
+Owner approved exactly one create_page for name corious facts, slug corious-facts, timezone Asia/Jakarta, target_markets US, trivia copied from Phase 9.5 and make_default true.
+Operation key: ad350ab5-e3a0-40c9-b7c9-1cb1d2bc07c0
+This marker requests one full local CR-020 technical/security gate for the final changed backend source on this SHA, including CR-037 default-locked digest allowlist tests and isolated three-Page configuration test.
+This marker does not install any grant, deploy production, create any Page, or authorize other writes. The public No-auth endpoint's write latch must remain CLOSED unless server-side exact-payload grant can be proven active and safely reversible.
