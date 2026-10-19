@@ -200,12 +200,13 @@ export async function isApprovedPilot104Write(
   const stage = tool as Stage;
   const raw = readEnv(stages[stage]);
   if (!raw || raw.length > 2048) return false;
-  let grant: Grant | null = null;
-  try {
-    grant = record(JSON.parse(raw));
-  } catch {
-    return false;
-  }
+  const grant: Grant | null = (() => {
+    try {
+      return record(JSON.parse(raw));
+    } catch {
+      return null;
+    }
+  })();
   if (
     !grant ||
     !validExpiry(grant.expires_at, now) ||
