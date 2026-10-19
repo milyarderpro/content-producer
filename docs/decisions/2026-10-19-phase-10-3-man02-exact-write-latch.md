@@ -13,6 +13,7 @@ The default `PILOT_WRITE_LOCKED` must remain unchanged without a separate exact 
 ## Narrow implementation
 
 Permit only an existing `create_page` MCP RPC with:
+
 1. The same fixed owner/workspace context, validated strict tool input and exactly the eleven expected named RPC arguments;
 2. A server-side, default-absent `MCP_MAN02_APPROVED_SHA256` environment value matching SHA-256 over a documented deterministic, recursively key-sorted JSON serialization of **all** named RPC arguments (including operation key, complete trivia config and make-default setting);
 3. An explicit owner approval of the full exact JSON and stable random UUIDv4 operation key, recorded before the grant is installed.
