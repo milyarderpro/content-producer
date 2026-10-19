@@ -148,10 +148,7 @@ Deno.test(
       );
       check(tool.annotations.destructiveHint === false, 'NON_DESTRUCTIVE');
       check(tool.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
-      check(
-        !Object.hasOwn(tool, 'outputSchema'),
-        'OPTIONAL_OUTPUT_OMITTED',
-      );
+      check(!Object.hasOwn(tool, 'outputSchema'), 'OPTIONAL_OUTPUT_OMITTED');
       check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
     }
   },
@@ -317,7 +314,7 @@ Deno.test(
             data: { ...responses.trivia_register_and_reserve_facts, leaked: 'secret' },
           }),
         )) as typeof fetch;
-      check((await call('trivia_register_and_reserve_facts')).isError === true, 'OPTIONAL_OUTPUT_OMITTED');
+      check((await call('trivia_register_and_reserve_facts')).isError === true, 'CLOSED_OUTPUT');
     } finally {
       globalThis.fetch = original;
     }
