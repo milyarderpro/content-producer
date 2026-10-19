@@ -14,18 +14,14 @@ export function buildPilotRpcStatement(tool: string, params: Record<string, unkn
   if (keys.length > 40 || keys.some((key) => !paramIdentifier.test(key))) {
     throw new Error('Invalid RPC arguments');
   }
-  return (
-    'select api."' +
-    tool +
-    '"(' +
-    keys
-      .map(
-        (key, index) =>
-          '"' +
-          key +
-          '" => 
-    ') as result'
-  );
+  const bindings = keys.map((key, index) => {
+    const placeholder = '$' + (index + 1);
+    // postgres.js .unsafe can encode a pre-serialized object as a JSON string.
+    // For MAN-02 only, parse the text as JSONB inside PostgreSQL.
+    const jsonbCast = tool === 'create_page' && key === 'p_config' ? '::text::jsonb' : '';
+    return '"' + key + '" => ' + placeholder + jsonbCast;
+  });
+  return 'select api."' + tool + '"(' + bindings.join(', ') + ') as result';
 }
 
 export function fixedPilotOwnerId(): string {
