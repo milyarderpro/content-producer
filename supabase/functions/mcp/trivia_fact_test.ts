@@ -148,7 +148,10 @@ Deno.test(
       );
       check(tool.annotations.destructiveHint === false, 'NON_DESTRUCTIVE');
       check(tool.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
-      check(!Object.hasOwn(tool, 'outputSchema'), 'OPTIONAL_OUTPUT_OMITTED');
+      check(
+        !Object.hasOwn(tool, 'outputSchema'),
+        'OPTIONAL_OUTPUT_OMITTED',
+      );
       check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
     }
   },

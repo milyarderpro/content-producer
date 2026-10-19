@@ -120,8 +120,7 @@ Deno.test('6.6 recovery schemas and destructive cancellation metadata survive 6.
       'cancel destructive',
     );
     assert(
-      tool.inputSchema.additionalProperties === false &&
-        !Object.hasOwn(tool, 'outputSchema'),
+      tool.inputSchema.additionalProperties === false && !Object.hasOwn(tool, 'outputSchema'),
       'input closed and optional output omitted',
     );
     assert(!Object.hasOwn(tool._meta, 'openai/profile'), 'profile metadata');

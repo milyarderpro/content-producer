@@ -153,10 +153,7 @@ Deno.test('6.5 claims retain OAuth and annotations after 6.11 expansion', async 
       (tool.inputSchema as { additionalProperties?: boolean }).additionalProperties === false,
       'closed input',
     );
-    assert(
-      !Object.hasOwn(tool, 'outputSchema'),
-      'optional output schema omitted from catalog',
-    );
+    assert(!Object.hasOwn(tool, 'outputSchema'), 'optional output schema omitted from catalog');
   }
   assert(
     tools.some((t) => t.name === 'trivia_find_similar_facts'),
