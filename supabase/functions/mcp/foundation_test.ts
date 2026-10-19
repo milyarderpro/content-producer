@@ -1,4 +1,6 @@
+import { createMcpHandler } from '@modelcontextprotocol/server';
 import { createAuthenticatedTransport } from './transport.ts';
+import { createMcpServer } from './server.ts';
 import type { RequestContext } from './auth.ts';
 import { FOUNDATION_TOOL_NAMES } from './foundation.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
@@ -244,7 +246,7 @@ Deno.test('All registered tool input/output object schemas are closed recursivel
   assert(new Set(tools.map((tool: { name: string }) => tool.name)).size === 33, 'unique names');
   for (const tool of tools) {
     assertClosedObjects(tool.inputSchema, tool.name + '.input');
-    assertClosedObjects(tool.outputSchema, tool.name + '.output');
+    assert(!Object.hasOwn(tool, 'outputSchema'), 'OAuth optional wire output must be omitted');
     assert(tool.securitySchemes?.[0]?.type === 'oauth2', tool.name + ' top-level OAuth');
     assert(
       JSON.stringify(tool.securitySchemes) === JSON.stringify(tool._meta?.securitySchemes),
@@ -252,15 +254,30 @@ Deno.test('All registered tool input/output object schemas are closed recursivel
     );
     assert(tool.securitySchemes[0].scopes.join(' ') === 'openid email', tool.name + ' scopes');
   }
+  // Registered output validators must remain closed even though the
+  // ChatGPT-facing OAuth catalog omits optional outputSchema metadata.
+  const sdkResponse = await createMcpHandler(() => createMcpServer(context)).fetch(
+    mcp('tools/list'),
+  );
+  assert(sdkResponse.status === 200, 'raw SDK catalog must remain available to tests');
+  const sdkBody = await sdkResponse.text();
+  const sdkFrame = sdkBody.split('\n').find((line) => line.startsWith('data: '));
+  assert(sdkFrame, 'SDK catalog must return a data frame');
+  const sdkTools = JSON.parse(sdkFrame.slice(6)).result.tools;
+  assert(sdkTools.length === 33, 'raw SDK must still have 33 output schemas');
+  for (const sdkTool of sdkTools) {
+    assertClosedObjects(sdkTool.outputSchema, sdkTool.name + '.output');
+  }
+  const sdkProfile = sdkTools.find((tool: { name: string }) => tool.name === 'get_account_profile');
   const profile = tools.find((tool: { name: string }) => tool.name === 'get_account_profile');
   assert(profile?.inputSchema?.additionalProperties === false, 'profile input must be closed');
   assert(Object.keys(profile.inputSchema.properties).length === 0, 'profile must accept {}');
-  assert(profile.outputSchema.required.includes('id'), 'top-level profile id required');
+  assert(sdkProfile.outputSchema.required.includes('id'), 'top-level profile id required');
   assert(
-    profile.outputSchema.required.includes('workspace_public_id'),
+    sdkProfile.outputSchema.required.includes('workspace_public_id'),
     'fixed workspace reference required',
   );
-  assert(profile.outputSchema.properties.id.type === 'string', 'profile id schema');
+  assert(sdkProfile.outputSchema.properties.id.type === 'string', 'profile id schema');
 });
 
 Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation', async () => {
