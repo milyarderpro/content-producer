@@ -84,8 +84,8 @@ Only store minimum redacted arguments/results needed to explain a failure. Crede
 - **Observed 3/3 real connected tool reads:** `get_account_profile({})` succeeded (display `Content Producer account`, workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`); `get_workspace_context({request_schema_version:1,workspace_public_id:<profile>})` returned active `trivia`, one active and zero inactive Pages; `list_pages({request_schema_version:1,workspace_public_id:<profile>,limit:50})` returned exactly one `phase-9-5-pilot-trivia` Page (public ID `5030e577-89bf-4645-85e8-1d5060fb91ee`), active, New York timezone, US target, trivia v1 enabled/default, and `has_more=false`.
 - **Extra read-only config inspection for MAN-02 proposal:** `get_page_generation_context` for that Page returned the full actual trivia v1 config and live context. This is **not** a MAN-02 write or owner approval.
 - **Safety:** no `create_page` or any other business write; owner-visible Page count stayed one. Fresh ledger count was **not independently verified** using the plugin, so no unobserved ledger state is asserted.
-- **Final MAN-01 verdict:** PASS on live reads, with explicit owner signoff during Phase 10.3 on 2026-10-19.
-- **MAN-02 progression:** exact owner approval, successful Page write, gated backend fix and grant revocation are documented below. The temporary grant is owner-confirmed deleted.
+- **Final MAN-01 verdict:** PASS based on the installed plugin's actual read-only calls and the owner's explicit 10.3 signoff.
+- **MAN-02 gate:** final exact Page payload and operation key were approved; gated production write, Page/config read-back, and owner-attested temporary grant revocation are documented below.
 
 ## Phase 10.3 — MAN-02 Page write and revocation (2026-10-19)
 
@@ -98,33 +98,6 @@ Only store minimum redacted arguments/results needed to explain a failure. Crede
 - **Read-back:** 2 active Pages, 0 inactive; the original Phase 9.5 Page remains unchanged, and both Page trivia configurations match.
 - **Grant closure:** owner confirmed deletion of temporary `MCP_MAN02_APPROVED_SHA256` after the successful write. The connector cannot independently read project secrets.
 - **Evidence boundary:** post-success direct ledger SQL queries were blocked by platform safety checks. No bypass or second successful write was attempted. The ledger count remains independently unverified.
-- **Final MAN-02 verdict:** PASS for exactly one Page/config, preserving the original Page. Owner confirmed temporary grant deletion. No second successful Page or extra business write.
-
-## Checkpoint 10.3 — closure verdict and 10.7 handoff (2026-10-19)
-
-**Checkpoint 10.3: PASS.** MAN-01 PASS and MAN-02 PASS, based on the installed
-private plugin, exact owner-approved payload and operation key, one successful
-new Page/config, two-Page readback without duplication, and the
-[full backend gate #39234992064](https://github.com/milyarderpro/content-producer/actions/runs/39234992064)
-including deterministic tests of three differently configured Pages and ledger
-idempotency in an isolated database. The corrected deployed MCP bundle is
-`c054ac447add8c44bf5bd3bc59331c7917b8c6fc63f3b6e235777682d84ceada`.
-The approved new Page is `37457236-17ec-4486-8880-6832460ae411`.
-
-**Residual limitations carried to independent audit 10.7:** the owner explicitly
-confirmed deletion of the temporary `MCP_MAN02_APPROVED_SHA256` secret; it was
-not verified by independent secret inventory because the connected management
-tools cannot list secrets. The production operation ledger was not read directly
-after the successful write, because the direct read-only SQL calls were blocked.
-The successful atomic RPC (`replayed=false`), Page/config readback, unchanged
-existing Page and isolated idempotency tests provide evidence of correctness,
-but are not falsely represented as independent production ledger inspection.
-CR-037's replay behavior was verified in the isolated test, **not** by another
-production write. These two evidence limitations are not explicit requirements
-for independent production readbacks in the 10.3 PASS definition; review them
-again at 10.7 without silently upgrading evidence strength.
-
-10.4–10.7 remain pending; the 14 MVP acceptance criteria are not marked
-complete. The private plugin remains v0.2.1; PR #23 stays draft/unmerged.
-No new business writes, production deployment, or full gate were conducted
-for this documentary closeout.
+- **Final MAN-02 verdict:** PASS: one Page/config created, same approved key used for failed attempt and successful retry, no duplicate Page, original Phase 9.5 Page unchanged, and owner confirmed secret deletion. Do not confuse this confirmation with independent secret inventory inspection.
+- **Audit 10.7 limitations:** direct production SQL ledger inspection after the successful write was blocked; no independent production ledger count is claimed. Secret revocation was owner-confirmed, not independently listed by the connector. The RPC response (`replayed=false`), Pages/config read-back, and idempotent operation replay tests in isolated CI support checkpoint PASS without representing either independent read as completed.
+- **Checkpoint 10.3 verdict:** MAN-01 PASS, MAN-02 PASS, 10.3 PASS on 2026-10-19. The runbook PASS condition does not explicitly require independent production SQL ledger and secret inventory reads. Keep both gaps visible for independent audit 10.7. PR #23 stays draft; 10.4–10.7 and AC-001..014 remain PENDING; no new write, deployment, or full gate for this documentation signoff.
