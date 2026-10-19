@@ -102,8 +102,13 @@ jobs:
           archive=artifacts/content-producer-private-v0.2.0.zip
           test -s "$archive"
           unzip -t "$archive" >/dev/null
-          test "$(unzip -Z1 "$archive" | wc -l)" -eq 13
-          test "$(unzip -Z1 "$archive" | grep -Fxc './mcp.json')" -eq 1
+          # Info-ZIP normalizes input './mcp.json' to archive entry 'mcp.json'.
+          # Inspect real archive paths and compare them to the strict 13-file index.
+          entries="$RUNNER_TEMP/phase-10-final-zip-entries.txt"
+          unzip -Z1 "$archive" | tee "$entries"
+          test "$(wc -l < "$entries")" -eq 13
+          test "$(grep -Fxc 'mcp.json' "$entries")" -eq 1
+          diff -u <(LC_ALL=C sort "$entries") <(jq -r '.files[].path' artifacts/plugin-candidate-filelist.json | LC_ALL=C sort)
           verify_dir="$(mktemp -d)"
           trap 'rm -rf "$verify_dir"' EXIT
           unzip -q "$archive" -d "$verify_dir"
