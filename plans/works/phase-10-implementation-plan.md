@@ -314,6 +314,22 @@ MVP tetap PENDING.
 
 ## 9. Checkpoint 10.4 — `MAN-03..MAN-04`: draft dan editorial
 
+**CR-038 owner selection and write separation (2026-10-19):** the owner chose
+Moon phases / `nature_science` / `single_subject_fast` / `fast_trivia`,
+preferred seven **distinct verified** claims (not forced), `follow`, and
+the Phase 10 trivia source/editorial policy. This is **only content direction
+and draft preparation**, not consent for assistant-executed business writes.
+Prepare the narrowly scoped revocable grants in
+[CR-038](../../docs/decisions/2026-10-19-phase-10-4-scoped-write-permits.md),
+and verify focused tests, one final-SHA full gate and deployment before
+showing the **complete MAN-03 prompt for the owner to submit via the installed
+plugin**. No assistant `trivia_register_and_reserve_facts`, `save_post`,
+`revise_post`, `approve_post`, plan or Facebook write in the preparation
+task. Grants are absent unless separately activated by the owner. Actual
+MAN-04 editorial approval is a later distinct, exact-revision/hash gate.
+Checkpoint remains PENDING until the real owner-triggered cards pass.
+
+
 Pada Page baru, minta pilihan owner tentang topik, sumber dan batas editorial
 tepat sebelum MAN-03, lalu ikat dan bekukan prompt kartu terkait. Jalankan
 prompt itu untuk penelitian trivia yang bersumber,
