@@ -350,3 +350,82 @@ Deno.test('10.4 draft saving cannot schedule, switch topic, approve or waive qua
   });
   assert(sqlSave.includes('"p_fact_bindings" => $3::text::jsonb'), 'allocations must be JSONB');
 });
+
+Deno.test('10.4 MAN-04 CAS revision permit does not imply editorial approval', async () => {
+  const now = Date.UTC(2026, 9, 19, 12);
+  const key = 'cccccccc-cccc-4ccc-8ccc-cccccccccccc';
+  const post = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
+  const hash = 'a'.repeat(64);
+  const sha = async (input: string) =>
+    Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))))
+      .map((n) => n.toString(16).padStart(2, '0')).join('');
+  const grant = JSON.stringify({
+    expires_at: '2026-10-19T13:00:00Z',
+    operation_key_sha256: await sha(key),
+    post_public_id: post,
+    expected_revision: 1,
+    expected_content_hash: hash,
+    approved_hook: 'Seven Moon-phase surprises',
+  });
+  const read = (name: string) => name === 'MCP_MAN04_REVISE_GRANT_JSON' ? grant : undefined;
+  const args: Record<string, unknown> = {
+    p_request_schema_version: 1,
+    p_workspace_public_id: 'cad2885e-952e-41b3-9eae-d2d9d75d533d',
+    p_operation_key: key, p_post_public_id: post,
+    p_expected_revision: 1, p_expected_content_hash: hash,
+    p_reservation_token: null, p_content_schema_version: 1,
+    p_format_key: 'single_subject_fast', p_topic_key: 'nature_science',
+    p_interaction_goal: 'follow',
+    p_content_payload: { schema_version: 1, hook: 'Seven Moon-phase surprises',
+      body: { facts: Array.from({ length: 7 }, (_, i) => ({ position: i + 1 })) } },
+    p_generation_snapshot: {
+      profile_key: 'fast_trivia', config_updated_at: '2026-10-19T10:33:17.018070Z',
+    },
+    p_fact_bindings: Array.from({ length: 7 }, (_, i) => ({ position: i + 1 })),
+  };
+  assert(await isApprovedPilot104Write('revise_post', args, read, now), 'CAS hook edit permitted');
+  assert(!(await isApprovedPilot104Write('approve_post', args, read, now)), 'no approval from revision grant');
+  for (const changed of [
+    { ...args, p_expected_revision: 2 },
+    { ...args, p_expected_content_hash: 'b'.repeat(64) },
+    { ...args, p_content_payload: { ...(args.p_content_payload as object), hook: 'Unreviewed hook' } },
+    { ...args, p_post_public_id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee' },
+  ]) {
+    assert(!(await isApprovedPilot104Write('revise_post', changed, read, now)), 'CAS/new copy not authorized');
+  }
+});
+
+Deno.test('10.4 approval demands a new exact owner-reviewed RPC hash with no waivers', async () => {
+  const now = Date.UTC(2026, 9, 19, 12);
+  const key = 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee';
+  const post = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
+  const content = 'a'.repeat(64);
+  const sha = async (input: string) =>
+    Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))))
+      .map((n) => n.toString(16).padStart(2, '0')).join('');
+  const args: Record<string, unknown> = {
+    p_request_schema_version: 1,
+    p_workspace_public_id: 'cad2885e-952e-41b3-9eae-d2d9d75d533d',
+    p_operation_key: key, p_post_public_id: post,
+    p_expected_revision: 2, p_expected_content_hash: content,
+    p_explicit_approval: true, p_accepted_warning_ids: [],
+    p_warning_acceptance_reason: null,
+  };
+  const ordered = Object.fromEntries(Object.entries(args).sort(([a], [b]) => a.localeCompare(b)));
+  const grant = JSON.stringify({
+    expires_at: '2026-10-19T13:00:00Z', operation_key_sha256: await sha(key),
+    post_public_id: post, expected_revision: 2, expected_content_hash: content,
+    approved_rpc_sha256: await sha(JSON.stringify(ordered)),
+  });
+  const read = (name: string) => name === 'MCP_MAN04_APPROVE_GRANT_JSON' ? grant : undefined;
+  assert(await isApprovedPilot104Write('approve_post', args, read, now), 'matching approval RPC');
+  for (const changed of [
+    { ...args, p_expected_revision: 1 },
+    { ...args, p_expected_content_hash: 'b'.repeat(64) },
+    { ...args, p_explicit_approval: false },
+    { ...args, p_accepted_warning_ids: ['trivia.visual_rhythm_clear'] },
+    { ...args, p_warning_acceptance_reason: 'Unreviewed waiver' },
+  ]) {
+    assert(!(await isApprovedPilot104Write('approve_post', changed, read, now)), 'stale or unreviewed approval must deny');
+  }
+});
