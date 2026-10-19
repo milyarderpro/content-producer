@@ -88,16 +88,8 @@ jobs:
         with:
           deno-version-file: .deno-version
 
-      - name: Phase 10.4 MCP typecheck and deny-by-default tests
-        shell: bash
-        run: |
-          set -euo pipefail
-          (
-            cd supabase/functions
-            deno check mcp/index.ts mcp/pilot_db_test.ts
-            deno lint mcp/pilot_write_10_4.ts mcp/pilot_db.ts mcp/pilot_db_test.ts mcp/foundation.ts
-            AI_AGENT=none APPVEYOR=1 deno test --allow-env=NODE_ENV,AI_AGENT,APPVEYOR,CI,DEBUG,TEST,MODE,MINIMAL,NO_COLOR,FORCE_COLOR,TERM mcp/pilot_db_test.ts
-          )
+      - name: Focused MCP-only 33-tool OAuth schema and regression suite
+        run: pnpm run test:mcp
 
       - name: Focused package tests and final source validation
         run: |
