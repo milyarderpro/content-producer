@@ -35,6 +35,13 @@ Procedure-v1 is frozen for MAN-01..09; per-card prompt binding, owner consent, a
 | MAN-10 | post-MVP | NOT RUN            | —                    | —                          | —               | —                                  | —                    | DEFERRED — POST-MVP              |
 | MAN-11 | post-MVP | NOT RUN            | —                    | —                          | —               | —                                  | —                    | DEFERRED — POST-MVP              |
 
+## Phase 10.4 — MAN-03/04 approved direction, preparation only (2026-10-19)
+
+- **Owner choice, not a write command:** Moon phases; `nature_science`; `single_subject_fast`; `fast_trivia`; prefer seven verified, nonduplicated factual claims (never force seven); `follow`; English US; stable low-risk astronomy trivia. Source policy Tier A/B per atomic claim, with NASA originals investigated. No invented or copied claims.
+- **Read-only baseline:** installed Content Producer v0.2.1 / release `pluginrel_6ad5c40b09588191842ddc1d42af957b`, ZIP SHA256 `236254c7d351cc9d932c4235ae50a4be23322610587e811effff77d43b4af37f`; workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`, `corious-facts` Page `37457236-17ec-4486-8880-6832460ae411`, config updated `2026-10-19T10:33:17.018070Z`, two Pages active. Original Phase 9.5 Page preserved. Do not infer a fresh ledger count.
+- **Safety:** CR-038 has distinct short-lived, Edge-only, default-absent operation permits. The owner sends the frozen executable MAN-03 prompt through installed Content Producer **only after** tests/deployment and separate grant activation; no assistant MCP business write. Raw operation keys and reservation tokens are not put into public GitHub. MAN-04 revised hook and exact owner approval remain future gates.
+- **Current outcome:** MAN-03 NOT RUN; MAN-04 NOT RUN; no draft/post ID, revision/hash or quality acceptance claimed. Never mark PASS before live owner-host trace, server checks and reviewed persisted output. Carry CR-037 independent ledger/secret inventory evidence gaps to 10.7.
+
 ## Evidence record: copy once for each actual card/attempt
 
 ```yaml
