@@ -117,62 +117,69 @@ Deno.test('10.1 default pilot write latch blocks business RPC before database ac
   assert(JSON.stringify(result).includes('PILOT_WRITE_LOCKED'), 'write latch error code');
 });
 
-Deno.test('10.3 MAN-02 payload grant is default-closed and exact, including operation key', async () => {
-  const params: Record<string, unknown> = {
-    p_request_schema_version: 1,
-    p_workspace_public_id: context.workspacePublicId,
-    p_operation_key: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-    p_name: 'Owner approved sample',
-    p_slug: 'owner-approved-sample',
-    p_timezone: 'America/New_York',
-    p_target_markets: ['US'],
-    p_niche_key: 'trivia',
-    p_config_schema_version: 1,
-    p_config: {
-      fact_count: { mode: 'adaptive', min: 5, preferred: 7, max: 9 },
-      fact_reuse_scope: 'workspace_unique',
-    },
-    p_make_default: true,
-  };
-  const canonical = canonicalMan02RpcArguments(params);
-  const digest = new Uint8Array(
-    await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical)),
-  );
-  const grant = Array.from(digest, (byte) => byte.toString(16).padStart(2, '0')).join('');
-  assert(!(await isApprovedMan02CreatePage('create_page', params, '')), 'no grant must deny');
-  assert(!(await isApprovedMan02CreatePage('create_page', params, '0'.repeat(64))), 'wrong grant');
-  assert(!(await isApprovedMan02CreatePage('create_page', params, 'SHA256:' + grant)), 'bad grant format');
-  assert(!(await isApprovedMan02CreatePage('update_page', params, grant)), 'other write blocked');
-  assert(await isApprovedMan02CreatePage('create_page', params, grant), 'exact grant permits');
-  const reordered: Record<string, unknown> = Object.fromEntries(
-    Object.entries(params).reverse(),
-  );
-  reordered.p_config = {
-    fact_reuse_scope: 'workspace_unique',
-    fact_count: { max: 9, preferred: 7, min: 5, mode: 'adaptive' },
-  };
-  assert(
-    await isApprovedMan02CreatePage('create_page', reordered, grant),
-    'object key order must not change the semantic hash',
-  );
-  for (const altered of [
-    { ...params, p_name: 'Unexpected Page' },
-    { ...params, p_operation_key: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' },
-    { ...params, p_workspace_public_id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee' },
-    { ...params, p_target_markets: ['GB'] },
-    { ...params, p_config: { ...params.p_config as object, fact_reuse_scope: 'page_unique' } },
-    { ...params, p_make_default: false },
-    { ...params, extra_rpc_argument: 'unexpected' },
-  ]) {
-    assert(
-      !(await isApprovedMan02CreatePage('create_page', altered, grant)),
-      'altered Page, config, key, workspace or fields must deny',
+Deno.test(
+  '10.3 MAN-02 payload grant is default-closed and exact, including operation key',
+  async () => {
+    const params: Record<string, unknown> = {
+      p_request_schema_version: 1,
+      p_workspace_public_id: context.workspacePublicId,
+      p_operation_key: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+      p_name: 'Owner approved sample',
+      p_slug: 'owner-approved-sample',
+      p_timezone: 'America/New_York',
+      p_target_markets: ['US'],
+      p_niche_key: 'trivia',
+      p_config_schema_version: 1,
+      p_config: {
+        fact_count: { mode: 'adaptive', min: 5, preferred: 7, max: 9 },
+        fact_reuse_scope: 'workspace_unique',
+      },
+      p_make_default: true,
+    };
+    const canonical = canonicalMan02RpcArguments(params);
+    const digest = new Uint8Array(
+      await crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonical)),
     );
-  }
-  const removed = { ...params };
-  delete removed.p_make_default;
-  assert(!(await isApprovedMan02CreatePage('create_page', removed, grant)), 'missing key denies');
-});
+    const grant = Array.from(digest, (byte) => byte.toString(16).padStart(2, '0')).join('');
+    assert(!(await isApprovedMan02CreatePage('create_page', params, '')), 'no grant must deny');
+    assert(
+      !(await isApprovedMan02CreatePage('create_page', params, '0'.repeat(64))),
+      'wrong grant',
+    );
+    assert(
+      !(await isApprovedMan02CreatePage('create_page', params, 'SHA256:' + grant)),
+      'bad grant format',
+    );
+    assert(!(await isApprovedMan02CreatePage('update_page', params, grant)), 'other write blocked');
+    assert(await isApprovedMan02CreatePage('create_page', params, grant), 'exact grant permits');
+    const reordered: Record<string, unknown> = Object.fromEntries(Object.entries(params).reverse());
+    reordered.p_config = {
+      fact_reuse_scope: 'workspace_unique',
+      fact_count: { max: 9, preferred: 7, min: 5, mode: 'adaptive' },
+    };
+    assert(
+      await isApprovedMan02CreatePage('create_page', reordered, grant),
+      'object key order must not change the semantic hash',
+    );
+    for (const altered of [
+      { ...params, p_name: 'Unexpected Page' },
+      { ...params, p_operation_key: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb' },
+      { ...params, p_workspace_public_id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee' },
+      { ...params, p_target_markets: ['GB'] },
+      { ...params, p_config: { ...(params.p_config as object), fact_reuse_scope: 'page_unique' } },
+      { ...params, p_make_default: false },
+      { ...params, extra_rpc_argument: 'unexpected' },
+    ]) {
+      assert(
+        !(await isApprovedMan02CreatePage('create_page', altered, grant)),
+        'altered Page, config, key, workspace or fields must deny',
+      );
+    }
+    const removed = { ...params };
+    delete removed.p_make_default;
+    assert(!(await isApprovedMan02CreatePage('create_page', removed, grant)), 'missing key denies');
+  },
+);
 
 Deno.test('10.1 foreign workspace must be rejected before SQL connection', async () => {
   const result = await invoke(
