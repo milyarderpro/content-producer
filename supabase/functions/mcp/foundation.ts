@@ -496,7 +496,11 @@ export async function invoke(
     // Each CR-038 stage has its own short-lived, default-absent, scoped permit.
     // No grant is sent over HTTP. This does not authenticate the public caller.
     const phase104Approved = await isApprovedPilot104Write(tool, params, (name) => {
-      try { return Deno.env.get(name); } catch { return undefined; }
+      try {
+        return Deno.env.get(name);
+      } catch {
+        return undefined;
+      }
     });
     if (!(await isApprovedMan02CreatePage(tool, params, grant)) && !phase104Approved) {
       return failure('PILOT_WRITE_LOCKED');

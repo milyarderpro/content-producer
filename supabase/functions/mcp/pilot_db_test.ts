@@ -233,82 +233,140 @@ Deno.test('10.1 SQL statement builder allows only named parameters, never free S
   }
 });
 
-Deno.test('10.4 stage permits are default-closed, short-lived and confined to Moon draft', async () => {
-  const now = Date.UTC(2026, 9, 19, 12);
-  const key = '11111111-1111-4111-8111-111111111111';
-  const token = '22222222-2222-4222-8222-222222222222';
-  const sha256 = async (input: string) =>
-    Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))))
-      .map((n) => n.toString(16).padStart(2, '0')).join('');
-  const permit = JSON.stringify({
-    expires_at: '2026-10-19T13:00:00Z',
-    operation_key_sha256: await sha256(key),
-    reservation_token_sha256: await sha256(token),
-  });
-  const read = (name: string) => name === 'MCP_MAN03_RESERVE_GRANT_JSON' ? permit : undefined;
-  const source = {
-    schema_version: 1, url: 'https://science.nasa.gov/moon/moon-phases/',
-    canonical_url: 'https://science.nasa.gov/moon/moon-phases/',
-    title: 'Moon Phases', publisher: 'NASA', tier: 'A', source_type: 'official',
-    accessed_at: '2026-10-19T12:00:00Z', language: 'en',
-    supports: 'The Sun illuminates one hemisphere of the Moon',
-    independence_group: 'nasa',
-  };
-  const args: Record<string, unknown> = {
-    p_request_schema_version: 1,
-    p_workspace_public_id: 'cad2885e-952e-41b3-9eae-d2d9d75d533d',
-    p_operation_key: key,
-    p_page_public_id: '37457236-17ec-4486-8880-6832460ae411',
-    p_reservation_token: token,
-    p_expected_config_updated_at: '2026-10-19T10:33:17.018070Z',
-    p_fact_reuse_scope: 'workspace_unique',
-    p_reservation_ttl_minutes: 30,
-    p_facts: Array.from({ length: 7 }, (_, i) => ({
-      position: i + 1,
-      candidate: {
-        candidate_key: 'moon_' + i, topic_key: 'nature_science',
-        normalization_version: 1, ontology_version: 1,
+Deno.test(
+  '10.4 stage permits are default-closed, short-lived and confined to Moon draft',
+  async () => {
+    const now = Date.UTC(2026, 9, 19, 12);
+    const key = '11111111-1111-4111-8111-111111111111';
+    const token = '22222222-2222-4222-8222-222222222222';
+    const sha256 = async (input: string) =>
+      Array.from(
+        new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))),
+      )
+        .map((n) => n.toString(16).padStart(2, '0'))
+        .join('');
+    const permit = JSON.stringify({
+      expires_at: '2026-10-19T13:00:00Z',
+      operation_key_sha256: await sha256(key),
+      reservation_token_sha256: await sha256(token),
+    });
+    const read = (name: string) => (name === 'MCP_MAN03_RESERVE_GRANT_JSON' ? permit : undefined);
+    const source = {
+      schema_version: 1,
+      url: 'https://science.nasa.gov/moon/moon-phases/',
+      canonical_url: 'https://science.nasa.gov/moon/moon-phases/',
+      title: 'Moon Phases',
+      publisher: 'NASA',
+      tier: 'A',
+      source_type: 'official',
+      accessed_at: '2026-10-19T12:00:00Z',
+      language: 'en',
+      supports: 'The Sun illuminates one hemisphere of the Moon',
+      independence_group: 'nasa',
+    };
+    const args: Record<string, unknown> = {
+      p_request_schema_version: 1,
+      p_workspace_public_id: 'cad2885e-952e-41b3-9eae-d2d9d75d533d',
+      p_operation_key: key,
+      p_page_public_id: '37457236-17ec-4486-8880-6832460ae411',
+      p_reservation_token: token,
+      p_expected_config_updated_at: '2026-10-19T10:33:17.018070Z',
+      p_fact_reuse_scope: 'workspace_unique',
+      p_reservation_ttl_minutes: 30,
+      p_facts: Array.from({ length: 7 }, (_, i) => ({
+        position: i + 1,
+        candidate: {
+          candidate_key: 'moon_' + i,
+          topic_key: 'nature_science',
+          normalization_version: 1,
+          ontology_version: 1,
+        },
+        sources: [source],
+        risk_class: 'standard',
+        freshness_class: 'stable',
+      })),
+    };
+    assert(
+      !(await isApprovedPilot104Write(
+        'trivia_register_and_reserve_facts',
+        args,
+        () => undefined,
+        now,
+      )),
+      'no grant must deny',
+    );
+    assert(
+      await isApprovedPilot104Write('trivia_register_and_reserve_facts', args, read, now),
+      'bounded Moon reservation',
+    );
+    for (const changed of [
+      { ...args, p_operation_key: '33333333-3333-4333-8333-333333333333' },
+      { ...args, p_page_public_id: '44444444-4444-4444-8444-444444444444' },
+      { ...args, p_reservation_token: '33333333-3333-4333-8333-333333333333' },
+      { ...args, p_facts: (args.p_facts as unknown[]).slice(0, 4) },
+      {
+        ...args,
+        p_facts: (args.p_facts as Record<string, unknown>[]).map((x) => ({
+          ...x,
+          candidate: { ...(x.candidate as object), topic_key: 'animals' },
+        })),
       },
-      sources: [source], risk_class: 'standard', freshness_class: 'stable',
-    })),
-  };
-  assert(!(await isApprovedPilot104Write('trivia_register_and_reserve_facts', args, () => undefined, now)), 'no grant must deny');
-  assert(await isApprovedPilot104Write('trivia_register_and_reserve_facts', args, read, now), 'bounded Moon reservation');
-  for (const changed of [
-    { ...args, p_operation_key: '33333333-3333-4333-8333-333333333333' },
-    { ...args, p_page_public_id: '44444444-4444-4444-8444-444444444444' },
-    { ...args, p_reservation_token: '33333333-3333-4333-8333-333333333333' },
-    { ...args, p_facts: (args.p_facts as unknown[]).slice(0, 4) },
-    { ...args, p_facts: (args.p_facts as Record<string, unknown>[]).map((x) => ({
-      ...x, candidate: { ...(x.candidate as object), topic_key: 'animals' },
-    })) },
-  ]) {
-    assert(!(await isApprovedPilot104Write('trivia_register_and_reserve_facts', changed, read, now)), 'altered scope must deny');
-  }
-  assert(!(await isApprovedPilot104Write('create_page', args, read, now)), 'wrong write must deny');
-  assert(!(await isApprovedPilot104Write('trivia_register_and_reserve_facts', args, read, now + 3_600_000)), 'expired grant must deny');
-  const excessive = JSON.stringify({
-    expires_at: '2026-10-20T00:00:00Z',
-    operation_key_sha256: await sha256(key),
-    reservation_token_sha256: await sha256(token),
-  });
-  assert(!(await isApprovedPilot104Write('trivia_register_and_reserve_facts', args, () => excessive, now)), 'long-term grant must deny');
-});
+    ]) {
+      assert(
+        !(await isApprovedPilot104Write('trivia_register_and_reserve_facts', changed, read, now)),
+        'altered scope must deny',
+      );
+    }
+    assert(
+      !(await isApprovedPilot104Write('create_page', args, read, now)),
+      'wrong write must deny',
+    );
+    assert(
+      !(await isApprovedPilot104Write(
+        'trivia_register_and_reserve_facts',
+        args,
+        read,
+        now + 3_600_000,
+      )),
+      'expired grant must deny',
+    );
+    const excessive = JSON.stringify({
+      expires_at: '2026-10-20T00:00:00Z',
+      operation_key_sha256: await sha256(key),
+      reservation_token_sha256: await sha256(token),
+    });
+    assert(
+      !(await isApprovedPilot104Write(
+        'trivia_register_and_reserve_facts',
+        args,
+        () => excessive,
+        now,
+      )),
+      'long-term grant must deny',
+    );
+  },
+);
 
 Deno.test('10.4 draft saving cannot schedule, switch topic, approve or waive quality', async () => {
   const now = Date.UTC(2026, 9, 19, 12);
   const key = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
   const token = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
   const sha = async (input: string) =>
-    Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))))
-      .map((n) => n.toString(16).padStart(2, '0')).join('');
+    Array.from(
+      new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))),
+    )
+      .map((n) => n.toString(16).padStart(2, '0'))
+      .join('');
   const permit = JSON.stringify({
     expires_at: '2026-10-19T13:00:00Z',
     operation_key_sha256: await sha(key),
     reservation_token_sha256: await sha(token),
   });
-  const read = (name: string) => name === 'MCP_MAN03_SAVE_GRANT_JSON' ? permit : undefined;
-  const copy = Array.from({ length: 7 }, (_, i) => ({ position: i + 1, text: 'Verified Moon fact ' + (i + 1) }));
+  const read = (name: string) => (name === 'MCP_MAN03_SAVE_GRANT_JSON' ? permit : undefined);
+  const copy = Array.from({ length: 7 }, (_, i) => ({
+    position: i + 1,
+    text: 'Verified Moon fact ' + (i + 1),
+  }));
   const args: Record<string, unknown> = {
     p_request_schema_version: 1,
     p_workspace_public_id: 'cad2885e-952e-41b3-9eae-d2d9d75d533d',
@@ -317,15 +375,26 @@ Deno.test('10.4 draft saving cannot schedule, switch topic, approve or waive qua
     p_niche_key: 'trivia',
     p_reservation_token: token,
     p_expected_config_updated_at: '2026-10-19T10:33:17.018070Z',
-    p_plan_item: null, p_scheduled_at: null, p_content_schema_version: 1,
-    p_format_key: 'single_subject_fast', p_topic_key: 'nature_science',
+    p_plan_item: null,
+    p_scheduled_at: null,
+    p_content_schema_version: 1,
+    p_format_key: 'single_subject_fast',
+    p_topic_key: 'nature_science',
     p_interaction_goal: 'follow',
-    p_content_payload: { schema_version: 1, hook: 'Moon facts',
-      body: { facts: copy }, cta: 'Follow for more' },
+    p_content_payload: {
+      schema_version: 1,
+      hook: 'Moon facts',
+      body: { facts: copy },
+      cta: 'Follow for more',
+    },
     p_generation_snapshot: {
-      profile_key: 'fast_trivia', config_updated_at: '2026-10-19T10:33:17.018070Z',
-      fact_count_applied: 7, fact_reuse_scope: 'workspace_unique',
-      locale: 'en-US', render_style: 'plain_lines', target_markets: ['US'],
+      profile_key: 'fast_trivia',
+      config_updated_at: '2026-10-19T10:33:17.018070Z',
+      fact_count_applied: 7,
+      fact_reuse_scope: 'workspace_unique',
+      locale: 'en-US',
+      render_style: 'plain_lines',
+      target_markets: ['US'],
       text_budget: { hook_max_chars: 45 },
     },
     p_fact_bindings: copy.map((x) => ({ position: x.position })),
@@ -339,14 +408,22 @@ Deno.test('10.4 draft saving cannot schedule, switch topic, approve or waive qua
     { ...args, p_plan_item: {} },
     { ...args, p_editorial_checks: { rubric_version: 1, overall_status: 'fail' } },
   ]) {
-    assert(!(await isApprovedPilot104Write('save_post', changed, read, now)), 'unauthorized variant must deny');
+    assert(
+      !(await isApprovedPilot104Write('save_post', changed, read, now)),
+      'unauthorized variant must deny',
+    );
   }
-  assert(!(await isApprovedPilot104Write('approve_post', args, read, now)), 'approval always separately locked');
+  assert(
+    !(await isApprovedPilot104Write('approve_post', args, read, now)),
+    'approval always separately locked',
+  );
   const sqlReserve = buildPilotRpcStatement('trivia_register_and_reserve_facts', { p_facts: [{}] });
   assert(sqlReserve.includes('"p_facts" => $1::text::jsonb'), 'fact list must be JSONB');
   const sqlSave = buildPilotRpcStatement('save_post', {
-    p_content_payload: {}, p_generation_snapshot: {},
-    p_fact_bindings: [{}], p_editorial_checks: {},
+    p_content_payload: {},
+    p_generation_snapshot: {},
+    p_fact_bindings: [{}],
+    p_editorial_checks: {},
   });
   assert(sqlSave.includes('"p_fact_bindings" => $3::text::jsonb'), 'allocations must be JSONB');
 });
@@ -357,8 +434,11 @@ Deno.test('10.4 MAN-04 CAS revision permit does not imply editorial approval', a
   const post = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
   const hash = 'a'.repeat(64);
   const sha = async (input: string) =>
-    Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))))
-      .map((n) => n.toString(16).padStart(2, '0')).join('');
+    Array.from(
+      new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))),
+    )
+      .map((n) => n.toString(16).padStart(2, '0'))
+      .join('');
   const grant = JSON.stringify({
     expires_at: '2026-10-19T13:00:00Z',
     operation_key_sha256: await sha(key),
@@ -367,31 +447,48 @@ Deno.test('10.4 MAN-04 CAS revision permit does not imply editorial approval', a
     expected_content_hash: hash,
     approved_hook: 'Seven Moon-phase surprises',
   });
-  const read = (name: string) => name === 'MCP_MAN04_REVISE_GRANT_JSON' ? grant : undefined;
+  const read = (name: string) => (name === 'MCP_MAN04_REVISE_GRANT_JSON' ? grant : undefined);
   const args: Record<string, unknown> = {
     p_request_schema_version: 1,
     p_workspace_public_id: 'cad2885e-952e-41b3-9eae-d2d9d75d533d',
-    p_operation_key: key, p_post_public_id: post,
-    p_expected_revision: 1, p_expected_content_hash: hash,
-    p_reservation_token: null, p_content_schema_version: 1,
-    p_format_key: 'single_subject_fast', p_topic_key: 'nature_science',
+    p_operation_key: key,
+    p_post_public_id: post,
+    p_expected_revision: 1,
+    p_expected_content_hash: hash,
+    p_reservation_token: null,
+    p_content_schema_version: 1,
+    p_format_key: 'single_subject_fast',
+    p_topic_key: 'nature_science',
     p_interaction_goal: 'follow',
-    p_content_payload: { schema_version: 1, hook: 'Seven Moon-phase surprises',
-      body: { facts: Array.from({ length: 7 }, (_, i) => ({ position: i + 1 })) } },
+    p_content_payload: {
+      schema_version: 1,
+      hook: 'Seven Moon-phase surprises',
+      body: { facts: Array.from({ length: 7 }, (_, i) => ({ position: i + 1 })) },
+    },
     p_generation_snapshot: {
-      profile_key: 'fast_trivia', config_updated_at: '2026-10-19T10:33:17.018070Z',
+      profile_key: 'fast_trivia',
+      config_updated_at: '2026-10-19T10:33:17.018070Z',
     },
     p_fact_bindings: Array.from({ length: 7 }, (_, i) => ({ position: i + 1 })),
   };
   assert(await isApprovedPilot104Write('revise_post', args, read, now), 'CAS hook edit permitted');
-  assert(!(await isApprovedPilot104Write('approve_post', args, read, now)), 'no approval from revision grant');
+  assert(
+    !(await isApprovedPilot104Write('approve_post', args, read, now)),
+    'no approval from revision grant',
+  );
   for (const changed of [
     { ...args, p_expected_revision: 2 },
     { ...args, p_expected_content_hash: 'b'.repeat(64) },
-    { ...args, p_content_payload: { ...(args.p_content_payload as object), hook: 'Unreviewed hook' } },
+    {
+      ...args,
+      p_content_payload: { ...(args.p_content_payload as object), hook: 'Unreviewed hook' },
+    },
     { ...args, p_post_public_id: 'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee' },
   ]) {
-    assert(!(await isApprovedPilot104Write('revise_post', changed, read, now)), 'CAS/new copy not authorized');
+    assert(
+      !(await isApprovedPilot104Write('revise_post', changed, read, now)),
+      'CAS/new copy not authorized',
+    );
   }
 });
 
@@ -401,23 +498,32 @@ Deno.test('10.4 approval demands a new exact owner-reviewed RPC hash with no wai
   const post = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd';
   const content = 'a'.repeat(64);
   const sha = async (input: string) =>
-    Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))))
-      .map((n) => n.toString(16).padStart(2, '0')).join('');
+    Array.from(
+      new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))),
+    )
+      .map((n) => n.toString(16).padStart(2, '0'))
+      .join('');
   const args: Record<string, unknown> = {
     p_request_schema_version: 1,
     p_workspace_public_id: 'cad2885e-952e-41b3-9eae-d2d9d75d533d',
-    p_operation_key: key, p_post_public_id: post,
-    p_expected_revision: 2, p_expected_content_hash: content,
-    p_explicit_approval: true, p_accepted_warning_ids: [],
+    p_operation_key: key,
+    p_post_public_id: post,
+    p_expected_revision: 2,
+    p_expected_content_hash: content,
+    p_explicit_approval: true,
+    p_accepted_warning_ids: [],
     p_warning_acceptance_reason: null,
   };
   const ordered = Object.fromEntries(Object.entries(args).sort(([a], [b]) => a.localeCompare(b)));
   const grant = JSON.stringify({
-    expires_at: '2026-10-19T13:00:00Z', operation_key_sha256: await sha(key),
-    post_public_id: post, expected_revision: 2, expected_content_hash: content,
+    expires_at: '2026-10-19T13:00:00Z',
+    operation_key_sha256: await sha(key),
+    post_public_id: post,
+    expected_revision: 2,
+    expected_content_hash: content,
     approved_rpc_sha256: await sha(JSON.stringify(ordered)),
   });
-  const read = (name: string) => name === 'MCP_MAN04_APPROVE_GRANT_JSON' ? grant : undefined;
+  const read = (name: string) => (name === 'MCP_MAN04_APPROVE_GRANT_JSON' ? grant : undefined);
   assert(await isApprovedPilot104Write('approve_post', args, read, now), 'matching approval RPC');
   for (const changed of [
     { ...args, p_expected_revision: 1 },
@@ -426,6 +532,9 @@ Deno.test('10.4 approval demands a new exact owner-reviewed RPC hash with no wai
     { ...args, p_accepted_warning_ids: ['trivia.visual_rhythm_clear'] },
     { ...args, p_warning_acceptance_reason: 'Unreviewed waiver' },
   ]) {
-    assert(!(await isApprovedPilot104Write('approve_post', changed, read, now)), 'stale or unreviewed approval must deny');
+    assert(
+      !(await isApprovedPilot104Write('approve_post', changed, read, now)),
+      'stale or unreviewed approval must deny',
+    );
   }
 });

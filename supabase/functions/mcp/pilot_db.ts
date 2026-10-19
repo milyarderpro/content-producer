@@ -12,10 +12,18 @@ const PILOT_JSONB_PARAMS: Record<string, readonly string[]> = {
   create_page: ['p_config'],
   trivia_register_and_reserve_facts: ['p_facts'],
   save_post: [
-    'p_plan_item', 'p_content_payload', 'p_generation_snapshot',
-    'p_fact_bindings', 'p_editorial_checks',
+    'p_plan_item',
+    'p_content_payload',
+    'p_generation_snapshot',
+    'p_fact_bindings',
+    'p_editorial_checks',
   ],
-  revise_post: ['p_content_payload', 'p_generation_snapshot', 'p_fact_bindings', 'p_editorial_checks'],
+  revise_post: [
+    'p_content_payload',
+    'p_generation_snapshot',
+    'p_fact_bindings',
+    'p_editorial_checks',
+  ],
 };
 
 function isPilotJsonbArgument(tool: string, key: string): boolean {
