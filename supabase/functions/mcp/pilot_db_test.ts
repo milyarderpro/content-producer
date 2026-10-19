@@ -5,7 +5,7 @@ import { invoke } from './foundation.ts';
 import { buildPilotRpcStatement } from './pilot_db.ts';
 import { canonicalMan02RpcArguments, isApprovedMan02CreatePage } from './pilot_write.ts';
 import { isApprovedPilot104Write } from './pilot_write_10_4.ts';
-import { createAuthenticatedTransport } from './transport.ts';
+import { createAuthenticatedTransport, fetchAnonymousDiscovery } from './transport.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
 import { createMcpServer } from './server.ts';
 
@@ -107,6 +107,18 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   );
   const oauth = responseJson(oauthWire);
   const oauthTools = (oauth.result as { tools: Array<Record<string, unknown>> }).tools;
+  const discovery = await fetchAnonymousDiscovery(request('tools/list'));
+  assert(discovery.status === 200, 'anonymous OAuth discovery must return catalog');
+  const anonymous = responseJson(await discovery.text());
+  const anonymousTools = (anonymous.result as { tools: Array<Record<string, unknown>> }).tools;
+  assert(
+    JSON.stringify(anonymousTools) === JSON.stringify(oauthTools),
+    'OAuth discovery and authenticated catalog must publish identical descriptors',
+  );
+  const blockedCall = await fetchAnonymousDiscovery(
+    request('tools/call', { name: 'get_account_profile', arguments: {} }),
+  );
+  assert(blockedCall.status === 403, 'anonymous OAuth tool calls must remain blocked');
   assert(oauthTools.length === 33, 'OAuth catalog must expose exactly 33 tools');
   assert(new Set(oauthTools.map((tool) => tool.name)).size === 33, 'OAuth duplicate tool name');
   assert(

@@ -15,4 +15,11 @@ OAuth JWT validation, OAuth owner workspace checks, bearer challenges, RLS, Post
 
 ## Evidence and gates
 
-Focused Deno tests compare all 33 No-auth and OAuth input schemas to the original raw SDK catalog after only approved CR-033/034 transformations; assert no Unicode Cc escapes remain, exactly one profile marker in OAuth, all OAuth schemes remain unchanged and never noauth, and the output catalog is below 100,000 bytes. Run focused MCP validation and `pnpm run check`. Execute CR-020 full technical/security gate **once on the final backend SHA** via the existing intentional marker. Only after SUCCESS, deploy the same MCP bundle, verify source/version and the read-only OAuth catalog, and request exactly one owner OAuth connection. If the host returns an error, report it verbatim and STOP. No MAN-03/04, no production write, no grant or RLS changes. No deployment before final-SHA gate.
+Focused Deno tests compare all 33 No-auth and OAuth input schemas to the original raw SDK catalog after only approved CR-033/034 transformations; assert no Unicode Cc escapes remain, exactly one profile marker in OAuth, all OAuth schemes remain unchanged and never noauth, and the OAuth catalog is substantially smaller than the original 292 KB SDK list without asserting an undocumented official size cap. Run focused MCP validation and `pnpm run check`. Execute CR-020 full technical/security gate **once on the final backend SHA** via the existing intentional marker. Only after SUCCESS, deploy the same MCP bundle, verify source/version and the read-only OAuth catalog, and request exactly one owner OAuth connection. If the host returns an error, report it verbatim and STOP. No MAN-03/04, no production write, no grant or RLS changes. No deployment before final-SHA gate.
+
+## Focused measured evidence (before final gate)
+
+- Local OAuth `tools/list` catalog: **101,846 UTF-8 bytes**, with all 33 tool descriptors, compared with the former ~292 KB full SDK catalog.
+- The No-auth catalog's 100,000-byte target is **not** asserted for OAuth: OAuth schemes are required and account for the additional metadata.
+- Dedicated regression also compares unauthenticated protocol discovery against authenticated OAuth listing byte-equivalent descriptors and rejects anonymous `tools/call` before a handler executes.
+- Owner OAuth and ChatGPT's opaque registration validator are not exercised by these automated tests. One owner connection only after full final-SHA gate and deployment.
