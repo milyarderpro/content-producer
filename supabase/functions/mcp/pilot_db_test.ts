@@ -203,6 +203,20 @@ Deno.test('10.1 SQL statement builder allows only named parameters, never free S
       'select api."list_pages"("p_request_schema_version" => $1, "p_workspace_public_id" => $2) as result',
     'named parameter binding changed',
   );
+  assert(
+    buildPilotRpcStatement('create_page', {
+      p_request_schema_version: 1,
+      p_config: { fact_count: { mode: 'fixed', value: 7 } },
+      p_make_default: true,
+    }) ===
+      'select api."create_page"("p_request_schema_version" => $1, "p_config" => $2::text::jsonb, "p_make_default" => $3) as result',
+    'MAN-02 JSON text must be explicitly parsed into a jsonb object by PostgreSQL',
+  );
+  assert(
+    buildPilotRpcStatement('update_page', { p_config: { example: true } }) ===
+      'select api."update_page"("p_config" => $1) as result',
+    'MAN-02 cast must not silently change other RPC SQL',
+  );
   for (const [name, params] of [
     ['list_pages;drop table public.workspaces', {}],
     ['list_pages', { 'p_limit); drop table x --': 1 }],
