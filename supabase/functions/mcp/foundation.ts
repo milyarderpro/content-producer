@@ -5,6 +5,7 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { triviaConfig, workspaceSettings } from './schemas.ts';
 import { executePilotRpc } from './pilot_db.ts';
+import { isApprovedMan02CreatePage } from './pilot_write.ts';
 
 const publicId = z
   .string()
@@ -482,7 +483,18 @@ export async function invoke(
     !tool.startsWith('list_') &&
     tool !== 'trivia_find_similar_facts'
   ) {
-    return failure('PILOT_WRITE_LOCKED');
+    // Default closed. Never accept a grant from tool arguments or HTTP.
+    // Only the Edge Function's server-side setting may authorize the exact
+    // MAN-02 create_page RPC, including the fixed workspace and operation key.
+    let grant = '';
+    try {
+      grant = Deno.env.get('MCP_MAN02_APPROVED_SHA256') ?? '';
+    } catch {
+      // Deno's restricted test runtime, or an unavailable env, stays locked.
+    }
+    if (!(await isApprovedMan02CreatePage(tool, params, grant))) {
+      return failure('PILOT_WRITE_LOCKED');
+    }
   }
   try {
     let raw: unknown;
