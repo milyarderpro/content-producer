@@ -23,7 +23,7 @@ Procedure-v1 is frozen for MAN-01..09; per-card prompt binding, owner consent, a
 
 | ID     | Phase    | Execution status | Chat reference | Source/plugin hash | Tool trace | State/ledger before→after | Reviewer | Outcome             |
 | ------ | -------- | ---------------- | -------------- | ------------------ | ---------- | ------------------------- | -------- | ------------------- |
-| MAN-01 | 10.3     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
+| MAN-01 | 10.3     | EXECUTED READ-ONLY | Work chat 2026-10-19 | v0.2.1 / verified 10.2 ZIP | 3 Read, 0 Write | one active pilot Page before→after | owner review pending | PASS technical / signoff PENDING |
 | MAN-02 | 10.3     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
 | MAN-03 | 10.4     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
 | MAN-04 | 10.4     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
@@ -76,3 +76,13 @@ Only store minimum redacted arguments/results needed to explain a failure. Crede
 - On timeouts, lost write responses, revision/lease conflicts or duplicate-looking state: stop; inspect safe state, reconcile original operation key and semantic payload, never retry with a new key to produce a second record.
 - On missing entitlement, wrong OAuth owner, unexpected tool count, unsafe write or secret disclosure: stop the checkpoint and record BLOCKED/FAIL; do not bypass via SQL, admin API or connector.
 - Maintain nine mandatory cards; optional `MAN-10..11` cannot delay MVP under CR-027. Preserve 101 frozen prompts as a non-executed regression inventory.
+
+## Phase 10.3 — MAN-01 live plugin readback (2026-10-19)
+
+- **Host:** final PRIVATE `Content Producer` v0.2.1 with its registered `mcpku` connection; installed release `pluginrel_6ad5c40b09588191842ddc1d42af957b`, inner ZIP SHA-256 `236254c7d351cc9d932c4235ae50a4be23322610587e811effff77d43b4af37f`; no refresh, OAuth flow or 10.2 reinstall.
+- **Frozen MAN-01 bound prompt:** “Gunakan hanya plugin Content Producer yang terpasang. Tampilkan identitas akun Content Producer yang terhubung, workspace dan niche yang aktif, lalu daftar Page saya. Tunjukkan apakah Page ber-slug `phase-9-5-pilot-trivia` ada. Jangan mengubah data.” The owner's 10.3 task directed these three reads in the same order.
+- **Observed 3/3 real connected tool reads:** `get_account_profile({})` succeeded (display `Content Producer account`, workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`); `get_workspace_context({request_schema_version:1,workspace_public_id:<profile>})` returned active `trivia`, one active and zero inactive Pages; `list_pages({request_schema_version:1,workspace_public_id:<profile>,limit:50})` returned exactly one `phase-9-5-pilot-trivia` Page (public ID `5030e577-89bf-4645-85e8-1d5060fb91ee`), active, New York timezone, US target, trivia v1 enabled/default, and `has_more=false`.
+- **Extra read-only config inspection for MAN-02 proposal:** `get_page_generation_context` for that Page returned the full actual trivia v1 config and live context. This is **not** a MAN-02 write or owner approval.
+- **Safety:** no `create_page` or any other business write; owner-visible Page count stayed one. Fresh ledger count was **not independently verified** using the plugin, so no unobserved ledger state is asserted.
+- **Technical MAN-01 verdict:** PASS on the actual live reads; owner signoff and final 10.3 checkpoint remain PENDING until MAN-02 approval, production write/readback and grant revocation.
+- **MAN-02 gate:** approval of new name/slug/IANA timezone/ISO markets/full trivia config/make-default and fixed UUIDv4 operation key **not yet given**. CR-037 exact-payload latch is default-closed; no production enabling or deployment before CI PASS.
