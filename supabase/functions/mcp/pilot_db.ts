@@ -8,6 +8,20 @@ const identifier = /^[a-z][a-z0-9_]{0,79}$/;
 const paramIdentifier = /^p_[a-z][a-z0-9_]{0,79}$/;
 const fixedClientId = 'phase-10-1-noauth-fixed-pilot';
 
+const PILOT_JSONB_PARAMS: Record<string, readonly string[]> = {
+  create_page: ['p_config'],
+  trivia_register_and_reserve_facts: ['p_facts'],
+  save_post: [
+    'p_plan_item', 'p_content_payload', 'p_generation_snapshot',
+    'p_fact_bindings', 'p_editorial_checks',
+  ],
+  revise_post: ['p_content_payload', 'p_generation_snapshot', 'p_fact_bindings', 'p_editorial_checks'],
+};
+
+function isPilotJsonbArgument(tool: string, key: string): boolean {
+  return (PILOT_JSONB_PARAMS[tool] ?? []).includes(key);
+}
+
 export function buildPilotRpcStatement(tool: string, params: Record<string, unknown>): string {
   if (!identifier.test(tool)) throw new Error('Invalid RPC name');
   const keys = Object.keys(params);
@@ -16,9 +30,9 @@ export function buildPilotRpcStatement(tool: string, params: Record<string, unkn
   }
   const bindings = keys.map((key, index) => {
     const placeholder = '$' + (index + 1);
-    // postgres.js .unsafe can encode a pre-serialized object as a JSON string.
-    // For MAN-02 only, parse the text as JSONB inside PostgreSQL.
-    const jsonbCast = tool === 'create_page' && key === 'p_config' ? '::text::jsonb' : '';
+    // postgres.js serializes arrays as PostgreSQL arrays, not JSONB.
+    // Cast only known JSONB-valued RPC parameters explicitly.
+    const jsonbCast = isPilotJsonbArgument(tool, key) ? '::text::jsonb' : '';
     return '"' + key + '" => ' + placeholder + jsonbCast;
   });
   return 'select api."' + tool + '"(' + bindings.join(', ') + ') as result';
@@ -40,8 +54,12 @@ export async function executePilotRpc(
   const url = Deno.env.get('SUPABASE_DB_URL');
   if (!url) throw new Error('Pilot database not configured');
   const statement = buildPilotRpcStatement(tool, params);
-  const values = Object.values(params).map((value) =>
-    value && !Array.isArray(value) && typeof value === 'object' ? JSON.stringify(value) : value,
+  const values = Object.entries(params).map(([key, value]) =>
+    isPilotJsonbArgument(tool, key)
+      ? JSON.stringify(value)
+      : value && !Array.isArray(value) && typeof value === 'object'
+        ? JSON.stringify(value)
+        : value,
   );
   const sql = postgres(url, { max: 1, prepare: false, connect_timeout: 5, idle_timeout: 1 });
   try {
