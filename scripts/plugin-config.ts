@@ -131,7 +131,7 @@ export function validatePortableManifest(value: unknown, pluginRoot: string): vo
   const openai = object(extensions['com.openai'], 'extensions.com.openai');
   keys(openai, ['interface', 'apps'], 'extensions.com.openai');
   if (openai.apps !== './.app.json') {
-    throw new Error('OpenAI registered MCP app mapping must be ./\.app.json.');
+    throw new Error('OpenAI registered MCP app mapping must be ./.app.json.');
   }
   validatePluginRelativePath(openai.apps, pluginRoot);
   const presentation = object(openai.interface, 'OpenAI interface');
