@@ -158,7 +158,7 @@ export async function isApprovedPilot104Write(
     return stage === 'trivia_register_and_reserve_facts' ? validReserve(params) : validSave(params);
   }
   if (!UUID4.test(String(grant.post_public_id)) ||
-      !Number.isSafeInteger(grant.expected_revision) ||
+      typeof grant.expected_revision !== 'number' || !Number.isSafeInteger(grant.expected_revision) ||
       typeof grant.expected_content_hash !== 'string' ||
       !HEX64.test(grant.expected_content_hash)) return false;
   if (stage === 'revise_post') {
