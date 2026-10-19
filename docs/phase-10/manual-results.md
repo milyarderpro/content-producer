@@ -21,19 +21,19 @@
 
 Procedure-v1 is frozen for MAN-01..09; per-card prompt binding, owner consent, and outcomes stay PENDING until the assigned later checkpoint. Static negative prompts MAN-08/09 are fixed now, but not yet executed.
 
-| ID     | Phase    | Execution status | Chat reference | Source/plugin hash | Tool trace | State/ledger before→after | Reviewer | Outcome             |
-| ------ | -------- | ---------------- | -------------- | ------------------ | ---------- | ------------------------- | -------- | ------------------- |
+| ID     | Phase    | Execution status   | Chat reference       | Source/plugin hash         | Tool trace      | State/ledger before→after          | Reviewer             | Outcome                          |
+| ------ | -------- | ------------------ | -------------------- | -------------------------- | --------------- | ---------------------------------- | -------------------- | -------------------------------- |
 | MAN-01 | 10.3     | EXECUTED READ-ONLY | Work chat 2026-10-19 | v0.2.1 / verified 10.2 ZIP | 3 Read, 0 Write | one active pilot Page before→after | owner review pending | PASS technical / signoff PENDING |
-| MAN-02 | 10.3     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
-| MAN-03 | 10.4     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
-| MAN-04 | 10.4     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
-| MAN-05 | 10.5     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
-| MAN-06 | 10.5     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
-| MAN-07 | 10.6     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
-| MAN-08 | 10.6     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
-| MAN-09 | 10.6     | NOT RUN          | —              | —                  | —          | —                         | —        | PENDING             |
-| MAN-10 | post-MVP | NOT RUN          | —              | —                  | —          | —                         | —        | DEFERRED — POST-MVP |
-| MAN-11 | post-MVP | NOT RUN          | —              | —                  | —          | —                         | —        | DEFERRED — POST-MVP |
+| MAN-02 | 10.3     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
+| MAN-03 | 10.4     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
+| MAN-04 | 10.4     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
+| MAN-05 | 10.5     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
+| MAN-06 | 10.5     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
+| MAN-07 | 10.6     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
+| MAN-08 | 10.6     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
+| MAN-09 | 10.6     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
+| MAN-10 | post-MVP | NOT RUN            | —                    | —                          | —               | —                                  | —                    | DEFERRED — POST-MVP              |
+| MAN-11 | post-MVP | NOT RUN            | —                    | —                          | —               | —                                  | —                    | DEFERRED — POST-MVP              |
 
 ## Evidence record: copy once for each actual card/attempt
 
