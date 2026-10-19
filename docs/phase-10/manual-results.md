@@ -24,7 +24,7 @@ Procedure-v1 is frozen for MAN-01..09; per-card prompt binding, owner consent, a
 | ID     | Phase    | Execution status   | Chat reference       | Source/plugin hash         | Tool trace      | State/ledger before→after          | Reviewer             | Outcome                          |
 | ------ | -------- | ------------------ | -------------------- | -------------------------- | --------------- | ---------------------------------- | -------------------- | -------------------------------- |
 | MAN-01 | 10.3     | EXECUTED READ-ONLY | Work chat 2026-10-19 | v0.2.1 / verified 10.2 ZIP | 3 Read, 0 Write | one active pilot Page before→after | owner review pending | PASS technical / signoff PENDING |
-| MAN-02 | 10.3     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
+| MAN-02 | 10.3     | EXECUTED           | Work chat 2026-10-19 | v0.2.1                     | create_page     | 1→2 Pages                          | owner consent        | closure PENDING                  |
 | MAN-03 | 10.4     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
 | MAN-04 | 10.4     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
 | MAN-05 | 10.5     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
