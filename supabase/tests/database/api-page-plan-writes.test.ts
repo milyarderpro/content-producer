@@ -432,6 +432,81 @@ function insertDraftPost(fixture: Fixture, pagePublicId: string, scheduledAt: st
 }
 
 describe('Phase 5.3 page and content-plan write RPCs', () => {
+  it('AC-002 isolated owner workspace supports three different Page trivia configurations', () => {
+    const f = createFixture();
+    try {
+      const base = f.config as JsonRecord;
+      const cases: Array<{ suffix: string; config: JsonRecord }> = [
+        { suffix: 'adaptive-workspace', config: base },
+        {
+          suffix: 'fixed-page',
+          config: {
+            ...base,
+            fact_count: { mode: 'fixed', value: 7 },
+            fact_reuse_scope: 'page_unique',
+          },
+        },
+        {
+          suffix: 'adaptive-page',
+          config: {
+            ...base,
+            fact_count: { mode: 'adaptive', min: 5, preferred: 6, max: 9 },
+            fact_reuse_scope: 'page_unique',
+            render_style: 'numbered',
+          },
+        },
+      ];
+      const created: RpcResponse[] = [];
+      const expressions: string[] = [];
+      for (const testCase of cases) {
+        const expression = createPageExpression(f, randomUUID(), testCase.suffix).replace(
+          f.configSql,
+          sqlJson(testCase.config),
+        );
+        const result = rpc(f.owner, expression);
+        expect(result.data.replayed).toBe(false);
+        expect(result.data.config.config).toEqual(testCase.config);
+        expect(result.data.page.slug).toBe(`${f.slugPrefix}-${testCase.suffix}`);
+        created.push(result);
+        expressions.push(expression);
+      }
+      expect(new Set(created.map((entry) => entry.data.page.page_public_id)).size).toBe(3);
+      const counts = state(f);
+      expect(counts.page_count).toBe(3);
+      expect(counts.config_count).toBe(3);
+      expect(counts.ledger_count).toBe(3);
+      expect(counts.plan_count).toBe(0);
+      expect(counts.item_count).toBe(0);
+
+      const distinctConfigs = querySingleRow(`
+        select
+          count(distinct config)::int as distinct_config_count,
+          count(*) filter (where config->'fact_count'->>'mode' = 'fixed')::int as fixed_count,
+          count(*) filter (where config->'fact_count'->>'mode' = 'adaptive')::int as adaptive_count,
+          count(*) filter (where config->>'fact_reuse_scope' = 'page_unique')::int as page_scope_count
+        from public.page_niche_configs
+        where workspace_id = (select id from public.workspaces where public_id = '${f.workspacePublicId}'::uuid)
+      `);
+      expect(distinctConfigs.distinct_config_count).toBe(3);
+      expect(distinctConfigs.fixed_count).toBe(1);
+      expect(distinctConfigs.adaptive_count).toBe(2);
+      expect(distinctConfigs.page_scope_count).toBe(2);
+
+      const frozen = domainRows(f);
+      for (let index = 0; index < expressions.length; index++) {
+        const replay = rpc(f.owner, expressions[index]!);
+        expect(replay).toEqual({
+          ...created[index],
+          data: { ...created[index]!.data, replayed: true },
+        });
+      }
+      expect(domainRows(f)).toEqual(frozen);
+      expect(state(f).page_count).toBe(3);
+    } finally {
+      cleanupFixture(f);
+    }
+  }, 90_000);
+
   it('CORE-001 replays all three immutable responses after Page/config/plan/item mutation and rejects mismatched payloads', () => {
     const f = createFixture();
     try {
