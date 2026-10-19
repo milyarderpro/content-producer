@@ -121,7 +121,7 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     for (const [key, entry] of Object.entries(value)) {
       if (key === 'pattern' && typeof entry === 'string') {
         patterns.push(entry);
-        assert(!entry.includes('\p{Cc}'), 'OAuth input contains nonportable Cc escape');
+        assert(!entry.includes('\\p{Cc}'), 'OAuth input contains nonportable Cc escape');
         new RegExp(entry); // Assert every advertised regex compiles as ordinary JS regex.
       } else scan(entry, patterns);
     }
@@ -176,7 +176,7 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     );
     scan(auth.inputSchema, compiledPatterns);
     assert(
-      !JSON.stringify(auth.inputSchema).includes('\\p{Cc}'),
+      !JSON.stringify(auth.inputSchema).includes('\\\\p{Cc}'),
       'OAuth catalog must have no nonportable Unicode category pattern',
     );
   }
@@ -189,7 +189,7 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     'exactly one OAuth get_account_profile marker required',
   );
   const impactedTools = originalTools
-    .filter((tool) => JSON.stringify(tool.inputSchema).includes('\\p{Cc}'))
+    .filter((tool) => JSON.stringify(tool.inputSchema).includes('\\\\p{Cc}'))
     .map((tool) => tool.name);
   assert(
     JSON.stringify(impactedTools) ===
