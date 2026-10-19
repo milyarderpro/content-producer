@@ -139,7 +139,7 @@ Deno.test(
     for (const name of POST_METRICS_TOOL_NAMES) {
       const tool = tools.find((entry: { name: string }) => entry.name === name);
       check(tool?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
-      check(tool?.outputSchema.additionalProperties === false, 'CLOSED_OUTPUT');
+      check(!Object.hasOwn(tool ?? {}, 'outputSchema'), 'OPTIONAL_OUTPUT_OMITTED');
       check(tool?._meta.securitySchemes[0].type === 'oauth2', 'OAUTH');
       check(tool.annotations.readOnlyHint === (name !== 'record_post_performance'), 'READ_ONLY');
       check(tool.annotations.destructiveHint === false, 'NOT_DESTRUCTIVE');

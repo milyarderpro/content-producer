@@ -223,7 +223,7 @@ Deno.test(
     for (const name of POST_EDIT_TOOL_NAMES) {
       const tool = tools.find((x: { name: string }) => x.name === name);
       check(tool?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
-      check(tool?.outputSchema.additionalProperties === false, 'CLOSED_OUTPUT');
+      check(!Object.hasOwn(tool ?? {}, 'outputSchema'), 'OPTIONAL_OUTPUT_OMITTED');
       check(tool?._meta.securitySchemes[0].type === 'oauth2', 'OAUTH');
       check(
         tool.annotations.openWorldHint === false && tool.annotations.destructiveHint === true,
