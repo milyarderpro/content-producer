@@ -116,7 +116,12 @@ export function validatePluginSource(
   }
 
   const appContent = read(pluginRoot, '.app.json');
-  const expectedApps = JSON.stringify({ apps: { 'content-producer': { id: registeredMcpAppId, required: true } } }, null, 2) + '\n';
+  const expectedApps =
+    JSON.stringify(
+      { apps: { 'content-producer': { id: registeredMcpAppId, required: true } } },
+      null,
+      2,
+    ) + '\n';
   if (appContent !== expectedApps) {
     throw new Error('Registered app mapping must use the proven mcpku ID exclusively.');
   }
