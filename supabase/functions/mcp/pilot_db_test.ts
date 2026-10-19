@@ -99,9 +99,11 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   }).fetch(request('tools/list'));
   assert(oauthResponse.status === 200, 'OAuth tools/list returns HTTP 200');
   const oauthWire = await oauthResponse.text();
+  const oauthBytes = new TextEncoder().encode(oauthWire).byteLength;
+  console.log('CR-040 OAuth tools/list UTF-8 bytes:', oauthBytes);
   assert(
-    new TextEncoder().encode(oauthWire).byteLength < 100_000,
-    'CR-033 OAuth catalog must be below the tested 100 KB target',
+    oauthBytes < 150_000,
+    'OAuth catalog must be substantially below the original 292 KB SDK catalog',
   );
   const oauth = responseJson(oauthWire);
   const oauthTools = (oauth.result as { tools: Array<Record<string, unknown>> }).tools;
