@@ -154,8 +154,8 @@ Deno.test('6.5 claims retain OAuth and annotations after 6.11 expansion', async 
       'closed input',
     );
     assert(
-      (tool.outputSchema as { additionalProperties?: boolean }).additionalProperties === false,
-      'closed output',
+      !Object.hasOwn(tool, 'outputSchema'),
+      'optional output schema omitted from catalog',
     );
   }
   assert(

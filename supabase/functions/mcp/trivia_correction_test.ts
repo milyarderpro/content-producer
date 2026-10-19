@@ -143,7 +143,7 @@ Deno.test('6.9 correction schemas remain closed among 33 authenticated tools', a
     check(tool.annotations.destructiveHint === true, 'CORRECTION_DESTRUCTIVE');
     check(tool.annotations.openWorldHint === false, 'CLOSED_WORLD');
     check(tool.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
-    check(tool.outputSchema.additionalProperties === false, 'CLOSED_OUTPUT');
+    check(!Object.hasOwn(tool, 'outputSchema'), 'OPTIONAL_OUTPUT_OMITTED');
     check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
   }
 });
