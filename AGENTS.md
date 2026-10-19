@@ -49,7 +49,14 @@ that ChatGPT web works in a phone browser. Native mobile app support
 was not tested. The public No-auth endpoint risk and default
 business-write lock remain. CR-037 allows only a narrowly pinned `create_page`
 RPC for MAN-02 when the exact owner-approved payload and stable operation key
-match a default-absent server-side SHA-256 grant. A private plugin is not
+match a default-absent server-side SHA-256 grant.
+CR-038 adds **separate default-absent, short-lived** MAN-03 reservation/save
+and MAN-04 revision/approval permits pinned to one production Page. Never
+conflate owner's choice of Moon-phase content with authority to invoke a
+business write: the owner sends MAN-03 through the installed plugin, and
+MAN-04 approval requires exact current revision/hash and distinct consent.
+The public No-auth endpoint still has no caller authentication; enabling
+any grant is a short-duration risk decision and must be revoked. A private plugin is not
 HTTP authentication; no general write unlock or early production write.
 Restore the default lock immediately after MAN-02 and verify exact replay
 through the existing ledger; three-Page variation uses isolated DB tests.
