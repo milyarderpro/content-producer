@@ -47,8 +47,13 @@ supported by a fresh Work web chat (skill + 33 tools, 3 Read, 0 Write),
 Plugin Creator release/version readback, and the owner's confirmation
 that ChatGPT web works in a phone browser. Native mobile app support
 was not tested. The public No-auth endpoint risk and default
-business-write lock remain; independent Pilot-ready audit is 10.7,
-and MVP Complete is Phase 11.
+business-write lock remain. CR-037 allows only a narrowly pinned `create_page`
+RPC for MAN-02 when the exact owner-approved payload and stable operation key
+match a default-absent server-side SHA-256 grant. A private plugin is not
+HTTP authentication; no general write unlock or early production write.
+Restore the default lock immediately after MAN-02 and verify exact replay
+through the existing ledger; three-Page variation uses isolated DB tests.
+Independent Pilot-ready audit is 10.7, and MVP Complete is Phase 11.
 
 ## Boundaries
 
