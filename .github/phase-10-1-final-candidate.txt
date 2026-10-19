@@ -1,31 +1,5 @@
-Phase 10.1 final candidate marker — CR-034 portable Unicode Cc regex tool schemas
-ChatGPT exact registration failure: HTTP 400 apps_sdk_error mcp_validation, Invalid MCP tool schema for tool 'mark_post_posted'.
-Read-only production inspector detected exactly 3 \\p{Cc} Unicode regex patterns on mark_post_posted and record_post_performance: https://github.com/milyarderpro/content-producer/actions/runs/39141721020
-CR-034 normalizes only pilot-discovery JSON Schema regex metadata to equivalent portable control ranges.
-No Zod validators, 33 RPCs, 33 tool names, write lock, RLS, connection secrets or underlying output behavior changed.
-Local focused format/pnpm check/Deno tests 4 of 4 PASS: https://github.com/milyarderpro/content-producer/actions/runs/39142055150
-Clean source HEAD (after ephemeral diagnostic removal) = 33dcb0ce7a7769bea0c410eb8b3ba3d5e1a67008
-Light CI PASS on clean source SHA: https://github.com/milyarderpro/content-producer/actions/runs/39142160635
-Run ONE CR-020 full technical/security gate on this marker commit SHA before the same-production-mcp Edge deployment.
-No write, plugin creation, install, Phase 10.2, or PR merge is authorized by this marker.
-
-Phase 10.3 MAN-02 exact-payload gate — 2026-10-19
-Owner approved exactly one create_page for name corious facts, slug corious-facts, timezone Asia/Jakarta, target_markets US, trivia copied from Phase 9.5 and make_default true.
-Operation key: ad350ab5-e3a0-40c9-b7c9-1cb1d2bc07c0
-This marker requests one full local CR-020 technical/security gate for the final changed backend source on this SHA, including CR-037 default-locked digest allowlist tests and isolated three-Page configuration test.
-This marker does not install any grant, deploy production, create any Page, or authorize other writes. The public No-auth endpoint's write latch must remain CLOSED unless server-side exact-payload grant can be proven active and safely reversible.
-
-Phase 10.3 MAN-02 JSONB adapter remediation gate — 2026-10-19
-First approved plugin create_page attempt returned CONFIG_INVALID from PostgreSQL early config validator; no Page and zero approved-key ledger entries, production Page count stayed one. The exact owner-approved payload and UUIDv4 key remain unchanged.
-The old full gate SHA ddbb51d80888938982a7be2eeafaeda9bb3696c0 cannot cover the new isolated adapter fix. The new pilot_db.ts uses PostgreSQL text-to-jsonb cast only for create_page p_config to prevent postgres.js string JSONB scalar binding. Regression test covers the named SQL bindings; other RPCs unchanged.
-Previous final code SHA 4c8bb021f7a49c516401a722f2eb28abdd8e7519 had successful lightweight push #39234782688 and PR #39234788356. Request exactly one new CR-020 local technical/security gate on this marker commit.
-This marker authorizes NO production deployment or new plugin write; owner has been instructed to delete temporary MAN-02 approval secret after the failed attempt and its absence must be confirmed before deployment and any retry. No operation key regeneration, admin SQL writes, early 10.4 or PR merge.
-
-Phase 10.4 MAN-03/04 final backend/security candidate — 2026-10-19 (CR-038)
-Owner selected Moon phases nature_science / single_subject_fast / fast_trivia / seven preferred distinct verified facts (never force seven) / follow / en-US. Content direction and preparation ONLY.
-Final prepared source HEAD before marker: 9c420b0197bbe951ec66114c3eeafe59f129bcf4
-Light CI completed PASS: https://github.com/milyarderpro/content-producer/actions/runs/39247609134
-No new plugin ZIP or MCP tool names; 33 tools unchanged.
-CR-038 default-absent 2-hour stage permits, restricted to existing corious-facts Page, reserve/save draft and separately CAS revise/approve, plus explicitly parsed JSONB for dedup/reserve/save/revise and SQL NULL for missing plan item.
-Trigger exactly ONE CR-020 full local reset, full test/security/Inspector gate on THIS marker commit SHA before any production MCP deploy or owner-triggered manual MAN-03.
-This marker authorizes NO production secret/grant activation, fact registration, draft creation, approval, Facebook publication, new Page, extra gate or PR merge. Assistant will NOT execute Content Producer business writes; owner will send the frozen MAN-03 prompt only after gates and readiness.
+Phase 10 OAuth catalog parity — CR-040 final gate marker
+Pre-marker tested backend SHA: 515b229002269cd0260488f220b1c3570bd9fd82
+Focused Phase 10 CI: run 39291996915 SUCCESS (pnpm run check, Deno MCP tests, all 33 OAuth/No-auth schema equivalence, anonymous OAuth catalog denial and package checks).
+CR-029 OAuth profile, CR-033 metadata compaction and CR-034 equivalent Cc pattern normalization preserved.
+NO production writes, grants, RLS changes, MAN-03 or MAN-04. Run CR-020 technical/security gate once at the post-marker final SHA before any Edge deploy.
