@@ -40,7 +40,8 @@ describe('Phase 7.4 generated package and source safety', () => {
   it('validates manifest, generator schema, skill, references, policy and exact tool order', () => {
     expect(() => validatePluginSource(root)).not.toThrow();
     expect(CANDIDATE_FILES).toHaveLength(13);
-    expect(CANDIDATE_FILES).toContain('mcp.json');
+    expect(CANDIDATE_FILES).toContain('.app.json');
+    expect(CANDIDATE_FILES).not.toContain('mcp.json');
   });
 
   it('builds thirteen allowlisted files and verifies actual candidate hashes', () => {
@@ -106,18 +107,19 @@ describe('Phase 7.4 generated package and source safety', () => {
     expect(() => validatePluginSource(dir)).toThrow(/Symlink/);
   });
 
-  it('accepts verified No-auth MCP config and rejects secrets and other endpoints', () => {
+  it('requires exact registered mcpku app mapping and rejects bundled MCP, secrets and endpoints', () => {
     const dir = setup();
+    const appPath = join(dir, 'plugin/.app.json');
+    change(appPath, 'asdk_app_6ad4ef8b42588191a749b8b9f356b662', 'asdk_app_another');
+    expect(() => validatePluginSource(dir)).toThrow(/proven mcpku ID/);
+    cpSync(join(root, 'plugin/.app.json'), appPath);
+    change(appPath, '"required": true', '"required": false');
+    expect(() => validatePluginSource(dir)).toThrow(/proven mcpku ID/);
+    cpSync(join(root, 'plugin/.app.json'), appPath);
     const finalPath = join(dir, 'plugin/mcp.json');
     writeFileSync(finalPath, '{"mcpServers":{}}');
-    expect(() => validatePluginSource(dir)).toThrow(/MCP config/);
-    cpSync(join(root, 'plugin/mcp.json'), finalPath);
-    change(finalPath, 'xjonnilnypchtxogtopb', 'different-project');
-    expect(() => validatePluginSource(dir)).toThrow(/verified 10.1/);
-    cpSync(join(root, 'plugin/mcp.json'), finalPath);
-    change(finalPath, '"url":', '"oauth": {}, "url":');
-    expect(() => validatePluginSource(dir)).toThrow(/unsupported field/);
-    cpSync(join(root, 'plugin/mcp.json'), finalPath);
+    expect(() => validatePluginSource(dir)).toThrow(/Deferred connection/);
+    rmSync(finalPath);
     const workflow = join(dir, 'plugin/skills/content-producer/references/core/workflow.md');
     writeFileSync(workflow, readFileSync(workflow, 'utf8') + '\n-----BEGIN PRIVATE KEY-----');
     expect(() => validatePluginSource(dir)).toThrow(/credential/);

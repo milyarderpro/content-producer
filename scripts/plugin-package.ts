@@ -11,24 +11,16 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
-import {
-  generatePortableMcpConfig,
-  validatePortableManifest,
-  validatePortableMcpConfig,
-} from './plugin-config.js';
+import { validatePortableManifest } from './plugin-config.js';
 
 const skillRoot = 'skills/content-producer/';
-const verifiedConnection = {
-  serverName: 'content-producer',
-  endpointUrl: 'https://xjonnilnypchtxogtopb.supabase.co/functions/v1/mcp',
-  authentication: { mode: 'none' },
-};
+const registeredMcpAppId = 'asdk_app_6ad4ef8b42588191a749b8b9f356b662';
 const core = ['workflow', 'lifecycle', 'tool-sequences', 'source-policy', 'output-contract'];
 const trivia = ['content-dna', 'formats', 'fact-checking', 'dedup-ontology', 'quality-rubric'];
 
 export const CANDIDATE_FILES = [
   'plugin.json',
-  'mcp.json',
+  '.app.json',
   skillRoot + 'SKILL.md',
   ...core.map((name) => skillRoot + 'references/core/' + name + '.md'),
   ...trivia.map((name) => skillRoot + 'references/niches/trivia/' + name + '.md'),
@@ -98,7 +90,7 @@ function checkSensitive(path: string, content: string): void {
     /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/,
     /\b(?:gh[pousr]_[a-zA-Z0-9]{20,}|github_pat_[a-zA-Z0-9_]{20,}|sk-[a-zA-Z0-9_-]{20,}|sb_secret_[a-zA-Z0-9_-]{15,})\b/,
     /https?:\/\/[^\s/)]+:[^\s/@]+@[^\s/)]+/,
-    ...(path === 'mcp.json' ? [] : [/https:\/\/[a-z0-9.-]+\/functions\/v1\/mcp\b/i]),
+    /https:\/\/[a-z0-9.-]+\/functions\/v1\/mcp\b/i,
     /\b(?:SUPABASE_SERVICE_ROLE_KEY|GITHUB_TOKEN|CLIENT_SECRET|ACCESS_TOKEN)\s*[:=]\s*['"]?[a-zA-Z0-9_-]{12,}/i,
   ];
   if (forbidden.some((rule) => rule.test(content))) {
@@ -118,17 +110,15 @@ export function validatePluginSource(
     if (!lstatSync(join(pluginRoot, path)).isFile())
       throw new Error('Invalid plugin file: ' + path);
   }
-  for (const deferred of ['connections.json', 'connection-mapping.json']) {
+  for (const deferred of ['mcp.json', '.mcp.json', 'connections.json', 'connection-mapping.json']) {
     if (existsSync(join(pluginRoot, deferred)))
       throw new Error('Deferred connection configuration is forbidden: ' + deferred);
   }
 
-  const mcpContent = read(pluginRoot, 'mcp.json');
-  const mcpConfig = JSON.parse(mcpContent) as unknown;
-  validatePortableMcpConfig(mcpConfig);
-  const expectedMcp = JSON.stringify(generatePortableMcpConfig(verifiedConnection), null, 2) + '\n';
-  if (mcpContent !== expectedMcp) {
-    throw new Error('Final No-auth MCP config differs from the verified 10.1 endpoint/mode.');
+  const appContent = read(pluginRoot, '.app.json');
+  const expectedApps = JSON.stringify({ apps: { 'content-producer': { id: registeredMcpAppId, required: true } } }, null, 2) + '\n';
+  if (appContent !== expectedApps) {
+    throw new Error('Registered app mapping must use the proven mcpku ID exclusively.');
   }
 
   const manifest = JSON.parse(read(pluginRoot, 'plugin.json')) as unknown;

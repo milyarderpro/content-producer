@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "content-producer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Private, owner-controlled workflows for researching and preparing Facebook content.",
   "author": {
     "name": "milyarderpro"
@@ -9,6 +9,7 @@
   "repository": "https://github.com/milyarderpro/content-producer",
   "extensions": {
     "com.openai": {
+      "apps": "./.app.json",
       "interface": {
         "displayName": "Content Producer",
         "shortDescription": "Prepare verified Facebook content.",

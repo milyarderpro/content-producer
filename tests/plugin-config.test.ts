@@ -44,6 +44,7 @@ describe('Phase 7.1 portable plugin manifest', () => {
       { ...manifest, $schema: 'unknown' },
       { ...manifest, mcpServers: {} },
       { ...manifest, version: 'latest' },
+      { ...manifest, extensions: { 'com.openai': { interface: (manifest.extensions as { 'com.openai': { interface: unknown } })['com.openai'].interface, apps: './invalid.json' } } },
     ]) {
       expect(() => validatePortableManifest(bad, root)).toThrow();
     }
@@ -130,9 +131,9 @@ describe('Phase 7.1 portable MCP generator', () => {
         mcpServers: { x: { type: 'streamable-http', url: connection.endpointUrl, oauth: {} } },
       }),
     ).toThrow();
-    expect(existsSync(join(root, 'mcp.json'))).toBe(true);
-    expect(() =>
-      validatePortableMcpConfig(JSON.parse(readFileSync(join(root, 'mcp.json'), 'utf8'))),
-    ).not.toThrow();
+    // Legacy generator remains testable, but the 0.2.1 package uses a
+    // registered MCP application instead of bundling another remote MCP.
+    expect(existsSync(join(root, 'mcp.json'))).toBe(false);
+    expect(existsSync(join(root, '.app.json'))).toBe(true);
   });
 });
