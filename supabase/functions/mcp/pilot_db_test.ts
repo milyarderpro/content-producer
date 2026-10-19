@@ -214,7 +214,9 @@ Deno.test('10.1 SQL statement builder allows only named parameters, never free S
     'MAN-02 JSON text must be explicitly parsed into a jsonb object by PostgreSQL',
   );
   assert(
-    buildPilotRpcStatement('trivia_find_similar_facts', { p_candidates: [{ candidate_key: 'moon_1' }] }) ===
+    buildPilotRpcStatement('trivia_find_similar_facts', {
+      p_candidates: [{ candidate_key: 'moon_1' }],
+    }) ===
       'select api."trivia_find_similar_facts"("p_candidates" => $1::text::jsonb) as result',
     'MAN-03 dedup candidates must be encoded as JSONB, not a PostgreSQL array',
   );
