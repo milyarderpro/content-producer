@@ -216,47 +216,49 @@ Bukti local/Inspector/HTTP terpisah bukan bukti host ChatGPT. Jika hosting
 atau konektor tidak bisa menjalankan salah satu tahap, beri satu tindakan
 manual yang jelas, tandai PENDING dan berhenti di 10.1; jangan mulai 10.2.
 
-## 7. Checkpoint 10.2 — Paket final No authentication dan instalasi PRIVATE
+## 7. Checkpoint 10.2 — PRIVATE final package via registered mcpku
 
-**Scope:** hanya generator, konfigurasi paket, validasi, transfer, instalasi
-owner dan uji baca-saja. CR-035 menyelaraskan paket dengan hasil 10.1 PASS.
+**Status:** v0.2.0 ZIP source passed CI but installed as desktop-only;
+owner Chrome proved it was absent from Work web chat selector, while existing
+registered `mcpku` was selectable. CR-036 corrects the **packaging contract**
+without touching the unchanged No-auth production backend.
 
-1. Hasilkan root `plugin/mcp.json` sesuai portable Agent Plugins schema v1
-   dari satu server `streamable-http` pada URL MCP production **yang telah
-   terbukti** di ChatGPT. Input generator wajib `authentication.mode =
-   "none"`; jangan bawa field OAuth `extensions`, client, bearer token,
-   query URL, atau registered connection ID. Koneksi No authentication
-   tidak mengautentikasi pemanggil jaringan. Endpoint tetap publik;
-   write bisnis default-locked. Lihat
-   [spesifikasi plugin](https://developers.openai.com/plugins/build/plugins).
-2. Naikkan versi manifest v0.2.0 dan validasi satu `mcp.json` pinned,
-   exact 33 nama tool dalam referensi skill, seluruh link, strict 13-file
-   allowlist, symlink/path safety, dan nihil secret/backup/state. CI ringan
-   menjalankan tes paket terfokus dan `pnpm run check`, menyusun inner ZIP,
-   memeriksa `unzip -t` dan SHA-256 tiap file hasil ekstraksi terhadap
-   index artifact. Catat HEAD SHA, ZIP SHA-256 dan artifact run/ID dari
-   hasil nyata. Tidak mengulang gate penuh `test-all` untuk paket-only:
-   backend production tetap SHA
-   `14d4955e07a55d0d5040e647d210ddab5ca282cd`,
-   [CR-020 gate #39142242292](https://github.com/milyarderpro/content-producer/actions/runs/39142242292)
-   PASS; Edge `mcp` v11.
-3. Pemilik mengunduh artifact GitHub Actions, mengekstrak outer Actions
-   artifact bila perlu, lalu mengunggah **inner**
-   `content-producer-private-v0.2.0.zip` ke Plugin Creator sebagai
-   **PRIVATE**. Verifikasi metadata Content Producer v0.2.0, bukan source
-   preflight v0.1.0. Buka **chat baru**, pilih **hanya plugin final**,
-   bukan koneksi `mcpku` 10.1; buktikan skill Content Producer dan MCP
-   paket yang sama terpakai. Katalog harus tepat 11 Read + 22 Write = 33
-   tool termasuk `create_page`. Jalankan hanya tiga read
+1. Use the **same** installed PRIVATE `Content Producer` plugin identity.
+   In portable root `plugin.json` declare
+   `extensions.com.openai.apps = "./.app.json"`; map one required alias
+   `content-producer` to the existing registered ChatGPT MCP ID
+   `asdk_app_6ad4ef8b42588191a749b8b9f356b662`. The ID is an app
+   locator, not credential. No `mcp.json` or `.mcp.json` in the new source
+   archive. Remove those stale files from the previous installed release
+   during guarded Plugin Creator **update**, not create. Registered MCP
+   `mcpku` remains No authentication with fixed-workspace public reads and
+   server-blocked write calls. Do not create additional connections.
+2. Manifest v0.2.1, one skill and ten references stay in a 13-file strict
+   allowlist. Validate exact mapping and rejecting alternate/optional IDs,
+   no bundled remote MCP, path safety, frozen 33 names, source links, secrets,
+   ZIP entries, extracted bytes and SHA-256. Run focused tests and
+   `pnpm run check` only; allow lightweight CI at the new SHA. Reuse
+   backend SHA `14d4955e07a55d0d5040e647d210ddab5ca282cd` and
+   [full CR-020 PASS #39142242292](https://github.com/milyarderpro/content-producer/actions/runs/39142242292);
+   do not repeat `test-all`, deploy or change production.
+3. After CI PASS and final ZIP SHA-256 recorded, use Plugin Creator
+   `update_plugin` against the **existing** PRIVATE release with its
+   exact ID and release precondition. If upload/host mapping fails, record
+   the **exact error** and leave 10.2 PENDING; do not install a duplicate.
+   Read back installed version and preserved PRIVATE identity.
+4. Owner opens a **fresh ChatGPT Work web conversation**, selects only
+   final `Content Producer` plugin (registered `mcpku` is a dependency,
+   not an additional selected plugin), proves skill `content-producer`
+   and 33 MCP tools together including `create_page`, and performs only
    `get_account_profile({})`, `get_workspace_context`, `list_pages`
-   melalui paket final, menggunakan workspace ID yang dibaca. Rekam bukti
-   host/chat, versi, dan hasil. Bila mapping koneksi tidak dapat
-   dibuktikan, tetap PENDING; jangan jalankan write.
+   on the fixed existing pilot workspace. Record 11 Read + 22 Write tools,
+   3/3 read results and source plugin/release. **Then** check plugin
+   selection/read usability from ChatGPT mobile. No Write tool invocation.
 
-**PASS 10.2 bila:** ZIP final valid dan benar-benar terpasang PRIVATE,
-skill + MCP aktif bersama dari paket terpilih dalam chat baru, 33 tools
-tersedia, 3/3 live read berhasil, tidak ada bisnis write, dan Issue/PR
-berisi bukti yang terkait paket. Jangan mulai 10.3 pada task ini.
+**10.2 PASS only when final package is truly usable outside desktop,
+skill+MCP actually work together, exactly 33 tools and three reads succeed,
+and evidence is recorded in Issue #22/PR #23.** A valid ZIP or installed
+version alone is not sufficient. Keep PR draft and do not begin 10.3 here.
 
 ## 8. Checkpoint 10.3 — `MAN-01..MAN-02`: aktivasi dan Page
 

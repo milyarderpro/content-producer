@@ -8,7 +8,7 @@ package. Packaging does not install the plugin or unlock business writes.
   with successful checkpoint CI recorded in Issue #3.
 - **7.4 — PASS after final gate and independent audit:** the strict allowlist build
   originally included plugin.json, SKILL.md and 10 core/trivia references.
-  Phase 10.2 adds root mcp.json (13 allowlisted files total).
+  Phase 10.2 now includes one registered `.app.json` mapping (13 allowlisted files total).
   Run `pnpm run package-plugin` to validate source and create
   `artifacts/plugin-candidate/`; run
   `pnpm exec tsx scripts/verify-plugin-candidate.ts` to verify the **actual**
@@ -18,19 +18,28 @@ package. Packaging does not install the plugin or unlock business writes.
   containment, symlinks, editorial terms and exact 33-tool ordering run in
   `pnpm run check` and `pnpm run test-all`.
 
-The connection-input schema (`schemas/mcp-connection-input.schema.json`),
-`scripts/generate-mcp-config.ts` and strict package validator require
-`authentication.mode = "none"`. Root `mcp.json` contains one portable
-`streamable-http` server using the public production URL that passed ChatGPT
-10.1. OAuth extensions, bearer tokens, connection IDs and query credentials
-are forbidden. The 10.1 live host result (not generator input) proves the
-actual connection; public-read exposure remains, with server-side write
-latch CLOSED.
+**Phase 10.2 web/mobile remediation v0.2.1:** The 0.2.0 portable
+`mcp.json` was installed but classified desktop-only in the owner ChatGPT
+web UI; it did not appear in the Work web plugin selector. The owner
+confirmed the existing PRIVATE custom MCP `mcpku` *does* appear there.
 
-`pnpm run package-plugin` stages the final files at
-`artifacts/plugin-candidate/`. Phase 10 light CI builds a 13-file ZIP and
-verifies each extracted file against SHA-256. The owner must separately
-install via Plugin Creator and pass fresh-chat skill + MCP checks.
+The final package now uses `extensions.com.openai.apps: "./.app.json"` and
+one required registered app mapping to the exact existing `mcpku` ID
+`asdk_app_6ad4ef8b42588191a749b8b9f356b662`. The `mcp.json`
+source is deliberately absent and **must be deleted** from the prior
+installed release, along with the generated `.mcp.json` overlay, on update.
+The old Phase 7 portable No-auth generator/schema remain regression-only,
+not a second MCP connection in this ZIP. The registered MCP still uses the
+server-fixed No-auth pilot identity with a publicly readable endpoint and
+default-closed write latch. No package secret or OAuth configuration.
+
+`pnpm run package-plugin` builds 13 allowlisted files: `plugin.json`,
+`.app.json`, one skill and 10 references. Light CI produces the
+v0.2.1 ZIP, verifies extracted hashes and disallows bundled `mcp.json`.
+Plugin Creator must **update** the existing PRIVATE plugin ID, never
+create a second one. Desktop support or successful update alone cannot
+satisfy 10.2: verify plugin selectable in Work web, 33 tools, packaged skill
+and 3 read calls, then confirm mobile separately.
 
 See [the Phase 7 runbook](../plans/works/phase-7-implementation-plan.md),
 [Issue #3](https://github.com/milyarderpro/content-producer/issues/3),
