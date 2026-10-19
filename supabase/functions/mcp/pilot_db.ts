@@ -10,6 +10,7 @@ const fixedClientId = 'phase-10-1-noauth-fixed-pilot';
 
 const PILOT_JSONB_PARAMS: Record<string, readonly string[]> = {
   create_page: ['p_config'],
+  trivia_find_similar_facts: ['p_candidates'],
   trivia_register_and_reserve_facts: ['p_facts'],
   save_post: [
     'p_plan_item',
