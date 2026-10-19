@@ -1,0 +1,50 @@
+name: Phase 10.4 - one-shot formatting repair
+
+on:
+  push:
+    branches: [codex/phase-10-plugin]
+    paths:
+      - '.github/phase-10-4-format-once.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  format-once:
+    if: github.ref == 'refs/heads/codex/phase-10-plugin'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Format only the five flagged files and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile
+          paths=(
+            docs/decisions/2026-10-19-phase-10-4-scoped-write-permits.md
+            supabase/functions/mcp/foundation.ts
+            supabase/functions/mcp/pilot_db.ts
+            supabase/functions/mcp/pilot_db_test.ts
+            supabase/functions/mcp/pilot_write_10_4.ts
+          )
+          pnpm exec prettier --write "${paths[@]}"
+          pnpm exec prettier --check "${paths[@]}"
+          git diff --check
+          git add -- "${paths[@]}"
+          if ! git diff --cached --quiet; then
+            git -c user.name='phase-10-ci[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Phase 10.4: apply Prettier to scoped grant changes'
+            git push origin HEAD:refs/heads/codex/phase-10-plugin
+          fi
