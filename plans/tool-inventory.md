@@ -690,6 +690,7 @@ Output `data`:
 ```text
 page: PageSummaryV1
 module: module/version/capability summary
+config_public_id: PublicId (selected owner-scoped Page+niche config row, CR-046)
 config: full current versioned config
 generation_rules: allowed topics, formats, profiles, interaction goals, budgets, locale
 reuse_policy: scope and relevant current constraints
