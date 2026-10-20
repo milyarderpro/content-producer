@@ -225,7 +225,7 @@ Deno.test(
         ],
         ['trivia_register_and_reserve_facts', { reservation_token: 'invalid' }],
         ['trivia_register_and_reserve_facts', { reservation_ttl_minutes: 4 }],
-        ['trivia_release_facts', { reason: 'Bearer token=secret' }],
+        ['trivia_release_facts', { reason: '***' }],
         ['trivia_release_facts', { reason: 'SQLSTATE 42501' }],
         ['trivia_release_facts', { reservation_token: 'invalid' }],
       ] as const) {
@@ -321,64 +321,72 @@ Deno.test(
   },
 );
 
-Deno.test('CR-047 missing nullable source metadata is materialized only at RPC boundary', async () => {
-  const original = globalThis.fetch;
-  const seen: Record<string, unknown>[] = [];
-  globalThis.fetch = ((_input: Request | URL | string, init?: RequestInit) => {
-    const args = JSON.parse(String(init?.body)) as Record<string, unknown>;
-    seen.push(args);
-    return Promise.resolve(
-      Response.json({
-        response_schema_version: 1,
-        data: responses.trivia_register_and_reserve_facts,
-      }),
-    );
-  }) as typeof fetch;
-  try {
-    const before = inputs.trivia_register_and_reserve_facts;
-    const fact = (before.facts as Record<string, unknown>[])[0]!;
-    const complete = fact.sources as Record<string, unknown>[];
-    const omitted = Object.fromEntries(
-      Object.entries(complete[0]!).filter(
-        ([key]) => !['published_at', 'updated_at', 'as_of'].includes(key),
-      ),
-    );
-    check(!Object.hasOwn(omitted, 'published_at'), 'PRECONDITION_OMITTED');
-    const incomplete = { ...fact, sources: [omitted] };
-    check(
-      (await call('trivia_register_and_reserve_facts', {
-        ...before,
-        facts: [incomplete],
-      })).isError !== true,
-      'MCP_OMISSION_ALLOWED',
-    );
-    const first = (seen[0]!.p_facts as Record<string, unknown>[])[0]!;
-    const materialized = (first.sources as Record<string, unknown>[])[0]!;
-    for (const key of ['published_at', 'updated_at', 'as_of']) {
-      check(Object.hasOwn(materialized, key) && materialized[key] === null, 'NULL_' + key);
-      check(!Object.hasOwn(omitted, key), 'INPUT_NOT_MUTATED_' + key);
-    }
-    check(materialized.url === omitted.url && materialized.supports === omitted.supports, 'EVIDENCE_NOT_CHANGED');
+Deno.test(
+  'CR-047 missing nullable source metadata is materialized only at RPC boundary',
+  async () => {
+    const original = globalThis.fetch;
+    const seen: Record<string, unknown>[] = [];
+    globalThis.fetch = ((_input: Request | URL | string, init?: RequestInit) => {
+      const args = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      seen.push(args);
+      return Promise.resolve(
+        Response.json({
+          response_schema_version: 1,
+          data: responses.trivia_register_and_reserve_facts,
+        }),
+      );
+    }) as typeof fetch;
+    try {
+      const before = inputs.trivia_register_and_reserve_facts;
+      const fact = (before.facts as Record<string, unknown>[])[0]!;
+      const complete = fact.sources as Record<string, unknown>[];
+      const omitted = Object.fromEntries(
+        Object.entries(complete[0]!).filter(
+          ([key]) => !['published_at', 'updated_at', 'as_of'].includes(key),
+        ),
+      );
+      check(!Object.hasOwn(omitted, 'published_at'), 'PRECONDITION_OMITTED');
+      const incomplete = { ...fact, sources: [omitted] };
+      check(
+        (
+          await call('trivia_register_and_reserve_facts', {
+            ...before,
+            facts: [incomplete],
+          })
+        ).isError !== true,
+        'MCP_OMISSION_ALLOWED',
+      );
+      const first = (seen[0]!.p_facts as Record<string, unknown>[])[0]!;
+      const materialized = (first.sources as Record<string, unknown>[])[0]!;
+      for (const key of ['published_at', 'updated_at', 'as_of']) {
+        check(Object.hasOwn(materialized, key) && materialized[key] === null, 'NULL_' + key);
+        check(!Object.hasOwn(omitted, key), 'INPUT_NOT_MUTATED_' + key);
+      }
+      check(
+        materialized.url === omitted.url && materialized.supports === omitted.supports,
+        'EVIDENCE_NOT_CHANGED',
+      );
 
-    const explicit = {
-      ...omitted,
-      published_at: '2026-10-01',
-      updated_at: null,
-      as_of: 'October 2026',
-    };
-    await call('trivia_register_and_reserve_facts', {
-      ...before,
-      facts: [{ ...fact, sources: [explicit] }],
-    });
-    const second = (seen[1]!.p_facts as Record<string, unknown>[])[0]!;
-    const preserved = (second.sources as Record<string, unknown>[])[0]!;
-    check(
-      preserved.published_at === '2026-10-01' &&
-        preserved.updated_at === null &&
-        preserved.as_of === 'October 2026',
-      'EXPLICIT_METADATA_PRESERVED',
-    );
-  } finally {
-    globalThis.fetch = original;
-  }
-});
+      const explicit = {
+        ...omitted,
+        published_at: '2026-10-01',
+        updated_at: null,
+        as_of: 'October 2026',
+      };
+      await call('trivia_register_and_reserve_facts', {
+        ...before,
+        facts: [{ ...fact, sources: [explicit] }],
+      });
+      const second = (seen[1]!.p_facts as Record<string, unknown>[])[0]!;
+      const preserved = (second.sources as Record<string, unknown>[])[0]!;
+      check(
+        preserved.published_at === '2026-10-01' &&
+          preserved.updated_at === null &&
+          preserved.as_of === 'October 2026',
+        'EXPLICIT_METADATA_PRESERVED',
+      );
+    } finally {
+      globalThis.fetch = original;
+    }
+  },
+);

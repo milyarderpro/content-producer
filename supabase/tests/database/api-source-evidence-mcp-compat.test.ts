@@ -50,9 +50,11 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
       );
       expect(before.valid, `facts[${position - 1}].sources[0] omitted keys`).toBe(false);
       const normalized = materializeMissingSourceNulls([{ sources: [source] }])[0]!.sources[0]!;
-      expect(Object.keys(normalized).filter((key) => ['published_at', 'updated_at', 'as_of'].includes(key))).toEqual(
-        ['published_at', 'updated_at', 'as_of'],
-      );
+      expect(
+        Object.keys(normalized).filter((key) =>
+          ['published_at', 'updated_at', 'as_of'].includes(key),
+        ),
+      ).toEqual(['published_at', 'updated_at', 'as_of']);
       for (const key of ['published_at', 'updated_at', 'as_of'] as const) {
         expect(normalized[key], `fact position ${position}: ${key}`).toBeNull();
       }
@@ -81,13 +83,15 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
       const ctx = rpc(
         f,
         `api.get_page_generation_context(1,'${f.workspace}','${f.page}','trivia',10,'nature_science','single_subject_fast','follow',null)`,
-      ) as unknown as { data: {
-        config_public_id: string;
-        context_version: { config_updated_at: string };
-        config: { fact_count: unknown; text_budget: unknown };
-        page: { target_markets: string[] };
-        reuse_policy: { scope: string };
-      } };
+      ) as unknown as {
+        data: {
+          config_public_id: string;
+          context_version: { config_updated_at: string };
+          config: { fact_count: unknown; text_budget: unknown };
+          page: { target_markets: string[] };
+          reuse_policy: { scope: string };
+        };
+      };
       expect(ctx.data.config_public_id).toMatch(/^[0-9a-f-]{36}$/);
       expect(ctx.data.context_version.config_updated_at).toBe(f.configTime);
       const facts = claims.map((claim_text, index) => ({
@@ -99,7 +103,11 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
           relation_key: 'has_named_part_or_property',
           object_key: `distinct_lunar_property_${index + 1}`,
           numbers: [],
-          qualifiers: { negated: false, comparison_direction: 'none', scope: `distinct property ${index + 1}` },
+          qualifiers: {
+            negated: false,
+            comparison_direction: 'none',
+            scope: `distinct property ${index + 1}`,
+          },
           topic_key: 'nature_science',
           normalization_version: 1,
           ontology_version: 1,
@@ -133,10 +141,13 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
         ...rendered,
         hook,
         cta,
-        body: { subject: 'Moon phases', facts: bindings.map((binding) => ({
-          position: binding.position,
-          text: binding.rendered_text,
-        })) },
+        body: {
+          subject: 'Moon phases',
+          facts: bindings.map((binding) => ({
+            position: binding.position,
+            text: binding.rendered_text,
+          })),
+        },
         canva_copy: [hook, ...copyLines, cta].join('\n\n'),
         caption: 'Seven facts about the changing appearance of the Moon.',
         hashtags: ['#MoonPhases', '#SpaceFacts', '#NASA'],
@@ -181,24 +192,38 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
         bindings,
         editorial: editorial(),
       } as Parameters<typeof save>[1]);
-      const persistedPost = rpc(f, expr) as unknown as { data: {
-        post: { post_public_id: string; status: string; revision: number; content_hash: string };
-      } };
+      const persistedPost = rpc(f, expr) as unknown as {
+        data: {
+          post: { post_public_id: string; status: string; revision: number; content_hash: string };
+        };
+      };
       expect(persistedPost.data.post.status).toBe('draft');
       expect(persistedPost.data.post.revision).toBe(1);
       expect(persistedPost.data.post.content_hash).toMatch(/^[0-9a-f]{64}$/);
       const fetched = rpc(
         f,
         `api.get_post(1,'${f.workspace}','${persistedPost.data.post.post_public_id}',true,true,false)`,
-      ) as unknown as { data: {
-        post: { status: string; revision: number; content_hash: string; content_payload: { canva_copy: string };
-          fact_bindings: { source_snapshot?: { sources: unknown[] } }[]; system_checks: { overall_status: string } };
-      } };
+      ) as unknown as {
+        data: {
+          post: {
+            status: string;
+            revision: number;
+            content_hash: string;
+            content_payload: { canva_copy: string };
+            fact_bindings: { source_snapshot?: { sources: unknown[] } }[];
+            system_checks: { overall_status: string };
+          };
+        };
+      };
       expect(fetched.data.post.status).toBe('draft');
       expect(fetched.data.post.content_payload.canva_copy).toBe(payload.canva_copy);
       expect(fetched.data.post.content_hash).toBe(persistedPost.data.post.content_hash);
       expect(fetched.data.post.fact_bindings).toHaveLength(7);
-      expect(fetched.data.post.fact_bindings.every((binding) => binding.source_snapshot?.sources?.length === 1)).toBe(true);
+      expect(
+        fetched.data.post.fact_bindings.every(
+          (binding) => binding.source_snapshot?.sources?.length === 1,
+        ),
+      ).toBe(true);
       expect(fetched.data.post.system_checks.overall_status).toBe('passed');
     } finally {
       cleanup(f);
