@@ -97,9 +97,8 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   );
   assert(rawPilotResponse.status === 200, 'raw No-auth SDK catalog available');
   const pilotOriginal = responseJson(await rawPilotResponse.text());
-  const pilotOriginalTools = (
-    pilotOriginal.result as { tools: Array<Record<string, unknown>> }
-  ).tools;
+  const pilotData = pilotOriginal.result as { tools: Array<Record<string, unknown>> };
+  const pilotOriginalTools = pilotData.tools;
   assert(pilotOriginalTools.length === 33, 'raw No-auth SDK still has 33 tools');
 
   const oauthResponse = await createAuthenticatedTransport({
@@ -161,8 +160,9 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     const portable = normalizeExpectedWirePatterns(expandedInput);
     const pilotInput = { ...(pilotFull.inputSchema as Record<string, unknown>) };
     delete pilotInput.$schema;
+    const portablePilot = normalizeExpectedWirePatterns(pilotInput);
     assert(
-      JSON.stringify(compact.inputSchema) === JSON.stringify(normalizeExpectedWirePatterns(pilotInput)),
+      JSON.stringify(compact.inputSchema) === JSON.stringify(portablePilot),
       'No-auth input differs from its SDK source beyond CR-034 transforms',
     );
     assert(
