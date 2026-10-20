@@ -1,5 +1,7 @@
 # Phase 10 — installed-plugin manual evidence ledger
 
+**Current operational status, 20 October 2026:** PRIVATE Content Producer v0.2.2 uses owner OAuth `mcpku2`; backend `mcp` v29, SHA `6a8c42d8a3ffb846b8bd92663dbfbdbc9cc22e92`, passed [full gate #39372282908](https://github.com/milyarderpro/content-producer/actions/runs/39372282908). Package/docs SHA `31cb86a3e528bdb599f96078c1ca08edb85c6f0b` passed [light CI #39379688115](https://github.com/milyarderpro/content-producer/actions/runs/39379688115). The plugin page and chat proved 33 tools and three owner reads; host permission is `ask_before_writes`. MAN-01/02 PASS historically; MAN-03 was attempted under the old fixed-pilot route but produced no draft, so MAN-03/04 remain PENDING. The following 10.0 and v0.2.1 tables record their state **at the time**, not current configuration. No fixed-pilot grant activation is required on the OAuth route.
+
 **10.0 historical procedure freeze: MAN-01..MAN-09 procedure-v1 FROZEN under CR-028.** Template only: **no cards executed, no new production mutations, and no new MCP connection**. Host write permission will be inspected first after connection/OAuth in 10.1; final plugin installation is 10.2. Per-card owner values and exact compiled prompts are deliberately PENDING until immediately before the card concerned. This cannot be mistaken for an executed test or approved write.
 
 ## Immutable test identity (fill on freeze)
@@ -19,27 +21,27 @@
 
 ## Per-card outcome table
 
-Procedure-v1 is frozen for MAN-01..09; per-card prompt binding, owner consent, and outcomes stay PENDING until the assigned later checkpoint. Static negative prompts MAN-08/09 are fixed now, but not yet executed.
+Procedure-v1 is frozen for MAN-01..09. MAN-01/02 were executed historically; MAN-03 had a failed fixed-pilot reservation attempt with no draft. MAN-03/04 and later cards still need current OAuth execution evidence. Static negative prompts MAN-08/09 are fixed but not yet executed.
 
-| ID     | Phase    | Execution status   | Chat reference       | Source/plugin hash         | Tool trace      | State/ledger before→after          | Reviewer             | Outcome                          |
-| ------ | -------- | ------------------ | -------------------- | -------------------------- | --------------- | ---------------------------------- | -------------------- | -------------------------------- |
-| MAN-01 | 10.3     | EXECUTED READ-ONLY | Work chat 2026-10-19 | v0.2.1 / verified 10.2 ZIP | 3 Read, 0 Write | one active pilot Page before→after | owner confirmed PASS | PASS; 10.7 audit evidence limits |
-| MAN-02 | 10.3     | EXECUTED           | Work chat 2026-10-19 | v0.2.1                     | create_page     | 1→2 Pages                          | owner signoff        | PASS (10.7 caveats)              |
-| MAN-03 | 10.4     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
-| MAN-04 | 10.4     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
-| MAN-05 | 10.5     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
-| MAN-06 | 10.5     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
-| MAN-07 | 10.6     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
-| MAN-08 | 10.6     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
-| MAN-09 | 10.6     | NOT RUN            | —                    | —                          | —               | —                                  | —                    | PENDING                          |
-| MAN-10 | post-MVP | NOT RUN            | —                    | —                          | —               | —                                  | —                    | DEFERRED — POST-MVP              |
-| MAN-11 | post-MVP | NOT RUN            | —                    | —                          | —               | —                                  | —                    | DEFERRED — POST-MVP              |
+| ID     | Phase    | Execution status    | Chat reference       | Source/plugin hash         | Tool trace         | State/ledger before→after          | Reviewer             | Outcome                                                        |
+| ------ | -------- | ------------------- | -------------------- | -------------------------- | ------------------ | ---------------------------------- | -------------------- | -------------------------------------------------------------- |
+| MAN-01 | 10.3     | EXECUTED READ-ONLY  | Work chat 2026-10-19 | v0.2.1 / verified 10.2 ZIP | 3 Read, 0 Write    | one active pilot Page before→after | owner confirmed PASS | PASS; 10.7 audit evidence limits                               |
+| MAN-02 | 10.3     | EXECUTED            | Work chat 2026-10-19 | v0.2.1                     | create_page        | 1→2 Pages                          | owner signoff        | PASS (10.7 caveats)                                            |
+| MAN-03 | 10.4     | ATTEMPTED; NOT PASS | historical No-auth   | v0.2.1                     | reservation failed | 0 new drafts                       | owner review pending | `FACT_RESERVATION_CONTEXT_CHANGED`; current OAuth card PENDING |
+| MAN-04 | 10.4     | NOT RUN             | —                    | —                          | —                  | —                                  | —                    | PENDING                                                        |
+| MAN-05 | 10.5     | NOT RUN             | —                    | —                          | —                  | —                                  | —                    | PENDING                                                        |
+| MAN-06 | 10.5     | NOT RUN             | —                    | —                          | —                  | —                                  | —                    | PENDING                                                        |
+| MAN-07 | 10.6     | NOT RUN             | —                    | —                          | —                  | —                                  | —                    | PENDING                                                        |
+| MAN-08 | 10.6     | NOT RUN             | —                    | —                          | —                  | —                                  | —                    | PENDING                                                        |
+| MAN-09 | 10.6     | NOT RUN             | —                    | —                          | —                  | —                                  | —                    | PENDING                                                        |
+| MAN-10 | post-MVP | NOT RUN             | —                    | —                          | —                  | —                                  | —                    | DEFERRED — POST-MVP                                            |
+| MAN-11 | post-MVP | NOT RUN             | —                    | —                          | —                  | —                                  | —                    | DEFERRED — POST-MVP                                            |
 
 ## Phase 10.4 — MAN-03/04 approved direction, preparation only (2026-10-19)
 
 - **Owner choice, not a write command:** Moon phases; `nature_science`; `single_subject_fast`; `fast_trivia`; prefer seven verified, nonduplicated factual claims (never force seven); `follow`; English US; stable low-risk astronomy trivia. Source policy Tier A/B per atomic claim, with NASA originals investigated. No invented or copied claims.
 - **Read-only baseline:** installed Content Producer v0.2.1 / release `pluginrel_6ad5c40b09588191842ddc1d42af957b`, ZIP SHA256 `236254c7d351cc9d932c4235ae50a4be23322610587e811effff77d43b4af37f`; workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`, `corious-facts` Page `37457236-17ec-4486-8880-6832460ae411`, config updated `2026-10-19T10:33:17.018070Z`, two Pages active. Original Phase 9.5 Page preserved. Do not infer a fresh ledger count.
-- **Safety:** CR-038 has distinct short-lived, Edge-only, default-absent operation permits. The owner sends the frozen executable MAN-03 prompt through installed Content Producer **only after** tests/deployment and separate grant activation; no assistant MCP business write. Raw operation keys and reservation tokens are not put into public GitHub. MAN-04 revised hook and exact owner approval remain future gates.
+- **Historical fixed-pilot safety:** CR-038 used short-lived, Edge-only operation permits and owner activation. This grant procedure is **not** used on current owner OAuth. Raw operation keys and reservation tokens are not put into public GitHub. MAN-04 revised hook and exact owner approval remain future gates.
 - **Current outcome:** MAN-03 NOT RUN; MAN-04 NOT RUN; no draft/post ID, revision/hash or quality acceptance claimed. Never mark PASS before live owner-host trace, server checks and reviewed persisted output. Carry CR-037 independent ledger/secret inventory evidence gaps to 10.7.
 
 ## Evidence record: copy once for each actual card/attempt
@@ -109,12 +111,21 @@ Only store minimum redacted arguments/results needed to explain a failure. Crede
 - **Audit 10.7 limitations:** direct production SQL ledger inspection after the successful write was blocked; no independent production ledger count is claimed. Secret revocation was owner-confirmed, not independently listed by the connector. The RPC response (`replayed=false`), Pages/config read-back, and idempotent operation replay tests in isolated CI support checkpoint PASS without representing either independent read as completed.
 - **Checkpoint 10.3 verdict:** MAN-01 PASS, MAN-02 PASS, 10.3 PASS on 2026-10-19. The runbook PASS condition does not explicitly require independent production SQL ledger and secret inventory reads. Keep both gaps visible for independent audit 10.7. PR #23 stays draft; 10.4–10.7 and AC-001..014 remain PENDING; no new write, deployment, or full gate for this documentation signoff.
 
-## Phase 10.4 — gate, deployment and manual handoff (2026-10-19)
+## Phase 10.4 — historical No-auth gate and handoff (2026-10-19; superseded operationally)
 
 - CR-020 full gate: **PASS**, [run #39247887069](https://github.com/milyarderpro/content-producer/actions/runs/39247887069), SHA `747bb81bd092991077d5f1b18539c7a5a4b14ba6`.
 - Production `mcp` version **18** deployed and read back, bundle SHA-256 `290baf9867eb3bde3b074114a084565275a95f0c0e03b6a0a92148f9ae1b233c`; `verify_jwt=false` preserved.
 - Read-only installed plugin smoke: expected owner/workspace and two active Pages; target Page still has **zero posts**. The supported `has_named_part_or_property` relation succeeded in `trivia_find_similar_facts`; an unsupported relation was rejected without a write.
 - Owner-only MAN-03 compiled prompt UTF-8 SHA-256: `4b4e8d0e373aff8cc594f15cd03ca41a2d2d14a370f66d9b99af02a32837d4d0`. Raw operation keys and reservation token are delivered privately, not committed.
-- Grant activation is **owner-controlled and pending**. No production stage grants have been set by the assistant; no Content Producer business write was executed.
-- MAN-03 and MAN-04 remain **NOT RUN / PENDING**. The owner must separately review the persisted draft, checks, actual revision and hash before any MAN-04 approval. No ready, schedule or publication action.
+- At this 2026-10-19 handoff, grant activation was pending. Later fixed-pilot reservation attempts failed and the grants were revoked; see [Issue #22 forensic record](https://github.com/milyarderpro/content-producer/issues/22#issuecomment-6270311976). This is historical and does not instruct grant activation on OAuth.
+- MAN-03 subsequently reached a failed reservation but **no draft**; MAN-03/04 remain **PENDING**. The owner must separately review any future persisted draft, checks, actual revision and hash before MAN-04 approval. No ready, schedule or publication action.
 - Preserve 10.3 independently unverified production ledger and secret-revocation evidence as audit 10.7 residuals.
+
+## Current MAN-03 OAuth handoff — 20 October 2026
+
+- **Installed host:** same PRIVATE plugin v0.2.2, required `mcpku2` OAuth app, 33 tools and three owner reads PASS through `@Content Producer`; no OAuth business write yet. The host is set to `ask_before_writes` ([host evidence](https://github.com/milyarderpro/content-producer/issues/22#issuecomment-6285034464)).
+- **Target:** owner Page `corious-facts`, public ID `37457236-17ec-4486-8880-6832460ae411`; Moon phases, `nature_science`, `single_subject_fast`, `fast_trivia`, `follow`, en-US, draft-only. The topic is owner-approved direction, not permission to approve/publish. The original Phase 9.5 Page remains untouched.
+- **Historical failure boundary:** a fixed-pilot Edge v25 reservation returned `FACT_RESERVATION_CONTEXT_CHANGED`; original bound values and that historical bundle were unavailable. Isolated database testing demonstrated that `2026-10-19T10:33:17.018070Z` is accepted while truncated `.018Z` conflicts; it did **not** prove the original failure cause. Zero draft was saved. Do not reuse a stale context or treat the failed historical call as a successful reservation.
+- **OAuth execution rule:** the fixed-pilot CR-038 grant gate runs only when `pilotMode` is active; current OAuth calls do not read those grants. No terminal activation/revocation step. Before reserving, read fresh `get_page_generation_context`, copy its `config_updated_at` exactly with six microsecond digits and current `fact_reuse_scope`, verify claims and similarity, then use one exact owner-approved reserve/save sequence. On uncertainty, context error or lost response, stop and reconcile owner-visible state; never generate replacement keys merely to retry.
+- **MAN-04 boundary:** show the saved draft, source evidence, quality checks, revision and `content_hash` to the owner. Revision and editorial approval are separate decisions. No ready status, schedule, Facebook publication or fabricated metrics before their assigned cards.
+- **Gate policy:** no backend code, migrations, security configuration or runtime dependency changed after the v29 gate. This documentation handoff uses light CI; a new full gate is due only if a later backend/security change requires one under CR-044.
