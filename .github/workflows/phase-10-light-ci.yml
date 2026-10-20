@@ -68,6 +68,13 @@ jobs:
       - name: Locked dependency installation
         run: pnpm install --frozen-lockfile
 
+      # Temporary local-only diagnostic. Deliberately fails and does not publish.
+      - name: Diagnose exact Prettier changes without committing them
+        run: |
+          pnpm exec prettier --write supabase/functions/mcp/pilot_db_test.ts
+          git --no-pager diff -- supabase/functions/mcp/pilot_db_test.ts
+          exit 1
+
       - name: Formatting check for changed text
         shell: bash
         run: |
