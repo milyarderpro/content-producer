@@ -460,7 +460,7 @@ describe('Phase 5.2 owner-scoped read projections', () => {
         expect(actualId).toMatch(/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/);
         expect(pageContext.data.context_version.config_updated_at).toBe(stored.config_updated_at);
         expect(String(pageContext.data.context_version.config_updated_at)).toMatch(
-          /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$/,
+          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/,
         );
         returnedConfigIds.add(actualId);
       }
