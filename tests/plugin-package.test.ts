@@ -107,14 +107,18 @@ describe('Phase 7.4 generated package and source safety', () => {
     expect(() => validatePluginSource(dir)).toThrow(/Symlink/);
   });
 
-  it('requires exact registered mcpku2 OAuth app mapping and rejects bundled MCP, secrets and endpoints', () => {
+  it('pins OAuth mcpku2 and rejects bundled MCP and secrets', () => {
     const dir = setup();
     const appPath = join(dir, 'plugin/.app.json');
-    change(appPath, 'asdk_app_6ad6ebeab5fc8191a1d2cd54b87cd96f', 'asdk_app_6ad4ef8b42588191a749b8b9f356b662');
+    change(
+      appPath,
+      'asdk_app_6ad6ebeab5fc8191a1d2cd54b87cd96f',
+      'asdk_app_6ad4ef8b42588191a749b8b9f356b662',
+    );
     expect(() => validatePluginSource(dir)).toThrow(/proven owner OAuth mcpku2 ID/);
     cpSync(join(root, 'plugin/.app.json'), appPath);
     change(appPath, '"required": true', '"required": false');
-    expect(() => validatePluginSource(dir)).toThrow(/proven mcpku ID/);
+    expect(() => validatePluginSource(dir)).toThrow(/proven owner OAuth mcpku2 ID/);
     cpSync(join(root, 'plugin/.app.json'), appPath);
     const finalPath = join(dir, 'plugin/mcp.json');
     writeFileSync(finalPath, '{"mcpServers":{}}');
