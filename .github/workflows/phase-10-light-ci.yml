@@ -162,8 +162,8 @@ jobs:
             echo "- ZIP: content-producer-private-v0.2.1.zip (13 allowlisted files)"
             echo "- ZIP SHA-256: $(sha256sum "$archive" | cut -d ' ' -f1)"
             echo "- All 13 extracted files verified against artifact filelist SHA-256"
-            echo "- Registered required mcpku app mapping; no bundled MCP or OAuth config"
-            echo "- Owner Plugin Creator installation and fresh-chat skill + MCP proof pending. No business write."
+            echo "- Registered required owner OAuth mcpku2 app mapping; no bundled MCP or OAuth config"
+            echo "- Owner Plugin Creator update and @Content Producer fresh-chat 33 tool / 3 read proof pending. No business write."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload final verified ZIP and SHA-256 filelist
