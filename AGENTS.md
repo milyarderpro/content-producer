@@ -35,6 +35,11 @@ server-generated claims, preserving the existing 33 RPCs and RLS. Never grant
 bypass-RLS service role. This **public URL is callable by anyone**: reads are
 not owner-authenticated; server-block all business writes during 10.1 and
 record the public endpoint risk. Test the identity boundary before release.
+CR-042 supersedes that default No authentication mode for the current OAuth
+repair. Production `mcp` now defaults to owner OAuth; the fixed pilot is only
+an explicit server-side rollback mode. Historical 10.1–10.3 evidence remains
+historical and does not prove the new OAuth connection. Do not enable a write
+grant or execute MAN-03/04 during this repair.
 Run one CR-020 full gate on the final changed backend SHA before production
 deployment; then require exactly 33 visible tools (including `create_page`)
 and three live ChatGPT reads for 10.1 PASS. Do not invoke business writes.

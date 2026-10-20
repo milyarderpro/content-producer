@@ -1,7 +1,5 @@
-Phase 10 OAuth profile-contract release candidate — CR-041
-Focused source SHA: c0feb79854178fea5f6e6a048de8897708b327b7
-Focused validation: GitHub Actions #39359182221 COMPLETED/SUCCESS
-pnpm run check: PASS; pnpm run test:mcp: 72 passed, 0 failed; 33 OAuth tool schema descriptors, owner-scoped get_workspace_context({}) and real serialized MCP OAuth profile outputSchema: PASS.
-OpenAI profile wire contract: required opaque stable id, optional name/nickname/email, strict output object; workspace_public_id discovered via authenticated get_workspace_context, no foreign workspace bypass.
-Original No-auth pilot workspace bootstrap retained; OAuth bearer protections and raw SDK output validation retained.
-Run exactly one CR-020 full backend/security gate on this POST-MARKER final commit SHA. No deployment before PASS; no manual login, grant, MAN-03 or MAN-04.
+Phase 10 OAuth protected-resource route and challenge final candidate — CR-042
+Production MCP v27 evidence: nested /.well-known/oauth-protected-resource 404; legacy /oauth-protected-resource 200; bare no-token POST 415 without challenge.
+Candidate: production defaults to owner OAuth. Fixed pilot requires explicit server-side MCP_AUTH_MODE=fixed-pilot. Exact nested metadata route returns the canonical resource and issuer. Bare no-token POST receives a bearer challenge; no anonymous business execution.
+Focused local validation: pnpm run check PASS; pnpm run test:mcp 73 passed, 0 failed, including createEdgeHandler() production path without configured fixture. CR-041 profile wire and 33-tool OAuth catalog protections retained.
+Run exactly one CR-020 full backend/security gate on this marker commit SHA. No deployment before PASS; no owner login, grant, MAN-03 or MAN-04 before hosted route probes pass.

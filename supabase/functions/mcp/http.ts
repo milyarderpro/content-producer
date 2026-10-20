@@ -97,7 +97,9 @@ function toolAuthChallenge(resource: string, id: string | number): Response {
 function discoveryPath(path: string, resourcePath: string): boolean {
   return (
     path === resourcePath + '/oauth-protected-resource' ||
+    path === resourcePath + '/.well-known/oauth-protected-resource' ||
     path === '/mcp/oauth-protected-resource' ||
+    path === '/mcp/.well-known/oauth-protected-resource' ||
     path === '/oauth-protected-resource' ||
     path === '/.well-known/oauth-protected-resource' + resourcePath ||
     path === '/.well-known/oauth-protected-resource'
@@ -202,7 +204,7 @@ export async function handleHttpRequest(
   }
   if (options.anonymousDiscovery && !request.headers.has('Authorization')) {
     const response = await fetchAnonymousDiscovery(request);
-    if (response.status !== 403 && response.status !== 400) {
+    if (response.status !== 403 && response.status !== 400 && response.status !== 415) {
       safeLog(id, 'public_discovery', response.status);
       return response;
     }

@@ -498,3 +498,17 @@ pemasangan Phase 10.2 **BELUM DIKERJAKAN**, `MAN-01..MAN-09` tetap NOT RUN,
 first business write `MAN-02` hanya setelah approval payload persis owner,
 10.3–10.7 belum dimulai. Draft PR #23 tetap terbuka dan tidak di-merge
 sebelum audit independen 10.7.
+
+## 16. Pemulihan OAuth setelah MCP v27 — 20 Oktober 2026
+
+Bagian 15 merekam hasil historis koneksi No authentication. CR-042 mengganti
+mode default endpoint production `mcp` menjadi owner OAuth untuk perbaikan
+koneksi ChatGPT saat ini; mode fixed pilot hanya tersedia jika dipilih secara
+eksplisit di sisi server. MCP v27 memberi 404 pada path metadata `.well-known`
+yang diminta ChatGPT dan 415 tanpa challenge pada POST tanpa JSON media type.
+Perbaikan rute dan challenge diuji pada jalur production tanpa fixture
+`configured`, lalu memerlukan satu gate penuh CR-020 pada SHA final, deployment
+SHA yang sama, dan probe HTTP aktif sebelum meminta owner menghubungkan OAuth.
+PASS membutuhkan koneksi OAuth ChatGPT nyata, tepat 33 tool, tiga read owner,
+dan bukti mekanisme persetujuan write tanpa pemanggilan write. Jangan
+mengaktifkan grant atau memulai MAN-03/04 selama pemulihan ini.

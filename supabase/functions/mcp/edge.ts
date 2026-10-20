@@ -121,7 +121,9 @@ export function createEdgeHandler(
     const isMcpPath = [resourcePath, '/mcp', '/functions/v1/mcp'].includes(path);
     const isDiscoveryPath = [
       resourcePath + '/oauth-protected-resource',
+      resourcePath + '/.well-known/oauth-protected-resource',
       '/mcp/oauth-protected-resource',
+      '/mcp/.well-known/oauth-protected-resource',
       '/oauth-protected-resource',
       '/.well-known/oauth-protected-resource' + resourcePath,
       '/.well-known/oauth-protected-resource',
@@ -129,6 +131,7 @@ export function createEdgeHandler(
     if (!isMcpPath && !isDiscoveryPath) {
       return handleHttpRequest(request, { config });
     }
+    if (isDiscoveryPath) return handleHttpRequest(request, { config });
     let body: ArrayBuffer | null = null;
     if (request.method === 'POST') {
       try {
@@ -144,12 +147,15 @@ export function createEdgeHandler(
       checkOwner,
     };
     const forwardedRequest = new Request(request, { body: body?.slice(0) ?? null });
-    // The production ChatGPT connection is No authentication. All requests
-    // without a bearer use one server-fixed pilot identity and non-bypass RLS.
-    // Tests supplying configured OAuth fixtures retain the legacy path.
+    // CR-042: production defaults to owner OAuth. The fixed pilot can only be
+    // selected by an explicit server-side rollback setting.
+    const mode = configured ? 'oauth' : (Deno.env.get('MCP_AUTH_MODE') ?? 'oauth');
+    if (mode !== 'oauth' && mode !== 'fixed-pilot') {
+      return Response.json({ error: 'authentication_unavailable' }, { status: 503 });
+    }
     if (
       isMcpPath &&
-      !configured &&
+      mode === 'fixed-pilot' &&
       request.method === 'POST' &&
       !request.headers.has('Authorization')
     ) {
