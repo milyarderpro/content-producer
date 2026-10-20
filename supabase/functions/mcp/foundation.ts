@@ -644,7 +644,7 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
       annotations,
       _meta: { securitySchemes },
     },
-    (args) => {
+    (args: { request_schema_version?: 1; workspace_public_id?: string }) => {
       const workspaceId = args.workspace_public_id ?? scoped.workspacePublicId;
       if (!workspaceId) return failure('OWNER_ACCESS_REQUIRED');
       return invoke(
