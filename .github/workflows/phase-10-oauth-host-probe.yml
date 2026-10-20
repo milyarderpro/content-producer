@@ -1,0 +1,42 @@
+name: Phase 10 OAuth - hosted anonymous discovery probe
+
+on:
+  push:
+    branches: [codex/phase-10-plugin]
+    paths:
+      - '.github/workflows/phase-10-oauth-host-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  hosted-probe:
+    name: Live v29 metadata and no-token challenge
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      MCP_RESOURCE: https://xjonnilnypchtxogtopb.supabase.co/functions/v1/mcp
+      OAUTH_ISSUER: https://xjonnilnypchtxogtopb.supabase.co/auth/v1
+    steps:
+      - name: Probe public OAuth metadata and unauthenticated POST, no secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          work="$(mktemp -d)"
+          trap 'rm -rf "$work"' EXIT
+
+          resource_status="$(curl -sS --retry 0 --max-time 20 --connect-timeout 10 -o "$work/resource.json" -w '%{http_code}' "$MCP_RESOURCE/.well-known/oauth-protected-resource")"
+          test "$resource_status" = 200
+          jq -e --arg resource "$MCP_RESOURCE" --arg issuer "$OAUTH_ISSUER" \
+            '.resource == $resource and .authorization_servers == [$issuer] and (.bearer_methods_supported | index("header") != null)' \
+            "$work/resource.json" > /dev/null
+
+          challenge_status="$(curl -sS --retry 0 --max-time 20 --connect-timeout 10 -X POST -H 'Content-Type:' --data-binary '{}' -D "$work/challenge.headers" -o "$work/challenge.body" -w '%{http_code}' "$MCP_RESOURCE")"
+          test "$challenge_status" = 401
+          grep -Eiq '^www-authenticate:[[:space:]]*Bearer[[:space:]]' "$work/challenge.headers"
+          grep -Fq '/.well-known/oauth-protected-resource' "$work/challenge.headers"
+
+          echo 'Live nested OAuth metadata: HTTP 200 and correct resource/issuer/header method'
+          echo 'Live unauthenticated content-type-less POST: HTTP 401 with bearer metadata challenge'
+          echo 'No OAuth credentials, business tool calls, writes, or secret values used'
