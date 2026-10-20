@@ -21,6 +21,13 @@ const common = { request_schema_version: version, workspace_public_id: publicId 
 // contract behind this MCP-only adapter.
 const profileInput = z.strictObject({});
 const workspaceInput = z.strictObject(common);
+// OAuth profile must contain ONLY documented identity fields, so bootstrap
+// the workspace with an authenticated context read that resolves its owner
+// scope on the server. Keep the existing No-auth input unchanged.
+const oauthWorkspaceInput = z.strictObject({
+  request_schema_version: version.optional(),
+  workspace_public_id: publicId.optional(),
+});
 const pagesInput = z.strictObject({
   ...common,
   query: z.string().trim().min(1).max(120).optional(),
@@ -75,11 +82,17 @@ const rpcProfileOutput = response(
     }),
   }),
 );
-const profileOutput = z.strictObject({
-  id: z.string().min(1).max(200).regex(/\S/),
+const profileFields = {
+  id: z.string().min(1).max(200).regex(/\\S/),
   name: z.string().min(1).max(120).optional(),
   nickname: z.string().min(1).max(120).optional(),
-  workspace_public_id: publicId, // required to pass the same workspace to subsequent reads
+};
+const oauthProfileOutput = z.strictObject(profileFields);
+// CR-032 No-auth workspace discovery is kept byte-compatible with the old
+// pilot contract; only OAuth's marked profile uses OpenAI's closed shape.
+const pilotProfileOutput = z.strictObject({
+  ...profileFields,
+  workspace_public_id: publicId, // CR-032 No-auth workspace bootstrap only
 });
 const moduleCatalog = z.strictObject({
   niche_key: nicheKey,
@@ -584,6 +597,8 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
   // Unauthenticated internal protocol harness must not list/call business tools.
   if (!context) return;
   const scoped = context;
+  const pilot = scoped.pilotMode === true;
+  const profileOutput = pilot ? pilotProfileOutput : oauthProfileOutput;
   server.registerTool(
     'get_account_profile',
     {
@@ -609,7 +624,9 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
         id: rpc.data.data.profile.id,
         name: rpc.data.data.profile.display_name,
         nickname: rpc.data.data.profile.workspace_name,
-        workspace_public_id: rpc.data.data.profile.workspace_public_id,
+        ...(pilot
+          ? { workspace_public_id: rpc.data.data.profile.workspace_public_id }
+          : {}),
       });
       if (!profile.success) return failure('DATABASE_UNAVAILABLE');
       return {
@@ -624,21 +641,24 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
       title: 'Get workspace context',
       description:
         "Use this before workspace-wide planning or when the active modules and defaults are unknown. It returns the authenticated owner's workspace rules and module catalog without changing state.",
-      inputSchema: workspaceInput,
+      inputSchema: pilot ? workspaceInput : oauthWorkspaceInput,
       outputSchema: workspaceOutput,
       annotations,
       _meta: { securitySchemes },
     },
-    (args) =>
-      invoke(
+    (args) => {
+      const workspaceId = args.workspace_public_id ?? scoped.workspacePublicId;
+      if (!workspaceId) return failure('OWNER_ACCESS_REQUIRED');
+      return invoke(
         'get_workspace_context',
         scoped,
         {
-          p_request_schema_version: args.request_schema_version,
-          p_workspace_public_id: args.workspace_public_id,
+          p_request_schema_version: args.request_schema_version ?? 1,
+          p_workspace_public_id: workspaceId,
         },
         workspaceOutput,
-      ),
+      );
+    },
   );
   server.registerTool(
     'list_pages',

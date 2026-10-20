@@ -58,7 +58,10 @@ function mirrorToolSchemes(value: unknown, pilot = false): unknown {
         };
         // Only optional catalog metadata is removed. Runtime output
         // verification, tool input schemas and OAuth guards are unchanged.
-        delete published.outputSchema;
+        // The designated OAuth profile is special: ChatGPT validates its
+        // actual output schema during account linking. Never omit it.
+        const isOAuthProfile = !pilot && restMeta['openai/profile'] === true;
+        if (!isOAuthProfile) delete published.outputSchema;
         delete published.title;
         if (
           published.inputSchema &&
