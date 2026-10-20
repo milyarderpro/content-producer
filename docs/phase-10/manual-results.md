@@ -353,3 +353,55 @@ Follow for more clear space facts.
 The owner reviewed the saved Moon draft, the exact revision-2 Canva copy, caption, hashtags, seven NASA source bindings, 19/19 passing system checks, 18/18 passing editorial checks, and hash `e944cf8975954f4041489e499ed20e1934181fd1f711b3f4756f62abe26abec3`. The owner authorized the hook revision separately and then expressly approved that exact content for `ready`. One authenticated approval through `mcpku2` returned `replayed=false`. Independent readback confirms post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8` is `ready`, revision 3, with the approved hash, `quality_status=passed`, approval snapshot bound to revision/hash, and no schedule or publication.
 
 [CR-048](../decisions/2026-10-20-phase-10-4-owner-oauth-evidence-acceptance.md) records the owner's explicit acceptance of the existing PRIVATE-plugin binding/owner-read proof together with these direct Codex `mcpku2` business calls. This closes **MAN-03, MAN-04 and checkpoint 10.4 as PASS** without repeating a production write. It does not claim a ChatGPT parent-plugin-selected write trace for 10.4. That limit remains visible to independent audit 10.7. MAN-05/06 and checkpoint 10.5 are not started; Phase 10 remains In progress, and Pilot-ready/MVP Complete/AC-001..014 remain pending. The already passing backend gate #39411054462 is reused; this documentation decision changes no runtime code.
+
+
+## MAN-05 — exact owner-approved plan and frozen pre-write intent (20 October 2026)
+
+**Approval reference:** the owner approved *exactly* the previously displayed plan name, purpose, three topics/formats/goals, local dates/times, default item configuration and operation key in the active ChatGPT conversation (20 October 2026), explicitly authorizing **one** `create_content_plan` followed by owner-scoped readback and Issue #22 / PR #23 reporting. This documentation records the frozen executable intent **before** any MAN-05 business write. Host `ask_before_writes` remains a separate permission control.
+
+**Bound prompt (procedure-v1):** “Untuk Page `corious-facts`, buat hanya satu content plan bernama `Corious Facts — Mini Trivia 22–26 Oct 2026` dengan tepat tiga item: (1) 22 Oktober 2026 21.00 WIB (+07:00), animals / emotional_animal_collection / share, fokus perilaku sosial keluarga gajah; (2) 24 Oktober 2026 21.00 WIB (+07:00), food_storage_home / themed_utility / save, fokus mengapa roti menjadi basi dan prinsip penyimpanannya; (3) 26 Oktober 2026 21.00 WIB (+07:00), geography / comparison / comment, fokus perbandingan luas beberapa pulau menggunakan metrik konsisten. Gunakan default config schema v1, tanpa item override. Simpan tepat satu plan, tampilkan ID, status, semua slot; jangan membuat post otomatis, mengklaim item, menjalankan background worker, atau menjadwalkan Facebook.”
+
+**Pre-write observed state:** OAuth `mcpku2` owner profile `686f8247-5585-4ec7-b755-738a0562bd09`, workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`; unique target Page `37457236-17ec-4486-8880-6832460ae411` (`corious-facts`, `Asia/Jakarta`, US, trivia config v1). Authenticated workspace/Page read showed zero plans; one existing `ready` post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8` revision 3 with `scheduled_at=null`. All topics, formats, goals and local timestamps were validated against current Page context and the MCP input schema. PRIVATE plugin v0.2.2, owner OAuth `mcpku2` binding verified in installed plugin metadata. Plan slots are **internal**, not Facebook scheduling.
+
+**Exact approved operation input (planned once only):**
+
+```json
+{
+  "request_schema_version": 1,
+  "workspace_public_id": "cad2885e-952e-41b3-9eae-d2d9d75d533d",
+  "operation_key": "32838999-d0a9-473c-83ba-37057689364b",
+  "page_public_id": "37457236-17ec-4486-8880-6832460ae411",
+  "niche_key": "trivia",
+  "name": "Corious Facts — Mini Trivia 22–26 Oct 2026",
+  "config_schema_version": 1,
+  "items": [
+    {
+      "position": 1,
+      "scheduled_at": "2026-10-22T21:00:00+07:00",
+      "topic_key": "animals",
+      "format_key": "emotional_animal_collection",
+      "interaction_goal": "share",
+      "item_config": {}
+    },
+    {
+      "position": 2,
+      "scheduled_at": "2026-10-24T21:00:00+07:00",
+      "topic_key": "food_storage_home",
+      "format_key": "themed_utility",
+      "interaction_goal": "save",
+      "item_config": {}
+    },
+    {
+      "position": 3,
+      "scheduled_at": "2026-10-26T21:00:00+07:00",
+      "topic_key": "geography",
+      "format_key": "comparison",
+      "interaction_goal": "comment",
+      "item_config": {}
+    }
+  ],
+  "plan_intent": "Menyusun tiga slot editorial trivia yang bervariasi untuk audiens Amerika Serikat, dengan topik dan tujuan interaksi berbeda. Plan ini digunakan untuk menguji penyimpanan, urutan slot, dan pembacaan kembali data melalui Content Producer."
+}
+```
+
+**Execution status at freezing:** NOT YET CALLED. Readback IDs/status/count and MAN-05 outcome must be appended after the one operation; MAN-06 is reserved for a separate conversation. No plan item claim, post creation, Facebook publication or heavy CI gate authorized.
