@@ -88,6 +88,13 @@ jobs:
       - name: Locked dependency installation
         run: pnpm install --frozen-lockfile
 
+      # Temporary CR-047 formatting snapshot; removed before the final gate.
+      - name: Capture formatted MCP regression source
+        shell: bash
+        run: |
+          pnpm exec prettier --write supabase/functions/mcp/trivia_fact_test.ts
+          node -e 'const fs=require("fs"); const p="supabase/functions/mcp/trivia_fact_test.ts"; console.log("CR047_FORMATTED="+JSON.stringify({path:p,content:fs.readFileSync(p,"utf8")}));'
+
       - name: Formatting check for changed text
         shell: bash
         run: |
