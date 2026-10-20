@@ -43,8 +43,8 @@ jobs:
             echo 'Missing WWW-Authenticate: Bearer challenge header'
             exit 1
           fi
-          if ! grep -Fq '/.well-known/oauth-protected-resource' "$work/challenge.headers"; then
-            echo 'WWW-Authenticate lacks protected resource metadata path'
+          if ! grep -Fq "$MCP_RESOURCE/oauth-protected-resource" "$work/challenge.headers"; then
+            echo 'WWW-Authenticate lacks the advertised metadata alias URL'
             exit 1
           fi
 
