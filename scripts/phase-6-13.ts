@@ -106,6 +106,15 @@ async function call(name: string, input: object, error?: string) {
     );
   return result?.structuredContent?.data;
 }
+async function rejectInactiveOwnerCall(name: string, input: object) {
+  const response = await rpcHttp('tools/call', { name, arguments: input });
+  check(
+    response.status === 403 &&
+      response.body.error?.code === 'OWNER_ACCESS_REQUIRED' &&
+      !response.body.result,
+    'INACTIVE_OWNER_HTTP_DENIAL',
+  );
+}
 async function rejectToolInput(name: string, input: object) {
   const response = await rpcHttp('tools/call', { name, arguments: input });
   check(response.status === 200, 'MCP_INVALID_TOOL_HTTP_STATUS');
@@ -288,23 +297,20 @@ try {
         ).count;
       const pagesBefore = pageCount();
       const listing = await rpcHttp('tools/list');
-      // A direct tools/call must remain owner-scoped even without prior tools/list.
-      await call('get_account_profile', {}, 'OWNER_ACCESS_REQUIRED');
-      await call(
-        'create_page',
-        {
-          ...write(),
-          name: 'Inactive workspace must not create a Page',
-          slug: f.prefix + '-inactive-denied',
-          timezone: 'UTC',
-          target_markets: ['US'],
-          niche_key: 'trivia',
-          config_schema_version: 1,
-          config: defaultConfig,
-          make_default: false,
-        },
-        'OWNER_ACCESS_REQUIRED',
-      );
+      // CR-043 rejects direct calls at HTTP before MCP transport when the
+      // owner workspace is inactive; no write tool may reach its RPC.
+      await rejectInactiveOwnerCall('get_account_profile', {});
+      await rejectInactiveOwnerCall('create_page', {
+        ...write(),
+        name: 'Inactive workspace must not create a Page',
+        slug: f.prefix + '-inactive-denied',
+        timezone: 'UTC',
+        target_markets: ['US'],
+        niche_key: 'trivia',
+        config_schema_version: 1,
+        config: defaultConfig,
+        make_default: false,
+      });
       check(stateDigest(f) === before && pageCount() === pagesBefore, 'INACTIVE_WORKSPACE_MUTATED');
       return listing;
     } finally {
@@ -362,14 +368,14 @@ try {
   );
   const afterPage = row<{ read_count: number; write_count: number }>(
     `select
-      coalesce(max(request_count) filter (where limit_group='read'), 0)::integer read_count,
-      coalesce(max(request_count) filter (where limit_group='write'), 0)::integer write_count
+      coalesce(sum(request_count) filter (where limit_group='read'), 0)::integer read_count,
+      coalesce(sum(request_count) filter (where limit_group='write'), 0)::integer write_count
       from internal.rate_limit_buckets
       where actor_user_id='${f.owner}' and oauth_client_id='${client}'`,
   );
   check(
-    afterPage.read_count === 1 && afterPage.write_count > 0,
-    'WORKSPACE_DISCOVERY_MUST_USE_ONE_READ_AND_NOT_PROBE_EACH_TOOL_CALL',
+    afterPage.read_count === 5 && afterPage.write_count > 0,
+    'OWNER_CHECK_MUST_PRECEDE_EACH_TOOL_CALL',
   );
 
   const updatePageInput = {
@@ -1963,8 +1969,12 @@ try {
 
     clearFixtureBuckets();
     for (const tool of tools) {
-      // The marked ChatGPT profile tool accepts {}; retain one invalid call per tool.
-      const invalidArgs = tool.name === 'get_account_profile' ? { request_schema_version: 1 } : {};
+      // OAuth profile and workspace bootstrap accept {}; retain one genuinely
+      // invalid call per tool without changing their production input schema.
+      const invalidArgs =
+        tool.name === 'get_account_profile' || tool.name === 'get_workspace_context'
+          ? { request_schema_version: 2 }
+          : {};
       await inspector('tools/call', tool.name, invalidArgs, 5);
     }
   }

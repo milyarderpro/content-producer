@@ -99,6 +99,24 @@ jobs:
           echo "one local reset exit=0 elapsed=$((SECONDS-start))s"
           echo "source migration count=$(find supabase/migrations -maxdepth 1 -name '*.sql' | wc -l)"
 
+      - name: Focused OAuth and owner security before Inspector
+        id: oauth_owner
+        run: |
+          set -euo pipefail
+          start=$SECONDS
+          pnpm run test:mcp
+          echo "focused MCP OAuth/owner tests exit=0 elapsed=$((SECONDS-start))s"
+
+      - name: Authenticated MCP HTTP, 33 Inspector valid/invalid, non-owner denial
+        id: inspector
+        run: |
+          set -euo pipefail
+          start=$SECONDS
+          # Existing Phase 6.13 harness exercises original owner/non-owner JWTs
+          # over local HTTP to PostgREST/RPC; does not call a hosted project.
+          pnpm exec tsx scripts/phase-6-13.ts
+          echo "local 33-tool Inspector and authenticated non-owner denial exit=0 elapsed=$((SECONDS-start))s"
+
       - name: Full project suite (includes check, migration validation, MCP, DB, frontend)
         id: full
         run: |
@@ -131,16 +149,6 @@ jobs:
           pnpm exec tsx scripts/phase-6-catalog-audit.ts
           echo "local security/catalog audit exit=0 elapsed=$((SECONDS-start))s"
 
-      - name: Authenticated MCP HTTP, 33 Inspector valid/invalid, non-owner denial
-        id: inspector
-        run: |
-          set -euo pipefail
-          start=$SECONDS
-          # Existing Phase 6.13 harness exercises original owner/non-owner JWTs
-          # over local HTTP to PostgREST/RPC; does not call a hosted project.
-          pnpm exec tsx scripts/phase-6-13.ts
-          echo "local 33-tool Inspector and authenticated non-owner denial exit=0 elapsed=$((SECONDS-start))s"
-
       - name: Post-Inspector catalog and clean fixture check
         id: audit_after
         run: |
@@ -163,6 +171,7 @@ jobs:
           INSTALL_RESULT: ${{ steps.install.outcome }}
           START_RESULT: ${{ steps.start.outcome }}
           RESET_RESULT: ${{ steps.reset.outcome }}
+          OAUTH_OWNER_RESULT: ${{ steps.oauth_owner.outcome }}
           FULL_RESULT: ${{ steps.full.outcome }}
           HISTORY_RESULT: ${{ steps.history.outcome }}
           LINT_RESULT: ${{ steps.lint.outcome }}
@@ -187,11 +196,12 @@ jobs:
             echo "| Pinned install / CLI help | $INSTALL_RESULT |"
             echo "| Local start | $START_RESULT |"
             echo "| One clean reset | $RESET_RESULT |"
+            echo "| Focused OAuth/owner MCP tests | $OAUTH_OWNER_RESULT |"
+            echo "| Inspector 33 valid/invalid + non-owner | $INSPECTOR_RESULT |"
             echo "| test-all | $FULL_RESULT |"
             echo "| Migration history | $HISTORY_RESULT |"
             echo "| Local db lint | $LINT_RESULT |"
             echo "| Catalog/RLS/grants | $AUDIT_RESULT |"
-            echo "| Inspector 33 valid/invalid + non-owner | $INSPECTOR_RESULT |"
             echo "| Post-Inspector catalog | $AUDIT_AFTER_RESULT |"
             echo "| git diff --check | $DIFF_RESULT |"
             echo

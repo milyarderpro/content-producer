@@ -43,6 +43,18 @@ grant or execute MAN-03/04 during this repair.
 Run one CR-020 full gate on the final changed backend SHA before production
 deployment; then require exactly 33 visible tools (including `create_page`)
 and three live ChatGPT reads for 10.1 PASS. Do not invoke business writes.
+CR-044 orders focused OAuth/owner tests and Inspector immediately after the
+single local reset in that gate, before the long database suite. During repair,
+use `check` and focused tests; do not run a full gate on trial commits. Run one
+full gate on the final candidate for changes to migrations, RLS, privileges,
+identity/owner authorization, write permissions, or business RPC logic. A
+transport-only MCP change that leaves permission decisions unchanged uses
+focused protocol/security tests. Documentation-only and plugin-package-only
+changes use light CI; do not trigger a full gate for a documentation commit.
+Reuse a passing backend gate only while deployed backend source, migrations,
+security configuration, and runtime dependencies stay unchanged, recording
+the backend SHA and later documentation/package SHA separately. CR-043 owner
+context repair requires its own full gate before deployment.
 Keep the nine mandatory manual-card **procedures** frozen as `procedure-v1`;
 bind Page/content/plan only before their respective cards. The first business
 write remains MAN-02 after exact Page payload approval. CR-036 supersedes CR-035's desktop-only bundled MCP for 10.2: the
@@ -80,9 +92,10 @@ Independent Pilot-ready audit is 10.7, and MVP Complete is Phase 11.
 ## Validation
 
 Run `pnpm run check` after TypeScript/configuration changes. Run
-`pnpm run test-all` before marking a phase gate complete. For Phase 10–11,
-CR-020 permits reuse of the full gate on the unchanged deployed backend SHA;
-record the SHA and run focused package/MCP tests for later plugin-only changes.
+`pnpm run test-all` within the full gate before marking a changed-backend
+phase gate complete. For Phase 10–11, CR-044 permits reuse of the full gate
+on the unchanged deployed backend SHA; record backend and later docs/package
+SHAs separately and run focused package/MCP tests for affected later changes.
 Use the Supabase CLI help output before invoking an unfamiliar command.
 
 ## Git discipline

@@ -66,6 +66,15 @@ bila host benar-benar menampilkan 33 tools termasuk `create_page` dan tiga
 read berhasil. Tidak ada business write sebelum MAN-02 dengan persetujuan
 payload tepat. Lihat [CR-032](../../docs/decisions/2026-10-18-phase-10-1-noauth-fixed-pilot.md).
 
+**Status koneksi terbaru (CR-042/043/044):** aturan No authentication di atas
+adalah catatan historis. Backend production `mcp` v28 default ke owner OAuth,
+dan koneksi PRIVATE OAuth ChatGPT telah berhasil dibuat. Tiga read owner belum
+seluruhnya PASS: `get_account_profile` berhasil, `get_workspace_context({})`
+gagal karena konteks workspace belum diisi pada `tools/call`, dan `list_pages`
+belum dipanggil. Perbaikan CR-043 memerlukan gate penuh pada kandidat final,
+deployment SHA yang sama, dan pengulangan tiga read melalui koneksi OAuth yang
+sudah ada; jangan minta login ulang tanpa bukti server-side bahwa perlu.
+
 ## 3. Alur GitHub, status, dan biaya pengujian
 
 - Gunakan satu Issue Phase 10, satu branch `codex/phase-10-plugin`, dan satu
@@ -86,11 +95,18 @@ payload tepat. Lihat [CR-032](../../docs/decisions/2026-10-18-phase-10-1-noauth-
 - Jalankan tes terfokus untuk perubahan yang terjadi. Setelah perubahan
   TypeScript atau konfigurasi, jalankan `pnpm run check`. Untuk perubahan
   paket/skill saja, validasi paket, tes skill/MCP yang relevan, dan kartu
-  manual yang terdampak. Jika backend, migration, Auth, atau security config
-  berubah, jalankan gate penuh **sekali pada SHA deployment baru** sesuai
-  CR-020 sebelum deploy; gate Phase 9 tidak lagi cukup. Jika backend deployed
-  tetap identik, gunakan bukti gate Phase 9 yang terikat SHA dan jangan
-  mengulang `test-all`/`smoke-test` hanya untuk Markdown atau paket.
+  manual yang terdampak. CR-044: selama pengembangan cukup `check` dan tes
+  terfokus; jangan gate penuh per commit percobaan. Setelah satu reset lokal,
+  gate penuh menjalankan OAuth/owner dan Inspector lebih dulu, baru suite
+  database panjang; seluruh audit CR-020 tetap wajib. Perubahan migration,
+  RLS, privilege, identitas/otorisasi owner, izin write, atau logika bisnis
+  RPC memerlukan **satu gate penuh pada kandidat final** sebelum deploy.
+  Perubahan transport MCP terbatas tanpa perubahan keputusan izin memakai
+  tes protokol/keamanan terfokus. Dokumentasi atau paket plugin saja memakai
+  CI ringan. Bukti gate backend boleh digunakan kembali bila kode backend,
+  migration, konfigurasi keamanan, dan dependensi runtime yang dideploy
+  tidak berubah; catat SHA backend dan SHA dokumentasi/paket secara terpisah.
+  Jangan memicu gate penuh hanya karena commit dokumentasi.
 - Jika Actions lama, catat URL, SHA, dan `PENDING` lalu berhenti memantau.
   Saat pemilik meminta "lanjutkan" pada task yang sama, periksa run yang sama;
   jangan memulai run pengganti tanpa alasan konkret.

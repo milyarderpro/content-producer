@@ -42,15 +42,25 @@ jobs:
       - name: Record SHA and classify changes
         id: changes
         shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
-          base="$(git merge-base HEAD origin/main)"
+          if [ "$EVENT_NAME" = push ] && [[ "$EVENT_BEFORE" =~ ^[0-9a-f]{40}$ ]] &&
+            [ "$EVENT_BEFORE" != 0000000000000000000000000000000000000000 ]; then
+            base="$EVENT_BEFORE"
+          else
+            base="$(git merge-base HEAD origin/main)"
+          fi
           echo "HEAD $(git rev-parse HEAD); base $base"
           git diff --check "$base" HEAD
           mapfile -t files < <(git diff --name-only --diff-filter=ACMR "$base" HEAD)
           printf 'Changed: %s\n' "${files[*]}"
           format=()
           need_check=false
+          mcp_changed=false
+          package_changed=false
           for file in "${files[@]}"; do
             case "$file" in
               *.md|*.json|*.yml|*.yaml|*.ts|*.tsx|*.js|*.mjs|*.cjs) format+=("$file") ;;
@@ -59,11 +69,21 @@ jobs:
               *.ts|*.tsx|*.js|*.mjs|*.cjs|package.json|pnpm-lock.yaml|tsconfig.json|.github/workflows/*.yml|.github/workflows/*.yaml)
                 need_check=true ;;
             esac
+            case "$file" in
+              supabase/functions/mcp/*|supabase/functions/batch_a_server.ts|supabase/functions/deno.json|scripts/phase-6-13.ts|package.json|pnpm-lock.yaml)
+                mcp_changed=true ;;
+            esac
+            case "$file" in
+              plugin/*|scripts/plugin-*.ts|scripts/package-plugin.ts|scripts/verify-plugin-candidate.ts|tests/plugin-*.test.ts|package.json|pnpm-lock.yaml)
+                package_changed=true ;;
+            esac
           done
           if [ "${#format[@]}" -gt 0 ]; then
             printf '%s\n' "${format[@]}" > "$RUNNER_TEMP/phase-10-formatted-paths"
           fi
           echo "need_check=$need_check" >> "$GITHUB_OUTPUT"
+          echo "mcp_changed=$mcp_changed" >> "$GITHUB_OUTPUT"
+          echo "package_changed=$package_changed" >> "$GITHUB_OUTPUT"
 
       - name: Locked dependency installation
         run: pnpm install --frozen-lockfile
@@ -83,15 +103,18 @@ jobs:
         if: steps.changes.outputs.need_check == 'true'
         run: pnpm run check
 
-      - name: Set up pinned Deno for Phase 10.4 focused MCP tests
+      - name: Set up pinned Deno for focused MCP tests
+        if: steps.changes.outputs.mcp_changed == 'true'
         uses: denoland/setup-deno@v2
         with:
           deno-version-file: .deno-version
 
       - name: Focused MCP-only 33-tool OAuth schema and regression suite
+        if: steps.changes.outputs.mcp_changed == 'true'
         run: pnpm run test:mcp
 
       - name: Focused package tests and final source validation
+        if: steps.changes.outputs.package_changed == 'true'
         run: |
           set -euo pipefail
           pnpm exec vitest run tests/plugin-config.test.ts tests/plugin-package.test.ts tests/plugin-skill.test.ts tests/plugin-trivia.test.ts
@@ -100,6 +123,7 @@ jobs:
           test "$(find artifacts/plugin-candidate -type f | wc -l)" -eq 13
 
       - name: Archive final package and verify extracted entries and SHA-256
+        if: steps.changes.outputs.package_changed == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -143,6 +167,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload final verified ZIP and SHA-256 filelist
+        if: steps.changes.outputs.package_changed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: phase-10-final-plugin
