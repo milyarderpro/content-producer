@@ -234,7 +234,6 @@ MAN-03 production and MAN-04 remain PENDING.
 
 **Residual/security boundary:** Supabase hosted Security Advisor exposed two categories of **WARN**, not blocking errors: 33 intentionally authenticated, owner-gated `SECURITY DEFINER` API functions (unchanged by CR-046), and leaked password protection configuration (one Auth warning, not modified in this change). Preserve these as residual items for 10.7 review; do not silently call the hosted advisor "zero warnings". OAuth token/secret were not read or stored. No manual grant activation, production trivia registration or reservation, `save_post`, business write, operation-key reuse, owner editorial approval, scheduling or publication occurred. The **CR-046 technical blocker is resolved and verified in production**; actual production **MAN-03 draft and MAN-04 remain PENDING**, requiring their distinct gated owner-approved operations.
 
-
 ## MAN-03 production owner OAuth draft execution — 20 October 2026
 
 **Outcome:** one production draft saved and read back for Page `corious-facts`; MAN-03 has persisted-draft evidence. MAN-04 and Phase 10.4 overall remain **PENDING**. This record follows CR-047 backend SHA `73087c33e8b20b663e6944f6ca89d0b591eebf44`, [full gate #39411054462](https://github.com/milyarderpro/content-producer/actions/runs/39411054462) **PASS**, and production Edge `mcp` v31 **ACTIVE**. No new CI gate or deployment was initiated for this manual card.
@@ -271,18 +270,17 @@ Follow for more clear space facts.
 
 **Hashtags:** `#MoonFacts #SpaceScience #LunarPhases`
 
-| # | Allocated fact | Stored official source |
-| --- | --- | --- |
-| 1 | Moonlight is sunlight reflected from the Moon's surface. | [NASA Moonlight](https://science.nasa.gov/moon/moonlight/) |
-| 2 | The Moon's repeating cycle includes eight named phases. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
-| 3 | During waxing, more of the Moon's sunlit side appears nightly. | [NASA Skywatching](https://science.nasa.gov/resource/whats-up-april-2019-skywatching-from-nasa/) |
-| 4 | At first quarter, the Moon often sits high in evening skies. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
-| 5 | A full Moon generally rises around your local sunset. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
-| 6 | New Moon to new Moon takes about 29.5 days. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
-| 7 | Earthshine is Earth's reflected sunlight lighting a crescent's dark side. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+| #   | Allocated fact                                                            | Stored official source                                                                           |
+| --- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| 1   | Moonlight is sunlight reflected from the Moon's surface.                  | [NASA Moonlight](https://science.nasa.gov/moon/moonlight/)                                       |
+| 2   | The Moon's repeating cycle includes eight named phases.                   | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/)                                   |
+| 3   | During waxing, more of the Moon's sunlit side appears nightly.            | [NASA Skywatching](https://science.nasa.gov/resource/whats-up-april-2019-skywatching-from-nasa/) |
+| 4   | At first quarter, the Moon often sits high in evening skies.              | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/)                                   |
+| 5   | A full Moon generally rises around your local sunset.                     | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/)                                   |
+| 6   | New Moon to new Moon takes about 29.5 days.                               | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/)                                   |
+| 7   | Earthshine is Earth's reflected sunlight lighting a crescent's dark side. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/)                                   |
 
 **Review boundary:** saved content, sources, checks, revision and hash are ready for owner editorial review. No revision, approval, scheduling, publishing or MAN-04 action occurred. Evidence is also on [Issue #22](https://github.com/milyarderpro/content-producer/issues/22) and [PR #23](https://github.com/milyarderpro/content-producer/pull/23#issuecomment-6290664363).
-
 
 ## MAN-04 part A — authorized hook revision preflight (20 October 2026)
 
@@ -293,7 +291,6 @@ Follow for more clear space facts.
 **Pre-write readback:** authenticated owner workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`; one exact active trivia Page `corious-facts` (`37457236-17ec-4486-8880-6832460ae411`). `get_post` returned status `draft`, revision `1`, the hash above, seven allocated fact bindings, 19/19 system passed and 18/18 editorial pass. Fresh Page generation context returned config ID `cd41b752-92f7-4905-9c02-fbcef032459a`, exact microsecond timestamp `2026-10-19T10:33:17.018070Z`, and unchanged `workspace_unique` reuse scope. The planned request keeps the seven bindings and caption/hashtags identical, replaces only hook and derived Canva copy, and requests fresh server text metrics and editorial attestation. One new UUIDv4 operation key is bound to this one logical revision; raw key is omitted from the public ledger.
 
 **Execution/result:** the subsequent dated result section records the single completed revision. This preflight did not authorize approval or a status transition.
-
 
 ## MAN-04 part A — one hook-only CAS revision, readback (20 October 2026)
 
@@ -329,18 +326,17 @@ Follow for more clear space facts.
 
 **HASHTAGS:** `#MoonFacts` `#SpaceScience` `#LunarPhases`
 
-| # | Unchanged allocated fact | Stored official source |
-| --- | --- | --- |
-| 1 | Moonlight is sunlight reflected from the Moon's surface. | [NASA Moonlight](https://science.nasa.gov/moon/moonlight/) |
-| 2 | The Moon's repeating cycle includes eight named phases. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
-| 3 | During waxing, more of the Moon's sunlit side appears nightly. | [NASA What's Up: April 2019 Skywatching from NASA](https://science.nasa.gov/resource/whats-up-april-2019-skywatching-from-nasa/) |
-| 4 | At first quarter, the Moon often sits high in evening skies. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
-| 5 | A full Moon generally rises around your local sunset. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
-| 6 | New Moon to new Moon takes about 29.5 days. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
-| 7 | Earthshine is Earth's reflected sunlight lighting a crescent's dark side. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+| #   | Unchanged allocated fact                                                  | Stored official source                                                                                                           |
+| --- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Moonlight is sunlight reflected from the Moon's surface.                  | [NASA Moonlight](https://science.nasa.gov/moon/moonlight/)                                                                       |
+| 2   | The Moon's repeating cycle includes eight named phases.                   | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/)                                                                   |
+| 3   | During waxing, more of the Moon's sunlit side appears nightly.            | [NASA What's Up: April 2019 Skywatching from NASA](https://science.nasa.gov/resource/whats-up-april-2019-skywatching-from-nasa/) |
+| 4   | At first quarter, the Moon often sits high in evening skies.              | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/)                                                                   |
+| 5   | A full Moon generally rises around your local sunset.                     | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/)                                                                   |
+| 6   | New Moon to new Moon takes about 29.5 days.                               | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/)                                                                   |
+| 7   | Earthshine is Earth's reflected sunlight lighting a crescent's dark side. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/)                                                                   |
 
 **Boundary:** MAN-04 part A revision/readback completed. MAN-04 part B (`approve_post`) and overall Phase 10.4 remain **PENDING** until the owner reviews and separately approves this exact revision 2 and hash. No approval, scheduling, publishing, full backend CI gate or deployment occurred.
-
 
 ## MAN-04 part B — owner approval and ready-state readback (20 October 2026)
 
