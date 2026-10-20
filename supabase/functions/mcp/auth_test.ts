@@ -446,6 +446,65 @@ Deno.test(
   },
 );
 
+Deno.test('CR-043 OAuth tool calls resolve and enforce the active owner workspace', async () => {
+  const { claims, dependencies, sign } = await fixture();
+  const jwks = await dependencies.loadKeys!(config.jwksUrl);
+  const token = await sign(claims);
+  let ownerChecks = 0;
+  let rpcCalls = 0;
+  let rpcWorkspace: unknown;
+  const handler = createEdgeHandler(config, jwks, (_config, _token, actor) => {
+    ownerChecks++;
+    assert(actor === owner, 'owner check received another actor');
+    return Promise.resolve(workspace);
+  });
+  const call = (handle: ReturnType<typeof createEdgeHandler>, name: string, args: object) =>
+    handle(
+      new Request(config.resource, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/event-stream',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 17,
+          method: 'tools/call',
+          params: { name, arguments: args },
+        }),
+      }),
+    );
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (_input, init) => {
+    rpcCalls++;
+    const body = JSON.parse(String(init?.body));
+    rpcWorkspace = body.p_workspace_public_id;
+    return Promise.resolve(Response.json({ error: 'fixture unavailable' }, { status: 503 }));
+  };
+  try {
+    const context = await call(handler, 'get_workspace_context', {});
+    const contextBody = await context.text();
+    assert(context.status === 200, 'owner context call must reach MCP transport');
+    assert(ownerChecks === 1, 'tool call skipped owner workspace check');
+    assert(rpcCalls === 1 && rpcWorkspace === workspace, 'read RPC missed server owner workspace');
+    assert(!contextBody.includes('OWNER_ACCESS_REQUIRED'), 'owner bootstrap rejected before RPC');
+
+    const foreign = await call(handler, 'get_workspace_context', {
+      workspace_public_id: other,
+    });
+    assert((await foreign.text()).includes('OWNER_ACCESS_REQUIRED'), 'foreign workspace accepted');
+    assert(rpcCalls === 1, 'foreign workspace reached read RPC');
+
+    const inactive = createEdgeHandler(config, jwks, () => Promise.resolve(null));
+    const denied = await call(inactive, 'get_workspace_context', {});
+    assert(denied.status === 403, 'inactive owner workspace admitted to tool call');
+    assert(rpcCalls === 1, 'inactive owner reached read RPC');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 Deno.test('9.5 upstream-verified claims retain exact MCP and owner checks', async () => {
   const { claims, dependencies, sign } = await fixture();
   const token = await sign(claims);

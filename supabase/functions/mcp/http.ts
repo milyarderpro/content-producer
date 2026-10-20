@@ -122,19 +122,20 @@ function safeLog(id: string, stage: string, status: number, failure?: WorkspaceC
     }),
   );
 }
-function includesToolsList(value: unknown): boolean {
-  if (Array.isArray(value)) return value.some(includesToolsList);
+function includesOwnerScopedOperation(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(includesOwnerScopedOperation);
   return (
     !!value &&
     typeof value === 'object' &&
     'method' in value &&
-    (value as { method: unknown }).method === 'tools/list'
+    ((value as { method: unknown }).method === 'tools/list' ||
+      (value as { method: unknown }).method === 'tools/call')
   );
 }
-async function isToolsListRequest(request: Request): Promise<boolean> {
+async function isOwnerScopedOperation(request: Request): Promise<boolean> {
   if (request.method !== 'POST') return false;
   try {
-    return includesToolsList(await request.clone().json());
+    return includesOwnerScopedOperation(await request.clone().json());
   } catch {
     return false;
   }
@@ -220,7 +221,7 @@ export async function handleHttpRequest(
     const context = options.verifiedClaims
       ? await authenticateVerifiedRequest(request, config, options.verifiedClaims, jwtDependencies)
       : await authenticateRequest(request, config, jwtDependencies);
-    if (checkOwner && (await isToolsListRequest(request))) {
+    if (checkOwner && (await isOwnerScopedOperation(request))) {
       const workspacePublicId = await checkOwner(config, context.accessToken, context.actorUserId);
       if (!workspacePublicId || !publicIdPattern.test(workspacePublicId)) {
         throw new AuthRejection(403);
