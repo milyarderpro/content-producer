@@ -33,9 +33,20 @@ jobs:
             "$work/resource.json" > /dev/null
 
           challenge_status="$(curl -sS --retry 0 --max-time 20 --connect-timeout 10 -X POST -H 'Content-Type:' --data-binary '{}' -D "$work/challenge.headers" -o "$work/challenge.body" -w '%{http_code}' "$MCP_RESOURCE")"
+          echo "Unauthenticated POST returned HTTP $challenge_status"
           test "$challenge_status" = 401
-          grep -Eiq '^www-authenticate:[[:space:]]*Bearer[[:space:]]' "$work/challenge.headers"
-          grep -Fq '/.well-known/oauth-protected-resource' "$work/challenge.headers"
+          echo 'Response header field names (no header values):'
+          awk -F: 'NF > 1 {print tolower($1)}' "$work/challenge.headers" | sort -u
+          jq -e '.error == "authentication_required" and (._meta["mcp/www_authenticate"][0] | startswith("Bearer resource_metadata="))' "$work/challenge.body" > /dev/null
+          echo 'JSON authentication hint: Bearer resource_metadata present'
+          if ! grep -Eiq '^www-authenticate:[[:space:]]*Bearer[[:space:]]' "$work/challenge.headers"; then
+            echo 'Missing WWW-Authenticate: Bearer challenge header'
+            exit 1
+          fi
+          if ! grep -Fq '/.well-known/oauth-protected-resource' "$work/challenge.headers"; then
+            echo 'WWW-Authenticate lacks protected resource metadata path'
+            exit 1
+          fi
 
           echo 'Live nested OAuth metadata: HTTP 200 and correct resource/issuer/header method'
           echo 'Live unauthenticated content-type-less POST: HTTP 401 with bearer metadata challenge'
