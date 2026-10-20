@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { materializeMissingSourceNulls } from '../../functions/mcp/source_evidence_adapter.js';
-import { content, editorial, save } from './helpers/post-rpc.js';
-import { cleanup, fixture, json, reserve, reserved, row, rpc } from './helpers/trivia-rpc.js';
+import { cleanup, content, editorial, save } from './helpers/post-rpc.js';
+import { fixture, json, reserve, reserved, row, rpc } from './helpers/trivia-rpc.js';
 
 const nasaPhase = 'https://science.nasa.gov/moon/moon-phases/';
 const nasaLight = 'https://science.nasa.gov/moon/moonlight/';
