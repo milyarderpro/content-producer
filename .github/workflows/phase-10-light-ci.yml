@@ -129,7 +129,7 @@ jobs:
           set -euo pipefail
           (
             cd artifacts/plugin-candidate
-            find . -type f -print | LC_ALL=C sort | zip -X -q "../content-producer-private-v0.2.1.zip" -@
+            find . -type f -print | LC_ALL=C sort | zip -X -q "../content-producer-private-v0.2.2.zip" -@
           )
           archive=artifacts/content-producer-private-v0.2.1.zip
           test -s "$archive"
@@ -170,7 +170,7 @@ jobs:
         if: steps.changes.outputs.package_changed == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: phase-10-final-plugin
+          name: phase-10-final-plugin-oauth-v0.2.2
           path: |
             artifacts/content-producer-private-v0.2.1.zip
             artifacts/plugin-candidate-filelist.json
