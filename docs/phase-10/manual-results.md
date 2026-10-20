@@ -179,3 +179,25 @@ MAN-03 production and MAN-04 remain PENDING.
 - **OAuth execution rule:** the fixed-pilot CR-038 grant gate runs only when `pilotMode` is active; current OAuth calls do not read those grants. No terminal activation/revocation step. Before reserving, read fresh `get_page_generation_context`, copy its `config_updated_at` exactly with six microsecond digits and current `fact_reuse_scope`, verify claims and similarity, then use one exact owner-approved reserve/save sequence. On uncertainty, context error or lost response, stop and reconcile owner-visible state; never generate replacement keys merely to retry.
 - **MAN-04 boundary:** show the saved draft, source evidence, quality checks, revision and `content_hash` to the owner. Revision and editorial approval are separate decisions. No ready status, schedule, Facebook publication or fabricated metrics before their assigned cards.
 - **Gate policy:** no backend code, migrations, security configuration or runtime dependency changed after the v29 gate. This documentation handoff uses light CI; a new full gate is due only if a later backend/security change requires one under CR-044.
+
+## CR-046 continued full gate — verified failure and frozen catalog repair (2026-10-20)
+
+- Continuation marker SHA `4bd27794979e4839f47d4afe189de4c9435f8530`:
+  [full backend/security Actions #39394186274](https://github.com/milyarderpro/content-producer/actions/runs/39394186274)
+  **FAIL** after 15m31s. The local reset, authenticated owner/OAuth, 33 valid/invalid MCP Inspector,
+  `pnpm run test-all`, migration history, and local DB lint **PASS**. Catalog/privilege audit
+  stopped at `scripts/phase-6-catalog-audit.ts:24`: `69 !== 68`; post-audit and whitespace
+  final checks were skipped. No grant or RLS breach was demonstrated by the failure, but no full
+  catalog PASS was obtained either.
+- The 69th migration is the intentional CR-046 additive RPC projection; the Phase 9.5
+  read-only audit had hard-coded the earlier total of 68. The correction is limited to
+  `scripts/phase-6-catalog-audit.ts` (audit code SHA `0df37bb69dc222d46eecb9bbfa69369be1e9cdc5`):
+  require 69 applied/source migrations; verify all 67 archived baseline migration SHA-256
+  fingerprints unchanged; pin the exact CR-021 and CR-046 SQL Git blob bytes; and compare
+  the CR-046 function source with the archived baseline after stripping exactly one known
+  added JSON projection. All existing grants, RLS, definer, ownership, zero-fixture,
+  operation-ledger and source-equality checks remain mandatory.
+- Corrected complete backend gate remains **NOT RUN / NOT PASS**. A pending/light check is not
+  release authorization. Do not apply migration/deploy Edge or do any production content write
+  until a new exact-SHA full gate actually **PASS** and the result is recorded.
+  MAN-03 and MAN-04 remain **PENDING**; `mcp` production v29 is the last verified state.
