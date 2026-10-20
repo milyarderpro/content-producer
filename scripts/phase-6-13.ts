@@ -12,6 +12,8 @@ import {
   stateDigest,
 } from '../supabase/tests/database/helpers/plan-lifecycle.js';
 import {
+  content as postContent,
+  editorial as postEditorial,
   request as postRequest,
   cleanup as postCleanup,
 } from '../supabase/tests/database/helpers/post-rpc.js';
@@ -1017,6 +1019,104 @@ try {
     'GET_PRIVATE_TOKEN_REDACTION',
   );
   console.info('POST_P5_POST_READ_PASSED');
+
+  // CR-046: use ONLY the public owner MCP read to supply the actual Page
+  // configuration identity and exact CAS timestamp for a fresh reserve + draft.
+  // This complete HTTP path runs against the ephemeral local fixture only.
+  clearFixtureBuckets();
+  const generationContext = await call('get_page_generation_context', {
+    ...common(),
+    page_public_id: f.page,
+    niche_key: 'trivia',
+    recent_post_limit: 12,
+  });
+  const storedContext = row<{ config_id: string; stamp: string }>(`
+    select c.public_id as config_id, internal.iso_timestamp_v1(c.updated_at) as stamp
+    from public.page_niche_configs c join public.pages p on p.id=c.page_id
+    where p.public_id='${f.page}' and c.workspace_id=p.workspace_id and c.niche_key='trivia'
+  `);
+  const ctxConfigId = generationContext.config_public_id as string;
+  const ctxStamp = generationContext.context_version.config_updated_at as string;
+  check(ctxConfigId === storedContext.config_id, 'CR046_PUBLIC_CONFIG_ID_MISMATCH');
+  check(ctxStamp === storedContext.stamp, 'CR046_PUBLIC_CONFIG_TIME_MISMATCH');
+  check(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$/.test(ctxStamp), 'CR046_MICROSECOND_LOSS');
+  const httpToken = randomUUID();
+  const httpFacts = Array.from({ length: 5 }, (_, index) =>
+    factInput(candidate(61 + index), index + 1),
+  );
+  const httpReservation = await call('trivia_register_and_reserve_facts', {
+    ...write(),
+    page_public_id: f.page,
+    reservation_token: httpToken,
+    expected_config_updated_at: ctxStamp,
+    fact_reuse_scope: generationContext.reuse_policy.scope,
+    reservation_ttl_minutes: generationContext.reuse_policy.reservation_ttl_minutes,
+    facts: httpFacts,
+  });
+  check(httpReservation.facts.length === 5, 'CR046_HTTP_RESERVATION_COUNT');
+  const httpBindings = httpReservation.facts.map(
+    (fact: { fact_public_id: string; canonical_claim: string }, index: number) => ({
+      position: index + 1,
+      fact_public_id: fact.fact_public_id,
+      fact_role: 'general',
+      rendered_text: fact.canonical_claim,
+    }),
+  );
+  const httpSnapshot = {
+    schema_version: 1,
+    module_version: generationContext.module.module_version,
+    config_schema_version: generationContext.module.config_schema_version,
+    content_schema_version: generationContext.module.content_schema_versions[0],
+    renderer_version: 1,
+    quality_gate_version: 1,
+    editorial_rubric_version: 1,
+    source_policy_version: 1,
+    dedup_contract_version: 1,
+    config_public_id: ctxConfigId,
+    config_updated_at: ctxStamp,
+    fact_count: generationContext.generation_rules.fact_count,
+    fact_count_applied: httpBindings.length,
+    fact_count_override: false,
+    text_budget: generationContext.generation_rules.text_budget,
+    fact_reuse_scope: generationContext.reuse_policy.scope,
+    profile_key: 'fast_trivia',
+    render_style: generationContext.generation_rules.render_style,
+    target_markets: generationContext.page.target_markets,
+    locale: generationContext.generation_rules.locale,
+    line_width_chars: 34,
+    target_video_seconds: 13,
+    override_reason: null,
+  };
+  const httpSaved = await call('save_post', {
+    ...write(),
+    page_public_id: f.page,
+    niche_key: 'trivia',
+    reservation_token: httpToken,
+    expected_config_updated_at: ctxStamp,
+    plan_item: null,
+    scheduled_at: null,
+    content_schema_version: 1,
+    format_key: 'single_subject_fast',
+    topic_key: 'animals',
+    interaction_goal: 'share',
+    content_payload: postContent(httpBindings),
+    generation_snapshot: httpSnapshot,
+    fact_bindings: httpBindings,
+    editorial_checks: postEditorial(),
+  });
+  const httpReadback = await call('get_post', {
+    ...common(),
+    post_public_id: httpSaved.post.post_public_id,
+  });
+  check(httpSaved.post.status === 'draft' && httpReadback.post.status === 'draft', 'CR046_HTTP_DRAFT_ONLY');
+  check(
+    httpReadback.post.generation_snapshot.config_public_id === ctxConfigId &&
+      httpReadback.post.generation_snapshot.config_updated_at === ctxStamp,
+    'CR046_HTTP_SNAPSHOT_READBACK',
+  );
+  check(httpReadback.post.fact_bindings.length === 5, 'CR046_HTTP_FACT_BINDINGS');
+  console.info('CR-046 isolated public MCP context -> reservation -> save_post -> get_post: PASS');
+
   const another = postRequest(f);
   const second = await call('save_post', draftArgs(another));
   check(second.post.status === 'draft', 'SECOND_DRAFT');
