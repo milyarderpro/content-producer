@@ -20,12 +20,13 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: true
+          fetch-depth: 2
       - name: Refuse unexpected source revision
         shell: bash
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test "$(git rev-parse HEAD^)" = "97c126e3b062e37710dbd3785953e2b9d4458d76"
+          test "$(git rev-parse HEAD^)" = "80904c3d071f9c5ca63b1c7e67ec9cd0ac289d09"
           test "$GITHUB_REF" = "refs/heads/codex/phase-10-plugin"
       - name: Setup pinned pnpm
         uses: pnpm/action-setup@v4
