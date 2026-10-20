@@ -1,0 +1,2 @@
+CR-047 isolated source evidence and MAN-03 draft E2E preflight.
+Ephemeral local Supabase only; no production database RPC or hosted writes.

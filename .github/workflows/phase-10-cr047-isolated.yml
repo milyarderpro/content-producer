@@ -1,0 +1,51 @@
+name: CR-047 - focused local source evidence and draft
+
+on:
+  push:
+    branches: [codex/phase-10-plugin]
+    paths:
+      - .github/phase-10-cr047-focused.txt
+
+permissions:
+  contents: read
+
+jobs:
+  isolated:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      SUPABASE_TELEMETRY_DISABLED: '1'
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Local CLI checks and locked install
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm exec supabase --version
+          pnpm exec supabase start --help > /dev/null
+          pnpm exec supabase db reset --help > /dev/null
+      - name: Start isolated local Supabase and one reset
+        run: |
+          set -euo pipefail
+          pnpm run supabase:start > "$RUNNER_TEMP/cr047-local-start.log" 2>&1
+          pnpm run supabase:reset > "$RUNNER_TEMP/cr047-local-reset.log" 2>&1
+          echo "LOCAL_ONLY_RESET_PASS"
+      - name: CR-047 seven-source SQL and context reserve save readback
+        run: |
+          pnpm exec vitest run --config vitest.database.config.ts supabase/tests/database/api-source-evidence-mcp-compat.test.ts
+      - name: Stop local Supabase
+        if: always()
+        run: pnpm run supabase:stop || true
