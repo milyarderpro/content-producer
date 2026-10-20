@@ -282,3 +282,14 @@ Follow for more clear space facts.
 | 7 | Earthshine is Earth's reflected sunlight lighting a crescent's dark side. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
 
 **Review boundary:** saved content, sources, checks, revision and hash are ready for owner editorial review. No revision, approval, scheduling, publishing or MAN-04 action occurred. Evidence is also on [Issue #22](https://github.com/milyarderpro/content-producer/issues/22) and [PR #23](https://github.com/milyarderpro/content-producer/pull/23#issuecomment-6290664363).
+
+
+## MAN-04 part A — authorized hook revision preflight (20 October 2026)
+
+**Owner instruction reference:** the owner's 20 October 2026 Codex continuation explicitly selected the hook `7 Moon Facts Worth Knowing` for post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8`, authorized one hook-only revision via owner OAuth `mcpku2`, required latest revision/hash CAS and readback, and expressly withheld `approve_post`/ready approval. This is authorization for part A only. The previous draft review does not authorize part B.
+
+**Compiled procedure-v1 part A prompt before execution:** “Buka draft `f58017bb-60ae-476d-afa7-65f8f0c6c3b8` pada Page `corious-facts`; revisi hook menjadi `7 Moon Facts Worth Knowing` sambil menjaga tujuh fakta, sumber, seluruh Canva copy lainnya, caption, hashtag dan status draft. Gunakan revision `1` dan content hash `06fabcc670b4690ef91f59e919c1c81325854d1727d29af43c1e7880478081b4` hasil `get_post` terbaru sebagai CAS; jalankan quality checks, lalu tampilkan teks/revision/hash final tanpa menyetujui. Jika CAS atau checks gagal, hentikan write dan rekonsiliasi tanpa key pengganti.”
+
+**Pre-write readback:** authenticated owner workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`; one exact active trivia Page `corious-facts` (`37457236-17ec-4486-8880-6832460ae411`). `get_post` returned status `draft`, revision `1`, the hash above, seven allocated fact bindings, 19/19 system passed and 18/18 editorial pass. Fresh Page generation context returned config ID `cd41b752-92f7-4905-9c02-fbcef032459a`, exact microsecond timestamp `2026-10-19T10:33:17.018070Z`, and unchanged `workspace_unique` reuse scope. The planned request keeps the seven bindings and caption/hashtags identical, replaces only hook and derived Canva copy, and requests fresh server text metrics and editorial attestation. One new UUIDv4 operation key is bound to this one logical revision; raw key is omitted from the public ledger.
+
+**Execution/result:** PENDING at this preflight record. No approval or status transition is authorized.
