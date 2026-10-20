@@ -121,6 +121,17 @@ Only store minimum redacted arguments/results needed to explain a failure. Crede
 - MAN-03 subsequently reached a failed reservation but **no draft**; MAN-03/04 remain **PENDING**. The owner must separately review any future persisted draft, checks, actual revision and hash before MAN-04 approval. No ready, schedule or publication action.
 - Preserve 10.3 independently unverified production ledger and secret-revocation evidence as audit 10.7 residuals.
 
+## CR-046 MAN-03 blocker repair — separate from manual-card outcome
+
+Source correction work on the same draft PR #23 adds the actual Page+niche
+`config_public_id` to generation context and validates it against the
+persisted configuration row. The isolated test exercises
+context → fact reservation → `save_post` → `get_post` with exact
+six-digit-microsecond CAS and a full snapshot. This is a **local fixture**
+trace, not a production MAN-03 draft or an owner editorial approval.
+Record a CI/deployment/OAuth result here only after it is observed.
+MAN-03 production and MAN-04 remain PENDING.
+
 ## Current MAN-03 OAuth handoff — 20 October 2026
 
 - **Installed host:** same PRIVATE plugin v0.2.2, required `mcpku2` OAuth app, 33 tools and three owner reads PASS through `@Content Producer`; no OAuth business write yet. The host is set to `ask_before_writes` ([host evidence](https://github.com/milyarderpro/content-producer/issues/22#issuecomment-6285034464)).
