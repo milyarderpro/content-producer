@@ -83,7 +83,7 @@ const rpcProfileOutput = response(
   }),
 );
 const profileFields = {
-  id: z.string().min(1).max(200).regex(/\\S/),
+  id: z.string().min(1).max(200).regex(/\S/),
   name: z.string().min(1).max(120).optional(),
   nickname: z.string().min(1).max(120).optional(),
 };

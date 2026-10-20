@@ -158,8 +158,11 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
       'OAuth input differs from SDK beyond CR-034 transforms',
     );
     assert(
-      !('outputSchema' in auth) && !('title' in auth),
-      'OAuth optional metadata must be compact',
+      !('title' in auth) &&
+        (auth.name === 'get_account_profile'
+          ? JSON.stringify(auth.outputSchema) === JSON.stringify(full.outputSchema)
+          : !('outputSchema' in auth)),
+      'only OAuth profile must retain output schema on wire',
     );
     assert(
       !('$schema' in (auth.inputSchema as Record<string, unknown>)),
@@ -195,6 +198,41 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     );
   }
   assert(compiledPatterns.length > 0, 'compiled schema must contain patterns');
+  const oauthProfile = oauthTools.find((tool) => tool.name === 'get_account_profile');
+  assert(!!oauthProfile, 'OAuth profile descriptor missing');
+  const profileSchema = oauthProfile.outputSchema as {
+    type: string;
+    required: string[];
+    additionalProperties: boolean;
+    properties: Record<string, unknown>;
+  };
+  assert(profileSchema.type === 'object' && profileSchema.additionalProperties === false,
+    'profile output must be a closed object');
+  assert(JSON.stringify(profileSchema.required) === JSON.stringify(['id']),
+    'profile output requires only id');
+  assert(
+    Object.keys(profileSchema.properties).every((field) =>
+      ['id', 'name', 'email', 'nickname'].includes(field)) &&
+      !Object.hasOwn(profileSchema.properties, 'workspace_public_id'),
+    'OpenAI profile forbids extra workspace_public_id',
+  );
+  const accountInput = oauthProfile.inputSchema as {
+    required?: string[];
+    properties: Record<string, unknown>;
+    additionalProperties: boolean;
+  };
+  assert(Object.keys(accountInput.properties).length === 0 &&
+    (!accountInput.required || accountInput.required.length === 0) &&
+    accountInput.additionalProperties === false, 'OAuth profile input must accept only {}');
+  const workspaceTool = oauthTools.find((tool) => tool.name === 'get_workspace_context');
+  const workspaceInput = workspaceTool?.inputSchema as {
+    required?: string[];
+    properties: Record<string, unknown>;
+  };
+  assert(!!workspaceTool &&
+    Object.hasOwn(workspaceInput.properties, 'workspace_public_id') &&
+    (!workspaceInput.required || !workspaceInput.required.includes('workspace_public_id')),
+    'owner-scoped workspace must be discoverable without asking profile for extra fields');
   const profiles = oauthTools.filter(
     (tool) => (tool._meta as Record<string, unknown>)['openai/profile'] === true,
   );

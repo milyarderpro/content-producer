@@ -23,3 +23,11 @@ Focused Deno tests compare all 33 No-auth and OAuth input schemas to the origina
 - The No-auth catalog's 100,000-byte target is **not** asserted for OAuth: OAuth schemes are required and account for the additional metadata.
 - Dedicated regression also compares unauthenticated protocol discovery against authenticated OAuth listing byte-equivalent descriptors and rejects anonymous `tools/call` before a handler executes.
 - Owner OAuth and ChatGPT's opaque registration validator are not exercised by these automated tests. One owner connection only after full final-SHA gate and deployment.
+
+## CR-041 profile contract correction (owner requested, 2026-10-20)
+
+OpenAI's [current official authentication contract](https://developers.openai.com/plugins/build/auth) explicitly requires an authenticated profile tool marked `_meta["openai/profile"]: true` to advertise its `outputSchema` and to return a top-level identity object with required stable `id`, optional `name`/`email`/`nickname` and `additionalProperties: false`. A workspace UUID is **not** one of the allowed profile properties. Earlier CR-029 profile result and CR-040 blanket `outputSchema` omission are incompatible with this current rule.
+
+Fix: preserve `outputSchema` **only** for the OAuth-designated `get_account_profile` in the outbound MCP tools/list, with exact SDK/Zod closed schema. Drop `workspace_public_id` only from OAuth profile output (never from database RPC), keep existing OAuth identity stable and identical JSON text and structuredContent. Keep No-auth pilot's unmarked profile + workspace field unchanged. To maintain workspace discovery, OAuth `get_workspace_context({})` resolves the server-validated owner workspace from `RequestContext`, forwards unchanged RPC version 1 and workspace UUID, and returns `workspace.public_id`. Optional supplied workspace IDs still undergo mismatch rejection. No migrations, ownership changes, or business writes.
+
+Tests validate the **serialized MCP wire catalog** (anonymous discovery and authenticated OAuth), sole profile outputSchema, 33 tools, strict schema and fields, profile call result equivalence, owner-derived workspace/bootstrap and cross-workspace denial; raw SDK output schemas remain validated independently. Local focused and one final-SHA full gate are required before a single OAuth owner connection.

@@ -246,7 +246,11 @@ Deno.test('All registered tool input/output object schemas are closed recursivel
   assert(new Set(tools.map((tool: { name: string }) => tool.name)).size === 33, 'unique names');
   for (const tool of tools) {
     assertClosedObjects(tool.inputSchema, tool.name + '.input');
-    assert(!Object.hasOwn(tool, 'outputSchema'), 'OAuth optional wire output must be omitted');
+    if (tool.name === 'get_account_profile') {
+      assertClosedObjects(tool.outputSchema, 'wire.oauth.profile.output');
+    } else {
+      assert(!Object.hasOwn(tool, 'outputSchema'), 'only profile publishes outputSchema');
+    }
     assert(tool.securitySchemes?.[0]?.type === 'oauth2', tool.name + ' top-level OAuth');
     assert(
       JSON.stringify(tool.securitySchemes) === JSON.stringify(tool._meta?.securitySchemes),
@@ -274,8 +278,16 @@ Deno.test('All registered tool input/output object schemas are closed recursivel
   assert(Object.keys(profile.inputSchema.properties).length === 0, 'profile must accept {}');
   assert(sdkProfile.outputSchema.required.includes('id'), 'top-level profile id required');
   assert(
-    sdkProfile.outputSchema.required.includes('workspace_public_id'),
-    'fixed workspace reference required',
+    !Object.hasOwn(sdkProfile.outputSchema.properties, 'workspace_public_id'),
+    'workspace id must not appear in closed OAuth profile contract',
+  );
+  assert(
+    JSON.stringify(profile.outputSchema) === JSON.stringify(sdkProfile.outputSchema),
+    'actual MCP wire must publish the raw registered profile outputSchema',
+  );
+  assert(
+    JSON.stringify(sdkProfile.outputSchema.required) === JSON.stringify(['id']),
+    'OAuth profile requires only opaque id',
   );
   assert(sdkProfile.outputSchema.properties.id.type === 'string', 'profile id schema');
 });
@@ -312,6 +324,11 @@ Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation',
     assert(profileResult.structuredContent.id === owner, 'top-level owner identity');
     assert(profileResult.structuredContent.name === 'Owner', 'profile display name');
     assert(profileResult.structuredContent.nickname === 'Owner workspace', 'profile label');
+    assert(!Object.hasOwn(profileResult.structuredContent, 'workspace_public_id'),
+      'OAuth profile must not expose nonstandard workspace_public_id');
+    assert(Object.keys(profileResult.structuredContent).every((key: string) =>
+      ['id', 'name', 'email', 'nickname'].includes(key)),
+      'profile response contains nonstandard fields');
     assert(
       profileResult.content[0].text === JSON.stringify(profileResult.structuredContent),
       'profile text must match structured content',
@@ -320,9 +337,10 @@ Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation',
     assert(!profile.includes('access_token'), 'must not expose tokens');
     const ws = await request('tools/call', {
       name: 'get_workspace_context',
-      arguments: { request_schema_version: 1, workspace_public_id: workspace },
+      arguments: {},
     });
     assert(ws.includes('Owner workspace'), 'workspace read missing');
+    assert(ws.includes(workspace), 'owner-derived workspace public id must remain discoverable');
     const pages = await request('tools/call', {
       name: 'list_pages',
       arguments: {
@@ -351,6 +369,11 @@ Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation',
     assert(
       calls[0]?.name === 'get_account_profile' && calls[0]?.args.p_request_schema_version === 1,
       'MCP profile adapter must preserve versioned RPC',
+    );
+    assert(
+      calls[1]?.args.p_request_schema_version === 1 &&
+        calls[1]?.args.p_workspace_public_id === workspace,
+      'workspace bootstrap must derive owner scope from auth context',
     );
     assert(
       calls[2]?.args.p_query === 'Owner' && calls[2]?.args.p_limit === 1,
