@@ -286,6 +286,34 @@ the OAuth procedure. Existing focused and full backend gate evidence
 is reusable while backend source and security configuration remain
 unchanged.
 
+**CR-046 context contract (MAN-03 blocker repair):** The versioned owner
+`get_page_generation_context` response now exposes
+`data.config_public_id`, the actual `public.page_niche_configs.public_id`
+for the selected Page+niche, alongside existing
+`data.context_version.config_updated_at`. Pass that **exact** UUID to
+`save_post.generation_snapshot.config_public_id`; never invent it, derive it
+from `page_public_id`, or substitute an ID from another Page. The
+`config_updated_at` value is an ISO timestamp with **six microsecond digits**
+and must be copied byte-for-byte into the reservation CAS,
+`save_post.expected_config_updated_at`, and
+`save_post.generation_snapshot.config_updated_at`.
+
+**Other snapshot fields audited:** `module_version`,
+`config_schema_version` and `content_schema_version` derive from
+`data.module`; `fact_count`, `text_budget`, `render_style` and `locale`
+derive from `data.generation_rules`; `fact_reuse_scope` derives from
+`data.reuse_policy.scope`; `target_markets` derives from `data.page`.
+`profile_key`, `fact_count_applied`, `fact_count_override` and
+`override_reason` are the chosen, validated generation inputs.
+The remaining frozen schema/renderer/quality/rubric/source/dedup version
+numbers are v1, `line_width_chars=34`, and
+`target_video_seconds=13` by the existing post contract, **not**
+extra fields returned by the Page context. The isolated HTTP regression
+constructs and persists this full required snapshot through the real public
+owner RPC/MCP path; these constants are not a second missing Page-specific
+identifier. The migration changes only the read projection and MCP schema,
+not business validation. MAN-03 production and MAN-04 are still PENDING.
+
 Immediately before any MAN-03 reservation, confirm the installed
 v0.2.2 OAuth plugin, owner workspace, target `corious-facts` Page,
 current zero-or-known draft state, and a fresh
