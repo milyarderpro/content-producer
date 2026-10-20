@@ -1,5 +1,7 @@
-Phase 10 OAuth catalog parity — CR-040 final gate marker
-Pre-marker tested backend SHA: 515b229002269cd0260488f220b1c3570bd9fd82
-Focused Phase 10 CI: run 39291996915 SUCCESS (pnpm run check, Deno MCP tests, all 33 OAuth/No-auth schema equivalence, anonymous OAuth catalog denial and package checks).
-CR-029 OAuth profile, CR-033 metadata compaction and CR-034 equivalent Cc pattern normalization preserved.
-NO production writes, grants, RLS changes, MAN-03 or MAN-04. Run CR-020 technical/security gate once at the post-marker final SHA before any Edge deploy.
+Phase 10 OAuth profile-contract release candidate — CR-041
+Focused source SHA: c0feb79854178fea5f6e6a048de8897708b327b7
+Focused validation: GitHub Actions #39359182221 COMPLETED/SUCCESS
+pnpm run check: PASS; pnpm run test:mcp: 72 passed, 0 failed; 33 OAuth tool schema descriptors, owner-scoped get_workspace_context({}) and real serialized MCP OAuth profile outputSchema: PASS.
+OpenAI profile wire contract: required opaque stable id, optional name/nickname/email, strict output object; workspace_public_id discovered via authenticated get_workspace_context, no foreign workspace bypass.
+Original No-auth pilot workspace bootstrap retained; OAuth bearer protections and raw SDK output validation retained.
+Run exactly one CR-020 full backend/security gate on this POST-MARKER final commit SHA. No deployment before PASS; no manual login, grant, MAN-03 or MAN-04.
