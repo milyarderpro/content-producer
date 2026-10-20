@@ -1024,12 +1024,14 @@ try {
   // configuration identity and exact CAS timestamp for a fresh reserve + draft.
   // This complete HTTP path runs against the ephemeral local fixture only.
   clearFixtureBuckets();
+  console.info('CR046_STAGE_READ_CONTEXT_BEGIN');
   const generationContext = await call('get_page_generation_context', {
     ...common(),
     page_public_id: f.page,
     niche_key: 'trivia',
     recent_post_limit: 12,
   });
+  console.info('CR046_STAGE_READ_CONTEXT_PASS');
   const storedContext = row<{ config_id: string; stamp: string }>(`
     select c.public_id as config_id, internal.iso_timestamp_v1(c.updated_at) as stamp
     from public.page_niche_configs c join public.pages p on p.id=c.page_id
@@ -1040,10 +1042,12 @@ try {
   check(ctxConfigId === storedContext.config_id, 'CR046_PUBLIC_CONFIG_ID_MISMATCH');
   check(ctxStamp === storedContext.stamp, 'CR046_PUBLIC_CONFIG_TIME_MISMATCH');
   check(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/.test(ctxStamp), 'CR046_MICROSECOND_LOSS');
+  console.info('CR046_STAGE_CONTEXT_ROW_PASS');
   const httpToken = randomUUID();
   const httpFacts = Array.from({ length: 5 }, (_, index) =>
     factInput(candidate(61 + index), index + 1),
   );
+  console.info('CR046_STAGE_RESERVE_BEGIN');
   const httpReservation = await call('trivia_register_and_reserve_facts', {
     ...write(),
     page_public_id: f.page,
@@ -1053,6 +1057,7 @@ try {
     reservation_ttl_minutes: generationContext.reuse_policy.reservation_ttl_minutes,
     facts: httpFacts,
   });
+  console.info('CR046_STAGE_RESERVE_RETURNED');
   check(httpReservation.facts.length === 5, 'CR046_HTTP_RESERVATION_COUNT');
   const httpBindings = httpReservation.facts.map(
     (fact: { fact_public_id: string; canonical_claim: string }, index: number) => ({
@@ -1087,6 +1092,7 @@ try {
     target_video_seconds: 13,
     override_reason: null,
   };
+  console.info('CR046_STAGE_SAVE_BEGIN');
   const httpSaved = await call('save_post', {
     ...write(),
     page_public_id: f.page,
@@ -1104,10 +1110,12 @@ try {
     fact_bindings: httpBindings,
     editorial_checks: postEditorial(),
   });
+  console.info('CR046_STAGE_SAVE_RETURNED');
   const httpReadback = await call('get_post', {
     ...common(),
     post_public_id: httpSaved.post.post_public_id,
   });
+  console.info('CR046_STAGE_READBACK_RETURNED');
   check(
     httpSaved.post.status === 'draft' && httpReadback.post.status === 'draft',
     'CR046_HTTP_DRAFT_ONLY',
