@@ -19,7 +19,7 @@ The owner-allowed one-time exact-SHA backend gate was run on
 **FAIL**, not deployable. The first isolated HTTP run uncovered a test-only
 assumption that `get_post` exposes private `generation_snapshot`, which the
 frozen public contract correctly omits. The harness now verifies private
-snapshot persistence via the *local isolated database*, and tests public
+snapshot persistence via the _local isolated database_, and tests public
 draft readback without requesting hidden fields. Narrow follow-up
 [Actions #39391875211](https://github.com/milyarderpro/content-producer/actions/runs/39391875211)
 **PASS**, including full authenticated local HTTP pipeline and Inspector's
