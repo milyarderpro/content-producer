@@ -1,3 +1,4 @@
+import { materializeMissingSourceNulls } from './source_evidence_adapter.ts';
 import { createAuthenticatedTransport } from './transport.ts';
 import type { RequestContext } from './auth.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
@@ -389,4 +390,31 @@ Deno.test(
       globalThis.fetch = original;
     }
   },
-);
+);Deno.test('CR-047 omitted nullable evidence fields become null without touching caller values', () => {
+  const original = (inputs.trivia_register_and_reserve_facts.facts as Record<string, unknown>[])[0]!;
+  const fullSource = (original.sources as Record<string, unknown>[])[0]!;
+  const omitted = Object.fromEntries(
+    Object.entries(fullSource).filter(
+      ([key]) => !['published_at', 'updated_at', 'as_of'].includes(key),
+    ),
+  );
+  const normalized = materializeMissingSourceNulls([{ sources: [omitted] }])[0]!.sources[0]!;
+  for (const key of ['published_at', 'updated_at', 'as_of']) {
+    check(!Object.hasOwn(omitted, key), 'INPUT_STILL_OMITTED_' + key);
+    check(Object.hasOwn(normalized, key) && normalized[key] === null, 'NORMALIZED_' + key);
+  }
+  check(normalized.url === omitted.url && normalized.supports === omitted.supports, 'SOURCE_UNCHANGED');
+  const explicit = {
+    ...omitted,
+    published_at: '2026-10-01',
+    updated_at: null,
+    as_of: 'October 2026',
+  };
+  const preserved = materializeMissingSourceNulls([{ sources: [explicit] }])[0]!.sources[0]!;
+  check(
+    preserved.published_at === '2026-10-01' &&
+      preserved.updated_at === null &&
+      preserved.as_of === 'October 2026',
+    'EXPLICIT_VALUES_PRESERVED',
+  );
+});
