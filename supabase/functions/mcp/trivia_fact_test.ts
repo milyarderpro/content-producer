@@ -226,7 +226,7 @@ Deno.test(
         ],
         ['trivia_register_and_reserve_facts', { reservation_token: 'invalid' }],
         ['trivia_register_and_reserve_facts', { reservation_ttl_minutes: 4 }],
-        ['trivia_release_facts', { reason: '***' }],
+        ['trivia_release_facts', { reason: 'CONTEXT: unsafe trace content' }],
         ['trivia_release_facts', { reason: 'SQLSTATE 42501' }],
         ['trivia_release_facts', { reservation_token: 'invalid' }],
       ] as const) {
