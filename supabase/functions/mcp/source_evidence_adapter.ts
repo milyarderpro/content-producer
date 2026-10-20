@@ -4,11 +4,12 @@
 export function materializeMissingSourceNulls<T extends { sources: object[] }>(facts: T[]) {
   return facts.map((fact) => ({
     ...fact,
-    sources: fact.sources.map((source) => ({
-      ...source,
-      ...(!Object.hasOwn(source, 'published_at') ? { published_at: null } : {}),
-      ...(!Object.hasOwn(source, 'updated_at') ? { updated_at: null } : {}),
-      ...(!Object.hasOwn(source, 'as_of') ? { as_of: null } : {}),
-    })),
+    sources: fact.sources.map((source) => {
+      const completed: Record<string, unknown> = { ...source };
+      for (const key of ['published_at', 'updated_at', 'as_of']) {
+        if (!Object.hasOwn(completed, key)) completed[key] = null;
+      }
+      return completed;
+    }),
   }));
 }
