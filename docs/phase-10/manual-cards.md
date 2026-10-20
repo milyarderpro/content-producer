@@ -13,8 +13,13 @@ it is not itself an approval of editorial content. Fetch Page generation
 context immediately before MAN-03 and preserve the exact six-digit
 microsecond `config_updated_at` text for CAS. Do not use the old
 No-auth prompt, stale timestamp, or a replacement operation key as a
-recovery shortcut. The owner still reviews the actual persisted draft,
-sources, checks, revision and hash before MAN-04 approval.
+recovery shortcut. The already recorded owner choice for MAN-03 is `corious-facts`, Moon phases,
+`nature_science`, `single_subject_fast`, `fast_trivia`, `follow`, en-US,
+verified NASA sources and draft-only effects. Reuse that choice without
+asking the owner to restate it, unless they request a change; still show
+the exact executable draft-only prompt and obtain approval for its write
+scope. The owner reviews the actual persisted draft, sources, checks,
+revision and hash before MAN-04 approval.
 
 ## Procedure freeze and per-card binding gates
 
