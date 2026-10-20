@@ -352,7 +352,6 @@ Follow for more clear space facts.
 
 **Provenance and checkpoint boundary:** the write/result report came from the owner's other Codex task; the authoritative ready/approval/content/check state above was independently read through owner OAuth `mcpku2` here. A fresh ChatGPT conversation showing the installed PRIVATE Content Producer parent plugin selected for these business calls is **not** part of this execution trace. Thus MAN-04's production approval effect is verified, while overall Phase 10.4 guided-plugin acceptance remains **PENDING** on that host-attribution evidence. No MAN-05, plan, scheduling, publication, metrics, merge or Phase 10 completion claim.
 
-
 ## Phase 10.4 final owner signoff — PASS (20 October 2026)
 
 The owner reviewed the saved Moon draft, the exact revision-2 Canva copy, caption, hashtags, seven NASA source bindings, 19/19 passing system checks, 18/18 passing editorial checks, and hash `e944cf8975954f4041489e499ed20e1934181fd1f711b3f4756f62abe26abec3`. The owner authorized the hook revision separately and then expressly approved that exact content for `ready`. One authenticated approval through `mcpku2` returned `replayed=false`. Independent readback confirms post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8` is `ready`, revision 3, with the approved hash, `quality_status=passed`, approval snapshot bound to revision/hash, and no schedule or publication.
