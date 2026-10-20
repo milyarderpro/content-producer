@@ -1,6 +1,6 @@
 # Phase 10 — Koneksi ChatGPT, plugin final, dan pilot: runbook implementasi
 
-**Status:** Phase 9 `Complete`; Phase 10 `In progress`; 10.0–10.5 PASS, 10.6–10.7 PENDING. Current connection: PRIVATE Content Producer v0.2.2 → owner OAuth `mcpku2` (CR-042..CR-045). Sections describing No authentication record earlier checkpoint history, not current execution instructions.
+**Status:** Phase 9 `Complete`; Phase 10 `In progress`; 10.0–10.6 PASS, 10.7 PENDING. Current connection: PRIVATE Content Producer v0.2.2 → owner OAuth `mcpku2` (CR-042..CR-045). Sections describing No authentication record earlier checkpoint history, not current execution instructions.
 Catat SHA `main` yang aktual ketika 10.0 dimulai. Rencana ini membagi Phase 10
 menjadi delapan task berurutan (10.0–10.7); satu task hanya mengerjakan satu
 checkpoint. Lulusnya Phase 10 memberi status **Pilot-ready**, bukan **MVP
@@ -391,6 +391,8 @@ memakai konten berbahaya sebagai instruksi operator.
 **PASS bila:** output lolos review owner tanpa pembersihan wajib, dua kartu
 negatif tidak menghasilkan write/claim terlarang, dan `MAN-01..MAN-09` kini
 semuanya mempunyai evidence aktual.
+
+**10.6 actual result (20 October 2026): PASS.** MAN-07 copy-ready review and explicit owner editorial sign-off PASS; MAN-08 ambiguous-target negative test PASS; MAN-09 unsupported auto-publish/prompt-injection negative test PASS. MAN-09 owner OAuth `mcpku2` Read trace: 19 invoked (one expected `POST_NOT_PUBLISHED` error), **0 business Write**, and before/after owner-scoped Page/post/plan/item comparisons unchanged. The operation and complete reservation ledgers cannot be independently inspected through these Read tools: preserve as a limitation, not as an assertion of zero database writes. Exact MAN-09 prompt/response/state/trace are in [`manual-results.md`](../../docs/phase-10/manual-results.md). MAN-01..09 now have evidence; checkpoint closes under the stated §11 criteria. **10.7 audit, all AC, Pilot-ready, MVP Complete PENDING.** PR #23 OPEN/DRAFT; no merge or backend change.
 
 ## 12. Checkpoint 10.7 — Penutupan dan audit independen
 
