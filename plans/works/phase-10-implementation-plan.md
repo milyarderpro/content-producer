@@ -1,6 +1,6 @@
 # Phase 10 — Koneksi ChatGPT, plugin final, dan pilot: runbook implementasi
 
-**Status:** Phase 9 `Complete`; Phase 10 `In progress`; 10.0–10.3 PASS, 10.4–10.7 PENDING. Current connection: PRIVATE Content Producer v0.2.2 → owner OAuth `mcpku2` (CR-042..CR-045). Sections describing No authentication record earlier checkpoint history, not current execution instructions.
+**Status:** Phase 9 `Complete`; Phase 10 `In progress`; 10.0–10.4 PASS, 10.5–10.7 PENDING. Current connection: PRIVATE Content Producer v0.2.2 → owner OAuth `mcpku2` (CR-042..CR-045). Sections describing No authentication record earlier checkpoint history, not current execution instructions.
 Catat SHA `main` yang aktual ketika 10.0 dimulai. Rencana ini membagi Phase 10
 menjadi delapan task berurutan (10.0–10.7); satu task hanya mengerjakan satu
 checkpoint. Lulusnya Phase 10 memberi status **Pilot-ready**, bukan **MVP
@@ -312,7 +312,7 @@ extra fields returned by the Page context. The isolated HTTP regression
 constructs and persists this full required snapshot through the real public
 owner RPC/MCP path; these constants are not a second missing Page-specific
 identifier. The migration changes only the read projection and MCP schema,
-not business validation. MAN-03 production and MAN-04 are still PENDING.
+not business validation. At the time of CR-046, MAN-03/04 were pending; their final production result and owner signoff are recorded under CR-048.
 
 Immediately before any MAN-03 reservation, confirm the installed
 v0.2.2 OAuth plugin, owner workspace, target `corious-facts` Page,
@@ -520,11 +520,6 @@ selection, required `mcpku2` connection, 33 tools and three successful
 owner reads. Host permission is `ask_before_writes`; an OAuth business
 write has not yet been proven.
 
-**Next executable checkpoint:** 10.4 / MAN-03, then MAN-04. Use the
-OAuth plugin and the exact owner-directed card boundaries above.
-Do not perform a fixed-pilot grant ritual or retry the historical
-No-auth failed operation. Refresh generation context, preserve the
-full timestamp and use one approved draft-only operation sequence.
-Record its actual result before any MAN-04 revision or approval.
-No new backend full gate, deployment, plugin upload or OAuth login
-is required solely to start this unchanged-backend card.
+**Checkpoint 10.4 final signoff:** PASS under [CR-048](../../docs/decisions/2026-10-20-phase-10-4-owner-oauth-evidence-acceptance.md). One owner OAuth draft was saved, revised using exact CAS, and approved after separate owner review; independent readback confirms ready revision 3 and passing checks. The direct Codex `mcpku2` write trace is accepted together with existing PRIVATE plugin binding and owner-read evidence. A fresh ChatGPT parent-plugin-selected write trace for those specific calls was not collected and remains a declared audit limit. No production operation is repeated to manufacture it.
+
+**Next executable checkpoint:** 10.5 / MAN-05, then MAN-06. Use the installed PRIVATE Content Producer plugin in ChatGPT. MAN-05 needs the owner's approval of exact plan name and 1–3 slots before one write. MAN-06 uses a separate new ChatGPT conversation for read-only recovery. No backend gate, deploy, login, or grant is required solely to begin while the deployed backend stays unchanged.
