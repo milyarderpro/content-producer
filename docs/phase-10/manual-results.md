@@ -1,6 +1,6 @@
 # Phase 10 — installed-plugin manual evidence ledger
 
-**Current operational status, 20 October 2026:** PRIVATE Content Producer v0.2.2 is bound to owner OAuth `mcpku2`. CR-047 backend SHA `73087c33e8b20b663e6944f6ca89d0b591eebf44` passed [full gate #39411054462](https://github.com/milyarderpro/content-producer/actions/runs/39411054462), and production Edge `mcp` v31 is ACTIVE. MAN-01/02 passed historically. MAN-03 now has one saved/read-back production draft on `corious-facts` (post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8`, revision 1, hash `06fabcc670b4690ef91f59e919c1c81325854d1727d29af43c1e7880478081b4`); see the dated execution record at the end of this ledger. MAN-04 and overall Phase 10.4 remain PENDING. The following 10.0 and v0.2.1 tables record their state **at the time**, not current configuration or current MAN-03 result. No fixed-pilot grant activation is required on the OAuth route.
+**Current operational status, 20 October 2026:** PRIVATE Content Producer v0.2.2 is bound to owner OAuth `mcpku2`. CR-047 backend SHA `73087c33e8b20b663e6944f6ca89d0b591eebf44` passed [full gate #39411054462](https://github.com/milyarderpro/content-producer/actions/runs/39411054462), and production Edge `mcp` v31 is ACTIVE. MAN-01/02 passed historically. MAN-03 has one saved/read-back production draft on `corious-facts` (post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8`, original revision 1). MAN-04 part A has one owner-authorized hook-only revision saved/read back at revision 2, hash `e944cf8975954f4041489e499ed20e1934181fd1f711b3f4756f62abe26abec3`; part B editorial approval and overall Phase 10.4 remain PENDING. See dated execution records below. The following 10.0 and v0.2.1 tables record their state **at the time**, not current configuration or current MAN-03 result. No fixed-pilot grant activation is required on the OAuth route.
 
 **10.0 historical procedure freeze: MAN-01..MAN-09 procedure-v1 FROZEN under CR-028.** Template only: **no cards executed, no new production mutations, and no new MCP connection**. Host write permission will be inspected first after connection/OAuth in 10.1; final plugin installation is 10.2. Per-card owner values and exact compiled prompts are deliberately PENDING until immediately before the card concerned. This cannot be mistaken for an executed test or approved write.
 
@@ -286,10 +286,57 @@ Follow for more clear space facts.
 
 ## MAN-04 part A — authorized hook revision preflight (20 October 2026)
 
-**Owner instruction reference:** the owner's 20 October 2026 Codex continuation explicitly selected the hook `7 Moon Facts Worth Knowing` for post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8`, authorized one hook-only revision via owner OAuth `mcpku2`, required latest revision/hash CAS and readback, and expressly withheld `approve_post`/ready approval. This is authorization for part A only. The previous draft review does not authorize part B.
+**Owner instruction reference:** the owner explicitly confirmed in this Codex task on 20 October 2026, “Ya, izinkan satu revisi bagian A,” for hook `7 Moon Facts Worth Knowing` on post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8`. The request limits the write to one hook-only revision via owner OAuth `mcpku2`, with latest revision/hash CAS and readback, and expressly withholds `approve_post`/ready approval. This is authorization for part A only; the previous draft review does not authorize part B.
 
 **Compiled procedure-v1 part A prompt before execution:** “Buka draft `f58017bb-60ae-476d-afa7-65f8f0c6c3b8` pada Page `corious-facts`; revisi hook menjadi `7 Moon Facts Worth Knowing` sambil menjaga tujuh fakta, sumber, seluruh Canva copy lainnya, caption, hashtag dan status draft. Gunakan revision `1` dan content hash `06fabcc670b4690ef91f59e919c1c81325854d1727d29af43c1e7880478081b4` hasil `get_post` terbaru sebagai CAS; jalankan quality checks, lalu tampilkan teks/revision/hash final tanpa menyetujui. Jika CAS atau checks gagal, hentikan write dan rekonsiliasi tanpa key pengganti.”
 
 **Pre-write readback:** authenticated owner workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`; one exact active trivia Page `corious-facts` (`37457236-17ec-4486-8880-6832460ae411`). `get_post` returned status `draft`, revision `1`, the hash above, seven allocated fact bindings, 19/19 system passed and 18/18 editorial pass. Fresh Page generation context returned config ID `cd41b752-92f7-4905-9c02-fbcef032459a`, exact microsecond timestamp `2026-10-19T10:33:17.018070Z`, and unchanged `workspace_unique` reuse scope. The planned request keeps the seven bindings and caption/hashtags identical, replaces only hook and derived Canva copy, and requests fresh server text metrics and editorial attestation. One new UUIDv4 operation key is bound to this one logical revision; raw key is omitted from the public ledger.
 
-**Execution/result:** PENDING at this preflight record. No approval or status transition is authorized.
+**Execution/result:** the subsequent dated result section records the single completed revision. This preflight did not authorize approval or a status transition.
+
+
+## MAN-04 part A — one hook-only CAS revision, readback (20 October 2026)
+
+**Actual write:** one `revise_post` call on owner OAuth `mcpku2`, using the single preassigned UUIDv4 operation key for this logical revision, returned `replayed=false`. The call used the latest `get_post` CAS: expected revision `1`, expected content hash `06fabcc670b4690ef91f59e919c1c81325854d1727d29af43c1e7880478081b4`; generation snapshot retained exact config ID `cd41b752-92f7-4905-9c02-fbcef032459a` and six-digit microsecond timestamp `2026-10-19T10:33:17.018070Z`. No response was lost and no retry or replacement key was used. Raw operation key is excluded from this public report.
+
+**Persisted readback:** `get_post` independently confirmed post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8`, Page `corious-facts`, status `draft`, revision **2**, `content_hash=e944cf8975954f4041489e499ed20e1934181fd1f711b3f4756f62abe26abec3`. The revision response and readback match. Only the hook and its derived rendered copy changed; all seven body facts, source bindings, allocations, CTA, caption, hashtags, topic, format and interaction goal match revision 1. No facts were released or replaced. `approval=null`, `scheduled_at=null`, `published_at=null`.
+
+**Quality:** server system checks **19/19 passed**; new revision-2 editorial attestation **18/18 pass** (six critical, twelve noncritical); risk flags empty. Renderer: 77 words, 25 estimated visual lines, 478 Canva-copy characters. `quality_status=pending` until separate owner approval; passing checks alone do not make the post `ready`.
+
+**Final CANVA COPY, exact persisted revision 2:**
+
+```text
+7 Moon Facts Worth Knowing
+
+Moonlight is sunlight reflected from the Moon's surface.
+
+The Moon's repeating cycle includes eight named phases.
+
+During waxing, more of the Moon's sunlit side appears nightly.
+
+At first quarter, the Moon often sits high in evening skies.
+
+A full Moon generally rises around your local sunset.
+
+New Moon to new Moon takes about 29.5 days.
+
+Earthshine is Earth's reflected sunlight lighting a crescent's dark side.
+
+Follow for more clear space facts.
+```
+
+**FACEBOOK CAPTION:** A few Moon facts worth a second look. Follow for more space science.
+
+**HASHTAGS:** `#MoonFacts` `#SpaceScience` `#LunarPhases`
+
+| # | Unchanged allocated fact | Stored official source |
+| --- | --- | --- |
+| 1 | Moonlight is sunlight reflected from the Moon's surface. | [NASA Moonlight](https://science.nasa.gov/moon/moonlight/) |
+| 2 | The Moon's repeating cycle includes eight named phases. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+| 3 | During waxing, more of the Moon's sunlit side appears nightly. | [NASA What's Up: April 2019 Skywatching from NASA](https://science.nasa.gov/resource/whats-up-april-2019-skywatching-from-nasa/) |
+| 4 | At first quarter, the Moon often sits high in evening skies. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+| 5 | A full Moon generally rises around your local sunset. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+| 6 | New Moon to new Moon takes about 29.5 days. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+| 7 | Earthshine is Earth's reflected sunlight lighting a crescent's dark side. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+
+**Boundary:** MAN-04 part A revision/readback completed. MAN-04 part B (`approve_post`) and overall Phase 10.4 remain **PENDING** until the owner reviews and separately approves this exact revision 2 and hash. No approval, scheduling, publishing, full backend CI gate or deployment occurred.
