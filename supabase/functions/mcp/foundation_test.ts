@@ -116,6 +116,7 @@ const payloads: Record<string, object> = {
       content_schema_versions: [1],
       capabilities: ['project_generation_context'],
     },
+    config_public_id: '44444444-4444-4444-8444-444444444444',
     config: {
       allowed_formats: ['single_subject_fast'],
       format_weights: {
@@ -370,6 +371,7 @@ Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation',
       },
     });
     assert(generation.includes('eligible_fact_count'), 'generation result missing');
+    assert(generation.includes('44444444-4444-4444-8444-444444444444'), 'actual config UUID missing from MCP generation context');
     assert(calls.length === 4, 'all 4 RPCs must be executed');
     assert(
       calls[0]?.name === 'get_account_profile' && calls[0]?.args.p_request_schema_version === 1,
