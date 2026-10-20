@@ -1039,7 +1039,10 @@ try {
   const ctxStamp = generationContext.context_version.config_updated_at as string;
   check(ctxConfigId === storedContext.config_id, 'CR046_PUBLIC_CONFIG_ID_MISMATCH');
   check(ctxStamp === storedContext.stamp, 'CR046_PUBLIC_CONFIG_TIME_MISMATCH');
-  check(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/.test(ctxStamp), 'CR046_MICROSECOND_LOSS');
+  check(
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/.test(ctxStamp),
+    'CR046_MICROSECOND_LOSS',
+  );
   const httpToken = randomUUID();
   const httpFacts = Array.from({ length: 5 }, (_, index) =>
     factInput(candidate(61 + index), index + 1),
@@ -1108,7 +1111,10 @@ try {
     ...common(),
     post_public_id: httpSaved.post.post_public_id,
   });
-  check(httpSaved.post.status === 'draft' && httpReadback.post.status === 'draft', 'CR046_HTTP_DRAFT_ONLY');
+  check(
+    httpSaved.post.status === 'draft' && httpReadback.post.status === 'draft',
+    'CR046_HTTP_DRAFT_ONLY',
+  );
   check(
     httpReadback.post.generation_snapshot.config_public_id === ctxConfigId &&
       httpReadback.post.generation_snapshot.config_updated_at === ctxStamp,
