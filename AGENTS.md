@@ -37,7 +37,10 @@ source-verified post on `corious-facts`; owner-scoped readback confirms
 of this direct `mcpku2` trace plus existing private-plugin host proof for
 checkpoint 10.4. A fresh ChatGPT parent-plugin-selected write trace for
 those calls was not captured; preserve this evidence limit for audit 10.7.
-Checkpoint 10.4 is PASS; 10.5–10.7 remain pending. Record backend and later
+Checkpoints 10.4 and 10.5 are PASS; 10.6–10.7 remain pending. MAN-05 created
+exactly one approved three-slot plan; separate-conversation MAN-06 owner OAuth
+readback confirmed all item IDs, WIB schedules and the unchanged ready post.
+AC-007/008 seven-post/seven-day thresholds remain PENDING. Record backend and later
 package/documentation SHAs separately; do not rerun the full backend gate
 for documentation-only changes.
 
