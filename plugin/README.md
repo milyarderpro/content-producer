@@ -35,7 +35,7 @@ the existing owner OAuth `mcpku2` ID
 `asdk_app_6ad6ebeab5fc8191a1d2cd54b87cd96f`. The production MCP now
 defaults to owner OAuth and the plugin must use the authenticated owner workspace.
 The package contains no token, credential, or bundled OAuth configuration.
-The write grants remain default-closed and MAN-03/04 remain unrun.
+The historical fixed-pilot write grants remain default-closed. Owner OAuth tool calls do not use those grants; MAN-03/04 remain pending: the historical fixed-pilot MAN-03 reservation failed and saved no draft. Current OAuth cards require ordinary owner-directed approvals.
 
 `pnpm run package-plugin` builds 13 allowlisted files: `plugin.json`,
 `.app.json`, one skill and 10 references. Light CI produces the
