@@ -58,3 +58,4 @@ jobs:
           pnpm run supabase:start > /tmp/cr046-start.log 2>&1
           pnpm run supabase:reset > /tmp/cr046-reset.log 2>&1
           pnpm exec tsx scripts/phase-6-13.ts
+# CR-046 focused rerun: public get_post intentionally redacts generation_snapshot; DB fixture validates persistence.
