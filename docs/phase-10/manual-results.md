@@ -123,6 +123,47 @@ Only store minimum redacted arguments/results needed to explain a failure. Crede
 
 ## CR-046 MAN-03 blocker repair — separate from manual-card outcome
 
+**Observed results — 20 October 2026.** Change record was committed first
+(`53c92e7dc29b1aa0a23679eab8b487a932b9aeda`). Source adds one
+owner-scoped `data.config_public_id` to the generation-context projection in
+an additive SQL migration, aligns the 33-tool MCP schema, and asserts each
+Page-specific configuration UUID and the exact six-microsecond timestamp. No
+old migrations, OAuth enforcement, grants, reservation or post-validation rules
+were intentionally changed.
+
+- Prior to the gate, [light CI #39390529881](https://github.com/milyarderpro/content-producer/actions/runs/39390529881)
+  **PASS**, including `pnpm run check` and 74 focused MCP tests.
+- **Exactly one CR-020 full gate** was triggered for backend marker SHA
+  `f39810bbe1e2eaa035c1e805f3b3a2eb3e0ae066`:
+  [run #39390719071](https://github.com/milyarderpro/content-producer/actions/runs/39390719071),
+  **FAIL** in the isolated Phase 6.13 HTTP/Inspector step, after local reset,
+  owner-auth tests and 74 focused MCP tests passed. The defect was in a **new
+  test assertion**, which wrongly expected private `generation_snapshot` on
+  public `get_post`; the frozen post projection intentionally redacts it.
+  The gate stopped before the remaining full suite. Do not call this run PASS.
+- Narrow subsequent [focused CI #39391441204](https://github.com/milyarderpro/content-producer/actions/runs/39391441204)
+  localized the failure to the new snapshot readback assertion, after the
+  real owner Page context, Page+niche config ID, microsecond CAS, fact
+  reservation, `save_post` and `get_post` had succeeded.
+- Test harness corrected in `a92a5e27b60e5301e2d85c25195f4dba17df9034`
+  to inspect the persisted snapshot in the **isolated fixture database**,
+  without widening `get_post`. [Focused public HTTP/RPC/MCP run
+  #39391875211](https://github.com/milyarderpro/content-producer/actions/runs/39391875211)
+  **PASS**: Page context → reserve → draft save → draft readback, config
+  identity and exact six-digit timestamp, private snapshot redaction, 33/33
+  valid and 33/33 invalid Inspector tool calls, non-owner isolation and
+  HTTP log privacy. This **does not replace a passing full gate**.
+- **Production not deployed.** Independent Supabase read confirmed `mcp`
+  v29 remains ACTIVE, `verify_jwt=false` for application OAuth, and CR-046
+  migration is **absent** from production history. No production fact
+  registration, reservation, `save_post`, pilot grant, authentication change,
+  or MAN-03/04 write was performed. The old released operation key was not
+  reused. Do not deploy until a passing final-SHA full gate is separately
+  authorized and observed; the single full-gate attempt in this task has
+  already been consumed.
+
+
+
 Source correction work on the same draft PR #23 adds the actual Page+niche
 `config_public_id` to generation context and validates it against the
 persisted configuration row. The isolated test exercises
