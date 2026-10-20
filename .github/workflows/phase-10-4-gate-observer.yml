@@ -28,3 +28,33 @@ jobs:
           echo "$result" | jq -e --arg sha "$BACKEND_SHA" '.workflow_runs | map(select(.head_sha == $sha)) | length > 0' > /dev/null
           echo "$result" | jq -r --arg sha "$BACKEND_SHA" '.workflow_runs[] | select(.head_sha == $sha) | "CR046_GATE_RUN_ID=\(.id) status=\(.status) conclusion=\(.conclusion) URL=\(.html_url)"'
           echo "Read-only gate observation. No backend gate dispatch, database or production write."
+
+  focused-http:
+    name: Isolated CR-046 HTTP/RPC/MCP diagnostic (no full gate)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    env:
+      SUPABASE_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version-file: .deno-version
+      - run: pnpm install --frozen-lockfile
+      - name: Ephemeral local database and CR-046 isolated HTTP flow
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm run supabase:start > /tmp/cr046-start.log 2>&1
+          pnpm run supabase:reset > /tmp/cr046-reset.log 2>&1
+          pnpm exec tsx scripts/phase-6-13.ts
