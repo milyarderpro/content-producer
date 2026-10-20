@@ -162,8 +162,6 @@ were intentionally changed.
   authorized and observed; the single full-gate attempt in this task has
   already been consumed.
 
-
-
 Source correction work on the same draft PR #23 adds the actual Page+niche
 `config_public_id` to generation context and validates it against the
 persisted configuration row. The isolated test exercises
