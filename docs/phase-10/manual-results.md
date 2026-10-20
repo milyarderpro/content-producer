@@ -1,6 +1,6 @@
 # Phase 10 — installed-plugin manual evidence ledger
 
-**Current operational status, 20 October 2026:** PRIVATE Content Producer v0.2.2 uses owner OAuth `mcpku2`; backend `mcp` v29, SHA `6a8c42d8a3ffb846b8bd92663dbfbdbc9cc22e92`, passed [full gate #39372282908](https://github.com/milyarderpro/content-producer/actions/runs/39372282908). Package/docs SHA `31cb86a3e528bdb599f96078c1ca08edb85c6f0b` passed [light CI #39379688115](https://github.com/milyarderpro/content-producer/actions/runs/39379688115). The plugin page and chat proved 33 tools and three owner reads; host permission is `ask_before_writes`. MAN-01/02 PASS historically; MAN-03 was attempted under the old fixed-pilot route but produced no draft, so MAN-03/04 remain PENDING. The following 10.0 and v0.2.1 tables record their state **at the time**, not current configuration. No fixed-pilot grant activation is required on the OAuth route.
+**Current operational status, 20 October 2026:** PRIVATE Content Producer v0.2.2 is bound to owner OAuth `mcpku2`. CR-047 backend SHA `73087c33e8b20b663e6944f6ca89d0b591eebf44` passed [full gate #39411054462](https://github.com/milyarderpro/content-producer/actions/runs/39411054462), and production Edge `mcp` v31 is ACTIVE. MAN-01/02 passed historically. MAN-03 now has one saved/read-back production draft on `corious-facts` (post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8`, revision 1, hash `06fabcc670b4690ef91f59e919c1c81325854d1727d29af43c1e7880478081b4`); see the dated execution record at the end of this ledger. MAN-04 and overall Phase 10.4 remain PENDING. The following 10.0 and v0.2.1 tables record their state **at the time**, not current configuration or current MAN-03 result. No fixed-pilot grant activation is required on the OAuth route.
 
 **10.0 historical procedure freeze: MAN-01..MAN-09 procedure-v1 FROZEN under CR-028.** Template only: **no cards executed, no new production mutations, and no new MCP connection**. Host write permission will be inspected first after connection/OAuth in 10.1; final plugin installation is 10.2. Per-card owner values and exact compiled prompts are deliberately PENDING until immediately before the card concerned. This cannot be mistaken for an executed test or approved write.
 
@@ -21,7 +21,7 @@
 
 ## Per-card outcome table
 
-Procedure-v1 is frozen for MAN-01..09. MAN-01/02 were executed historically; MAN-03 had a failed fixed-pilot reservation attempt with no draft. MAN-03/04 and later cards still need current OAuth execution evidence. Static negative prompts MAN-08/09 are fixed but not yet executed.
+Procedure-v1 is frozen for MAN-01..09. The table below preserves the historical 10.0/v0.2.1 snapshot: MAN-01/02 had executed, while MAN-03 had a failed fixed-pilot reservation attempt with no draft. The current owner OAuth MAN-03 result is recorded in the dated execution section at the end of this ledger; MAN-04 and later cards remain pending. Static negative prompts MAN-08/09 are fixed but not yet executed.
 
 | ID     | Phase    | Execution status    | Chat reference       | Source/plugin hash         | Tool trace         | State/ledger before→after          | Reviewer             | Outcome                                                        |
 | ------ | -------- | ------------------- | -------------------- | -------------------------- | ------------------ | ---------------------------------- | -------------------- | -------------------------------------------------------------- |
@@ -233,3 +233,52 @@ MAN-03 production and MAN-04 remain PENDING.
 **Live owner OAuth, read-only:** via the existing PRIVATE `mcpku2` connector, `get_account_profile`, `get_workspace_context`, `list_pages` and `get_page_generation_context` succeeded. Owner workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`; two active Pages. `corious-facts` (`37457236-17ec-4486-8880-6832460ae411`) produced `config_public_id=cd41b752-92f7-4905-9c02-fbcef032459a`, `context_version.config_updated_at=2026-10-19T10:33:17.018070Z`, topic `nature_science`, format `single_subject_fast`, interaction `follow`. The independent Page `phase-9-5-pilot-trivia` returned `config_public_id=f94e0941-55c5-4312-b57d-a913bbd98366` and `2026-10-18T01:38:51.087105Z`. Read-only SQL from actual `page_niche_configs` matched both Page-specific UUIDs and timestamps **byte-for-byte to six microsecond digits**.
 
 **Residual/security boundary:** Supabase hosted Security Advisor exposed two categories of **WARN**, not blocking errors: 33 intentionally authenticated, owner-gated `SECURITY DEFINER` API functions (unchanged by CR-046), and leaked password protection configuration (one Auth warning, not modified in this change). Preserve these as residual items for 10.7 review; do not silently call the hosted advisor "zero warnings". OAuth token/secret were not read or stored. No manual grant activation, production trivia registration or reservation, `save_post`, business write, operation-key reuse, owner editorial approval, scheduling or publication occurred. The **CR-046 technical blocker is resolved and verified in production**; actual production **MAN-03 draft and MAN-04 remain PENDING**, requiring their distinct gated owner-approved operations.
+
+
+## MAN-03 production owner OAuth draft execution — 20 October 2026
+
+**Outcome:** one production draft saved and read back for Page `corious-facts`; MAN-03 has persisted-draft evidence. MAN-04 and Phase 10.4 overall remain **PENDING**. This record follows CR-047 backend SHA `73087c33e8b20b663e6944f6ca89d0b591eebf44`, [full gate #39411054462](https://github.com/milyarderpro/content-producer/actions/runs/39411054462) **PASS**, and production Edge `mcp` v31 **ACTIVE**. No new CI gate or deployment was initiated for this manual card.
+
+**Provenance and scope:** Codex used the owner-authenticated `mcpku2` Content Producer connector, to which installed PRIVATE v0.2.2 is bound. The current execution trace is the direct Codex connector trace; it does not independently capture a fresh ChatGPT parent-plugin selection. Owner workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`; target Page `37457236-17ec-4486-8880-6832460ae411`. Immediately before writes, the generation context returned config ID `cd41b752-92f7-4905-9c02-fbcef032459a` and exact six-digit-microsecond CAS `2026-10-19T10:33:17.018070Z` with `workspace_unique` fact reuse. Page `list_posts` returned zero posts; seven approved NASA Moon facts were eligible and not actively reserved.
+
+**Operation reconciliation:** the old failed OAuth reservation key `88e8…b8b7` belonged to the earlier `FACT_SOURCE_INSUFFICIENT` response before operation claim (CR-047), and was not replayed. A fresh UUIDv4 key was assigned only to the new logical reservation; that single request returned seven `matched_existing` facts, one reservation token, and `replayed=false`. A distinct UUIDv4 key was assigned to the single logical `save_post`; it returned `replayed=false`. No response was lost, neither operation was retried, and no additional reserve/save was made. Raw operation keys and reservation token are excluded from this public ledger.
+
+**Readback:** `save_post`, subsequent `get_post`, and `list_posts` agree on exactly one target Page post: `f58017bb-60ae-476d-afa7-65f8f0c6c3b8`, status `draft`, revision `1`, `content_hash=06fabcc670b4690ef91f59e919c1c81325854d1727d29af43c1e7880478081b4`. Seven fact bindings are `allocated`, each with one verified Tier A NASA official source; no source warning or risk flag. System checks **19/19 passed** and editorial checks **18/18 passed** (six critical, twelve noncritical). Renderer measurements: seven facts, 78 words, 25 estimated visual lines, 484 Canva-copy characters. `quality_status=pending`, editorial approval `null`, schedule `null`, publication `null`.
+
+**Saved Canva copy:**
+
+```text
+Seven Moon facts in plain sight.
+
+Moonlight is sunlight reflected from the Moon's surface.
+
+The Moon's repeating cycle includes eight named phases.
+
+During waxing, more of the Moon's sunlit side appears nightly.
+
+At first quarter, the Moon often sits high in evening skies.
+
+A full Moon generally rises around your local sunset.
+
+New Moon to new Moon takes about 29.5 days.
+
+Earthshine is Earth's reflected sunlight lighting a crescent's dark side.
+
+Follow for more clear space facts.
+```
+
+**Caption:** A few Moon facts worth a second look. Follow for more space science.
+
+**Hashtags:** `#MoonFacts #SpaceScience #LunarPhases`
+
+| # | Allocated fact | Stored official source |
+| --- | --- | --- |
+| 1 | Moonlight is sunlight reflected from the Moon's surface. | [NASA Moonlight](https://science.nasa.gov/moon/moonlight/) |
+| 2 | The Moon's repeating cycle includes eight named phases. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+| 3 | During waxing, more of the Moon's sunlit side appears nightly. | [NASA Skywatching](https://science.nasa.gov/resource/whats-up-april-2019-skywatching-from-nasa/) |
+| 4 | At first quarter, the Moon often sits high in evening skies. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+| 5 | A full Moon generally rises around your local sunset. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+| 6 | New Moon to new Moon takes about 29.5 days. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+| 7 | Earthshine is Earth's reflected sunlight lighting a crescent's dark side. | [NASA Moon Phases](https://science.nasa.gov/moon/moon-phases/) |
+
+**Review boundary:** saved content, sources, checks, revision and hash are ready for owner editorial review. No revision, approval, scheduling, publishing or MAN-04 action occurred. Evidence is also on [Issue #22](https://github.com/milyarderpro/content-producer/issues/22) and [PR #23](https://github.com/milyarderpro/content-producer/pull/23#issuecomment-6290664363).
