@@ -448,6 +448,14 @@ Deno.test(
         invalid.includes('error') && !invalid.includes('items'),
         'invalid pagination must not succeed',
       );
+      const forbiddenWorkspace = await request('tools/call', {
+        name: 'get_workspace_context',
+        arguments: { workspace_public_id: foreign },
+      });
+      assert(
+        forbiddenWorkspace.includes('OWNER_ACCESS_REQUIRED'),
+        'OAuth workspace bootstrap must reject foreign workspace IDs',
+      );
       const unknown = await request('tools/call', {
         name: 'get_workspace_context',
         arguments: {
