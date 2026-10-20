@@ -64,6 +64,17 @@ The text and rules in `MAN-01..MAN-09` are the frozen manual procedure `procedur
 
 ### MAN-03 — research, dedup and save one draft
 
+**CR-046 repair note (not production execution):** After the additive
+generation-context fix is deployed, use `data.config_public_id` from the
+fresh owner/Page/niche response as
+`save_post.generation_snapshot.config_public_id`, and preserve the six-digit
+`data.context_version.config_updated_at` verbatim for both CAS inputs
+and snapshot. Other required snapshot fields come from the current module,
+generation rules, reuse policy, Page target markets, validated chosen content,
+or the frozen v1 renderer/quality/source/rubric contracts (34-char line
+width; 13-second target). A Page public ID is **not** a config public ID.
+No reservation or draft is authorized by this repair alone.
+
 **Just-in-time gate:** Ask for the chosen topic, format/profile/interaction goal, sourcing constraints and allowed draft-only side effects immediately before MAN-03. **Prompt to compile:** “Untuk Page `<OWNER-PAGE-SLUG>`, buat satu draft trivia bertopik `<OWNER-TOPIC>` dengan batas `<OWNER-EDITORIAL-RULES>`. Teliti sumber publik yang dapat diverifikasi, periksa kemiripan fakta dan reuse, reservasi set fakta yang valid, simpan **draft saja**, lalu tampilkan sumber dan copy untuk saya tinjau. Jangan approve, jadwalkan, atau publish.”
 
 - **Prerequisite/target:** newly created Page and generation context; owner topic and factual/editorial limits frozen; browsing available. **Approval:** prompt authorizes only research/reservation/save draft.
