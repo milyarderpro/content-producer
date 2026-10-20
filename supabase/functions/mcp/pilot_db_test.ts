@@ -92,6 +92,15 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   const original = responseJson(await rawResponse.text());
   const originalTools = (original.result as { tools: Array<Record<string, unknown>> }).tools;
   assert(originalTools.length === 33, 'SDK original contains 33 tools');
+  const rawPilotResponse = await createMcpHandler(() => createMcpServer(context)).fetch(
+    request('tools/list'),
+  );
+  assert(rawPilotResponse.status === 200, 'raw No-auth SDK catalog available');
+  const pilotOriginal = responseJson(await rawPilotResponse.text());
+  const pilotOriginalTools = (
+    pilotOriginal.result as { tools: Array<Record<string, unknown>> }
+  ).tools;
+  assert(pilotOriginalTools.length === 33, 'raw No-auth SDK still has 33 tools');
 
   const oauthResponse = await createAuthenticatedTransport({
     ...context,
@@ -143,15 +152,18 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   const compiledPatterns: string[] = [];
   for (const compact of tools) {
     const full = originalTools.find((tool) => tool.name === compact.name);
+    const pilotFull = pilotOriginalTools.find((tool) => tool.name === compact.name);
     const auth = oauthTools.find((tool) => tool.name === compact.name);
-    assert(!!full && !!auth, 'tool is missing in raw or OAuth catalog');
+    assert(!!full && !!pilotFull && !!auth, 'tool is missing in raw or OAuth catalog');
     assert('outputSchema' in full && 'title' in full, 'raw SDK metadata intact');
     const expandedInput = { ...(full.inputSchema as Record<string, unknown>) };
     delete expandedInput.$schema;
     const portable = normalizeExpectedWirePatterns(expandedInput);
+    const pilotInput = { ...(pilotFull.inputSchema as Record<string, unknown>) };
+    delete pilotInput.$schema;
     assert(
-      JSON.stringify(compact.inputSchema) === JSON.stringify(portable),
-      'No-auth input differs from SDK beyond CR-034 transforms',
+      JSON.stringify(compact.inputSchema) === JSON.stringify(normalizeExpectedWirePatterns(pilotInput)),
+      'No-auth input differs from its SDK source beyond CR-034 transforms',
     );
     assert(
       JSON.stringify(auth.inputSchema) === JSON.stringify(portable),
