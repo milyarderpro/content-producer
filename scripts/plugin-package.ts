@@ -14,7 +14,7 @@ import { dirname, join, relative, resolve, sep } from 'node:path';
 import { validatePortableManifest } from './plugin-config.js';
 
 const skillRoot = 'skills/content-producer/';
-const registeredMcpAppId = 'asdk_app_6ad4ef8b42588191a749b8b9f356b662';
+const registeredMcpAppId = 'asdk_app_6ad6ebeab5fc8191a1d2cd54b87cd96f';
 const core = ['workflow', 'lifecycle', 'tool-sequences', 'source-policy', 'output-contract'];
 const trivia = ['content-dna', 'formats', 'fact-checking', 'dedup-ontology', 'quality-rubric'];
 
@@ -123,7 +123,7 @@ export function validatePluginSource(
       2,
     ) + '\n';
   if (appContent !== expectedApps) {
-    throw new Error('Registered app mapping must use the proven mcpku ID exclusively.');
+    throw new Error('Registered app mapping must use the proven owner OAuth mcpku2 ID exclusively.');
   }
 
   const manifest = JSON.parse(read(pluginRoot, 'plugin.json')) as unknown;
