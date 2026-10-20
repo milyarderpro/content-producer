@@ -201,3 +201,23 @@ MAN-03 production and MAN-04 remain PENDING.
   release authorization. Do not apply migration/deploy Edge or do any production content write
   until a new exact-SHA full gate actually **PASS** and the result is recorded.
   MAN-03 and MAN-04 remain **PENDING**; `mcp` production v29 is the last verified state.
+
+## CR-046 focused catalog check after formatting — 20 October 2026
+
+- The frozen Prettier formatter corrected exactly the two affected source/documentation
+  files, then was removed together with the one-shot focused audit workflow.
+  No temporary write-capable workflow remains in this final candidate.
+- [Light CI push #39400119059](https://github.com/milyarderpro/content-producer/actions/runs/39400119059)
+  and [Light CI PR #39400124328](https://github.com/milyarderpro/content-producer/actions/runs/39400124328)
+  **PASS** on focused-check SHA `b308e2e8799c36cb59e108a078bf51c67c3fa9db`.
+- [Isolated catalog audit #39400119267](https://github.com/milyarderpro/content-producer/actions/runs/39400119267)
+  **PASS** on the same SHA: clean local start/reset, source/applied 69 migrations,
+  preserved 67-migration baseline, independently pinned CR-021 and CR-046
+  SQL, exact generation-context function source delta, 33 API RPCs,
+  15/15 RLS tables, grants, privilege/ownership boundaries and zero fixtures.
+  This audited fixture run is not a substitute for the full backend/security gate.
+- The earlier full gate [#39394186274](https://github.com/milyarderpro/content-producer/actions/runs/39394186274)
+  remains **FAIL**, with its original 68-migration check failure unchanged.
+  Production `mcp` v29 remains the last verified deployment;
+  CR-046 migration, OAuth production verification and MAN-03/04
+  business writes remain **PENDING** until a new exact-SHA full gate **PASS**.
