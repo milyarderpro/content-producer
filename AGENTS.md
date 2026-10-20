@@ -25,15 +25,21 @@ full test result for an unchanged deployed backend SHA; validate later plugin-pa
 changes with focused package/MCP tests and affected manual cards. Keep the 101
 cases as a regression inventory.
 For Phase 10, follow `plans/works/phase-10-implementation-plan.md`, one
-checkpoint per task, and the current OAuth decisions CR-042..CR-045.
+checkpoint per task, and current owner OAuth decisions CR-042..CR-048.
 Production `mcp` defaults to owner OAuth. The installed PRIVATE Content
 Producer v0.2.2 plugin has one required registered app, `mcpku2`, bound to
-that OAuth connection. Backend SHA `6a8c42d8a3ffb846b8bd92663dbfbdbc9cc22e92`
-passed CR-020 gate #39372282908 and runs as Edge `mcp` v29. Package/docs SHA
-`31cb86a3e528bdb599f96078c1ca08edb85c6f0b` passed light CI
-#39379688115. The ChatGPT host showed 33 tools and three owner reads through
-the updated plugin; no business write on the OAuth connection has yet been
-executed. Record backend and later package/documentation SHAs separately.
+that OAuth connection. Backend SHA `73087c33e8b20b663e6944f6ca89d0b591eebf44`
+passed CR-020 gate #39411054462 and runs as Edge `mcp` v31. The ChatGPT
+host showed 33 tools and three owner reads through the installed plugin.
+MAN-03/04 owner OAuth business calls in Codex saved, revised and approved one
+source-verified post on `corious-facts`; owner-scoped readback confirms
+`ready` revision 3 and passing checks. CR-048 records the owner's acceptance
+of this direct `mcpku2` trace plus existing private-plugin host proof for
+checkpoint 10.4. A fresh ChatGPT parent-plugin-selected write trace for
+those calls was not captured; preserve this evidence limit for audit 10.7.
+Checkpoint 10.4 is PASS; 10.5–10.7 remain pending. Record backend and later
+package/documentation SHAs separately; do not rerun the full backend gate
+for documentation-only changes.
 
 CR-032/037/038 and the 10.1–10.3 No-auth/fixed-pilot evidence are historical.
 Fixed-pilot mode is available only by explicit server-side rollback selection.
@@ -46,9 +52,12 @@ model. Keep all direct `anon` business RPC/table/sequence/helper privileges
 closed and preserve owner-scoped RLS.
 
 Keep the nine mandatory manual-card procedures frozen as `procedure-v1`.
-MAN-01/02 passed historically. MAN-03/04 remain PENDING: use the installed
-OAuth plugin, confirm the owner workspace and target Page, then fetch the
-current generation context immediately before a write. Preserve the complete
+MAN-01/02 passed historically; MAN-03/04 passed under CR-048. For the next
+checkpoint use the installed OAuth plugin in ChatGPT, confirm the owner
+workspace and target Page, and obtain approval of exact plan slots before
+MAN-05. MAN-06 requires a separate fresh ChatGPT conversation for readback.
+For later fact-bearing writes, fetch the current generation context immediately
+before a write. Preserve the complete
 six-digit microsecond `config_updated_at` text when passing exact CAS
 preconditions; do not convert it through JavaScript `Date` or truncate it.
 For a lost response, reconcile state and reuse only the same operation
