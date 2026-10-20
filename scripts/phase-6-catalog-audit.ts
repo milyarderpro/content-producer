@@ -31,10 +31,7 @@ deepStrictEqual(
     const body = readFileSync(`supabase/migrations/${file}`);
     return {
       file,
-      git_blob_sha1: createHash('sha1')
-        .update(`blob ${body.length}\0`)
-        .update(body)
-        .digest('hex'),
+      git_blob_sha1: createHash('sha1').update(`blob ${body.length}\0`).update(body).digest('hex'),
     };
   }),
   [
