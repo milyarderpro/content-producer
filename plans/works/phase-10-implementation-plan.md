@@ -1,6 +1,6 @@
 # Phase 10 — Koneksi ChatGPT, plugin final, dan pilot: runbook implementasi
 
-**Status:** Phase 9 `Complete`; Phase 10 `In progress`; 10.0–10.4 PASS, 10.5–10.7 PENDING. Current connection: PRIVATE Content Producer v0.2.2 → owner OAuth `mcpku2` (CR-042..CR-045). Sections describing No authentication record earlier checkpoint history, not current execution instructions.
+**Status:** Phase 9 `Complete`; Phase 10 `In progress`; 10.0–10.5 PASS, 10.6–10.7 PENDING. Current connection: PRIVATE Content Producer v0.2.2 → owner OAuth `mcpku2` (CR-042..CR-045). Sections describing No authentication record earlier checkpoint history, not current execution instructions.
 Catat SHA `main` yang aktual ketika 10.0 dimulai. Rencana ini membagi Phase 10
 menjadi delapan task berurutan (10.0–10.7); satu task hanya mengerjakan satu
 checkpoint. Lulusnya Phase 10 memberi status **Pilot-ready**, bukan **MVP
@@ -522,4 +522,4 @@ write has not yet been proven.
 
 **Checkpoint 10.4 final signoff:** PASS under [CR-048](../../docs/decisions/2026-10-20-phase-10-4-owner-oauth-evidence-acceptance.md). One owner OAuth draft was saved, revised using exact CAS, and approved after separate owner review; independent readback confirms ready revision 3 and passing checks. The direct Codex `mcpku2` write trace is accepted together with existing PRIVATE plugin binding and owner-read evidence. A fresh ChatGPT parent-plugin-selected write trace for those specific calls was not collected and remains a declared audit limit. No production operation is repeated to manufacture it.
 
-**Next executable checkpoint:** 10.5 / MAN-05, then MAN-06. Use the installed PRIVATE Content Producer plugin in ChatGPT. MAN-05 needs the owner's approval of exact plan name and 1–3 slots before one write. MAN-06 uses a separate new ChatGPT conversation for read-only recovery. No backend gate, deploy, login, or grant is required solely to begin while the deployed backend stays unchanged.
+**Checkpoint 10.5 signoff — PASS (20 October 2026):** MAN-05 created the owner-approved three-item plan exactly once; MAN-06 in a new ChatGPT conversation read back the owner Page, unique plan, all three item IDs/slots and the unchanged ready Moon post through `mcpku2`. Zero mismatches or plugin business writes in MAN-06. See `docs/phase-10/manual-results.md`. Three slots do not meet AC-007/008 thresholds; both remain PENDING. **Next executable checkpoint:** 10.6 / MAN-07..MAN-09, only on separate owner instruction. No backend gate or deploy was required for MAN-06.
