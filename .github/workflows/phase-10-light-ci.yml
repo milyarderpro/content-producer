@@ -131,7 +131,7 @@ jobs:
             cd artifacts/plugin-candidate
             find . -type f -print | LC_ALL=C sort | zip -X -q "../content-producer-private-v0.2.2.zip" -@
           )
-          archive=artifacts/content-producer-private-v0.2.1.zip
+          archive=artifacts/content-producer-private-v0.2.2.zip
           test -s "$archive"
           unzip -t "$archive" >/dev/null
           # Info-ZIP normalizes './.app.json' to archive entry '.app.json'.
@@ -157,9 +157,9 @@ jobs:
             exit 1
           fi
           {
-            echo "## Phase 10.2 final package (owner installation pending)"
+            echo "## Phase 10 private owner OAuth v0.2.2 package (plugin update pending)"
             echo "- Commit SHA: $(git rev-parse HEAD)"
-            echo "- ZIP: content-producer-private-v0.2.1.zip (13 allowlisted files)"
+            echo "- ZIP: content-producer-private-v0.2.2.zip (13 allowlisted files)"
             echo "- ZIP SHA-256: $(sha256sum "$archive" | cut -d ' ' -f1)"
             echo "- All 13 extracted files verified against artifact filelist SHA-256"
             echo "- Registered required owner OAuth mcpku2 app mapping; no bundled MCP or OAuth config"
@@ -172,7 +172,7 @@ jobs:
         with:
           name: phase-10-final-plugin-oauth-v0.2.2
           path: |
-            artifacts/content-producer-private-v0.2.1.zip
+            artifacts/content-producer-private-v0.2.2.zip
             artifacts/plugin-candidate-filelist.json
           if-no-files-found: error
           retention-days: 14
