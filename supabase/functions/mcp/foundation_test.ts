@@ -324,11 +324,16 @@ Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation',
     assert(profileResult.structuredContent.id === owner, 'top-level owner identity');
     assert(profileResult.structuredContent.name === 'Owner', 'profile display name');
     assert(profileResult.structuredContent.nickname === 'Owner workspace', 'profile label');
-    assert(!Object.hasOwn(profileResult.structuredContent, 'workspace_public_id'),
-      'OAuth profile must not expose nonstandard workspace_public_id');
-    assert(Object.keys(profileResult.structuredContent).every((key: string) =>
-      ['id', 'name', 'email', 'nickname'].includes(key)),
-      'profile response contains nonstandard fields');
+    assert(
+      !Object.hasOwn(profileResult.structuredContent, 'workspace_public_id'),
+      'OAuth profile must not expose nonstandard workspace_public_id',
+    );
+    assert(
+      Object.keys(profileResult.structuredContent).every((key: string) =>
+        ['id', 'name', 'email', 'nickname'].includes(key),
+      ),
+      'profile response contains nonstandard fields',
+    );
     assert(
       profileResult.content[0].text === JSON.stringify(profileResult.structuredContent),
       'profile text must match structured content',

@@ -624,9 +624,7 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
         id: rpc.data.data.profile.id,
         name: rpc.data.data.profile.display_name,
         nickname: rpc.data.data.profile.workspace_name,
-        ...(pilot
-          ? { workspace_public_id: rpc.data.data.profile.workspace_public_id }
-          : {}),
+        ...(pilot ? { workspace_public_id: rpc.data.data.profile.workspace_public_id } : {}),
       });
       if (!profile.success) return failure('DATABASE_UNAVAILABLE');
       return {
