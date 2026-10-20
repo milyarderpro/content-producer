@@ -32,6 +32,13 @@ remain PENDING. A subsequent release task must obtain a passing full backend
 gate and perform migration/Edge deployment and owner OAuth read verification
 before recording production PASS.
 
+## Continuation — failed final-candidate catalog audit (2026-10-20)
+
+A second, explicitly triggered full local backend gate was run on `4bd27794979e4839f47d4afe189de4c9435f8530`:
+[Actions #39394186274](https://github.com/milyarderpro/content-producer/actions/runs/39394186274) **FAIL** after 15m31s. The clean migration reset, owner/OAuth checks, HTTP 33-tool Inspector, full project test suite, migration history and local db lint all passed. The catalog audit stopped at `scripts/phase-6-catalog-audit.ts:24`, with `69 !== 68`: its frozen Phase 9.5 check expected the prior 68 migration files, whereas the authorized additive CR-046 file makes 69. This is an audit-harness incompatibility, not evidence of a changed public grant or a production defect; however, the remainder of the catalog audit was not executed, and the release gate remains **FAILED**.
+
+Repair the audit narrowly: pin both new migration artifacts independently, retain the accepted 67-migration baseline, and compare the CR-046 generation-context function to the frozen baseline after undoing *only* the approved added JSON key in a local read-only canonical function definition. Check runtime source digest and all other grants/RLS/fixture invariants unchanged. Do not weaken expectations or rewrite prior migration baselines. Rerun focused checks and light CI; a passing complete backend/security gate is still required before any production migration or Edge deployment. Keep MAN-03/MAN-04 production pending and preserve the no-business-write boundary.
+
 ## Invariants, tests and release
 
 Do not edit historical migrations; make a new additive replacement for the one RPC projection only. Preserve API signature, ownership, EXECUTE grants, SECURITY DEFINER guard, owner-scoped filtering, direct `anon` denial, and the exact 33 RPC/MCP tools. Do not touch OAuth route/settings, fixed-pilot rollback, business validators, reservation semantics or `save_post` logic.
