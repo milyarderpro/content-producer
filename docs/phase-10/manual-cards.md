@@ -2,24 +2,24 @@
 
 **Status at 10.0: procedure-v1 FROZEN; execution had not started then.** The invariant steps, tool ordering, forbidden actions, state checks, recovery and approval boundaries below are frozen under CR-028. Content-bearing exact executable prompts remain unbound until the owner chooses values at the relevant card. This is **not** authority to perform any business write, start 10.1, or install a plugin.
 
-**Current execution overlay (CR-042..CR-045; does not rewrite procedure-v1):**
-MAN-01/02 passed historically. The current PRIVATE plugin is Content Producer
-v0.2.2 with one owner OAuth `mcpku2` connection. MAN-03 had a failed
-fixed-pilot reservation attempt but saved no draft; MAN-03/04 remain PENDING.
-For new cards use only the OAuth connection. CR-037/038 manual grants
-belong to the historical fixed-pilot path and are not consulted by OAuth.
-The host setting `ask_before_writes` requires user confirmation for writes;
-it is not itself an approval of editorial content. Fetch Page generation
-context immediately before MAN-03 and preserve the exact six-digit
-microsecond `config_updated_at` text for CAS. Do not use the old
-No-auth prompt, stale timestamp, or a replacement operation key as a
-recovery shortcut. The already recorded owner choice for MAN-03 is `corious-facts`, Moon phases,
-`nature_science`, `single_subject_fast`, `fast_trivia`, `follow`, en-US,
-verified NASA sources and draft-only effects. Reuse that choice without
-asking the owner to restate it, unless they request a change; still show
-the exact executable draft-only prompt and obtain approval for its write
-scope. The owner reviews the actual persisted draft, sources, checks,
-revision and hash before MAN-04 approval.
+**Current execution overlay (CR-042..CR-048; procedure-v1 unchanged):**
+MAN-01..04 passed. The installed PRIVATE Content Producer v0.2.2 plugin
+is bound to owner OAuth `mcpku2`. MAN-03 saved one verified Moon draft
+on `corious-facts`; MAN-04 revised the hook with exact CAS and obtained
+separate owner approval of the reviewed hash. Independent owner readback
+confirms `ready` revision 3. CR-048 accepts the direct Codex `mcpku2`
+write trace together with prior private-plugin host evidence for 10.4;
+the absent fresh ChatGPT parent-plugin write trace remains an audit limit.
+The historical fixed-pilot failure and CR-037/038 manual grants do not
+apply to current OAuth cards.
+
+The next card is MAN-05. Use the installed PRIVATE plugin in ChatGPT;
+confirm the owner Page and obtain approval of the exact plan name and
+1–3 dated slots before writing. MAN-06 requires a separate fresh ChatGPT
+conversation and read-only recovery of the plan and post. The host
+`ask_before_writes` control is distinct from the owner's approval of
+specific content or schedule. Keep the frozen steps and recovery rules
+below; do not repeat completed MAN-03/04 writes.
 
 ## Procedure freeze and per-card binding gates
 
