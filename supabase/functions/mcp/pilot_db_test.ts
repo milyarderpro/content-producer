@@ -213,7 +213,10 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   for (const field of Object.keys(profileSchema.properties)) {
     assert(['id', 'name', 'email', 'nickname'].includes(field), 'unknown profile property');
   }
-  assert(!Object.hasOwn(profileSchema.properties, 'workspace_public_id'), 'no workspace in profile');
+  assert(
+    !Object.hasOwn(profileSchema.properties, 'workspace_public_id'),
+    'no workspace in profile',
+  );
   const accountInput = oauthProfile.inputSchema as {
     required?: string[];
     properties: Record<string, unknown>;
@@ -228,8 +231,14 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     required?: string[];
     properties: Record<string, unknown>;
   };
-  assert(Object.hasOwn(workspaceInput.properties, 'workspace_public_id'), 'workspace field missing');
-  assert(!workspaceInput.required?.includes('workspace_public_id'), 'workspace ID must be optional');
+  assert(
+    Object.hasOwn(workspaceInput.properties, 'workspace_public_id'),
+    'workspace field missing',
+  );
+  assert(
+    !workspaceInput.required?.includes('workspace_public_id'),
+    'workspace ID must be optional',
+  );
   const profiles = oauthTools.filter(
     (tool) => (tool._meta as Record<string, unknown>)['openai/profile'] === true,
   );
