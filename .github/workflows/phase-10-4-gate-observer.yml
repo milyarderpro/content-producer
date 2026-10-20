@@ -1,0 +1,30 @@
+name: Phase 10.4 - one-time gate run lookup
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/phase-10-4-gate-observer.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  observe:
+    name: Resolve exact-commit backend gate run
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BACKEND_SHA: f39810bbe1e2eaa035c1e805f3b3a2eb3e0ae066
+    steps:
+      - name: Query one-time technical gate without re-running it
+        shell: bash
+        run: |
+          set -euo pipefail
+          api="https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/phase-10-1-technical-gate.yml/runs?branch=codex%2Fphase-10-plugin&per_page=30"
+          result="$(curl -fsS --retry 2 --max-time 15 -H "Accept: application/vnd.github+json" -H "Authorization: Bearer $GH_TOKEN" "$api")"
+          echo "$result" | jq -e --arg sha "$BACKEND_SHA" '.workflow_runs | map(select(.head_sha == $sha)) | length > 0' > /dev/null
+          echo "$result" | jq -r --arg sha "$BACKEND_SHA" '.workflow_runs[] | select(.head_sha == $sha) | "CR046_GATE_RUN_ID=\(.id) status=\(.status) conclusion=\(.conclusion) URL=\(.html_url)"'
+          echo "Read-only gate observation. No backend gate dispatch, database or production write."
