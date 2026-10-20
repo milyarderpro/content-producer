@@ -405,3 +405,20 @@ The owner reviewed the saved Moon draft, the exact revision-2 Canva copy, captio
 ```
 
 **Execution status at freezing:** NOT YET CALLED. Readback IDs/status/count and MAN-05 outcome must be appended after the one operation; MAN-06 is reserved for a separate conversation. No plan item claim, post creation, Facebook publication or heavy CI gate authorized.
+
+
+## MAN-05 — actual owner OAuth creation and independent readback (20 October 2026)
+
+**MAN-05 PASS (card only), checkpoint 10.5 PENDING MAN-06.** The owner explicitly approved the exact name, plan intent, three dated Asia/Jakarta slots, item fields, default configuration and UUIDv4 operation key in the ChatGPT conversation. The complete bound prompt and exact payload were committed **before** the production write in preceding MAN-05 entry.
+
+One (and only one) direct owner OAuth `mcpku2.create_content_plan` invocation used operation key `32838999-d0a9-473c-83ba-37057689364b`. It returned `replayed=false`, persisted plan `08c75cc2-c123-4471-852a-4c159f26f22e`, status `pending`, requested_count=3, progress `pending=3, in_progress=0, completed=0, failed=0, cancelled=0`, at `2026-10-20T13:21:16.072891Z`. No lost-response retry was necessary. The same authorized owner session then independently called `get_content_plan` with `limit=100`; it returned **all 3 items**, `has_more=false`, and exact persisted values:
+
+| Position | Item public ID | UTC stored | WIB +07:00 | Topic | Format | Interaction goal | Item status |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | `a34ad84e-3e43-4989-afa1-1ea335825563` | 2026-10-22T14:00:00.000000Z | 2026-10-22 21:00 | `animals` | `emotional_animal_collection` | `share` | pending |
+| 2 | `13633535-b964-4300-bf45-bbf001f92e24` | 2026-10-24T14:00:00.000000Z | 2026-10-24 21:00 | `food_storage_home` | `themed_utility` | `save` | pending |
+| 3 | `0bd86b13-fbf6-44d8-856b-89e818c350b5` | 2026-10-26T14:00:00.000000Z | 2026-10-26 21:00 | `geography` | `comparison` | `comment` | pending |
+
+All item `item_config={}`, `attempt_count=0`, `claim_expires_at=null`, `active_post_public_id=null`, `last_error=null`. Separate owner-scoped `list_content_plans` confirmed **one total Page plan**, matching ID/name and progress, no pagination; `list_posts` still confirmed **only the earlier Moon Facts ready post**, revision 3, `scheduled_at=null`, `published_at=null`. No `claim_content_plan_items`, post creation, background worker, Facebook scheduling, SQL administrator, deployment or heavy gate.
+
+**Evidence attribution:** installed PRIVATE plugin `content-producer` v0.2.2 with required registered owner OAuth app and `mcpku2` tools was read beforehand. This MAN-05 business tool execution is a direct ChatGPT `mcpku2` call; a fresh visible parent-plugin-selected `@Content Producer` invocation for this exact write was not independently captured. Carry this host-attribution limitation to 10.7 without pretending otherwise. Source branch `codex/phase-10-plugin`, prior head `cd364ef9c442080c824558f65d52d17cbe4092a7`, documented frozen intent commit `71810a380fc30142c565dd7907c5af127b4f4a82`; backend reused existing CR-047 full gate #39411054462 (no retest). No AC-007 (seven processed posts) or AC-008 (seven calendar days) threshold is asserted from a three-item plan. **MAN-06 remains unexecuted and requires the owner's new ChatGPT conversation; do not complete checkpoint 10.5 yet.**
