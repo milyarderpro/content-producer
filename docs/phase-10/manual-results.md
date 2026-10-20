@@ -222,7 +222,6 @@ MAN-03 production and MAN-04 remain PENDING.
   CR-046 migration, OAuth production verification and MAN-03/04
   business writes remain **PENDING** until a new exact-SHA full gate **PASS**.
 
-
 ## CR-046 production rollout — backend contract repair PASS (20 October 2026)
 
 **Release gate and SHA:** [full backend/security gate #39400805545](https://github.com/milyarderpro/content-producer/actions/runs/39400805545) **PASS**, attempt 1, exact source SHA `41a93e6cf30e8f63e59233a859a5a83390bc6631`. All steps passed: one ephemeral clean Supabase reset; owner/OAuth security; authenticated MCP HTTP 33-tool valid/invalid Inspector and non-owner denial; `test-all`; source/applied migration history; local database lint; catalog/grants/RLS/privilege and zero-fixture audit twice; final whitespace check. The older failed gates remain historically **FAIL**, not retroactively PASS.
