@@ -1,6 +1,6 @@
 # Phase 10 — Koneksi ChatGPT, plugin final, dan pilot: runbook implementasi
 
-**Status:** Phase 9 `Complete`; Phase 10 `In progress`, 10.0 mengikuti CR-028.
+**Status:** Phase 9 `Complete`; Phase 10 `In progress`; 10.0–10.3 PASS, 10.4–10.7 PENDING. Current connection: PRIVATE Content Producer v0.2.2 → owner OAuth `mcpku2` (CR-042..CR-045). Sections describing No authentication record earlier checkpoint history, not current execution instructions.
 Catat SHA `main` yang aktual ketika 10.0 dimulai. Rencana ini membagi Phase 10
 menjadi delapan task berurutan (10.0–10.7); satu task hanya mengerjakan satu
 checkpoint. Lulusnya Phase 10 memberi status **Pilot-ready**, bukan **MVP
@@ -53,27 +53,30 @@ menerima arsip lokal ZIP/tar.gz menjadi plugin PRIVATE. Ini hanya bukti
 instalasi final. Jangan mencentang peringatan risiko, membuat koneksi,
 login/OAuth, ataupun mengunggah paket di 10.0.
 
-**CR-032 menggantikan gate OAuth tersebut hanya pada 10.1:**
-Pemilik memilih satu custom MCP **PRIVATE / No authentication** ke URL `mcp`
-production yang sama. Tidak ada user login, OAuth, atau consent. Edge Function
-menggunakan identitas satu workspace tetap dengan transaksi Postgres yang
-turun ke role `authenticated`; RLS dan 33 RPC yang ada tetap berlaku.
-Endpoint HTTPS-nya sendiri **publik**, meskipun plugin private, sehingga
-siapa pun dengan URL dapat meminta pembacaan. Semua tool write terlihat
-tetapi eksekusi RPC write ditolak selama 10.1. Pembuktian tool/approval
-OAuth historis CR-028/031 bukan lagi syarat koneksi ini. 10.1 PASS hanya
-bila host benar-benar menampilkan 33 tools termasuk `create_page` dan tiga
-read berhasil. Tidak ada business write sebelum MAN-02 dengan persetujuan
-payload tepat. Lihat [CR-032](../../docs/decisions/2026-10-18-phase-10-1-noauth-fixed-pilot.md).
+**Historical 10.1–10.3:** CR-032 temporarily selected a PRIVATE
+No-auth/fixed-pilot connection to the production `mcp` URL. That route
+used server-fixed pilot identity, exposed reads to anyone knowing the URL,
+and required default-absent, exact-payload grants for business writes.
+CR-037/038 describe permits for that historical mode. Preserve its test
+and MAN-01/02 results as historical evidence, never as the current
+authentication or grant procedure.
 
-**Status koneksi terbaru (CR-042/043/044):** aturan No authentication di atas
-adalah catatan historis. Backend production `mcp` v28 default ke owner OAuth,
-dan koneksi PRIVATE OAuth ChatGPT telah berhasil dibuat. Tiga read owner belum
-seluruhnya PASS: `get_account_profile` berhasil, `get_workspace_context({})`
-gagal karena konteks workspace belum diisi pada `tools/call`, dan `list_pages`
-belum dipanggil. Perbaikan CR-043 memerlukan gate penuh pada kandidat final,
-deployment SHA yang sama, dan pengulangan tiga read melalui koneksi OAuth yang
-sudah ada; jangan minta login ulang tanpa bukti server-side bahwa perlu.
+**Current host acceptance (CR-042..CR-045, 20 October 2026):** production
+`mcp` v29 defaults to owner OAuth. Backend SHA
+`6a8c42d8a3ffb846b8bd92663dbfbdbc9cc22e92` passed
+[CR-020 gate #39372282908](https://github.com/milyarderpro/content-producer/actions/runs/39372282908).
+The existing PRIVATE Content Producer plugin was updated in place to
+v0.2.2, release `pluginrel_6ad708422a988191afc09772ee7eb261`,
+with one required `mcpku2` OAuth binding. Package/docs SHA
+`31cb86a3e528bdb599f96078c1ca08edb85c6f0b` passed
+[light CI #39379688115](https://github.com/milyarderpro/content-producer/actions/runs/39379688115).
+The plugin page displayed 33 tools (11 Read, 22 Write); a chat launched
+from that page showed `@Content Producer`, `Used mcpku2`, and successful
+`get_account_profile`, `get_workspace_context` and `list_pages`.
+The app-specific host setting is `ask_before_writes`. This is read-only
+host acceptance, not evidence of a live OAuth business write. No second
+plugin, login loop, fixed-pilot grant, or full gate rerun is needed for
+unchanged backend source.
 
 ## 3. Alur GitHub, status, dan biaya pengujian
 
@@ -88,7 +91,7 @@ sudah ada; jangan minta login ulang tanpa bukti server-side bahwa perlu.
   `PASS`, `FAIL`, atau `BLOCKED/PENDING` yang spesifik. Centang hanya bila
   kriteria selesai terbukti. `PENDING` bukan `PASS`.
 - AI mengerjakan repository, paket, penilaian evidence, dan pemeriksaan
-  teknis. Pemilik memilih koneksi No authentication 10.1 dan mengaktifkan plugin,
+  teknis. Pemilik mempertahankan koneksi owner OAuth `mcpku2` dan plugin PRIVATE v0.2.2,
   menjalankan prompt kartu yang telah dibekukan, memberi data Page dan
   persetujuan editorial. Jangan meminta password, token, authorization code,
   client secret, service key, atau isi cookie di chat/Issue/PR/log.
@@ -115,21 +118,25 @@ sudah ada; jangan minta login ulang tanpa bukti server-side bahwa perlu.
   [panduan OpenAI](https://developers.openai.com/plugins/deploy/connect-chatgpt).
   Catat source SHA, hash paket final, dan versi terpasang. Paket yang diuji
   harus sama dengan paket yang dinyatakan final.
-- Registrasi OAuth client adalah prosedur historis Phase 9 dan **tidak**
-  dipakai untuk koneksi No authentication CR-032. Apabila diaudit, policy backend
-  yang sudah dirilis: catat client, redirect persis, scope, dan uji OAuth/owner
-  hosted secara terfokus. Jika setup itu memerlukan perubahan Auth policy,
-  token claim hook, middleware, RLS, atau security config backend, perlakukan
-  sebagai perubahan keamanan: review, gate penuh pada SHA rilis baru, lalu
-  verifikasi hosted. Jangan menyebut registrasi client saja sebagai bukti
-  bahwa kebijakan akses berubah atau gate lama otomatis tidak berlaku.
+- Koneksi OAuth owner `mcpku2` sudah ada dan teruji. Jangan membuat
+  koneksi/plugin tambahan atau meminta login ulang tanpa error autentikasi
+  aktual. Untuk perubahan Auth policy, token claim hook, middleware,
+  RLS, atau security config backend, lakukan review dan gate penuh pada
+  SHA rilis baru, lalu verifikasi hosted. Pembaruan dokumen/paket saja
+  memakai light CI dan gate backend SHA yang tidak berubah.
 
 ## 4. Batas tindakan dan evidence
 
-Selama 10.1 tidak ada write bisnis. Identitas fixed pilot di sisi server
-menggantikan OAuth owner untuk koneksi No authentication; hal ini tidak
-dapat mengotentikasi pemanggil publik. Pembukaan write setelah 10.1 butuh
-persetujuan payload dan keputusan operasional terpisah.
+10.1 melarang write bisnis dan kini mempunyai bukti OAuth owner
+read-only. Untuk MAN-03 dan kartu berikutnya, gunakan hanya plugin
+PRIVATE `@Content Producer` v0.2.2 dengan app OAuth `mcpku2`.
+Permintaan OAuth berjalan sebagai owner yang diverifikasi; fixed-pilot
+`pilotMode` tidak aktif. Grant sementara CR-037/038 hanya berlaku pada
+jalur fixed-pilot dan **tidak diperlukan atau dibaca** oleh jalur OAuth.
+Jangan meminta pemilik mengaktifkan/mencabut grant tersebut untuk
+kartu OAuth. Tetap minta keputusan owner untuk cakupan tindakan bisnis
+dan biarkan host meminta persetujuan sebelum write.
+
 Page tambahan, draft, revisi, approval, dan plan yang bertahan di production
 adalah data pilot sungguhan milik owner. Prompt kartu yang dikirim pemilik
 memberi otorisasi untuk tindakan tepat yang dijelaskan di kartu; jangan
@@ -200,91 +207,28 @@ ada OAuth, instalasi, koneksi baru atau business write. **Tidak
 mensyaratkan** izin write, plugin final terpasang, atau data Page sebelum
 10.1/10.2/10.3. Jika bukti tersebut tidak ada, beri BLOCKED spesifik.
 
-## 6. Checkpoint 10.1 — No authentication, fixed pilot dan tiga read
+## 6. Checkpoint 10.1 — koneksi MCP (PASS; riwayat dan keadaan kini)
 
-**Scope:** adaptasi existing production MCP, satu koneksi plugin PRIVATE
-ChatGPT tanpa autentikasi pengguna, tanpa bisnis write ataupun final package.
-CR-032 mengesampingkan gate owner OAuth CR-028/031 untuk koneksi ini.
+CR-032 No-auth/fixed-pilot menghasilkan PASS historis pada 18 Oktober.
+CR-042 menggantinya untuk penggunaan saat ini. Setelah CR-043/044,
+backend OAuth v29 lulus gate #39372282908 pada SHA
+`6a8c42d8a3ffb846b8bd92663dbfbdbc9cc22e92`.
+ChatGPT menampilkan 33 tool dan tiga read owner berhasil melalui
+`mcpku2`. Jangan mengulang pemasangan koneksi atau grant fixed-pilot
+untuk melanjutkan kartu Phase 10.
 
-1. Verifikasi SHA HEAD PR #23, catat CR-032 dan risiko endpoint publik **sebelum**
-   mengubah source. Buktikan lewat tes terfokus bahwa Edge-only DB connection,
-   `SET LOCAL ROLE authenticated` dan claims server-side membatasi satu
-   workspace pilot lewat RLS; `anon` tidak mendapat grant langsung pada
-   33 RPC, tabel, sequence atau helper. Bila identitas gagal, STOP.
-2. Pertahankan exactly 33 MCP tool/RPC, dengan `create_page` terdaftar,
-   descriptor tanpa OAuth, input schema tertutup, dan read-only adapter
-   profile yang mengembalikan public workspace id. Semua mutasi server-blocked
-   pada 10.1. Jalankan tes terfokus, `pnpm run check`, dan CI ringan.
-3. Jalankan **tepat satu** gate CR-020 lengkap pada SHA final; bila Actions
-   lama, catat URL/SHA dan STOP sampai `lanjutkan` untuk memeriksa run yang
-   sama. Deploy hanya setelah PASS ke project production Phase 9 yang sama,
-   bukan MCP demo atau project baru. Verifikasi secret tetap di Edge saja.
-4. Pemilik membuat **satu** koneksi/plugin PRIVATE dengan **No authentication**
-   ke URL production `mcp` yang ada. Katalog ChatGPT harus menampilkan tepat
-   33 tool unik termasuk `create_page`; gunakan hanya tiga tool baca
-   `get_account_profile`, `get_workspace_context`, dan `list_pages`.
-   Catat hasil aktual dan jumlah bisnis row/ledger tetap. Jangan menjalankan
-   write meskipun host menyediakannya.
+## 7. Checkpoint 10.2 — paket PRIVATE (PASS; v0.2.2 kini aktif)
 
-**PASS 10.1 hanya bila:** gate final SHA dan deployment PASS, host private
-No authentication membuktikan 33 tool serta ketiga read, tanpa write bisnis.
-Bukti local/Inspector/HTTP terpisah bukan bukti host ChatGPT. Jika hosting
-atau konektor tidak bisa menjalankan salah satu tahap, beri satu tindakan
-manual yang jelas, tandai PENDING dan berhenti di 10.1; jangan mulai 10.2.
-
-## 7. Checkpoint 10.2 — PRIVATE final package via registered mcpku
-
-**Status:** v0.2.0 ZIP source passed CI but installed as desktop-only;
-owner Chrome proved it was absent from Work web chat selector, while existing
-registered `mcpku` was selectable. CR-036 corrects the **packaging contract**
-without touching the unchanged No-auth production backend.
-
-1. Use the **same** installed PRIVATE `Content Producer` plugin identity.
-   In portable root `plugin.json` declare
-   `extensions.com.openai.apps = "./.app.json"`; map one required alias
-   `content-producer` to the existing registered ChatGPT MCP ID
-   `asdk_app_6ad4ef8b42588191a749b8b9f356b662`. The ID is an app
-   locator, not credential. No `mcp.json` or `.mcp.json` in the new source
-   archive. Remove those stale files from the previous installed release
-   during guarded Plugin Creator **update**, not create. Registered MCP
-   `mcpku` remains No authentication with fixed-workspace public reads and
-   server-blocked write calls. Do not create additional connections.
-2. Manifest v0.2.1, one skill and ten references stay in a 13-file strict
-   allowlist. Validate exact mapping and rejecting alternate/optional IDs,
-   no bundled remote MCP, path safety, frozen 33 names, source links, secrets,
-   ZIP entries, extracted bytes and SHA-256. Run focused tests and
-   `pnpm run check` only; allow lightweight CI at the new SHA. Reuse
-   backend SHA `14d4955e07a55d0d5040e647d210ddab5ca282cd` and
-   [full CR-020 PASS #39142242292](https://github.com/milyarderpro/content-producer/actions/runs/39142242292);
-   do not repeat `test-all`, deploy or change production.
-3. After CI PASS and final ZIP SHA-256 recorded, use Plugin Creator
-   `update_plugin` against the **existing** PRIVATE release with its
-   exact ID and release precondition. If upload/host mapping fails, record
-   the **exact error** and leave 10.2 PENDING; do not install a duplicate.
-   Read back installed version and preserved PRIVATE identity.
-4. Owner opens a **fresh ChatGPT Work web conversation**, selects only
-   final `Content Producer` plugin (registered `mcpku` is a dependency,
-   not an additional selected plugin), proves skill `content-producer`
-   and 33 MCP tools together including `create_page`, and performs only
-   `get_account_profile({})`, `get_workspace_context`, `list_pages`
-   on the fixed existing pilot workspace. Record 11 Read + 22 Write tools,
-   3/3 read results and source plugin/release. **Then** check plugin
-   selection/read usability from ChatGPT mobile. No Write tool invocation.
-
-**10.2 PASS only when final package is truly usable outside desktop,
-skill+MCP actually work together, exactly 33 tools and three reads succeed,
-and evidence is recorded in Issue #22/PR #23.** A valid ZIP or installed
-version alone is not sufficient. Keep PR draft and do not begin 10.3 here.
-
-### 10.2 signoff — 2026-10-19: PASS
-
-Owner confirmed v0.2.1 works in ChatGPT Work web and the phone's web
-browser (native mobile app not tested). Fresh web chat used the installed
-skill and registered mcpku's 33 tools together: 3 Read PASS, 0 Write.
-Plugin Creator verified v0.2.1, PRIVATE and the same release ID.
-Final ZIP/hash and CI proof are recorded in Issue #22 and PR #23.
-The public No-auth read risk remains; 10.3–10.7 and 14 MVP ACs are PENDING.
-
+CR-036 mengantar paket v0.2.1 yang dahulu memakai `mcpku`
+No authentication; itu adalah bukti historis 10.2. CR-045 memperbarui
+**plugin PRIVATE yang sama** ke v0.2.2 dengan satu required app
+`content-producer` → `mcpku2` OAuth, tanpa `mcp.json` atau secret.
+[Issue #22](https://github.com/milyarderpro/content-producer/issues/22#issuecomment-6285034464)
+mencatat readback release, 33 tool, tiga read, dan parent-plugin
+`@Content Producer` yang teramati. Instalasi paket, koneksi, dan
+tiga read tidak perlu diulang selama versi dan binding tidak berubah.
+Keberadaan 22 tool Write dan pengaturan `ask_before_writes` tidak
+membuktikan satu pun write telah berhasil. MAN-03/04 tetap PENDING.
 
 ## 8. Checkpoint 10.3 — `MAN-01..MAN-02`: aktivasi dan Page
 
@@ -330,21 +274,36 @@ MVP tetap PENDING.
 
 ## 9. Checkpoint 10.4 — `MAN-03..MAN-04`: draft dan editorial
 
-**CR-038 owner selection and write separation (2026-10-19):** the owner chose
-Moon phases / `nature_science` / `single_subject_fast` / `fast_trivia`,
-preferred seven **distinct verified** claims (not forced), `follow`, and
-the Phase 10 trivia source/editorial policy. This is **only content direction
-and draft preparation**, not consent for assistant-executed business writes.
-Prepare the narrowly scoped revocable grants in
-[CR-038](../../docs/decisions/2026-10-19-phase-10-4-scoped-write-permits.md),
-and verify focused tests, one final-SHA full gate and deployment before
-showing the **complete MAN-03 prompt for the owner to submit via the installed
-plugin**. No assistant `trivia_register_and_reserve_facts`, `save_post`,
-`revise_post`, `approve_post`, plan or Facebook write in the preparation
-task. Grants are absent unless separately activated by the owner. Actual
-MAN-04 editorial approval is a later distinct, exact-revision/hash gate.
-Checkpoint remains PENDING until the real owner-triggered cards pass.
+**Current MAN-03/04 handoff (CR-038 historical permit, CR-042..045 OAuth):**
+Owner has chosen Moon phases / `nature_science` /
+`single_subject_fast` / `fast_trivia`, preferably seven distinct
+verified claims (not a quota), `follow`, English US, NASA source
+checks and draft-only side effects. This is content direction, not
+approval to publish or to approve an unseen draft. Under the current
+OAuth path, `pilotMode=false`; the default-absent CR-038 grant check is
+not executed. No manual grant activation/revocation script is part of
+the OAuth procedure. Existing focused and full backend gate evidence
+is reusable while backend source and security configuration remain
+unchanged.
 
+Immediately before any MAN-03 reservation, confirm the installed
+v0.2.2 OAuth plugin, owner workspace, target `corious-facts` Page,
+current zero-or-known draft state, and a fresh
+`get_page_generation_context`. Pass its `config_updated_at` text
+**exactly, including six microsecond digits**; never round-trip it
+through JavaScript `Date` or reuse a stale value. Verify each
+source/claim and similarity result. Compile one exact owner-approved
+draft-only prompt and stable operation keys; run at most one logical
+reserve followed by one logical `save_post`, then read the draft back.
+If a response is lost, reconcile state and replay only the identical
+key/payload; if the context changed or a claim is uncertain, stop
+without creating replacement keys. The earlier
+`FACT_RESERVATION_CONTEXT_CHANGED` failure remains historical:
+the actual failed v25 arguments were unavailable, while isolated DB
+tests showed complete `.018070Z` accepted and truncated `.018Z`
+rejected. Do not claim its original cause was proven.
+MAN-04 requires a separate review of persisted copy, sources, checks,
+revision and content hash before any revision or approval.
 
 Pada Page baru, minta pilihan owner tentang topik, sumber dan batas editorial
 tepat sebelum MAN-03, lalu ikat dan bekukan prompt kartu terkait. Jalankan
@@ -466,7 +425,7 @@ independen menyetujui. `MVP Complete` tetap menunggu Phase 11, bukan
   menjelaskan kebijakan akun/workspace yang dapat berubah. Bukti UI akun
   pemilik pada 10.0, bukan asumsi PRD lama, menentukan kelayakan jalur ini.
 
-## 15. Checkpoint 10.1 — final host acceptance, 18 Oktober 2026
+## 15. Historical No-auth host acceptance, 18 Oktober 2026 (superseded for current operation)
 
 **10.1 PASS (CR-032/CR-033/CR-034), bukan Phase 10 Complete atau MVP
 Complete.** Owner berhasil membuat dan menyambungkan satu custom MCP
@@ -515,16 +474,25 @@ first business write `MAN-02` hanya setelah approval payload persis owner,
 10.3–10.7 belum dimulai. Draft PR #23 tetap terbuka dan tidak di-merge
 sebelum audit independen 10.7.
 
-## 16. Pemulihan OAuth setelah MCP v27 — 20 Oktober 2026
+## 16. OAuth recovery and current handoff — 20 Oktober 2026
 
-Bagian 15 merekam hasil historis koneksi No authentication. CR-042 mengganti
-mode default endpoint production `mcp` menjadi owner OAuth untuk perbaikan
-koneksi ChatGPT saat ini; mode fixed pilot hanya tersedia jika dipilih secara
-eksplisit di sisi server. MCP v27 memberi 404 pada path metadata `.well-known`
-yang diminta ChatGPT dan 415 tanpa challenge pada POST tanpa JSON media type.
-Perbaikan rute dan challenge diuji pada jalur production tanpa fixture
-`configured`, lalu memerlukan satu gate penuh CR-020 pada SHA final, deployment
-SHA yang sama, dan probe HTTP aktif sebelum meminta owner menghubungkan OAuth.
-PASS membutuhkan koneksi OAuth ChatGPT nyata, tepat 33 tool, tiga read owner,
-dan bukti mekanisme persetujuan write tanpa pemanggilan write. Jangan
-mengaktifkan grant atau memulai MAN-03/04 selama pemulihan ini.
+CR-042/043 restored protected-resource discovery and owner workspace
+resolution. Backend SHA `6a8c42d8a3ffb846b8bd92663dbfbdbc9cc22e92`
+passed the full CR-020 gate #39372282908 and is deployed as active
+Edge `mcp` v29. CR-044 permits reuse of that gate for unchanged backend
+source, migrations, runtime dependencies and security configuration.
+CR-045 updated the same PRIVATE plugin to v0.2.2 on package/docs SHA
+`31cb86a3e528bdb599f96078c1ca08edb85c6f0b`; light CI
+#39379688115 passed. The host showed the parent `@Content Producer`
+selection, required `mcpku2` connection, 33 tools and three successful
+owner reads. Host permission is `ask_before_writes`; an OAuth business
+write has not yet been proven.
+
+**Next executable checkpoint:** 10.4 / MAN-03, then MAN-04. Use the
+OAuth plugin and the exact owner-directed card boundaries above.
+Do not perform a fixed-pilot grant ritual or retry the historical
+No-auth failed operation. Refresh generation context, preserve the
+full timestamp and use one approved draft-only operation sequence.
+Record its actual result before any MAN-04 revision or approval.
+No new backend full gate, deployment, plugin upload or OAuth login
+is required solely to start this unchanged-backend card.
