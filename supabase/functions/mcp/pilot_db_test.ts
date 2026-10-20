@@ -206,42 +206,30 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     additionalProperties: boolean;
     properties: Record<string, unknown>;
   };
-  assert(
-    profileSchema.type === 'object' && profileSchema.additionalProperties === false,
-    'profile output must be a closed object',
-  );
-  assert(
-    JSON.stringify(profileSchema.required) === JSON.stringify(['id']),
-    'profile output requires only id',
-  );
-  assert(
-    Object.keys(profileSchema.properties).every((field) =>
-      ['id', 'name', 'email', 'nickname'].includes(field)) &&
-      !Object.hasOwn(profileSchema.properties, 'workspace_public_id'),
-    'OpenAI profile forbids extra workspace_public_id',
-  );
+  assert(profileSchema.type === 'object', 'profile output must be object');
+  assert(profileSchema.additionalProperties === false, 'profile output must be closed');
+  assert(profileSchema.required.length === 1, 'profile must have one required field');
+  assert(profileSchema.required[0] === 'id', 'profile must require only id');
+  for (const field of Object.keys(profileSchema.properties)) {
+    assert(['id', 'name', 'email', 'nickname'].includes(field), 'unknown profile property');
+  }
+  assert(!Object.hasOwn(profileSchema.properties, 'workspace_public_id'), 'no workspace in profile');
   const accountInput = oauthProfile.inputSchema as {
     required?: string[];
     properties: Record<string, unknown>;
     additionalProperties: boolean;
   };
-  assert(
-    Object.keys(accountInput.properties).length === 0 &&
-      (!accountInput.required || accountInput.required.length === 0) &&
-      accountInput.additionalProperties === false,
-    'OAuth profile input must accept only {}',
-  );
+  assert(Object.keys(accountInput.properties).length === 0, 'profile input takes no args');
+  assert(!accountInput.required?.length, 'profile input has no required arguments');
+  assert(accountInput.additionalProperties === false, 'profile input rejects unknown args');
   const workspaceTool = oauthTools.find((tool) => tool.name === 'get_workspace_context');
-  const workspaceInput = workspaceTool?.inputSchema as {
+  assert(!!workspaceTool, 'missing authenticated workspace discovery');
+  const workspaceInput = workspaceTool.inputSchema as {
     required?: string[];
     properties: Record<string, unknown>;
   };
-  assert(
-    !!workspaceTool &&
-      Object.hasOwn(workspaceInput.properties, 'workspace_public_id') &&
-      (!workspaceInput.required || !workspaceInput.required.includes('workspace_public_id')),
-    'owner-scoped workspace must be discoverable without asking profile for extra fields',
-  );
+  assert(Object.hasOwn(workspaceInput.properties, 'workspace_public_id'), 'workspace field missing');
+  assert(!workspaceInput.required?.includes('workspace_public_id'), 'workspace ID must be optional');
   const profiles = oauthTools.filter(
     (tool) => (tool._meta as Record<string, unknown>)['openai/profile'] === true,
   );
