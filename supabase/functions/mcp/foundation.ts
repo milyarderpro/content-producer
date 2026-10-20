@@ -142,8 +142,9 @@ const contextOutput = response(
       content_schema_versions: z.array(z.number().int().min(1)),
       capabilities: z.array(z.string()),
     }),
+    config_public_id: publicId,
     config: triviaConfig,
-    generation_rules: z.strictObject({
+    generation_rules: z.strictObject({}
       allowed_topics: triviaConfig.shape.allowed_topics,
       allowed_formats: triviaConfig.shape.allowed_formats,
       allowed_profiles: z.array(z.string()),
