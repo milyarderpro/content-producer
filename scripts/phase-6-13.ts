@@ -1120,12 +1120,26 @@ try {
     httpSaved.post.status === 'draft' && httpReadback.post.status === 'draft',
     'CR046_HTTP_DRAFT_ONLY',
   );
+  // get_post intentionally omits the private generation_snapshot projection.
+  // Verify the persisted snapshot on the same *local fixture* DB while keeping
+  // public MCP draft-readback assertions within its frozen output contract.
+  check(!('generation_snapshot' in httpReadback.post), 'CR046_PRIVATE_SNAPSHOT_REDACTED');
+  const savedSnapshot = row<{ config_id: string; stamp: string; status: string }>(`
+    select p.generation_snapshot->>'config_public_id' as config_id,
+      p.generation_snapshot->>'config_updated_at' as stamp, p.status
+    from public.posts p where p.public_id='${httpSaved.post.post_public_id}'
+  `);
   check(
-    httpReadback.post.generation_snapshot.config_public_id === ctxConfigId &&
-      httpReadback.post.generation_snapshot.config_updated_at === ctxStamp,
-    'CR046_HTTP_SNAPSHOT_READBACK',
+    savedSnapshot.config_id === ctxConfigId &&
+      savedSnapshot.stamp === ctxStamp &&
+      savedSnapshot.status === 'draft',
+    'CR046_LOCAL_STORED_SNAPSHOT',
   );
-  check(httpReadback.post.fact_bindings.length === 5, 'CR046_HTTP_FACT_BINDINGS');
+  check(
+    httpReadback.post.fact_bindings.length === 5 &&
+      httpReadback.post.content_hash === httpSaved.post.content_hash,
+    'CR046_HTTP_FACT_BINDINGS',
+  );
   console.info('CR-046 isolated public MCP context -> reservation -> save_post -> get_post: PASS');
 
   const another = postRequest(f);
