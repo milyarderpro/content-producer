@@ -88,6 +88,11 @@ jobs:
       - name: Locked dependency installation
         run: pnpm install --frozen-lockfile
 
+      - name: Temporary CR-046 formatting diagnosis (remove before final gate)
+        run: |
+          pnpm exec prettier --write scripts/phase-6-13.ts
+          git diff -- scripts/phase-6-13.ts
+
       - name: Formatting check for changed text
         shell: bash
         run: |
