@@ -123,7 +123,9 @@ export function validatePluginSource(
       2,
     ) + '\n';
   if (appContent !== expectedApps) {
-    throw new Error('Registered app mapping must use the proven owner OAuth mcpku2 ID exclusively.');
+    throw new Error(
+      'Registered app mapping must use the proven owner OAuth mcpku2 ID exclusively.',
+    );
   }
 
   const manifest = JSON.parse(read(pluginRoot, 'plugin.json')) as unknown;
