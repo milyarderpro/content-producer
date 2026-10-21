@@ -44,11 +44,11 @@ Pemilik menjalankan **enam tool Read** lewat PRIVATE Content Producer pada konek
 Pemilik menjalankan tepat tiga panggilan **READ** `trivia_find_similar_facts`
 dengan klaim Moon yang sama:
 
-| Varian | Unit | comparison_direction | Hasil | Match |
-| ------ | ---- | -------------------- | ----- | ----- |
-| C | `"count"` | `"none"` | **SUCCESS** | 5 |
-| A | `"count"` | **dihilangkan** | **VALIDATION_FAILED** | — |
-| B | `null` | `"none"` | **SUCCESS** | 5 |
+| Varian | Unit      | comparison_direction | Hasil                 | Match |
+| ------ | --------- | -------------------- | --------------------- | ----- |
+| C      | `"count"` | `"none"`             | **SUCCESS**           | 5     |
+| A      | `"count"` | **dihilangkan**      | **VALIDATION_FAILED** | —     |
+| B      | `null`    | `"none"`             | **SUCCESS**           | 5     |
 
 Perbedaan sinyal angka: unit `"count"` memperoleh
 `score_components.numeric=1`, sedangkan unit `null` memperoleh `0`
