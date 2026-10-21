@@ -141,6 +141,31 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     expect(text).toContain('trivia_find_similar_facts');
     expect(text).toContain('trivia_register_and_reserve_facts');
     expect(text).toContain('must **not be registered/reserved**');
+    for (const relation of [
+      'has_count',
+      'has_measurement',
+      'is_classified_as',
+      'is_located_in',
+      'originated_in_time_place',
+      'has_named_part_or_property',
+      'holds_record_by_metric_as_of',
+      'can_perform',
+      'behaves_as',
+      'communicates_by',
+      'affects',
+      'causes',
+      'reduces_or_increases_risk',
+      'is_safe_or_toxic_for',
+      'recommended_practice',
+      'is_illegal_or_required_in',
+      'is_best_or_safest',
+    ]) {
+      expect(text).toContain('`' + relation + '`');
+    }
+    expect(text).toContain('greets_via_trunk_touch');
+    expect(text).toContain('do not assert');
+    expect(text).toContain('**Do not** change a');
+
   });
 
   it('handles all formats, mismatched hooks, CTA pressure and critical quality failures', () => {
