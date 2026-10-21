@@ -265,7 +265,7 @@ export function registerTriviaFactTools(server: McpServer, context?: RequestCont
     {
       title: 'Find similar trivia facts',
       description:
-        'Find candidate duplicate facts, ranked signals and reuse restrictions. You must review semantic identity; search alone never proves equivalence.',
+        'Find duplicate fact candidates and reuse limits; semantic identity requires your review.',
       inputSchema: findInput,
       outputSchema: findOutput,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
