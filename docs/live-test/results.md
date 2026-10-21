@@ -111,6 +111,52 @@ Detail: [Issue #29 komentar retest](https://github.com/milyarderpro/content-prod
 **Issue #26** tetap `NEEDS TRACE`; sebab draft gagal sebelumnya
 belum terhubung secara pasti ke kasus ini.
 
+### LT-016-SCHEMA-REFRESH — 21 Oktober 2026 — FINAL PASS LIVE (owner-reported)
+
+Setelah pemilik menjalankan **Refresh** pada koneksi registered app `mcpku2`
+yang sudah ada (tanpa membuat koneksi atau plugin baru), satu **chat
+ChatGPT baru** dengan definisi tool sesi itu mengonfirmasi bahwa
+`mcp__mcpku2__trivia_find_similar_facts` mengiklankan
+`qualifiers.comparison_direction` sebagai field **REQUIRED**
+(tanpa `?`) dan enum tertutup berisi delapan nilai:
+`increase`, `decrease`, `greater_than`, `less_than`,
+`at_least`, `at_most`, `equal`, `none`. Deskripsi yang terlihat
+adalah `Find duplicate fact candidates and reuse limits; semantic
+identity requires your review.` Tidak ada tool yang dieksekusi
+pada sesi schema-only ini. Bukti: **signature yang dikutip oleh pemilik
+dari definisi sesi**, bukan raw katalog server yang direkam independen.
+
+Digabung dengan **LT-016-RETEST sebelumnya** pada plugin PRIVATE
+`mcpku2`: varian C dan B masing-masing **SUCCESS** (5 matches),
+`numbers.unit=null` dipertahankan, dan varian A tanpa
+`comparison_direction` menerima **expected MCP input-validation
+rejection** yang menyebut enum; bukan lagi SQL `VALIDATION_FAILED`.
+Pada retest terdahulu schema host masih optional/free-string; ini
+**bukti historis kondisi sebelum refresh**, bukan status terkini.
+
+Verifikasi terpisah oleh navigator melalui Plugin Creator menyatakan
+PRIVATE plugin yang sama sudah v0.2.3, release
+`pluginrel_6ad88fd9d5a88191b680e9416d649adf` dan registered app
+tetap sama. Edge `mcp` v32 dan bundle SHA adalah bukti rollout
+implementer di [Issue #29](https://github.com/milyarderpro/content-producer/issues/29),
+bukan pembacaan Edge saat sesi schema-only.
+
+**Final verdict LT-016: PASS LIVE**, berdasarkan gabungan bukti
+perilaku runtime owner-reported, rejection negatif, deklarasi host
+required enum setelah refresh, fix PR #31 dan CI fokus yang lulus.
+**Batas:** tidak ada trace RPC backend untuk kasus negatif; tes
+MCP terisolasi di CI menegakkan tidak diteruskannya payload invalid,
+sementara pesan live mengindikasikan validasi sebelum RPC. Tidak ada
+business Write pada tes-tes ini. Tidak mengeklaim bahwa versi plugin
+atau Edge dapat dibuktikan dari schema-only session.
+
+**Status kampanye:** 11 Read tool PASS / 0 FAIL / 22 Write NOT RUN.
+[Issue #29](https://github.com/milyarderpro/content-producer/issues/29)
+boleh ditutup sebagai perbaikan dan retest yang terbukti menurut
+batas di atas. [Issue #26](https://github.com/milyarderpro/content-producer/issues/26)
+tetap `NEEDS TRACE` untuk alur pembuatan draft dan tidak dianggap
+otomatis terselesaikan.
+
 ## Laporan sebelum kampanye
 
 | ID        | Tanggal dilaporkan | Gejala pengguna                                                                    | Bukti saat ini                                                                  | Tindakan                                                                                                                      | Status                |
