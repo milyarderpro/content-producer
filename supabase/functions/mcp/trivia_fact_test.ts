@@ -215,6 +215,31 @@ Deno.test(
         ['trivia_find_similar_facts', { candidates: [] }],
         ['trivia_find_similar_facts', { candidates: [candidate, candidate] }],
         ['trivia_find_similar_facts', { candidates: [{ ...candidate, ontology_version: 2 }] }],
+        // LT-016/CR-005: SQL requires explicit comparison_direction although old MCP
+        // schema advertised it as optional. Reject before reaching the RPC boundary.
+        [
+          'trivia_find_similar_facts',
+          { candidates: [{ ...candidate, qualifiers: { negated: false } }] },
+        ],
+        [
+          'trivia_find_similar_facts',
+          {
+            candidates: [
+              { ...candidate, qualifiers: { negated: false, comparison_direction: 'upward' } },
+            ],
+          },
+        ],
+        [
+          'trivia_register_and_reserve_facts',
+          {
+            facts: [
+              {
+                ...(inputs.trivia_register_and_reserve_facts.facts as Record<string, unknown>[])[0],
+                candidate: { ...candidate, qualifiers: { negated: false } },
+              },
+            ],
+          },
+        ],
         ['trivia_register_and_reserve_facts', { facts: [] }],
         [
           'trivia_register_and_reserve_facts',
