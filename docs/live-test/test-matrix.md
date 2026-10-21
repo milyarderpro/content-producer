@@ -48,11 +48,11 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 
 **LT-E2E-01 — Membuat satu draft baru dari ChatGPT**
 
-- **Status awal:** `BLOCKED — NEEDS TRACE`. Sumber: laporan pemilik [#26](https://github.com/milyarderpro/content-producer/issues/26); tool yang benar-benar gagal **belum diketahui**. Jangan klaim `save_post` pasti bermasalah.
+- **Status saat ini:** `BLOCKED — AWAITING OWNER-APPROVED E2E WRITE SCOPE`. Ringkasan chat gagal asli pada [#26](https://github.com/milyarderpro/content-producer/issues/26) mengidentifikasi `trivia_find_similar_facts` gagal `VALIDATION_FAILED` pada **4 Read attempts**; `trivia_register_and_reserve_facts` dan `save_post` **tidak dipanggil**. Alur historis berhenti sebelum save, bukan bukti defect `save_post`. Kasus LT-016 serupa sudah PASS setelah perbaikan, tetapi payload lama tidak tersedia sehingga kesamaan akar sebab belum pasti. Perlu Page uji yang diizinkan dan payload Write tepat sebelum membuktikan E2E.
 - **Langkah:** identitas owner → pilih Page yang disetujui → `get_page_generation_context` → riset/sumber kredibel → `trivia_find_similar_facts` → keputusan dedup → `trivia_register_and_reserve_facts` → periksa exact output/attestation → `save_post` → `get_post`.
 - **PASS:** tepat satu draft baru tersimpan, `post_public_id`, `revision`, `content_hash`, evidence, quality checks, fact bindings dan status `draft` cocok dari hasil live tool dan readback. Tidak ada otomatis `ready` atau `posted`.
 - **FAIL:** input valid dan telah diotorisasi tetapi tool gagal atau state tidak sesuai. Simpan trace yang disanitasi untuk menentukan lokasi gagal.
-- **BLOCKED:** bukti error lama belum lengkap, izin write/data Page belum disetujui, atau source evidence tidak lolos policy.
+- **BLOCKED:** izin Write/Page disposable belum disetujui atau source evidence tidak lolos policy. Bukti ringkasan kegagalan lama sudah mengidentifikasi tahap dedup, tetapi exact payload empat percobaan belum ada.
 - **Prioritas:** investigasi pertama setelah Read preflight. Retest harus memakai konten/fakta baru yang valid, bukan membuat duplikat/ulang write dengan key baru tanpa reconciliation.
 
 ## Rekap kampanye
@@ -65,6 +65,6 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 | FAIL terkonfirmasi          | 0                   |
 | BLOCKED (tool individual)   | 0                   |
 | NOT RUN (tool individual)   | 22                  |
-| Report perlu bukti tambahan | 1 — LT-E2E-01 / #26 |
+| E2E membutuhkan otorisasi  | 1 — LT-E2E-01 / #26 |
 
 **LT-016 PASS (21 Oktober 2026):** C/B SUCCESS, A expected MCP input-validation rejection, kemudian pemilik menjalankan Refresh koneksi `mcpku2` dan chat baru mengonfirmasi `comparison_direction` **required closed enum (8 nilai)** pada definisi tool, tanpa memanggil backend lagi. Bukti runtime dan schema diperoleh pada **dua sesi**, bukan klaim satu trace atomik atau server RPC negatif independen. Plugin terpasang v0.2.3 diverifikasi lewat Plugin Creator; deployment Edge v32 merupakan bukti rollout terpisah. Lihat [results.md](results.md) dan [Issue #29](https://github.com/milyarderpro/content-producer/issues/29). **Setiap status baris akan berubah hanya setelah tes kampanye direview dan direkam.** Pastikan ringkasan dan [results.md](results.md) diselaraskan setiap kali ada bukti baru.
