@@ -1,8 +1,8 @@
 name: Temporary - Live Test Markdown formatting diagnostic
 
 on:
-  push:
-    branches: [docs/live-test-fix-workflow]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
