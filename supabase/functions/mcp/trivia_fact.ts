@@ -26,7 +26,17 @@ const topic = z.enum([
 ]);
 const qualifier = z.strictObject({
   negated: z.boolean(),
-  comparison_direction: z.string().min(1).max(80).optional(),
+  // CR-005: SQL canonical identity requires an explicit direction; "none" is not inferred.
+  comparison_direction: z.enum([
+    'increase',
+    'decrease',
+    'greater_than',
+    'less_than',
+    'at_least',
+    'at_most',
+    'equal',
+    'none',
+  ]),
   time: z.string().min(1).max(300).nullable().optional(),
   location: z.string().min(1).max(300).nullable().optional(),
   population: z.string().min(1).max(300).nullable().optional(),
