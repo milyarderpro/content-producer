@@ -6,6 +6,19 @@ Frozen authority: `plans/trivia-content-dna.md` section 18, `plans/phase-0-decis
 
 Compare `subject_entity`, `subject_type`, `relation`, `object_entity_or_value`, `object_type`, `normalized_number`, `normalized_unit`, `comparison_operator_and_direction`, `negation`, `time_qualifier`, `location_qualifier`, `population_qualifier`, `condition_qualifier`, `method_or_metric`, `estimate_or_range_flag` and `scope`. Missing fields serialize explicitly; do not infer that unknown is equivalent to global/unqualified.
 
+**CR-005 / LT-016 live regression:** Every trivia candidate sent to
+`trivia_find_similar_facts`, `trivia_register_and_reserve_facts`, or as a
+correction successor **must** include
+`qualifiers.comparison_direction`. Choose only the supported values
+`increase`, `decrease`, `greater_than`, `less_than`, `at_least`,
+`at_most`, `equal`, or `none`, consistent with the relation and the
+verified atomic proposition. Use `"none"` only when no directional comparison
+is asserted (such as a plain `has_count` fact); **do not guess or silently
+default** it for directional claims. Omission is invalid even though earlier
+plugin/MCP schema advertised this field as optional. Units, including
+`null`, must preserve the verified meaning: never change `null` to
+`"count"` solely to improve dedup matching scores.
+
 When complete, deterministic-safe relation families include `has_count`, `has_measurement`, `is_classified_as`, `is_located_in`, `originated_in_time_place`, `has_named_part_or_property` and `holds_record_by_metric_as_of`. Potentially ambiguous behavioral, causal, safety, comparative and normative relations such as `can_perform`, `behaves_as`, `causes`, `is_safe_or_toxic_for` and `recommended_practice` require semantic review or stricter discrimination. Changing the relation allowlist/ontology requires a contract change and dedicated fixtures, not an editorial shortcut.
 
 ## Decision path
