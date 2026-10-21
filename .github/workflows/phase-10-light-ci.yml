@@ -88,14 +88,6 @@ jobs:
       - name: Locked dependency installation
         run: pnpm install --frozen-lockfile
 
-      - name: TEMPORARY diagnosis of Prettier Markdown difference
-        shell: bash
-        run: |
-          set -euo pipefail
-          pnpm exec prettier --write docs/phase-10/manual-results.md
-          git diff -- docs/phase-10/manual-results.md
-          git checkout -- docs/phase-10/manual-results.md
-
       - name: Formatting check for changed text
         shell: bash
         run: |
