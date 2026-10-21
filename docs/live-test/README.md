@@ -23,7 +23,7 @@
 
 ## Keamanan pengujian langsung
 
-- **Read tools:** uji pada owner workspace yang sudah terhubung tanpa mengubah data. Read yang seharusnya ditolak (misalnya metrik post belum `posted`) diuji sebagai *expected-denial*.
+- **Read tools:** uji pada owner workspace yang sudah terhubung tanpa mengubah data. Read yang seharusnya ditolak (misalnya metrik post belum `posted`) diuji sebagai _expected-denial_.
 - **Write tools:** gunakan Page/data **khusus testing yang disetujui pemilik**; jika belum ada, hentikan di `BLOCKED` dan minta keputusan objek uji. **Jangan** merusak atau mengganti `corious-facts` dan Page/post pilot historis hanya untuk mendapat PASS.
 - **Operasi irreversible atau bermakna dunia nyata** (`mark_post_posted`, `record_post_performance`, `archive_post`, `trivia_correct_fact`, discard/cancel pada data nyata): uji positif lewat fixture/database terisolasi kecuali telah ada peristiwa nyata dan persetujuan owner untuk ID yang tepat. Jangan membuat Facebook post ID/URL, `published_at`, snapshot engagement, atau fakta sumber palsu di production.
 - MCP tidak otomatis menerbitkan ke Facebook, membuat video Canva, atau mengambil analitik Facebook. Kalender hanya jadwal internal. Jangan membuat fitur palsu untuk meluluskan tes.
