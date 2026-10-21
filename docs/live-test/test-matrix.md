@@ -57,14 +57,14 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 
 ## Rekap kampanye
 
-| Indikator                   | Per 21 Oktober 2026 |
-| --------------------------- | ------------------- |
-| Tool tersedia               | 33                  |
-| PASS live baru              | 11                  |
-| PASS CI/fixture kampanye    | 0                   |
-| FAIL terkonfirmasi          | 0                   |
-| BLOCKED (tool individual)   | 0                   |
-| NOT RUN (tool individual)   | 22                  |
-| E2E membutuhkan otorisasi   | 1 — LT-E2E-01 / #26 |
+| Indikator                 | Per 21 Oktober 2026 |
+| ------------------------- | ------------------- |
+| Tool tersedia             | 33                  |
+| PASS live baru            | 11                  |
+| PASS CI/fixture kampanye  | 0                   |
+| FAIL terkonfirmasi        | 0                   |
+| BLOCKED (tool individual) | 0                   |
+| NOT RUN (tool individual) | 22                  |
+| E2E membutuhkan otorisasi | 1 — LT-E2E-01 / #26 |
 
 **LT-016 PASS (21 Oktober 2026):** C/B SUCCESS, A expected MCP input-validation rejection, kemudian pemilik menjalankan Refresh koneksi `mcpku2` dan chat baru mengonfirmasi `comparison_direction` **required closed enum (8 nilai)** pada definisi tool, tanpa memanggil backend lagi. Bukti runtime dan schema diperoleh pada **dua sesi**, bukan klaim satu trace atomik atau server RPC negatif independen. Plugin terpasang v0.2.3 diverifikasi lewat Plugin Creator; deployment Edge v32 merupakan bukti rollout terpisah. Lihat [results.md](results.md) dan [Issue #29](https://github.com/milyarderpro/content-producer/issues/29). **Setiap status baris akan berubah hanya setelah tes kampanye direview dan direkam.** Pastikan ringkasan dan [results.md](results.md) diselaraskan setiap kali ada bukti baru.
