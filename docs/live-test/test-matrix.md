@@ -62,7 +62,7 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 | Tool tersedia               | 33                  |
 | PASS live baru              | 10                  |
 | PASS CI/fixture kampanye    | 0                   |
-| FAIL terkonfirmasi          | 1 — LT-016 (error)   |
+| FAIL terkonfirmasi          | 1 — LT-016 (error)  |
 | BLOCKED (tool individual)   | 0                   |
 | NOT RUN (tool individual)   | 22                  |
 | Report perlu bukti tambahan | 1 — LT-E2E-01 / #26 |
