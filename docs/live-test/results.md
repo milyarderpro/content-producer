@@ -157,11 +157,38 @@ batas di atas. [Issue #26](https://github.com/milyarderpro/content-producer/issu
 tetap `NEEDS TRACE` untuk alur pembuatan draft dan tidak dianggap
 otomatis terselesaikan.
 
+### LT-E2E-01 — trace percobaan lama ditemukan (21 Oktober 2026)
+
+Pemilik kembali ke chat percobaan draft sebelumnya dan mengirim
+ringkasan pemanggilan MCP yang terjadi: `get_page_generation_context`
+**SUCCESS**, `get_post` **SUCCESS**, dan
+`trivia_find_similar_facts` **FAIL `VALIDATION_FAILED` sebanyak
+empat percobaan**. Tool `trivia_register_and_reserve_facts` serta
+`save_post` **tidak dipanggil**. Tidak ada draft tersimpan, menurut
+ringkasan tersebut.
+
+**Diagnosis yang diperbarui:** proses lama terhenti pada tahap
+pencarian duplikasi yang bersifat Read, **bukan pada penyimpanan
+`save_post`**. Gejala dan tool yang gagal konsisten dengan
+LT-016 / [Issue #29](https://github.com/milyarderpro/content-producer/issues/29)
+yang sudah diselesaikan, tetapi payload persis keempat request lama
+tidak tersedia. Oleh sebab itu kesamaan penyebab `comparison_direction`
+hanya **hipotesis sangat mungkin**, bukan bukti forensik.
+
+**LT-016** sudah PASS di runtime dan katalog baru, namun **LT-E2E-01
+belum PASS**: jalur `trivia_register_and_reserve_facts → save_post →
+get_post` belum dicoba ulang setelah perbaikan. Status
+`BLOCKED — AWAITING OWNER-APPROVED E2E WRITE SCOPE`: minta
+Page disposable yang disetujui, serta tinjauan fakta/sumber dan payload
+tepat untuk reservasi lalu penyimpanan satu draft. Tidak ada izin Write
+yang tersirat dari laporan error ini. [Issue #26](https://github.com/milyarderpro/content-producer/issues/26)
+tetap OPEN.
+
 ## Laporan sebelum kampanye
 
-| ID        | Tanggal dilaporkan | Gejala pengguna                                                                    | Bukti saat ini                                                                  | Tindakan                                                                                                                      | Status                |
-| --------- | ------------------ | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| LT-E2E-01 | 21 Okt 2026        | Draft baru tidak berhasil disimpan melalui plugin ChatGPT; ada tool MCP yang gagal | Laporan pengguna; belum ada nama tool/payload/error/readback dari percobaan itu | [#26](https://github.com/milyarderpro/content-producer/issues/26) — kumpulkan trace dan diagnosa, jangan langsung write ulang | BLOCKED — NEEDS TRACE |
+| ID        | Tanggal dilaporkan | Gejala pengguna                              | Bukti saat ini                                                                                    | Tindakan                                                                                                                      | Status                      |
+| --------- | ------------------ | -------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| LT-E2E-01 | 21 Okt 2026        | Draft creation terhenti sebelum reserve/save | Ringkasan lama: `trivia_find_similar_facts` gagal `VALIDATION_FAILED` 4×; reserve/save NOT CALLED | [#26](https://github.com/milyarderpro/content-producer/issues/26) — pastikan Page uji dan payload Write disetujui sebelum E2E | BLOCKED — AWAITING APPROVAL |
 
 ## Template record satu pengujian (salin untuk setiap kasus)
 
