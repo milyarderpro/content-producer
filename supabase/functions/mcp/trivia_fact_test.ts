@@ -151,6 +151,17 @@ Deno.test(
       check(tool.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
       check(!Object.hasOwn(tool, 'outputSchema'), 'OPTIONAL_OUTPUT_OMITTED');
       check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
+      if (name === 'trivia_find_similar_facts') {
+        // The advertised tools/list schema must never suggest that CR-005
+        // comparison_direction can be omitted when SQL requires it.
+        const qualifiers =
+          tool.inputSchema.properties.candidates.items.properties.qualifiers;
+        check(qualifiers.required.includes('comparison_direction'), 'DIRECTION_REQUIRED');
+        check(
+          qualifiers.properties.comparison_direction.enum.includes('none'),
+          'DIRECTION_ENUM_ADVERTISED',
+        );
+      }
     }
   },
 );
