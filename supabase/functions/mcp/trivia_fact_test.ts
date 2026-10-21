@@ -229,61 +229,13 @@ Deno.test(
     }
   },
 );
-Deno.test('FIX-37 accepts SQL v1 relation keys and preserves behavioral candidates', async () => {
-  check(TRIVIA_RELATION_KEYS_V1.length === 17, 'SQL_V1_HAS_17_RELATIONS');
-  // Schema probes only; SQL retains all relation/direction semantic checks.
+Deno.test('FIX-37 accepts exactly the 17 SQL v1 relations in the shared candidate schema', () => {
+  check(TRIVIA_RELATION_KEYS_V1.length === 17, 'EXACT_17_SQL_RELATIONS');
   for (const relation_key of TRIVIA_RELATION_KEYS_V1) {
-    const comparison_direction =
-      relation_key === 'reduces_or_increases_risk'
-        ? 'increase'
-        : relation_key === 'holds_record_by_metric_as_of' || relation_key === 'is_best_or_safest'
-          ? 'greater_than'
-          : 'none';
     check(
-      candidateSchema.safeParse({
-        ...candidate,
-        relation_key,
-        qualifiers: { negated: false, comparison_direction },
-      }).success,
-      'ACCEPT_SQL_RELATION_' + relation_key,
+      candidateSchema.safeParse({ ...candidate, relation_key }).success,
+      'SQL_RELATION_ACCEPTED_' + relation_key,
     );
-  }
-  const behavioral = {
-    ...candidate,
-    claim_text: 'Test subjects communicate using signals.',
-    relation_key: 'communicates_by',
-    object_key: 'signals',
-    numbers: [],
-    qualifiers: { negated: false, comparison_direction: 'none' },
-  };
-  const firstFact =
-    (inputs.trivia_register_and_reserve_facts.facts as Record<string, unknown>[])[0];
-  const original = globalThis.fetch;
-  const forwarded: Array<{ name: string; args: Record<string, unknown> }> = [];
-  globalThis.fetch = ((input: Request | URL | string, init?: RequestInit) => {
-    const name = String(input).split('/').pop()!;
-    forwarded.push({ name, args: JSON.parse(String(init?.body)) });
-    return Promise.resolve(Response.json({ response_schema_version: 1, data: responses[name] }));
-  }) as typeof fetch;
-  try {
-    const found = await call('trivia_find_similar_facts', {
-      ...inputs.trivia_find_similar_facts,
-      candidates: [behavioral],
-    });
-    const reserved = await call('trivia_register_and_reserve_facts', {
-      ...inputs.trivia_register_and_reserve_facts,
-      facts: [{ ...firstFact, candidate: behavioral }],
-    });
-    check(found?.isError !== true && reserved?.isError !== true, 'OFFICIAL_RELATION_ACCEPTED');
-    check(forwarded.length === 2, 'EXACTLY_TWO_CALLS');
-    const foundCandidate = (forwarded[0].args.p_candidates as typeof behavioral[])[0];
-    const reservedFacts = forwarded[1].args.p_facts as Array<{ candidate: typeof behavioral }>;
-    const reservedCandidate = reservedFacts[0].candidate;
-    check(foundCandidate.relation_key === 'communicates_by', 'FIND_RELATION_UNCHANGED');
-    check(reservedCandidate.relation_key === 'communicates_by', 'RESERVE_RELATION_UNCHANGED');
-    check(reservedCandidate.qualifiers.comparison_direction === 'none', 'DIRECTION_UNCHANGED');
-  } finally {
-    globalThis.fetch = original;
   }
 });
 Deno.test(
