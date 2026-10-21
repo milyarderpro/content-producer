@@ -1,6 +1,6 @@
 # Live Test & Fix — workflow aktif Content Producer
 
-**Berlaku mulai:** 21 Oktober 2026 · **Cakupan:** pengujian langsung plugin PRIVATE Content Producer v0.2.2 melalui owner OAuth `mcpku2`, remediasi, dan retest. **Kampanye:** [Issue #25](https://github.com/milyarderpro/content-producer/issues/25). **Masalah awal:** [Issue #26](https://github.com/milyarderpro/content-producer/issues/26).
+**Berlaku mulai:** 21 Oktober 2026 · **Cakupan:** pengujian langsung plugin PRIVATE Content Producer **v0.2.3** melalui owner OAuth `mcpku2` (terverifikasi di [Issue #29](https://github.com/milyarderpro/content-producer/issues/29); v0.2.2 adalah baseline awal historis), remediasi, dan retest. **Kampanye:** [Issue #25](https://github.com/milyarderpro/content-producer/issues/25). **Masalah awal:** [Issue #26](https://github.com/milyarderpro/content-producer/issues/26).
 
 ## Keputusan sederhana
 
@@ -69,7 +69,7 @@ Laporan tetap ringkas: kirim satu prompt, terima hasil, catat verdict, lanjut. T
 
 ## Titik awal
 
-[Issue #26](https://github.com/milyarderpro/content-producer/issues/26) — **pemilik melaporkan draft baru gagal tersimpan**. Error tool, trace dan state saat kejadian belum tersedia dalam kampanye ini. Prioritas investigasi: **LT-E2E-01** (lihat matriks); jangan otomatis mengatakan `save_post` penyebabnya karena bisa gagal di tahap dedup, reserve, evidence schema, context/CAS atau approval host. Mulai dari Read preflight, lalu reproduksi yang disetujui pemilik.
+[Issue #26](https://github.com/milyarderpro/content-producer/issues/26) — **percobaan draft historis berhenti pada tahap dedup Read**: `trivia_find_similar_facts` gagal `VALIDATION_FAILED` dalam empat percobaan; `trivia_register_and_reserve_facts` dan `save_post` **tidak dipanggil**. Ringkasan tahap dan error sudah diketahui, tetapi **payload tepat keempat panggilan asli belum tersedia**, sehingga kesamaan akar sebab dengan LT-016 belum terbukti. **LT-E2E-01 tetap OPEN / BLOCKED**; tidak ada bukti kegagalan `save_post` atau draft baru berhasil disimpan. Mulai lagi hanya dari Read preflight dan payload Write spesifik yang disetujui pemilik.
 
 ## Paket sumber lintas percakapan — LT-E2E-01
 
