@@ -1,0 +1,32 @@
+name: Temporary - LT-016 Prettier diagnostic
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  formatting:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Print formatted evidence for precise repair
+        shell: bash
+        run: |
+          pnpm exec prettier --write docs/live-test/results.md supabase/functions/mcp/trivia_fact_test.ts
+          for f in docs/live-test/results.md supabase/functions/mcp/trivia_fact_test.ts; do
+            printf 'FORMAT_DATA|%s|%s\n' "$f" "$(base64 -w0 "$f")"
+          done
