@@ -19,6 +19,37 @@ plugin/MCP schema advertised this field as optional. Units, including
 `null`, must preserve the verified meaning: never change `null` to
 `"count"` solely to improve dedup matching scores.
 
+**FIX-37 — SQL v1 closed ontology.** `relation_key` must be one of the
+following **17 case-sensitive official keys**; it is not a free-text predicate:
+
+- Measurement/classification/context: `has_count`, `has_measurement`,
+  `is_classified_as`, `is_located_in`, `originated_in_time_place`,
+  `has_named_part_or_property`, `holds_record_by_metric_as_of`.
+- Behavior/impact: `can_perform`, `behaves_as`, `communicates_by`,
+  `affects`, `causes`, `reduces_or_increases_risk`.
+- Safety/practice/comparison: `is_safe_or_toxic_for`,
+  `recommended_practice`, `is_illegal_or_required_in`,
+  `is_best_or_safest`.
+
+Choose only a key that accurately represents the sourced atomic claim.
+For example `greets_via_trunk_touch` is unsupported; `communicates_by`
+may represent an explicitly verified communicative greeting, with its
+trunk-touch method retained in the object/qualifier. If the source only
+supports physical contact, **do not assert** communication. Hold for
+editorial review, reword with verified evidence, or choose a different
+fact with the owner's agreement. Never broaden an assertion or silently
+change its relation simply to pass validation.
+
+SQL v1 permits `increase`/`decrease` only with
+`reduces_or_increases_risk`, and `greater_than`, `less_than`,
+`at_least`, `at_most` or `equal` only with
+`holds_record_by_metric_as_of` and `is_best_or_safest`. Every other
+relation requires comparison direction `none`. **Do not** change a
+verified directional claim to `none` or misclassify it as a record or
+superlative. If no official relation faithfully expresses the claim,
+seek editorial clarification instead of registering it. The legacy SQL
+error `ONTOLOGY_VERSION_UNSUPPORTED` can also mean an unknown relation key.
+
 When complete, deterministic-safe relation families include `has_count`, `has_measurement`, `is_classified_as`, `is_located_in`, `originated_in_time_place`, `has_named_part_or_property` and `holds_record_by_metric_as_of`. Potentially ambiguous behavioral, causal, safety, comparative and normative relations such as `can_perform`, `behaves_as`, `causes`, `is_safe_or_toxic_for` and `recommended_practice` require semantic review or stricter discrimination. Changing the relation allowlist/ontology requires a contract change and dedicated fixtures, not an editorial shortcut.
 
 ## Decision path

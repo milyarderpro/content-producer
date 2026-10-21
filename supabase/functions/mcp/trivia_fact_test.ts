@@ -2,7 +2,11 @@ import { materializeMissingSourceNulls } from './source_evidence_adapter.ts';
 import { createAuthenticatedTransport } from './transport.ts';
 import type { RequestContext } from './auth.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
-import { TRIVIA_FACT_TOOL_NAMES } from './trivia_fact.ts';
+import {
+  candidate as candidateSchema,
+  TRIVIA_FACT_TOOL_NAMES,
+  TRIVIA_RELATION_KEYS_V1,
+} from './trivia_fact.ts';
 
 const workspace = '44444444-4444-4444-8444-444444444444';
 const page = '66666666-6666-4666-8666-666666666666';
@@ -160,6 +164,20 @@ Deno.test(
           qualifiers.properties.comparison_direction.enum.includes('none'),
           'DIRECTION_ENUM_ADVERTISED',
         );
+        const relationEnum =
+          tool.inputSchema.properties.candidates.items.properties.relation_key.enum;
+        check(
+          JSON.stringify(relationEnum) === JSON.stringify(TRIVIA_RELATION_KEYS_V1),
+          'FIND_SQL_RELATION_ENUM',
+        );
+      }
+      if (name === 'trivia_register_and_reserve_facts') {
+        const relationEnum =
+          tool.inputSchema.properties.facts.items.properties.candidate.properties.relation_key.enum;
+        check(
+          JSON.stringify(relationEnum) === JSON.stringify(TRIVIA_RELATION_KEYS_V1),
+          'RESERVE_SQL_RELATION_ENUM',
+        );
       }
     }
   },
@@ -211,6 +229,15 @@ Deno.test(
     }
   },
 );
+Deno.test('FIX-37 accepts exactly the 17 SQL v1 relations in the shared candidate schema', () => {
+  check(TRIVIA_RELATION_KEYS_V1.length === 17, 'EXACT_17_SQL_RELATIONS');
+  for (const relation_key of TRIVIA_RELATION_KEYS_V1) {
+    check(
+      candidateSchema.safeParse({ ...candidate, relation_key }).success,
+      'SQL_RELATION_ACCEPTED_' + relation_key,
+    );
+  }
+});
 Deno.test(
   '6.7 malformed candidates, unsafe release, foreign workspace and hidden identity rejected before RPC',
   async () => {
@@ -225,6 +252,14 @@ Deno.test(
         ['trivia_find_similar_facts', { candidates: [] }],
         ['trivia_find_similar_facts', { candidates: [candidate, candidate] }],
         ['trivia_find_similar_facts', { candidates: [{ ...candidate, ontology_version: 2 }] }],
+        [
+          'trivia_find_similar_facts',
+          { candidates: [{ ...candidate, relation_key: 'greets_via_trunk_touch' }] },
+        ],
+        [
+          'trivia_find_similar_facts',
+          { candidates: [{ ...candidate, relation_key: ' communicates_by ' }] },
+        ],
         // LT-016/CR-005: SQL requires explicit comparison_direction although old MCP
         // schema advertised it as optional. Reject before reaching the RPC boundary.
         [
@@ -251,6 +286,17 @@ Deno.test(
           },
         ],
         ['trivia_register_and_reserve_facts', { facts: [] }],
+        [
+          'trivia_register_and_reserve_facts',
+          {
+            facts: [
+              {
+                ...(inputs.trivia_register_and_reserve_facts.facts as Record<string, unknown>[])[0],
+                candidate: { ...candidate, relation_key: 'greets_via_trunk_touch' },
+              },
+            ],
+          },
+        ],
         [
           'trivia_register_and_reserve_facts',
           {

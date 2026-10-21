@@ -155,6 +155,12 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     const pilotFull = pilotOriginalTools.find((tool) => tool.name === compact.name);
     const auth = oauthTools.find((tool) => tool.name === compact.name);
     assert(!!full && !!pilotFull && !!auth, 'tool is missing in raw or OAuth catalog');
+    if (typeof pilotFull.title === 'string') {
+      assert(
+        compact.description === pilotFull.title,
+        'No-auth fallback uses concise SDK title as its catalog description',
+      );
+    }
     assert('outputSchema' in full && 'title' in full, 'raw SDK metadata intact');
     const expandedInput = { ...(full.inputSchema as Record<string, unknown>) };
     delete expandedInput.$schema;

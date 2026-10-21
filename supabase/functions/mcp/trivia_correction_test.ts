@@ -1,6 +1,7 @@
 import { createAuthenticatedTransport } from './transport.ts';
 import type { RequestContext } from './auth.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
+import { TRIVIA_RELATION_KEYS_V1 } from './trivia_fact.ts';
 import { TRIVIA_CORRECTION_TOOL_NAMES } from './trivia_correction.ts';
 
 const workspace = '44444444-4444-4444-8444-444444444444';
@@ -145,6 +146,14 @@ Deno.test('6.9 correction schemas remain closed among 33 authenticated tools', a
     check(tool.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
     check(!Object.hasOwn(tool, 'outputSchema'), 'OPTIONAL_OUTPUT_OMITTED');
     check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
+    if (name === 'trivia_correct_fact') {
+      const relationEnum =
+        tool.inputSchema.properties.successor.properties.candidate.properties.relation_key.enum;
+      check(
+        JSON.stringify(relationEnum) === JSON.stringify(TRIVIA_RELATION_KEYS_V1),
+        'SUCCESSOR_SQL_RELATION_ENUM',
+      );
+    }
   }
 });
 Deno.test(
@@ -201,6 +210,37 @@ Deno.test(
     }
   },
 );
+Deno.test('FIX-37 correction successor preserves an official behavioral relation', async () => {
+  const original = globalThis.fetch;
+  const forwarded: Record<string, unknown>[] = [];
+  globalThis.fetch = ((_: Request | URL | string, init?: RequestInit) => {
+    forwarded.push(JSON.parse(String(init?.body)));
+    return Promise.resolve(
+      Response.json({ response_schema_version: 1, data: outputs.trivia_correct_fact }),
+    );
+  }) as typeof fetch;
+  try {
+    const behavioral = {
+      ...candidate,
+      claim_text: 'Test subjects communicate using signals.',
+      relation_key: 'communicates_by',
+      object_key: 'signals',
+      numbers: [],
+      qualifiers: { negated: false, comparison_direction: 'none' },
+    };
+    const result = await call('trivia_correct_fact', {
+      ...correct,
+      successor: { ...successor, candidate: behavioral },
+    });
+    check(result?.isError !== true, 'OFFICIAL_SUCCESSOR_ACCEPTED');
+    check(forwarded.length === 1, 'ONE_CORRECTION_CALL');
+    const sent = (forwarded[0].p_successor as { candidate: typeof behavioral }).candidate;
+    check(sent.relation_key === 'communicates_by', 'SUCCESSOR_RELATION_UNCHANGED');
+    check(sent.qualifiers.comparison_direction === 'none', 'SUCCESSOR_DIRECTION_UNCHANGED');
+  } finally {
+    globalThis.fetch = original;
+  }
+});
 Deno.test(
   '6.8 rejects stale-shaped, unauthorized and semantically invalid corrections before RPC',
   async () => {
@@ -220,6 +260,16 @@ Deno.test(
         ['trivia_correct_fact', { ...correct, explicit_correction: false }],
         ['trivia_correct_fact', { ...correct, action: 'invalidate' }],
         ['trivia_correct_fact', { ...correct, action: 'supersede', successor: undefined }],
+        [
+          'trivia_correct_fact',
+          {
+            ...correct,
+            successor: {
+              ...successor,
+              candidate: { ...candidate, relation_key: 'greets_via_trunk_touch' },
+            },
+          },
+        ],
         [
           'trivia_correct_fact',
           {

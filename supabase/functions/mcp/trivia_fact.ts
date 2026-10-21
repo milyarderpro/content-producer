@@ -53,11 +53,33 @@ const number = z.strictObject({
   unit: z.string().min(1).max(80).nullable(),
   role: z.string().min(1).max(80),
 });
+// FIX-37: exactly the frozen SQL v1 internal.trivia_relation_is_known_v1 keys.
+// Never infer or rewrite a predicate to fit this vocabulary.
+export const TRIVIA_RELATION_KEYS_V1 = [
+  'has_count',
+  'has_measurement',
+  'is_classified_as',
+  'is_located_in',
+  'originated_in_time_place',
+  'has_named_part_or_property',
+  'holds_record_by_metric_as_of',
+  'can_perform',
+  'behaves_as',
+  'communicates_by',
+  'affects',
+  'causes',
+  'reduces_or_increases_risk',
+  'is_safe_or_toxic_for',
+  'recommended_practice',
+  'is_illegal_or_required_in',
+  'is_best_or_safest',
+] as const;
+
 export const candidate = z.strictObject({
   candidate_key: z.string().regex(/^[A-Za-z0-9_-]{1,64}$/),
   claim_text: z.string().trim().min(1).max(500),
   subject_key: z.string().trim().min(1).max(120),
-  relation_key: z.string().trim().min(1).max(120),
+  relation_key: z.enum(TRIVIA_RELATION_KEYS_V1),
   object_key: z.string().trim().min(1).max(300),
   numbers: z.array(number).max(10),
   qualifiers: qualifier,
