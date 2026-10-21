@@ -57,14 +57,14 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 
 ## Rekap kampanye
 
-| Indikator                   | Per 21 Oktober 2026  |
-| --------------------------- | -------------------- |
-| Tool tersedia               | 33                   |
-| PASS live baru              | 5                    |
-| PASS CI/fixture kampanye    | 0                    |
-| FAIL terkonfirmasi          | 0                    |
-| BLOCKED (tool individual)   | 0                    |
-| NOT RUN (tool individual)   | 28                   |
-| Report perlu bukti tambahan | 1 — LT-E2E-01 / #26  |
+| Indikator                   | Per 21 Oktober 2026 |
+| --------------------------- | ------------------- |
+| Tool tersedia               | 33                  |
+| PASS live baru              | 5                   |
+| PASS CI/fixture kampanye    | 0                   |
+| FAIL terkonfirmasi          | 0                   |
+| BLOCKED (tool individual)   | 0                   |
+| NOT RUN (tool individual)   | 28                  |
+| Report perlu bukti tambahan | 1 — LT-E2E-01 / #26 |
 
 **Setiap status baris akan berubah hanya setelah tes kampanye direview dan direkam.** Pastikan ringkasan dan [results.md](results.md) diselaraskan setiap kali ada bukti baru.
