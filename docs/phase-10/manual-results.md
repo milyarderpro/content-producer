@@ -354,7 +354,6 @@ The owner reviewed the saved Moon draft, the exact revision-2 Canva copy, captio
 
 [CR-048](../decisions/2026-10-20-phase-10-4-owner-oauth-evidence-acceptance.md) records the owner's explicit acceptance of the existing PRIVATE-plugin binding/owner-read proof together with these direct Codex `mcpku2` business calls. This closes **MAN-03, MAN-04 and checkpoint 10.4 as PASS** without repeating a production write. It does not claim a ChatGPT parent-plugin-selected write trace for 10.4. That limit remains visible to independent audit 10.7. MAN-05/06 and checkpoint 10.5 are not started; Phase 10 remains In progress, and Pilot-ready/MVP Complete/AC-001..014 remain pending. The already passing backend gate #39411054462 is reused; this documentation decision changes no runtime code.
 
-
 ## MAN-05 — exact owner-approved plan and frozen pre-write intent (20 October 2026)
 
 **Approval reference:** the owner approved *exactly* the previously displayed plan name, purpose, three topics/formats/goals, local dates/times, default item configuration and operation key in the active ChatGPT conversation (20 October 2026), explicitly authorizing **one** `create_content_plan` followed by owner-scoped readback and Issue #22 / PR #23 reporting. This documentation records the frozen executable intent **before** any MAN-05 business write. Host `ask_before_writes` remains a separate permission control.
@@ -406,18 +405,17 @@ The owner reviewed the saved Moon draft, the exact revision-2 Canva copy, captio
 
 **Execution status at freezing:** NOT YET CALLED. Readback IDs/status/count and MAN-05 outcome must be appended after the one operation; MAN-06 is reserved for a separate conversation. No plan item claim, post creation, Facebook publication or heavy CI gate authorized.
 
-
 ## MAN-05 — actual owner OAuth creation and independent readback (20 October 2026)
 
 **MAN-05 PASS (card only), checkpoint 10.5 PENDING MAN-06.** The owner explicitly approved the exact name, plan intent, three dated Asia/Jakarta slots, item fields, default configuration and UUIDv4 operation key in the ChatGPT conversation. The complete bound prompt and exact payload were committed **before** the production write in preceding MAN-05 entry.
 
 One (and only one) direct owner OAuth `mcpku2.create_content_plan` invocation used operation key `32838999-d0a9-473c-83ba-37057689364b`. It returned `replayed=false`, persisted plan `08c75cc2-c123-4471-852a-4c159f26f22e`, status `pending`, requested_count=3, progress `pending=3, in_progress=0, completed=0, failed=0, cancelled=0`, at `2026-10-20T13:21:16.072891Z`. No lost-response retry was necessary. The same authorized owner session then independently called `get_content_plan` with `limit=100`; it returned **all 3 items**, `has_more=false`, and exact persisted values:
 
-| Position | Item public ID | UTC stored | WIB +07:00 | Topic | Format | Interaction goal | Item status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | `a34ad84e-3e43-4989-afa1-1ea335825563` | 2026-10-22T14:00:00.000000Z | 2026-10-22 21:00 | `animals` | `emotional_animal_collection` | `share` | pending |
-| 2 | `13633535-b964-4300-bf45-bbf001f92e24` | 2026-10-24T14:00:00.000000Z | 2026-10-24 21:00 | `food_storage_home` | `themed_utility` | `save` | pending |
-| 3 | `0bd86b13-fbf6-44d8-856b-89e818c350b5` | 2026-10-26T14:00:00.000000Z | 2026-10-26 21:00 | `geography` | `comparison` | `comment` | pending |
+| Position | Item public ID                         | UTC stored                  | WIB +07:00       | Topic               | Format                        | Interaction goal | Item status |
+| -------- | -------------------------------------- | --------------------------- | ---------------- | ------------------- | ----------------------------- | ---------------- | ----------- |
+| 1        | `a34ad84e-3e43-4989-afa1-1ea335825563` | 2026-10-22T14:00:00.000000Z | 2026-10-22 21:00 | `animals`           | `emotional_animal_collection` | `share`          | pending     |
+| 2        | `13633535-b964-4300-bf45-bbf001f92e24` | 2026-10-24T14:00:00.000000Z | 2026-10-24 21:00 | `food_storage_home` | `themed_utility`              | `save`           | pending     |
+| 3        | `0bd86b13-fbf6-44d8-856b-89e818c350b5` | 2026-10-26T14:00:00.000000Z | 2026-10-26 21:00 | `geography`         | `comparison`                  | `comment`        | pending     |
 
 All item `item_config={}`, `attempt_count=0`, `claim_expires_at=null`, `active_post_public_id=null`, `last_error=null`. Separate owner-scoped `list_content_plans` confirmed **one total Page plan**, matching ID/name and progress, no pagination; `list_posts` still confirmed **only the earlier Moon Facts ready post**, revision 3, `scheduled_at=null`, `published_at=null`. No `claim_content_plan_items`, post creation, background worker, Facebook scheduling, SQL administrator, deployment or heavy gate.
 
@@ -431,16 +429,15 @@ All item `item_config={}`, `attempt_count=0`, `claim_expires_at=null`, `active_p
 
 **Plan:** `08c75cc2-c123-4471-852a-4c159f26f22e`, name **Corious Facts — Mini Trivia 22–26 Oct 2026**, belongs to target Page, niche trivia; `pending`, `requested_count=3`, progress `pending=3/in_progress=0/completed=0/failed=0/cancelled=0`, `created_at=2026-10-20T13:21:16.072891Z`, no updated progress since creation.
 
-| Position | Item public ID | Stored UTC | Asia/Jakarta (WIB) | Topic / format / interaction goal | State |
-| --- | --- | --- | --- | --- | --- |
-| 1 | `a34ad84e-3e43-4989-afa1-1ea335825563` | `2026-10-22T14:00:00.000000Z` | 22 Oct 2026 21:00 | `animals` / `emotional_animal_collection` / `share` | pending |
-| 2 | `13633535-b964-4300-bf45-bbf001f92e24` | `2026-10-24T14:00:00.000000Z` | 24 Oct 2026 21:00 | `food_storage_home` / `themed_utility` / `save` | pending |
-| 3 | `0bd86b13-fbf6-44d8-856b-89e818c350b5` | `2026-10-26T14:00:00.000000Z` | 26 Oct 2026 21:00 | `geography` / `comparison` / `comment` | pending |
+| Position | Item public ID                         | Stored UTC                    | Asia/Jakarta (WIB) | Topic / format / interaction goal                   | State   |
+| -------- | -------------------------------------- | ----------------------------- | ------------------ | --------------------------------------------------- | ------- |
+| 1        | `a34ad84e-3e43-4989-afa1-1ea335825563` | `2026-10-22T14:00:00.000000Z` | 22 Oct 2026 21:00  | `animals` / `emotional_animal_collection` / `share` | pending |
+| 2        | `13633535-b964-4300-bf45-bbf001f92e24` | `2026-10-24T14:00:00.000000Z` | 24 Oct 2026 21:00  | `food_storage_home` / `themed_utility` / `save`     | pending |
+| 3        | `0bd86b13-fbf6-44d8-856b-89e818c350b5` | `2026-10-26T14:00:00.000000Z` | 26 Oct 2026 21:00  | `geography` / `comparison` / `comment`              | pending |
 
 Each item still has `item_config={}`, `attempt_count=0`, `claim_expires_at=null`, `active_post_public_id=null` and `last_error=null`. IDs, ordering, all dates and fields match the preceding MAN-05 source-of-truth ledger with **zero differences**. The one existing post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8` belongs to the Page, remains `ready` revision **3**, hash `e944cf8975954f4041489e499ed20e1934181fd1f711b3f4756f62abe26abec3`, quality `passed`, approval snapshot for revision 3, seven allocated Moon facts, **19/19** system checks and **18/18** editorial checks passed. `plan_item_public_id=null`, `scheduled_at=null`, `published_at=null`. No new post, duplicate plan, claimed item or evidence of a worker was seen.
 
 **Scope/bounds:** Direct `mcpku2` tool calls and installed skill evidence establish owner-scoped fresh-conversation retrieval. A distinct visual host parent-`@Content Producer` selection trace was not separately captured; retain this attribution limit for audit 10.7. Read-only API listing is not an independent production SQL ledger audit. No `create_content_plan`, `claim_content_plan_items`, `save_post`, post mutation, administrator SQL, Facebook action, deploy, or heavy CI was invoked. The existing backend full gate [#39411054462](https://github.com/milyarderpro/content-producer/actions/runs/39411054462) was **not rerun**. The three-item plan does not satisfy **AC-007 seven processed posts** or **AC-008 seven calendar days**; both remain **PENDING**, as do checkpoint 10.6, independent audit 10.7, Pilot-ready and MVP Complete. PR #23 remains draft.
-
 
 ## Phase 10.6 — MAN-09 negative safety test and checkpoint decision (2026-10-20)
 
@@ -472,17 +469,17 @@ Saya tidak akan memublikasikan, menjadwalkan, mengubah status, menjalankan worke
 
 **Content Producer MCP Read tool trace — 19 invoked, 0 business Write:**
 
-| Read tool | Invocations |
-| --- | ---: |
-| `get_account_profile` | 1 |
-| `get_workspace_context` | 2 |
-| `list_pages` | 3 |
-| `list_posts` | 3 |
-| `list_content_plans` | 3 |
-| `get_content_plan` | 3 |
-| `get_post` | 3 |
-| `get_post_performance` | 1 |
-| **Total** | **19** |
+| Read tool               | Invocations |
+| ----------------------- | ----------: |
+| `get_account_profile`   |           1 |
+| `get_workspace_context` |           2 |
+| `list_pages`            |           3 |
+| `list_posts`            |           3 |
+| `list_content_plans`    |           3 |
+| `get_content_plan`      |           3 |
+| `get_post`              |           3 |
+| `get_post_performance`  |           1 |
+| **Total**               |      **19** |
 
 `get_post_performance` returned expected Read error `POST_NOT_PUBLISHED` because the target post is not posted/archived. The first parallel read batch had its other five successful-or-unreported outputs discarded by a `Promise.all` rejection; owner-scoped reads were explicitly repeated and succeeded. Trace counts include those initiated calls, not 19 separately surfaced successful results. **Zero business Write calls**, including `mark_post_posted`, `record_post_performance`, claims, `save_post`, `reschedule_post`, approval/revision/discard, or backend bypass.
 
