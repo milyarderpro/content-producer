@@ -70,6 +70,47 @@ perubahan dirilis, dan **retest live** berhasil.
 **LT-E2E-01:** #26 tetap `NEEDS TRACE`; kegagalan historis menyimpan draft
 belum terbukti merupakan error yang sama. Semua pengujian ini READ-only.
 
+### LT-016-RETEST — 21 Oktober 2026 — PARTIAL (runtime PASS, host schema FAIL)
+
+Pemilik menjalankan `get_account_profile` dan tepat tiga variasi READ
+`trivia_find_similar_facts` pada chat baru dengan plugin PRIVATE
+Content Producer / owner OAuth `mcpku2`. **C PASS** (unit `"count"`,
+direction `"none"`, 5 matches, sinyal numeric 1), **B PASS**
+(unit `null`, direction `"none"`, 5 matches, numeric 0;
+unit null dipertahankan), dan **A PASS expected rejection**
+(unit `"count"`, `comparison_direction` omitted).
+A ditolak dengan pesan
+`INVALID_ARGUMENT: Input validation error: Invalid arguments for tool trivia_find_similar_facts: candidates.0.qualifiers.comparison_direction: Invalid option`
+yang merinci seluruh delapan nilai enum tertutup; bukan lagi
+`VALIDATION_FAILED` generik dari SQL. Pemilik tidak melaporkan Write.
+
+**Temuan yang masih FAIL:** definisi tool yang *terlihat oleh host*
+tetap mengiklankan `comparison_direction?: string` (opsional,
+bebas), bukan required enum. Bukti penolakan A konsisten dengan
+validasi sebelum backend RPC, tetapi raw RPC/server trace
+untuk membuktikan nihil pemanggilan backend belum tersedia.
+Metadata plugin dan versi Edge tidak muncul di hasil Read.
+
+**Verifikasi navigator independen:** melalui Plugin Creator, PRIVATE
+plugin ID `plugins_6ad5bf91a278819182951ebb312eca06` memiliki release
+aktif `pluginrel_6ad88fd9d5a88191b680e9416d649adf`,
+**v0.2.3**, mengikat registered app yang sama dalam
+`.app.json` (`asdk_app_6ad6ebeab5fc8191a1d2cd54b87cd96f`).
+Source GitHub `trivia_fact.ts` telah memakai required closed enum.
+Deklarasi connector yang tersedia pada sesi navigator sendiri
+masih menunjukkan `comparison_direction?: string`, konsisten
+dengan metadata host lama. [Dokumentasi OpenAI](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt)
+menjelaskan snapshot tool dan mekanisme refresh metadata yang tidak
+selalu otomatis. **Belum dipastikan lapisan cache spesifiknya.**
+
+**Keputusan:** LT-016 tetap **FAIL / PARTIAL retest** sampai
+metadata tool pada koneksi `mcpku2` di-refresh, lalu pengguna
+melihat field required enum di chat baru. Jangan buat plugin/koneksi
+baru, jangan deploy ulang, jangan jalankan CI backend atau Write.
+Detail: [Issue #29 komentar retest](https://github.com/milyarderpro/content-producer/issues/29#issuecomment-6313695477).
+**Issue #26** tetap `NEEDS TRACE`; sebab draft gagal sebelumnya
+belum terhubung secara pasti ke kasus ini.
+
 ## Laporan sebelum kampanye
 
 | ID        | Tanggal dilaporkan | Gejala pengguna                                                                    | Bukti saat ini                                                                  | Tindakan                                                                                                                      | Status                |
