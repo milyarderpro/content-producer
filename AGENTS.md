@@ -36,8 +36,9 @@ source-verified post on `corious-facts`; owner-scoped readback confirms
 `ready` revision 3 and passing checks. CR-048 records the owner's acceptance
 of this direct `mcpku2` trace plus existing private-plugin host proof for
 checkpoint 10.4. A fresh ChatGPT parent-plugin-selected write trace for
-those calls was not captured; preserve this evidence limit for audit 10.7.
-Checkpoints 10.4 and 10.5 are PASS; 10.6–10.7 remain pending. MAN-05 created
+those calls was not captured; preserve this evidence limit in Phase 11.
+Checkpoints 10.0–10.7 are PASS and independent audit approved Phase 10 as
+Pilot-ready. MVP Complete and AC-001..AC-014 remain PENDING for Phase 11. MAN-05 created
 exactly one approved three-slot plan; separate-conversation MAN-06 owner OAuth
 readback confirmed all item IDs, WIB schedules and the unchanged ready post.
 AC-007/008 seven-post/seven-day thresholds remain PENDING. Record backend and later
@@ -55,10 +56,10 @@ model. Keep all direct `anon` business RPC/table/sequence/helper privileges
 closed and preserve owner-scoped RLS.
 
 Keep the nine mandatory manual-card procedures frozen as `procedure-v1`.
-MAN-01/02 passed historically; MAN-03/04 passed under CR-048. For the next
-checkpoint use the installed OAuth plugin in ChatGPT, confirm the owner
-workspace and target Page, and obtain approval of exact plan slots before
-MAN-05. MAN-06 requires a separate fresh ChatGPT conversation for readback.
+MAN-01..MAN-09 passed under their documented evidence limits; MAN-03/04
+passed under CR-048. MAN-05 created one approved three-slot plan and MAN-06
+confirmed it in a separate ChatGPT conversation. MAN-07 owner review and
+MAN-08/09 safety checks passed. No Phase 11 work has started.
 For later fact-bearing writes, fetch the current generation context immediately
 before a write. Preserve the complete
 six-digit microsecond `config_updated_at` text when passing exact CAS
