@@ -33,11 +33,7 @@
       "African elephants can recognize family members through urine scent."
     ],
     "caption": "From greeting and caring for calves to cooperation and recognizing family members, elephant societies are full of nuanced behavior. These examples come from published research; some observations were in captivity or controlled tasks. #Elephants #AnimalBehavior #Wildlife",
-    "hashtags": [
-      "#Elephants",
-      "#AnimalBehavior",
-      "#Wildlife"
-    ],
+    "hashtags": ["#Elephants", "#AnimalBehavior", "#Wildlife"],
     "render_preflight": {
       "hook_characters": 39,
       "hook_limit_last_reported": 45,
@@ -397,14 +393,7 @@
     "evidence_type": "HISTORICAL_OWNER_REPORTED_PLUS_ONE_NAVIGATOR_LIVE_READ",
     "basis": "https://github.com/milyarderpro/content-producer/issues/26#issuecomment-6315725958",
     "approved_f6": "https://github.com/milyarderpro/content-producer/issues/26#issuecomment-6315832321",
-    "batch_facts": [
-      "F1",
-      "F2",
-      "F3",
-      "F4",
-      "F5",
-      "F7"
-    ],
+    "batch_facts": ["F1", "F2", "F3", "F4", "F5", "F7"],
     "batch_read_success": 6,
     "batch_observed_matches": 30,
     "batch_reported_by": "owner",
@@ -425,10 +414,7 @@
   "execution_boundary": {
     "status": "BLOCKED_FOR_LIVE_WRITE_NOT_TESTED",
     "safe_use": "Static reusable input for a new-chat READ preflight and owner review, not a ready-to-execute Write request.",
-    "must_read_live": [
-      "get_page_generation_context",
-      "trivia_find_similar_facts"
-    ],
+    "must_read_live": ["get_page_generation_context", "trivia_find_similar_facts"],
     "before_any_reserve": "Retrieve exact fresh Page CAS with six fractional digits, full dedup matches, current source policy and current owner approval for the specific one-draft operation.",
     "at_reservation_time": "Generate fresh operation_key and reservation_token; choose TTL and requested_expires_at from current runtime; obtain and review authoritative allocated fact IDs.",
     "at_save_time": "Generate fresh save operation_key, use successful reservation's token and actual fact IDs, live config snapshot, exact render metrics, approved one-draft payload; do not attach to a plan.",
