@@ -10,9 +10,9 @@ Dokumen ini adalah **log ringkas hasil kampanye baru**, bukan duplikasi seluruh 
 
 ## Laporan sebelum kampanye
 
-| ID | Tanggal dilaporkan | Gejala pengguna | Bukti saat ini | Tindakan | Status |
-| --- | --- | --- | --- | --- | --- |
-| LT-E2E-01 | 21 Okt 2026 | Draft baru tidak berhasil disimpan melalui plugin ChatGPT; ada tool MCP yang gagal | Laporan pengguna; belum ada nama tool/payload/error/readback dari percobaan itu | [#26](https://github.com/milyarderpro/content-producer/issues/26) — kumpulkan trace dan diagnosa, jangan langsung write ulang | BLOCKED — NEEDS TRACE |
+| ID        | Tanggal dilaporkan | Gejala pengguna                                                                    | Bukti saat ini                                                                  | Tindakan                                                                                                                      | Status                |
+| --------- | ------------------ | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| LT-E2E-01 | 21 Okt 2026        | Draft baru tidak berhasil disimpan melalui plugin ChatGPT; ada tool MCP yang gagal | Laporan pengguna; belum ada nama tool/payload/error/readback dari percobaan itu | [#26](https://github.com/milyarderpro/content-producer/issues/26) — kumpulkan trace dan diagnosa, jangan langsung write ulang | BLOCKED — NEEDS TRACE |
 
 ## Template record satu pengujian (salin untuk setiap kasus)
 
