@@ -6,13 +6,22 @@ designed for future niche modules.
 
 ## Repository status
 
-Phases 2–5 are complete on `main`. The local database has 67 checked-in
-migrations and 33 owner-scoped business RPCs in `api`. Phase 6 is next: the MCP
-Edge Function entrypoint and tool registry have not been implemented, and the
-local `mcp` function remains disabled. No production deployment, plugin
-connection, or Facebook/Canva integration has been completed. See the
-[current phase tracker](plans/implementation-plan.md#16-phase-tracker) for
-status and evidence; earlier phase runbooks and reports are historical records.
+**21 October 2026:** Phases 0–10 have historical evidence; Phase 10 was
+independently audited as **Pilot-ready**. Production MCP uses owner OAuth,
+Supabase Edge `mcp` v31, and the installed PRIVATE Content Producer v0.2.2
+plugin connected through `mcpku2` with **33 tools (11 Read, 22 Write)**.
+Phase 11 has **not** started and the 14 final MVP acceptance criteria remain
+historically PENDING; they are **not** the active testing queue.
+
+**Current work:** [Live Test & Fix](docs/live-test/README.md) — one test prompt in
+a fresh ChatGPT plugin chat, report result, triage Issue, focused PR, GitHub
+Actions, and repeat the live test. See the [33-tool test matrix](docs/live-test/test-matrix.md),
+[results log](docs/live-test/results.md) and [master Issue #25](https://github.com/milyarderpro/content-producer/issues/25).
+The first reported issue is [a new draft not saved](https://github.com/milyarderpro/content-producer/issues/26);
+its failing tool and root cause are **unverified until the actual trace is supplied**.
+
+Historical phase plans and acceptance evidence are preserved as reference,
+not deleted or marked complete. This workflow does not assert `MVP Complete`.
 
 ## Prerequisites
 
@@ -41,24 +50,24 @@ manifest. `verify-migrations` validates checked-in migration filenames.
 
 ## Edge Function tooling
 
-Supabase CLI with Docker is the local execution path for the Phase 6 Edge
-Function.
-Deno-compatible source configuration is retained for the Edge Runtime and for
-developers who want direct Deno tooling, but installing standalone Deno is not
-a repository prerequisite. See
-[ADR-001](docs/decisions/2026-10-08-node-and-deno-tooling-baseline.md) for the
-runtime decision.
+Supabase Edge Function `mcp` is deployed and active behind owner OAuth.
+The repository retains local Supabase CLI/Docker verification and pinned
+Deno-compatible sources/tests. When an implementer changes business logic,
+identity, RLS, migrations or permissions, run the applicable focused tests and
+CR-020/044 risk-based backend gate on the final SHA **before any authorized
+production deployment**. Documentation-only PRs use lightweight PR CI.
 
 ## Boundaries
 
-- `plugin/` is the portable package boundary; its manifest and skills are added
-  in Phase 7.
-- `auth-frontend/` is limited to login, OAuth consent, logout, and safe errors.
-  It is not a product dashboard.
-- `supabase/` contains local project configuration, migrations, and database
-  tests from Phases 2–5. Phase 6 adds the MCP Edge Function implementation.
-- `tests/` contains cross-cutting tests; `supabase/tests/` contains database and
-  function fixtures.
-
-Read [the frozen implementation plan](plans/implementation-plan.md) before
-changing contracts or adding a new niche.
+- `plugin/` contains the installed PRIVATE plugin package/skills. Its
+  registered Content Producer MCP app is the owner OAuth connection `mcpku2`.
+- `auth-frontend/` is limited to login, OAuth consent, logout, and safe errors,
+  not a product dashboard.
+- `supabase/` contains migrations, RPC/Edge MCP implementation and database
+  tests; `tests/` contains cross-cutting tests.
+- No automatic Canva/Facebook publishing or automatic Facebook analytics.
+  Do not fabricate publication evidence, metrics, tool success, or production
+  PASS from synthetic fixtures.
+- No unauthorized writes, bypass of owner OAuth/RLS or unrelated production
+  deployment. Follow [the live workflow](docs/live-test/README.md) for safe
+  testing and [frozen contracts](plans/tool-inventory.md) for API requirements.
