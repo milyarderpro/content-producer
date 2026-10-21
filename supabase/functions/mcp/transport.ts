@@ -56,6 +56,13 @@ function mirrorToolSchemes(value: unknown, pilot = false): unknown {
           securitySchemes: schemes,
           _meta: restMeta,
         };
+        // FIX-37: the new closed enum is repeated in three candidate inputs.
+        // In the historical No-auth fallback only, use the already-declared
+        // concise title as the description to retain CR-033's 100 KB catalog
+        // ceiling. OAuth descriptions and every inputSchema stay unchanged.
+        if (pilot && typeof tool.title === 'string') {
+          published.description = tool.title;
+        }
         // Only optional catalog metadata is removed. Runtime output
         // verification, tool input schemas and OAuth guards are unchanged.
         // The designated OAuth profile is special: ChatGPT validates its
