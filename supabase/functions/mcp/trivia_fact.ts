@@ -265,7 +265,7 @@ export function registerTriviaFactTools(server: McpServer, context?: RequestCont
     {
       title: 'Find similar trivia facts',
       description:
-        'Use this after researching atomic candidate claims and before registering them. It returns exact, structured, and ranked semantic-review candidates plus reuse signals; it never decides paraphrase equivalence by itself.',
+        'Find candidate duplicate facts, ranked signals and reuse restrictions. You must review semantic identity; search alone never proves equivalence.',
       inputSchema: findInput,
       outputSchema: findOutput,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
@@ -290,7 +290,7 @@ export function registerTriviaFactTools(server: McpServer, context?: RequestCont
     {
       title: 'Register and reserve trivia facts',
       description:
-        'Use this only after source verification and semantic dedup review. It atomically reuses or creates canonical facts and reserves the exact ordered set for one Page and one future post.',
+        'After source verification and dedup review, register/reuse and reserve an ordered fact set for one Page draft.',
       inputSchema: reserveInput,
       outputSchema: reserveOutput,
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
@@ -319,7 +319,7 @@ export function registerTriviaFactTools(server: McpServer, context?: RequestCont
     {
       title: 'Release reserved trivia facts',
       description:
-        'Use this when a draft attempt is abandoned before save. It idempotently releases only facts still owned by the supplied reservation token; it never releases allocated or published facts.',
+        'Release unused facts from an abandoned reservation. Requires its token; never releases allocated or published facts.',
       inputSchema: releaseInput,
       outputSchema: releaseOutput,
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
