@@ -1,0 +1,459 @@
+{
+  "fixture_schema_version": 1,
+  "test_id": "LT-E2E-01",
+  "provenance": {
+    "classification": "VERIFIED_RECONSTRUCTION_NOT_ORIGINAL",
+    "original_attachment_name": "lt_e2e_01_elephant_prewrite_preview.json",
+    "original_attachment_recovered": false,
+    "investigation": "No copy found in main recursive repository tree, filename code search, available conversation/Project files, or examined existing light-CI run artifacts. Issue #26 confirms old file was a local conversation attachment.",
+    "reconstructed_from": "https://github.com/milyarderpro/content-producer/issues/26",
+    "research_verified_on": "2026-10-21",
+    "immutable_test_input_only": true
+  },
+  "target": {
+    "workspace_public_id": "cad2885e-952e-41b3-9eae-d2d9d75d533d",
+    "page_public_id": "37457236-17ec-4486-8880-6832460ae411",
+    "page_slug": "corious-facts",
+    "owner_oauth_connection": "mcpku2",
+    "page_usage": "owner-selected real-content test target only; not blanket Write authorization"
+  },
+  "editorial": {
+    "language": "en-US",
+    "topic_key": "animals",
+    "format_key": "emotional_animal_collection",
+    "goal_key": "share",
+    "hook": "Elephants have a surprising social life",
+    "canva_fact_lines": [
+      "African savanna elephants sometimes greet through trunk contact.",
+      "At a Thai camp, Asian elephants used reassuring touch after distress.",
+      "Young female African elephants can comfort and protect calves.",
+      "Wild African elephants use name-like calls for specific individuals.",
+      "In a rope task, Asian elephants waited for partners before pulling.",
+      "Captive Asian elephant females can bond with unrelated females.",
+      "African elephants can recognize family members through urine scent."
+    ],
+    "caption": "From greeting and caring for calves to cooperation and recognizing family members, elephant societies are full of nuanced behavior. These examples come from published research; some observations were in captivity or controlled tasks. #Elephants #AnimalBehavior #Wildlife",
+    "hashtags": [
+      "#Elephants",
+      "#AnimalBehavior",
+      "#Wildlife"
+    ],
+    "render_preflight": {
+      "hook_characters": 39,
+      "hook_limit_last_reported": 45,
+      "max_fact_line_characters": 69,
+      "fact_line_limit_last_reported": 90,
+      "fact_block_characters": 466,
+      "fact_block_limit_last_reported": 500,
+      "full_canva_preview_characters": 507,
+      "full_canva_limit_last_reported": 600,
+      "caption_characters": 270,
+      "caption_limit_last_reported": 500,
+      "requires_live_renderer_check": true
+    },
+    "draft_only": true,
+    "scheduled_at": null,
+    "plan_item_association": null
+  },
+  "candidates": [
+    {
+      "position": 1,
+      "candidate": {
+        "candidate_key": "elephant_trunk_contact_greeting",
+        "claim_text": "African savanna elephants sometimes greet one another through trunk contact.",
+        "subject_key": "african_savanna_elephant",
+        "relation_key": "communicates_by",
+        "object_key": "trunk_contact_greeting",
+        "numbers": [],
+        "qualifiers": {
+          "negated": false,
+          "comparison_direction": "none",
+          "population": "african_savanna_elephants",
+          "scope": "observed_greeting_interactions"
+        },
+        "topic_key": "animals",
+        "normalization_version": 1,
+        "ontology_version": 1
+      },
+      "canva_line": "African savanna elephants sometimes greet through trunk contact.",
+      "sources": [
+        {
+          "schema_version": 1,
+          "url": "https://www.mdpi.com/2076-2615/11/9/2718",
+          "canonical_url": "https://www.mdpi.com/2076-2615/11/9/2718",
+          "title": "Function of Trunk-Mediated “Greeting” Behaviours between Male African Elephants: Insights from Choice of Partners",
+          "publisher": "Animals (MDPI)",
+          "tier": "A",
+          "source_type": "primary_paper",
+          "accessed_at": "2026-10-21T13:09:23Z",
+          "published_at": null,
+          "updated_at": null,
+          "as_of": null,
+          "language": "en",
+          "supports": "Reports trunk-to-mouth, temporal-gland and genital contact called greeting behaviours among male African savanna elephants; no claim that all contacts have only a greeting function.",
+          "independence_group": "elephants-f1-trunk-2021"
+        }
+      ],
+      "bibliographic_doi": "10.3390/ani11092718",
+      "verification_status": "VERIFIED_PRIMARY_RESEARCH",
+      "semantic_caveat": "The cited primary study observes males; the claim says sometimes, not all elephants or every encounter.",
+      "freshness_class": "stable",
+      "as_of_date": null,
+      "risk_class": "standard",
+      "prior_read_evidence": "owner_reported_six_candidate_batch",
+      "dedup_reviews": [],
+      "dedup_review_note": "Earlier top-five Moon matches were judged materially distinct; exact match IDs and a fresh live review snapshot are not preserved in this fixture."
+    },
+    {
+      "position": 2,
+      "candidate": {
+        "candidate_key": "elephant_distress_reassurance_touch",
+        "claim_text": "Asian elephants at a Thai camp showed reassuring physical contact after another elephant became distressed.",
+        "subject_key": "asian_elephant",
+        "relation_key": "behaves_as",
+        "object_key": "directed_affiliative_contact_after_distress",
+        "numbers": [],
+        "qualifiers": {
+          "negated": false,
+          "comparison_direction": "none",
+          "population": "asian_elephants_at_thai_camp",
+          "condition": "following_observed_distress"
+        },
+        "topic_key": "animals",
+        "normalization_version": 1,
+        "ontology_version": 1
+      },
+      "canva_line": "At a Thai camp, Asian elephants used reassuring touch after distress.",
+      "sources": [
+        {
+          "schema_version": 1,
+          "url": "https://peerj.com/articles/278/",
+          "canonical_url": "https://peerj.com/articles/278/",
+          "title": "Asian elephants (Elephas maximus) reassure others in distress",
+          "publisher": "PeerJ",
+          "tier": "A",
+          "source_type": "primary_paper",
+          "accessed_at": "2026-10-21T13:09:23Z",
+          "published_at": "2014-02-18",
+          "updated_at": null,
+          "as_of": null,
+          "language": "en",
+          "supports": "Field observations found more directed physical contact and vocal affiliation after distress than during control periods; the study notes possible common-stimulus confounding.",
+          "independence_group": "elephants-f2-peerj-2014"
+        }
+      ],
+      "bibliographic_doi": "10.7717/peerj.278",
+      "verification_status": "VERIFIED_PRIMARY_RESEARCH",
+      "semantic_caveat": "Camp setting and observed response are explicit; do not assert proven empathy or the distress trigger.",
+      "freshness_class": "stable",
+      "as_of_date": null,
+      "risk_class": "standard",
+      "prior_read_evidence": "owner_reported_six_candidate_batch",
+      "dedup_reviews": [],
+      "dedup_review_note": "Earlier top-five Moon matches were judged materially distinct; exact match IDs and a fresh live review snapshot are not preserved in this fixture."
+    },
+    {
+      "position": 3,
+      "candidate": {
+        "candidate_key": "elephant_allomother_calf_support",
+        "claim_text": "Young female African elephants have been observed comforting and protecting calves.",
+        "subject_key": "young_female_african_elephant",
+        "relation_key": "behaves_as",
+        "object_key": "allomother_comforts_and_protects_calves",
+        "numbers": [],
+        "qualifiers": {
+          "negated": false,
+          "comparison_direction": "none",
+          "population": "young_female_african_elephants",
+          "scope": "observed_allomother_care"
+        },
+        "topic_key": "animals",
+        "normalization_version": 1,
+        "ontology_version": 1
+      },
+      "canva_line": "Young female African elephants can comfort and protect calves.",
+      "sources": [
+        {
+          "schema_version": 1,
+          "url": "https://www.sciencedirect.com/science/article/pii/S0003347287802348",
+          "canonical_url": "https://www.sciencedirect.com/science/article/pii/S0003347287802348",
+          "title": "Allomothering among African elephants",
+          "publisher": "Animal Behaviour (Elsevier)",
+          "tier": "A",
+          "source_type": "primary_paper",
+          "accessed_at": "2026-10-21T13:09:23Z",
+          "published_at": null,
+          "updated_at": null,
+          "as_of": null,
+          "language": "en",
+          "supports": "Observations found juvenile and adolescent females, described as allomothers, comforted, assisted and protected calves.",
+          "independence_group": "elephants-f3-lee-1987"
+        }
+      ],
+      "bibliographic_doi": "10.1016/S0003-3472(87)80234-8",
+      "verification_status": "VERIFIED_PRIMARY_RESEARCH",
+      "semantic_caveat": "Observed among African elephant family groups; do not imply all females are allomothers.",
+      "freshness_class": "stable",
+      "as_of_date": null,
+      "risk_class": "standard",
+      "prior_read_evidence": "owner_reported_six_candidate_batch",
+      "dedup_reviews": [],
+      "dedup_review_note": "Earlier top-five Moon matches were judged materially distinct; exact match IDs and a fresh live review snapshot are not preserved in this fixture."
+    },
+    {
+      "position": 4,
+      "candidate": {
+        "candidate_key": "elephant_name_like_individual_calls",
+        "claim_text": "Wild African elephants address specific individuals with name-like calls.",
+        "subject_key": "wild_african_elephant",
+        "relation_key": "communicates_by",
+        "object_key": "individually_specific_name_like_calls",
+        "numbers": [],
+        "qualifiers": {
+          "negated": false,
+          "comparison_direction": "none",
+          "population": "wild_african_elephants",
+          "scope": "individual_addressing_calls"
+        },
+        "topic_key": "animals",
+        "normalization_version": 1,
+        "ontology_version": 1
+      },
+      "canva_line": "Wild African elephants use name-like calls for specific individuals.",
+      "sources": [
+        {
+          "schema_version": 1,
+          "url": "https://www.nature.com/articles/s41559-024-02420-w",
+          "canonical_url": "https://www.nature.com/articles/s41559-024-02420-w",
+          "title": "African elephants address one another with individually specific name-like calls",
+          "publisher": "Nature Ecology & Evolution (Springer Nature)",
+          "tier": "A",
+          "source_type": "primary_paper",
+          "accessed_at": "2026-10-21T13:09:23Z",
+          "published_at": "2024-06-10",
+          "updated_at": "2025-07-17",
+          "as_of": null,
+          "language": "en",
+          "supports": "Machine-learning analysis and playback experiments support individually specific receiver-directed calls; a 2025 correction changed values, not qualitative conclusions.",
+          "independence_group": "elephants-f4-pardo-2024"
+        }
+      ],
+      "bibliographic_doi": "10.1038/s41559-024-02420-w",
+      "verification_status": "VERIFIED_PRIMARY_RESEARCH",
+      "semantic_caveat": "Say name-like calls, not human language or actual personal names; article correction DOI 10.1038/s41559-025-02823-3 confirmed qualitatively unchanged.",
+      "freshness_class": "stable",
+      "as_of_date": null,
+      "risk_class": "standard",
+      "prior_read_evidence": "owner_reported_six_candidate_batch",
+      "dedup_reviews": [],
+      "dedup_review_note": "Earlier top-five Moon matches were judged materially distinct; exact match IDs and a fresh live review snapshot are not preserved in this fixture."
+    },
+    {
+      "position": 5,
+      "candidate": {
+        "candidate_key": "elephant_cooperative_rope_waiting",
+        "claim_text": "Asian elephants in a cooperative rope task sometimes waited for a partner before pulling.",
+        "subject_key": "asian_elephant",
+        "relation_key": "behaves_as",
+        "object_key": "waits_for_partner_in_cooperative_rope_task",
+        "numbers": [],
+        "qualifiers": {
+          "negated": false,
+          "comparison_direction": "none",
+          "population": "tested_asian_elephants",
+          "condition": "cooperative_two_ends_rope_task"
+        },
+        "topic_key": "animals",
+        "normalization_version": 1,
+        "ontology_version": 1
+      },
+      "canva_line": "In a rope task, Asian elephants waited for partners before pulling.",
+      "sources": [
+        {
+          "schema_version": 1,
+          "url": "https://doi.org/10.1073/pnas.1101765108",
+          "canonical_url": "https://doi.org/10.1073/pnas.1101765108",
+          "title": "Elephants know when they need a helping trunk in a cooperative task",
+          "publisher": "Proceedings of the National Academy of Sciences",
+          "tier": "A",
+          "source_type": "primary_paper",
+          "accessed_at": "2026-10-21T13:09:23Z",
+          "published_at": "2011-03-07",
+          "updated_at": null,
+          "as_of": null,
+          "language": "en",
+          "supports": "In cooperative two-end rope experiments, elephants delayed pulling until partners arrived, with task-specific access controls; behaviour may also be learned contingency.",
+          "independence_group": "elephants-f5-plotnik-2011"
+        }
+      ],
+      "bibliographic_doi": "10.1073/pnas.1101765108",
+      "verification_status": "VERIFIED_PRIMARY_RESEARCH",
+      "semantic_caveat": "Limited to experimental task; avoid claims of generalized human-style cooperation.",
+      "freshness_class": "stable",
+      "as_of_date": null,
+      "risk_class": "standard",
+      "prior_read_evidence": "owner_reported_six_candidate_batch",
+      "dedup_reviews": [],
+      "dedup_review_note": "Earlier top-five Moon matches were judged materially distinct; exact match IDs and a fresh live review snapshot are not preserved in this fixture."
+    },
+    {
+      "position": 6,
+      "candidate": {
+        "candidate_key": "elephant_unrelated_female_bonds",
+        "claim_text": "Captive female Asian elephants can form social bonds with unrelated females.",
+        "subject_key": "captive_female_asian_elephants",
+        "relation_key": "can_perform",
+        "object_key": "form_affiliative_social_bonds_with_unrelated_females",
+        "numbers": [],
+        "qualifiers": {
+          "negated": false,
+          "comparison_direction": "none",
+          "population": "captive_female_asian_elephants",
+          "scope": "observed_social_relationships_in_captive_group"
+        },
+        "topic_key": "animals",
+        "normalization_version": 1,
+        "ontology_version": 1
+      },
+      "canva_line": "Captive Asian elephant females can bond with unrelated females.",
+      "sources": [
+        {
+          "schema_version": 1,
+          "url": "https://www.animalbehaviorandcognition.org/article.php?id=1306",
+          "canonical_url": "https://www.animalbehaviorandcognition.org/article.php?id=1306",
+          "title": "Characteristics of Social Relationships in a Group of Captive Asian Elephants (Elephas maximus) in the Elephant Village in Thailand",
+          "publisher": "Animal Behavior and Cognition",
+          "tier": "A",
+          "source_type": "primary_paper",
+          "accessed_at": "2026-10-21T13:09:23Z",
+          "published_at": null,
+          "updated_at": null,
+          "as_of": null,
+          "language": "en",
+          "supports": "Study of 13 captive Asian elephants in Thailand documents affiliative female relationships among unrelated individuals within a captive group.",
+          "independence_group": "elephants-f6-yasui-idani-2022"
+        }
+      ],
+      "bibliographic_doi": "10.26451/abc.09.01.08.2022",
+      "verification_status": "VERIFIED_PRIMARY_RESEARCH",
+      "semantic_caveat": "Owner-approved canonical and Canva wording are reproduced exactly; not evidence about unrelated wild females.",
+      "freshness_class": "stable",
+      "as_of_date": null,
+      "risk_class": "standard",
+      "prior_read_evidence": "navigator_verified_single_f6_read",
+      "dedup_reviews": [],
+      "dedup_review_note": "Earlier top-five Moon matches were judged materially distinct; exact match IDs and a fresh live review snapshot are not preserved in this fixture."
+    },
+    {
+      "position": 7,
+      "candidate": {
+        "candidate_key": "elephant_family_member_urine_recognition",
+        "claim_text": "African elephants can recognize individual family members from urine-related scent cues.",
+        "subject_key": "african_elephant",
+        "relation_key": "can_perform",
+        "object_key": "recognize_family_members_from_urine_olfactory_cues",
+        "numbers": [],
+        "qualifiers": {
+          "negated": false,
+          "comparison_direction": "none",
+          "population": "african_elephants_in_studied_family_groups",
+          "method": "urine_earth_olfactory_cues"
+        },
+        "topic_key": "animals",
+        "normalization_version": 1,
+        "ontology_version": 1
+      },
+      "canva_line": "African elephants can recognize family members through urine scent.",
+      "sources": [
+        {
+          "schema_version": 1,
+          "url": "https://doi.org/10.1098/rsbl.2007.0529",
+          "canonical_url": "https://doi.org/10.1098/rsbl.2007.0529",
+          "title": "African elephants have expectations about the locations of out-of-sight family members",
+          "publisher": "Biology Letters (The Royal Society)",
+          "tier": "A",
+          "source_type": "primary_paper",
+          "accessed_at": "2026-10-21T13:09:23Z",
+          "published_at": "2007-12-04",
+          "updated_at": null,
+          "as_of": null,
+          "language": "en",
+          "supports": "Urine-earth cue experiments found responses indicating recognition of specific female relatives and tracking of companions' locations.",
+          "independence_group": "elephants-f7-bates-2008"
+        }
+      ],
+      "bibliographic_doi": "10.1098/rsbl.2007.0529",
+      "verification_status": "VERIFIED_PRIMARY_RESEARCH",
+      "semantic_caveat": "Urine-related cues in field experiments; do not conflate with general scent recognition of all elephants.",
+      "freshness_class": "stable",
+      "as_of_date": null,
+      "risk_class": "standard",
+      "prior_read_evidence": "owner_reported_six_candidate_batch",
+      "dedup_reviews": [],
+      "dedup_review_note": "Earlier top-five Moon matches were judged materially distinct; exact match IDs and a fresh live review snapshot are not preserved in this fixture."
+    }
+  ],
+  "deduplication_evidence": {
+    "evidence_type": "HISTORICAL_OWNER_REPORTED_PLUS_ONE_NAVIGATOR_LIVE_READ",
+    "basis": "https://github.com/milyarderpro/content-producer/issues/26#issuecomment-6315725958",
+    "approved_f6": "https://github.com/milyarderpro/content-producer/issues/26#issuecomment-6315832321",
+    "batch_facts": [
+      "F1",
+      "F2",
+      "F3",
+      "F4",
+      "F5",
+      "F7"
+    ],
+    "batch_read_success": 6,
+    "batch_observed_matches": 30,
+    "batch_reported_by": "owner",
+    "f6_single_read_success": true,
+    "f6_observed_matches": 5,
+    "f6_verified_by": "navigator through mcpku2 READ",
+    "total_bounded_matches": 35,
+    "match_pattern": "Unrelated existing Moon records, numeric-only signal arising from empty numbers arrays; no exact claim/structure/FTS/entity matches reported; low trigram.",
+    "editorial_review": "Distinct from shown Moon matches on material subject/relation/object identity. Not an exhaustive proof of no duplicates.",
+    "report_review_required": false,
+    "returned_match_ids_persisted": false,
+    "refresh_required_before_write": true,
+    "issues": [
+      "https://github.com/milyarderpro/content-producer/issues/36",
+      "https://github.com/milyarderpro/content-producer/issues/37"
+    ]
+  },
+  "execution_boundary": {
+    "status": "BLOCKED_FOR_LIVE_WRITE_NOT_TESTED",
+    "safe_use": "Static reusable input for a new-chat READ preflight and owner review, not a ready-to-execute Write request.",
+    "must_read_live": [
+      "get_page_generation_context",
+      "trivia_find_similar_facts"
+    ],
+    "before_any_reserve": "Retrieve exact fresh Page CAS with six fractional digits, full dedup matches, current source policy and current owner approval for the specific one-draft operation.",
+    "at_reservation_time": "Generate fresh operation_key and reservation_token; choose TTL and requested_expires_at from current runtime; obtain and review authoritative allocated fact IDs.",
+    "at_save_time": "Generate fresh save operation_key, use successful reservation's token and actual fact IDs, live config snapshot, exact render metrics, approved one-draft payload; do not attach to a plan.",
+    "after_save": "Verify exactly one draft through get_post with correct seven fact bindings, revision, content hash and checks.",
+    "forbidden_persisted_fields": [
+      "reservation_token",
+      "operation_key",
+      "expected_config_updated_at",
+      "requested_expires_at",
+      "fact_public_id",
+      "post_public_id",
+      "content_hash",
+      "revision"
+    ],
+    "historical_ready_moon_post_untouched": true,
+    "existing_plan_untouched": true,
+    "no_publication": true
+  },
+  "readiness": {
+    "static_seven_sources": "VERIFIED",
+    "static_seven_ontology_candidates": "VERIFIED",
+    "static_copy": "PREVIEW_REQUIRES_LIVE_RENDERER_CHECK",
+    "live_dedup_refresh": "PENDING",
+    "exact_write_scope_and_owner_approval": "PENDING",
+    "reservation_save_get_post": "NOT_RUN",
+    "overall_lt_e2e_01": "BLOCKED"
+  }
+}

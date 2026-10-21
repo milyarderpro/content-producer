@@ -224,3 +224,11 @@ Residual risk:
 ## Handoff
 
 Kumpulkan masalah dan link perbaikan pada [Issue #25](https://github.com/milyarderpro/content-producer/issues/25). Setiap masalah terpisah memakai Issue khusus, seperti [#26](https://github.com/milyarderpro/content-producer/issues/26). Implementer membuat PR yang terhubung ke Issue, tidak menyalin seluruh chat ke source code.
+
+### LT-E2E-01 — fixture direkonstruksi, Write tetap BLOCKED (21 Oktober 2026)
+
+File lama `lt_e2e_01_elephant_prewrite_preview.json` hanya dilaporkan sebagai lampiran percakapan sebelumnya; salinan yang dapat dibaca belum ditemukan dalam tree repository, pencarian nama, file percakapan/Project yang tersedia atau artifact run ringan yang diperiksa. **Tidak dipulihkan.** [Fixture pengganti](fixtures/lt-e2e-01-elephant-source-pack.json) dengan penanda `VERIFIED_RECONSTRUCTION_NOT_ORIGINAL` memuat tujuh kandidat, sumber penelitian primer (F1–F7), copy English dan pembatasan studi; F6 mempertahankan kata-kata canonical dan Canva yang disetujui pemilik pada [Issue #26](https://github.com/milyarderpro/content-producer/issues/26#issuecomment-6315832321). Semua relasi berada dalam allowlist SQL v1 dan arah perbandingan `none` sesuai kontrak.
+
+Bukti dedup yang dapat dikutip: **6/6 Read owner-reported + 1/1 Read navigator** berhasil; 35 hasil Moon top-five `numeric`-only dinilai bukan duplikat semantik. Ini bukan pemeriksaan menyeluruh ataupun snapshot dedup saat Write. Sumber `published_at`/`updated_at` yang tanggal pastinya tak diketahui tetap `null`; tanggal akses dan koreksi artikel F4 dicatat terpisah. Belum ada reservasi, `save_post` atau readback draft baru; field runtime (CAS, operation key, reservation token, expiry, fact/post IDs) sengaja tidak disimpan.
+
+**Outcome E2E: BLOCKED / belum ada PASS draft.** Berikutnya hanya setelah pekerjaan pemulihan fixture ini ditinjau: buka fixture dari repository dalam chat baru, jalankan Read preflight terbaru, cek budget renderer, review tepat satu draft dan izin produksi per Write sebelum eksekusi. Tidak ada Write, deploy, full CI atau perubahan backend pada tugas fixture ini. Referensi: [Issue #26](https://github.com/milyarderpro/content-producer/issues/26).
