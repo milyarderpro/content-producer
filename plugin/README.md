@@ -1,5 +1,16 @@
 # Plugin source boundary
 
+> **Live Test & Fix candidate v0.2.3 (LT-016; not installed/deployed yet):**
+> Updates the plugin skill to require an explicit
+> `qualifiers.comparison_direction` for every trivia candidate, matching
+> accepted CR-005 and the existing SQL canonical validator. The matching
+> MCP `trivia_fact.ts` input schema is tightened to the same closed enum.
+> This is a prospective package source version, **not a claim that the
+> currently installed PRIVATE plugin or production MCP has been updated**.
+> After focused CI and approved backend rollout, the owner must update the
+> existing PRIVATE plugin (same `mcpku2` OAuth app, not a second plugin),
+> then repeat the same LT-016 live test before closing Issue #29.
+
 Phase 7 prepared the portable Content Producer plugin **source** and a local
 package candidate. Phase 10.2 originally delivered the historical No-auth package; CR-045 now
 updates the same PRIVATE plugin to an owner OAuth mcpku2 binding in v0.2.2. Packaging does not install the plugin or unlock business writes.
