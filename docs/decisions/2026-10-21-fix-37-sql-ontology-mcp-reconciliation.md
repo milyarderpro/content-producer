@@ -34,6 +34,16 @@ Never change the verified claim, its relational meaning or direction
 silently merely to fit an accepted enum. Hold unsuitable claims for
 editorial review or choose a separately verified fact.
 
+## Catalog size guard
+
+Advertising the full enum in three candidate inputs increases the
+`tools/list` payload. The historical No-auth fallback keeps the CR-033
+100,000-byte ceiling by using each tool's existing concise SDK title
+as its fallback description. This is wire-presentation metadata only:
+OAuth descriptions, tool names, the full 17-value input enum, output
+validation, authorization and backend behavior remain unchanged.
+The catalog regression checks the size and description provenance.
+
 ## Evidence and rollout limits
 
 Issue #37 records the live F1 failure and a read-only successful
