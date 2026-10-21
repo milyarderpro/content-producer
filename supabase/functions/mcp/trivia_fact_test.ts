@@ -151,6 +151,16 @@ Deno.test(
       check(tool.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
       check(!Object.hasOwn(tool, 'outputSchema'), 'OPTIONAL_OUTPUT_OMITTED');
       check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
+      if (name === 'trivia_find_similar_facts') {
+        // The advertised tools/list schema must never suggest that CR-005
+        // comparison_direction can be omitted when SQL requires it.
+        const qualifiers = tool.inputSchema.properties.candidates.items.properties.qualifiers;
+        check(qualifiers.required.includes('comparison_direction'), 'DIRECTION_REQUIRED');
+        check(
+          qualifiers.properties.comparison_direction.enum.includes('none'),
+          'DIRECTION_ENUM_ADVERTISED',
+        );
+      }
     }
   },
 );
@@ -215,6 +225,31 @@ Deno.test(
         ['trivia_find_similar_facts', { candidates: [] }],
         ['trivia_find_similar_facts', { candidates: [candidate, candidate] }],
         ['trivia_find_similar_facts', { candidates: [{ ...candidate, ontology_version: 2 }] }],
+        // LT-016/CR-005: SQL requires explicit comparison_direction although old MCP
+        // schema advertised it as optional. Reject before reaching the RPC boundary.
+        [
+          'trivia_find_similar_facts',
+          { candidates: [{ ...candidate, qualifiers: { negated: false } }] },
+        ],
+        [
+          'trivia_find_similar_facts',
+          {
+            candidates: [
+              { ...candidate, qualifiers: { negated: false, comparison_direction: 'upward' } },
+            ],
+          },
+        ],
+        [
+          'trivia_register_and_reserve_facts',
+          {
+            facts: [
+              {
+                ...(inputs.trivia_register_and_reserve_facts.facts as Record<string, unknown>[])[0],
+                candidate: { ...candidate, qualifiers: { negated: false } },
+              },
+            ],
+          },
+        ],
         ['trivia_register_and_reserve_facts', { facts: [] }],
         [
           'trivia_register_and_reserve_facts',

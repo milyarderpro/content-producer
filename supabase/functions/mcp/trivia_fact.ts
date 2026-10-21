@@ -26,7 +26,17 @@ const topic = z.enum([
 ]);
 const qualifier = z.strictObject({
   negated: z.boolean(),
-  comparison_direction: z.string().min(1).max(80).optional(),
+  // CR-005: SQL canonical identity requires an explicit direction; "none" is not inferred.
+  comparison_direction: z.enum([
+    'increase',
+    'decrease',
+    'greater_than',
+    'less_than',
+    'at_least',
+    'at_most',
+    'equal',
+    'none',
+  ]),
   time: z.string().min(1).max(300).nullable().optional(),
   location: z.string().min(1).max(300).nullable().optional(),
   population: z.string().min(1).max(300).nullable().optional(),
@@ -255,7 +265,7 @@ export function registerTriviaFactTools(server: McpServer, context?: RequestCont
     {
       title: 'Find similar trivia facts',
       description:
-        'Use this after researching atomic candidate claims and before registering them. It returns exact, structured, and ranked semantic-review candidates plus reuse signals; it never decides paraphrase equivalence by itself.',
+        'Find duplicate fact candidates and reuse limits; semantic identity requires your review.',
       inputSchema: findInput,
       outputSchema: findOutput,
       annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
@@ -280,7 +290,7 @@ export function registerTriviaFactTools(server: McpServer, context?: RequestCont
     {
       title: 'Register and reserve trivia facts',
       description:
-        'Use this only after source verification and semantic dedup review. It atomically reuses or creates canonical facts and reserves the exact ordered set for one Page and one future post.',
+        'After source verification and dedup review, register/reuse and reserve an ordered fact set for one Page draft.',
       inputSchema: reserveInput,
       outputSchema: reserveOutput,
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },
@@ -309,7 +319,7 @@ export function registerTriviaFactTools(server: McpServer, context?: RequestCont
     {
       title: 'Release reserved trivia facts',
       description:
-        'Use this when a draft attempt is abandoned before save. It idempotently releases only facts still owned by the supplied reservation token; it never releases allocated or published facts.',
+        'Release unused facts from an abandoned reservation. Requires its token; never releases allocated or published facts.',
       inputSchema: releaseInput,
       outputSchema: releaseOutput,
       annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false },

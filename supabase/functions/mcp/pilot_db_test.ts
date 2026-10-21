@@ -49,9 +49,10 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   const response = await createAuthenticatedTransport(context).fetch(request('tools/list'));
   assert(response.status === 200, 'catalog must succeed');
   const catalogBody = await response.text();
+  const catalogBytes = new TextEncoder().encode(catalogBody).byteLength;
   assert(
-    new TextEncoder().encode(catalogBody).byteLength < 100_000,
-    'CR-033 pilot catalog must remain under 100 KB without changing tool count',
+    catalogBytes < 100_000,
+    `CR-033 pilot catalog must remain under 100 KB without changing tool count (actual: ${catalogBytes} bytes)`,
   );
   const listed = responseJson(catalogBody);
   const tools = (listed.result as { tools: Array<Record<string, unknown>> }).tools;

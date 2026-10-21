@@ -895,6 +895,10 @@ numbers: array 0..10 of {
 }
 qualifiers: {
   negated: boolean
+  comparison_direction: required enum[
+    increase, decrease, greater_than, less_than,
+    at_least, at_most, equal, none
+  ]
   time?: string | null
   location?: string | null
   population?: string | null
@@ -907,6 +911,12 @@ topic_key: trivia topic allowlist value
 normalization_version: const 1
 ontology_version: const 1
 ```
+
+**CR-005 (accepted, 9 October 2026):** `comparison_direction` wajib hadir secara
+eksplisit pada setiap candidate, baik untuk pencarian dedup, reservasi,
+maupun successor saat koreksi fakta. Nilai `none` hanya untuk relasi tanpa
+perbandingan terarah. Jangan menganggap field yang absen sama dengan `none`;
+validator SQL `internal.trivia_canonical_qualifiers_v3` menolak omission.
 
 Server menghitung normalized claim, structured key, dan hashes. Caller tidak mengirim authoritative hashes.
 
