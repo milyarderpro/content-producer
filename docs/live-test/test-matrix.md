@@ -2,7 +2,7 @@
 
 **Kampanye:** [#25](https://github.com/milyarderpro/content-producer/issues/25) · **Versi awal:** 21 Oktober 2026 · **Panduan:** [README](README.md) · **Hasil eksekusi:** [results.md](results.md).
 
-**Status kampanye setelah LT-READ-A: 5 PASS berdasarkan laporan live pemilik, 28 NOT RUN.** Ini tidak menyangkal bukti Phase 10 atau read-only inspection sebelumnya: PASS historis/CI harus dicatat sebagai referensi `HISTORICAL`/ `CI/FIXTURE`, bukan otomatis menjadi PASS pada pengujian ChatGPT baru. Detail bukti [results.md](results.md) dan [Issue #25](https://github.com/milyarderpro/content-producer/issues/25#issuecomment-6312425727).
+**Status kampanye setelah LT-READ-A + LT-READ-B: 10 PASS, 1 FAIL (`LT-016`), 22 NOT RUN berdasarkan laporan live pemilik.** Ini tidak menyangkal bukti Phase 10 atau read-only inspection sebelumnya: PASS historis/CI harus dicatat sebagai referensi `HISTORICAL`/ `CI/FIXTURE`, bukan otomatis menjadi PASS pada pengujian ChatGPT baru. Detail bukti [results.md](results.md), [Issue #25](https://github.com/milyarderpro/content-producer/issues/25) dan [Issue #29](https://github.com/milyarderpro/content-producer/issues/29) untuk diagnosa `LT-016`.
 
 Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan concurrency. Untuk Write, `PASS LIVE` memerlukan izin spesifik, respons sukses yang sah dan verifikasi owner-scoped readback; untuk tool destruktif, keberhasilan fixture diberi label `PASS CI/FIXTURE`, tidak diberi label sukses LIVE.
 
@@ -16,22 +16,22 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 | LT-004 | Page      | create_page                       | Write | Owner-approved test Page   | Tepat satu Page/config baru; readback          | NOT RUN |
 | LT-005 | Page      | update_page                       | Write | Owner-approved test Page   | Hanya field diminta berubah; stale CAS ditolak | NOT RUN |
 | LT-006 | Page      | get_page_generation_context       | Read  | Live                       | Config ID, CAS, allowed rules tersedia         | PASS    |
-| LT-007 | Plan      | list_content_plans                | Read  | Live                       | Daftar plan sesuai filter                      | NOT RUN |
+| LT-007 | Plan      | list_content_plans                | Read  | Live                       | Daftar plan sesuai filter                      | PASS    |
 | LT-008 | Plan      | create_content_plan               | Write | Owner-approved test plan   | Plan dan item tepat; readback                  | NOT RUN |
-| LT-009 | Plan      | get_content_plan                  | Read  | Live                       | Progress dan jadwal item konsisten             | NOT RUN |
+| LT-009 | Plan      | get_content_plan                  | Read  | Live                       | Progress dan jadwal item konsisten             | PASS    |
 | LT-010 | Plan      | claim_content_plan_items          | Write | Disposable plan            | Maksimal 3 claim dan lease valid               | NOT RUN |
 | LT-011 | Plan      | renew_content_plan_claim          | Write | Disposable live claim      | Satu perpanjangan sah; renewal kedua ditolak   | NOT RUN |
 | LT-012 | Plan      | report_content_plan_item_failure  | Write | Disposable live claim      | Gagal aman; detail error tersimpan             | NOT RUN |
 | LT-013 | Plan      | retry_content_plan_item           | Write | Disposable failed item     | Failed kembali pending; riwayat tetap          | NOT RUN |
 | LT-014 | Plan      | replace_discarded_plan_item       | Write | Fixture preferred          | Penggantian hanya discard sebelum publish      | NOT RUN |
 | LT-015 | Plan      | cancel_content_plan               | Write | Disposable plan            | Hanya item tersisa batal, output selesai tetap | NOT RUN |
-| LT-016 | Trivia    | trivia_find_similar_facts         | Read  | Live                       | Kandidat duplikat dan reuse terbaca            | NOT RUN |
+| LT-016 | Trivia    | trivia_find_similar_facts         | Read  | Live                       | Kandidat duplikat dan reuse terbaca            | FAIL    |
 | LT-017 | Trivia    | trivia_register_and_reserve_facts | Write | Approved new draft         | Reserve verified facts; token/ID valid         | NOT RUN |
 | LT-018 | Trivia    | trivia_release_facts              | Write | Abandoned test reservation | Unused reservation dilepas; tak ganggu alokasi | NOT RUN |
 | LT-019 | Trivia    | trivia_reverify_fact              | Write | Fixture preferred          | Evidence same-meaning diperbarui aman          | NOT RUN |
 | LT-020 | Trivia    | trivia_correct_fact               | Write | Fixture only by default    | Invalidate/successor benar; posts terdampak    | NOT RUN |
 | LT-021 | Post      | list_posts                        | Read  | Live                       | Status/filter/page match                       | PASS    |
-| LT-022 | Post      | get_post                          | Read  | Live                       | Copy/checks/source/hash cocok                  | NOT RUN |
+| LT-022 | Post      | get_post                          | Read  | Live                       | Copy/checks/source/hash cocok                  | PASS    |
 | LT-023 | Post      | save_post                         | Write | Approved new draft         | Draft persisted sekali; get_post cocok         | NOT RUN |
 | LT-024 | Post      | revise_post                       | Write | Disposable draft           | CAS revision/hash; stale ditolak               | NOT RUN |
 | LT-025 | Post      | reschedule_post                   | Write | Disposable draft           | Slot internal tepat; conflict aman             | NOT RUN |
@@ -41,8 +41,8 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 | LT-029 | Publikasi | mark_post_posted                  | Write | Fixture / real event only  | Hanya setelah publikasi manual nyata           | NOT RUN |
 | LT-030 | Publikasi | archive_post                      | Write | Fixture / real posted only | Arsip setelah posted; sejarah dipertahankan    | NOT RUN |
 | LT-031 | Performa  | record_post_performance           | Write | Fixture / real metric only | Snapshot hanya metrik nyata/fixture            | NOT RUN |
-| LT-032 | Performa  | get_post_performance              | Read  | Expected denial on ready   | POST_NOT_PUBLISHED untuk post ready            | NOT RUN |
-| LT-033 | Performa  | get_performance_insights          | Read  | Live empty-data case       | Tidak mengarang insight bila tanpa data        | NOT RUN |
+| LT-032 | Performa  | get_post_performance              | Read  | Expected denial on ready   | POST_NOT_PUBLISHED untuk post ready            | PASS    |
+| LT-033 | Performa  | get_performance_insights          | Read  | Live empty-data case       | Tidak mengarang insight bila tanpa data        | PASS    |
 
 ## Alur end-to-end utama: kegagalan menyimpan draft
 
@@ -60,11 +60,11 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 | Indikator                   | Per 21 Oktober 2026 |
 | --------------------------- | ------------------- |
 | Tool tersedia               | 33                  |
-| PASS live baru              | 5                   |
+| PASS live baru              | 10                  |
 | PASS CI/fixture kampanye    | 0                   |
-| FAIL terkonfirmasi          | 0                   |
+| FAIL terkonfirmasi          | 1 — LT-016 (error)   |
 | BLOCKED (tool individual)   | 0                   |
-| NOT RUN (tool individual)   | 28                  |
+| NOT RUN (tool individual)   | 22                  |
 | Report perlu bukti tambahan | 1 — LT-E2E-01 / #26 |
 
-**Setiap status baris akan berubah hanya setelah tes kampanye direview dan direkam.** Pastikan ringkasan dan [results.md](results.md) diselaraskan setiap kali ada bukti baru.
+**LT-016 FAIL means the recorded prompt was rejected, not a proven root-cause or unconditionally valid SQL payload.** The public MCP schema appears to allow the candidate, while SQL may enforce stricter canonical semantics (Issue #29). **Setiap status baris akan berubah hanya setelah tes kampanye direview dan direkam.** Pastikan ringkasan dan [results.md](results.md) diselaraskan setiap kali ada bukti baru.
