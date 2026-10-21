@@ -40,6 +40,24 @@ Setiap bug Issue harus memuat **ID LT, gejala, expected vs actual, prasyarat dan
 
 Implementer memulai dari Issue, membuat branch/PR yang menyebut `Refs #N`, menambah tes yang gagal sebelum perbaikan (jika bisa), menulis perbaikan minimum tanpa kontrak baru yang diam-diam, lalu merekam run Actions/commit SHA. **Docs-only:** gunakan existing light PR CI; **TypeScript/config:** `pnpm run check` + focused tests; **auth, RLS, migration, backend write/security:** gunakan gate CR-020/044 yang relevan pada SHA final sebelum deployment. Lulus CI lokal/terisolasi tidak sama dengan PASS plugin live. PR merge/deployment dan perubahan production hanya dengan keputusan pemilik yang sesuai; jangan merunning full gate hanya untuk Markdown.
 
+## Batas durasi CI wajib — estimasi sebelum dijalankan
+
+Seluruh implementer mengikuti **aturan utama di
+[`AGENTS.md`](../../AGENTS.md)**. Sebelum menjalankan/men-trigger GitHub
+Actions atau CI lokal, tentukan **estimasi durasi** dengan merujuk isi job
+dan run sebelumnya. Jika dibutuhkan gate yang **diperkirakan lebih dari
+10 menit**, **jangan memulai gate itu** (termasuk push/PR yang otomatis
+men-trigger-nya). Implementer melaporkan check, estimasi, SHA, bukti yang
+sudah tersedia, dan apa yang masih tertunda, **lalu berhenti tanpa
+menunggu atau memantau** sampai pemilik mengetik **`lanjutkan`**.
+
+Ini **bukan** aturan menunggu 10 menit lalu berhenti. Jika workflow
+sudah berjalan, jangan membatalkannya sepihak; cukup cantumkan URL/status
+dan hentikan polling. Gate backend/security yang wajib tetap **harus
+dipenuhi sebelum deploy** dan tidak boleh dilewati karena batas waktu.
+Jangan mengulang full gate ketika focused CI atau reuse SHA yang sah sudah
+mencukupi.
+
 ## Definisi selesai untuk kampanye ini
 
 1. Semua **33 tool telah dipetakan** dengan hasil dan batas bukti yang eksplisit; bukan harus mengeksekusi seluruh mutasi destruktif di production.

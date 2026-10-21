@@ -29,6 +29,49 @@ owner OAuth data changes are consequential; prefer isolated fixtures for
 irreversible positive tests. **Do not merge, deploy, or change production
 business data merely because the workflow document has been adopted.**
 
+## Mandatory CI duration preflight and stop rule (owner directive, 21 October 2026)
+
+**This rule applies to every implementer/AI agent, every new task and every
+GitHub Actions or local CI run, regardless of historical phase instructions.**
+It is a **forecast threshold, not a wall-clock timer**.
+
+1. **Before starting, dispatching or triggering CI**, estimate the likely
+   execution duration using the workflow's actual jobs and available recent
+   run history. Identify whether a focused/light check and an existing
+   passing run on an unchanged relevant SHA can satisfy the required gate.
+   Do not start a duplicate full gate without a concrete technical reason.
+2. **If any required CI workflow is estimated to take MORE THAN 10 MINUTES,
+   STOP BEFORE TRIGGERING IT.** Do not start a heavy job, dispatch its workflow,
+   push/create a PR that would auto-trigger it, or enter a watch/poll loop.
+   Report the estimated duration and basis, exact workflow/check and
+   candidate SHA, status of completed work, remaining gates, and links to
+   Issues/PRs or already existing runs. **End the current chat response
+   immediately after this handoff.**
+3. **Wait for the owner's explicit `lanjutkan` instruction in a future
+   message** before resuming that CI step. `lanjutkan` resumes the task
+   sequence; it is not by itself permission to deploy, merge restricted
+   changes, or write production business data.
+4. **Do not wait ten minutes and then stop.** The decision is made from the
+   **estimate before execution**. A 12-minute estimate means stop now,
+   even if nothing has started; an estimated 8-minute focused check may
+   proceed under the usual risk gates and permissions.
+5. **If a long-running workflow was already started by another actor or
+   unexpectedly becomes clearly longer than 10 minutes**, leave it running
+   (do not cancel without authorization), record its run URL and current
+   status once, **stop polling or holding the conversation**, and hand
+   control back until `lanjutkan`. Never present an unfinished CI as PASS.
+6. Mandatory security/backend/CR-020/CR-044 gates are **deferred, not
+   waived** by this timing rule. Do not bypass the gate, lower tests, or
+   deploy an unverified backend to avoid waiting. Prefer passing focused
+   CI and verified unchanged-SHA gate reuse when contractually permitted.
+
+**Example:** LT-016 rollout can inspect and reuse [PR #31's passing focused
+Actions](https://github.com/milyarderpro/content-producer/pull/31) if
+unchanged source and CR-044 permit; it must **not** schedule a fresh full
+backend gate merely by habit. If review demonstrates a full gate is necessary
+and its estimated duration exceeds 10 minutes, stop before triggering it
+and wait for `lanjutkan`.
+
 ## Scope and source of truth
 
 The frozen Phase 0 documents under `plans/` govern implementation. Resolve a
