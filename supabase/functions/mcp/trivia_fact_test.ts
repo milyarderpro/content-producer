@@ -256,7 +256,8 @@ Deno.test('FIX-37 accepts SQL v1 relation keys and preserves behavioral candidat
     numbers: [],
     qualifiers: { negated: false, comparison_direction: 'none' },
   };
-  const firstFact = (inputs.trivia_register_and_reserve_facts.facts as Record<string, unknown>[])[0];
+  const firstFact =
+    (inputs.trivia_register_and_reserve_facts.facts as Record<string, unknown>[])[0];
   const original = globalThis.fetch;
   const forwarded: Array<{ name: string; args: Record<string, unknown> }> = [];
   globalThis.fetch = ((input: Request | URL | string, init?: RequestInit) => {
@@ -276,9 +277,8 @@ Deno.test('FIX-37 accepts SQL v1 relation keys and preserves behavioral candidat
     check(found?.isError !== true && reserved?.isError !== true, 'OFFICIAL_RELATION_ACCEPTED');
     check(forwarded.length === 2, 'EXACTLY_TWO_CALLS');
     const foundCandidate = (forwarded[0].args.p_candidates as typeof behavioral[])[0];
-    const reservedCandidate = (
-      forwarded[1].args.p_facts as Array<{ candidate: typeof behavioral }>
-    )[0].candidate;
+    const reservedFacts = forwarded[1].args.p_facts as Array<{ candidate: typeof behavioral }>;
+    const reservedCandidate = reservedFacts[0].candidate;
     check(foundCandidate.relation_key === 'communicates_by', 'FIND_RELATION_UNCHANGED');
     check(reservedCandidate.relation_key === 'communicates_by', 'RESERVE_RELATION_UNCHANGED');
     check(reservedCandidate.qualifiers.comparison_direction === 'none', 'DIRECTION_UNCHANGED');
