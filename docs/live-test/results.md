@@ -39,6 +39,37 @@ Pemilik menjalankan **enam tool Read** lewat PRIVATE Content Producer pada konek
 
 **Konsekuensi:** seluruh **11 Read tools telah dieksekusi sekurangnya sekali** dalam kampanye; **10 PASS (termasuk expected-denial) / 1 FAIL yang sedang ditriase**, dan 22 Write tools belum diuji kampanye ini. Laporan draft gagal tersimpan [Issue #26](https://github.com/milyarderpro/content-producer/issues/26) belum memiliki trace lama yang mengidentifikasi titik gagal dan tidak otomatis disamakan dengan `LT-016`.
 
+### LT-016-DIAG — 21 Oktober 2026 — diagnosis selesai; fix/retest masih PENDING
+
+Pemilik menjalankan tepat tiga panggilan **READ** `trivia_find_similar_facts`
+dengan klaim Moon yang sama:
+
+| Varian | Unit | comparison_direction | Hasil | Match |
+| ------ | ---- | -------------------- | ----- | ----- |
+| C | `"count"` | `"none"` | **SUCCESS** | 5 |
+| A | `"count"` | **dihilangkan** | **VALIDATION_FAILED** | — |
+| B | `null` | `"none"` | **SUCCESS** | 5 |
+
+Perbedaan sinyal angka: unit `"count"` memperoleh
+`score_components.numeric=1`, sedangkan unit `null` memperoleh `0`
+pada match pertama. Walaupun lima ID hasil cocok, **nilai unit bukan
+normalisasi kosmetik**, jangan mengubahnya secara otomatis.
+
+**Root cause confirmed from repository source:**
+`internal.trivia_canonical_qualifiers_v3` di migration
+`20261009113820_finalize_batch_a_contract_remediation.sql` memerlukan key
+`comparison_direction`. Sementara itu input schema MCP
+`supabase/functions/mcp/trivia_fact.ts` menerimanya sebagai opsional;
+`plans/tool-inventory.md` masih belum merefleksikan
+[CR-005](../decisions/2026-10-09-comparison-direction-candidate-contract.md)
+yang telah menerima enum wajib. **Tidak ada alasan melonggarkan SQL validator.**
+
+**Issue:** [#29](https://github.com/milyarderpro/content-producer/issues/29).
+**Outcome tool tetap:** LT-016 **FAIL live** sampai MCP/package sesuai kontrak,
+perubahan dirilis, dan **retest live** berhasil.
+**LT-E2E-01:** #26 tetap `NEEDS TRACE`; kegagalan historis menyimpan draft
+belum terbukti merupakan error yang sama. Semua pengujian ini READ-only.
+
 ## Laporan sebelum kampanye
 
 | ID        | Tanggal dilaporkan | Gejala pengguna                                                                    | Bukti saat ini                                                                  | Tindakan                                                                                                                      | Status                |
