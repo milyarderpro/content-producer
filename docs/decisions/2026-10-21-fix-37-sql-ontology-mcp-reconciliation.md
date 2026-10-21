@@ -1,7 +1,7 @@
 # FIX-37 — MCP candidate relations aligned with frozen SQL ontology v1
 
-**Status:** Proposed contract reconciliation; Navigator review required.  
-**Date:** 21 October 2026.  
+**Status:** Proposed contract reconciliation; Navigator review required.
+**Date:** 21 October 2026.
 **Scope:** MCP candidate schema, advertised tool catalog, regression tests and plugin guidance.
 
 ## Conflict and resolution
