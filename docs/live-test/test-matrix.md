@@ -2,7 +2,7 @@
 
 **Kampanye:** [#25](https://github.com/milyarderpro/content-producer/issues/25) · **Versi awal:** 21 Oktober 2026 · **Panduan:** [README](README.md) · **Hasil eksekusi:** [results.md](results.md).
 
-**Status kampanye setelah LT-READ-A + LT-READ-B: 10 PASS, 1 FAIL (`LT-016`), 22 NOT RUN berdasarkan laporan live pemilik.** Ini tidak menyangkal bukti Phase 10 atau read-only inspection sebelumnya: PASS historis/CI harus dicatat sebagai referensi `HISTORICAL`/ `CI/FIXTURE`, bukan otomatis menjadi PASS pada pengujian ChatGPT baru. Detail bukti [results.md](results.md), [Issue #25](https://github.com/milyarderpro/content-producer/issues/25) dan [Issue #29](https://github.com/milyarderpro/content-producer/issues/29) untuk diagnosa `LT-016`.
+**Status kampanye setelah LT-016-RETEST dan refresh katalog: 11 PASS, 0 FAIL, 22 NOT RUN (owner-reported live evidence, 21 Oktober 2026).** Ini tidak menyangkal bukti Phase 10 atau read-only inspection sebelumnya: PASS historis/CI harus dicatat sebagai referensi `HISTORICAL`/ `CI/FIXTURE`, bukan otomatis menjadi PASS pada pengujian ChatGPT baru. Detail bukti [results.md](results.md), [Issue #25](https://github.com/milyarderpro/content-producer/issues/25) dan [Issue #29](https://github.com/milyarderpro/content-producer/issues/29) untuk diagnosa `LT-016`.
 
 Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan concurrency. Untuk Write, `PASS LIVE` memerlukan izin spesifik, respons sukses yang sah dan verifikasi owner-scoped readback; untuk tool destruktif, keberhasilan fixture diberi label `PASS CI/FIXTURE`, tidak diberi label sukses LIVE.
 
@@ -25,7 +25,7 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 | LT-013 | Plan      | retry_content_plan_item           | Write | Disposable failed item     | Failed kembali pending; riwayat tetap          | NOT RUN |
 | LT-014 | Plan      | replace_discarded_plan_item       | Write | Fixture preferred          | Penggantian hanya discard sebelum publish      | NOT RUN |
 | LT-015 | Plan      | cancel_content_plan               | Write | Disposable plan            | Hanya item tersisa batal, output selesai tetap | NOT RUN |
-| LT-016 | Trivia    | trivia_find_similar_facts         | Read  | Live                       | Kandidat duplikat dan reuse terbaca            | FAIL    |
+| LT-016 | Trivia    | trivia_find_similar_facts         | Read  | Live                       | Kandidat duplikat dan reuse terbaca            | PASS    |
 | LT-017 | Trivia    | trivia_register_and_reserve_facts | Write | Approved new draft         | Reserve verified facts; token/ID valid         | NOT RUN |
 | LT-018 | Trivia    | trivia_release_facts              | Write | Abandoned test reservation | Unused reservation dilepas; tak ganggu alokasi | NOT RUN |
 | LT-019 | Trivia    | trivia_reverify_fact              | Write | Fixture preferred          | Evidence same-meaning diperbarui aman          | NOT RUN |
@@ -60,11 +60,11 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 | Indikator                   | Per 21 Oktober 2026 |
 | --------------------------- | ------------------- |
 | Tool tersedia               | 33                  |
-| PASS live baru              | 10                  |
+| PASS live baru              | 11                  |
 | PASS CI/fixture kampanye    | 0                   |
-| FAIL terkonfirmasi          | 1 — LT-016 (error)  |
+| FAIL terkonfirmasi          | 0                   |
 | BLOCKED (tool individual)   | 0                   |
 | NOT RUN (tool individual)   | 22                  |
 | Report perlu bukti tambahan | 1 — LT-E2E-01 / #26 |
 
-**LT-016 tetap FAIL setelah PARTIAL live retest 21 Oktober 2026:** C/B SUCCESS; A memperoleh expected MCP input-validation rejection. Namun host masih mengiklankan `comparison_direction?: string`, bukan required enum, meskipun plugin v0.2.3 terpasang dan runtime menerapkan enum. Perlu refresh/discovery metadata pada koneksi `mcpku2`, bukan penurunan validator SQL. Lihat [results.md](results.md) dan [Issue #29](https://github.com/milyarderpro/content-producer/issues/29). **Setiap status baris akan berubah hanya setelah tes kampanye direview dan direkam.** Pastikan ringkasan dan [results.md](results.md) diselaraskan setiap kali ada bukti baru.
+**LT-016 PASS (21 Oktober 2026):** C/B SUCCESS, A expected MCP input-validation rejection, kemudian pemilik menjalankan Refresh koneksi `mcpku2` dan chat baru mengonfirmasi `comparison_direction` **required closed enum (8 nilai)** pada definisi tool, tanpa memanggil backend lagi. Bukti runtime dan schema diperoleh pada **dua sesi**, bukan klaim satu trace atomik atau server RPC negatif independen. Plugin terpasang v0.2.3 diverifikasi lewat Plugin Creator; deployment Edge v32 merupakan bukti rollout terpisah. Lihat [results.md](results.md) dan [Issue #29](https://github.com/milyarderpro/content-producer/issues/29). **Setiap status baris akan berubah hanya setelah tes kampanye direview dan direkam.** Pastikan ringkasan dan [results.md](results.md) diselaraskan setiap kali ada bukti baru.
