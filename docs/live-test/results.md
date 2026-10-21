@@ -4,9 +4,23 @@
 
 Dokumen ini adalah **log ringkas hasil kampanye baru**, bukan duplikasi seluruh trace chat. Simpan bukti yang telah disanitasi, tool input/output yang relevan dan tautan diskusi di GitHub Issue; jangan menyimpan akses token, OAuth client secret, reservation token atau kredensial.
 
-## Hasil terverifikasi
+## Hasil yang telah dinilai
 
-**Belum ada tes LT baru yang dinilai.** Pembacaan owner OAuth dan sukses manual Phase 10 sebelumnya adalah bukti historis, **bukan** PASS pada putaran kampanye baru.
+### LT-READ-A — 21 Oktober 2026 — 5 PASS LIVE (owner-reported)
+
+Pemilik menjalankan pengujian di chat ChatGPT baru dengan PRIVATE Content Producer dan owner OAuth `mcpku2`, kemudian mengirim laporan lima pemanggilan MCP nyata berurutan. **Reviewer menerima kelima tool sebagai PASS dalam cakupan Read dasar yang diminta.** Bukti berupa **laporan hasil yang diteruskan pemilik**, bukan raw invocation trace independen, CI, atau screenshot langsung. Ringkasan disimpan pada [Issue #25, komentar LT-READ-A](https://github.com/milyarderpro/content-producer/issues/25#issuecomment-6312425727). Tidak ada error maupun Write yang dilaporkan.
+
+| Test ID | Tool                          | Verdict   | Actual, menurut laporan owner                                         |
+| ------- | ----------------------------- | --------- | --------------------------------------------------------------------- |
+| LT-001  | `get_account_profile`         | PASS LIVE | Owner admin / Content Producer terbaca tanpa error                    |
+| LT-002  | `get_workspace_context`       | PASS LIVE | Workspace owner; module trivia v1; 2 Page aktif, default status draft |
+| LT-003  | `list_pages`                  | PASS LIVE | `corious-facts` dan `phase-9-5-pilot-trivia`, dua Page aktif          |
+| LT-006  | `get_page_generation_context` | PASS LIVE | Config ID tersedia, policy/aturan lengkap; eligible verified facts 0  |
+| LT-021  | `list_posts`                  | PASS LIVE | 1 post Moon `ready`, revisi 3, quality passed; tidak ada draft lain   |
+
+**Catatan batas bukti:** `eligible_fact_count=0` dan performance signals kosong bukan bukti bug; keduanya hanya keadaan yang dilaporkan. Tidak ada bukti revisi konfigurasi/CAS terpisah yang disalin ke laporan ini. `list_posts` hanya membuktikan satu post pada saat tes, **tidak mengidentifikasi alasan draft baru sebelumnya gagal tersimpan** (Issue #26). Tidak dilakukan Write, retry, reservasi, pembuatan atau publikasi.
+
+**Rekap kampanye:** 5/33 PASS LIVE (owner-reported), 28/33 NOT RUN, 0 FAIL terkonfirmasi, 0 Write pada LT-READ-A. Berikutnya uji enam Read yang tersisa sebagai LT-READ-B; investigasi draft gagal di #26 tetap prioritas E2E.
 
 ## Laporan sebelum kampanye
 

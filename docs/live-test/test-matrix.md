@@ -2,7 +2,7 @@
 
 **Kampanye:** [#25](https://github.com/milyarderpro/content-producer/issues/25) · **Versi awal:** 21 Oktober 2026 · **Panduan:** [README](README.md) · **Hasil eksekusi:** [results.md](results.md).
 
-**Status kampanye baru semuanya `NOT RUN`.** Ini tidak menyangkal bukti Phase 10 atau read-only inspection sebelumnya: PASS historis/CI harus dicatat sebagai referensi `HISTORICAL`/ `CI/FIXTURE`, bukan otomatis menjadi PASS pada pengujian ChatGPT baru.
+**Status kampanye setelah LT-READ-A: 5 PASS berdasarkan laporan live pemilik, 28 NOT RUN.** Ini tidak menyangkal bukti Phase 10 atau read-only inspection sebelumnya: PASS historis/CI harus dicatat sebagai referensi `HISTORICAL`/ `CI/FIXTURE`, bukan otomatis menjadi PASS pada pengujian ChatGPT baru. Detail bukti [results.md](results.md) dan [Issue #25](https://github.com/milyarderpro/content-producer/issues/25#issuecomment-6312425727).
 
 Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan concurrency. Untuk Write, `PASS LIVE` memerlukan izin spesifik, respons sukses yang sah dan verifikasi owner-scoped readback; untuk tool destruktif, keberhasilan fixture diberi label `PASS CI/FIXTURE`, tidak diberi label sukses LIVE.
 
@@ -10,12 +10,12 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 
 | ID     | Kelompok  | Tool                              | Akses | Metode uji                 | Hasil yang diharapkan                          | Status  |
 | ------ | --------- | --------------------------------- | ----- | -------------------------- | ---------------------------------------------- | ------- |
-| LT-001 | Koneksi   | get_account_profile               | Read  | Live                       | Profil owner muncul tanpa token                | NOT RUN |
-| LT-002 | Koneksi   | get_workspace_context             | Read  | Live                       | Workspace/niche aktif terbaca                  | NOT RUN |
-| LT-003 | Page      | list_pages                        | Read  | Live                       | List dua Page saat baseline; ID+slug           | NOT RUN |
+| LT-001 | Koneksi   | get_account_profile               | Read  | Live                       | Profil owner muncul tanpa token                | PASS    |
+| LT-002 | Koneksi   | get_workspace_context             | Read  | Live                       | Workspace/niche aktif terbaca                  | PASS    |
+| LT-003 | Page      | list_pages                        | Read  | Live                       | List dua Page saat baseline; ID+slug           | PASS    |
 | LT-004 | Page      | create_page                       | Write | Owner-approved test Page   | Tepat satu Page/config baru; readback          | NOT RUN |
 | LT-005 | Page      | update_page                       | Write | Owner-approved test Page   | Hanya field diminta berubah; stale CAS ditolak | NOT RUN |
-| LT-006 | Page      | get_page_generation_context       | Read  | Live                       | Config ID, CAS, allowed rules tersedia         | NOT RUN |
+| LT-006 | Page      | get_page_generation_context       | Read  | Live                       | Config ID, CAS, allowed rules tersedia         | PASS    |
 | LT-007 | Plan      | list_content_plans                | Read  | Live                       | Daftar plan sesuai filter                      | NOT RUN |
 | LT-008 | Plan      | create_content_plan               | Write | Owner-approved test plan   | Plan dan item tepat; readback                  | NOT RUN |
 | LT-009 | Plan      | get_content_plan                  | Read  | Live                       | Progress dan jadwal item konsisten             | NOT RUN |
@@ -30,7 +30,7 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 | LT-018 | Trivia    | trivia_release_facts              | Write | Abandoned test reservation | Unused reservation dilepas; tak ganggu alokasi | NOT RUN |
 | LT-019 | Trivia    | trivia_reverify_fact              | Write | Fixture preferred          | Evidence same-meaning diperbarui aman          | NOT RUN |
 | LT-020 | Trivia    | trivia_correct_fact               | Write | Fixture only by default    | Invalidate/successor benar; posts terdampak    | NOT RUN |
-| LT-021 | Post      | list_posts                        | Read  | Live                       | Status/filter/page match                       | NOT RUN |
+| LT-021 | Post      | list_posts                        | Read  | Live                       | Status/filter/page match                       | PASS    |
 | LT-022 | Post      | get_post                          | Read  | Live                       | Copy/checks/source/hash cocok                  | NOT RUN |
 | LT-023 | Post      | save_post                         | Write | Approved new draft         | Draft persisted sekali; get_post cocok         | NOT RUN |
 | LT-024 | Post      | revise_post                       | Write | Disposable draft           | CAS revision/hash; stale ditolak               | NOT RUN |
@@ -57,14 +57,14 @@ Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan conc
 
 ## Rekap kampanye
 
-| Indikator                   | Awal 21 Oktober 2026 |
-| --------------------------- | -------------------- |
-| Tool tersedia               | 33                   |
-| PASS live baru              | 0                    |
-| PASS CI/fixture kampanye    | 0                    |
-| FAIL terkonfirmasi          | 0                    |
-| BLOCKED (tool individual)   | 0                    |
-| NOT RUN (tool individual)   | 33                   |
-| Report perlu bukti tambahan | 1 — LT-E2E-01 / #26  |
+| Indikator                   | Per 21 Oktober 2026 |
+| --------------------------- | ------------------- |
+| Tool tersedia               | 33                  |
+| PASS live baru              | 5                   |
+| PASS CI/fixture kampanye    | 0                   |
+| FAIL terkonfirmasi          | 0                   |
+| BLOCKED (tool individual)   | 0                   |
+| NOT RUN (tool individual)   | 28                  |
+| Report perlu bukti tambahan | 1 — LT-E2E-01 / #26 |
 
 **Setiap status baris akan berubah hanya setelah tes kampanye direview dan direkam.** Pastikan ringkasan dan [results.md](results.md) diselaraskan setiap kali ada bukti baru.
