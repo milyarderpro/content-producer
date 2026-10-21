@@ -1,0 +1,8 @@
+{
+  "apps": {
+    "content-producer": {
+      "id": "asdk_app_6ad6ebeab5fc8191a1d2cd54b87cd96f",
+      "required": true
+    }
+  }
+}

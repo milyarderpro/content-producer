@@ -12,6 +12,8 @@ import {
   stateDigest,
 } from '../supabase/tests/database/helpers/plan-lifecycle.js';
 import {
+  content as postContent,
+  editorial as postEditorial,
   request as postRequest,
   cleanup as postCleanup,
 } from '../supabase/tests/database/helpers/post-rpc.js';
@@ -106,6 +108,15 @@ async function call(name: string, input: object, error?: string) {
     );
   return result?.structuredContent?.data;
 }
+async function rejectInactiveOwnerCall(name: string, input: object) {
+  const response = await rpcHttp('tools/call', { name, arguments: input });
+  check(
+    response.status === 403 &&
+      response.body.error?.code === 'OWNER_ACCESS_REQUIRED' &&
+      !response.body.result,
+    'INACTIVE_OWNER_HTTP_DENIAL',
+  );
+}
 async function rejectToolInput(name: string, input: object) {
   const response = await rpcHttp('tools/call', { name, arguments: input });
   check(response.status === 200, 'MCP_INVALID_TOOL_HTTP_STATUS');
@@ -178,7 +189,7 @@ async function inspector(method: string, name?: string, input?: object, expected
   check(!result.output.includes(bearer), 'INSPECTOR_BEARER_LEAK');
   check(
     result.code === expectedExit,
-    `INSPECTOR_EXIT_${method}_${name ?? 'handshake'}_${result.code}_EXPECTED_${expectedExit}`,
+    `INSPECTOR_EXIT_${method.replaceAll('/', '_').toUpperCase()}_${(name ?? 'handshake').toUpperCase()}_${result.code}_EXPECTED_${expectedExit}`,
   );
   const parsed = result.output.trim() ? JSON.parse(result.output) : {};
   console.info(`Inspector 2.5.0 ${method} ${name ?? ''}: exit ${result.code}`);
@@ -288,23 +299,20 @@ try {
         ).count;
       const pagesBefore = pageCount();
       const listing = await rpcHttp('tools/list');
-      // A direct tools/call must remain owner-scoped even without prior tools/list.
-      await call('get_account_profile', { request_schema_version: 1 }, 'OWNER_ACCESS_REQUIRED');
-      await call(
-        'create_page',
-        {
-          ...write(),
-          name: 'Inactive workspace must not create a Page',
-          slug: f.prefix + '-inactive-denied',
-          timezone: 'UTC',
-          target_markets: ['US'],
-          niche_key: 'trivia',
-          config_schema_version: 1,
-          config: defaultConfig,
-          make_default: false,
-        },
-        'OWNER_ACCESS_REQUIRED',
-      );
+      // CR-043 rejects direct calls at HTTP before MCP transport when the
+      // owner workspace is inactive; no write tool may reach its RPC.
+      await rejectInactiveOwnerCall('get_account_profile', {});
+      await rejectInactiveOwnerCall('create_page', {
+        ...write(),
+        name: 'Inactive workspace must not create a Page',
+        slug: f.prefix + '-inactive-denied',
+        timezone: 'UTC',
+        target_markets: ['US'],
+        niche_key: 'trivia',
+        config_schema_version: 1,
+        config: defaultConfig,
+        make_default: false,
+      });
       check(stateDigest(f) === before && pageCount() === pagesBefore, 'INACTIVE_WORKSPACE_MUTATED');
       return listing;
     } finally {
@@ -362,14 +370,14 @@ try {
   );
   const afterPage = row<{ read_count: number; write_count: number }>(
     `select
-      coalesce(max(request_count) filter (where limit_group='read'), 0)::integer read_count,
-      coalesce(max(request_count) filter (where limit_group='write'), 0)::integer write_count
+      coalesce(sum(request_count) filter (where limit_group='read'), 0)::integer read_count,
+      coalesce(sum(request_count) filter (where limit_group='write'), 0)::integer write_count
       from internal.rate_limit_buckets
       where actor_user_id='${f.owner}' and oauth_client_id='${client}'`,
   );
   check(
-    afterPage.read_count === 1 && afterPage.write_count > 0,
-    'WORKSPACE_DISCOVERY_MUST_USE_ONE_READ_AND_NOT_PROBE_EACH_TOOL_CALL',
+    afterPage.read_count === 5 && afterPage.write_count > 0,
+    'OWNER_CHECK_MUST_PRECEDE_EACH_TOOL_CALL',
   );
 
   const updatePageInput = {
@@ -1011,6 +1019,129 @@ try {
     'GET_PRIVATE_TOKEN_REDACTION',
   );
   console.info('POST_P5_POST_READ_PASSED');
+
+  // CR-046: use ONLY the public owner MCP read to supply the actual Page
+  // configuration identity and exact CAS timestamp for a fresh reserve + draft.
+  // This complete HTTP path runs against the ephemeral local fixture only.
+  clearFixtureBuckets();
+  console.info('CR046_STAGE_READ_CONTEXT_BEGIN');
+  const generationContext = await call('get_page_generation_context', {
+    ...common(),
+    page_public_id: f.page,
+    niche_key: 'trivia',
+    recent_post_limit: 12,
+  });
+  console.info('CR046_STAGE_READ_CONTEXT_PASS');
+  const storedContext = row<{ config_id: string; stamp: string }>(`
+    select c.public_id as config_id, internal.iso_timestamp_v1(c.updated_at) as stamp
+    from public.page_niche_configs c join public.pages p on p.id=c.page_id
+    where p.public_id='${f.page}' and c.workspace_id=p.workspace_id and c.niche_key='trivia'
+  `);
+  const ctxConfigId = generationContext.config_public_id as string;
+  const ctxStamp = generationContext.context_version.config_updated_at as string;
+  check(ctxConfigId === storedContext.config_id, 'CR046_PUBLIC_CONFIG_ID_MISMATCH');
+  check(ctxStamp === storedContext.stamp, 'CR046_PUBLIC_CONFIG_TIME_MISMATCH');
+  check(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/.test(ctxStamp), 'CR046_MICROSECOND_LOSS');
+  console.info('CR046_STAGE_CONTEXT_ROW_PASS');
+  const httpToken = randomUUID();
+  const httpFacts = Array.from({ length: 5 }, (_, index) =>
+    factInput(candidate(61 + index), index + 1),
+  );
+  console.info('CR046_STAGE_RESERVE_BEGIN');
+  const httpReservation = await call('trivia_register_and_reserve_facts', {
+    ...write(),
+    page_public_id: f.page,
+    reservation_token: httpToken,
+    expected_config_updated_at: ctxStamp,
+    fact_reuse_scope: generationContext.reuse_policy.scope,
+    reservation_ttl_minutes: generationContext.reuse_policy.reservation_ttl_minutes,
+    facts: httpFacts,
+  });
+  console.info('CR046_STAGE_RESERVE_RETURNED');
+  check(httpReservation.facts.length === 5, 'CR046_HTTP_RESERVATION_COUNT');
+  const httpBindings = httpReservation.facts.map(
+    (fact: { fact_public_id: string; canonical_claim: string }, index: number) => ({
+      position: index + 1,
+      fact_public_id: fact.fact_public_id,
+      fact_role: 'general',
+      rendered_text: fact.canonical_claim,
+    }),
+  );
+  const httpSnapshot = {
+    schema_version: 1,
+    module_version: generationContext.module.module_version,
+    config_schema_version: generationContext.module.config_schema_version,
+    content_schema_version: generationContext.module.content_schema_versions[0],
+    renderer_version: 1,
+    quality_gate_version: 1,
+    editorial_rubric_version: 1,
+    source_policy_version: 1,
+    dedup_contract_version: 1,
+    config_public_id: ctxConfigId,
+    config_updated_at: ctxStamp,
+    fact_count: generationContext.generation_rules.fact_count,
+    fact_count_applied: httpBindings.length,
+    fact_count_override: false,
+    text_budget: generationContext.generation_rules.text_budget,
+    fact_reuse_scope: generationContext.reuse_policy.scope,
+    profile_key: 'fast_trivia',
+    render_style: generationContext.generation_rules.render_style,
+    target_markets: generationContext.page.target_markets,
+    locale: generationContext.generation_rules.locale,
+    line_width_chars: 34,
+    target_video_seconds: 13,
+    override_reason: null,
+  };
+  console.info('CR046_STAGE_SAVE_BEGIN');
+  const httpSaved = await call('save_post', {
+    ...write(),
+    page_public_id: f.page,
+    niche_key: 'trivia',
+    reservation_token: httpToken,
+    expected_config_updated_at: ctxStamp,
+    plan_item: null,
+    scheduled_at: null,
+    content_schema_version: 1,
+    format_key: 'single_subject_fast',
+    topic_key: 'animals',
+    interaction_goal: 'share',
+    content_payload: postContent(httpBindings),
+    generation_snapshot: httpSnapshot,
+    fact_bindings: httpBindings,
+    editorial_checks: postEditorial(),
+  });
+  console.info('CR046_STAGE_SAVE_RETURNED');
+  const httpReadback = await call('get_post', {
+    ...common(),
+    post_public_id: httpSaved.post.post_public_id,
+  });
+  console.info('CR046_STAGE_READBACK_RETURNED');
+  check(
+    httpSaved.post.status === 'draft' && httpReadback.post.status === 'draft',
+    'CR046_HTTP_DRAFT_ONLY',
+  );
+  // get_post intentionally omits the private generation_snapshot projection.
+  // Verify the persisted snapshot on the same *local fixture* DB while keeping
+  // public MCP draft-readback assertions within its frozen output contract.
+  check(!('generation_snapshot' in httpReadback.post), 'CR046_PRIVATE_SNAPSHOT_REDACTED');
+  const savedSnapshot = row<{ config_id: string; stamp: string; status: string }>(`
+    select p.generation_snapshot->>'config_public_id' as config_id,
+      p.generation_snapshot->>'config_updated_at' as stamp, p.status
+    from public.posts p where p.public_id='${httpSaved.post.post_public_id}'
+  `);
+  check(
+    savedSnapshot.config_id === ctxConfigId &&
+      savedSnapshot.stamp === ctxStamp &&
+      savedSnapshot.status === 'draft',
+    'CR046_LOCAL_STORED_SNAPSHOT',
+  );
+  check(
+    httpReadback.post.fact_bindings.length === 5 &&
+      httpReadback.post.content_hash === httpSaved.post.content_hash,
+    'CR046_HTTP_FACT_BINDINGS',
+  );
+  console.info('CR-046 isolated public MCP context -> reservation -> save_post -> get_post: PASS');
+
   const another = postRequest(f);
   const second = await call('save_post', draftArgs(another));
   check(second.post.status === 'draft', 'SECOND_DRAFT');
@@ -1633,7 +1764,7 @@ try {
     await inspector('initialize');
     const listed = await inspector('tools/list');
     check(listed.tools.length === 33, 'INSPECTOR_CENSUS');
-    await inspector('tools/call', 'get_account_profile', { request_schema_version: 1 });
+    await inspector('tools/call', 'get_account_profile', {});
     await inspector('tools/call', 'get_workspace_context', common());
     await inspector('tools/call', 'list_pages', common());
     await inspector('tools/call', 'get_page_generation_context', {
@@ -1962,7 +2093,15 @@ try {
     );
 
     clearFixtureBuckets();
-    for (const tool of tools) await inspector('tools/call', tool.name, {}, 5);
+    for (const tool of tools) {
+      // OAuth profile and workspace bootstrap accept {}; retain one genuinely
+      // invalid call per tool without changing their production input schema.
+      const invalidArgs =
+        tool.name === 'get_account_profile' || tool.name === 'get_workspace_context'
+          ? { request_schema_version: 2 }
+          : {};
+      await inspector('tools/call', tool.name, invalidArgs, 5);
+    }
   }
   check(
     !logs.includes(bearer) &&

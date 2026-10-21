@@ -4,7 +4,7 @@
   "description": "Phase 10 connection data for the Phase 7 generator; never a stored credential or registered connection mapping.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["serverName", "endpointUrl", "oauth"],
+  "required": ["serverName", "endpointUrl", "authentication"],
   "properties": {
     "serverName": {
       "type": "string",
@@ -15,12 +15,12 @@
       "format": "uri",
       "pattern": "^https://"
     },
-    "oauth": {
+    "authentication": {
       "type": "object",
       "additionalProperties": false,
       "required": ["mode"],
       "properties": {
-        "mode": { "const": "discovery" }
+        "mode": { "const": "none" }
       }
     }
   }

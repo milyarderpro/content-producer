@@ -26,7 +26,7 @@ const manifest = JSON.parse(readFileSync(join(root, 'plugin.json'), 'utf8')) as 
 const connection = {
   serverName: 'content-producer',
   endpointUrl: 'https://mcp-fixture.integration-tools.net/functions/v1/mcp',
-  oauth: { mode: 'discovery' },
+  authentication: { mode: 'none' },
 };
 
 describe('Phase 7.1 portable plugin manifest', () => {
@@ -38,12 +38,19 @@ describe('Phase 7.1 portable plugin manifest', () => {
   });
 
   it('rejects empty metadata, nonportable fields and incorrect schema', () => {
+    const openaiInterface = (manifest.extensions as { 'com.openai': { interface: unknown } })[
+      'com.openai'
+    ].interface;
     for (const bad of [
       { ...manifest, name: '' },
       { ...manifest, description: ' ' },
       { ...manifest, $schema: 'unknown' },
       { ...manifest, mcpServers: {} },
       { ...manifest, version: 'latest' },
+      {
+        ...manifest,
+        extensions: { 'com.openai': { interface: openaiInterface, apps: './invalid.json' } },
+      },
     ]) {
       expect(() => validatePortableManifest(bad, root)).toThrow();
     }
@@ -67,7 +74,7 @@ describe('Phase 7.1 portable plugin manifest', () => {
 });
 
 describe('Phase 7.1 portable MCP generator', () => {
-  it('produces one named streamable-http server with discovery-only OAuth input', () => {
+  it('produces one named streamable-http server with No-auth input', () => {
     const config = generatePortableMcpConfig(connection);
     expect(config).toEqual({
       $schema: MCP_SCHEMA,
@@ -82,14 +89,15 @@ describe('Phase 7.1 portable MCP generator', () => {
     expect(JSON.stringify(config)).not.toMatch(/clientId|clientSecret|token|Authorization|oauth/i);
   });
 
-  it('rejects missing data, unexpected credentials and wrong OAuth strategy', () => {
+  it('rejects missing data, credentials and OAuth input', () => {
     for (const bad of [
       {},
       { ...connection, serverName: '' },
       { ...connection, serverName: '../mcp' },
-      { ...connection, oauth: {} },
-      { ...connection, oauth: { mode: 'provided' } },
-      { ...connection, oauth: { mode: 'discovery', clientId: 'forbidden' } },
+      { ...connection, authentication: {} },
+      { ...connection, authentication: { mode: 'oauth' } },
+      { ...connection, authentication: { mode: 'none', clientSecret: 'forbidden' } },
+      { ...connection, oauth: { mode: 'discovery' } },
       { ...connection, registeredConnectionId: 'forbidden' },
     ]) {
       expect(() => generatePortableMcpConfig(bad)).toThrow();
@@ -115,7 +123,7 @@ describe('Phase 7.1 portable MCP generator', () => {
     }
   });
 
-  it('rejects invalid portable configurations and never writes final MCP source', () => {
+  it('rejects invalid portable configurations and validates final MCP source', () => {
     const generated = generatePortableMcpConfig(connection);
     expect(() =>
       validatePortableMcpConfig({
@@ -129,6 +137,9 @@ describe('Phase 7.1 portable MCP generator', () => {
         mcpServers: { x: { type: 'streamable-http', url: connection.endpointUrl, oauth: {} } },
       }),
     ).toThrow();
+    // Legacy generator remains testable, but the 0.2.1 package uses a
+    // registered MCP application instead of bundling another remote MCP.
     expect(existsSync(join(root, 'mcp.json'))).toBe(false);
+    expect(existsSync(join(root, '.app.json'))).toBe(true);
   });
 });

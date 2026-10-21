@@ -440,6 +440,32 @@ describe('Phase 5.2 owner-scoped read projections', () => {
       expect(context.data.recent_variety.length).toBeGreaterThan(0);
       expect(context.data.reuse_policy.eligible_fact_count).toBe(0);
 
+      // CR-046: each owner-scoped Page must return its own persisted niche
+      // configuration UUID. Never accept a different Page's ID or invent one.
+      const returnedConfigIds = new Set<string>();
+      for (const pageId of fixture.pagePublicIds) {
+        const pageContext = rpc(
+          fixture.owner,
+          `api.get_page_generation_context(1, '${fixture.workspacePublicId}'::uuid, '${pageId}'::uuid, 'trivia', 2, null, null, null, null)`,
+        );
+        const stored = querySingleRow(`
+          select c.public_id as config_public_id, internal.iso_timestamp_v1(c.updated_at) as config_updated_at
+          from public.page_niche_configs c
+          join public.pages p on p.id = c.page_id and p.workspace_id = c.workspace_id
+          where p.workspace_id = (select id from public.workspaces where public_id = '${fixture.workspacePublicId}'::uuid)
+            and p.public_id = '${pageId}'::uuid and c.niche_key = 'trivia'
+        `);
+        const actualId = String(pageContext.data.config_public_id);
+        expect(actualId).toBe(String(stored.config_public_id));
+        expect(actualId).toMatch(/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/);
+        expect(pageContext.data.context_version.config_updated_at).toBe(stored.config_updated_at);
+        expect(String(pageContext.data.context_version.config_updated_at)).toMatch(
+          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/,
+        );
+        returnedConfigIds.add(actualId);
+      }
+      expect(returnedConfigIds.size).toBe(fixture.pagePublicIds.length);
+
       const planFirst = rpc(
         fixture.owner,
         `api.list_content_plans(1, '${fixture.workspacePublicId}'::uuid, null, null, null, null, null, null, 1, null)`,

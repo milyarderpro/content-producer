@@ -1173,11 +1173,15 @@ opsional setelah MVP menurut CR-027.
 
 Jalankan checkpoint kecil 10.0–10.7 sesuai
 `plans/works/phase-10-implementation-plan.md`, satu task per checkpoint.
-10.0 harus memverifikasi bahwa akun ChatGPT pemilik benar-benar mendukung
-custom MCP private, instalasi plugin/skill, OAuth, dan aksi tulis. Asumsi
-ChatGPT Plus pada PRD §34 belum merupakan bukti kemampuan host. Bila jalur
-write tidak tersedia, hentikan Phase 10 dan rekonsiliasi keputusan host/akun;
-jangan mengganti uji plugin dengan SQL administrator.
+Menurut CR-028, 10.0 membuktikan formulir custom MCP/OAuth dan jalur
+GitHub Actions artifact ke penerima plugin private, **tanpa** membuat koneksi
+atau memasang paket final. Setelah koneksi/OAuth awal 10.1, periksa
+ketersediaan tool write dan persetujuan owner secara baca-saja **sebagai gate
+pertama**, sebelum pemanggilan tool baca biasa atau persiapan paket. Jika
+tidak terbukti, hentikan 10.1. Paket final dipasang pada 10.2; write bisnis
+pertama hanya pada MAN-02 dengan payload Page yang disetujui. Asumsi Plus
+pada PRD §34 bukan bukti izin write; jangan pakai SQL administrator sebagai
+jalan pintas.
 
 CR-019 menunda koneksi staging dan private test plugin Phase 8. CR-020/CR-027
 menetapkan sembilan kartu manual wajib setelah plugin final terpasang, dengan
@@ -1196,8 +1200,10 @@ owner tidak dibebankan pada pemilik; denial tersebut dibuktikan otomatis.
 5. Memvalidasi, membuat artifact final, lalu membimbing instalasi private plugin.
 6. Menyiapkan sembilan kartu wajib `MAN-01..MAN-09` menurut CR-020/CR-027.
    Pertahankan `MAN-10..MAN-11` sebagai panduan observasi opsional setelah MVP.
-   Bekukan prompt atau urutan singkat, prasyarat, expected tool/behavior, hasil terlarang,
-   pemeriksaan state yang sederhana, dan recovery sebelum uji dimulai.
+   Bekukan prosedur dan urutan langkah, prasyarat, expected tool/behavior,
+   hasil terlarang, pemeriksaan state dan recovery pada 10.0. Ikat nilai
+   Page/konten/jadwal sesaat sebelum kartu yang menggunakannya dan bekukan
+   prompt persis itu sebelum dieksekusi, sesuai CR-028.
    `MAN-01..MAN-09` mencakup koneksi/owner, Page, draft dan sumber, revisi/
    approval, plan dan jadwal, resume chat baru, copy/editorial, ambiguitas,
    serta permintaan publikasi otomatis atau sumber berbahaya. Kartu opsional
@@ -1487,7 +1493,7 @@ Implementasi MVP selesai hanya jika:
 
 ## 16. Phase tracker
 
-Status terkini per 18 Oktober 2026. Bagian ini adalah tracker yang diperbarui
+Status terkini per 19 Oktober 2026. Bagian ini adalah tracker yang diperbarui
 seiring kemajuan proyek; CR-019 mengesampingkan gate Phase 8 historis di atas,
 sedangkan CR-020 memperjelas gate Phase 9–11 dan status pilot. Runbook dan
 laporan lama mencatat keadaan pada saat ditulis, bukan status terkini.
@@ -1504,10 +1510,29 @@ laporan lama mencatat keadaan pada saat ditulis, bukan status terkini.
 | 7 — Plugin skill/package source | Complete | Source/package candidate validation dan audit independen lulus | Checkpoint 7.0–7.4 lulus pada `codex/phase-7-plugin`. [Gate akhir pada `b2766bfd` sukses](https://github.com/milyarderpro/content-producer/actions/runs/38707892003): 27/27 unit tests, 58/58 MCP tests, 172/172 database tests, clean reset 67 migration, dan validasi kandidat 12 file. [Audit independen pada SHA yang sama lulus](https://github.com/milyarderpro/content-producer/pull/4#issuecomment-6188726374). Koneksi hosted dan paket final tetap pada Phase 9–10; lihat [Issue #3](https://github.com/milyarderpro/content-producer/issues/3). |
 | 8 — Full verification | Deferred by CR-019 | Gate CR-018 tidak lagi menjadi syarat MVP; 8.0 tetap BLOCKED, bukan PASS | [CR-019](../docs/decisions/2026-10-15-phase-8-manual-acceptance-resequencing.md); [8.0 preflight](../docs/phase-8/preflight-8.0.md) dan coverage map dipertahankan sebagai bukti persiapan; live E3/E4/101 belum dijalankan (Issue #5). |
 | 9 — Production deployment | **Complete** (Phase 9) | Checkpoint 9.0–9.5 selesai dalam cakupan Phase 9; gate teknis/security dan hosted PASS, audit independen 9.5 PASS | [Final release `be3bf04b703a4aff16510c496600c9796c13b57a`](https://github.com/milyarderpro/content-producer/commit/be3bf04b703a4aff16510c496600c9796c13b57a), [full final-SHA gate #39085571345 SUCCESS](https://github.com/milyarderpro/content-producer/actions/runs/39085571345), [laporan implementasi 9.5](https://github.com/milyarderpro/content-producer/issues/8#issuecomment-6244399653), [audit independen 9.5 PASS](https://github.com/milyarderpro/content-producer/issues/20#issuecomment-6244579966), [Issue #8](https://github.com/milyarderpro/content-producer/issues/8). Production frontend HTTPS `https://content-producer-auth-frontend.vercel.app/` menunjuk deployment aman [READY `dpl_CWyhYgNn7zfxNGkWaHZhqZjhTQxo`](https://vercel.com/creator-03a9/content-producer-auth-frontend/CWyhYgNn7zfxNGkWaHZhqZjhTQxo) pada SHA tersebut; kedua flag sementara `PHASE95_ENABLED` dan `PHASE95_WRITE_ENABLED` OFF. Hosted 68/68 migration, 33 RPC/MCP tools, 15/15 RLS tables, owner OAuth/PKCE dan 3 reads terbukti; satu owner-MCP `create_page` yang disetujui menghasilkan tepat satu Page, satu config dan satu ledger, tanpa post/plan/fact/reservation/metric. Phase 9 Complete **bukan** Pilot-ready atau MVP Complete. |
-| 10 — MCP connection/package/pilot | Not started | Plugin final terpasang; `MAN-01..MAN-09` untuk `Pilot-ready`; `MAN-10..MAN-11` opsional setelah MVP | CR-020/CR-027; [runbook 10.0–10.7](works/phase-10-implementation-plan.md) sudah disusun, panduan prompt kartu dan bukti eksekusi belum dibuat. |
+| 10 — MCP connection/package/pilot | **In progress — 10.0–10.6 PASS; 10.7 PENDING** | **Current:** PRIVATE Content Producer v0.2.2 is bound to owner OAuth `mcpku2`; 33 tools and owner reads were shown in ChatGPT. MAN-03 saved one source-verified Moon draft on `corious-facts`; MAN-04 revised the hook with exact CAS and obtained separate owner approval. Independent OAuth readback confirms post `f58017bb-60ae-476d-afa7-65f8f0c6c3b8` is `ready`, revision 3, with passing system/editorial checks, no schedule or publication. CR-048 accepts the direct Codex `mcpku2` business trace plus prior private-plugin host proof for 10.4, while explicitly recording the missing fresh ChatGPT parent-plugin write trace. MAN-05/06 and MAN-07/08/09 PASS; Pilot-ready and MVP Complete remain pending. | Backend SHA `73087c33e8b20b663e6944f6ca89d0b591eebf44`, [CR-020 gate #39411054462 PASS](https://github.com/milyarderpro/content-producer/actions/runs/39411054462), production Edge `mcp` v31. [MAN-03/04 evidence](https://github.com/milyarderpro/content-producer/issues/22#issuecomment-6291191224); [CR-048](../docs/decisions/2026-10-20-phase-10-4-owner-oauth-evidence-acceptance.md). Historical 10.3 ledger/secret inventory gaps and 10.4 host-attribution limit remain for audit 10.7. **AC-001..014 PENDING**. MAN-05 created exactly one approved three-slot plan; fresh ChatGPT MAN-06 OAuth readback confirmed all three item IDs, ordered WIB schedules and the unchanged ready Moon post. Checkpoint 10.5 PASS; AC-007/008 still PENDING (seven processed posts / seven days), 10.6 PASS; 10.7 PENDING. MAN-07 editorial sign-off, MAN-08 safe ambiguity clarification and MAN-09 injection/autopublish refusal passed with owner-scoped unchanged state, 0 MAN-09 business Write calls; ledger/reservation inspection limits remain for 10.7. [MAN-09 evidence](../docs/phase-10/manual-results.md). No business writes or heavy CI in MAN-06/07/08/09. |
+
 | 11 — Stabilization | Not started | Operasional, backup/rollback, handoff, seluruh AC dan `MVP Complete` disetujui tanpa menunggu publikasi/metrik nyata | CR-020/CR-027; belum dimulai. |
 
-**Batas Phase 9 dan risiko residual (18 Oktober 2026):** Seluruh **14 acceptance criteria MVP, AC-001..AC-014, tetap PENDING** untuk pembuktian Phase 10–11 menurut CR-020/CR-027, sekalipun beberapa sub-gate teknis Phase 9 sudah PASS. Phase 10 belum dimulai: integrasi ChatGPT custom MCP, paket plugin final, dan `MAN-01..MAN-09` diperlukan sebelum `Pilot-ready`; Phase 11/handoff diperlukan sebelum `MVP Complete`. Publikasi Facebook dan metrik nyata pada `MAN-10..MAN-11` adalah observasi opsional setelah MVP, bukan gate. Phase 8 tetap **Deferred by CR-019** dan 101 prompt hanya inventaris regresi. Residual yang belum selesai: dua klien OAuth uji masih aktif dan perlu review/retirement terotorisasi; Security Advisor tetap melaporkan WARN pada 33 SECURITY DEFINER RPC yang disengaja dan WARN perlindungan leaked password nonaktif; bukti restore terisolasi PostgreSQL tidak mencakup pemulihan penuh Supabase Auth/Storage/Edge/secrets maupun Page pilot terbaru. Audit PASS mengakui batas ini, bukan menutupnya; callback pilot disabled (HTTP 404 berasal dari bukti operator yang dikorelasikan auditor dengan alias/deployment/flags). Tidak ada pencabutan klien uji, deploy, atau operasi production sebagai bagian dari penutupan dokumentasi ini.
+**Batas Phase 9–10 dan risiko residual (20 Oktober 2026):** Seluruh
+**14 acceptance criteria MVP, AC-001..AC-014, tetap PENDING** untuk
+pembuktian Phase 10–11 menurut CR-020/CR-027. Phase 10.0–10.6 PASS; MAN-01..MAN-09 sudah mempunyai bukti PASS. Phase 10.7 masih PENDING. Production `mcp` sekarang default owner
+OAuth, dengan plugin v0.2.2 / `mcpku2`; bukti No-auth lama tetap sejarah
+CR-032, bukan instruksi koneksi saat ini. Grant fixed-pilot CR-037/038
+tidak dijalankan pada jalur OAuth, sehingga MAN-03/04 tidak memerlukan
+aktivasi/pencabutan grant manual. Tetap wajib ada tindakan owner yang
+jelas untuk tiap kartu, dan review terpisah atas versi/hash aktual
+sebelum approval editorial. MAN-03/04 telah membuktikan write OAuth owner, revisi CAS dan approval pada post yang sama; CR-048 mencatat batas atribusi host. Hasil ini belum menyelesaikan acceptance MVP. Publikasi Facebook dan
+metrik nyata pada MAN-10/11 hanya observasi opsional pasca-MVP.
+Phase 8 tetap **Deferred by CR-019** dan 101 prompt hanya inventaris
+regresi. Risiko residual yang masih perlu dinilai: dua klien OAuth uji
+aktif, peringatan Security Advisor pada 33 SECURITY DEFINER RPC yang
+disengaja dan perlindungan leaked password nonaktif, serta bukti
+restore PostgreSQL terisolasi yang belum mencakup seluruh komponen
+Supabase maupun data Page terbaru. Phase 9 audit PASS menerima batas
+ini; tidak menyatakan risikonya hilang. Gap ledger/secret MAN-02 dibawa
+ke audit 10.7. Tidak ada Pilot-ready sebelum sembilan kartu dan audit
+independen PASS; Phase 11 mengatur MVP Complete.
 
 Phase 5 ditutup atas keputusan pengguna setelah gate lokal terakhir lulus dan
 perubahan di-commit sebagai `04f6373`. Laporan remediasi yang lebih awal masih

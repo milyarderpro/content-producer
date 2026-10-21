@@ -14,11 +14,13 @@ import { dirname, join, relative, resolve, sep } from 'node:path';
 import { validatePortableManifest } from './plugin-config.js';
 
 const skillRoot = 'skills/content-producer/';
+const registeredMcpAppId = 'asdk_app_6ad6ebeab5fc8191a1d2cd54b87cd96f';
 const core = ['workflow', 'lifecycle', 'tool-sequences', 'source-policy', 'output-contract'];
 const trivia = ['content-dna', 'formats', 'fact-checking', 'dedup-ontology', 'quality-rubric'];
 
 export const CANDIDATE_FILES = [
   'plugin.json',
+  '.app.json',
   skillRoot + 'SKILL.md',
   ...core.map((name) => skillRoot + 'references/core/' + name + '.md'),
   ...trivia.map((name) => skillRoot + 'references/niches/trivia/' + name + '.md'),
@@ -108,9 +110,22 @@ export function validatePluginSource(
     if (!lstatSync(join(pluginRoot, path)).isFile())
       throw new Error('Invalid plugin file: ' + path);
   }
-  for (const deferred of ['mcp.json', 'connections.json', 'connection-mapping.json']) {
+  for (const deferred of ['mcp.json', '.mcp.json', 'connections.json', 'connection-mapping.json']) {
     if (existsSync(join(pluginRoot, deferred)))
       throw new Error('Deferred connection configuration is forbidden: ' + deferred);
+  }
+
+  const appContent = read(pluginRoot, '.app.json');
+  const expectedApps =
+    JSON.stringify(
+      { apps: { 'content-producer': { id: registeredMcpAppId, required: true } } },
+      null,
+      2,
+    ) + '\n';
+  if (appContent !== expectedApps) {
+    throw new Error(
+      'Registered app mapping must use the proven owner OAuth mcpku2 ID exclusively.',
+    );
   }
 
   const manifest = JSON.parse(read(pluginRoot, 'plugin.json')) as unknown;
@@ -150,10 +165,10 @@ export function validatePluginSource(
     inputSchema.$schema !== 'https://json-schema.org/draft/2020-12/schema' ||
     inputSchema.additionalProperties !== false ||
     JSON.stringify(inputSchema.required) !==
-      JSON.stringify(['serverName', 'endpointUrl', 'oauth']) ||
-    inputSchema.properties?.oauth?.additionalProperties !== false ||
-    JSON.stringify(inputSchema.properties?.oauth?.required) !== JSON.stringify(['mode']) ||
-    inputSchema.properties?.oauth?.properties?.mode?.const !== 'discovery'
+      JSON.stringify(['serverName', 'endpointUrl', 'authentication']) ||
+    inputSchema.properties?.authentication?.additionalProperties !== false ||
+    JSON.stringify(inputSchema.properties?.authentication?.required) !== JSON.stringify(['mode']) ||
+    inputSchema.properties?.authentication?.properties?.mode?.const !== 'none'
   ) {
     throw new Error('MCP connection-input generator schema drift.');
   }

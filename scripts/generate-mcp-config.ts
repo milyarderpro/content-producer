@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { generatePortableMcpConfig } from './plugin-config.js';
 
-// Usage (Phase 10, after endpoint and OAuth discovery are verified):
-// pnpm exec tsx scripts/generate-mcp-config.ts < verified-connection.json > temporary-mcp.json
-// Writes JSON to stdout only; never creates plugin/mcp.json in the source tree.
+// Usage: pnpm exec tsx scripts/generate-mcp-config.ts < verified-noauth-input.json
+// Input requires authentication.mode = 'none' and no OAuth/credentials.
+// Source plugin/mcp.json must match the known Phase 10.1 production endpoint.
 try {
   if (process.argv.length !== 2) {
     throw new Error('Read connection JSON from stdin; no command-line credentials or paths.');

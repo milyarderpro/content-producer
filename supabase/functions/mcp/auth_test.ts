@@ -1,10 +1,10 @@
 import {
+  type AuthDependencies,
   authenticateRequest,
   authenticateVerifiedRequest,
   AuthRejection,
-  WorkspaceCheckFailure,
-  type AuthDependencies,
   type OAuthConfig,
+  WorkspaceCheckFailure,
 } from './auth.ts';
 import { handleHttpRequest } from './http.ts';
 import { checkActiveOwnerWorkspace, createEdgeHandler } from './edge.ts';
@@ -193,7 +193,10 @@ Deno.test('6.2 discovery and 401 WWW-Authenticate bind exact resource', async ()
     config,
   });
   assert(missing.status === 401, 'missing token admitted');
-  const challenge = 'Bearer resource_metadata="' + metadataUrl + '"';
+  const challenge =
+    'Bearer resource_metadata="' +
+    metadataUrl +
+    '", error="insufficient_scope", error_description="Sign in to continue"';
   assert(missing.headers.get('WWW-Authenticate') === challenge, 'wrong challenge');
   const payload = await missing.json();
   assert(payload._meta['mcp/www_authenticate'][0] === challenge, 'MCP metadata mismatch');
@@ -211,6 +214,70 @@ Deno.test('6.2 discovery and 401 WWW-Authenticate bind exact resource', async ()
   );
   assert(MCP_TOOL_COUNT === 33, '6.12 must have 33 owner-scoped tools');
 });
+
+Deno.test(
+  '10.1 mixed discovery lists 33 OAuth-only tools without a token and denies calls',
+  async () => {
+    let ownerChecks = 0;
+    const handler = createEdgeHandler(config, { keys: [] }, () => {
+      ownerChecks++;
+      return Promise.resolve(workspace);
+    });
+    const post = (method: string, params?: object) =>
+      handler(
+        new Request(config.resource, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json, text/event-stream',
+          },
+          body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, ...(params ? { params } : {}) }),
+        }),
+      );
+    const initialized = await post('initialize', {
+      protocolVersion: '2025-06-18',
+      capabilities: {},
+      clientInfo: { name: 'mixed-auth-test', version: '1' },
+    });
+    assert(
+      initialized.status === 200 && (await initialized.text()).includes('serverInfo'),
+      'public initialize',
+    );
+    const listed = await post('tools/list');
+    assert(listed.status === 200, 'public tools/list');
+    const event = (await listed.text()).split('\n').find((line) => line.startsWith('data: '));
+    assert(event, 'missing tools/list event');
+    const tools = JSON.parse(event.slice(6)).result?.tools;
+    assert(Array.isArray(tools) && tools.length === 33, 'public catalog count');
+    assert(new Set(tools.map((tool: { name: string }) => tool.name)).size === 33, 'duplicate tool');
+    assert(
+      tools.some((tool: { name: string }) => tool.name === 'create_page'),
+      'create_page absent',
+    );
+    for (const tool of tools) {
+      assert(
+        tool.securitySchemes?.length === 1 && tool.securitySchemes[0].type === 'oauth2',
+        'public tool must require OAuth',
+      );
+      assert(
+        JSON.stringify(tool.securitySchemes) === JSON.stringify(tool._meta?.securitySchemes),
+        'OAuth mirror',
+      );
+    }
+    const denied = await post('tools/call', { name: 'create_page', arguments: {} });
+    assert(
+      denied.status === 200 && denied.headers.has('WWW-Authenticate'),
+      'anonymous call must challenge',
+    );
+    const deniedBody = await denied.json();
+    assert(deniedBody.result?.isError === true, 'anonymous call must be a tool error');
+    assert(
+      deniedBody.result?._meta?.['mcp/www_authenticate']?.[0]?.includes('error_description='),
+      'tool-level OAuth challenge is missing',
+    );
+    assert(ownerChecks === 0, 'anonymous discovery or call reached owner RPC');
+  },
+);
 
 Deno.test(
   '6.2 signature issuer audience expiry nbf scope client and active owner are enforced',
@@ -358,9 +425,85 @@ Deno.test(
         method === 'initialize' ? body.includes('serverInfo') : body.includes('list_pages'),
         'invalid transport response',
       );
+      if (method === 'tools/list') {
+        const frame = body.split('\n').find((line) => line.startsWith('data: '));
+        assert(frame, 'signed owner tools/list frame missing');
+        const tools = JSON.parse(frame.slice(6)).result.tools;
+        assert(tools.length === 33, 'signed owner must see exactly 33 tools');
+        assert(
+          tools.some((tool: { name: string }) => tool.name === 'create_page'),
+          'write tool absent',
+        );
+        for (const tool of tools) {
+          assert(tool.securitySchemes?.[0]?.type === 'oauth2', 'top-level OAuth missing');
+          assert(
+            JSON.stringify(tool.securitySchemes) === JSON.stringify(tool._meta.securitySchemes),
+            'OAuth compatibility mirror differs',
+          );
+        }
+      }
     }
   },
 );
+
+Deno.test('CR-043 OAuth tool calls resolve and enforce the active owner workspace', async () => {
+  const { claims, dependencies, sign } = await fixture();
+  const jwks = await dependencies.loadKeys!(config.jwksUrl);
+  const token = await sign(claims);
+  let ownerChecks = 0;
+  let rpcCalls = 0;
+  let rpcWorkspace: unknown;
+  const handler = createEdgeHandler(config, jwks, (_config, _token, actor) => {
+    ownerChecks++;
+    assert(actor === owner, 'owner check received another actor');
+    return Promise.resolve(workspace);
+  });
+  const call = (handle: ReturnType<typeof createEdgeHandler>, name: string, args: object) =>
+    handle(
+      new Request(config.resource, {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/event-stream',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 17,
+          method: 'tools/call',
+          params: { name, arguments: args },
+        }),
+      }),
+    );
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (_input, init) => {
+    rpcCalls++;
+    const body = JSON.parse(String(init?.body));
+    rpcWorkspace = body.p_workspace_public_id;
+    return Promise.resolve(Response.json({ error: 'fixture unavailable' }, { status: 503 }));
+  };
+  try {
+    const context = await call(handler, 'get_workspace_context', {});
+    const contextBody = await context.text();
+    assert(context.status === 200, 'owner context call must reach MCP transport');
+    assert(ownerChecks === 1, 'tool call skipped owner workspace check');
+    assert(rpcCalls === 1 && rpcWorkspace === workspace, 'read RPC missed server owner workspace');
+    assert(!contextBody.includes('OWNER_ACCESS_REQUIRED'), 'owner bootstrap rejected before RPC');
+
+    const foreign = await call(handler, 'get_workspace_context', {
+      workspace_public_id: other,
+    });
+    assert((await foreign.text()).includes('OWNER_ACCESS_REQUIRED'), 'foreign workspace accepted');
+    assert(rpcCalls === 1, 'foreign workspace reached read RPC');
+
+    const inactive = createEdgeHandler(config, jwks, () => Promise.resolve(null));
+    const denied = await call(inactive, 'get_workspace_context', {});
+    assert(denied.status === 403, 'inactive owner workspace admitted to tool call');
+    assert(rpcCalls === 1, 'inactive owner reached read RPC');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
 
 Deno.test('9.5 upstream-verified claims retain exact MCP and owner checks', async () => {
   const { claims, dependencies, sign } = await fixture();
@@ -464,14 +607,14 @@ Deno.test(
     const noToken = await handle(
       new Request(config.resource, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/event-stream',
+        },
         body: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }),
       }),
     );
-    assert(
-      noToken.status === 401 && noToken.headers.has('WWW-Authenticate'),
-      'missing token must receive protected-resource challenge',
-    );
+    assert(noToken.status === 200, 'mixed-mode tools/list must be public');
 
     for (const invalidToken of [
       await sign(claims, true),

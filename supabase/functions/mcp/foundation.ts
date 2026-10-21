@@ -1,9 +1,12 @@
 // Phase 6.3: read-only MCP facade over the frozen Phase 5 api RPC contracts.
-// No business SQL, service-role credential, identity override, or secondary rate limiter.
+// No business rules or service-role RPC bypass; CR-032 uses a scoped pilot DB adapter.
 import * as z from 'npm:zod@4.3.6';
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { triviaConfig, workspaceSettings } from './schemas.ts';
+import { executePilotRpc } from './pilot_db.ts';
+import { isApprovedMan02CreatePage } from './pilot_write.ts';
+import { isApprovedPilot104Write } from './pilot_write_10_4.ts';
 
 const publicId = z
   .string()
@@ -14,8 +17,17 @@ const timestamp = z.string().datetime({ offset: true });
 const cursor = z.string().min(1).max(512);
 const version = z.literal(1);
 const common = { request_schema_version: version, workspace_public_id: publicId };
-const profileInput = z.strictObject({ request_schema_version: version });
+// ChatGPT calls the designated profile tool with {}. Keep the versioned RPC
+// contract behind this MCP-only adapter.
+const profileInput = z.strictObject({});
 const workspaceInput = z.strictObject(common);
+// OAuth profile must contain ONLY documented identity fields, so bootstrap
+// the workspace with an authenticated context read that resolves its owner
+// scope on the server. Keep the existing No-auth input unchanged.
+const oauthWorkspaceInput = z.strictObject({
+  request_schema_version: version.optional(),
+  workspace_public_id: publicId.optional(),
+});
 const pagesInput = z.strictObject({
   ...common,
   query: z.string().trim().min(1).max(120).optional(),
@@ -58,7 +70,7 @@ const pageFields = {
   enabled_niches: z.array(niche),
   updated_at: timestamp,
 };
-const profileOutput = response(
+const rpcProfileOutput = response(
   z.strictObject({
     profile: z.strictObject({
       id: z.string().min(1).max(200),
@@ -70,6 +82,18 @@ const profileOutput = response(
     }),
   }),
 );
+const profileFields = {
+  id: z.string().min(1).max(200).regex(/\S/),
+  name: z.string().min(1).max(120).optional(),
+  nickname: z.string().min(1).max(120).optional(),
+};
+const oauthProfileOutput = z.strictObject(profileFields);
+// CR-032 No-auth workspace discovery is kept byte-compatible with the old
+// pilot contract; only OAuth's marked profile uses OpenAI's closed shape.
+const pilotProfileOutput = z.strictObject({
+  ...profileFields,
+  workspace_public_id: publicId, // CR-032 No-auth workspace bootstrap only
+});
 const moduleCatalog = z.strictObject({
   niche_key: nicheKey,
   display_name: z.string(),
@@ -118,6 +142,7 @@ const contextOutput = response(
       content_schema_versions: z.array(z.number().int().min(1)),
       capabilities: z.array(z.string()),
     }),
+    config_public_id: publicId,
     config: triviaConfig,
     generation_rules: z.strictObject({
       allowed_topics: triviaConfig.shape.allowed_topics,
@@ -171,6 +196,11 @@ const securitySchemes = [{ type: 'oauth2', scopes: ['openid', 'email'] }];
 const annotations = { readOnlyHint: true, destructiveHint: false, openWorldHint: false };
 const safeErrors = {
   AUTH_REQUIRED: ['Connection authentication is required.', false, 'Relink the account.'],
+  PILOT_WRITE_LOCKED: [
+    'Pilot business writes are disabled during Phase 10.1.',
+    false,
+    'Obtain action-specific owner approval at MAN-02 before enabling business writes.',
+  ],
   OWNER_ACCESS_REQUIRED: [
     'Only the connected workspace owner may access this resource.',
     false,
@@ -462,37 +492,74 @@ export async function invoke(
     params.p_workspace_public_id !== context.workspacePublicId
   )
     return failure('OWNER_ACCESS_REQUIRED');
-  try {
-    const rpc = await fetch(context.supabaseUrl + '/rest/v1/rpc/' + tool, {
-      method: 'POST',
-      redirect: 'error',
-      signal: AbortSignal.timeout(10000),
-      headers: {
-        apikey: context.publishableKey,
-        Authorization: 'Bearer ' + context.accessToken,
-        'Content-Type': 'application/json',
-        'Accept-Profile': 'api',
-        'Content-Profile': 'api',
-      },
-      body: JSON.stringify(params),
-    });
-    const rawText = await rpc.text();
-    if (new TextEncoder().encode(rawText).byteLength > 256 * 1024) {
-      return failure('DATABASE_UNAVAILABLE');
-    }
-    let raw: unknown;
+  if (
+    context.pilotMode &&
+    !tool.startsWith('get_') &&
+    !tool.startsWith('list_') &&
+    tool !== 'trivia_find_similar_facts'
+  ) {
+    // Default closed. Never accept a grant from tool arguments or HTTP.
+    // Only the Edge Function's server-side setting may authorize the exact
+    // MAN-02 create_page RPC, including the fixed workspace and operation key.
+    let grant = '';
     try {
-      raw = JSON.parse(rawText);
+      grant = Deno.env.get('MCP_MAN02_APPROVED_SHA256') ?? '';
     } catch {
-      return failure('DATABASE_UNAVAILABLE');
+      // Deno's restricted test runtime, or an unavailable env, stays locked.
     }
-    if (!rpc.ok) {
-      const message =
-        raw && typeof raw === 'object' && 'message' in raw
-          ? (raw as { message: unknown }).message
-          : null;
-      if (isSafeError(message)) return failure(message);
-      return failure(rpc.status === 401 ? 'AUTH_REQUIRED' : 'DATABASE_UNAVAILABLE');
+    // Each CR-038 stage has its own short-lived, default-absent, scoped permit.
+    // No grant is sent over HTTP. This does not authenticate the public caller.
+    const phase104Approved = await isApprovedPilot104Write(tool, params, (name) => {
+      try {
+        return Deno.env.get(name);
+      } catch {
+        return undefined;
+      }
+    });
+    if (!(await isApprovedMan02CreatePage(tool, params, grant)) && !phase104Approved) {
+      return failure('PILOT_WRITE_LOCKED');
+    }
+  }
+  try {
+    let raw: unknown;
+    if (context.pilotMode) {
+      try {
+        raw = await executePilotRpc(tool, params, context.actorUserId);
+      } catch (error) {
+        const safe = error instanceof Error ? error.message : '';
+        return failure(isSafeError(safe) ? safe : 'DATABASE_UNAVAILABLE');
+      }
+    } else {
+      const rpc = await fetch(context.supabaseUrl + '/rest/v1/rpc/' + tool, {
+        method: 'POST',
+        redirect: 'error',
+        signal: AbortSignal.timeout(10000),
+        headers: {
+          apikey: context.publishableKey,
+          Authorization: 'Bearer ' + context.accessToken,
+          'Content-Type': 'application/json',
+          'Accept-Profile': 'api',
+          'Content-Profile': 'api',
+        },
+        body: JSON.stringify(params),
+      });
+      const rawText = await rpc.text();
+      if (new TextEncoder().encode(rawText).byteLength > 256 * 1024) {
+        return failure('DATABASE_UNAVAILABLE');
+      }
+      try {
+        raw = JSON.parse(rawText);
+      } catch {
+        return failure('DATABASE_UNAVAILABLE');
+      }
+      if (!rpc.ok) {
+        const message =
+          raw && typeof raw === 'object' && 'message' in raw
+            ? (raw as { message: unknown }).message
+            : null;
+        if (isSafeError(message)) return failure(message);
+        return failure(rpc.status === 401 ? 'AUTH_REQUIRED' : 'DATABASE_UNAVAILABLE');
+      }
     }
     const parsed = schema.safeParse(raw);
     if (
@@ -531,6 +598,8 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
   // Unauthenticated internal protocol harness must not list/call business tools.
   if (!context) return;
   const scoped = context;
+  const pilot = scoped.pilotMode === true;
+  const profileOutput = pilot ? pilotProfileOutput : oauthProfileOutput;
   server.registerTool(
     'get_account_profile',
     {
@@ -542,15 +611,28 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
       annotations,
       _meta: { securitySchemes, 'openai/profile': true },
     },
-    (args) =>
-      invoke(
+    async () => {
+      const result = await invoke(
         'get_account_profile',
         scoped,
-        {
-          p_request_schema_version: args.request_schema_version,
-        },
-        profileOutput,
-      ),
+        { p_request_schema_version: 1 },
+        rpcProfileOutput,
+      );
+      if ('isError' in result) return result;
+      const rpc = rpcProfileOutput.safeParse(result.structuredContent);
+      if (!rpc.success) return failure('DATABASE_UNAVAILABLE');
+      const profile = profileOutput.safeParse({
+        id: rpc.data.data.profile.id,
+        name: rpc.data.data.profile.display_name,
+        nickname: rpc.data.data.profile.workspace_name,
+        ...(pilot ? { workspace_public_id: rpc.data.data.profile.workspace_public_id } : {}),
+      });
+      if (!profile.success) return failure('DATABASE_UNAVAILABLE');
+      return {
+        structuredContent: profile.data,
+        content: [{ type: 'text' as const, text: JSON.stringify(profile.data) }],
+      };
+    },
   );
   server.registerTool(
     'get_workspace_context',
@@ -558,21 +640,24 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
       title: 'Get workspace context',
       description:
         "Use this before workspace-wide planning or when the active modules and defaults are unknown. It returns the authenticated owner's workspace rules and module catalog without changing state.",
-      inputSchema: workspaceInput,
+      inputSchema: pilot ? workspaceInput : oauthWorkspaceInput,
       outputSchema: workspaceOutput,
       annotations,
       _meta: { securitySchemes },
     },
-    (args) =>
-      invoke(
+    (args: { request_schema_version?: 1; workspace_public_id?: string }) => {
+      const workspaceId = args.workspace_public_id ?? scoped.workspacePublicId;
+      if (!workspaceId) return failure('OWNER_ACCESS_REQUIRED');
+      return invoke(
         'get_workspace_context',
         scoped,
         {
-          p_request_schema_version: args.request_schema_version,
-          p_workspace_public_id: args.workspace_public_id,
+          p_request_schema_version: args.request_schema_version ?? 1,
+          p_workspace_public_id: workspaceId,
         },
         workspaceOutput,
-      ),
+      );
+    },
   );
   server.registerTool(
     'list_pages',

@@ -1,13 +1,14 @@
 import { MCP_SERVICE_NAME, MCP_SERVICE_VERSION } from './server.ts';
-import { createAuthenticatedTransport } from './transport.ts';
+import type { RequestContext } from './auth.ts';
+import { createAuthenticatedTransport, fetchAnonymousDiscovery } from './transport.ts';
 import {
+  type AuthDependencies,
   authenticateRequest,
   authenticateVerifiedRequest,
   AuthRejection,
-  WorkspaceCheckFailure,
-  runtimeOAuthConfig,
   type OAuthConfig,
-  type AuthDependencies,
+  runtimeOAuthConfig,
+  WorkspaceCheckFailure,
 } from './auth.ts';
 
 const publicHeaders = {
@@ -22,6 +23,8 @@ export interface HttpOptions {
   config?: OAuthConfig;
   dependencies?: AuthDependencies;
   verifiedClaims?: Record<string, unknown>;
+  anonymousDiscovery?: boolean;
+  pilotContext?: RequestContext;
 }
 function jsonResponse(body: object, status: number, extra: Record<string, string> = {}): Response {
   return Response.json(body, { status, headers: { ...publicHeaders, ...extra } });
@@ -48,7 +51,10 @@ function ownerDenied(): Response {
   );
 }
 function challenge(resource: string, status: number): Response {
-  const header = 'Bearer resource_metadata="' + metadataUrl(resource) + '"';
+  const header =
+    'Bearer resource_metadata="' +
+    metadataUrl(resource) +
+    '", error="insufficient_scope", error_description="Sign in to continue"';
   return jsonResponse(
     {
       error: status === 503 ? 'authentication_unavailable' : 'authentication_required',
@@ -58,10 +64,42 @@ function challenge(resource: string, status: number): Response {
     { 'WWW-Authenticate': header },
   );
 }
+async function toolCallId(request: Request): Promise<string | number | null> {
+  try {
+    const body: unknown = await request.clone().json();
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return null;
+    const record = body as { jsonrpc?: unknown; method?: unknown; id?: unknown };
+    if (record.jsonrpc !== '2.0' || record.method !== 'tools/call') return null;
+    return typeof record.id === 'string' || typeof record.id === 'number' ? record.id : null;
+  } catch {
+    return null;
+  }
+}
+function toolAuthChallenge(resource: string, id: string | number): Response {
+  const header =
+    'Bearer resource_metadata="' +
+    metadataUrl(resource) +
+    '", error="insufficient_scope", error_description="Sign in to continue"';
+  return jsonResponse(
+    {
+      jsonrpc: '2.0',
+      id,
+      result: {
+        content: [{ type: 'text', text: 'Authentication required.' }],
+        _meta: { 'mcp/www_authenticate': [header] },
+        isError: true,
+      },
+    },
+    200,
+    { 'WWW-Authenticate': header },
+  );
+}
 function discoveryPath(path: string, resourcePath: string): boolean {
   return (
     path === resourcePath + '/oauth-protected-resource' ||
+    path === resourcePath + '/.well-known/oauth-protected-resource' ||
     path === '/mcp/oauth-protected-resource' ||
+    path === '/mcp/.well-known/oauth-protected-resource' ||
     path === '/oauth-protected-resource' ||
     path === '/.well-known/oauth-protected-resource' + resourcePath ||
     path === '/.well-known/oauth-protected-resource'
@@ -84,19 +122,20 @@ function safeLog(id: string, stage: string, status: number, failure?: WorkspaceC
     }),
   );
 }
-function includesToolsList(value: unknown): boolean {
-  if (Array.isArray(value)) return value.some(includesToolsList);
+function includesOwnerScopedOperation(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(includesOwnerScopedOperation);
   return (
     !!value &&
     typeof value === 'object' &&
     'method' in value &&
-    (value as { method: unknown }).method === 'tools/list'
+    ((value as { method: unknown }).method === 'tools/list' ||
+      (value as { method: unknown }).method === 'tools/call')
   );
 }
-async function isToolsListRequest(request: Request): Promise<boolean> {
+async function isOwnerScopedOperation(request: Request): Promise<boolean> {
   if (request.method !== 'POST') return false;
   try {
-    return includesToolsList(await request.clone().json());
+    return includesOwnerScopedOperation(await request.clone().json());
   } catch {
     return false;
   }
@@ -159,12 +198,30 @@ export async function handleHttpRequest(
   // The Supabase Edge gateway removes /functions/v1 before invoking this function.
   if (path !== expectedPath && path !== '/mcp') return challenge(config.resource, 401);
   const id = crypto.randomUUID();
+  if (options.pilotContext) {
+    const response = await createAuthenticatedTransport(options.pilotContext).fetch(request);
+    safeLog(id, 'fixed_pilot', response.status);
+    return response;
+  }
+  if (options.anonymousDiscovery && !request.headers.has('Authorization')) {
+    const response = await fetchAnonymousDiscovery(request);
+    if (response.status !== 403 && response.status !== 400 && response.status !== 415) {
+      safeLog(id, 'public_discovery', response.status);
+      return response;
+    }
+    const callId = await toolCallId(request);
+    if (callId !== null) {
+      safeLog(id, 'auth_challenge', 200);
+      return toolAuthChallenge(config.resource, callId);
+    }
+    return challenge(config.resource, 401);
+  }
   try {
     const { checkOwner, ...jwtDependencies } = options.dependencies ?? {};
     const context = options.verifiedClaims
       ? await authenticateVerifiedRequest(request, config, options.verifiedClaims, jwtDependencies)
       : await authenticateRequest(request, config, jwtDependencies);
-    if (checkOwner && (await isToolsListRequest(request))) {
+    if (checkOwner && (await isOwnerScopedOperation(request))) {
       const workspacePublicId = await checkOwner(config, context.accessToken, context.actorUserId);
       if (!workspacePublicId || !publicIdPattern.test(workspacePublicId)) {
         throw new AuthRejection(403);

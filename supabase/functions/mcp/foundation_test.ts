@@ -1,4 +1,6 @@
+import { createMcpHandler } from '@modelcontextprotocol/server';
 import { createAuthenticatedTransport } from './transport.ts';
+import { createMcpServer } from './server.ts';
 import type { RequestContext } from './auth.ts';
 import { FOUNDATION_TOOL_NAMES } from './foundation.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
@@ -114,6 +116,7 @@ const payloads: Record<string, object> = {
       content_schema_versions: [1],
       capabilities: ['project_generation_context'],
     },
+    config_public_id: '77777777-7777-4777-8777-777777777777',
     config: {
       allowed_formats: ['single_subject_fast'],
       format_weights: {
@@ -229,7 +232,7 @@ Deno.test(
     assert((listed.match(/"readOnlyHint":true/g) || []).length === 11, 'eleven read-only tools');
     assert((listed.match(/"openWorldHint":false/g) || []).length === 33, 'open world must be off');
     assert(listed.split('"openai/profile":true').length === 2, 'one profile metadata');
-    assert((listed.match(/"oauth2"/g) || []).length === 33, '33 OAuth security schemes');
+    assert((listed.match(/"oauth2"/g) || []).length === 66, '33 OAuth schemes with mirrors');
     assert(listed.includes('create_page'), '6.4 tool must be present');
   },
 );
@@ -241,10 +244,53 @@ Deno.test('All registered tool input/output object schemas are closed recursivel
   const parsed = JSON.parse(frame.slice(6));
   const tools = parsed.result?.tools ?? [];
   assert(tools.length === MCP_TOOL_COUNT && tools.length === 33, 'exact 33 schemas');
+  assert(new Set(tools.map((tool: { name: string }) => tool.name)).size === 33, 'unique names');
   for (const tool of tools) {
     assertClosedObjects(tool.inputSchema, tool.name + '.input');
-    assertClosedObjects(tool.outputSchema, tool.name + '.output');
+    if (tool.name === 'get_account_profile') {
+      assertClosedObjects(tool.outputSchema, 'wire.oauth.profile.output');
+    } else {
+      assert(!Object.hasOwn(tool, 'outputSchema'), 'only profile publishes outputSchema');
+    }
+    assert(tool.securitySchemes?.[0]?.type === 'oauth2', tool.name + ' top-level OAuth');
+    assert(
+      JSON.stringify(tool.securitySchemes) === JSON.stringify(tool._meta?.securitySchemes),
+      tool.name + ' OAuth mirror mismatch',
+    );
+    assert(tool.securitySchemes[0].scopes.join(' ') === 'openid email', tool.name + ' scopes');
   }
+  // Registered output validators must remain closed even though the
+  // ChatGPT-facing OAuth catalog omits optional outputSchema metadata.
+  const sdkResponse = await createMcpHandler(() => createMcpServer(context)).fetch(
+    mcp('tools/list'),
+  );
+  assert(sdkResponse.status === 200, 'raw SDK catalog must remain available to tests');
+  const sdkBody = await sdkResponse.text();
+  const sdkFrame = sdkBody.split('\n').find((line) => line.startsWith('data: '));
+  assert(sdkFrame, 'SDK catalog must return a data frame');
+  const sdkTools = JSON.parse(sdkFrame.slice(6)).result.tools;
+  assert(sdkTools.length === 33, 'raw SDK must still have 33 output schemas');
+  for (const sdkTool of sdkTools) {
+    assertClosedObjects(sdkTool.outputSchema, sdkTool.name + '.output');
+  }
+  const sdkProfile = sdkTools.find((tool: { name: string }) => tool.name === 'get_account_profile');
+  const profile = tools.find((tool: { name: string }) => tool.name === 'get_account_profile');
+  assert(profile?.inputSchema?.additionalProperties === false, 'profile input must be closed');
+  assert(Object.keys(profile.inputSchema.properties).length === 0, 'profile must accept {}');
+  assert(sdkProfile.outputSchema.required.includes('id'), 'top-level profile id required');
+  assert(
+    !Object.hasOwn(sdkProfile.outputSchema.properties, 'workspace_public_id'),
+    'workspace id must not appear in closed OAuth profile contract',
+  );
+  assert(
+    JSON.stringify(profile.outputSchema) === JSON.stringify(sdkProfile.outputSchema),
+    'actual MCP wire must publish the raw registered profile outputSchema',
+  );
+  assert(
+    JSON.stringify(sdkProfile.outputSchema.required) === JSON.stringify(['id']),
+    'OAuth profile requires only opaque id',
+  );
+  assert(sdkProfile.outputSchema.properties.id.type === 'string', 'profile id schema');
 });
 
 Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation', async () => {
@@ -271,15 +317,36 @@ Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation',
   try {
     const profile = await request('tools/call', {
       name: 'get_account_profile',
-      arguments: { request_schema_version: 1 },
+      arguments: {},
     });
-    assert(profile.includes('o***@example.test'), 'masked hint must be available');
+    const profileFrame = profile.split('\n').find((line) => line.startsWith('data: '));
+    assert(profileFrame, 'profile must return MCP data frame');
+    const profileResult = JSON.parse(profileFrame.slice(6)).result;
+    assert(profileResult.structuredContent.id === owner, 'top-level owner identity');
+    assert(profileResult.structuredContent.name === 'Owner', 'profile display name');
+    assert(profileResult.structuredContent.nickname === 'Owner workspace', 'profile label');
+    assert(
+      !Object.hasOwn(profileResult.structuredContent, 'workspace_public_id'),
+      'OAuth profile must not expose nonstandard workspace_public_id',
+    );
+    assert(
+      Object.keys(profileResult.structuredContent).every((key: string) =>
+        ['id', 'name', 'email', 'nickname'].includes(key),
+      ),
+      'profile response contains nonstandard fields',
+    );
+    assert(
+      profileResult.content[0].text === JSON.stringify(profileResult.structuredContent),
+      'profile text must match structured content',
+    );
+    assert(!profile.includes('o***@example.test'), 'masked hint must not masquerade as email');
     assert(!profile.includes('access_token'), 'must not expose tokens');
     const ws = await request('tools/call', {
       name: 'get_workspace_context',
-      arguments: { request_schema_version: 1, workspace_public_id: workspace },
+      arguments: {},
     });
     assert(ws.includes('Owner workspace'), 'workspace read missing');
+    assert(ws.includes(workspace), 'owner-derived workspace public id must remain discoverable');
     const pages = await request('tools/call', {
       name: 'list_pages',
       arguments: {
@@ -304,7 +371,20 @@ Deno.test('6.3 MCP calls map four tools to user-JWT, api RPC, with no mutation',
       },
     });
     assert(generation.includes('eligible_fact_count'), 'generation result missing');
+    assert(
+      generation.includes('77777777-7777-4777-8777-777777777777'),
+      'actual config UUID missing from MCP generation context',
+    );
     assert(calls.length === 4, 'all 4 RPCs must be executed');
+    assert(
+      calls[0]?.name === 'get_account_profile' && calls[0]?.args.p_request_schema_version === 1,
+      'MCP profile adapter must preserve versioned RPC',
+    );
+    assert(
+      calls[1]?.args.p_request_schema_version === 1 &&
+        calls[1]?.args.p_workspace_public_id === workspace,
+      'workspace bootstrap must derive owner scope from auth context',
+    );
     assert(
       calls[2]?.args.p_query === 'Owner' && calls[2]?.args.p_limit === 1,
       'list_pages filters and pagination lost',
@@ -373,6 +453,14 @@ Deno.test(
         invalid.includes('error') && !invalid.includes('items'),
         'invalid pagination must not succeed',
       );
+      const forbiddenWorkspace = await request('tools/call', {
+        name: 'get_workspace_context',
+        arguments: { workspace_public_id: foreign },
+      });
+      assert(
+        forbiddenWorkspace.includes('OWNER_ACCESS_REQUIRED'),
+        'OAuth workspace bootstrap must reject foreign workspace IDs',
+      );
       const unknown = await request('tools/call', {
         name: 'get_workspace_context',
         arguments: {
@@ -382,6 +470,11 @@ Deno.test(
         },
       });
       assert(unknown.includes('error'), 'additional input properties forbidden');
+      const oldProfileInput = await request('tools/call', {
+        name: 'get_account_profile',
+        arguments: { request_schema_version: 1 },
+      });
+      assert(oldProfileInput.includes('error'), 'versioned MCP profile input must be rejected');
       assert(count === before, 'denied/invalid MCP inputs must never reach PostgREST');
     } finally {
       globalThis.fetch = original;

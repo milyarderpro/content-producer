@@ -129,7 +129,11 @@ export function validatePortableManifest(value: unknown, pluginRoot: string): vo
   const extensions = object(manifest.extensions, 'extensions');
   keys(extensions, ['com.openai'], 'extensions');
   const openai = object(extensions['com.openai'], 'extensions.com.openai');
-  keys(openai, ['interface'], 'extensions.com.openai');
+  keys(openai, ['interface', 'apps'], 'extensions.com.openai');
+  if (openai.apps !== './.app.json') {
+    throw new Error('OpenAI registered MCP app mapping must be ./.app.json.');
+  }
+  validatePluginRelativePath(openai.apps, pluginRoot);
   const presentation = object(openai.interface, 'OpenAI interface');
   keys(
     presentation,
@@ -193,16 +197,16 @@ export function validatePortableMcpConfig(value: unknown): asserts value is Port
 
 export function generatePortableMcpConfig(input: unknown): PortableMcpConfig {
   const connection = object(input, 'connection input');
-  keys(connection, ['serverName', 'endpointUrl', 'oauth'], 'connection input');
+  keys(connection, ['serverName', 'endpointUrl', 'authentication'], 'connection input');
   const name = serverName(connection.serverName);
   const url = httpsEndpoint(connection.endpointUrl);
-  const oauth = object(connection.oauth, 'oauth');
-  keys(oauth, ['mode'], 'oauth');
-  if (oauth.mode !== 'discovery') {
-    throw new Error('OAuth requires discovery; client registration awaits verified hosting.');
+  const authentication = object(connection.authentication, 'authentication');
+  keys(authentication, ['mode'], 'authentication');
+  if (authentication.mode !== 'none') {
+    throw new Error('Verified Phase 10.1 connection requires No authentication.');
   }
-  // Portable v1 MCP schema has no OAuth-client fields. RFC 9728 discovery and
-  // Supabase OAuth 2.1 live at the server/host; no client ID or secret is bundled.
+  // No-auth portable MCP omits OAuth extensions. This endpoint is public;
+  // the server-side business-write latch remains closed by default.
   const result: PortableMcpConfig = {
     $schema: MCP_SCHEMA,
     mcpServers: { [name]: { type: 'streamable-http', url } },

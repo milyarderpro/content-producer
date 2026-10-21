@@ -39,15 +39,16 @@ afterEach(() => {
 describe('Phase 7.4 generated package and source safety', () => {
   it('validates manifest, generator schema, skill, references, policy and exact tool order', () => {
     expect(() => validatePluginSource(root)).not.toThrow();
-    expect(CANDIDATE_FILES).toHaveLength(12);
+    expect(CANDIDATE_FILES).toHaveLength(13);
+    expect(CANDIDATE_FILES).toContain('.app.json');
     expect(CANDIDATE_FILES).not.toContain('mcp.json');
   });
 
-  it('builds twelve allowlisted files and verifies actual candidate hashes', () => {
+  it('builds thirteen allowlisted files and verifies actual candidate hashes', () => {
     const dir = setup();
     const out = join(dir, 'artifacts/plugin-candidate');
     const index = createCandidate(dir, out);
-    expect(index.file_count).toBe(12);
+    expect(index.file_count).toBe(13);
     expect(index.files.every((entry) => entry.sha256.length === 64 && entry.bytes > 0)).toBe(true);
     expect(verifyCandidate(dir, out)).toEqual(index);
     expect(readFileSync(join(out, 'plugin.json'), 'utf8')).toBe(
@@ -73,7 +74,7 @@ describe('Phase 7.4 generated package and source safety', () => {
     expect(() => validatePluginSource(dir)).toThrow(/Required plugin file/);
     cpSync(join(root, 'plugin/plugin.json'), manifest);
     const schema = join(dir, 'plugin/schemas/mcp-connection-input.schema.json');
-    change(schema, '"discovery"', '"fabricated"');
+    change(schema, '"none"', '"fabricated"');
     expect(() => validatePluginSource(dir)).toThrow(/schema drift/);
     cpSync(join(root, 'plugin/schemas/mcp-connection-input.schema.json'), schema);
     const skill = join(dir, 'plugin/skills/content-producer/SKILL.md');
@@ -106,8 +107,19 @@ describe('Phase 7.4 generated package and source safety', () => {
     expect(() => validatePluginSource(dir)).toThrow(/Symlink/);
   });
 
-  it('rejects final MCP config, embedded secrets and fictional MCP endpoints', () => {
+  it('pins OAuth mcpku2 and rejects bundled MCP and secrets', () => {
     const dir = setup();
+    const appPath = join(dir, 'plugin/.app.json');
+    change(
+      appPath,
+      'asdk_app_6ad6ebeab5fc8191a1d2cd54b87cd96f',
+      'asdk_app_6ad4ef8b42588191a749b8b9f356b662',
+    );
+    expect(() => validatePluginSource(dir)).toThrow(/proven owner OAuth mcpku2 ID/);
+    cpSync(join(root, 'plugin/.app.json'), appPath);
+    change(appPath, '"required": true', '"required": false');
+    expect(() => validatePluginSource(dir)).toThrow(/proven owner OAuth mcpku2 ID/);
+    cpSync(join(root, 'plugin/.app.json'), appPath);
     const finalPath = join(dir, 'plugin/mcp.json');
     writeFileSync(finalPath, '{"mcpServers":{}}');
     expect(() => validatePluginSource(dir)).toThrow(/Deferred connection/);

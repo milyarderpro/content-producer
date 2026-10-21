@@ -4,6 +4,7 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { invoke } from './foundation.ts';
 import { safeDetail } from './plan_claim.ts';
+import { materializeMissingSourceNulls } from './source_evidence_adapter.ts';
 
 const uuid = z
   .string()
@@ -298,7 +299,7 @@ export function registerTriviaFactTools(server: McpServer, context?: RequestCont
           p_expected_config_updated_at: args.expected_config_updated_at,
           p_fact_reuse_scope: args.fact_reuse_scope,
           p_reservation_ttl_minutes: args.reservation_ttl_minutes,
-          p_facts: args.facts,
+          p_facts: materializeMissingSourceNulls(args.facts),
         },
         reserveOutput,
       ),

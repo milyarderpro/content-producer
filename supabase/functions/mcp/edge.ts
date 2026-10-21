@@ -1,12 +1,13 @@
 import { pipeline } from 'npm:@supabase/middleware@1.0.0';
 import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1.9.0';
 import {
-  runtimeOAuthConfig,
-  WorkspaceCheckFailure,
   type AuthDependencies,
   type OAuthConfig,
+  runtimeOAuthConfig,
+  WorkspaceCheckFailure,
 } from './auth.ts';
 import { handleHttpRequest, oversizedRequestResponse } from './http.ts';
+import { fixedPilotOwnerId, resolvePilotWorkspace } from './pilot_db.ts';
 
 type FixtureJwks = { keys: Array<JsonWebKey & { kid?: string }> };
 const MAX_REQUEST_BYTES = 256 * 1024;
@@ -120,7 +121,9 @@ export function createEdgeHandler(
     const isMcpPath = [resourcePath, '/mcp', '/functions/v1/mcp'].includes(path);
     const isDiscoveryPath = [
       resourcePath + '/oauth-protected-resource',
+      resourcePath + '/.well-known/oauth-protected-resource',
       '/mcp/oauth-protected-resource',
+      '/mcp/.well-known/oauth-protected-resource',
       '/oauth-protected-resource',
       '/.well-known/oauth-protected-resource' + resourcePath,
       '/.well-known/oauth-protected-resource',
@@ -128,6 +131,7 @@ export function createEdgeHandler(
     if (!isMcpPath && !isDiscoveryPath) {
       return handleHttpRequest(request, { config });
     }
+    if (isDiscoveryPath) return handleHttpRequest(request, { config });
     let body: ArrayBuffer | null = null;
     if (request.method === 'POST') {
       try {
@@ -143,6 +147,44 @@ export function createEdgeHandler(
       checkOwner,
     };
     const forwardedRequest = new Request(request, { body: body?.slice(0) ?? null });
+    // CR-042: production defaults to owner OAuth. The fixed pilot can only be
+    // selected by an explicit server-side rollback setting.
+    const mode = configured ? 'oauth' : (Deno.env.get('MCP_AUTH_MODE') ?? 'oauth');
+    if (mode !== 'oauth' && mode !== 'fixed-pilot') {
+      return Response.json({ error: 'authentication_unavailable' }, { status: 503 });
+    }
+    if (
+      isMcpPath &&
+      mode === 'fixed-pilot' &&
+      request.method === 'POST' &&
+      !request.headers.has('Authorization')
+    ) {
+      try {
+        const actor = fixedPilotOwnerId();
+        const workspace = await resolvePilotWorkspace(actor);
+        return handleHttpRequest(forwardedRequest, {
+          config,
+          pilotContext: {
+            requestId: crypto.randomUUID(),
+            actorUserId: actor,
+            oauthClientId: 'phase-10-1-noauth-fixed-pilot',
+            workspacePublicId: workspace,
+            accessToken: '',
+            supabaseUrl: config.supabaseUrl,
+            publishableKey: config.publishableKey,
+            pilotMode: true,
+          },
+        });
+      } catch {
+        // No credential, internal DB result, or profile leaks to the caller.
+        return Response.json({ error: 'pilot_unavailable' }, { status: 503 });
+      }
+    }
+    // Mixed authentication: protocol discovery is public; every business
+    // tools/call still passes through the existing user and owner gates.
+    if (isMcpPath && request.method === 'POST' && !request.headers.has('Authorization')) {
+      return handleHttpRequest(forwardedRequest, { config, anonymousDiscovery: true });
+    }
     const protectedHandler = pipeline(
       [
         withOAuthProtectedResource({

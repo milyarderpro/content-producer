@@ -4,8 +4,9 @@ import { deepStrictEqual, strict as assert } from 'node:assert';
 import { format, resolveConfig } from 'prettier';
 import { row, sql } from '../supabase/tests/database/helpers/plan-lifecycle.js';
 
-// SELECT-only audit: retain the accepted 67-migration CR-016 baseline while
-// checking the additive CR-021 hook and 68th migration independently.
+// SELECT-only audit: retain the accepted 67-migration CR-016 baseline.
+// Pin the CR-021 OAuth hook (68th) and CR-046 projection fix (69th) independently,
+// then prove their only allowed catalog differences before baseline comparison.
 const expected = JSON.parse(
   readFileSync('docs/phase-5-batch-b-remediation-final-catalog.json', 'utf8'),
 );
@@ -21,8 +22,29 @@ const manifest = readdirSync('supabase/migrations')
       .update(readFileSync(`supabase/migrations/${file}`))
       .digest('hex'),
   }));
-assert.equal(manifest.length, 68);
+assert.equal(manifest.length, 69);
 deepStrictEqual(manifest.slice(0, 67), expected.manifest);
+// Git blob hashes pin the exact bytes of each post-baseline migration, without
+// editing either the accepted baseline or an already-applied migration.
+deepStrictEqual(
+  manifest.slice(67).map(({ file }) => {
+    const body = readFileSync(`supabase/migrations/${file}`);
+    return {
+      file,
+      git_blob_sha1: createHash('sha1').update(`blob ${body.length}\0`).update(body).digest('hex'),
+    };
+  }),
+  [
+    {
+      file: '20261016120000_add_mcp_oauth_resource_audience_hook.sql',
+      git_blob_sha1: 'df0aa723c7eab77085f5badf532915258f719473',
+    },
+    {
+      file: '20261020074800_expose_generation_context_config_public_id.sql',
+      git_blob_sha1: '21101f64796019ce9ea97aee75b39874450c3631',
+    },
+  ],
+);
 const applied = row<{ versions: string[] }>(
   'select array_agg(version order by version) versions from supabase_migrations.schema_migrations',
 ).versions;
@@ -136,6 +158,32 @@ assert.ok(hookFunction, 'CR-021 hook is missing from catalog');
 extra.functions = (extra.functions as { signature: string }[]).filter(
   (x) => x.signature !== 'internal.mcp_oauth_resource_audience_v1(jsonb)',
 );
+// CR-046 is permitted to add only the selected Page+niche config UUID key.
+// Reverse exactly that projection on a READ-ONLY function definition to compare
+// every other source byte, owner, security bit, SET option, and ACL against the
+// accepted Phase 5/9 baseline; do not weaken the frozen snapshot.
+const functionDefinition = row<{ definition: string }>(
+  `select pg_catalog.pg_get_functiondef(
+    'api.get_page_generation_context(integer,uuid,uuid,text,integer,text,text,text,timestamp with time zone)'::regprocedure
+  ) definition`,
+).definition;
+const addedProjection = "'config_public_id', v_page.config_public_id, ";
+assert.equal(
+  functionDefinition.split(addedProjection).length,
+  2,
+  'CR-046 projection must appear exactly once in the canonical SQL definition',
+);
+const previousDefinition = functionDefinition.replace(addedProjection, '');
+const currentSourceSha = createHash('sha256').update(functionDefinition).digest('hex');
+const previousSourceSha = createHash('sha256').update(previousDefinition).digest('hex');
+assert.notEqual(currentSourceSha, previousSourceSha);
+const generationFunctions = (
+  extra.functions as { signature: string; source_sha256: string }[]
+).filter((x) => x.signature.startsWith('api.get_page_generation_context('));
+assert.equal(generationFunctions.length, 1, 'Expected one generation-context RPC');
+assert.equal(generationFunctions[0].source_sha256, currentSourceSha);
+// The archived baseline comparison below must still match exactly.
+generationFunctions[0].source_sha256 = previousSourceSha;
 for (const key of [
   'auth_users',
   'storage_objects',
@@ -198,10 +246,16 @@ writeFileSync(
       manifest,
       applied,
       oauth_hook: { ...hook, function: hookFunction },
+      config_public_id_projection: {
+        signature: generationFunctions[0].signature,
+        current_source_sha256: currentSourceSha,
+        accepted_baseline_source_sha256: previousSourceSha,
+        extra_projection: addedProjection,
+      },
     }),
     { ...(await resolveConfig(file)), parser: 'json' },
   ),
 );
 console.info(
-  'Phase 9.5 catalog: 68 source/applied migrations, 33 RPCs, 15/15 RLS, unchanged 67-migration baseline, private Auth hook, owner/bridge/admin boundary and zero fixtures/faults: PASS.',
+  'Phase 10.4 catalog: 69 source/applied migrations, 33 RPCs, 15/15 RLS, unchanged 67-migration baseline after exact CR-046 projection normalization, pinned CR-021/CR-046 migrations, private Auth hook, grants and zero fixtures/faults: PASS.',
 );

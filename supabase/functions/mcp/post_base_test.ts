@@ -178,7 +178,7 @@ Deno.test('6.9: post schemas remain closed among 33 OAuth tools', async () => {
   for (const name of POST_BASE_TOOL_NAMES) {
     const t = tools.find((x: { name: string }) => x.name === name);
     check(t?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
-    check(t?.outputSchema.additionalProperties === false, 'CLOSED_OUTPUT');
+    check(!Object.hasOwn(t ?? {}, 'outputSchema'), 'OPTIONAL_OUTPUT_OMITTED');
     check(t?._meta.securitySchemes[0].type === 'oauth2', 'OAUTH');
     check(t.annotations.openWorldHint === false, 'NO_OPEN_WORLD');
     check(t.annotations.destructiveHint === false, 'NON_DESTRUCTIVE');
