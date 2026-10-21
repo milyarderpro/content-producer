@@ -84,7 +84,7 @@ A ditolak dengan pesan
 yang merinci seluruh delapan nilai enum tertutup; bukan lagi
 `VALIDATION_FAILED` generik dari SQL. Pemilik tidak melaporkan Write.
 
-**Temuan yang masih FAIL:** definisi tool yang *terlihat oleh host*
+**Temuan yang masih FAIL:** definisi tool yang _terlihat oleh host_
 tetap mengiklankan `comparison_direction?: string` (opsional,
 bebas), bukan required enum. Bukti penolakan A konsisten dengan
 validasi sebelum backend RPC, tetapi raw RPC/server trace
