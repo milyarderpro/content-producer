@@ -227,6 +227,17 @@ Deno.test(
             successor: { ...successor, candidate: { ...candidate, ontology_version: 2 } },
           },
         ],
+        // Successor facts share the same CR-005 candidate contract as dedup and reserve.
+        [
+          'trivia_correct_fact',
+          {
+            ...correct,
+            successor: {
+              ...successor,
+              candidate: { ...candidate, qualifiers: { negated: false } },
+            },
+          },
+        ],
         ['trivia_correct_fact', { ...correct, correction_reason: '' }],
       ];
       for (const [name, args] of badInputs) {
