@@ -165,7 +165,6 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     expect(text).toContain('greets_via_trunk_touch');
     expect(text).toContain('do not assert');
     expect(text).toContain('**Do not** change a');
-
   });
 
   it('handles all formats, mismatched hooks, CTA pressure and critical quality failures', () => {
