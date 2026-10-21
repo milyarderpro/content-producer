@@ -1,5 +1,34 @@
 # Repository guidance
 
+## Current operating workflow — Live Test & Fix (from 21 October 2026)
+
+**For all new user-driven testing and remediation after Phase 10, use
+[`docs/live-test/README.md`](docs/live-test/README.md) as the active operational
+runbook**, [`docs/live-test/test-matrix.md`](docs/live-test/test-matrix.md) for
+all 33 tool cases, and [`docs/live-test/results.md`](docs/live-test/results.md)
+for evidence. Master campaign [Issue #25](https://github.com/milyarderpro/content-producer/issues/25);
+initial reported draft-save failure [Issue #26](https://github.com/milyarderpro/content-producer/issues/26).
+Workflow: **one ChatGPT prompt → owner executes with PRIVATE Content Producer
+OAuth `mcpku2` in a fresh chat → share sanitized tool outputs → review
+PASS/FAIL/BLOCKED/NOT RUN → issue per defect → focused PR + GitHub Actions →
+retest on verified runtime**. Do not resume Phase 11, run 14 ACs as gates, or
+use sequential phase checkpoints without an explicit new owner decision.
+Phase 10 remains historically Pilot-ready; Phase 11 and final AC acceptance
+remain not completed, not silently converted to PASS. Preserve frozen contracts,
+old runbooks and safety-critical gates as technical reference, not the active
+work queue. The owner reports a draft creation attempt failed but **the failed
+tool/error has not been independently identified**; do not assume
+`save_post` is the root cause or retry a business write automatically.
+
+GitHub Issues/PRs/Actions remain required for fixes. Documentation-only PRs
+use existing light CI. Backend/security/auth/migration changes require the
+applicable focused tests and risk-based CR-020/044 gate before any authorized
+deployment. Never fabricate Facebook publications/metrics or perform
+irreversible live writes without exact owner authorization. All production
+owner OAuth data changes are consequential; prefer isolated fixtures for
+irreversible positive tests. **Do not merge, deploy, or change production
+business data merely because the workflow document has been adopted.**
+
 ## Scope and source of truth
 
 The frozen Phase 0 documents under `plans/` govern implementation. Resolve a
