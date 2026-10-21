@@ -26,14 +26,14 @@ Pemilik menjalankan pengujian di chat ChatGPT baru dengan PRIVATE Content Produc
 
 Pemilik menjalankan **enam tool Read** lewat PRIVATE Content Producer pada koneksi owner OAuth `mcpku2` di chat baru. Seluruh enam tool terpanggil; **nol Write**. Bukti yang tersedia adalah laporan yang diteruskan pengguna berisi parameter dan error aktual, bukan raw server trace independen. Temuan terperinci dicatat di [Issue #29](https://github.com/milyarderpro/content-producer/issues/29); campaign [Issue #25](https://github.com/milyarderpro/content-producer/issues/25).
 
-| Test ID | Tool                        | Verdict                  | Actual |
-| ------- | --------------------------- | ------------------------ | ------ |
-| LT-007  | `list_content_plans`        | PASS LIVE                | 1 plan `08c75cc2-c123-4471-852a-4c159f26f22e`, pending, 3 item |
-| LT-009  | `get_content_plan`          | PASS LIVE                | 3/3 pending; 22/24/26 Oktober 2026 pukul 21 WIB; 0 claim/attempt |
-| LT-022  | `get_post`                  | PASS LIVE                | Moon post ready rev 3; 7 allocated, verified facts, 3 NASA URLs; 19/19 system dan 18/18 editorial checks, approved hash cocok |
-| LT-016  | `trivia_find_similar_facts` | **FAIL — needs triage**  | MCP `INVALID_ARGUMENT` / SQL `VALIDATION_FAILED` pada satu calon fakta dengan `numbers.unit:null` dan `qualifiers:{negated:false}`; tidak ada match |
-| LT-032  | `get_post_performance`      | PASS — EXPECTED DENIAL   | `POST_NOT_PUBLISHED` untuk post ready, bukan published; penolakan sesuai kontrak |
-| LT-033  | `get_performance_insights`  | PASS — EMPTY VALID DATA  | `eligible_post_count=0`, `excluded_post_count=1` karena `not_published`, `groups=[]`; tidak ada metrik direkayasa |
+| Test ID | Tool                        | Verdict                 | Actual                                                                                                                                              |
+| ------- | --------------------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LT-007  | `list_content_plans`        | PASS LIVE               | 1 plan `08c75cc2-c123-4471-852a-4c159f26f22e`, pending, 3 item                                                                                      |
+| LT-009  | `get_content_plan`          | PASS LIVE               | 3/3 pending; 22/24/26 Oktober 2026 pukul 21 WIB; 0 claim/attempt                                                                                    |
+| LT-022  | `get_post`                  | PASS LIVE               | Moon post ready rev 3; 7 allocated, verified facts, 3 NASA URLs; 19/19 system dan 18/18 editorial checks, approved hash cocok                       |
+| LT-016  | `trivia_find_similar_facts` | **FAIL — needs triage** | MCP `INVALID_ARGUMENT` / SQL `VALIDATION_FAILED` pada satu calon fakta dengan `numbers.unit:null` dan `qualifiers:{negated:false}`; tidak ada match |
+| LT-032  | `get_post_performance`      | PASS — EXPECTED DENIAL  | `POST_NOT_PUBLISHED` untuk post ready, bukan published; penolakan sesuai kontrak                                                                    |
+| LT-033  | `get_performance_insights`  | PASS — EMPTY VALID DATA | `eligible_post_count=0`, `excluded_post_count=1` karena `not_published`, `groups=[]`; tidak ada metrik direkayasa                                   |
 
 **Analisis LT-016:** Payload yang dilaporkan kelihatan cocok dengan `candidate` Zod/`findInput` di `supabase/functions/mcp/trivia_fact.ts`, tetapi backend menggunakan validator kanonis tambahan `internal.trivia_candidate_v1` yang memanggil `trivia_canonical_numbers_v2` dan `trivia_canonical_qualifiers_v3`. Fixture sukses `supabase/tests/database/helpers/trivia-rpc.ts` memakai `unit:"count"` dan `comparison_direction:"none"`. Belum dipastikan aturan mana yang menolak; **ini kegagalan pada input uji live, bukan akar masalah backend terverifikasi**. [Issue #29](https://github.com/milyarderpro/content-producer/issues/29) meminta uji perbedaan input terisolasi dan perbaikan kontrak atau petunjuk penggunaan bila terbukti.
 
