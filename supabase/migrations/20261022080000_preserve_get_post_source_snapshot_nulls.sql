@@ -7,7 +7,7 @@
 do $migration$
 declare
   source_definition text;
-  open_anchor constant text := 'jsonb_strip_nulls(jsonb_build_object(';
+  open_anchor constant text := E'select coalesce(jsonb_agg(\n    jsonb_strip_nulls(jsonb_build_object(';
   close_anchor constant text := ')) order by usage.position asc, usage.id asc';
 begin
   source_definition := pg_catalog.pg_get_functiondef(
@@ -26,7 +26,7 @@ begin
   end if;
 
   source_definition := pg_catalog.replace(
-    source_definition, open_anchor, 'jsonb_build_object('
+    source_definition, open_anchor, E'select coalesce(jsonb_agg(\n    jsonb_build_object('
   );
   source_definition := pg_catalog.replace(
     source_definition,
