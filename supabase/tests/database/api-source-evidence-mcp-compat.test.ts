@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { materializeMissingSourceNulls } from '../../functions/mcp/source_evidence_adapter.js';
 import { cleanup, content, editorial, save } from './helpers/post-rpc.js';
@@ -225,6 +226,44 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
         ),
       ).toBe(true);
       expect(fetched.data.post.system_checks.overall_status).toBe('passed');
+      // Issue #40: read all eight SQL projections before MCP/Zod. Persist only
+      // isolated fixture JSON to the runner's ephemeral temp path (never CI logs).
+      const diagnostic: Array<{
+        sources: boolean;
+        checks: boolean;
+        metrics: boolean;
+        sqlError?: boolean;
+        bytes?: number;
+        rpc?: unknown;
+      }> = [];
+      for (const sources of [false, true]) {
+        for (const checks of [false, true]) {
+          for (const metrics of [false, true]) {
+            try {
+              const result = rpc(
+                f,
+                `api.get_post(1,'${f.workspace}','${persistedPost.data.post.post_public_id}',${sources},${checks},${metrics})`,
+              );
+              diagnostic.push({
+                sources,
+                checks,
+                metrics,
+                bytes: Buffer.byteLength(JSON.stringify(result), 'utf8'),
+                rpc: result,
+              });
+            } catch {
+              // Do not output SQL exception text; classify SQL separately.
+              diagnostic.push({ sources, checks, metrics, sqlError: true });
+            }
+          }
+        }
+      }
+      expect(diagnostic).toHaveLength(8);
+      const diagnosticPath = process.env.GET_POST_DIFFERENTIAL_FILE;
+      if (diagnosticPath) {
+        writeFileSync(diagnosticPath, JSON.stringify(diagnostic), { mode: 0o600 });
+      }
+      expect(diagnostic.every((entry) => !entry.sqlError), 'SQL_GET_POST_FLAG_MATRIX').toBe(true);
     } finally {
       cleanup(f);
     }
