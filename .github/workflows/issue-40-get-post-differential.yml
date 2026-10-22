@@ -73,7 +73,18 @@ jobs:
           set -euo pipefail
           docker info >/dev/null
           pnpm exec supabase db reset --help >/dev/null
-          pnpm run supabase:start > "$RUNNER_TEMP/issue-40-start.log" 2>&1
+          if ! pnpm run supabase:start > "$RUNNER_TEMP/issue-40-start.log" 2>&1; then
+            if grep -Fq 'UNEXPECTED_GET_POST_SOURCE_PROJECTION' "$RUNNER_TEMP/issue-40-start.log"; then
+              echo 'LOCAL_START_FAILURE_CLASS=GET_POST_MIGRATION_ANCHOR'
+            elif grep -Eiq 'syntax error|unterminated|invalid input syntax' "$RUNNER_TEMP/issue-40-start.log"; then
+              echo 'LOCAL_START_FAILURE_CLASS=SQL_SYNTAX'
+            elif grep -Eiq 'ERROR:|failed to apply migration' "$RUNNER_TEMP/issue-40-start.log"; then
+              echo 'LOCAL_START_FAILURE_CLASS=MIGRATION_ERROR_REDACTED'
+            else
+              echo 'LOCAL_START_FAILURE_CLASS=OTHER_REDACTED'
+            fi
+            exit 1
+          fi
           if ! pnpm run supabase:reset > "$RUNNER_TEMP/issue-40-reset.log" 2>&1; then
             if grep -Fq 'UNEXPECTED_GET_POST_SOURCE_PROJECTION' "$RUNNER_TEMP/issue-40-reset.log"; then
               echo 'LOCAL_RESET_FAILURE_CLASS=GET_POST_MIGRATION_ANCHOR'
