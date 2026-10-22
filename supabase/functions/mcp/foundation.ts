@@ -484,19 +484,67 @@ function forbiddenOutputKeys(
 // Never capture values, keys from untrusted objects, URLs, SQL messages,
 // authentication claims, tokens, or the response body.
 const getPostDiagnosticPaths = new Set([
-  'response_schema_version', 'data', 'post', 'approval', 'plan_item_public_id',
-  'current_fact_warnings', 'latest_metrics', 'fact_bindings', 'source_snapshot',
-  'sources', 'numbers', 'qualifiers', 'schema_version', 'canonical_claim',
-  'normalized_claim', 'normalization_version', 'claim_hash', 'subject_key',
-  'relation_key', 'object_key', 'value', 'unit', 'role', 'negated',
-  'comparison_direction', 'time', 'location', 'population', 'condition',
-  'method', 'scope', 'estimate', 'ontology_version', 'structured_key',
-  'structured_hash', 'structured_match_eligible', 'topic_key', 'risk_class',
-  'source_schema_version', 'verification_status', 'verified_at',
-  'as_of_date', 'expires_at', 'dedup_review_schema_version', 'url',
-  'canonical_url', 'title', 'publisher', 'tier', 'source_type', 'accessed_at',
-  'published_at', 'updated_at', 'as_of', 'language', 'supports',
-  'independence_group', 'status', 'revision', 'system_checks', 'editorial_checks',
+  'response_schema_version',
+  'data',
+  'post',
+  'approval',
+  'plan_item_public_id',
+  'current_fact_warnings',
+  'latest_metrics',
+  'fact_bindings',
+  'source_snapshot',
+  'sources',
+  'numbers',
+  'qualifiers',
+  'schema_version',
+  'canonical_claim',
+  'normalized_claim',
+  'normalization_version',
+  'claim_hash',
+  'subject_key',
+  'relation_key',
+  'object_key',
+  'value',
+  'unit',
+  'role',
+  'negated',
+  'comparison_direction',
+  'time',
+  'location',
+  'population',
+  'condition',
+  'method',
+  'scope',
+  'estimate',
+  'ontology_version',
+  'structured_key',
+  'structured_hash',
+  'structured_match_eligible',
+  'topic_key',
+  'risk_class',
+  'source_schema_version',
+  'verification_status',
+  'verified_at',
+  'as_of_date',
+  'expires_at',
+  'dedup_review_schema_version',
+  'url',
+  'canonical_url',
+  'title',
+  'publisher',
+  'tier',
+  'source_type',
+  'accessed_at',
+  'published_at',
+  'updated_at',
+  'as_of',
+  'language',
+  'supports',
+  'independence_group',
+  'status',
+  'revision',
+  'system_checks',
+  'editorial_checks',
 ]);
 type GetPostDiagnosticCategory =
   | 'rpc_http_error'
@@ -528,24 +576,34 @@ export function emitGetPostDiagnostic(
     ? context.requestId
     : 'unavailable';
   const paths = issues.slice(0, 5).map((issue) => ({
-    path: issue.path.slice(0, 12).map((component) => {
-      if (typeof component === 'number') return '[]';
-      return typeof component === 'string' && getPostDiagnosticPaths.has(component)
-        ? component
-        : '[field]';
-    }).join('.'),
+    path: issue.path
+      .slice(0, 12)
+      .map((component) => {
+        if (typeof component === 'number') return '[]';
+        return typeof component === 'string' && getPostDiagnosticPaths.has(component)
+          ? component
+          : '[field]';
+      })
+      .join('.'),
     code: /^[a-z_]{1,40}$/.test(issue.code) ? issue.code : 'unknown',
   }));
-  console.info(JSON.stringify({
-    event: 'get_post_boundary',
-    request_id: requestId,
-    category,
-    http_status: httpStatus !== null && Number.isInteger(httpStatus) &&
-      httpStatus >= 100 && httpStatus <= 599 ? httpStatus : null,
-    body_bytes: bodyBytes !== null && Number.isSafeInteger(bodyBytes) &&
-      bodyBytes >= 0 ? bodyBytes : null,
-    issues: paths,
-  }));
+  console.info(
+    JSON.stringify({
+      event: 'get_post_boundary',
+      request_id: requestId,
+      category,
+      http_status:
+        httpStatus !== null &&
+        Number.isInteger(httpStatus) &&
+        httpStatus >= 100 &&
+        httpStatus <= 599
+          ? httpStatus
+          : null,
+      body_bytes:
+        bodyBytes !== null && Number.isSafeInteger(bodyBytes) && bodyBytes >= 0 ? bodyBytes : null,
+      issues: paths,
+    }),
+  );
 }
 
 export async function invoke(
@@ -620,7 +678,13 @@ export async function invoke(
       phase = 'processed';
       diagnosticBytes = new TextEncoder().encode(rawText).byteLength;
       if (diagnosticBytes > 256 * 1024) {
-        emitGetPostDiagnostic(tool, context, 'response_too_large', diagnosticStatus, diagnosticBytes);
+        emitGetPostDiagnostic(
+          tool,
+          context,
+          'response_too_large',
+          diagnosticStatus,
+          diagnosticBytes,
+        );
         return failure('DATABASE_UNAVAILABLE');
       }
       try {
@@ -642,16 +706,23 @@ export async function invoke(
     const parsed = schema.safeParse(raw);
     if (!parsed.success) {
       emitGetPostDiagnostic(
-        tool, context, 'invalid_schema', diagnosticStatus, diagnosticBytes, parsed.error.issues,
+        tool,
+        context,
+        'invalid_schema',
+        diagnosticStatus,
+        diagnosticBytes,
+        parsed.error.issues,
       );
       return failure('DATABASE_UNAVAILABLE');
     }
-    if (forbiddenOutputKeys(
-      parsed.data,
-      tool === 'claim_content_plan_items',
-      '',
-      tool === 'trivia_register_and_reserve_facts',
-    )) {
+    if (
+      forbiddenOutputKeys(
+        parsed.data,
+        tool === 'claim_content_plan_items',
+        '',
+        tool === 'trivia_register_and_reserve_facts',
+      )
+    ) {
       emitGetPostDiagnostic(tool, context, 'forbidden_field', diagnosticStatus, diagnosticBytes);
       return failure('DATABASE_UNAVAILABLE');
     }
@@ -667,9 +738,15 @@ export async function invoke(
     };
   } catch {
     emitGetPostDiagnostic(
-      tool, context, phase === 'transport' ? 'transport_error' :
-        phase === 'body' ? 'response_read_error' : 'unexpected_exception',
-      diagnosticStatus, diagnosticBytes,
+      tool,
+      context,
+      phase === 'transport'
+        ? 'transport_error'
+        : phase === 'body'
+          ? 'response_read_error'
+          : 'unexpected_exception',
+      diagnosticStatus,
+      diagnosticBytes,
     );
     // Do not reflect SQLSTATE, URL, token, response body, or raw exception.
     return failure('DATABASE_UNAVAILABLE');

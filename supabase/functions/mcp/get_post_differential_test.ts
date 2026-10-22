@@ -105,13 +105,17 @@ Deno.test('Issue #40: eight SQL get_post projections retain strict MCP contract'
           'SOURCE_VARIANT_NONEMPTY_NUMBERS',
         );
         check(
-          snapshots.some((snapshot) => snapshot.qualifiers.estimate === true &&
-            snapshot.qualifiers.method !== null),
+          snapshots.some(
+            (snapshot) =>
+              snapshot.qualifiers.estimate === true && snapshot.qualifiers.method !== null,
+          ),
           'SOURCE_VARIANT_ESTIMATE_METHOD',
         );
         check(
-          snapshots.some((snapshot) => snapshot.qualifiers.time !== null &&
-            snapshot.qualifiers.location !== null),
+          snapshots.some(
+            (snapshot) =>
+              snapshot.qualifiers.time !== null && snapshot.qualifiers.location !== null,
+          ),
           'SOURCE_VARIANT_TIME_LOCATION',
         );
         check(
@@ -121,7 +125,7 @@ Deno.test('Issue #40: eight SQL get_post projections retain strict MCP contract'
         );
         check(
           snapshots.some((snapshot) =>
-            snapshot.sources.some((source) => source.updated_at === '2026-09-22')
+            snapshot.sources.some((source) => source.updated_at === '2026-09-22'),
           ),
           'SOURCE_VARIANT_NON_NULL_UPDATE_DATE',
         );

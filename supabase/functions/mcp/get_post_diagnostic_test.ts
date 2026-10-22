@@ -20,11 +20,13 @@ const schema = z.strictObject({
   response_schema_version: z.literal(1),
   data: z.strictObject({
     post: z.strictObject({
-      fact_bindings: z.array(z.strictObject({
-        source_snapshot: z.strictObject({
-          numbers: z.array(z.strictObject({ value: z.string(), unit: z.string().nullable() })),
+      fact_bindings: z.array(
+        z.strictObject({
+          source_snapshot: z.strictObject({
+            numbers: z.array(z.strictObject({ value: z.string(), unit: z.string().nullable() })),
+          }),
         }),
-      })),
+      ),
     }),
   }),
 });
@@ -32,75 +34,109 @@ const schema = z.strictObject({
 function check(ok: unknown, label: string): asserts ok {
   if (!ok) throw new Error(label);
 }
-Deno.test('Issue #40 diagnostics are opt-in, phase-aware, and redact all untrusted content', async () => {
-  const originalFetch = globalThis.fetch;
-  const originalInfo = console.info;
-  const prior = Deno.env.get('MCP_GET_POST_DIAGNOSTICS');
-  const logs: string[] = [];
-  console.info = (...args: unknown[]) => logs.push(args.map(String).join(' '));
-  const invokeFixture = async (response: () => Response | Promise<Response>) => {
-    globalThis.fetch = (() => Promise.resolve(response())) as typeof fetch;
-    return await invoke(
-      'get_post',
-      context,
-      { p_request_schema_version: 1, p_workspace_public_id: workspace },
-      schema,
-    );
-  };
-  try {
-    Deno.env.delete('MCP_GET_POST_DIAGNOSTICS');
-    await invokeFixture(() => new Response(fakeValue, { status: 200 }));
-    check(logs.length === 0, 'DIAGNOSTICS_MUST_BE_DEFAULT_OFF');
-
-    Deno.env.set('MCP_GET_POST_DIAGNOSTICS', '1');
-    const bad = await invokeFixture(() => new Response(JSON.stringify({
-      response_schema_version: 1,
-      data: { post: { fact_bindings: [{ source_snapshot: {
-        numbers: [{ value: 42, unit: null, [fakeValue]: fakeValue }],
-      } }] } },
-    }), { status: 200 }));
-    check('isError' in bad, 'STRICT_VALIDATION_MUST_STAY_MASKED');
-    check(logs.length === 1, 'INVALID_SCHEMA_EVENT_REQUIRED');
-    const parsed = JSON.parse(logs[0]!) as {
-      category: string; issues: Array<{ path: string; code: string }>;
-      request_id: string; body_bytes: number; http_status: number;
+Deno.test(
+  'Issue #40 diagnostics are opt-in, phase-aware, and redact all untrusted content',
+  async () => {
+    const originalFetch = globalThis.fetch;
+    const originalInfo = console.info;
+    const prior = Deno.env.get('MCP_GET_POST_DIAGNOSTICS');
+    const logs: string[] = [];
+    console.info = (...args: unknown[]) => logs.push(args.map(String).join(' '));
+    const invokeFixture = async (response: () => Response | Promise<Response>) => {
+      globalThis.fetch = (() => Promise.resolve(response())) as typeof fetch;
+      return await invoke(
+        'get_post',
+        context,
+        { p_request_schema_version: 1, p_workspace_public_id: workspace },
+        schema,
+      );
     };
-    check(parsed.category === 'invalid_schema', 'INVALID_SCHEMA_CATEGORY');
-    check(parsed.issues[0]?.path.includes('source_snapshot.numbers.[]'), 'PATH_CLASSIFICATION');
-    check(parsed.issues.every((issue) => !issue.path.includes(fakeValue)), 'NO_RAW_ZOD_PATH');
-    check(parsed.body_bytes > 0 && parsed.http_status === 200, 'VALID_STATUS_BYTES');
-    check(parsed.request_id === 'unavailable', 'UNTRUSTED_REQUEST_ID_REDACTED');
+    try {
+      Deno.env.delete('MCP_GET_POST_DIAGNOSTICS');
+      await invokeFixture(() => new Response(fakeValue, { status: 200 }));
+      check(logs.length === 0, 'DIAGNOSTICS_MUST_BE_DEFAULT_OFF');
 
-    logs.length = 0;
-    const huge = await invokeFixture(() => new Response(fakeValue.repeat(20000), { status: 200 }));
-    check('isError' in huge, 'SIZE_LIMIT_STILL_ENFORCED');
-    check(logs.some((record) => record.includes('response_too_large')), 'SIZE_EVENT');
+      Deno.env.set('MCP_GET_POST_DIAGNOSTICS', '1');
+      const bad = await invokeFixture(
+        () =>
+          new Response(
+            JSON.stringify({
+              response_schema_version: 1,
+              data: {
+                post: {
+                  fact_bindings: [
+                    {
+                      source_snapshot: {
+                        numbers: [{ value: 42, unit: null, [fakeValue]: fakeValue }],
+                      },
+                    },
+                  ],
+                },
+              },
+            }),
+            { status: 200 },
+          ),
+      );
+      check('isError' in bad, 'STRICT_VALIDATION_MUST_STAY_MASKED');
+      check(logs.length === 1, 'INVALID_SCHEMA_EVENT_REQUIRED');
+      const parsed = JSON.parse(logs[0]!) as {
+        category: string;
+        issues: Array<{ path: string; code: string }>;
+        request_id: string;
+        body_bytes: number;
+        http_status: number;
+      };
+      check(parsed.category === 'invalid_schema', 'INVALID_SCHEMA_CATEGORY');
+      check(parsed.issues[0]?.path.includes('source_snapshot.numbers.[]'), 'PATH_CLASSIFICATION');
+      check(
+        parsed.issues.every((issue) => !issue.path.includes(fakeValue)),
+        'NO_RAW_ZOD_PATH',
+      );
+      check(parsed.body_bytes > 0 && parsed.http_status === 200, 'VALID_STATUS_BYTES');
+      check(parsed.request_id === 'unavailable', 'UNTRUSTED_REQUEST_ID_REDACTED');
 
-    logs.length = 0;
-    await invokeFixture(() => new Response('{', { status: 200 }));
-    check(logs.some((record) => record.includes('invalid_json')), 'JSON_EVENT');
+      logs.length = 0;
+      const huge = await invokeFixture(
+        () => new Response(fakeValue.repeat(20000), { status: 200 }),
+      );
+      check('isError' in huge, 'SIZE_LIMIT_STILL_ENFORCED');
+      check(
+        logs.some((record) => record.includes('response_too_large')),
+        'SIZE_EVENT',
+      );
 
-    logs.length = 0;
-    await invokeFixture(() => new Response('{"message":"temporary"}', { status: 503 }));
-    check(logs.some((record) => record.includes('rpc_http_error')), 'HTTP_ERROR_EVENT');
+      logs.length = 0;
+      await invokeFixture(() => new Response('{', { status: 200 }));
+      check(
+        logs.some((record) => record.includes('invalid_json')),
+        'JSON_EVENT',
+      );
 
-    logs.length = 0;
-    emitGetPostDiagnostic('get_post', context, 'invalid_schema', 200, 10, [
-      { code: fakeValue, path: [fakeValue, 0, 'source_snapshot', 'numbers'] },
-    ]);
-    check(logs.length === 1, 'EXPLICIT_EVENT');
-    check(logs[0]!.includes('[field]'), 'UNTRUSTED_KEYS_REDACTED');
-    check(logs[0]!.includes('unknown'), 'UNTRUSTED_CODES_REDACTED');
+      logs.length = 0;
+      await invokeFixture(() => new Response('{"message":"temporary"}', { status: 503 }));
+      check(
+        logs.some((record) => record.includes('rpc_http_error')),
+        'HTTP_ERROR_EVENT',
+      );
 
-    for (const line of logs) {
-      check(!line.includes(fakeJwt), 'JWT_NOT_LOGGED');
-      check(!line.includes(fakeValue), 'CONTENT_NOT_LOGGED');
-      check(!line.includes(context.publishableKey), 'API_KEY_NOT_LOGGED');
+      logs.length = 0;
+      emitGetPostDiagnostic('get_post', context, 'invalid_schema', 200, 10, [
+        { code: fakeValue, path: [fakeValue, 0, 'source_snapshot', 'numbers'] },
+      ]);
+      check(logs.length === 1, 'EXPLICIT_EVENT');
+      check(logs[0]!.includes('[field]'), 'UNTRUSTED_KEYS_REDACTED');
+      check(logs[0]!.includes('unknown'), 'UNTRUSTED_CODES_REDACTED');
+
+      for (const line of logs) {
+        check(!line.includes(fakeJwt), 'JWT_NOT_LOGGED');
+        check(!line.includes(fakeValue), 'CONTENT_NOT_LOGGED');
+        check(!line.includes(context.publishableKey), 'API_KEY_NOT_LOGGED');
+      }
+    } finally {
+      if (prior === undefined) Deno.env.delete('MCP_GET_POST_DIAGNOSTICS');
+      else Deno.env.set('MCP_GET_POST_DIAGNOSTICS', prior);
+      globalThis.fetch = originalFetch;
+      console.info = originalInfo;
     }
-  } finally {
-    if (prior === undefined) Deno.env.delete('MCP_GET_POST_DIAGNOSTICS');
-    else Deno.env.set('MCP_GET_POST_DIAGNOSTICS', prior);
-    globalThis.fetch = originalFetch;
-    console.info = originalInfo;
-  }
-});
+  },
+);

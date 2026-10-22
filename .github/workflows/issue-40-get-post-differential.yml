@@ -54,13 +54,12 @@ jobs:
         run: |
           set -euo pipefail
           pnpm install --frozen-lockfile
-          pnpm exec prettier --write \
+          pnpm exec prettier --check \
             supabase/functions/mcp/post_base.ts \
             supabase/functions/mcp/foundation.ts \
             supabase/functions/mcp/get_post_diagnostic_test.ts \
             supabase/functions/mcp/get_post_differential_test.ts \
             supabase/tests/database/api-source-evidence-mcp-compat.test.ts
-          git diff -- supabase/functions/mcp/foundation.ts supabase/functions/mcp/get_post_diagnostic_test.ts supabase/functions/mcp/get_post_differential_test.ts supabase/tests/database/api-source-evidence-mcp-compat.test.ts
           pnpm run check
           pnpm run test:mcp
 

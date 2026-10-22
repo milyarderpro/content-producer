@@ -139,16 +139,13 @@ async function postgrestGetPost(
   return { status: response.status, bytes, jsonValid, ...(response.ok ? { rpc } : {}) };
 }
 
-
 // Distinct, synthetic source evidence variants modeled on the LIVE risk shapes.
 // Keep the original missing-date normalization test unchanged.
 function mixedSourceEvidence(position: number) {
   const primary = sourceWithoutOptionalDates(position);
-  const sources = [
-    position <= 4 ? { ...primary, updated_at: '2026-09-22' } : primary,
-  ];
+  const sources = [position <= 4 ? { ...primary, updated_at: '2026-09-22' } : primary];
   if (position === 2 || position === 6) {
-    const additional = sourceWithoutOptionalDates(position === 3 ? 1 : 3);
+    const additional = sourceWithoutOptionalDates(3);
     sources.push({
       ...additional,
       url: 'https://science.nasa.gov/moon/moon-facts/',
