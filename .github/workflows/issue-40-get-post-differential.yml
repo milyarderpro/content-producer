@@ -9,6 +9,8 @@ on:
       - 'supabase/functions/mcp/post_base.ts'
       - 'supabase/functions/mcp/foundation.ts'
       - 'supabase/functions/mcp/get_post_diagnostic_test.ts'
+      - 'supabase/migrations/20261022080000_preserve_get_post_source_snapshot_nulls.sql'
+      - 'docs/decisions/2026-10-22-cr-049-get-post-source-evidence-null-preservation.md'
       - 'supabase/tests/database/api-source-evidence-mcp-compat.test.ts'
   workflow_dispatch:
 

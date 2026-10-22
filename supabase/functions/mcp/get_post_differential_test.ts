@@ -129,6 +129,14 @@ Deno.test('Issue #40: eight SQL get_post projections retain strict MCP contract'
           ),
           'SOURCE_VARIANT_NON_NULL_UPDATE_DATE',
         );
+        check(
+          snapshots.some((snapshot) =>
+            snapshot.numbers.some((number) =>
+              number.unit === null && Object.hasOwn(number, 'unit')
+            ),
+          ),
+          'SOURCE_VARIANT_NULL_UNIT_KEY_PRESERVED',
+        );
       }
       check(post.status === 'draft' && post.revision === 1, label + ':UNCHANGED_DRAFT');
       check(parsed.data.data.approval === null, label + ':NO_APPROVAL');

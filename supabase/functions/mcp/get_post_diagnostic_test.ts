@@ -127,7 +127,7 @@ Deno.test(
       check(logs[0]!.includes('[field]'), 'UNTRUSTED_KEYS_REDACTED');
       check(logs[0]!.includes('unknown'), 'UNTRUSTED_CODES_REDACTED');
 
-      for (const line of logs) {
+      for (const line of allEmitted) {
         check(!line.includes(fakeJwt), 'JWT_NOT_LOGGED');
         check(!line.includes(fakeValue), 'CONTENT_NOT_LOGGED');
         check(!line.includes(context.publishableKey), 'API_KEY_NOT_LOGGED');
