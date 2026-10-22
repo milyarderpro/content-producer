@@ -1,9 +1,10 @@
 import { randomUUID } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { materializeMissingSourceNulls } from '../../functions/mcp/source_evidence_adapter.js';
 import { cleanup, content, editorial, save } from './helpers/post-rpc.js';
-import { fixture, json, reserve, reserved, row, rpc } from './helpers/trivia-rpc.js';
+import { fixture, json, quote, reserve, reserved, row, rpc, sql } from './helpers/trivia-rpc.js';
 
 const nasaPhase = 'https://science.nasa.gov/moon/moon-phases/';
 const nasaLight = 'https://science.nasa.gov/moon/moonlight/';
@@ -42,6 +43,81 @@ const sourceWithoutOptionalDates = (position: number) => {
   };
 };
 
+// Only local Supabase configuration is read; no keys, JWT or raw responses enter CI logs.
+function localAnonKey(): string {
+  const result = spawnSync('pnpm', ['exec', 'supabase', 'status', '--output', 'json'], {
+    encoding: 'utf8',
+    env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
+  });
+  if (result.error || result.status !== 0) throw new Error('LOCAL_SUPABASE_STATUS_FAILED');
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(result.stdout.slice(result.stdout.indexOf('{'))) as Record<string, unknown>;
+  } catch {
+    throw new Error('LOCAL_SUPABASE_STATUS_NOT_JSON');
+  }
+  const key = parsed.ANON_KEY;
+  if (typeof key !== 'string' || key.length < 20) throw new Error('LOCAL_ANON_KEY_MISSING');
+  return key;
+}
+
+async function fixtureAccessToken(id: string, password: string, anonKey: string): Promise<string> {
+  const response = await fetch('http://127.0.0.1:54321/auth/v1/token?grant_type=password', {
+    method: 'POST',
+    headers: { apikey: anonKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: id + '@example.test', password }),
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!response.ok) throw new Error('LOCAL_FIXTURE_AUTH_FAILED_HTTP_' + response.status);
+  const session = (await response.json()) as { access_token?: unknown; user?: { id?: string } };
+  if (session.user?.id !== id || typeof session.access_token !== 'string') {
+    throw new Error('LOCAL_FIXTURE_AUTH_IDENTITY_MISMATCH');
+  }
+  return session.access_token;
+}
+
+async function postgrestGetPost(
+  anonKey: string,
+  jwt: string,
+  workspace: string,
+  postId: string,
+  sources: boolean,
+  checks: boolean,
+  metrics: boolean,
+): Promise<{ status: number; bytes: number; jsonValid: boolean; rpc?: unknown }> {
+  const response = await fetch('http://127.0.0.1:54321/rest/v1/rpc/get_post', {
+    method: 'POST',
+    redirect: 'error',
+    signal: AbortSignal.timeout(10000),
+    headers: {
+      apikey: anonKey,
+      Authorization: 'Bearer ' + jwt,
+      'Content-Type': 'application/json',
+      'Accept-Profile': 'api',
+      'Content-Profile': 'api',
+    },
+    body: JSON.stringify({
+      p_request_schema_version: 1,
+      p_workspace_public_id: workspace,
+      p_post_public_id: postId,
+      p_include_sources: sources,
+      p_include_checks: checks,
+      p_include_latest_metrics: metrics,
+    }),
+  });
+  const body = await response.text();
+  const bytes = Buffer.byteLength(body, 'utf8');
+  let rpc: unknown;
+  let jsonValid = false;
+  try {
+    rpc = JSON.parse(body);
+    jsonValid = true;
+  } catch {
+    // Keep only status/size/classification; never log the raw body.
+  }
+  return { status: response.status, bytes, jsonValid, ...(response.ok ? { rpc } : {}) };
+}
+
 describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated post flow', () => {
   it('pinpoints the omitted three keys on every fact, preserves tier pairing and rejects unsafe metadata', () => {
     for (let position = 1; position <= 7; position++) {
@@ -78,7 +154,7 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
     }
   });
 
-  it('takes owner context through seven-source reservation, draft save, and source/quality readback', () => {
+  it('takes owner context through seven-source reservation, draft save, and source/quality readback', async () => {
     const f = fixture();
     try {
       const ctx = rpc(
@@ -238,6 +314,74 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
       if (diagnosticPath) {
         writeFileSync(diagnosticPath, JSON.stringify(diagnostic), { mode: 0o600 });
       }
+      // Same live fixture, now across actual Kong/PostgREST HTTP (not a fetch stub).
+      // The two auth.users were created by fixture(); assign isolated bcrypt
+      // passwords without ever persisting or printing them.
+      const password = randomUUID() + '-fixture-password';
+      sql(`update auth.users set encrypted_password =
+        extensions.crypt(${quote(password)}, extensions.gen_salt('bf'))
+        where id in ('${f.owner}'::uuid, '${f.other}'::uuid)`);
+      const anonKey = localAnonKey();
+      const ownerJwt = await fixtureAccessToken(f.owner, password, anonKey);
+      const otherJwt = await fixtureAccessToken(f.other, password, anonKey);
+      const httpDiagnostic: Array<{
+        sources: boolean;
+        checks: boolean;
+        metrics: boolean;
+        status: number;
+        bytes: number;
+        jsonValid: boolean;
+        rpc?: unknown;
+      }> = [];
+      for (const sources of [false, true]) {
+        for (const checks of [false, true]) {
+          for (const metrics of [false, true]) {
+            const result = await postgrestGetPost(
+              anonKey,
+              ownerJwt,
+              f.workspace,
+              persistedPost.data.post.post_public_id,
+              sources,
+              checks,
+              metrics,
+            );
+            httpDiagnostic.push({ sources, checks, metrics, ...result });
+          }
+        }
+      }
+      // A genuinely authenticated but foreign user must not access this workspace.
+      const foreign = await postgrestGetPost(
+        anonKey,
+        otherJwt,
+        f.workspace,
+        persistedPost.data.post.post_public_id,
+        true,
+        true,
+        false,
+      );
+      const httpDiagnosticPath = process.env.GET_POST_HTTP_DIFFERENTIAL_FILE;
+      if (httpDiagnosticPath) {
+        writeFileSync(
+          httpDiagnosticPath,
+          JSON.stringify({
+            cases: httpDiagnostic,
+            negative: {
+              status: foreign.status,
+              bytes: foreign.bytes,
+              jsonValid: foreign.jsonValid,
+            },
+          }),
+          { mode: 0o600 },
+        );
+      }
+      // Never include JWT, source snapshot or raw HTTP response in assertion text.
+      expect(httpDiagnostic).toHaveLength(8);
+      expect(httpDiagnostic.every((sample) => sample.status === 200 && sample.jsonValid)).toBe(
+        true,
+      );
+      expect(foreign.status >= 400 && foreign.status < 500, 'WRONG_OWNER_HTTP_DENIED').toBe(
+        true,
+      );
 
       const fetched = rpc(
         f,

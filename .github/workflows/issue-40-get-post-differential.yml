@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   isolated-differential:
-    name: Seven-fact SQL RPC and MCP output flags (no hosted database)
+    name: Seven-fact SQL and real owner-JWT PostgREST HTTP differential
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
@@ -74,21 +74,23 @@ jobs:
         run: |
           set -euo pipefail
           export GET_POST_DIFFERENTIAL_FILE="$RUNNER_TEMP/issue-40-sql-matrix.json"
+          export GET_POST_HTTP_DIFFERENTIAL_FILE="$RUNNER_TEMP/issue-40-http-matrix.json"
           set +e
           pnpm exec vitest run --config vitest.database.config.ts \
             supabase/tests/database/api-source-evidence-mcp-compat.test.ts
           db_status=$?
           set -e
           test -s "$GET_POST_DIFFERENTIAL_FILE"
+          test -s "$GET_POST_HTTP_DIFFERENTIAL_FILE"
           (cd supabase/functions && deno test \
-            --allow-env=GET_POST_DIFFERENTIAL_FILE \
-            --allow-read="$GET_POST_DIFFERENTIAL_FILE" \
+            --allow-env=GET_POST_DIFFERENTIAL_FILE,GET_POST_HTTP_DIFFERENTIAL_FILE \
+            --allow-read="$GET_POST_DIFFERENTIAL_FILE,$GET_POST_HTTP_DIFFERENTIAL_FILE" \
             mcp/get_post_differential_test.ts)
           test "$db_status" -eq 0
 
       - name: Note evidence boundary
         if: always()
         run: |
-          echo 'SQL runs on disposable local Supabase only; MCP HTTP 200 is simulated from SQL JSON.' >> "$GITHUB_STEP_SUMMARY"
-          echo 'No production PostgREST HTTP status, secret, token, raw SQL or source document is captured.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Real owner-JWT PostgREST HTTP and SQL run on disposable local Supabase; only adapter replay uses simulated HTTP.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Only sanitized local HTTP status, byte counts and Zod issue paths are reported; no token/raw payload is logged.' >> "$GITHUB_STEP_SUMMARY"
           echo 'This focused run does not replace a >10-minute CR-020/044 full technical gate.' >> "$GITHUB_STEP_SUMMARY"
