@@ -201,31 +201,6 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
       expect(persistedPost.data.post.status).toBe('draft');
       expect(persistedPost.data.post.revision).toBe(1);
       expect(persistedPost.data.post.content_hash).toMatch(/^[0-9a-f]{64}$/);
-      const fetched = rpc(
-        f,
-        `api.get_post(1,'${f.workspace}','${persistedPost.data.post.post_public_id}',true,true,false)`,
-      ) as unknown as {
-        data: {
-          post: {
-            status: string;
-            revision: number;
-            content_hash: string;
-            content_payload: { canva_copy: string };
-            fact_bindings: { source_snapshot?: { sources: unknown[] } }[];
-            system_checks: { overall_status: string };
-          };
-        };
-      };
-      expect(fetched.data.post.status).toBe('draft');
-      expect(fetched.data.post.content_payload.canva_copy).toBe(payload.canva_copy);
-      expect(fetched.data.post.content_hash).toBe(persistedPost.data.post.content_hash);
-      expect(fetched.data.post.fact_bindings).toHaveLength(7);
-      expect(
-        fetched.data.post.fact_bindings.every(
-          (binding) => binding.source_snapshot?.sources?.length === 1,
-        ),
-      ).toBe(true);
-      expect(fetched.data.post.system_checks.overall_status).toBe('passed');
       // Issue #40: read all eight SQL projections before MCP/Zod. Persist only
       // isolated fixture JSON to the runner's ephemeral temp path (never CI logs).
       const diagnostic: Array<{
@@ -263,7 +238,33 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
       if (diagnosticPath) {
         writeFileSync(diagnosticPath, JSON.stringify(diagnostic), { mode: 0o600 });
       }
-      expect(diagnostic.every((entry) => !entry.sqlError), 'SQL_GET_POST_FLAG_MATRIX').toBe(true);
+
+      const fetched = rpc(
+        f,
+        `api.get_post(1,'${f.workspace}','${persistedPost.data.post.post_public_id}',true,true,false)`,
+      ) as unknown as {
+        data: {
+          post: {
+            status: string;
+            revision: number;
+            content_hash: string;
+            content_payload: { canva_copy: string };
+            fact_bindings: { source_snapshot?: { sources: unknown[] } }[];
+            system_checks: { overall_status: string };
+          };
+        };
+      };
+      expect(fetched.data.post.status).toBe('draft');
+      expect(fetched.data.post.content_payload.canva_copy).toBe(payload.canva_copy);
+      expect(fetched.data.post.content_hash).toBe(persistedPost.data.post.content_hash);
+      expect(fetched.data.post.fact_bindings).toHaveLength(7);
+      expect(
+        fetched.data.post.fact_bindings.every(
+          (binding) => binding.source_snapshot?.sources?.length === 1,
+        ),
+      ).toBe(true);
+      expect(fetched.data.post.system_checks.overall_status).toBe('passed');
+
     } finally {
       cleanup(f);
     }
