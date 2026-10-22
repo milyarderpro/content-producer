@@ -134,12 +134,7 @@ Deno.test(
         `get_post HTTP ${label}: status=${sample.status} bytes=${sample.bytes} json=${sample.jsonValid ? 'OK' : 'FAIL'} zod=${parsed.success ? 'OK' : 'FAIL'} paths=${paths.join(',') || '-'}`,
       );
       const bodyBytes = sample.bytes ?? Number.POSITIVE_INFINITY;
-      if (
-        sample.status !== 200 ||
-        !sample.jsonValid ||
-        bodyBytes > 256 * 1024 ||
-        !parsed.success
-      ) {
+      if (sample.status !== 200 || !sample.jsonValid || bodyBytes > 256 * 1024 || !parsed.success) {
         failures.push(label);
         continue;
       }
