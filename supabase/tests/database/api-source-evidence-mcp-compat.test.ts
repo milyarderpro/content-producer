@@ -1,10 +1,10 @@
-import { randomUUID } from 'node:crypto';
+import { createHmac, randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { materializeMissingSourceNulls } from '../../functions/mcp/source_evidence_adapter.js';
 import { cleanup, content, editorial, save } from './helpers/post-rpc.js';
-import { fixture, json, quote, reserve, reserved, row, rpc, sql } from './helpers/trivia-rpc.js';
+import { fixture, json, reserve, reserved, row, rpc } from './helpers/trivia-rpc.js';
 
 const nasaPhase = 'https://science.nasa.gov/moon/moon-phases/';
 const nasaLight = 'https://science.nasa.gov/moon/moonlight/';
@@ -61,19 +61,44 @@ function localAnonKey(): string {
   return key;
 }
 
-async function fixtureAccessToken(id: string, password: string, anonKey: string): Promise<string> {
-  const response = await fetch('http://127.0.0.1:54321/auth/v1/token?grant_type=password', {
-    method: 'POST',
-    headers: { apikey: anonKey, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: id + '@example.test', password }),
-    signal: AbortSignal.timeout(10000),
+function fixtureOwnerJwt(userId: string): string {
+  // Read the ephemeral local Auth signing secret without logging or persisting it.
+  // A direct password grant cannot supply the required OAuth client_id claim.
+  const result = spawnSync('docker', ['inspect', 'supabase_auth_content-producer'], {
+    encoding: 'utf8',
   });
-  if (!response.ok) throw new Error('LOCAL_FIXTURE_AUTH_FAILED_HTTP_' + response.status);
-  const session = (await response.json()) as { access_token?: unknown; user?: { id?: string } };
-  if (session.user?.id !== id || typeof session.access_token !== 'string') {
-    throw new Error('LOCAL_FIXTURE_AUTH_IDENTITY_MISMATCH');
+  if (result.error || result.status !== 0) {
+    throw new Error('LOCAL_AUTH_CONTAINER_NOT_FOUND');
   }
-  return session.access_token;
+  let env: string[];
+  try {
+    const container = JSON.parse(result.stdout) as Array<{ Config?: { Env?: string[] } }>;
+    env = container[0]?.Config?.Env ?? [];
+  } catch {
+    throw new Error('LOCAL_AUTH_CONTAINER_INFO_INVALID');
+  }
+  const entry = env.find((value) => value.startsWith('GOTRUE_JWT_SECRET='));
+  const secret = entry?.slice('GOTRUE_JWT_SECRET='.length);
+  if (!secret || secret.length < 20) throw new Error('LOCAL_SIGNING_KEY_UNAVAILABLE');
+  const now = Math.floor(Date.now() / 1000);
+  const encode = (value: object) => Buffer.from(JSON.stringify(value)).toString('base64url');
+  const unsigned =
+    encode({ alg: 'HS256', typ: 'JWT' }) +
+    '.' +
+    encode({
+      sub: userId,
+      role: 'authenticated',
+      client_id: randomUUID(),
+      aud: 'authenticated',
+      iss: 'http://127.0.0.1:54321/auth/v1',
+      iat: now,
+      exp: now + 600,
+    });
+  return (
+    unsigned +
+    '.' +
+    createHmac('sha256', secret).update(unsigned).digest('base64url')
+  );
 }
 
 async function postgrestGetPost(
@@ -315,15 +340,12 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
         writeFileSync(diagnosticPath, JSON.stringify(diagnostic), { mode: 0o600 });
       }
       // Same live fixture, now across actual Kong/PostgREST HTTP (not a fetch stub).
-      // The two auth.users were created by fixture(); assign isolated bcrypt
-      // passwords without ever persisting or printing them.
-      const password = randomUUID() + '-fixture-password';
-      sql(`update auth.users set encrypted_password =
-        extensions.crypt(${quote(password)}, extensions.gen_salt('bf'))
-        where id in ('${f.owner}'::uuid, '${f.other}'::uuid)`);
+      // JWTs are locally signed for real auth.users fixture identities, with
+      // the OAuth client_id required by the unchanged database security gate.
+      // No LIVE user credentials, service-role request, or test auth bypass.
       const anonKey = localAnonKey();
-      const ownerJwt = await fixtureAccessToken(f.owner, password, anonKey);
-      const otherJwt = await fixtureAccessToken(f.other, password, anonKey);
+      const ownerJwt = fixtureOwnerJwt(f.owner);
+      const otherJwt = fixtureOwnerJwt(f.other);
       const httpDiagnostic: Array<{
         sources: boolean;
         checks: boolean;
@@ -379,9 +401,7 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
       expect(httpDiagnostic.every((sample) => sample.status === 200 && sample.jsonValid)).toBe(
         true,
       );
-      expect(foreign.status >= 400 && foreign.status < 500, 'WRONG_OWNER_HTTP_DENIED').toBe(
-        true,
-      );
+      expect(foreign.status >= 400 && foreign.status < 500, 'WRONG_OWNER_HTTP_DENIED').toBe(true);
 
       const fetched = rpc(
         f,

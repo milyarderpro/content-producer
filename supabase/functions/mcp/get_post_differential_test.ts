@@ -109,68 +109,73 @@ Deno.test('Issue #40: eight SQL get_post projections retain strict MCP contract'
 
 // An independent PostgREST boundary: actual local owner JWT is used by the
 // preceding Vitest fixture before teardown. Only ephemeral JSON is carried here.
-Deno.test('Issue #40: real authenticated PostgREST HTTP responses validate all eight outputs', async () => {
-  const path = Deno.env.get('GET_POST_HTTP_DIFFERENTIAL_FILE');
-  check(path, 'MISSING_REAL_HTTP_MATRIX');
-  const captured = JSON.parse(await Deno.readTextFile(path)) as {
-    cases: Array<Sample & { status: number; jsonValid: boolean }>;
-    negative: { status: number; bytes: number; jsonValid: boolean };
-  };
-  check(captured.cases.length === 8, 'HTTP_EXPECTED_EIGHT_COMBINATIONS');
-  const seen = new Set<string>();
-  const failures: string[] = [];
-  for (const sample of captured.cases) {
-    const label = `${Number(sample.sources)}${Number(sample.checks)}${Number(sample.metrics)}`;
-    check(!seen.has(label), 'HTTP_DUPLICATE_CASE');
-    seen.add(label);
-    const parsed = getPostOutputSchema.safeParse(sample.rpc);
-    const paths = parsed.success
-      ? []
-      : parsed.error.issues.map((issue) => `${issue.path.join('.')}:${issue.code}`);
-    // Only safe structural diagnostics. No JWT, raw response or source text.
-    console.log(
-      `get_post HTTP ${label}: status=${sample.status} bytes=${sample.bytes} json=${sample.jsonValid ? 'OK' : 'FAIL'} zod=${parsed.success ? 'OK' : 'FAIL'} paths=${paths.join(',') || '-'}`,
-    );
-    if (
-      sample.status !== 200 ||
-      !sample.jsonValid ||
-      sample.bytes > 256 * 1024 ||
-      !parsed.success
-    ) {
-      failures.push(label);
-      continue;
+Deno.test(
+  'Issue #40: real authenticated PostgREST HTTP responses validate all eight outputs',
+  async () => {
+    const path = Deno.env.get('GET_POST_HTTP_DIFFERENTIAL_FILE');
+    check(path, 'MISSING_REAL_HTTP_MATRIX');
+    const captured = JSON.parse(await Deno.readTextFile(path)) as {
+      cases: Array<Sample & { status: number; jsonValid: boolean }>;
+      negative: { status: number; bytes: number; jsonValid: boolean };
+    };
+    check(captured.cases.length === 8, 'HTTP_EXPECTED_EIGHT_COMBINATIONS');
+    const seen = new Set<string>();
+    const failures: string[] = [];
+    for (const sample of captured.cases) {
+      const label = `${Number(sample.sources)}${Number(sample.checks)}${Number(sample.metrics)}`;
+      check(!seen.has(label), 'HTTP_DUPLICATE_CASE');
+      seen.add(label);
+      const parsed = getPostOutputSchema.safeParse(sample.rpc);
+      const paths = parsed.success
+        ? []
+        : parsed.error.issues.map((issue) => `${issue.path.join('.')}:${issue.code}`);
+      // Only safe structural diagnostics. No JWT, raw response or source text.
+      console.log(
+        `get_post HTTP ${label}: status=${sample.status} bytes=${sample.bytes} json=${sample.jsonValid ? 'OK' : 'FAIL'} zod=${parsed.success ? 'OK' : 'FAIL'} paths=${paths.join(',') || '-'}`,
+      );
+      if (
+        sample.status !== 200 ||
+        !sample.jsonValid ||
+        sample.bytes > 256 * 1024 ||
+        !parsed.success
+      ) {
+        failures.push(label);
+        continue;
+      }
+      const data = parsed.data.data;
+      const post = data.post;
+      check(post.fact_bindings.length === 7, label + ':HTTP_SEVEN_BINDINGS');
+      check(
+        post.fact_bindings.every((binding) =>
+          sample.sources
+            ? (binding.source_snapshot?.sources.length ?? 0) > 0
+            : !binding.source_snapshot,
+        ),
+        label + ':HTTP_SOURCE_VISIBILITY',
+      );
+      check(
+        sample.checks
+          ? post.system_checks !== null &&
+              post.editorial_checks !== null &&
+              Object.keys(post.system_checks).length > 0 &&
+              Object.keys(post.editorial_checks).length > 0
+          : post.system_checks === null && post.editorial_checks === null,
+        label + ':HTTP_CHECK_VISIBILITY',
+      );
+      check(post.status === 'draft' && post.revision === 1, label + ':HTTP_DRAFT');
+      check(data.approval === null && data.latest_metrics === null, label + ':HTTP_UNAPPROVED');
+      const forbidden =
+        /"(?:owner_user_id|oauth_client_id|reservation_token|claim_token|access_token|refresh_token|password|secret|internal_id)"\s*:/i;
+      check(!forbidden.test(JSON.stringify(parsed.data)), label + ':HTTP_PRIVATE_FIELD');
     }
-    const data = parsed.data.data;
-    const post = data.post;
-    check(post.fact_bindings.length === 7, label + ':HTTP_SEVEN_BINDINGS');
-    check(
-      post.fact_bindings.every((binding) =>
-        sample.sources
-          ? (binding.source_snapshot?.sources.length ?? 0) > 0
-          : !binding.source_snapshot,
-      ),
-      label + ':HTTP_SOURCE_VISIBILITY',
+    console.log(
+      `get_post HTTP foreign-owner: status=${captured.negative.status} bytes=${captured.negative.bytes} json=${captured.negative.jsonValid ? 'OK' : 'FAIL'}`,
     );
     check(
-      sample.checks
-        ? post.system_checks !== null &&
-            post.editorial_checks !== null &&
-            Object.keys(post.system_checks).length > 0 &&
-            Object.keys(post.editorial_checks).length > 0
-        : post.system_checks === null && post.editorial_checks === null,
-      label + ':HTTP_CHECK_VISIBILITY',
+      captured.negative.status >= 400 && captured.negative.status < 500,
+      'HTTP_CROSS_OWNER_DENIAL',
     );
-    check(post.status === 'draft' && post.revision === 1, label + ':HTTP_DRAFT');
-    check(data.approval === null && data.latest_metrics === null, label + ':HTTP_UNAPPROVED');
-    const forbidden = /"(?:owner_user_id|oauth_client_id|reservation_token|claim_token|access_token|refresh_token|password|secret|internal_id)"\s*:/i;
-    check(!forbidden.test(JSON.stringify(parsed.data)), label + ':HTTP_PRIVATE_FIELD');
-  }
-  console.log(
-    `get_post HTTP foreign-owner: status=${captured.negative.status} bytes=${captured.negative.bytes} json=${captured.negative.jsonValid ? 'OK' : 'FAIL'}`,
-  );
-  check(
-    captured.negative.status >= 400 && captured.negative.status < 500,
-    'HTTP_CROSS_OWNER_DENIAL',
-  );
-  check(seen.size === 8 && failures.length === 0, 'HTTP_MATRIX_FAILURE:' + failures.join(','));
-});
+    check(seen.size === 8 && failures.length === 0, 'HTTP_MATRIX_FAILURE:' + failures.join(','));
+
+  },
+);
