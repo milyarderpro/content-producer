@@ -94,11 +94,7 @@ function fixtureOwnerJwt(userId: string): string {
       iat: now,
       exp: now + 600,
     });
-  return (
-    unsigned +
-    '.' +
-    createHmac('sha256', secret).update(unsigned).digest('base64url')
-  );
+  return unsigned + '.' + createHmac('sha256', secret).update(unsigned).digest('base64url');
 }
 
 async function postgrestGetPost(

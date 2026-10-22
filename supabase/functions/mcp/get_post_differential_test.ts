@@ -176,6 +176,5 @@ Deno.test(
       'HTTP_CROSS_OWNER_DENIAL',
     );
     check(seen.size === 8 && failures.length === 0, 'HTTP_MATRIX_FAILURE:' + failures.join(','));
-
   },
 );
