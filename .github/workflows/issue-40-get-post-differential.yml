@@ -74,13 +74,17 @@ jobs:
         run: |
           set -euo pipefail
           export GET_POST_DIFFERENTIAL_FILE="$RUNNER_TEMP/issue-40-sql-matrix.json"
+          set +e
           pnpm exec vitest run --config vitest.database.config.ts \
             supabase/tests/database/api-source-evidence-mcp-compat.test.ts
+          db_status=$?
+          set -e
           test -s "$GET_POST_DIFFERENTIAL_FILE"
           (cd supabase/functions && deno test \
             --allow-env=GET_POST_DIFFERENTIAL_FILE \
             --allow-read="$GET_POST_DIFFERENTIAL_FILE" \
             mcp/get_post_differential_test.ts)
+          test "$db_status" -eq 0
 
       - name: Note evidence boundary
         if: always()
