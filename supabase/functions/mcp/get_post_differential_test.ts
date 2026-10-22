@@ -131,8 +131,8 @@ Deno.test('Issue #40: eight SQL get_post projections retain strict MCP contract'
         );
         check(
           snapshots.some((snapshot) =>
-            snapshot.numbers.some((number) =>
-              number.unit === null && Object.hasOwn(number, 'unit')
+            snapshot.numbers.some(
+              (number) => number.unit === null && Object.hasOwn(number, 'unit'),
             ),
           ),
           'SOURCE_VARIANT_NULL_UNIT_KEY_PRESERVED',

@@ -7,20 +7,31 @@
 do $migration$
 declare
   source_definition text;
+  open_position integer;
+  close_position integer;
   open_anchor constant text := E'select coalesce(jsonb_agg(\n    jsonb_strip_nulls(jsonb_build_object(';
   close_anchor constant text := ')) order by usage.position asc, usage.id asc';
 begin
   source_definition := pg_catalog.pg_get_functiondef(
     'api.get_post(integer,uuid,uuid,boolean,boolean,boolean)'::pg_catalog.regprocedure
   );
-  if pg_catalog.strpos(source_definition, open_anchor) = 0
-    or pg_catalog.strpos(source_definition, close_anchor) = 0
+  open_position := pg_catalog.strpos(source_definition, open_anchor);
+  close_position := pg_catalog.strpos(source_definition, close_anchor);
+  if open_position = 0
+    or close_position < open_position + pg_catalog.length(open_anchor)
     or pg_catalog.strpos(
       pg_catalog.substr(
         source_definition,
-        pg_catalog.strpos(source_definition, open_anchor) + pg_catalog.length(open_anchor)
+        open_position + pg_catalog.length(open_anchor)
       ),
       open_anchor
+    ) <> 0
+    or pg_catalog.strpos(
+      pg_catalog.substr(
+        source_definition,
+        close_position + pg_catalog.length(close_anchor)
+      ),
+      close_anchor
     ) <> 0 then
     raise exception 'UNEXPECTED_GET_POST_SOURCE_PROJECTION';
   end if;

@@ -421,9 +421,9 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
       }
       // Never include JWT, source snapshot or raw HTTP response in assertion text.
       expect(httpDiagnostic).toHaveLength(8);
-      expect(httpDiagnostic.every((sample) => sample.status === 200 && sample.jsonValid)).toBe(
-        true,
-      );
+      expect(
+        httpDiagnostic.every((sample) => sample.status === 200 && sample.jsonValid),
+      ).toBe(true);
       expect(foreign.status >= 400 && foreign.status < 500, 'WRONG_OWNER_HTTP_DENIED').toBe(true);
 
       const fetched = rpc(
