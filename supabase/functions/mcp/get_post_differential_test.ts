@@ -1,0 +1,106 @@
+// Issue #40: compare real isolated SQL RPC JSON with the unchanged strict MCP
+// output schema and the masking boundary. No production connection or tokens.
+import type { RequestContext } from './auth.ts';
+import { invoke } from './foundation.ts';
+import { getPostOutputSchema } from './post_base.ts';
+
+type Sample = {
+  sources: boolean;
+  checks: boolean;
+  metrics: boolean;
+  bytes?: number;
+  sqlError?: boolean;
+  rpc?: unknown;
+};
+const workspace = '44444444-4444-4444-8444-444444444444';
+const context: RequestContext = {
+  requestId: 'issue-40-isolated',
+  actorUserId: '11111111-1111-4111-8111-111111111111',
+  oauthClientId: '33333333-3333-4333-8333-333333333333',
+  workspacePublicId: workspace,
+  accessToken: 'local-fixture-only',
+  supabaseUrl: 'http://127.0.0.1:54321',
+  publishableKey: 'local-fixture-key',
+};
+
+function check(condition: unknown, message: string): asserts condition {
+  if (!condition) throw new Error(message);
+}
+Deno.test('Issue #40: eight SQL get_post projections retain strict MCP contract', async () => {
+  const path = Deno.env.get('GET_POST_DIFFERENTIAL_FILE');
+  check(path, 'MISSING_ISOLATED_SQL_MATRIX');
+  const samples = JSON.parse(await Deno.readTextFile(path)) as Sample[];
+  check(samples.length === 8, 'EXPECTED_EIGHT_FLAG_COMBINATIONS');
+  const labels = new Set<string>();
+  const failures: string[] = [];
+  const original = globalThis.fetch;
+  try {
+    for (const sample of samples) {
+      const label = `${Number(sample.sources)}${Number(sample.checks)}${Number(sample.metrics)}`;
+      check(!labels.has(label), 'DUPLICATE_FLAG_COMBINATION');
+      labels.add(label);
+      if (sample.sqlError || !sample.rpc) {
+        console.log(`get_post matrix ${label}: SQL_RPC_ERROR`);
+        failures.push(label + ':SQL');
+        continue;
+      }
+      const parsed = getPostOutputSchema.safeParse(sample.rpc);
+      const issues = parsed.success
+        ? []
+        : parsed.error.issues.map((issue) => `${issue.path.join('.')}:${issue.code}`);
+      // Paths and codes only; no values, source documents, SQL, JWT or response body.
+      globalThis.fetch = (() =>
+        Promise.resolve(
+          new Response(JSON.stringify(sample.rpc), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        )) as typeof fetch;
+      const response = await invoke(
+        'get_post',
+        context,
+        {
+          p_request_schema_version: 1,
+          p_workspace_public_id: workspace,
+          p_include_sources: sample.sources,
+          p_include_checks: sample.checks,
+          p_include_latest_metrics: sample.metrics,
+        },
+        getPostOutputSchema,
+      );
+      const adapterOk = !('isError' in response);
+      console.log(
+        `get_post matrix ${label}: sql=OK bytes=${sample.bytes ?? '?'} json=OK zod=${parsed.success ? 'OK' : 'FAIL'} adapter=${adapterOk ? 'OK' : 'MASKED'} paths=${issues.join(',') || '-'}`,
+      );
+      if (!parsed.success || !adapterOk) {
+        failures.push(label + ':SCHEMA_OR_REDACTION');
+        continue;
+      }
+      const post = parsed.data.data.post;
+      check(post.fact_bindings.length === 7, label + ':SEVEN_ALLOCATIONS_REQUIRED');
+      check(
+        post.fact_bindings.every((binding) =>
+          sample.sources ? (binding.source_snapshot?.sources.length ?? 0) > 0 : !binding.source_snapshot
+        ),
+        label + ':SOURCE_INCLUDE_EXCLUDE',
+      );
+      check(
+        sample.checks
+          ? post.system_checks !== null &&
+              post.editorial_checks !== null &&
+              Object.keys(post.system_checks).length > 0 &&
+              Object.keys(post.editorial_checks).length > 0
+          : post.system_checks === null && post.editorial_checks === null,
+        label + ':CHECK_INCLUDE_EXCLUDE',
+      );
+      check(post.status === 'draft' && post.revision === 1, label + ':UNCHANGED_DRAFT');
+      check(parsed.data.data.approval === null, label + ':NO_APPROVAL');
+      // No metrics exist for the draft: include_latest_metrics must still succeed.
+      check(parsed.data.data.latest_metrics === null, label + ':NO_METRICS_FOR_DRAFT');
+    }
+  } finally {
+    globalThis.fetch = original;
+  }
+  check(labels.size === 8, 'FLAG_MATRIX_INCOMPLETE');
+  check(failures.length === 0, 'GET_POST_DIFFERENTIAL_FAILURE:' + failures.join(','));
+});
