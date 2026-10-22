@@ -34,23 +34,20 @@ const pinnedPostBaselineMigrations = manifest.slice(67).map(({ file }) => {
     git_blob_sha1: createHash('sha1').update(`blob ${body.length}\0`).update(body).digest('hex'),
   };
 });
-deepStrictEqual(
-  pinnedPostBaselineMigrations,
-  [
-    {
-      file: '20261016120000_add_mcp_oauth_resource_audience_hook.sql',
-      git_blob_sha1: 'df0aa723c7eab77085f5badf532915258f719473',
-    },
-    {
-      file: '20261020074800_expose_generation_context_config_public_id.sql',
-      git_blob_sha1: '21101f64796019ce9ea97aee75b39874450c3631',
-    },
-    {
-      file: '20261022080000_preserve_get_post_source_snapshot_nulls.sql',
-      git_blob_sha1: 'fb98e61e253ec96748fa2405c89bcf12680560f0',
-    },
-  ],
-);
+deepStrictEqual(pinnedPostBaselineMigrations, [
+  {
+    file: '20261016120000_add_mcp_oauth_resource_audience_hook.sql',
+    git_blob_sha1: 'df0aa723c7eab77085f5badf532915258f719473',
+  },
+  {
+    file: '20261020074800_expose_generation_context_config_public_id.sql',
+    git_blob_sha1: '21101f64796019ce9ea97aee75b39874450c3631',
+  },
+  {
+    file: '20261022080000_preserve_get_post_source_snapshot_nulls.sql',
+    git_blob_sha1: 'fb98e61e253ec96748fa2405c89bcf12680560f0',
+  },
+]);
 const applied = row<{ versions: string[] }>(
   'select array_agg(version order by version) versions from supabase_migrations.schema_migrations',
 ).versions;
@@ -233,11 +230,7 @@ assert.notEqual(currentGetPostSha, archivedGetPostSha);
 const archivedGetPostFunctions = (
   expected.extra.functions as { signature: string; source_sha256: string }[]
 ).filter((x) => x.signature === getPostSignature);
-assert.equal(
-  archivedGetPostFunctions.length,
-  1,
-  'Exactly one archived get_post RPC expected',
-);
+assert.equal(archivedGetPostFunctions.length, 1, 'Exactly one archived get_post RPC expected');
 assert.equal(
   archivedGetPostSha,
   archivedGetPostFunctions[0].source_sha256,
@@ -246,11 +239,7 @@ assert.equal(
 const currentGetPostFunctions = (
   extra.functions as { signature: string; source_sha256: string }[]
 ).filter((x) => x.signature === getPostSignature);
-assert.equal(
-  currentGetPostFunctions.length,
-  1,
-  'Exactly one current get_post RPC expected',
-);
+assert.equal(currentGetPostFunctions.length, 1, 'Exactly one current get_post RPC expected');
 assert.equal(
   currentGetPostFunctions[0].source_sha256,
   currentGetPostSha,

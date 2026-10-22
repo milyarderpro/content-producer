@@ -64,8 +64,7 @@ jobs:
             supabase/functions/mcp/get_post_differential_test.ts \
             supabase/tests/database/api-source-evidence-mcp-compat.test.ts
           pnpm exec prettier --write docs/decisions/2026-10-22-cr-049-get-post-source-evidence-null-preservation.md
-          pnpm exec prettier --write scripts/phase-6-catalog-audit.ts
-          git diff -- scripts/phase-6-catalog-audit.ts
+          pnpm exec prettier --check scripts/phase-6-catalog-audit.ts
           git diff -- supabase/functions/mcp/get_post_differential_test.ts docs/decisions/2026-10-22-cr-049-get-post-source-evidence-null-preservation.md
           pnpm run check
           pnpm run test:mcp
