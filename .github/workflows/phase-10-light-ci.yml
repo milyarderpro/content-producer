@@ -94,10 +94,7 @@ jobs:
           set -euo pipefail
           if [ -s "$RUNNER_TEMP/phase-10-formatted-paths" ]; then
             mapfile -t paths < "$RUNNER_TEMP/phase-10-formatted-paths"
-            # Temporary CR-049 diagnostic: capture only formatter diff of local synthetic test.
-            pnpm exec prettier --write supabase/tests/database/api-source-evidence-mcp-compat.test.ts
-            git diff -- supabase/tests/database/api-source-evidence-mcp-compat.test.ts
-            exit 1 # Intentional diagnostic run; restore this workflow in the next commit.
+            pnpm exec prettier --check "${paths[@]}"
           else
             echo "No format-covered changed files"
           fi
