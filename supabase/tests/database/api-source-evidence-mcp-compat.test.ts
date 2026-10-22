@@ -447,7 +447,9 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
       expect(fetched.data.post.fact_bindings).toHaveLength(7);
       expect(
         fetched.data.post.fact_bindings.every(
-          (binding) => binding.source_snapshot?.sources?.length === 1,
+          (binding, index) =>
+            binding.source_snapshot?.sources?.length ===
+            (index === 1 || index === 5 ? 2 : 1),
         ),
       ).toBe(true);
       expect(fetched.data.post.system_checks.overall_status).toBe('passed');

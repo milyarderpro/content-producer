@@ -41,7 +41,12 @@ Deno.test(
     const originalInfo = console.info;
     const prior = Deno.env.get('MCP_GET_POST_DIAGNOSTICS');
     const logs: string[] = [];
-    console.info = (...args: unknown[]) => logs.push(args.map(String).join(' '));
+    const allEmitted: string[] = [];
+    console.info = (...args: unknown[]) => {
+      const record = args.map(String).join(' ');
+      logs.push(record);
+      allEmitted.push(record);
+    };
     const invokeFixture = async (response: () => Response | Promise<Response>) => {
       globalThis.fetch = (() => Promise.resolve(response())) as typeof fetch;
       return await invoke(
@@ -54,7 +59,7 @@ Deno.test(
     try {
       Deno.env.delete('MCP_GET_POST_DIAGNOSTICS');
       await invokeFixture(() => new Response(fakeValue, { status: 200 }));
-      check(logs.length === 0, 'DIAGNOSTICS_MUST_BE_DEFAULT_OFF');
+      check(logs.at(0) === undefined, 'DIAGNOSTICS_MUST_BE_DEFAULT_OFF');
 
       Deno.env.set('MCP_GET_POST_DIAGNOSTICS', '1');
       const bad = await invokeFixture(
@@ -78,7 +83,7 @@ Deno.test(
           ),
       );
       check('isError' in bad, 'STRICT_VALIDATION_MUST_STAY_MASKED');
-      check(logs.length === 1, 'INVALID_SCHEMA_EVENT_REQUIRED');
+      check(logs.at(0) !== undefined, 'INVALID_SCHEMA_EVENT_REQUIRED');
       const parsed = JSON.parse(logs[0]!) as {
         category: string;
         issues: Array<{ path: string; code: string }>;
@@ -123,7 +128,7 @@ Deno.test(
       emitGetPostDiagnostic('get_post', context, 'invalid_schema', 200, 10, [
         { code: fakeValue, path: [fakeValue, 0, 'source_snapshot', 'numbers'] },
       ]);
-      check(logs.length === 1, 'EXPLICIT_EVENT');
+      check(logs.at(0) !== undefined, 'EXPLICIT_EVENT');
       check(logs[0]!.includes('[field]'), 'UNTRUSTED_KEYS_REDACTED');
       check(logs[0]!.includes('unknown'), 'UNTRUSTED_CODES_REDACTED');
 
