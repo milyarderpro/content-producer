@@ -102,7 +102,8 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
           subject_key: `moon_phase_topic_${index + 1}`,
           relation_key: 'has_named_part_or_property',
           object_key: `distinct_lunar_property_${index + 1}`,
-          numbers: [],
+          // CR-049: the nested nullable unit must survive get_post JSON projection.
+          numbers: index === 0 ? [{ value: '8', unit: null, role: 'phase_count' }] : [],
           qualifiers: {
             negated: false,
             comparison_direction: 'none',
@@ -210,7 +211,9 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
             revision: number;
             content_hash: string;
             content_payload: { canva_copy: string };
-            fact_bindings: { source_snapshot?: { sources: unknown[] } }[];
+            fact_bindings: {
+              source_snapshot?: { sources: unknown[]; numbers: { unit?: string | null }[] };
+            }[];
             system_checks: { overall_status: string };
           };
         };
@@ -225,6 +228,23 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
         ),
       ).toBe(true);
       expect(fetched.data.post.system_checks.overall_status).toBe('passed');
+      for (const includeSources of [false, true]) {
+        for (const includeChecks of [false, true]) {
+          for (const includeMetrics of [false, true]) {
+            const projection = rpc(
+              f,
+              `api.get_post(1,'${f.workspace}','${persistedPost.data.post.post_public_id}',${includeSources},${includeChecks},${includeMetrics})`,
+            ) as unknown as typeof fetched;
+            const firstBinding = projection.data.post.fact_bindings[0]!;
+            if (includeSources) {
+              expect(firstBinding.source_snapshot?.numbers[0]?.unit).toBeNull();
+              expect(Object.hasOwn(firstBinding.source_snapshot!.numbers[0]!, 'unit')).toBe(true);
+            } else {
+              expect(Object.hasOwn(firstBinding, 'source_snapshot')).toBe(false);
+            }
+          }
+        }
+      }
     } finally {
       cleanup(f);
     }
