@@ -52,12 +52,12 @@ jobs:
         run: |
           set -euo pipefail
           pnpm install --frozen-lockfile
-          pnpm run check
           pnpm exec prettier --write \
             supabase/functions/mcp/post_base.ts \
             supabase/functions/mcp/get_post_differential_test.ts \
             supabase/tests/database/api-source-evidence-mcp-compat.test.ts
           git diff -- supabase/functions/mcp/get_post_differential_test.ts supabase/tests/database/api-source-evidence-mcp-compat.test.ts
+          pnpm run check
           pnpm run test:mcp
 
       - name: Isolated Supabase startup and one clean migration reset
