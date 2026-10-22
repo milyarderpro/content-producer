@@ -264,7 +264,6 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
         ),
       ).toBe(true);
       expect(fetched.data.post.system_checks.overall_status).toBe('passed');
-
     } finally {
       cleanup(f);
     }

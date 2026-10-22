@@ -80,7 +80,9 @@ Deno.test('Issue #40: eight SQL get_post projections retain strict MCP contract'
       check(post.fact_bindings.length === 7, label + ':SEVEN_ALLOCATIONS_REQUIRED');
       check(
         post.fact_bindings.every((binding) =>
-          sample.sources ? (binding.source_snapshot?.sources.length ?? 0) > 0 : !binding.source_snapshot
+          sample.sources
+            ? (binding.source_snapshot?.sources.length ?? 0) > 0
+            : !binding.source_snapshot,
         ),
         label + ':SOURCE_INCLUDE_EXCLUDE',
       );
