@@ -1,0 +1,90 @@
+name: Issue 40 - focused get_post differential
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/issue-40-get-post-differential.yml'
+      - 'supabase/functions/mcp/get_post_differential_test.ts'
+      - 'supabase/functions/mcp/post_base.ts'
+      - 'supabase/tests/database/api-source-evidence-mcp-compat.test.ts'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: issue-40-differential-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  isolated-differential:
+    name: Seven-fact SQL RPC and MCP output flags (no hosted database)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      SUPABASE_TELEMETRY_DISABLED: '1'
+    steps:
+      - name: Checkout exact PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Set up pinned pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+
+      - name: Set up pinned Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Set up pinned Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version-file: .deno-version
+
+      - name: Install and focused static checks
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile
+          pnpm run check
+          pnpm exec prettier --check \
+            supabase/functions/mcp/post_base.ts \
+            supabase/functions/mcp/get_post_differential_test.ts \
+            supabase/tests/database/api-source-evidence-mcp-compat.test.ts
+          pnpm run test:mcp
+
+      - name: Isolated Supabase startup and one clean migration reset
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker info >/dev/null
+          pnpm exec supabase db reset --help >/dev/null
+          pnpm run supabase:start > "$RUNNER_TEMP/issue-40-start.log" 2>&1
+          pnpm run supabase:reset > "$RUNNER_TEMP/issue-40-reset.log" 2>&1
+          echo "Local-only stack started and migrations reset; no secrets or SQL logged."
+
+      - name: Capture eight real SQL RPC projections and compare against MCP/Zod
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GET_POST_DIFFERENTIAL_FILE="$RUNNER_TEMP/issue-40-sql-matrix.json"
+          pnpm exec vitest run --config vitest.database.config.ts \
+            supabase/tests/database/api-source-evidence-mcp-compat.test.ts
+          test -s "$GET_POST_DIFFERENTIAL_FILE"
+          (cd supabase/functions && deno test \
+            --allow-env=GET_POST_DIFFERENTIAL_FILE \
+            --allow-read="$GET_POST_DIFFERENTIAL_FILE" \
+            mcp/get_post_differential_test.ts)
+
+      - name: Note evidence boundary
+        if: always()
+        run: |
+          echo 'SQL runs on disposable local Supabase only; MCP HTTP 200 is simulated from SQL JSON.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No production PostgREST HTTP status, secret, token, raw SQL or source document is captured.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'This focused run does not replace a >10-minute CR-020/044 full technical gate.' >> "$GITHUB_STEP_SUMMARY"
