@@ -8,7 +8,7 @@ do $migration$
 declare
   source_definition text;
   open_anchor constant text := 'jsonb_strip_nulls(jsonb_build_object(';
-  close_anchor constant text := E'end\n    )) order by usage.position asc, usage.id asc';
+  close_anchor constant text := ')) order by usage.position asc, usage.id asc';
 begin
   source_definition := pg_catalog.pg_get_functiondef(
     'api.get_post(integer,uuid,uuid,boolean,boolean,boolean)'::pg_catalog.regprocedure
@@ -31,7 +31,7 @@ begin
   source_definition := pg_catalog.replace(
     source_definition,
     close_anchor,
-    E'end\n    ) - (case when p_include_sources then '''' else ''source_snapshot'' end) order by usage.position asc, usage.id asc'
+    ') - (case when p_include_sources then '''' else ''source_snapshot'' end) order by usage.position asc, usage.id asc'
   );
   execute source_definition;
 end
