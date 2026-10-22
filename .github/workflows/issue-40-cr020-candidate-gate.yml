@@ -23,12 +23,12 @@ jobs:
     timeout-minutes: 120
     env:
       SUPABASE_TELEMETRY_DISABLED: '1'
-      APPROVED_CANDIDATE_SHA: '40a5b6418d3107dedb0e063f08a59691310c126c'
+      APPROVED_CANDIDATE_SHA: '1a4e755a48f3c77eb557b931fd6bd99d5e1b24fd'
     steps:
       - name: Checkout immutable approved candidate SHA (not workflow event SHA)
         uses: actions/checkout@v4
         with:
-          ref: 40a5b6418d3107dedb0e063f08a59691310c126c
+          ref: 1a4e755a48f3c77eb557b931fd6bd99d5e1b24fd
           fetch-depth: 2
           persist-credentials: false
 
@@ -39,7 +39,7 @@ jobs:
           test "$GITHUB_EVENT_NAME" = push
           test "$GITHUB_REF" = refs/heads/ci/issue-40-cr020-gate-40a5b6
           [[ "$GITHUB_SHA" =~ ^[0-9a-f]{40}$ ]]
-          test "$APPROVED_CANDIDATE_SHA" = 40a5b6418d3107dedb0e063f08a59691310c126c
+          test "$APPROVED_CANDIDATE_SHA" = 1a4e755a48f3c77eb557b931fd6bd99d5e1b24fd
           test "$GITHUB_SHA" != "$APPROVED_CANDIDATE_SHA"
           test "$(git rev-parse HEAD)" = "$APPROVED_CANDIDATE_SHA"
           test ! -e .github/workflows/issue-40-cr020-candidate-gate.yml
