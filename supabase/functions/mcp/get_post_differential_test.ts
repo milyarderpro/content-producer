@@ -136,7 +136,7 @@ Deno.test(
       if (
         sample.status !== 200 ||
         !sample.jsonValid ||
-        sample.bytes > 256 * 1024 ||
+        (typeof sample.bytes !== 'number' || sample.bytes > 256 * 1024) ||
         !parsed.success
       ) {
         failures.push(label);
