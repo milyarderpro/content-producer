@@ -12,6 +12,7 @@ on:
       - 'supabase/migrations/20261022080000_preserve_get_post_source_snapshot_nulls.sql'
       - 'docs/decisions/2026-10-22-cr-049-get-post-source-evidence-null-preservation.md'
       - 'supabase/tests/database/api-source-evidence-mcp-compat.test.ts'
+      - 'scripts/phase-6-catalog-audit.ts'
   workflow_dispatch:
 
 permissions:
@@ -63,6 +64,7 @@ jobs:
             supabase/functions/mcp/get_post_differential_test.ts \
             supabase/tests/database/api-source-evidence-mcp-compat.test.ts
           pnpm exec prettier --write docs/decisions/2026-10-22-cr-049-get-post-source-evidence-null-preservation.md
+          pnpm exec prettier --check scripts/phase-6-catalog-audit.ts
           git diff -- supabase/functions/mcp/get_post_differential_test.ts docs/decisions/2026-10-22-cr-049-get-post-source-evidence-null-preservation.md
           pnpm run check
           pnpm run test:mcp
@@ -97,6 +99,11 @@ jobs:
           fi
           echo "Local-only stack started and migrations reset; no secrets or SQL logged."
 
+      - name: Verify full CR-049 catalog, grants, ACL, RLS and archived baseline on clean reset
+        run: |
+          set -euo pipefail
+          pnpm exec tsx scripts/phase-6-catalog-audit.ts
+
       - name: Capture eight real SQL RPC projections and compare against MCP/Zod
         shell: bash
         run: |
@@ -118,6 +125,20 @@ jobs:
             --allow-env=MCP_GET_POST_DIAGNOSTICS \
             mcp/get_post_diagnostic_test.ts)
           test "$db_status" -eq 0
+
+      - name: Verify catalog and fixture cleanup again after differential tests
+        run: |
+          set -euo pipefail
+          pnpm exec tsx scripts/phase-6-catalog-audit.ts
+
+      - name: Upload local pinned catalog evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-40-cr049-pinned-catalog
+          path: artifacts/phase-9-5-catalog.json
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Note evidence boundary
         if: always()

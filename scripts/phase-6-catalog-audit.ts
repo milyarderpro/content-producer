@@ -5,8 +5,9 @@ import { format, resolveConfig } from 'prettier';
 import { row, sql } from '../supabase/tests/database/helpers/plan-lifecycle.js';
 
 // SELECT-only audit: retain the accepted 67-migration CR-016 baseline.
-// Pin the CR-021 OAuth hook (68th) and CR-046 projection fix (69th) independently,
-// then prove their only allowed catalog differences before baseline comparison.
+// Pin the CR-021 OAuth hook (68th), CR-046 projection fix (69th), and
+// CR-049 source-null preservation (70th) independently. Reconstruct only their
+// exact permitted function-source deltas before comparing to the frozen baseline.
 const expected = JSON.parse(
   readFileSync('docs/phase-5-batch-b-remediation-final-catalog.json', 'utf8'),
 );
@@ -22,18 +23,19 @@ const manifest = readdirSync('supabase/migrations')
       .update(readFileSync(`supabase/migrations/${file}`))
       .digest('hex'),
   }));
-assert.equal(manifest.length, 69);
+assert.equal(manifest.length, 70);
 deepStrictEqual(manifest.slice(0, 67), expected.manifest);
 // Git blob hashes pin the exact bytes of each post-baseline migration, without
 // editing either the accepted baseline or an already-applied migration.
+const pinnedPostBaselineMigrations = manifest.slice(67).map(({ file }) => {
+  const body = readFileSync(`supabase/migrations/${file}`);
+  return {
+    file,
+    git_blob_sha1: createHash('sha1').update(`blob ${body.length}\0`).update(body).digest('hex'),
+  };
+});
 deepStrictEqual(
-  manifest.slice(67).map(({ file }) => {
-    const body = readFileSync(`supabase/migrations/${file}`);
-    return {
-      file,
-      git_blob_sha1: createHash('sha1').update(`blob ${body.length}\0`).update(body).digest('hex'),
-    };
-  }),
+  pinnedPostBaselineMigrations,
   [
     {
       file: '20261016120000_add_mcp_oauth_resource_audience_hook.sql',
@@ -42,6 +44,10 @@ deepStrictEqual(
     {
       file: '20261020074800_expose_generation_context_config_public_id.sql',
       git_blob_sha1: '21101f64796019ce9ea97aee75b39874450c3631',
+    },
+    {
+      file: '20261022080000_preserve_get_post_source_snapshot_nulls.sql',
+      git_blob_sha1: 'fb98e61e253ec96748fa2405c89bcf12680560f0',
     },
   ],
 );
@@ -184,6 +190,78 @@ assert.equal(generationFunctions.length, 1, 'Expected one generation-context RPC
 assert.equal(generationFunctions[0].source_sha256, currentSourceSha);
 // The archived baseline comparison below must still match exactly.
 generationFunctions[0].source_sha256 = previousSourceSha;
+
+// CR-049 changes exactly one fact_bindings aggregation inside api.get_post:
+// preserve nested nullable evidence while omitting source_snapshot when excluded.
+// Recover the exact previously accepted SQL source using only the two anchored
+// replacements performed by the pinned migration. Any extra source alteration,
+// function metadata change, missing/duplicate anchor, or incorrect order fails.
+const getPostSignature = 'api.get_post(integer,uuid,uuid,boolean,boolean,boolean)';
+const getPostDefinition = row<{ definition: string }>(
+  `select pg_catalog.pg_get_functiondef(
+    'api.get_post(integer,uuid,uuid,boolean,boolean,boolean)'::regprocedure
+  ) definition`,
+).definition;
+const currentOpenAnchor = 'select coalesce(jsonb_agg(\n    jsonb_build_object(';
+const originalOpenAnchor = 'select coalesce(jsonb_agg(\n    jsonb_strip_nulls(jsonb_build_object(';
+const currentCloseAnchor =
+  ") - (case when p_include_sources then '' else 'source_snapshot' end) order by usage.position asc, usage.id asc";
+const originalCloseAnchor = ')) order by usage.position asc, usage.id asc';
+assert.equal(
+  getPostDefinition.split(currentOpenAnchor).length,
+  2,
+  'CR-049 new fact_bindings open anchor must occur exactly once',
+);
+assert.equal(
+  getPostDefinition.split(currentCloseAnchor).length,
+  2,
+  'CR-049 new fact_bindings close anchor must occur exactly once',
+);
+assert.ok(
+  getPostDefinition.indexOf(currentCloseAnchor) >
+    getPostDefinition.indexOf(currentOpenAnchor) + currentOpenAnchor.length,
+  'CR-049 fact_bindings open and close anchors must remain ordered',
+);
+const reconstructedGetPostDefinition = getPostDefinition
+  .replace(currentOpenAnchor, originalOpenAnchor)
+  .replace(currentCloseAnchor, originalCloseAnchor);
+const currentGetPostSha = createHash('sha256').update(getPostDefinition).digest('hex');
+const archivedGetPostSha = createHash('sha256')
+  .update(reconstructedGetPostDefinition)
+  .digest('hex');
+assert.notEqual(currentGetPostSha, archivedGetPostSha);
+const archivedGetPostFunctions = (
+  expected.extra.functions as { signature: string; source_sha256: string }[]
+).filter((x) => x.signature === getPostSignature);
+assert.equal(
+  archivedGetPostFunctions.length,
+  1,
+  'Exactly one archived get_post RPC expected',
+);
+assert.equal(
+  archivedGetPostSha,
+  archivedGetPostFunctions[0].source_sha256,
+  'CR-049 inverse projection must recover the exact archived get_post SQL source',
+);
+const currentGetPostFunctions = (
+  extra.functions as { signature: string; source_sha256: string }[]
+).filter((x) => x.signature === getPostSignature);
+assert.equal(
+  currentGetPostFunctions.length,
+  1,
+  'Exactly one current get_post RPC expected',
+);
+assert.equal(
+  currentGetPostFunctions[0].source_sha256,
+  currentGetPostSha,
+  'Current catalog get_post hash must equal pg_get_functiondef',
+);
+deepStrictEqual(
+  { ...currentGetPostFunctions[0], source_sha256: archivedGetPostSha },
+  archivedGetPostFunctions[0],
+  'CR-049 must preserve get_post owner, SECURITY DEFINER, SET options, ACL and signature',
+);
+currentGetPostFunctions[0].source_sha256 = archivedGetPostSha;
 for (const key of [
   'auth_users',
   'storage_objects',
@@ -252,10 +330,18 @@ writeFileSync(
         accepted_baseline_source_sha256: previousSourceSha,
         extra_projection: addedProjection,
       },
+      get_post_source_evidence_projection: {
+        signature: getPostSignature,
+        current_source_sha256: currentGetPostSha,
+        accepted_baseline_source_sha256: archivedGetPostSha,
+        new_open_anchor: currentOpenAnchor,
+        new_close_anchor: currentCloseAnchor,
+      },
+      pinned_post_baseline_migrations: pinnedPostBaselineMigrations,
     }),
     { ...(await resolveConfig(file)), parser: 'json' },
   ),
 );
 console.info(
-  'Phase 10.4 catalog: 69 source/applied migrations, 33 RPCs, 15/15 RLS, unchanged 67-migration baseline after exact CR-046 projection normalization, pinned CR-021/CR-046 migrations, private Auth hook, grants and zero fixtures/faults: PASS.',
+  'Phase 10.4 + CR-049 catalog: 70 source/applied migrations, 33 RPCs, 15/15 RLS, unchanged archived 67-migration baseline after exact CR-046/CR-049 source normalization, pinned CR-021/CR-046/CR-049 migrations, private Auth hook, grants and zero fixtures/faults: PASS.',
 );
