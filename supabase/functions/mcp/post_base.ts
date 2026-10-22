@@ -415,7 +415,8 @@ const listOutput = envelope(
     has_more: z.boolean(),
   }),
 );
-const getOutput = envelope(
+// Exposed solely for protocol/SQL regression comparison; validator remains strict.
+export const getPostOutputSchema = envelope(
   z.strictObject({
     post: postPackage,
     approval: z
@@ -532,7 +533,7 @@ export function registerPostBaseTools(server: McpServer, context?: RequestContex
       description:
         'Read the current content package, revision/hash, fact bindings, quality evidence and approval state before reviewing or changing a post. Optionally include source evidence, checks and latest metrics.',
       inputSchema: getInput,
-      outputSchema: getOutput,
+      outputSchema: getPostOutputSchema,
       annotations: readAnnotations,
       _meta: { securitySchemes },
     },
@@ -548,7 +549,7 @@ export function registerPostBaseTools(server: McpServer, context?: RequestContex
           p_include_checks: args.include_checks ?? true,
           p_include_latest_metrics: args.include_latest_metrics ?? false,
         },
-        getOutput,
+        getPostOutputSchema,
       ),
   );
 }
