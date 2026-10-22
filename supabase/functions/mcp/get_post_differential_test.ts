@@ -95,6 +95,37 @@ Deno.test('Issue #40: eight SQL get_post projections retain strict MCP contract'
           : post.system_checks === null && post.editorial_checks === null,
         label + ':CHECK_INCLUDE_EXCLUDE',
       );
+      // Only source-enabled projections exercise this precise LIVE-shaped
+      // mismatch: numeric structures, qualifiers, non-null update dates, and
+      // both one- and two-source snapshots. No payload is logged.
+      if (sample.sources && !sample.checks && !sample.metrics) {
+        const snapshots = post.fact_bindings.map((binding) => binding.source_snapshot!);
+        check(
+          snapshots.filter((snapshot) => snapshot.numbers.length > 0).length >= 3,
+          'SOURCE_VARIANT_NONEMPTY_NUMBERS',
+        );
+        check(
+          snapshots.some((snapshot) => snapshot.qualifiers.estimate === true &&
+            snapshot.qualifiers.method !== null),
+          'SOURCE_VARIANT_ESTIMATE_METHOD',
+        );
+        check(
+          snapshots.some((snapshot) => snapshot.qualifiers.time !== null &&
+            snapshot.qualifiers.location !== null),
+          'SOURCE_VARIANT_TIME_LOCATION',
+        );
+        check(
+          snapshots.some((snapshot) => snapshot.sources.length === 2) &&
+            snapshots.some((snapshot) => snapshot.sources.length === 1),
+          'SOURCE_VARIANT_ONE_TWO_OFFICIAL_SOURCES',
+        );
+        check(
+          snapshots.some((snapshot) =>
+            snapshot.sources.some((source) => source.updated_at === '2026-09-22')
+          ),
+          'SOURCE_VARIANT_NON_NULL_UPDATE_DATE',
+        );
+      }
       check(post.status === 'draft' && post.revision === 1, label + ':UNCHANGED_DRAFT');
       check(parsed.data.data.approval === null, label + ':NO_APPROVAL');
       // No metrics exist for the draft: include_latest_metrics must still succeed.

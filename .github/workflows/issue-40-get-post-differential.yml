@@ -7,6 +7,8 @@ on:
       - '.github/workflows/issue-40-get-post-differential.yml'
       - 'supabase/functions/mcp/get_post_differential_test.ts'
       - 'supabase/functions/mcp/post_base.ts'
+      - 'supabase/functions/mcp/foundation.ts'
+      - 'supabase/functions/mcp/get_post_diagnostic_test.ts'
       - 'supabase/tests/database/api-source-evidence-mcp-compat.test.ts'
   workflow_dispatch:
 
@@ -54,6 +56,8 @@ jobs:
           pnpm install --frozen-lockfile
           pnpm exec prettier --check \
             supabase/functions/mcp/post_base.ts \
+            supabase/functions/mcp/foundation.ts \
+            supabase/functions/mcp/get_post_diagnostic_test.ts \
             supabase/functions/mcp/get_post_differential_test.ts \
             supabase/tests/database/api-source-evidence-mcp-compat.test.ts
           pnpm run check
@@ -86,6 +90,9 @@ jobs:
             --allow-env=GET_POST_DIFFERENTIAL_FILE,GET_POST_HTTP_DIFFERENTIAL_FILE \
             --allow-read="$GET_POST_DIFFERENTIAL_FILE,$GET_POST_HTTP_DIFFERENTIAL_FILE" \
             mcp/get_post_differential_test.ts)
+          (cd supabase/functions && deno test \
+            --allow-env=MCP_GET_POST_DIAGNOSTICS \
+            mcp/get_post_diagnostic_test.ts)
           test "$db_status" -eq 0
 
       - name: Note evidence boundary

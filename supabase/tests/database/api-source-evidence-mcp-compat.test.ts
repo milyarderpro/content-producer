@@ -139,6 +139,34 @@ async function postgrestGetPost(
   return { status: response.status, bytes, jsonValid, ...(response.ok ? { rpc } : {}) };
 }
 
+
+// Distinct, synthetic source evidence variants modeled on the LIVE risk shapes.
+// Keep the original missing-date normalization test unchanged.
+function mixedSourceEvidence(position: number) {
+  const primary = sourceWithoutOptionalDates(position);
+  const sources = [
+    position <= 4 ? { ...primary, updated_at: '2026-09-22' } : primary,
+  ];
+  if (position === 2 || position === 6) {
+    const additional = sourceWithoutOptionalDates(position === 3 ? 1 : 3);
+    sources.push({
+      ...additional,
+      url: 'https://science.nasa.gov/moon/moon-facts/',
+      canonical_url: 'https://science.nasa.gov/moon/moon-facts/',
+      title: 'Moon Facts',
+      updated_at: '2026-10-01',
+    });
+  }
+  return sources;
+}
+
+function structuredNumbers(index: number) {
+  if (index === 0) return [{ value: '8', unit: null, role: 'phase_count' }];
+  if (index === 1) return [{ value: '29.5', unit: 'days', role: 'cycle_duration' }];
+  if (index === 4) return [{ value: '1', unit: null, role: 'quarter_sequence' }];
+  return [];
+}
+
 describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated post flow', () => {
   it('pinpoints the omitted three keys on every fact, preserves tier pairing and rejects unsafe metadata', () => {
     for (let position = 1; position <= 7; position++) {
@@ -200,18 +228,20 @@ describe('CR-047: seven actual MAN-03 source shapes against SQL and isolated pos
           subject_key: `moon_phase_topic_${index + 1}`,
           relation_key: 'has_named_part_or_property',
           object_key: `distinct_lunar_property_${index + 1}`,
-          numbers: [],
+          numbers: structuredNumbers(index),
           qualifiers: {
             negated: false,
             comparison_direction: 'none',
             scope: `distinct property ${index + 1}`,
+            ...(index === 0 ? { time: 'modern lunar observation', location: 'Earth' } : {}),
+            ...(index === 1 ? { estimate: true, method: 'lunar cycle average' } : {}),
           },
           topic_key: 'nature_science',
           normalization_version: 1,
           ontology_version: 1,
         },
         dedup_reviews: [],
-        sources: [sourceWithoutOptionalDates(index + 1)],
+        sources: mixedSourceEvidence(index + 1),
         freshness_class: 'stable',
         as_of_date: null,
         requested_expires_at: new Date(Date.now() + 86_400_000 * 45).toISOString(),

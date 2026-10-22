@@ -480,6 +480,74 @@ function forbiddenOutputKeys(
     );
   });
 }
+// Issue #40: opt-in, server-side-only get_post boundary classification.
+// Never capture values, keys from untrusted objects, URLs, SQL messages,
+// authentication claims, tokens, or the response body.
+const getPostDiagnosticPaths = new Set([
+  'response_schema_version', 'data', 'post', 'approval', 'plan_item_public_id',
+  'current_fact_warnings', 'latest_metrics', 'fact_bindings', 'source_snapshot',
+  'sources', 'numbers', 'qualifiers', 'schema_version', 'canonical_claim',
+  'normalized_claim', 'normalization_version', 'claim_hash', 'subject_key',
+  'relation_key', 'object_key', 'value', 'unit', 'role', 'negated',
+  'comparison_direction', 'time', 'location', 'population', 'condition',
+  'method', 'scope', 'estimate', 'ontology_version', 'structured_key',
+  'structured_hash', 'structured_match_eligible', 'topic_key', 'risk_class',
+  'source_schema_version', 'verification_status', 'verified_at',
+  'as_of_date', 'expires_at', 'dedup_review_schema_version', 'url',
+  'canonical_url', 'title', 'publisher', 'tier', 'source_type', 'accessed_at',
+  'published_at', 'updated_at', 'as_of', 'language', 'supports',
+  'independence_group', 'status', 'revision', 'system_checks', 'editorial_checks',
+]);
+type GetPostDiagnosticCategory =
+  | 'rpc_http_error'
+  | 'response_too_large'
+  | 'invalid_json'
+  | 'invalid_schema'
+  | 'forbidden_field'
+  | 'transport_error'
+  | 'response_read_error'
+  | 'unexpected_exception'
+  | 'ok';
+
+export function emitGetPostDiagnostic(
+  tool: string,
+  context: RequestContext,
+  category: GetPostDiagnosticCategory,
+  httpStatus: number | null = null,
+  bodyBytes: number | null = null,
+  issues: ReadonlyArray<{ path: PropertyKey[]; code: string }> = [],
+) {
+  if (tool !== 'get_post' || context.pilotMode) return;
+  try {
+    if (Deno.env.get('MCP_GET_POST_DIAGNOSTICS') !== '1') return;
+  } catch {
+    // No env permission means diagnostics remain disabled.
+    return;
+  }
+  const requestId = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(context.requestId)
+    ? context.requestId
+    : 'unavailable';
+  const paths = issues.slice(0, 5).map((issue) => ({
+    path: issue.path.slice(0, 12).map((component) => {
+      if (typeof component === 'number') return '[]';
+      return typeof component === 'string' && getPostDiagnosticPaths.has(component)
+        ? component
+        : '[field]';
+    }).join('.'),
+    code: /^[a-z_]{1,40}$/.test(issue.code) ? issue.code : 'unknown',
+  }));
+  console.info(JSON.stringify({
+    event: 'get_post_boundary',
+    request_id: requestId,
+    category,
+    http_status: httpStatus !== null && Number.isInteger(httpStatus) &&
+      httpStatus >= 100 && httpStatus <= 599 ? httpStatus : null,
+    body_bytes: bodyBytes !== null && Number.isSafeInteger(bodyBytes) &&
+      bodyBytes >= 0 ? bodyBytes : null,
+    issues: paths,
+  }));
+}
+
 export async function invoke(
   tool: string,
   context: RequestContext,
@@ -520,6 +588,9 @@ export async function invoke(
       return failure('PILOT_WRITE_LOCKED');
     }
   }
+  let phase: 'transport' | 'body' | 'processed' = 'transport';
+  let diagnosticStatus: number | null = null;
+  let diagnosticBytes: number | null = null;
   try {
     let raw: unknown;
     if (context.pilotMode) {
@@ -543,16 +614,23 @@ export async function invoke(
         },
         body: JSON.stringify(params),
       });
+      phase = 'body';
+      diagnosticStatus = rpc.status;
       const rawText = await rpc.text();
-      if (new TextEncoder().encode(rawText).byteLength > 256 * 1024) {
+      phase = 'processed';
+      diagnosticBytes = new TextEncoder().encode(rawText).byteLength;
+      if (diagnosticBytes > 256 * 1024) {
+        emitGetPostDiagnostic(tool, context, 'response_too_large', diagnosticStatus, diagnosticBytes);
         return failure('DATABASE_UNAVAILABLE');
       }
       try {
         raw = JSON.parse(rawText);
       } catch {
+        emitGetPostDiagnostic(tool, context, 'invalid_json', diagnosticStatus, diagnosticBytes);
         return failure('DATABASE_UNAVAILABLE');
       }
       if (!rpc.ok) {
+        emitGetPostDiagnostic(tool, context, 'rpc_http_error', diagnosticStatus, diagnosticBytes);
         const message =
           raw && typeof raw === 'object' && 'message' in raw
             ? (raw as { message: unknown }).message
@@ -562,17 +640,22 @@ export async function invoke(
       }
     }
     const parsed = schema.safeParse(raw);
-    if (
-      !parsed.success ||
-      forbiddenOutputKeys(
-        parsed.data,
-        tool === 'claim_content_plan_items',
-        '',
-        tool === 'trivia_register_and_reserve_facts',
-      )
-    ) {
+    if (!parsed.success) {
+      emitGetPostDiagnostic(
+        tool, context, 'invalid_schema', diagnosticStatus, diagnosticBytes, parsed.error.issues,
+      );
       return failure('DATABASE_UNAVAILABLE');
     }
+    if (forbiddenOutputKeys(
+      parsed.data,
+      tool === 'claim_content_plan_items',
+      '',
+      tool === 'trivia_register_and_reserve_facts',
+    )) {
+      emitGetPostDiagnostic(tool, context, 'forbidden_field', diagnosticStatus, diagnosticBytes);
+      return failure('DATABASE_UNAVAILABLE');
+    }
+    emitGetPostDiagnostic(tool, context, 'ok', diagnosticStatus, diagnosticBytes);
     return {
       structuredContent: parsed.data as Record<string, unknown>,
       content: [
@@ -583,6 +666,11 @@ export async function invoke(
       ],
     };
   } catch {
+    emitGetPostDiagnostic(
+      tool, context, phase === 'transport' ? 'transport_error' :
+        phase === 'body' ? 'response_read_error' : 'unexpected_exception',
+      diagnosticStatus, diagnosticBytes,
+    );
     // Do not reflect SQLSTATE, URL, token, response body, or raw exception.
     return failure('DATABASE_UNAVAILABLE');
   }
