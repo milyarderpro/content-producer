@@ -101,9 +101,7 @@ describe('Phase 7.2 core skill source contract', () => {
     }
     const output = read('references/core/output-contract.md');
     expect(output).toContain('server-returned `text_metrics`');
-    expect(output).toContain(
-      'never display pre-submit client estimates as authoritative',
-    );
+    expect(output).toContain('never display pre-submit client estimates as authoritative');
   });
 
   it('preserves explicit saves, batch limits and separate copy sections', () => {
