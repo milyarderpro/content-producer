@@ -80,26 +80,33 @@ describe('Phase 7.2 core skill source contract', () => {
     expect(lifecycle).toContain('same operation_key');
   });
 
-  it('pins empty client text_metrics for both save/revise writes and server-authoritative output', () => {
+  it('enforces server-authoritative metrics for post writes', () => {
     const docs = [
-      ['SKILL.md', read('SKILL.md')],
-      ['references/core/workflow.md', read('references/core/workflow.md')],
-    ] as const;
-    const exact = /For `save_post` and `revise_post`, always send `content_payload\.text_metrics: \{\}`\./;
-    for (const [path, content] of docs) {
-      expect(content, path).toMatch(exact);
-      expect(content, path).toContain('Never calculate, guess, reuse, or fabricate pre-submit `text_metrics`');
-      expect(content, path).toContain('server-returned `text_metrics`');
-      // Regression guard: a client-computed replacement must not satisfy the instruction.
+      read('SKILL.md'),
+      read('references/core/workflow.md'),
+    ];
+    const rule = [
+      'For `save_post` and `revise_post`,',
+      'always send `content_payload.text_metrics: {}`.',
+    ].join(' ');
+    for (const content of docs) {
+      expect(content).toContain(rule);
+      expect(content).toContain(
+        'Never calculate, guess, reuse, or fabricate pre-submit `text_metrics`',
+      );
+      expect(content).toContain('server-returned `text_metrics`');
+      // Negative guard: fabricated client metrics must not match the rule.
       const invalid = content.replace(
         'content_payload.text_metrics: {}',
         'content_payload.text_metrics: {"word_count":79}',
       );
-      expect(invalid, path).not.toMatch(exact);
+      expect(invalid).not.toContain(rule);
     }
     const output = read('references/core/output-contract.md');
     expect(output).toContain('server-returned `text_metrics`');
-    expect(output).toContain('never display pre-submit client estimates as authoritative');
+    expect(output).toContain(
+      'never display pre-submit client estimates as authoritative',
+    );
   });
 
   it('preserves explicit saves, batch limits and separate copy sections', () => {
