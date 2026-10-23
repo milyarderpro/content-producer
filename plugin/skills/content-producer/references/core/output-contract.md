@@ -16,7 +16,7 @@ Show stored relevant hashtags separately from the caption and copy.
 
 ## INFORMASI INTERNAL / INTERNAL INFO
 
-Show public post ID, Page/niche, topic/format, interaction goal, current status and revision, scheduled_at and Page timezone when known, source links and concise system/editorial quality checks. Internal information is not pasted into Canva/Facebook. Include current plan progress, warnings and recovery needs.
+Show public post ID, Page/niche, topic/format, interaction goal, current status and revision, scheduled_at and Page timezone when known, source links and concise system/editorial quality checks. Internal information is not pasted into Canva/Facebook. Use the server-returned `text_metrics` from a successful `save_post` / `revise_post` or authoritative `get_post` readback; never display pre-submit client estimates as authoritative. Include current plan progress, warnings and recovery needs.
 
 Three independent authorities govern readiness: server system checks, ChatGPT versioned editorial attestation of exact content and explicit owner approval. Critical fails/needs_review block ready; only allowlisted noncritical warnings can be accepted with an explicit reason. On failures or stale content, report the uncertainty rather than claiming approval.
 
