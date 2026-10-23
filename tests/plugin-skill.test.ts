@@ -81,10 +81,7 @@ describe('Phase 7.2 core skill source contract', () => {
   });
 
   it('enforces server-authoritative metrics for post writes', () => {
-    const docs = [
-      read('SKILL.md'),
-      read('references/core/workflow.md'),
-    ];
+    const docs = [read('SKILL.md'), read('references/core/workflow.md')];
     const rule = [
       'For `save_post` and `revise_post`,',
       'always send `content_payload.text_metrics: {}`.',
