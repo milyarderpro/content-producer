@@ -1,0 +1,234 @@
+name: CI - source, MCP, dan paket
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    name: Locked install, affected checks, verified final ZIP
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Record SHA and classify changes
+        id: changes
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_BEFORE: ${{ github.event.before }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          all_checks=false
+          if [ "$EVENT_NAME" = pull_request ] && [[ "$PR_BASE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            base="$PR_BASE_SHA"
+          elif [ "$EVENT_NAME" = push ] && [[ "$EVENT_BEFORE" =~ ^[0-9a-f]{40}$ ]] &&
+            [ "$EVENT_BEFORE" != 0000000000000000000000000000000000000000 ]; then
+            base="$EVENT_BEFORE"
+          else
+            base=HEAD
+            all_checks=true
+          fi
+          echo "HEAD $(git rev-parse HEAD); base $base; all_checks=$all_checks"
+          git diff --check "$base" HEAD
+          mapfile -d '' -t files < <(git diff --name-only --no-renames --diff-filter=ACMRD -z "$base" HEAD)
+          format=()
+          need_check="$all_checks"
+          mcp_changed="$all_checks"
+          probe_changed="$all_checks"
+          package_changed="$all_checks"
+          backend_review="$all_checks"
+          for file in "${files[@]}"; do
+            case "$file" in
+              *.md|*.json|*.yml|*.yaml|*.ts|*.tsx|*.js|*.mjs|*.cjs)
+                if [ -f "$file" ]; then format+=("$file"); fi ;;
+            esac
+            case "$file" in
+              *.ts|*.tsx|*.js|*.mjs|*.cjs|package.json|pnpm-lock.yaml|tsconfig.json|.nvmrc|.npmrc|.gitignore|.env.example|.deno-version|.prettierignore|.prettierrc.json|.github/workflows/*|.github/actions/*|auth-frontend/*|plans/tool-inventory.md|plans/trivia-content-dna.md|plans/use-case-inventory.md|plans/acceptance-traceability.md|docs/phase-8/*|docs/phase-5-*-catalog*|docs/phase-5-batch-b-remediation-final-catalog.json|supabase/tests/fixtures/*|dataset-reference/*|supabase/migrations/*|supabase/config.toml|supabase/functions/deno.json|supabase/functions/deno.lock)
+                need_check=true ;;
+            esac
+            case "$file" in
+              supabase/functions/mcp/*|supabase/functions/batch_a_server.ts|supabase/functions/deno.json|supabase/functions/deno.lock|supabase/config.toml|.deno-version|scripts/phase-6-13.ts|plans/tool-inventory.md|package.json|pnpm-lock.yaml|.github/workflows/*|.github/actions/*)
+                mcp_changed=true ;;
+            esac
+            case "$file" in
+              supabase/functions/mcp-probe/*|supabase/functions/deno.json|supabase/functions/deno.lock|supabase/config.toml|.deno-version|package.json|pnpm-lock.yaml|.github/workflows/*|.github/actions/*)
+                probe_changed=true ;;
+            esac
+            case "$file" in
+              plugin/*|scripts/plugin-*.ts|scripts/package-plugin.ts|scripts/verify-plugin-candidate.ts|tests/plugin-*.test.ts|plans/tool-inventory.md|plans/trivia-content-dna.md|package.json|pnpm-lock.yaml|.github/workflows/*|.github/actions/*)
+                package_changed=true ;;
+            esac
+            case "$file" in
+              supabase/migrations/*|supabase/config.toml|supabase/functions/*|.deno-version|scripts/phase-6-catalog-audit.ts|scripts/phase-6-13.ts|.github/workflows/backend-technical-gate.yml|docs/phase-5-*-catalog*|docs/phase-5-batch-b-remediation-final-catalog.json)
+                backend_review=true ;;
+            esac
+          done
+          if [ "${#format[@]}" -gt 0 ]; then
+            printf '%s\0' "${format[@]}" > "$RUNNER_TEMP/ci-formatted-paths"
+          fi
+          {
+            echo "need_check=$need_check"
+            echo "mcp_changed=$mcp_changed"
+            echo "probe_changed=$probe_changed"
+            echo "package_changed=$package_changed"
+            echo "backend_review=$backend_review"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Locked dependency installation
+        run: pnpm install --frozen-lockfile
+
+      - name: Format changed files and documentation indexes
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -s "$RUNNER_TEMP/ci-formatted-paths" ]; then
+            mapfile -d '' -t paths < "$RUNNER_TEMP/ci-formatted-paths"
+            pnpm exec prettier --check "${paths[@]}"
+          fi
+          pnpm exec prettier --ignore-path /dev/null --check archive/README.md plans/README.md plans/implementation-plan.md
+
+      - name: Project checks including frontend and root regressions
+        if: steps.changes.outputs.need_check == 'true'
+        run: pnpm run check
+
+      - name: Validate migration filenames
+        run: pnpm run verify-migrations
+
+      - uses: denoland/setup-deno@v2
+        if: steps.changes.outputs.mcp_changed == 'true' || steps.changes.outputs.probe_changed == 'true'
+        with:
+          deno-version-file: .deno-version
+
+      - name: Focused MCP OAuth and protocol regressions
+        if: steps.changes.outputs.mcp_changed == 'true'
+        run: pnpm run test:mcp
+
+      - name: Isolated anonymous probe regressions
+        if: steps.changes.outputs.probe_changed == 'true'
+        working-directory: supabase/functions
+        run: |
+          set -euo pipefail
+          deno fmt --check mcp-probe
+          deno lint mcp-probe
+          deno check mcp-probe/index.ts mcp-probe/handler_test.ts
+          deno test mcp-probe/handler_test.ts
+
+      - name: Validate package source and actual candidate
+        if: steps.changes.outputs.package_changed == 'true'
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.changes.outputs.need_check }}" != true ]; then
+            pnpm exec vitest run tests/plugin-config.test.ts tests/plugin-package.test.ts tests/plugin-skill.test.ts tests/plugin-trivia.test.ts
+          fi
+          pnpm run package-plugin
+          pnpm exec tsx scripts/verify-plugin-candidate.ts
+          test "$(find artifacts/plugin-candidate -type f | wc -l)" -eq 13
+
+      - name: Read package artifact identity
+        id: package_identity
+        if: steps.changes.outputs.package_changed == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(node -p "JSON.parse(require('node:fs').readFileSync('plugin/plugin.json', 'utf8')).version")"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          {
+            echo "version=$version"
+            echo "archive_name=content-producer-private-v${version}.zip"
+            echo "artifact_name=content-producer-private-v${version}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Archive and verify package entries and hashes
+        if: steps.changes.outputs.package_changed == 'true'
+        shell: bash
+        env:
+          ARCHIVE_NAME: ${{ steps.package_identity.outputs.archive_name }}
+          PLUGIN_VERSION: ${{ steps.package_identity.outputs.version }}
+        run: |
+          set -euo pipefail
+          (
+            cd artifacts/plugin-candidate
+            find . -type f -print | LC_ALL=C sort | zip -X -q "../$ARCHIVE_NAME" -@
+          )
+          archive="artifacts/$ARCHIVE_NAME"
+          test -s "$archive"
+          unzip -t "$archive" >/dev/null
+          entries="$RUNNER_TEMP/plugin-zip-entries.txt"
+          unzip -Z1 "$archive" | tee "$entries"
+          test "$(wc -l < "$entries")" -eq 13
+          test "$(grep -Fxc '.app.json' "$entries")" -eq 1
+          if grep -Fxq 'mcp.json' "$entries" || grep -Fxq '.mcp.json' "$entries"; then
+            echo "Bundled MCP configuration is forbidden"
+            exit 1
+          fi
+          diff -u <(LC_ALL=C sort "$entries") <(jq -r '.files[].path' artifacts/plugin-candidate-filelist.json | LC_ALL=C sort)
+          verify_dir="$(mktemp -d)"
+          trap 'rm -rf "$verify_dir"' EXIT
+          unzip -q "$archive" -d "$verify_dir"
+          diff -u <(find "$verify_dir" -type f | sed "s|^$verify_dir/||" | LC_ALL=C sort) <(jq -r '.files[].path' artifacts/plugin-candidate-filelist.json | LC_ALL=C sort)
+          while IFS=$'\t' read -r hash path; do
+            test "$(sha256sum "$verify_dir/$path" | cut -d ' ' -f1)" = "$hash"
+          done < <(jq -r '.files[] | [.sha256, .path] | @tsv' artifacts/plugin-candidate-filelist.json)
+          if grep -REq -- '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|sb_secret_|github_pat_|ghp_[[:alnum:]]{20}' "$verify_dir"; then
+            echo "Credential material must not appear in plugin ZIP"
+            exit 1
+          fi
+          {
+            echo "## Kandidat plugin PRIVATE v$PLUGIN_VERSION"
+            echo "- Source SHA: $(git rev-parse HEAD)"
+            echo "- ZIP: $ARCHIVE_NAME; SHA-256: $(sha256sum "$archive" | cut -d ' ' -f1)"
+            echo "- 13 file dan hash hasil ekstraksi sesuai filelist source"
+            echo "- App owner OAuth mcpku2; tanpa bundled MCP atau credential"
+            echo "- Packaging bukan instalasi atau bukti business Write"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload verified package
+        if: steps.changes.outputs.package_changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package_identity.outputs.artifact_name }}
+          path: |
+            artifacts/${{ steps.package_identity.outputs.archive_name }}
+            artifacts/plugin-candidate-filelist.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Record verification boundary
+        if: always()
+        env:
+          BACKEND_REVIEW: ${{ steps.changes.outputs.backend_review }}
+        run: |
+          {
+            echo "## Batas CI ringan"
+            echo "- Review risiko backend: ${BACKEND_REVIEW:-unavailable}"
+            echo "- Tidak ada reset/database suite, deployment, atau business Write production"
+            echo "- Gate CR-020/044 wajib tetap dipilih sebelum deploy perubahan backend yang memerlukannya"
+          } >> "$GITHUB_STEP_SUMMARY"

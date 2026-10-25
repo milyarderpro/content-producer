@@ -1,0 +1,40 @@
+name: Hosted - probe metadata OAuth manual
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hosted-probe:
+    name: Public metadata and missing-token challenge
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      MCP_RESOURCE: https://xjonnilnypchtxogtopb.supabase.co/functions/v1/mcp
+      OAUTH_ISSUER: https://xjonnilnypchtxogtopb.supabase.co/auth/v1
+    steps:
+      - name: Inspect public metadata and unauthenticated challenge
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          work="$(mktemp -d)"
+          trap 'rm -rf "$work"' EXIT
+          resource_status="$(curl -sS --retry 0 --max-time 20 --connect-timeout 10 -o "$work/resource.json" -w '%{http_code}' "$MCP_RESOURCE/.well-known/oauth-protected-resource")"
+          test "$resource_status" = 200
+          jq -e --arg resource "$MCP_RESOURCE" --arg issuer "$OAUTH_ISSUER" \
+            '.resource == $resource and .authorization_servers == [$issuer] and (.bearer_methods_supported | index("header") != null)' \
+            "$work/resource.json" >/dev/null
+          status="$(curl -sS --retry 0 --max-time 20 --connect-timeout 10 -X POST -H 'Content-Type:' --data-binary '{}' -D "$work/headers" -o "$work/body" -w '%{http_code}' "$MCP_RESOURCE")"
+          test "$status" = 401
+          jq -e '.error == "authentication_required" and (._meta["mcp/www_authenticate"][0] | startswith("Bearer resource_metadata="))' "$work/body" >/dev/null
+          grep -Eiq '^www-authenticate:[[:space:]]*Bearer[[:space:]]' "$work/headers"
+          grep -Fq "$MCP_RESOURCE/oauth-protected-resource" "$work/headers"
+          {
+            echo "## Probe hosted anonim"
+            echo "Metadata HTTP 200 dan challenge tanpa token HTTP 401 sesuai kontrak."
+            echo "Tidak ada login, credential, business tools/call, atau Write."
+          } >> "$GITHUB_STEP_SUMMARY"

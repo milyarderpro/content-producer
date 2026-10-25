@@ -1,6 +1,5 @@
-import { writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { format, resolveConfig } from 'prettier';
+import { writeCr016Evidence } from '../../../scripts/evidence-output.js';
 import { goldCases } from '../fixtures/trivia/dedup-v1/gold-cases.js';
 import { fixture, cleanup, rpc, json, quote, sql, source, digest } from './helpers/trivia-rpc.js';
 
@@ -67,15 +66,7 @@ describe('CR-016 source-free public gold retrieval', () => {
         }
         expect(counts.cases).toBe(split === 'development' ? 105 : 45);
         expect(counts.same_found).toBe(counts.same);
-        const label = process.env.CR016_EVIDENCE_RUN;
-        if (label === 'A' || label === 'B')
-          writeFileSync(
-            `docs/phase-5-batch-b-remediation-gold-${split}-${label}.json`,
-            await format(JSON.stringify({ split, counts }), {
-              ...(await resolveConfig('docs/phase-5-batch-b-remediation-gold-development-A.json')),
-              parser: 'json',
-            }),
-          );
+        await writeCr016Evidence(`gold-${split}`, { split, counts });
         console.info(`CR-016 public ${split}: ${JSON.stringify(counts)}`);
       } finally {
         cleanup(f);

@@ -1,57 +1,60 @@
-# Minimal Supabase Auth frontend — Phase 9.1
+# Frontend autentikasi
 
-Frontend statis tanpa dependency runtime: login, consent/deny, logout, dan error
-aman. **Bukan dashboard.** Browser hanya menggunakan API publik Supabase Auth
-dengan publishable key. Kode OAuth/callback berasal dari Supabase Auth, bukan
-dibuat oleh frontend. Sesi disimpan di `sessionStorage` per tab dan dihapus
-saat logout; tidak ada pendaftaran publik.
+Frontend statis ini menyediakan login, consent/deny OAuth, logout, dan pesan error
+aman. Tidak ada dashboard produk atau formulir pendaftaran publik. Source
+menggunakan API publik Supabase Auth dengan publishable key; sesi browser disimpan
+di `sessionStorage` per tab dan dibersihkan saat logout.
 
-## Build dan hosting (tidak provision/deploy pada 9.1)
+## Peta source
 
-Root Directory untuk project Vercel **di masa depan**: `auth-frontend/`.
-Package manager `pnpm@10.33.2`. Perintah build `pnpm run build`, output
-`dist/`. `vercel.json` me-rewrite `/login`, `/oauth/consent`, `/logout`,
-dan `/error` ke `index.html`, termasuk saat membuka rute langsung/refresh.
+- [src/app.js](src/app.js): alur UI dan pemilihan route.
+- [src/auth.js](src/auth.js): login, pembaruan sesi, detail/keputusan consent,
+  dan logout melalui Auth.
+- [src/routes.js](src/routes.js): penjagaan `authorization_id` dan redirect.
+- [scripts/build.mjs](scripts/build.mjs): build statis dan allowlist konfigurasi publik.
+- [vercel.json](vercel.json): build, rewrite, header, serta Git auto-deployment OFF.
+- `api/phase-9-5/`: callback/client uji OAuth dan pilot dengan flag server-side;
+  bukan endpoint bisnis umum atau izin write dari login biasa.
 
-Konfigurasi build publik saja: `VITE_SUPABASE_URL` (origin project Supabase)
-dan `VITE_SUPABASE_PUBLISHABLE_KEY` (format `sb_publishable_...`).
-Builder hanya memasukkan dua nilai allowlisted ini ke `dist/config.js`.
-Jika kosong, halaman menampilkan kesalahan aman sehingga CI dapat build tanpa
-credential. Secret key, service-role, OAuth client secret, database password,
-token, dan `.env` tidak boleh disalin ke source, output, atau log.
-`dist/` diabaikan Git.
+Jika pengguna belum login saat consent, `authorization_id` dipertahankan untuk
+kembali ke layar yang tepat. Tujuan callback berasal dari respons Auth yang
+divalidasi, bukan query `redirect` bebas. Persetujuan koneksi OAuth berbeda dari
+persetujuan editorial suatu post.
 
-Di root repository, pemeriksaan yang ditambahkan:
+## Build dan pemeriksaan
 
-- `pnpm run frontend:typecheck` — TypeScript `checkJs` pada source browser.
-- `pnpm run frontend:build` — build statis tanpa secret.
-- `pnpm run frontend:test` — tes Node (route, ID, redirect, approve/deny,
-  logout, konfigurasi dan asset).
-- `pnpm run check` — juga menjalankan ketiganya.
+Dari root repository, setelah [preflight durasi](../docs/testing.md#1-estimasi-sebelum-menjalankan-pemeriksaan):
 
-Dependency aplikasi frontend **kosong** (tanpa library runtime/build pihak
-ketiga); lockfile mandiri mencatat importer kosong. TypeScript berasal dari
-devDependency root yang sudah terkunci.
+```sh
+pnpm run frontend:typecheck
+pnpm run frontend:build
+pnpm run frontend:test
+```
 
-## Alur OAuth
+Ketiganya juga tercakup dalam `pnpm run check`; pilih pemeriksaan yang diperlukan
+tanpa mengulangnya sebagai rangkaian duplikat. Tidak ada script `dev` pada package
+frontend. Dependency runtime frontend kosong; tooling pemeriksaan berasal dari root.
 
-Setelah konfigurasi OAuth Server di checkpoint **9.4**, Supabase mengirim
-`authorization_id` ke `/oauth/consent`. Jika belum login, aplikasi
-mempertahankan ID tersebut saat menuju `/login`, lalu kembali ke consent
-setelah login. Identitas client dan scope didapat dari Supabase Auth.
-Persetujuan eksplisit `Izinkan` dan penolakan eksplisit `Tolak` memanggil
-endpoint resmi Auth: `GET /auth/v1/oauth/authorizations/{id}` untuk detail dan
-`POST /auth/v1/oauth/authorizations/{id}/consent` dengan JSON
-`{"action":"approve"}` atau `{"action":"deny"}` untuk keputusan.
-Rute `/oauth/authorize/{id}/approve|deny` **bukan** kontrak consent Supabase.
-Referensi: [source resmi Supabase Auth](https://github.com/supabase/auth/blob/master/internal/api/oauthserver/authorize.go)
-dan [panduan resmi](https://supabase.com/docs/guides/auth/oauth-server/oauth-flows).
-Callback hanya dari respons Auth, dibatasi HTTPS
-(atau HTTP loopback untuk tes lokal) dan disamakan dengan callback terdaftar
-bila detail redirect tersedia. Query `redirect` arbitrary tidak digunakan.
-Pesan error tidak meneruskan rincian server atau token.
+Hosting menggunakan Root Directory `auth-frontend/`, perintah `pnpm run build`,
+dan output `dist/`. Builder hanya membaca `VITE_SUPABASE_URL` serta
+`VITE_SUPABASE_PUBLISHABLE_KEY` dari environment proses; `.env` tidak otomatis
+dimuat oleh script build ini. Keduanya menjadi nilai publik di `dist/config.js`.
+Konfigurasi kosong menghasilkan pesan aman dan bukan bukti login berfungsi.
 
-Tes routing mengonfirmasi konfigurasi fallback dan source UI.
-**Bukti direct refresh pada hosting Vercel, OAuth production, PKCE dan login
-owner di production masih PENDING 9.4/9.5**; tidak diklaim oleh tes unit 9.1.
-Tidak membuat project, mengatur Auth production, atau deploy di sini.
+`vercel.json` me-rewrite `/login`, `/oauth/consent`, `/logout`, dan `/error` ke
+`index.html`, beserta route uji yang masih tersedia. Server preview statis harus
+memiliki fallback yang sesuai; tidak semua server membaca konfigurasi Vercel.
+Secret key, service-role, OAuth client secret, password, dan token tidak masuk
+source, output build, atau log.
+
+## Hosting dan bukti operasional
+
+Push Git tidak otomatis membuktikan frontend diperbarui; source mematikan Git
+auto-deployment. Versi/deployment aktif dan flag uji perlu diperiksa pada provider.
+Test Node memeriksa perilaku terisolasi; perubahan route/Auth juga membutuhkan
+pemeriksaan browser dan, bila relevan, flow hosted yang diotorisasi.
+
+Gunakan [development](../docs/development.md), [testing](../docs/testing.md), dan
+[operations](../docs/operations.md) untuk prosedur terkini. Bukti deployment lama
+tersedia melalui [tracker historis](../archive/plans/implementation-plan.md#16-phase-tracker),
+bukan alasan menyatakan versi hosted sekarang sudah diverifikasi.

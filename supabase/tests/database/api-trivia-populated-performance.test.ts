@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { format, resolveConfig } from 'prettier';
+import { existsSync, readFileSync } from 'node:fs';
+import { writeCr016Evidence } from '../../../scripts/evidence-output.js';
 import { fixture, cleanup, sql } from './helpers/trivia-rpc.js';
 import { populateSearch } from './helpers/trivia-performance.js';
 
@@ -19,19 +19,15 @@ describe('CR-016 public populated retrieval', () => {
       console.info(
         `CR-016 populated authenticated search p95=${timing.p95_ms.toFixed(1)}ms; n=12; rows=5001`,
       );
-      const label = process.env.CR016_EVIDENCE_RUN;
-      if (label === 'A' || label === 'B')
-        writeFileSync(
-          `docs/phase-5-batch-b-remediation-search-${label}.json`,
-          await format(JSON.stringify(result), {
-            ...(await resolveConfig('docs/phase-5-batch-b-remediation-search-A.json')),
-            parser: 'json',
-          }),
-        );
+      await writeCr016Evidence('search', result);
       expect(timing.p95_ms).toBeLessThanOrEqual(3000);
       // A frozen source-controlled report remains historical; no overwrite.
-      expect(existsSync('docs/phase-5-9-performance-A.json')).toBe(true);
-      expect(JSON.parse(readFileSync('docs/phase-5-9-performance-A.json', 'utf8')).label).toBe('A');
+      const historicalReport = new URL(
+        '../fixtures/trivia/history/phase-5-9-performance-A.json',
+        import.meta.url,
+      );
+      expect(existsSync(historicalReport)).toBe(true);
+      expect(JSON.parse(readFileSync(historicalReport, 'utf8')).label).toBe('A');
     } finally {
       cleanup(f);
     }

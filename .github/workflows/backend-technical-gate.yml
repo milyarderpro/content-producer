@@ -1,0 +1,186 @@
+name: Backend - CR-020 dan CR-044 technical gate
+
+# Manual: estimasi durasi dan aturan lanjutkan harus dipenuhi sebelum dispatch.
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: Exact main SHA yang disetujui untuk diperiksa
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-technical-gate
+  cancel-in-progress: false
+
+jobs:
+  technical-gate:
+    name: One local reset, full suites, security, 33-tool Inspector, non-owner
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      SUPABASE_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+
+      - name: Verify approved exact main SHA
+        shell: bash
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$GITHUB_EVENT_NAME" = workflow_dispatch
+          test "$GITHUB_REF" = refs/heads/main
+          test "$GITHUB_SHA" = "$CANDIDATE_SHA"
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          echo "Tested candidate SHA: $CANDIDATE_SHA"
+          echo "GATE_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version-file: .deno-version
+
+      - name: Locked install and CLI preflight
+        id: install
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile
+          test "$(pnpm --version)" = 10.33.2
+          test "$(pnpm exec supabase --version)" = 2.120.0
+          docker info --format '{{.ServerVersion}}'
+          node --version
+          deno --version
+          pnpm exec supabase db reset --help >/dev/null
+          pnpm exec supabase migration list --help >/dev/null
+          pnpm exec supabase db lint --help >/dev/null
+          pnpm exec supabase db push --help >/dev/null
+          pnpm exec supabase db dump --help >/dev/null
+          pnpm exec supabase functions deploy --help >/dev/null
+
+      - name: Start ephemeral local stack
+        id: start
+        run: pnpm run supabase:start > "$RUNNER_TEMP/backend-start.log" 2>&1
+
+      - name: One clean local migration reset
+        id: reset
+        run: pnpm run supabase:reset > "$RUNNER_TEMP/backend-reset.log" 2>&1
+
+      - name: Focused OAuth and owner regressions
+        id: oauth_owner
+        run: pnpm run test:mcp
+
+      - name: Catalog and clean fixture baseline before Inspector
+        id: audit_before
+        run: |
+          set -euo pipefail
+          pnpm exec tsx scripts/phase-6-catalog-audit.ts
+          mkdir -p "$RUNNER_TEMP/backend-evidence"
+          cp artifacts/phase-9-5-catalog.json "$RUNNER_TEMP/backend-evidence/catalog-before-inspector.json"
+
+      - name: Authenticated HTTP, Inspector 33 valid and invalid calls, cross-owner denial
+        id: inspector
+        run: pnpm exec tsx scripts/phase-6-13.ts
+
+      - name: Catalog and clean fixtures after Inspector
+        id: audit_after
+        run: |
+          set -euo pipefail
+          pnpm exec tsx scripts/phase-6-catalog-audit.ts
+          cp artifacts/phase-9-5-catalog.json "$RUNNER_TEMP/backend-evidence/catalog-after-inspector.json"
+
+      - name: Full project suites
+        id: full
+        run: pnpm run test-all
+
+      - name: Applied and source migration history
+        id: history
+        run: pnpm run supabase:verify
+
+      - name: Local database lint
+        id: lint
+        run: pnpm exec supabase db lint --local --fail-on error
+
+      - name: Final catalog, grants, RLS, and fixture cleanup
+        id: audit_final
+        run: |
+          set -euo pipefail
+          pnpm exec tsx scripts/phase-6-catalog-audit.ts
+          cp artifacts/phase-9-5-catalog.json "$RUNNER_TEMP/backend-evidence/catalog-final.json"
+
+      - name: Whitespace on exact candidate
+        id: diff
+        run: |
+          set -euo pipefail
+          git diff --check HEAD^ HEAD
+          git diff --check
+
+      - name: Write safe gate evidence
+        if: always()
+        shell: bash
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          INSTALL_RESULT: ${{ steps.install.outcome }}
+          START_RESULT: ${{ steps.start.outcome }}
+          RESET_RESULT: ${{ steps.reset.outcome }}
+          OAUTH_RESULT: ${{ steps.oauth_owner.outcome }}
+          BEFORE_RESULT: ${{ steps.audit_before.outcome }}
+          INSPECTOR_RESULT: ${{ steps.inspector.outcome }}
+          AFTER_RESULT: ${{ steps.audit_after.outcome }}
+          FULL_RESULT: ${{ steps.full.outcome }}
+          HISTORY_RESULT: ${{ steps.history.outcome }}
+          LINT_RESULT: ${{ steps.lint.outcome }}
+          FINAL_RESULT: ${{ steps.audit_final.outcome }}
+          DIFF_RESULT: ${{ steps.diff.outcome }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/backend-evidence"
+          {
+            echo "# CR-020/044 - bukti gate lokal terisolasi"
+            echo "Candidate SHA: $CANDIDATE_SHA; checkout SHA: $(git rev-parse HEAD)"
+            echo "Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "Mulai: ${GATE_STARTED_UTC:-unavailable}; selesai: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "| Tahap | Outcome |"
+            echo "| --- | --- |"
+            echo "| Install/CLI | $INSTALL_RESULT |"
+            echo "| Start lokal | $START_RESULT |"
+            echo "| Satu reset | $RESET_RESULT |"
+            echo "| OAuth/owner | $OAUTH_RESULT |"
+            echo "| Audit awal | $BEFORE_RESULT |"
+            echo "| Inspector/cross-owner | $INSPECTOR_RESULT |"
+            echo "| Audit setelah Inspector | $AFTER_RESULT |"
+            echo "| test-all | $FULL_RESULT |"
+            echo "| Migration history | $HISTORY_RESULT |"
+            echo "| DB lint lokal | $LINT_RESULT |"
+            echo "| Audit akhir | $FINAL_RESULT |"
+            echo "| Whitespace | $DIFF_RESULT |"
+            echo "Tidak membuktikan hosted Security Advisor, instalasi plugin, atau business Write live."
+          } > "$RUNNER_TEMP/backend-evidence/technical-gate.md"
+          if [ -f artifacts/phase-9-5-catalog.json ]; then
+            cp artifacts/phase-9-5-catalog.json "$RUNNER_TEMP/backend-evidence/local-catalog.json"
+          fi
+
+      - name: Upload safe gate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-technical-gate-${{ github.sha }}
+          path: ${{ runner.temp }}/backend-evidence/
+          if-no-files-found: error
+          retention-days: 30

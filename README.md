@@ -1,73 +1,90 @@
 # Content Producer
 
-Private ChatGPT plugin and Supabase-backed MCP service for creating verified,
-deduplicated Facebook trivia posts. The MVP is trivia-only, while the core is
-designed for future niche modules.
+Content Producer membantu pemilik menyiapkan konten trivia Facebook melalui
+plugin PRIVATE ChatGPT dan layanan MCP berbasis Supabase. Alurnya mencakup riset,
+pemeriksaan duplikasi, reservasi fakta, draft, review, persetujuan, rencana konten,
+serta pencatatan publikasi dan performa secara manual.
 
-## Repository status
+Niche yang diimplementasikan saat ini adalah `trivia`; core dirancang agar niche
+baru dapat memiliki aturan dan modelnya sendiri. Bahasa konten trivia tetap
+`en-US`, sedangkan panduan pengembangan menggunakan bahasa Indonesia.
 
-**21 October 2026:** Phases 0–10 have historical evidence; Phase 10 was
-independently audited as **Pilot-ready**. Production MCP uses owner OAuth,
-Supabase Edge `mcp` v31, and the installed PRIVATE Content Producer v0.2.2
-plugin connected through `mcpku2` with **33 tools (11 Read, 22 Write)**.
-Phase 11 has **not** started and the 14 final MVP acceptance criteria remain
-historically PENDING; they are **not** the active testing queue.
+## Mulai memahami project
 
-**Current work:** [Live Test & Fix](docs/live-test/README.md) — one test prompt in
-a fresh ChatGPT plugin chat, report result, triage Issue, focused PR, GitHub
-Actions, and repeat the live test. See the [33-tool test matrix](docs/live-test/test-matrix.md),
-[results log](docs/live-test/results.md) and [master Issue #25](https://github.com/milyarderpro/content-producer/issues/25).
-The first reported issue is [a new draft not saved](https://github.com/milyarderpro/content-producer/issues/26);
-its failing tool and root cause are **unverified until the actual trace is supplied**.
+| Kebutuhan                             | Panduan                                |
+| ------------------------------------- | -------------------------------------- |
+| Tujuan produk dan peta implementasi   | [Arsitektur](docs/architecture.md)     |
+| Arti data dan aturan bisnis           | [Domain](docs/domain.md)               |
+| Input/output dan pilihan 33 tool      | [Kontrak tool](docs/tool-contracts.md) |
+| Setup lokal dan pengembangan fitur    | [Development](docs/development.md)     |
+| Memilih test dan gate CI              | [Testing](docs/testing.md)             |
+| Versi terpasang, rilis, dan pemulihan | [Operations](docs/operations.md)       |
+| Instruksi kerja AI                    | [AGENTS.md](AGENTS.md)                 |
 
-Historical phase plans and acceptance evidence are preserved as reference,
-not deleted or marked complete. This workflow does not assert `MVP Complete`.
+Indeks lengkap ada di [docs/README.md](docs/README.md). Kontrak frozen dalam
+`plans/` dan keputusan di `docs/decisions/` tetap menjadi acuan teknis.
 
-## Prerequisites
+## Status dan alur kerja aktif
 
-- Node.js 24.15.0 is the local and CI runtime baseline. Node 20 and Node 26
-  are outside the supported project range.
-- pnpm 10.33.2 or a Corepack-managed equivalent.
-- The project pins Supabase CLI 2.120.0. Docker access is required for local
-  Supabase work and database tests.
-- Standalone Deno is optional. The checked-in `.deno-version`,
-  `supabase/functions/deno.json`, and Deno foundation test support developers
-  who choose to run `deno fmt`, `deno lint`, `deno test`, or the Deno LSP
-  directly. No Phase 1 pnpm command requires a `deno` executable.
+Project sudah digunakan di production menurut pemilik. Source menggunakan default
+owner OAuth dengan app `mcpku2` dan 33 tool, yaitu 11 Baca dan 22 Tulis. Ringkasan
+versi source dan bukti deployment yang tercatat dipusatkan di
+[operations](docs/operations.md#1-satu-ringkasan-versi-dengan-sumber-bukti-yang-jelas);
+HEAD lokal bukan bukti versi live terbaru.
 
-## Commands
+Pengujian langsung dan remediasi mengikuti [Live Test & Fix](docs/live-test/README.md):
+satu prompt → chat baru oleh pemilik → bukti disanitasi → verdict → Issue → PR
+fokus dan Actions → retest pada runtime yang terverifikasi. Lihat
+[matriks 33 tool](docs/live-test/test-matrix.md), [log hasil](docs/live-test/results.md),
+dan [Issue kampanye #25](https://github.com/milyarderpro/content-producer/issues/25).
+
+[Issue #26](https://github.com/milyarderpro/content-producer/issues/26) merekam
+percobaan historis yang berhenti pada dedup Read; reserve/save tidak dipanggil
+menurut ringkasan yang tersedia. E2E draft baru masih BLOCKED pada log lokal itu.
+Periksa bukti terbaru sebelum menyimpulkan masalah atau mengulang write.
+
+Phase 10 historis Pilot-ready; final AC dan Phase 11 bukan antrean aktif. Hasil
+cleanup dan verifikasi lokal dirangkum dalam
+[audit cleanup](docs/cleanup-audit.md#ringkasan-hasil-cleanup), tanpa mengubah hasil
+acceptance historis menjadi PASS.
+
+## Menyiapkan lingkungan
+
+- Node.js `24.15.0` dan pnpm `10.33.2` mengikuti pin repository.
+- Supabase CLI `2.120.0` tersedia melalui dependency project.
+- Deno `2.9.7` diperlukan untuk `test:mcp` dan harness HTTP.
+- Docker diperlukan untuk stack Supabase dan suite database lokal.
+
+Instalasi dependency dari root:
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm run check
-pnpm run test-all
-pnpm run verify-migrations
-pnpm run smoke-test
 ```
 
-`package-plugin` validates a package only after Phase 7 adds the plugin
-manifest. `verify-migrations` validates checked-in migration filenames.
+Selanjutnya pilih command sesuai pekerjaan, bukan menjalankan semuanya sekaligus:
 
-## Edge Function tooling
+| Command                   | Fungsi singkat                                                |
+| ------------------------- | ------------------------------------------------------------- |
+| `pnpm run check`          | Format, lint, typecheck, root test, dan frontend checks/build |
+| `pnpm run test:mcp`       | Suite MCP terisolasi melalui Deno                             |
+| `pnpm run test:database`  | Suite database pada stack lokal yang sudah siap               |
+| `pnpm run test-all`       | Check, validasi nama migration, suite MCP dan database        |
+| `pnpm run package-plugin` | Membuat kandidat paket lokal yang tervalidasi                 |
 
-Supabase Edge Function `mcp` is deployed and active behind owner OAuth.
-The repository retains local Supabase CLI/Docker verification and pinned
-Deno-compatible sources/tests. When an implementer changes business logic,
-identity, RLS, migrations or permissions, run the applicable focused tests and
-CR-020/044 risk-based backend gate on the final SHA **before any authorized
-production deployment**. Documentation-only PRs use lightweight PR CI.
+**Estimasi durasi CI wajib dilakukan sebelum run atau trigger.** Jika check/gate
+wajib diperkirakan lebih dari 10 menit, berhenti sebelum memulainya dan ikuti
+[stop rule](AGENTS.md#3-estimasi-ci-wajib-dan-stop-rule). Detail prasyarat serta
+pemilihan pemeriksaan ada di [testing](docs/testing.md).
 
-## Boundaries
+## Batas produk dan perubahan
 
-- `plugin/` contains the installed PRIVATE plugin package/skills. Its
-  registered Content Producer MCP app is the owner OAuth connection `mcpku2`.
-- `auth-frontend/` is limited to login, OAuth consent, logout, and safe errors,
-  not a product dashboard.
-- `supabase/` contains migrations, RPC/Edge MCP implementation and database
-  tests; `tests/` contains cross-cutting tests.
-- No automatic Canva/Facebook publishing or automatic Facebook analytics.
-  Do not fabricate publication evidence, metrics, tool success, or production
-  PASS from synthetic fixtures.
-- No unauthorized writes, bypass of owner OAuth/RLS or unrelated production
-  deployment. Follow [the live workflow](docs/live-test/README.md) for safe
-  testing and [frozen contracts](plans/tool-inventory.md) for API requirements.
+- `plugin/` berisi source paket dan instruksi ChatGPT; packaging tidak sama
+  dengan instalasi plugin.
+- `auth-frontend/` terbatas pada autentikasi/consent dan utilitas uji terkait;
+  bukan dashboard produk.
+- `supabase/` berisi migration, RPC, Edge MCP, dan test database. Aturan transaksi
+  berada pada core/niche SQL; MCP menjaga transport dan pemetaan yang tipis.
+- Canva dan Facebook tetap dikerjakan manual; backend tidak membuat video,
+  memublikasikan post, atau mengambil analitik Facebook secara otomatis.
+- Perubahan kode, merge, deploy, dan perubahan data production mempunyai scope
+  izin masing-masing. Pertahankan owner OAuth, RLS, CAS, dan bukti hasil yang jujur.
