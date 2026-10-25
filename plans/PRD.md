@@ -28,7 +28,7 @@ Kedudukan dokumen perencanaan adalah sebagai berikut:
 - `plans/acceptance-traceability.md` menghubungkan requirement serta acceptance criteria ke implementation phase dan evidence.
 - `plans/workflow-users.md` tetap menjadi ringkasan alur penggunaan sehari-hari.
 
-Dokumen dalam folder `archive/` hanya merupakan riwayat rancangan lama dan bukan acuan implementasi baru.
+Rancangan awal yang bukan acuan implementasi baru tetap tersedia dalam riwayat Git sebelum pembersihan repository.
 
 ---
 
