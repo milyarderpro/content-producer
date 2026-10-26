@@ -5,9 +5,10 @@ import { format, resolveConfig } from 'prettier';
 import { row, sql } from '../supabase/tests/database/helpers/plan-lifecycle.js';
 
 // SELECT-only audit: retain the accepted 67-migration CR-016 baseline.
-// Pin the CR-021 OAuth hook (68th), CR-046 projection fix (69th), and
-// CR-049 source-null preservation (70th) independently. Reconstruct only their
-// exact permitted function-source deltas before comparing to the frozen baseline.
+// Pin the CR-021 OAuth hook (68th), CR-046 projection fix (69th),
+// CR-049 source-null preservation (70th), and CR-050 source diagnostics (71st)
+// independently. Validate only their permitted function-source deltas before
+// comparing to the frozen baseline.
 const expected = JSON.parse(
   readFileSync('docs/phase-5-batch-b-remediation-final-catalog.json', 'utf8'),
 );
@@ -23,7 +24,7 @@ const manifest = readdirSync('supabase/migrations')
       .update(readFileSync(`supabase/migrations/${file}`))
       .digest('hex'),
   }));
-assert.equal(manifest.length, 70);
+assert.equal(manifest.length, 71);
 deepStrictEqual(manifest.slice(0, 67), expected.manifest);
 // Git blob hashes pin the exact bytes of each post-baseline migration, without
 // editing either the accepted baseline or an already-applied migration.
@@ -46,6 +47,10 @@ deepStrictEqual(pinnedPostBaselineMigrations, [
   {
     file: '20261022080000_preserve_get_post_source_snapshot_nulls.sql',
     git_blob_sha1: 'fb98e61e253ec96748fa2405c89bcf12680560f0',
+  },
+  {
+    file: '20261026121918_trivia_source_diagnostics.sql',
+    git_blob_sha1: 'b8b8152d2e061951affcc21211906c8b7dffdb1b',
   },
 ]);
 const applied = row<{ versions: string[] }>(
@@ -251,6 +256,60 @@ deepStrictEqual(
   'CR-049 must preserve get_post owner, SECURITY DEFINER, SET options, ACL and signature',
 );
 currentGetPostFunctions[0].source_sha256 = archivedGetPostSha;
+// CR-050 replaces exactly two private functions. The pinned migration is the
+// source of their complete bodies; compare installed prosrc byte-for-byte to
+// each body before restoring only the archived digest for baseline comparison.
+const sourceDiagnosticsMigration = readFileSync(
+  'supabase/migrations/20261026121918_trivia_source_diagnostics.sql',
+  'utf8',
+);
+const sourceDiagnosticSignatures = [
+  'internal.trivia_rpc_raise_v1(text,text)',
+  'internal.trivia_fact_input_v1(jsonb,boolean)',
+] as const;
+const sourceDiagnosticFunctions = sourceDiagnosticSignatures.map((signature) => {
+  const name = signature.slice(0, signature.indexOf('('));
+  const marker = `create or replace function ${name}(`;
+  assert.equal(
+    sourceDiagnosticsMigration.split(marker).length,
+    2,
+    `CR-050 replacement for ${name} must occur exactly once`,
+  );
+  const start = sourceDiagnosticsMigration.indexOf(marker);
+  const bodyOpen = sourceDiagnosticsMigration.indexOf('as $$', start);
+  const bodyClose = sourceDiagnosticsMigration.indexOf('$$;', bodyOpen);
+  assert.ok(bodyOpen > start && bodyClose > bodyOpen, `CR-050 body missing for ${name}`);
+  const expectedBody = sourceDiagnosticsMigration.slice(bodyOpen + 'as $$'.length, bodyClose);
+  const installedBody = row<{ body: string }>(
+    `select prosrc body from pg_proc where oid='${signature}'::regprocedure`,
+  ).body;
+  assert.equal(installedBody, expectedBody, `CR-050 installed body differs for ${name}`);
+  const currentFunctions = (
+    extra.functions as { signature: string; source_sha256: string }[]
+  ).filter((x) => x.signature === signature);
+  const archivedFunctions = (
+    expected.extra.functions as { signature: string; source_sha256: string }[]
+  ).filter((x) => x.signature === signature);
+  assert.equal(currentFunctions.length, 1, `Exactly one current ${name} expected`);
+  assert.equal(archivedFunctions.length, 1, `Exactly one archived ${name} expected`);
+  const currentDefinition = row<{ definition: string }>(
+    `select pg_catalog.pg_get_functiondef('${signature}'::regprocedure) definition`,
+  ).definition;
+  const currentSha = createHash('sha256').update(currentDefinition).digest('hex');
+  assert.equal(currentFunctions[0].source_sha256, currentSha);
+  assert.notEqual(currentSha, archivedFunctions[0].source_sha256);
+  deepStrictEqual(
+    { ...currentFunctions[0], source_sha256: archivedFunctions[0].source_sha256 },
+    archivedFunctions[0],
+    `CR-050 must preserve ${name} owner, security mode, SET options and ACL`,
+  );
+  currentFunctions[0].source_sha256 = archivedFunctions[0].source_sha256;
+  return {
+    signature,
+    current_source_sha256: currentSha,
+    accepted_baseline_source_sha256: archivedFunctions[0].source_sha256,
+  };
+});
 for (const key of [
   'auth_users',
   'storage_objects',
@@ -327,10 +386,11 @@ writeFileSync(
         new_close_anchor: currentCloseAnchor,
       },
       pinned_post_baseline_migrations: pinnedPostBaselineMigrations,
+      source_diagnostics_projections: sourceDiagnosticFunctions,
     }),
     { ...(await resolveConfig(file)), parser: 'json' },
   ),
 );
 console.info(
-  'Phase 10.4 + CR-049 catalog: 70 source/applied migrations, 33 RPCs, 15/15 RLS, unchanged archived 67-migration baseline after exact CR-046/CR-049 source normalization, pinned CR-021/CR-046/CR-049 migrations, private Auth hook, grants and zero fixtures/faults: PASS.',
+  'Phase 10.4 + CR-049/CR-050 catalog: 71 source/applied migrations, 33 RPCs, 15/15 RLS, unchanged archived 67-migration baseline after exact CR-046/CR-049/CR-050 source validation, pinned CR-021/CR-046/CR-049/CR-050 migrations, private Auth hook, grants and zero fixtures/faults: PASS.',
 );
