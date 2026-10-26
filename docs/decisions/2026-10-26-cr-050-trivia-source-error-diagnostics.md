@@ -1,8 +1,27 @@
 # CR-050 — Diagnostik aman untuk penolakan sumber trivia
 
-**Status:** kandidat lokal, belum diuji pada runtime live atau di-deploy.
+**Status:** source sudah digabung ke `main`; full gate belum lulus, runtime live belum diuji, dan belum di-deploy.
 
 **Issue:** [#49](https://github.com/milyarderpro/content-producer/issues/49).
+
+## Addendum audit katalog setelah merge
+
+**Defect gate:** [Issue #51](https://github.com/milyarderpro/content-producer/issues/51).
+
+PR #50 digabung ke `main` pada SHA `879c547d5cd0d78ed2dbce99283c85753f0ca591`.
+[Full gate #40329988395](https://github.com/milyarderpro/content-producer/actions/runs/40329988395)
+berakhir **FAIL** pada audit katalog awal: skrip masih mengharapkan 70 migration,
+sedangkan CR-050 menambah migration ke-71. Clean reset migration dan regresi
+OAuth/owner telah selesai, tetapi Inspector, `test-all`, dan pemeriksaan akhir
+belum berjalan. Ini kegagalan kompatibilitas audit dengan perubahan yang
+disetujui, bukan PASS gate atau bukti perilaku production.
+
+Perbaikan audit harus mengunci byte migration CR-050, membandingkan body dua
+fungsi private yang diganti dengan isi migration tersebut, dan tetap menguji
+owner, security mode, SET options, ACL, semua fungsi lainnya, grants, RLS,
+riwayat migration, serta kebersihan fixture terhadap baseline 67 migration
+yang diterima. Jangan mengubah baseline historis. Jalankan ulang satu full gate
+pada SHA `main` final sebelum deployment; status live tetap belum terverifikasi.
 
 **Keputusan pemilik:** 26 Oktober 2026, bedakan penyebab `FACT_SOURCE_INSUFFICIENT` agar diagnosis cepat tanpa audit URL per fakta.
 
