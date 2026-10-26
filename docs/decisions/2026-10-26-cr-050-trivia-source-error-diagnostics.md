@@ -1,6 +1,6 @@
 # CR-050 — Diagnostik aman untuk penolakan sumber trivia
 
-**Status:** source sudah digabung ke `main`; full gate belum lulus, runtime live belum diuji, dan belum di-deploy.
+**Status:** source sudah digabung ke `main` dan full gate lokal terisolasi lulus; runtime live belum diuji dan belum di-deploy.
 
 **Issue:** [#49](https://github.com/milyarderpro/content-producer/issues/49).
 
@@ -23,6 +23,18 @@ riwayat migration, serta kebersihan fixture terhadap baseline 67 migration
 yang diterima. Jangan mengubah baseline historis. Jalankan ulang satu full gate
 pada SHA `main` final sebelum deployment; status live tetap belum terverifikasi.
 
+[PR #52](https://github.com/milyarderpro/content-producer/pull/52) memperbaiki audit tanpa
+mengubah migration atau backend runtime. [Full gate #40364895835](https://github.com/milyarderpro/content-producer/actions/runs/40364895835)
+pada exact `main` SHA `be7ce5455863d3c51f4cfdd9ec6c9263e837ede3` selesai
+**SUCCESS** dalam 13m56s: clean reset, OAuth/owner, audit sebelum/sesudah
+Inspector, 33-tool Inspector dan cross-owner denial, `test-all`, history
+migration, DB lint, audit akhir, whitespace, dan evidence upload lulus.
+[Issue #51](https://github.com/milyarderpro/content-producer/issues/51) ditutup
+untuk defect gate ini saja. Dokumentasi setelah gate memakai SHA tersendiri;
+gate backend boleh direuse hanya jika source backend, migration, security config,
+dan runtime dependency tetap identik. Ini belum membuktikan deployment atau
+memperbaiki kegagalan live pada Issue #49.
+
 **Keputusan pemilik:** 26 Oktober 2026, bedakan penyebab `FACT_SOURCE_INSUFFICIENT` agar diagnosis cepat tanpa audit URL per fakta.
 
 ## Batas keputusan
@@ -33,4 +45,4 @@ SQL menaruh hanya tag kategori allowlist pada `DETAIL`; MCP memvalidasinya kemba
 
 ## Batas bukti dan rilis
 
-Tiga penolakan live CMP/MVF belum mempunyai payload maupun versi runtime terverifikasi. Perubahan ini meningkatkan kemampuan diagnosis; **bukan** bukti akar live telah ditemukan atau `FIXED`. Test fokus perlu membuktikan kategori, redaksi, dan jalur sukses minimal. Karena migration/business RPC berubah, satu full CR-020 gate pada kandidat final wajib sebelum deployment; aturan estimasi lebih dari 10 menit dalam `AGENTS.md` tetap berlaku. Commit, PR, merge, deploy, dan retest live adalah izin terpisah.
+Tiga penolakan live CMP/MVF belum mempunyai payload maupun versi runtime terverifikasi. Perubahan ini meningkatkan kemampuan diagnosis; **bukan** bukti akar live telah ditemukan atau `FIXED`. Test fokus dan full gate di atas membuktikan kandidat source, bukan runtime hosted. Deployment dan retest live tetap tindakan terpisah.
