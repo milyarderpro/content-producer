@@ -514,3 +514,64 @@ Deno.test('6.3 SQL and sensitive outputs are not returned in tool errors', async
     globalThis.fetch = original;
   }
 });
+
+Deno.test('source errors expose only allowlisted fact-position diagnostics', async () => {
+  const original = globalThis.fetch;
+  try {
+    for (const [details, expected] of [
+      ['SOURCE_DIAG:3:SOURCE_TIER_TYPE_MISMATCH', 'facts[2].sources'],
+      ['SOURCE_DIAG:6:SOURCE_AS_OF_DATE_REQUIRED', 'facts[5].as_of_date'],
+      ['SOURCE_DIAG:1:SOURCE_INDEPENDENCE_REQUIRED', 'facts[0].sources'],
+    ]) {
+      globalThis.fetch = (() =>
+        Promise.resolve(
+          Response.json(
+            { message: 'FACT_SOURCE_INSUFFICIENT', details },
+            {
+              status: 400,
+            },
+          ),
+        )) as typeof fetch;
+      const answer = await request('tools/call', {
+        name: 'get_page_generation_context',
+        arguments: {
+          request_schema_version: 1,
+          workspace_public_id: workspace,
+          page_public_id: page,
+          niche_key: 'trivia',
+        },
+      });
+      assert(answer.includes(expected), `safe diagnostic path missing: ${expected}`);
+      assert(answer.includes('field_errors'), 'structured field error missing');
+      assert(answer.includes('FACT_SOURCE_INSUFFICIENT'), 'stable public error code missing');
+    }
+    for (const details of [
+      'SOURCE_DIAG:0:SOURCE_METADATA_INVALID',
+      'SOURCE_DIAG:2:PRIVATE_SQL_DETAIL',
+      'SOURCE_DIAG:2:SOURCE_METADATA_INVALID token=secret',
+    ]) {
+      globalThis.fetch = (() =>
+        Promise.resolve(
+          Response.json(
+            { message: 'FACT_SOURCE_INSUFFICIENT', details },
+            {
+              status: 400,
+            },
+          ),
+        )) as typeof fetch;
+      const answer = await request('tools/call', {
+        name: 'get_page_generation_context',
+        arguments: {
+          request_schema_version: 1,
+          workspace_public_id: workspace,
+          page_public_id: page,
+          niche_key: 'trivia',
+        },
+      });
+      assert(!answer.includes('field_errors'), 'unrecognized detail must remain hidden');
+      assert(!answer.includes(details), 'raw database detail disclosed');
+    }
+  } finally {
+    globalThis.fetch = original;
+  }
+});

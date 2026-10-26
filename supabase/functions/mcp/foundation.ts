@@ -433,7 +433,34 @@ const safeErrors = {
 } as const;
 type SafeError = keyof typeof safeErrors;
 
-function failure(code: SafeError) {
+const sourceDiagnosticMessages = {
+  SOURCE_METADATA_INVALID: 'Source metadata is incomplete or invalid.',
+  SOURCE_DUPLICATE_CANONICAL_URL: 'Canonical source URLs are duplicated or missing.',
+  SOURCE_TIER_TYPE_MISMATCH: 'Source tier and source type do not match.',
+  SOURCE_NO_ELIGIBLE_AB: 'At least one valid Tier A or B source is required.',
+  SOURCE_SENSITIVE_TIER_A_REQUIRED: 'Sensitive facts require a Tier A source.',
+  SOURCE_INDEPENDENCE_REQUIRED: 'This fact requires two independent source groups.',
+  SOURCE_AS_OF_DATE_REQUIRED: 'Periodic or volatile facts require an as_of_date.',
+} as const;
+type SourceDiagnosticCode = keyof typeof sourceDiagnosticMessages;
+type SourceFieldError = { path: string; code: SourceDiagnosticCode; message: string };
+
+function sourceFieldError(details: unknown): SourceFieldError | null {
+  if (typeof details !== 'string') return null;
+  const match = /^SOURCE_DIAG:([1-9]):([A-Z_]+)$/.exec(details);
+  if (!match) return null;
+  const reason = match[2];
+  if (!Object.prototype.hasOwnProperty.call(sourceDiagnosticMessages, reason)) return null;
+  const code = reason as SourceDiagnosticCode;
+  const position = Number(match[1]);
+  const path =
+    code === 'SOURCE_AS_OF_DATE_REQUIRED'
+      ? `facts[${position - 1}].as_of_date`
+      : `facts[${position - 1}].sources`;
+  return { path, code, message: sourceDiagnosticMessages[code] };
+}
+
+function failure(code: SafeError, fieldError?: SourceFieldError | null) {
   const [message, retryable, recovery] = safeErrors[code];
   return {
     isError: true as const,
@@ -445,9 +472,23 @@ function failure(code: SafeError) {
         retryable,
         recovery,
         ...(code === 'RATE_LIMITED' ? { retry_after_seconds: 60 } : {}),
+        ...(code === 'FACT_SOURCE_INSUFFICIENT' && fieldError
+          ? { field_errors: [fieldError] }
+          : {}),
       },
     },
-    content: [{ type: 'text' as const, text: code + ': ' + message }],
+    content: [
+      {
+        type: 'text' as const,
+        text:
+          code +
+          ': ' +
+          message +
+          (code === 'FACT_SOURCE_INSUFFICIENT' && fieldError
+            ? ` ${fieldError.path}: ${fieldError.message}`
+            : ''),
+      },
+    ],
   };
 }
 function isSafeError(text: unknown): text is SafeError {
@@ -557,7 +598,16 @@ export async function invoke(
           raw && typeof raw === 'object' && 'message' in raw
             ? (raw as { message: unknown }).message
             : null;
-        if (isSafeError(message)) return failure(message);
+        if (isSafeError(message)) {
+          const details =
+            raw && typeof raw === 'object' && 'details' in raw
+              ? (raw as { details: unknown }).details
+              : null;
+          return failure(
+            message,
+            message === 'FACT_SOURCE_INSUFFICIENT' ? sourceFieldError(details) : null,
+          );
+        }
         return failure(rpc.status === 401 ? 'AUTH_REQUIRED' : 'DATABASE_UNAVAILABLE');
       }
     }

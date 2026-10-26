@@ -1,6 +1,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
+import { sql as runLocalSql } from './helpers/plan-lifecycle.js';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -28,28 +29,24 @@ function sqlJson(value: unknown): string {
 }
 
 function runCli(sql: string): string {
-  const result = spawnSync('pnpm', ['exec', 'supabase', 'db', 'query', '--local', sql], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
-  });
-
-  if (result.error) throw result.error;
-  if (result.status !== 0) {
-    throw new Error(`Supabase local command failed: ${result.stderr}\n${result.stdout}`);
+  try {
+    return runLocalSql(sql);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : '';
+    const code = /^[A-Z_]+$/.test(message) ? message : 'LOCAL_TEST_QUERY_FAILED';
+    throw new Error(`Local database command failed: error: ${code}`, { cause: error });
   }
-  return result.stdout;
 }
 
 function queryRows(sql: string): JsonRecord[] {
-  const output = runCli(sql);
-  const jsonStart = output.indexOf('{');
-  if (jsonStart === -1) throw new Error('Expected JSON output from supabase db query.');
-  const parsed: unknown = JSON.parse(output.slice(jsonStart));
-  if (!isJsonRecord(parsed) || !Array.isArray(parsed.rows)) {
-    throw new Error('Expected database rows.');
-  }
-  return parsed.rows.filter(isJsonRecord);
+  const statement = sql.trim().replace(/;+\s*$/, '');
+  const output = runCli(`select row_to_json(q) from (${statement}) q;`);
+  if (!output) return [];
+  return output.split('\n').map((line) => {
+    const parsed: unknown = JSON.parse(line);
+    if (!isJsonRecord(parsed)) throw new Error('Expected a database row.');
+    return parsed;
+  });
 }
 
 function querySingleRow(sql: string): JsonRecord {

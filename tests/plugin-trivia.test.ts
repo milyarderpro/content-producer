@@ -115,6 +115,26 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     expect(evidence).toContain('trivia_correct_fact');
   });
 
+  it('requires a structured evidence check before trivia reservation without rejecting one valid B source', () => {
+    const evidence = read(niche + 'fact-checking.md');
+    const sequence = read('references/core/tool-sequences.md');
+    const flow = sequence.split('Single trivia post: ')[1]!.split('\n')[0]!;
+    const beforeReserve = flow.split(' → trivia_register_and_reserve_facts')[0];
+    expect(beforeReserve).toContain('check the complete structured evidence packet');
+    for (const rule of [
+      'literal HTTPS `url` and `canonical_url`',
+      '`published_at`, `updated_at`, or source `as_of`, use `null`',
+      'Pair `tier` with `source_type` exactly',
+      'One valid Tier B source is enough for a `stable` + `standard` fact',
+      '`sensitive` fact needs a Tier A source and two distinct',
+      '`periodic` and `volatile` facts require a non-null fact-level `as_of_date`',
+      '`holds_record_by_metric_as_of`',
+      'hold that fact before the write',
+    ]) {
+      expect(evidence).toContain(rule);
+    }
+  });
+
   it('routes weak sources, stale records and sensitive claims away from approval', () => {
     const seen = cases(read(niche + 'fact-checking.md'));
     expect(seen.size).toBe(7);
