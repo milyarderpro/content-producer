@@ -17,6 +17,14 @@ Stable, nonsensitive claims require at least **one A or B** source supporting th
 
 Record `canonical_url`, publisher, title, source tier/type, accessed time, relevant publication/update time, `as_of`, `supports` and `independence_group` under the module evidence schema; never copy whole articles into audit snapshots. No URLs in Canva copy or public caption in the MVP. Viral reference examples cannot fill missing source evidence; substantially copied wording must be independently rewritten.
 
+## Check the complete evidence packet before reservation
+
+Before calling `trivia_register_and_reserve_facts`, inspect every ordered fact's structured `sources`, `risk_class`, `freshness_class`, `as_of_date`, and candidate `relation_key`. A source name, domain, citation marker, or Markdown link in a preview is not the `sources` object. Each source needs `schema_version: 1`, literal HTTPS `url` and `canonical_url`, nonempty `title`, `publisher`, `supports` for the complete claim, and `independence_group`, plus an RFC3339 `accessed_at` and language tag. Keep each `canonical_url` unique within a fact. Use only verified metadata; do not invent a URL, date, publisher, source tier, or independence group to complete the packet.
+
+Pair `tier` with `source_type` exactly: A = `official`, `primary_paper`, or `dataset`; B = `museum`, `professional_association`, `reputable_reference`, or `review_paper`; C = `reputable_secondary`; D = `social`, `aggregator`, or `other`. A credible institution's name alone does not determine the pair. For unknown `published_at`, `updated_at`, or source `as_of`, use `null` (or omit the field for the MCP adapter to materialize as `null`); retain known values. These three nullable source fields are distinct from the fact-level `as_of_date`.
+
+Count only valid A/B sources for server eligibility. One valid Tier B source is enough for a `stable` + `standard` fact if it supports the complete proposition. A `sensitive` fact needs a Tier A source and two distinct `independence_group` values among A/B sources. `periodic` and `volatile` facts require a non-null fact-level `as_of_date`; if their `relation_key` is `holds_record_by_metric_as_of` or their risk is `sensitive`, they also need two independent A/B groups. Apply the stricter editorial checks above for other changing numbers, superlatives, disputed claims, and safety topics. If any fact lacks evidence or a justified classification, hold that fact before the write; do not send the set or silently relabel it to pass the server.
+
 ## Freshness ceilings from verification time
 
 - `stable`: at most **24 months**.

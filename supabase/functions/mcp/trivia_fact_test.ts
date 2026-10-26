@@ -4,6 +4,7 @@ import type { RequestContext } from './auth.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
 import {
   candidate as candidateSchema,
+  source as sourceSchema,
   TRIVIA_FACT_TOOL_NAMES,
   TRIVIA_RELATION_KEYS_V1,
 } from './trivia_fact.ts';
@@ -115,6 +116,32 @@ const responses: Record<string, object> = {
     replayed: false,
   },
 };
+
+Deno.test('reservation reports safe source field error without exposing raw evidence', async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = (() =>
+    Promise.resolve(
+      Response.json(
+        {
+          message: 'FACT_SOURCE_INSUFFICIENT',
+          details: 'SOURCE_DIAG:1:SOURCE_INDEPENDENCE_REQUIRED',
+          hint: 'private SQL or URL must stay hidden',
+        },
+        { status: 400 },
+      ),
+    )) as typeof fetch;
+  try {
+    const result = await call('trivia_register_and_reserve_facts');
+    const error = result.structuredContent?.error;
+    check(result.isError === true, 'RESERVATION_ERROR_EXPECTED');
+    check(error?.code === 'FACT_SOURCE_INSUFFICIENT', 'STABLE_SOURCE_CODE');
+    check(error?.field_errors?.[0]?.path === 'facts[0].sources', 'SOURCE_POSITION');
+    check(error?.field_errors?.[0]?.code === 'SOURCE_INDEPENDENCE_REQUIRED', 'SOURCE_REASON');
+    check(!JSON.stringify(result).includes('private SQL or URL'), 'NO_RAW_HINT');
+  } finally {
+    globalThis.fetch = original;
+  }
+});
 function check(condition: unknown, label: string): asserts condition {
   if (!condition) throw new Error(label);
 }
@@ -238,6 +265,55 @@ Deno.test('FIX-37 accepts exactly the 17 SQL v1 relations in the shared candidat
     );
   }
 });
+Deno.test(
+  'reserve source shape rejects SQL-invalid metadata before RPC and accepts one valid B',
+  async () => {
+    const original = globalThis.fetch;
+    let invoked = 0;
+    globalThis.fetch = (() => {
+      invoked++;
+      return Promise.resolve(
+        Response.json({
+          response_schema_version: 1,
+          data: responses.trivia_register_and_reserve_facts,
+        }),
+      );
+    }) as typeof fetch;
+    try {
+      const input = inputs.trivia_register_and_reserve_facts;
+      const baseFact = (input.facts as Record<string, unknown>[])[0]!;
+      const bSource = { ...source, tier: 'B', source_type: 'museum' };
+      check(sourceSchema.safeParse(bSource).success, 'VALID_B_PAIR');
+      check(
+        (
+          await call('trivia_register_and_reserve_facts', {
+            ...input,
+            facts: [{ ...baseFact, sources: [bSource] }],
+          })
+        ).isError !== true,
+        'ONE_B_STABLE_STANDARD_ALLOWED',
+      );
+      check(invoked === 1, 'VALID_B_REACHED_RPC');
+      for (const sources of [
+        [{ ...bSource, source_type: 'official' }],
+        [{ ...bSource, language: 'not a language tag' }],
+        [bSource, { ...bSource, url: 'https://example.test/other' }],
+      ]) {
+        const result = await call('trivia_register_and_reserve_facts', {
+          ...input,
+          facts: [{ ...baseFact, sources }],
+        });
+        check(result.isError === true, 'SQL_INVALID_SOURCE_REJECTED');
+        check(invoked === 1, 'INVALID_SOURCE_DID_NOT_REACH_RPC');
+        check(!JSON.stringify(result).includes(reservationToken), 'NO_TOKEN_IN_ERROR');
+        check(!JSON.stringify(result).includes(candidate.claim_text), 'NO_CLAIM_IN_ERROR');
+        check(!JSON.stringify(result).includes('https://example.test/'), 'NO_URL_IN_ERROR');
+      }
+    } finally {
+      globalThis.fetch = original;
+    }
+  },
+);
 Deno.test(
   '6.7 malformed candidates, unsafe release, foreign workspace and hidden identity rejected before RPC',
   async () => {

@@ -109,45 +109,60 @@ const review = z
     material_differences: z.array(difference).max(10),
   })
   .refine((d) => d.decision !== 'same' || d.candidate_fact_public_id !== undefined);
-export const source = z.strictObject({
-  schema_version: z.literal(1),
-  url: z.url().startsWith('https://').max(2048),
-  canonical_url: z.url().startsWith('https://').max(2048),
-  title: z.string().trim().min(1).max(300),
-  publisher: z.string().trim().min(1).max(200),
-  tier: z.enum(['A', 'B', 'C', 'D']),
-  source_type: z.enum([
-    'official',
-    'primary_paper',
-    'dataset',
-    'museum',
-    'professional_association',
-    'reputable_reference',
-    'review_paper',
-    'reputable_secondary',
-    'social',
-    'aggregator',
-    'other',
-  ]),
-  accessed_at: timestamp,
-  published_at: date.nullable().optional(),
-  updated_at: date.nullable().optional(),
-  as_of: z.string().max(100).nullable().optional(),
-  language: z.string().min(1).max(35),
-  supports: z.string().trim().min(1).max(500),
-  independence_group: z.string().trim().min(1).max(120),
-});
-const fact = z.strictObject({
-  position: z.number().int().min(1).max(9),
-  candidate,
-  dedup_reviews: z.array(review),
-  sources: z.array(source).min(1).max(8),
-  freshness_class: z.enum(['stable', 'periodic', 'volatile']),
-  as_of_date: date.nullable(),
-  requested_expires_at: timestamp,
-  risk_class: z.enum(['standard', 'sensitive']),
-  verification_note: z.string().trim().min(1).max(1000),
-});
+const sourceTypesByTier = {
+  A: ['official', 'primary_paper', 'dataset'],
+  B: ['museum', 'professional_association', 'reputable_reference', 'review_paper'],
+  C: ['reputable_secondary'],
+  D: ['social', 'aggregator', 'other'],
+} as const;
+export const source = z
+  .strictObject({
+    schema_version: z.literal(1),
+    url: z.url().startsWith('https://').max(2048),
+    canonical_url: z.url().startsWith('https://').max(2048),
+    title: z.string().trim().min(1).max(300),
+    publisher: z.string().trim().min(1).max(200),
+    tier: z.enum(['A', 'B', 'C', 'D']),
+    source_type: z.enum([
+      'official',
+      'primary_paper',
+      'dataset',
+      'museum',
+      'professional_association',
+      'reputable_reference',
+      'review_paper',
+      'reputable_secondary',
+      'social',
+      'aggregator',
+      'other',
+    ]),
+    accessed_at: timestamp,
+    published_at: date.nullable().optional(),
+    updated_at: date.nullable().optional(),
+    as_of: z.string().max(100).nullable().optional(),
+    language: z.string().regex(/^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/),
+    supports: z.string().trim().min(1).max(500),
+    independence_group: z.string().trim().min(1).max(120),
+  })
+  .refine((value) =>
+    (sourceTypesByTier[value.tier] as readonly string[]).includes(value.source_type),
+  );
+const fact = z
+  .strictObject({
+    position: z.number().int().min(1).max(9),
+    candidate,
+    dedup_reviews: z.array(review),
+    sources: z.array(source).min(1).max(8),
+    freshness_class: z.enum(['stable', 'periodic', 'volatile']),
+    as_of_date: date.nullable(),
+    requested_expires_at: timestamp,
+    risk_class: z.enum(['standard', 'sensitive']),
+    verification_note: z.string().trim().min(1).max(1000),
+  })
+  .refine(
+    (value) =>
+      new Set(value.sources.map((item) => item.canonical_url)).size === value.sources.length,
+  );
 const common = { request_schema_version: z.literal(1), workspace_public_id: uuid };
 const write = { ...common, operation_key: uuid };
 const findInput = z

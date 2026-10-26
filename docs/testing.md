@@ -117,6 +117,13 @@ bukan dry-run read-only atau pemeriksaan beberapa detik yang boleh diasumsikan.
 `scripts/phase-6-catalog-audit.ts` memeriksa history, source, ACL/RLS, dan sisa
 fixture terhadap baseline yang dipin; empat input Phase 5 masih dibacanya.
 
+Suite `api-page-plan-writes.test.ts` memakai helper `psql` lokal yang sudah
+digunakan suite plan lain, bukan menjalankan CLI Supabase untuk setiap query.
+Seluruh 18 kasus, termasuk pemeriksaan owner/JWT dan penolakan lintas owner,
+tetap dijalankan. Pada checkout lokal 26 Oktober 2026, durasi file ini turun
+dari sekitar 333 detik (Actions sebelumnya) menjadi 49 detik (test fokus);
+durasi full gate Actions sesudah perubahan belum diukur.
+
 Urutan wajib CR-044 dalam full gate: setelah satu clean reset lokal, jalankan
 focused OAuth/owner dan authenticated Inspector **sebelum** suite database panjang
 dalam `test-all`. Pertahankan locked install, migration history, DB lint lokal,
