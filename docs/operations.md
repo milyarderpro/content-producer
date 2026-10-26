@@ -6,7 +6,7 @@ memulihkan layanan, dan menelusuri masalah. Untuk pekerjaan lokal baca
 [testing](testing.md). Izin deployment dan perubahan data tetap mengikuti
 [AGENTS.md](../AGENTS.md) serta keputusan pemilik untuk tindakan yang tepat.
 
-**Tanggal peninjauan:** 25 Oktober 2026. Task dokumentasi ini tidak mengakses atau
+**Tanggal peninjauan:** 27 Oktober 2026. Task dokumentasi ini tidak mengakses atau
 mengubah production. Command di bawah adalah prosedur bersyarat, bukan bukti bahwa
 command sudah dijalankan atau otorisasi untuk langsung mengeksekusinya.
 
@@ -15,18 +15,20 @@ command sudah dijalankan atau otorisasi untuk langsung mengeksekusinya.
 Pemilik menyatakan project sudah digunakan di production. Source dan bukti lokal
 yang tersedia perlu dibedakan dari pemeriksaan live terbaru:
 
-| Komponen             | Yang dapat dirujuk sekarang                                                                                                                       | Batas bukti                                                                         |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Source yang ditinjau | HEAD `d6e7fe83ea006931f85624c4d60486f92ab3438c`; cleanup masih perubahan lokal                                                                    | Bukan exact SHA deployment yang baru diperiksa                                      |
-| Paket plugin         | Manifest source `0.2.3`; hasil LT-016 mencatat plugin PRIVATE v0.2.3 dan refresh schema pada `mcpku2`                                             | Instalasi/release aktif sekarang belum dibaca ulang                                 |
-| Edge `mcp`           | CR-049 mencatat Edge tetap v33 saat rollout SQL 22 Oktober; v31/v32 adalah record lebih awal                                                      | Versi aktif serta exact source/bundle SHA sekarang belum diverifikasi               |
-| Database             | Ada 70 migration source; CR-049 mencatat 70 migration production setelah rollout                                                                  | Applied history dan drift sekarang belum diperiksa                                  |
-| Gate historis CR-049 | Kandidat `1a4e755a48f3c77eb557b931fd6bd99d5e1b24fd`, [run 39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314) | Record pada CR-049; jangan menempelkan exact-SHA PASS tersebut ke HEAD yang berbeda |
-| Frontend             | Tracker merekam hosting production; source memakai `auth-frontend/`, build `dist/`, Git auto-deployment dimatikan                                 | Deployment aktif, environment, dan flag hosted sekarang belum diperiksa             |
-| Kampanye live        | Log lokal merekam 11 Read PASS; LT-E2E-01 masih BLOCKED pada record tersebut                                                                      | Status Issue atau hasil setelah log itu belum diperiksa                             |
+| Komponen             | Yang dapat dirujuk sekarang                                                                                                                                      | Batas bukti                                                                         |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Source yang ditinjau | Backend `main` SHA `be7ce5455863d3c51f4cfdd9ec6c9263e837ede3` setelah PR #52                                                                                     | Bukan exact SHA deployment yang baru diperiksa                                      |
+| Paket plugin         | Manifest source `0.2.3`; hasil LT-016 mencatat plugin PRIVATE v0.2.3 dan refresh schema pada `mcpku2`                                                            | Instalasi/release aktif sekarang belum dibaca ulang                                 |
+| Edge `mcp`           | CR-049 mencatat Edge tetap v33 saat rollout SQL 22 Oktober; v31/v32 adalah record lebih awal                                                                     | Versi aktif serta exact source/bundle SHA sekarang belum diverifikasi               |
+| Database             | Ada 71 migration source pada backend SHA di atas; CR-049 terakhir mencatat 70 migration production setelah rollout                                               | Applied production history dan drift sekarang belum diperiksa                       |
+| Gate historis CR-049 | Kandidat `1a4e755a48f3c77eb557b931fd6bd99d5e1b24fd`, [run 39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314)                | Record pada CR-049; jangan menempelkan exact-SHA PASS tersebut ke HEAD yang berbeda |
+| Gate CR-050          | Backend SHA `be7ce5455863d3c51f4cfdd9ec6c9263e837ede3`, [run 40364895835](https://github.com/milyarderpro/content-producer/actions/runs/40364895835) **SUCCESS** | Gate lokal terisolasi; bukan bukti deployment atau retest live                      |
+| Frontend             | Tracker merekam hosting production; source memakai `auth-frontend/`, build `dist/`, Git auto-deployment dimatikan                                                | Deployment aktif, environment, dan flag hosted sekarang belum diperiksa             |
+| Kampanye live        | Log lokal merekam 11 Read PASS; LT-E2E-01 masih BLOCKED pada record tersebut                                                                                     | Status Issue atau hasil setelah log itu belum diperiksa                             |
 
 Sumber: [log live](live-test/results.md),
 [CR-049](decisions/2026-10-22-cr-049-get-post-source-evidence-null-preservation.md),
+[CR-050](decisions/2026-10-26-cr-050-trivia-source-error-diagnostics.md),
 [tracker historis](../archive/plans/implementation-plan.md#16-phase-tracker), dan
 [audit cleanup](cleanup-audit.md). Perbarui tabel ini hanya dengan bukti yang dapat
 ditelusuri; cantumkan kapan diperiksa, bukan sekadar menaikkan nomor versi.
