@@ -142,6 +142,31 @@ Deno.test('reservation reports safe source field error without exposing raw evid
     globalThis.fetch = original;
   }
 });
+Deno.test('reservation reports only the allowlisted dedup position and reason', async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = (() =>
+    Promise.resolve(
+      Response.json(
+        {
+          message: 'FACT_REVIEW_REQUIRED',
+          details: 'REVIEW_DIAG:4:REVIEW_MISSING_OR_INVALID',
+          hint: 'private candidate and SQL must stay hidden',
+        },
+        { status: 400 },
+      ),
+    )) as typeof fetch;
+  try {
+    const result = await call('trivia_register_and_reserve_facts');
+    const error = result.structuredContent?.error;
+    check(result.isError === true, 'REVIEW_ERROR_EXPECTED');
+    check(error?.code === 'FACT_REVIEW_REQUIRED', 'STABLE_REVIEW_CODE');
+    check(error?.field_errors?.[0]?.path === 'facts[3].dedup_reviews', 'REVIEW_POSITION');
+    check(error?.field_errors?.[0]?.code === 'REVIEW_MISSING_OR_INVALID', 'REVIEW_REASON');
+    check(!JSON.stringify(result).includes('private candidate and SQL'), 'NO_RAW_REVIEW_HINT');
+  } finally {
+    globalThis.fetch = original;
+  }
+});
 function check(condition: unknown, label: string): asserts condition {
   if (!condition) throw new Error(label);
 }

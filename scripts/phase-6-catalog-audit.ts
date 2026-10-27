@@ -6,7 +6,8 @@ import { row, sql } from '../supabase/tests/database/helpers/plan-lifecycle.js';
 
 // SELECT-only audit: retain the accepted 67-migration CR-016 baseline.
 // Pin the CR-021 OAuth hook (68th), CR-046 projection fix (69th),
-// CR-049 source-null preservation (70th), and CR-050 source diagnostics (71st)
+// CR-049 source-null preservation (70th), CR-050 source diagnostics (71st),
+// and CR-051 visual/dedup policy (72nd)
 // independently. Validate only their permitted function-source deltas before
 // comparing to the frozen baseline.
 const expected = JSON.parse(
@@ -24,7 +25,7 @@ const manifest = readdirSync('supabase/migrations')
       .update(readFileSync(`supabase/migrations/${file}`))
       .digest('hex'),
   }));
-assert.equal(manifest.length, 71);
+assert.equal(manifest.length, 72);
 deepStrictEqual(manifest.slice(0, 67), expected.manifest);
 // Git blob hashes pin the exact bytes of each post-baseline migration, without
 // editing either the accepted baseline or an already-applied migration.
@@ -51,6 +52,10 @@ deepStrictEqual(pinnedPostBaselineMigrations, [
   {
     file: '20261026121918_trivia_source_diagnostics.sql',
     git_blob_sha1: 'b8b8152d2e061951affcc21211906c8b7dffdb1b',
+  },
+  {
+    file: '20261027075748_relax_trivia_visual_limit_and_dedup_diagnostics.sql',
+    git_blob_sha1: '39800ec7c9db52309a464c0aa010d1da36f7a9f2',
   },
 ]);
 const applied = row<{ versions: string[] }>(
@@ -256,17 +261,13 @@ deepStrictEqual(
   'CR-049 must preserve get_post owner, SECURITY DEFINER, SET options, ACL and signature',
 );
 currentGetPostFunctions[0].source_sha256 = archivedGetPostSha;
-// CR-050 replaces exactly two private functions. The pinned migration is the
-// source of their complete bodies; compare installed prosrc byte-for-byte to
-// each body before restoring only the archived digest for baseline comparison.
+// CR-050's fact-input helper remains unchanged by CR-051. Compare its installed
+// body byte-for-byte before restoring the archived digest.
 const sourceDiagnosticsMigration = readFileSync(
   'supabase/migrations/20261026121918_trivia_source_diagnostics.sql',
   'utf8',
 );
-const sourceDiagnosticSignatures = [
-  'internal.trivia_rpc_raise_v1(text,text)',
-  'internal.trivia_fact_input_v1(jsonb,boolean)',
-] as const;
+const sourceDiagnosticSignatures = ['internal.trivia_fact_input_v1(jsonb,boolean)'] as const;
 const sourceDiagnosticFunctions = sourceDiagnosticSignatures.map((signature) => {
   const name = signature.slice(0, signature.indexOf('('));
   const marker = `create or replace function ${name}(`;
@@ -309,6 +310,57 @@ const sourceDiagnosticFunctions = sourceDiagnosticSignatures.map((signature) => 
     current_source_sha256: currentSha,
     accepted_baseline_source_sha256: archivedFunctions[0].source_sha256,
   };
+});
+
+// Pin each CR-051 function body after applying the migration in a rolled-back
+// local transaction. The reserve resolver already contains additive rewrites,
+// so its original migration text is not the final baseline body.
+// Compare exact body fingerprints and unchanged archived metadata separately.
+const cr051BodyHashes = new Map([
+  [
+    'internal.post_system_base_v1(jsonb,jsonb,text,integer)',
+    '744644cd514107e2aeaae8fc97d6cb3fa037e27dce7815d527536a03cf935c09',
+  ],
+  [
+    'internal.trivia_resolve_fact_v2(bigint,jsonb,boolean,bigint,bigint[])',
+    '472af3a6666958789306e142e25e5a0adb3da129befe3660a688b194bfaf130e',
+  ],
+  [
+    'internal.trivia_rpc_raise_v1(text,text)',
+    '567d24670cbed8763e75e7c9948ffae16c4522ff5c8e69e62db656ba76ae0e51',
+  ],
+]);
+const cr051Functions = Array.from(cr051BodyHashes, ([signature, bodyHash]) => {
+  const installedBody = row<{ body: string }>(
+    `select prosrc body from pg_proc where oid='${signature}'::regprocedure`,
+  ).body;
+  assert.equal(
+    createHash('sha256').update(installedBody).digest('hex'),
+    bodyHash,
+    `CR-051 installed body differs for ${signature}`,
+  );
+  const current = (extra.functions as { signature: string; source_sha256: string }[]).find(
+    (x) => x.signature === signature,
+  );
+  const archived = (
+    expected.extra.functions as { signature: string; source_sha256: string }[]
+  ).find((x) => x.signature === signature);
+  assert.ok(current && archived, `CR-051 catalog function missing: ${signature}`);
+  const currentSha = createHash('sha256')
+    .update(
+      row<{ definition: string }>(
+        `select pg_catalog.pg_get_functiondef('${signature}'::regprocedure) definition`,
+      ).definition,
+    )
+    .digest('hex');
+  assert.equal(current.source_sha256, currentSha);
+  deepStrictEqual(
+    { ...current, source_sha256: archived.source_sha256 },
+    archived,
+    `CR-051 must preserve ${signature} owner, mode, settings and ACL`,
+  );
+  current.source_sha256 = archived.source_sha256;
+  return { signature, current_source_sha256: currentSha };
 });
 for (const key of [
   'auth_users',
@@ -387,10 +439,11 @@ writeFileSync(
       },
       pinned_post_baseline_migrations: pinnedPostBaselineMigrations,
       source_diagnostics_projections: sourceDiagnosticFunctions,
+      cr051_projections: cr051Functions,
     }),
     { ...(await resolveConfig(file)), parser: 'json' },
   ),
 );
 console.info(
-  'Phase 10.4 + CR-049/CR-050 catalog: 71 source/applied migrations, 33 RPCs, 15/15 RLS, unchanged archived 67-migration baseline after exact CR-046/CR-049/CR-050 source validation, pinned CR-021/CR-046/CR-049/CR-050 migrations, private Auth hook, grants and zero fixtures/faults: PASS.',
+  'Phase 10.4 + CR-051 catalog: 72 source/applied migrations, 33 RPCs, 15/15 RLS, unchanged archived 67-migration baseline after exact CR-046/CR-049/CR-050/CR-051 source validation, pinned post-baseline migrations, private Auth hook, grants and zero fixtures/faults: PASS.',
 );

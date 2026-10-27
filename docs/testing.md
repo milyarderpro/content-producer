@@ -171,8 +171,8 @@ Dispatch CI manual atau event tanpa base yang sah memilih seluruh pemeriksaan
 ringan. Review risiko backend ditandai terpisah, bukan otomatis menjalankan full
 gate. Dependency baru tetap harus ditambahkan ke pemetaan dan regresinya.
 
-Nama ZIP dan artefak diambil dari versi manifest plugin; source v0.2.3 menghasilkan
-nama v0.2.3, bukan label checkpoint yang ditulis permanen. Kandidat 13 file,
+Nama ZIP dan artefak diambil dari versi manifest plugin; kandidat source v0.2.7
+menghasilkan nama v0.2.7, bukan label checkpoint yang ditulis permanen. Kandidat 13 file,
 allowlist, hash ekstraksi, dan larangan credential/bundled MCP tetap diperiksa.
 
 Basis durasi yang tersedia: job light run 39915940238 berlangsung 29 detik,

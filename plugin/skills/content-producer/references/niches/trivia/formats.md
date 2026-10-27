@@ -29,7 +29,9 @@ Choose `fast_trivia` or `practical_utility` based on subject; prefer 5–7 corre
 - `fast_trivia`: 7–8 facts, 8–11 words/fact, around 45–70 characters/fact, 65–85 words total Canva copy.
 - `practical_utility`: 5–6 facts, 10–14 words/fact, around 65–90 characters/fact, 65–85 words total.
 
-These are **preferences**, not hard gates. Page-config default counts are adaptive 5–9 (preferred 7); only explicit eligible `FACT_COUNT_BELOW_CONFIG_MIN` waiver can allow 1–4, never less than one, and cannot silently override a fixed count. The hard readiness limits are at most 18 words/fact, 12 in hook, 14 in CTA, 100 Canva words, 28 estimated visual lines including blank separators, 3 wrapped lines/fact, 2 wrapped lines for hook or CTA, `replay_ratio` 2.5, `estimated_loops` 3. Hard failures cannot be waived.
+These are **preferences**, not hard gates. Page-config default counts are adaptive 5–9 (preferred 7); only explicit eligible `FACT_COUNT_BELOW_CONFIG_MIN` waiver can allow 1–4, never less than one, and cannot silently override a fixed count. The hard readiness limits are at most 18 words/fact, 12 in hook, 14 in CTA, 100 Canva words, 3 wrapped lines/fact, 2 wrapped lines for hook or CTA, `replay_ratio` 2.5, `estimated_loops` 3. Total estimated visual lines remain a server-reported metric, **not** a hard limit or approval warning under CR-051. Other hard failures cannot be waived.
+
+During composition, aim comfortably within the preferred word range: use a short, specific hook and CTA, remove redundant wording, and prefer facts that express their meaning compactly. Preserve material qualifiers and replace a fact that cannot fit honestly. Do not claim an exact line count before the server renders the copy, and never supply calculated `text_metrics`; send `{}` as the core workflow requires. A saved draft with another hard readability failure stays a draft requiring review, not a successful quality pass.
 
 ## Canonical output
 

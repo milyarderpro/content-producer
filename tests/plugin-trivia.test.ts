@@ -65,7 +65,7 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
       '12 in hook',
       '14 in CTA',
       '100 Canva words',
-      '28 estimated visual lines',
+      'Total estimated visual lines remain a server-reported metric',
       'replay_ratio',
       'estimated_loops',
       '600',
@@ -185,6 +185,30 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     expect(text).toContain('greets_via_trunk_touch');
     expect(text).toContain('do not assert');
     expect(text).toContain('**Do not** change a');
+  });
+
+  it('holds incomplete dedup reads before reservation and does not treat clipped results as empty', () => {
+    const text = read(niche + 'dedup-ontology.md');
+    const sequence = read('references/core/tool-sequences.md');
+    expect(text).toContain('`max_matches_per_candidate: 20`');
+    expect(text).toContain('narrower default of 10');
+    expect(text).toContain('account for every requested candidate position');
+    expect(text).toContain('targeted `trivia_find_similar_facts` READ');
+    expect(text).toContain('do not interpret unseen matches as none');
+    expect(text).toContain('Use `dedup_reviews: []` only');
+    expect(text).toContain('An incomplete or uncertain review holds the set');
+    expect(sequence).toContain('confirm complete results for every position');
+  });
+
+  it('calibrates first-draft interest and visual density without bypassing server metrics', () => {
+    const dna = read(niche + 'content-dna.md');
+    const formats = read(niche + 'formats.md');
+    expect(dna).toContain('Before reserving the final ordered set');
+    expect(dna).toContain('replace weak candidates while still in research');
+    expect(dna).toContain('not a separate preview/GO checkpoint');
+    expect(formats).toContain('aim comfortably within the preferred word range');
+    expect(formats).toContain('never supply calculated `text_metrics`');
+    expect(formats).toContain('Preserve material qualifiers');
   });
 
   it('handles all formats, mismatched hooks, CTA pressure and critical quality failures', () => {
