@@ -9,14 +9,14 @@
 
 ## Penilaian editorial atas copy pertama
 
-| DNA 0–2 | Skor | Dasar ringkas |
-| --- | ---: | --- |
-| Familiarity | 2 | Sea turtles mudah dikenali lintas audiens sasaran. |
-| Surprise | 2 | Kontras cangkang leatherback, suhu sarang, navigasi magnetik, dan arribada memberi beberapa momen baru. |
-| Specificity | 2 | Klaim yang hanya berlaku pada jenis tertentu diberi nama spesies; tiap baris mengandung satu proposisi utama. |
-| Coherence | 2 | Ketujuh baris tetap dalam satu subjek, dengan variasi anatomi, makanan, navigasi, dan reproduksi. |
-| Scanability | 2 | Baris pendek, pemisah jelas, bahasa umum; ini penilaian visual reviewer, **bukan** metrik renderer server. |
-| Utility/emotion | 1 | Ada rasa ingin tahu, tetapi hook “worth knowing” dan CTA “ocean wildlife fan” generik; penutup belum menjadi fakta terkuat secara jelas. |
+| DNA 0–2         | Skor | Dasar ringkas                                                                                                                            |
+| --------------- | ---: | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Familiarity     |    2 | Sea turtles mudah dikenali lintas audiens sasaran.                                                                                       |
+| Surprise        |    2 | Kontras cangkang leatherback, suhu sarang, navigasi magnetik, dan arribada memberi beberapa momen baru.                                  |
+| Specificity     |    2 | Klaim yang hanya berlaku pada jenis tertentu diberi nama spesies; tiap baris mengandung satu proposisi utama.                            |
+| Coherence       |    2 | Ketujuh baris tetap dalam satu subjek, dengan variasi anatomi, makanan, navigasi, dan reproduksi.                                        |
+| Scanability     |    2 | Baris pendek, pemisah jelas, bahasa umum; ini penilaian visual reviewer, **bukan** metrik renderer server.                               |
+| Utility/emotion |    1 | Ada rasa ingin tahu, tetapi hook “worth knowing” dan CTA “ocean wildlife fan” generik; penutup belum menjadi fakta terkuat secara jelas. |
 
 **Total 11/12 — `KUAT` pada copy `UNSAVED`; `format_fit: FIT`.** Tujuh fakta dan satu CTA sesuai arsitektur `single_subject_fast`. `en-US` natural dan tidak bergaya buku teks; “arribadas” dijelaskan sebagai peristiwa bersarang massal. Caption tidak tampak menambah klaim faktual baru. Urutan fakta dan hook masih bisa diperkuat, tetapi baseline tidak diubah. Dukungan sumber per klaim, dedup semantik, batas renderer, serta kelayakan `ready` tetap `UNVERIFIED`; skor DNA tidak membatalkan hold server.
 
@@ -58,4 +58,4 @@ Seven quick sea turtle facts, from shell anatomy to navigation and nesting. Pass
 
 Pemilik meneruskan audit tanpa tool/Write tambahan. Pada hasil `trivia_find_similar_facts` yang masih terlihat, `review_required: false` untuk F1, F2, F6, dan F7; bagian F3–F5 terpotong dan statusnya `UNVERIFIED`. Request reservasi **memuat `dedup_reviews: []` pada seluruh F1–F7**, sehingga tidak ada keputusan `same`/`distinct`/`uncertain` maupun alasan pembeda yang dikirim. Belum dapat dipastikan apakah F3–F5 (atau kandidat lain yang tidak terlihat) memang membutuhkan review, dan respons server tidak melokalisasi cabang validator. Karena itu, **penyebab persis `FACT_REVIEW_REQUIRED` tetap `UNVERIFIED`**; paket review kosong adalah celah kesiapan yang nyata, bukan bukti tunggal sebab live.
 
-Keputusan reviewer: tidak mengulang Write `DNA-SSF-01` hanya untuk menebak kandidat. Kasus ini tetap `BLOCKED` dan copy tetap `UNSAVED`. Uji berikutnya boleh dilanjutkan dengan guardrail singkat: penguji harus menuntaskan pembacaan dedup per fakta sebelum reservasi; `[]` hanya layak jika hasil lengkap menunjukkan tidak ada review yang diperlukan. Jika hasil Read terpotong, lakukan Read terarah untuk bagian itu; jika tetap tak lengkap, berhenti sebelum Write. Belum membuat Issue defect baru sampai ada bukti payload/validator yang cukup atau pola berulang.
+Keputusan reviewer: tidak mengulang Write `DNA-SSF-01` hanya untuk menebak kandidat. Kasus ini tetap `BLOCKED` dan copy tetap `UNSAVED`. Uji berikutnya memakai guardrail singkat: penguji harus menuntaskan pembacaan dedup per fakta sebelum reservasi; `[]` hanya layak jika hasil lengkap menunjukkan tidak ada review yang diperlukan. Jika hasil Read terpotong, lakukan Read terarah untuk bagian itu; jika tetap tak lengkap, berhenti sebelum Write. Setelah uji TUT/EAC selesai, celah preflight yang tampak dicatat di [Issue #56](https://github.com/milyarderpro/content-producer/issues/56); issue itu tidak mengklaim penyebab validator live sudah terbukti.
