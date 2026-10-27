@@ -35,6 +35,8 @@ metadata Read, format trivia, niche baru, dan penyajian hasil plugin.
 
 - [Live Test & Fix](live-test/README.md) adalah workflow aktif untuk pengujian
   langsung dan remediasi menurut instruksi repository.
+- [Evaluasi editorial trivia](live-test/editorial/README.md) menyiapkan audit tiga
+  dataset, Page uji internal, dan prompt draft tersimpan; hasil uji belum tersedia.
 - [Matriks pengujian](live-test/test-matrix.md) dan [hasil pengujian](live-test/results.md)
   mencatat cakupan serta batas bukti yang tersedia.
 - [Audit cleanup](cleanup-audit.md) mencatat baseline lokal 25 Oktober 2026,
