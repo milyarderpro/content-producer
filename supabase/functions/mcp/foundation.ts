@@ -444,6 +444,11 @@ const sourceDiagnosticMessages = {
 } as const;
 type SourceDiagnosticCode = keyof typeof sourceDiagnosticMessages;
 type SourceFieldError = { path: string; code: SourceDiagnosticCode; message: string };
+type ReviewFieldError = {
+  path: string;
+  code: 'REVIEW_MISSING_OR_INVALID';
+  message: string;
+};
 
 function sourceFieldError(details: unknown): SourceFieldError | null {
   if (typeof details !== 'string') return null;
@@ -460,7 +465,18 @@ function sourceFieldError(details: unknown): SourceFieldError | null {
   return { path, code, message: sourceDiagnosticMessages[code] };
 }
 
-function failure(code: SafeError, fieldError?: SourceFieldError | null) {
+function reviewFieldError(details: unknown): ReviewFieldError | null {
+  if (typeof details !== 'string') return null;
+  const match = /^REVIEW_DIAG:([1-9]):REVIEW_MISSING_OR_INVALID$/.exec(details);
+  if (!match) return null;
+  return {
+    path: `facts[${Number(match[1]) - 1}].dedup_reviews`,
+    code: 'REVIEW_MISSING_OR_INVALID',
+    message: 'A required semantic review decision is missing or inconsistent.',
+  };
+}
+
+function failure(code: SafeError, fieldError?: SourceFieldError | ReviewFieldError | null) {
   const [message, retryable, recovery] = safeErrors[code];
   return {
     isError: true as const,
@@ -472,7 +488,7 @@ function failure(code: SafeError, fieldError?: SourceFieldError | null) {
         retryable,
         recovery,
         ...(code === 'RATE_LIMITED' ? { retry_after_seconds: 60 } : {}),
-        ...(code === 'FACT_SOURCE_INSUFFICIENT' && fieldError
+        ...((code === 'FACT_SOURCE_INSUFFICIENT' || code === 'FACT_REVIEW_REQUIRED') && fieldError
           ? { field_errors: [fieldError] }
           : {}),
       },
@@ -484,7 +500,7 @@ function failure(code: SafeError, fieldError?: SourceFieldError | null) {
           code +
           ': ' +
           message +
-          (code === 'FACT_SOURCE_INSUFFICIENT' && fieldError
+          ((code === 'FACT_SOURCE_INSUFFICIENT' || code === 'FACT_REVIEW_REQUIRED') && fieldError
             ? ` ${fieldError.path}: ${fieldError.message}`
             : ''),
       },
@@ -605,7 +621,11 @@ export async function invoke(
               : null;
           return failure(
             message,
-            message === 'FACT_SOURCE_INSUFFICIENT' ? sourceFieldError(details) : null,
+            message === 'FACT_SOURCE_INSUFFICIENT'
+              ? sourceFieldError(details)
+              : message === 'FACT_REVIEW_REQUIRED'
+                ? reviewFieldError(details)
+                : null,
           );
         }
         return failure(rpc.status === 401 ? 'AUTH_REQUIRED' : 'DATABASE_UNAVAILABLE');

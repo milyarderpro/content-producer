@@ -61,6 +61,8 @@ When complete, deterministic-safe relation families include `has_count`, `has_me
 4. For `same`, use the eligible existing canonical fact subject to freshness, reuse scope and current status. For `distinct`, register and reserve the actual new proposition atomically via `trivia_register_and_reserve_facts`. Do not create duplicates to avoid the reuse rule.
 5. Preserve a single ordered fact set, token and matching junctions into `save_post`. Release an abandoned reservation via `trivia_release_facts`. No duplicated reservation or unsanctioned retry of an operation with a new `operation_key`.
 
+If reservation returns `FACT_REVIEW_REQUIRED` with `facts[index].dedup_reviews`, inspect that position's complete `trivia_find_similar_facts` result and the submitted decision. The error does not prove the candidate is distinct or identify a safe automatic replacement. Without a field position, report the generic hold and reconcile the full ordered set; do not guess or retry the same rejected payload with a new operation key.
+
 Materially changed meaning creates a successor through explicitly authorized `trivia_correct_fact`, with old fact `superseded` or `invalidated` as appropriate. Mere fresh evidence for the same meaning uses `trivia_reverify_fact`. Correction can invalidate a ready approval; posted snapshots are immutable. Server enforces version, owner scope, reservation and reuse, not this reference.
 
 ## Identity decision pairs (synthetic examples, not verified facts)

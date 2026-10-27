@@ -27,6 +27,8 @@ Setelah tiap hasil, reviewer mencatat kasus di `results.jsonl` dan `runs/`, memb
 
 **Kasus terakhir selesai:** [`DNA-EAC-01`](runs/DNA-EAC-01-baseline.md) menyimpan satu draft dengan readback cocok (`PASS` workflow), DNA 10/12 (`KUAT`), tetapi checks sistem gagal karena 29 baris visual melewati hard limit 28; 88 kata juga di atas preferensi 85. Draft tetap tidak `ready`. Ketiga kasus baru kini selesai sebagai bukti diagnostik; jangan mengulang atau menambah kasus live tanpa keputusan baru. Sintesis lintas lima format memakai dua retest MVF/CMP sebelumnya dengan batas versi/runtime tetap.
 
+**Pembaruan sesudah uji:** [CR-051](../../decisions/2026-10-27-cr-051-trivia-visual-lines-and-dedup-diagnostics.md) mencabut batas total 28 baris untuk versi mendatang. Hasil 29/28 di atas tetap benar sebagai catatan baseline lama, bukan kegagalan yang harus dihindari dengan margin pada naskah baru. Efek live CR-051 belum diverifikasi.
+
 Versi plugin v0.2.6 adalah konfirmasi pemilik sebelum dua retest, bukan release ID sesi. Setiap chat baru diminta melaporkan identitas runtime dan `config_updated_at` hanya bila benar-benar terlihat; jika tidak, `UNVERIFIED`. Source manifest repository yang saat audit masih `0.2.3` tidak boleh dipakai sebagai bukti versi plugin live. Kelima contoh boleh dibandingkan secara **deskriptif**, bukan digabung menjadi klaim peningkatan satu rilis.
 
 ## Prompt siap-tempel — kirim hanya satu sesuai urutan

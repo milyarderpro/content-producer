@@ -1,5 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { factInput, json, row, source, sql } from './helpers/trivia-rpc.js';
+import {
+  candidate,
+  cleanup,
+  factInput,
+  fixture,
+  json,
+  release,
+  reserve,
+  reserved,
+  row,
+  rpc,
+  source,
+  sql,
+} from './helpers/trivia-rpc.js';
 
 function capturedError(expression: string): { message: string; detail: string } {
   const output = sql(`begin;
@@ -64,6 +77,43 @@ describe('trivia source diagnostics retain policy and redact evidence', () => {
 
   it('does not expose an unrecognized internal diagnostic', () => {
     expect(capturedError("internal.trivia_rpc_raise_v1('P0001','SOURCE_DIAG:1:SECRET')")).toEqual({
+      message: 'INTERNAL_ERROR',
+      detail: '',
+    });
+  });
+});
+
+describe('CR-051 trivia dedup diagnostics preserve rejection and redact candidates', () => {
+  it('reports the rejected fact position without changing semantic review policy', () => {
+    const f = fixture();
+    try {
+      const initial = {
+        ...candidate(),
+        relation_key: 'can_perform',
+        numbers: [],
+        object_key: 'action',
+      };
+      const created = rpc(f, reserve(f, [factInput(initial)]));
+      rpc(f, release(f, created.data.reservation_token as string));
+      const changed = { ...initial, claim_text: 'A differently worded action claim.' };
+      const denied = capturedError(reserve(f, [factInput(changed)]));
+      expect(denied).toEqual({
+        message: 'FACT_REVIEW_REQUIRED',
+        detail: 'REVIEW_DIAG:1:REVIEW_MISSING_OR_INVALID',
+      });
+      expect(JSON.stringify(denied)).not.toContain(changed.claim_text);
+      expect(JSON.stringify(denied)).not.toContain(reserved(created)[0]!.fact_public_id);
+    } finally {
+      cleanup(f);
+    }
+  });
+
+  it('keeps positionless and unknown diagnostics generic', () => {
+    expect(capturedError("internal.trivia_rpc_raise_v1('P0001','FACT_REVIEW_REQUIRED')")).toEqual({
+      message: 'FACT_REVIEW_REQUIRED',
+      detail: '',
+    });
+    expect(capturedError("internal.trivia_rpc_raise_v1('P0001','REVIEW_DIAG:1:SECRET')")).toEqual({
       message: 'INTERNAL_ERROR',
       detail: '',
     });

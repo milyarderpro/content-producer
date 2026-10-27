@@ -78,11 +78,11 @@
     },
     {
       "fixture_id": "READ-LINES-029",
-      "reason_label": "one line above hard boundary",
+      "reason_label": "total line count is informational under CR-051",
       "fact_lengths": [69, 69, 69, 69, 65, 65, 65],
       "hook_chars": 35,
       "expected_line_count": 29,
-      "expected_status": "failed"
+      "expected_status": "passed"
     },
     {
       "fixture_id": "READ-REPLAY-250",

@@ -65,7 +65,7 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
       '12 in hook',
       '14 in CTA',
       '100 Canva words',
-      '28 estimated visual lines',
+      'Total estimated visual lines remain a server-reported metric',
       'replay_ratio',
       'estimated_loops',
       '600',
@@ -206,7 +206,7 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     expect(dna).toContain('Before reserving the final ordered set');
     expect(dna).toContain('replace weak candidates while still in research');
     expect(dna).toContain('not a separate preview/GO checkpoint');
-    expect(formats).toContain('editorial buffer');
+    expect(formats).toContain('aim comfortably within the preferred word range');
     expect(formats).toContain('never supply calculated `text_metrics`');
     expect(formats).toContain('Preserve material qualifiers');
   });
