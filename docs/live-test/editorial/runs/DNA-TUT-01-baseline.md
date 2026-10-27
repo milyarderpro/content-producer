@@ -10,14 +10,14 @@
 
 ## Penilaian editorial reviewer atas copy pertama yang tersimpan
 
-| DNA 0–2 | Skor | Dasar ringkas |
-| --- | ---: | --- |
-| Familiarity | 2 | Buku dan rak buku mudah dikenali audiens luas. |
-| Surprise | 0 | Sebagian besar saran—kering, jauh dari matahari, tangan bersih—mudah ditebak; F4/F6 memberi detail berguna tetapi belum menjadi kejutan kuat. |
-| Specificity | 2 | Ada tindakan konkret: bookends, buku berat mendatar, pegang bagian tengah punggung buku. |
-| Coherence | 2 | Keenam baris tetap dalam satu tema penyimpanan/penanganan buku. |
-| Scanability | 1 | Struktur jelas dan lolos batas server, tetapi 83 kata/25 baris membutuhkan sekitar 27,7 detik estimasi baca pada Reel 13 detik; beberapa kalimat masih panjang. |
-| Utility/emotion | 2 | Semua baris dapat dipraktikkan, dengan CTA save yang relevan. |
+| DNA 0–2         | Skor | Dasar ringkas                                                                                                                                                   |
+| --------------- | ---: | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Familiarity     |    2 | Buku dan rak buku mudah dikenali audiens luas.                                                                                                                  |
+| Surprise        |    0 | Sebagian besar saran—kering, jauh dari matahari, tangan bersih—mudah ditebak; F4/F6 memberi detail berguna tetapi belum menjadi kejutan kuat.                   |
+| Specificity     |    2 | Ada tindakan konkret: bookends, buku berat mendatar, pegang bagian tengah punggung buku.                                                                        |
+| Coherence       |    2 | Keenam baris tetap dalam satu tema penyimpanan/penanganan buku.                                                                                                 |
+| Scanability     |    1 | Struktur jelas dan lolos batas server, tetapi 83 kata/25 baris membutuhkan sekitar 27,7 detik estimasi baca pada Reel 13 detik; beberapa kalimat masih panjang. |
+| Utility/emotion |    2 | Semua baris dapat dipraktikkan, dengan CTA save yang relevan.                                                                                                   |
 
 **Total 9/12 — `PERLU REVISI` secara DNA; `format_fit: FIT`.** Format praktis, enam fakta, caption dan hashtag terpisah, `en-US` natural dan tidak akademis. Hook “6 small habits that protect your books” akurat tetapi generik. F5 “before turning the pages of books” terdengar agak kaku; F4/F6 lebih khas dan layak ditempatkan lebih menonjol bila kelak ada revisi. Tidak ada revisi baseline dalam uji ini. Kelulusan 18/18 kriteria editorial server adalah laporan pemeriksaan pada draft, **bukan** bukti bahwa novelty/hook memenuhi target DNA referensi. Sumber per klaim dan penyalinan tidak diaudit ulang oleh reviewer.
 
