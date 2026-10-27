@@ -1,6 +1,6 @@
 # DNA-SSF-01 — baseline
 
-- Bukti: jawaban lengkap chat penguji yang diteruskan pemilik pada 27 Oktober 2026. Prompt acuan ada di [`mini-test-v1.md`](../mini-test-v1.md#dna-ssf-01--aktif); kesamaan byte dengan prompt yang ditempel `UNVERIFIED`.
+- Bukti: jawaban lengkap chat penguji yang diteruskan pemilik pada 27 Oktober 2026. Prompt acuan ada di [`mini-test-v1.md`](../mini-test-v1.md#dna-ssf-01--selesai-blocked); kesamaan byte dengan prompt yang ditempel `UNVERIFIED`.
 - Page: `Trivia Editorial Test (Internal)`, public ID `f3984ee4-8ae7-4043-8c93-45765f82f46e`. Format diminta/dilaporkan: `single_subject_fast`; topik sea turtles; bahasa `en-US`.
 - Runtime: versi plugin `UNVERIFIED`, backend `UNVERIFIED`; module version yang dilaporkan `1`; `config_updated_at` yang dilaporkan `2026-10-26T06:03:13.793118Z`. Identitas konfigurasi dan kesamaan runtime dengan retest sebelumnya belum terverifikasi.
 - Alur yang dilaporkan: `get_account_profile` → `get_workspace_context` → `list_pages` → `get_page_generation_context` → riset → `trivia_find_similar_facts` → `get_page_generation_context` → satu `trivia_register_and_reserve_facts` ditolak. Kode `FACT_REVIEW_REQUIRED`; pesan `Semantic deduplication needs explicit review.` Respons tidak memuat `field_errors`.
@@ -52,4 +52,10 @@ Seven quick sea turtle facts, from shell anatomy to navigation and nesting. Pass
 
 ## Verdict dan triase berikutnya
 
-`execution_status: BLOCKED`; `workflow_verdict: BLOCKED / POLICY_HOLD`. Ini **bukan** kegagalan `save_post` dan belum membuktikan bug server maupun kesalahan tertentu pada prompt. Aturan plugin memang mensyaratkan keputusan `same`/`distinct`/`uncertain` yang eksplisit untuk kandidat semantik. Laporan belum menyertakan ringkasan kandidat/keputusan dedup dan bagian `dedup_reviews` dari request reservasi, sehingga penyebab spesifik belum bisa diatribusikan. Jangan melakukan retry Write atau mengganti fakta berdasarkan dugaan. Minta satu ringkasan READ-only tersanitasi dari chat yang sama; tunda `DNA-TUT-01` sampai hasilnya ditinjau.
+`execution_status: BLOCKED`; `workflow_verdict: BLOCKED / POLICY_HOLD`. Ini **bukan** kegagalan `save_post` dan belum membuktikan bug server maupun kesalahan tertentu pada prompt. Aturan plugin memang mensyaratkan keputusan `same`/`distinct`/`uncertain` yang eksplisit untuk kandidat semantik.
+
+### Triase READ-only dari chat yang sama
+
+Pemilik meneruskan audit tanpa tool/Write tambahan. Pada hasil `trivia_find_similar_facts` yang masih terlihat, `review_required: false` untuk F1, F2, F6, dan F7; bagian F3–F5 terpotong dan statusnya `UNVERIFIED`. Request reservasi **memuat `dedup_reviews: []` pada seluruh F1–F7**, sehingga tidak ada keputusan `same`/`distinct`/`uncertain` maupun alasan pembeda yang dikirim. Belum dapat dipastikan apakah F3–F5 (atau kandidat lain yang tidak terlihat) memang membutuhkan review, dan respons server tidak melokalisasi cabang validator. Karena itu, **penyebab persis `FACT_REVIEW_REQUIRED` tetap `UNVERIFIED`**; paket review kosong adalah celah kesiapan yang nyata, bukan bukti tunggal sebab live.
+
+Keputusan reviewer: tidak mengulang Write `DNA-SSF-01` hanya untuk menebak kandidat. Kasus ini tetap `BLOCKED` dan copy tetap `UNSAVED`. Uji berikutnya boleh dilanjutkan dengan guardrail singkat: penguji harus menuntaskan pembacaan dedup per fakta sebelum reservasi; `[]` hanya layak jika hasil lengkap menunjukkan tidak ada review yang diperlukan. Jika hasil Read terpotong, lakukan Read terarah untuk bagian itu; jika tetap tak lengkap, berhenti sebelum Write. Belum membuat Issue defect baru sampai ada bukti payload/validator yang cukup atau pola berulang.
