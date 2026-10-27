@@ -200,6 +200,21 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     expect(sequence).toContain('confirm complete results for every position');
   });
 
+  it('requires per-candidate material differences that match actual structured fields', () => {
+    const text = read(niche + 'dedup-ontology.md');
+    const sequence = read('references/core/tool-sequences.md');
+    expect(text).toContain(
+      'validate **each submitted review against the exact candidate returned by READ',
+    );
+    expect(text).toContain('`relation` only when `relation_key` differs');
+    expect(text).toContain('`other` only when `subject_key` or `object_key` differs');
+    expect(text).toContain('Do not copy one generic difference list across all matches');
+    expect(text).toContain('material_differences: ["other"]');
+    expect(text).toContain('**do not add `"relation"`**');
+    expect(text).toContain('four asserted `"relation"`');
+    expect(sequence).toContain('validate every submitted `material_differences` label');
+  });
+
   it('calibrates first-draft interest and visual density without bypassing server metrics', () => {
     const dna = read(niche + 'content-dna.md');
     const formats = read(niche + 'formats.md');
