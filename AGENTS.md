@@ -52,29 +52,29 @@ final AC-001..014 tetap PENDING. Pertahankan kontrak, bukti historis, dan
 `procedure-v1` MAN-01..09 beserta batas CR-048; MAN-10..11 opsional menurut CR-027.
 Ringkasan dan tautan rinci ada di [operations](docs/operations.md#8-status-dan-batas-bukti-historis).
 
-## 3. Estimasi CI wajib dan stop rule
+## 3. Estimasi CI wajib dan batas pemantauan
 
 Aturan pemilik 21 Oktober 2026 berlaku pada setiap task dan CI lokal/Actions.
-Ini **ambang estimasi sebelum eksekusi**, bukan timer sepuluh menit.
+Estimasi dilakukan sebelum eksekusi; batas sepuluh menit mengatur **pemantauan
+chat**, bukan melarang pemicu gate yang sudah diizinkan.
 
 1. Sebelum run/dispatch/push/PR yang men-trigger CI, periksa job dan riwayat run
    yang tersedia, estimasikan durasi, catat candidate SHA dan scope. Gunakan check
    fokus atau reuse gate unchanged-SHA bila memang memenuhi kontrak; jangan
    menjalankan full gate duplikat tanpa alasan teknis.
-2. Jika workflow/check wajib diperkirakan **lebih dari 10 menit, STOP sebelum
-   men-trigger**. Jangan mulai job berat, push/PR pemicu, atau watch/poll loop.
-   Laporkan estimasi/basis, workflow/check, SHA, pekerjaan selesai, sisa gate,
-   dan URL Issue/PR/run yang tersedia; **akhiri respons saat itu juga**.
-3. Tunggu pesan eksplisit **`lanjutkan`** berikutnya untuk meneruskan langkah CI.
-   Kata itu bukan izin deploy, merge restricted changes, atau business Write.
-4. Jangan menunggu sepuluh menit dahulu: estimasi 12 menit berarti berhenti
-   sebelum mulai; estimasi 8 menit boleh diproses sesuai izin/gate biasa.
-5. Jika run sudah dimulai pihak lain atau ternyata jelas melampaui sepuluh menit,
-   biarkan berjalan tanpa pembatalan sepihak; catat URL/status sekali, hentikan
-   polling/penahanan percakapan, lalu serahkan sampai `lanjutkan`. Jangan menulis
-   PASS untuk run yang belum selesai.
-6. Gate wajib **ditunda, bukan dihapus**. Jangan melemahkan test atau deploy
-   backend yang belum terverifikasi untuk menghindari batas durasi.
+2. Jika workflow/check yang sudah diizinkan diperkirakan **lebih dari 10 menit**,
+   jalankan atau dispatch sesuai scope izin. Konfirmasi sekali bahwa run dimulai,
+   lalu laporkan estimasi/basis, SHA, URL run, dan status sementara; **akhiri
+   respons tanpa menunggu hasil atau memantau log berulang**. Jangan menunggu
+   sepuluh menit dahulu untuk melepas chat.
+3. Jika run dimulai pihak lain atau ternyata melampaui sepuluh menit, biarkan
+   berjalan tanpa pembatalan sepihak. Catat URL/status sekali, hentikan polling,
+   lalu tunggu pesan eksplisit **`lanjutkan`** untuk memeriksa hasil atau
+   melanjutkan pekerjaan. Jangan menulis PASS untuk run yang belum selesai.
+4. `lanjutkan` bukan izin deploy, merge restricted changes, atau business Write.
+   Commit, push, PR, merge, dan deployment tetap mengikuti izin masing-masing.
+5. Gate wajib **tetap dijalankan**, bukan dihapus. Jangan melemahkan test atau
+   deploy backend yang belum terverifikasi untuk menghemat waktu.
 
 ## 4. Pemilihan pemeriksaan dan pelepasan perubahan
 
