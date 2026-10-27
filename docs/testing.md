@@ -21,17 +21,19 @@ Sebelum menjalankan:
    image/dependency, reset, suite, serta upload artefak. Timeout YAML bukan estimasi.
 3. Cari apakah pemeriksaan fokus atau bukti passing pada backend SHA yang tetap
    identik sudah memenuhi kebutuhan. Jangan memulai full gate duplikat tanpa alasan.
-4. Bila pemeriksaan **wajib diperkirakan lebih dari 10 menit**, berhenti sebelum
-   men-trigger-nya. Laporkan estimasi/basis, workflow/check, SHA, hasil yang sudah
-   selesai, sisa gate, serta URL Issue/PR/run yang tersedia, lalu akhiri respons.
-5. Tunggu pesan **`lanjutkan`** berikutnya untuk meneruskan langkah CI tersebut.
-   Pesan itu bukan izin merge, deploy, atau menulis data production.
+4. Bila pemeriksaan yang sudah diizinkan diperkirakan **lebih dari 10 menit**,
+   jalankan/dispatch dan konfirmasi sekali bahwa run dimulai. Laporkan
+   estimasi/basis, SHA, URL run, dan status sementara, lalu akhiri respons tanpa
+   menunggu hasil atau memantau log berulang.
+5. Tunggu pesan **`lanjutkan`** berikutnya untuk memeriksa hasil atau
+   melanjutkan pekerjaan. Pesan itu bukan izin merge, deploy, atau menulis data
+   production.
 
 Ini bukan timer yang menyuruh menunggu sepuluh menit dahulu. Jika run milik pihak
 lain sudah berjalan, atau sebuah run ternyata jelas akan melampaui sepuluh menit,
 biarkan berjalan tanpa membatalkan sepihak, catat URL/status sekali, hentikan
 polling, dan serahkan kendali sampai ada `lanjutkan`. Run yang belum selesai tetap
-belum PASS. Gate yang ditunda tetap wajib sebelum deployment yang memerlukannya.
+belum PASS. Gate wajib tetap dijalankan sebelum deployment yang memerlukannya.
 
 ## 2. Arti setiap command
 
@@ -180,7 +182,8 @@ run 39800520559 40 detik, sementara full gate 39768822314 berlangsung 23 menit
 19 detik pada job-nya. Itu bukti historis, bukan jaminan cold run berikutnya.
 Perubahan CI saja memakai source/config tests lokal; full gate baru tidak wajib
 dijalankan hanya untuk konsolidasi ini. Jika gate itu kemudian diperlukan sebelum
-deployment backend, estimasi ulang dan terapkan stop rule sebelum dispatch.
+deployment backend, estimasi ulang lalu dispatch sesuai izin; hentikan pemantauan
+chat setelah run dimulai bila perkiraan durasinya lebih dari sepuluh menit.
 
 ## 6. Bukti lokal, CI, dan live
 
