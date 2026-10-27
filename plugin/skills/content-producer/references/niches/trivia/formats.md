@@ -31,6 +31,8 @@ Choose `fast_trivia` or `practical_utility` based on subject; prefer 5–7 corre
 
 These are **preferences**, not hard gates. Page-config default counts are adaptive 5–9 (preferred 7); only explicit eligible `FACT_COUNT_BELOW_CONFIG_MIN` waiver can allow 1–4, never less than one, and cannot silently override a fixed count. The hard readiness limits are at most 18 words/fact, 12 in hook, 14 in CTA, 100 Canva words, 28 estimated visual lines including blank separators, 3 wrapped lines/fact, 2 wrapped lines for hook or CTA, `replay_ratio` 2.5, `estimated_loops` 3. Hard failures cannot be waived.
 
+During composition, leave a small editorial buffer below the preferred word range's upper edge and the 28-line hard ceiling: use a short, specific hook and CTA, remove redundant wording, and prefer facts that express their meaning compactly. Preserve material qualifiers and replace a fact that cannot fit honestly. Do not claim an exact line count before the server renders the copy, and never supply calculated `text_metrics`; send `{}` as the core workflow requires. A saved draft with a hard readability failure stays a draft requiring review, not a successful quality pass.
+
 ## Canonical output
 
 Renderer default `plain_lines`: hook, blank line, fact lines separated by blank lines, blank line, CTA. `numbered` is justified by genuinely ordered content, clear comparison pairs, a safe checklist or explicit user choice where budget allows. Components must be sent without internal newlines; the **server** normalizes NFC/LF, validates components, adds separators/prefixes, counts characters including punctuation/line breaks and recomputes `canva_copy`. Do not handcraft or truncate an allegedly authoritative rendering.

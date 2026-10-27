@@ -187,6 +187,28 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     expect(text).toContain('**Do not** change a');
   });
 
+  it('holds incomplete dedup reads before reservation and does not treat clipped results as empty', () => {
+    const text = read(niche + 'dedup-ontology.md');
+    const sequence = read('references/core/tool-sequences.md');
+    expect(text).toContain('account for every requested candidate position');
+    expect(text).toContain('targeted `trivia_find_similar_facts` READ');
+    expect(text).toContain('do not interpret unseen matches as none');
+    expect(text).toContain('Use `dedup_reviews: []` only');
+    expect(text).toContain('An incomplete or uncertain review holds the set');
+    expect(sequence).toContain('confirm complete results for every position');
+  });
+
+  it('calibrates first-draft interest and visual density without bypassing server metrics', () => {
+    const dna = read(niche + 'content-dna.md');
+    const formats = read(niche + 'formats.md');
+    expect(dna).toContain('Before reserving the final ordered set');
+    expect(dna).toContain('replace weak candidates while still in research');
+    expect(dna).toContain('not a separate preview/GO checkpoint');
+    expect(formats).toContain('editorial buffer');
+    expect(formats).toContain('never supply calculated `text_metrics`');
+    expect(formats).toContain('Preserve material qualifiers');
+  });
+
   it('handles all formats, mismatched hooks, CTA pressure and critical quality failures', () => {
     const formatCases = cases(read(niche + 'formats.md'));
     expect(formatCases.size).toBe(7);
