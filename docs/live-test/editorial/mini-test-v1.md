@@ -15,11 +15,13 @@ Page tunggal: `Trivia Editorial Test (Internal)`, public ID `f3984ee4-8ae7-4043-
 
 | ID           | Format                        | Topik baru pada Page uji                                                          | Status awal  |
 | ------------ | ----------------------------- | --------------------------------------------------------------------------------- | ------------ |
-| `DNA-SSF-01` | `single_subject_fast`         | Sea turtles, satu kelompok hewan dengan klaim yang dibatasi spesies bila perlu    | `GO` pertama |
+| `DNA-SSF-01` | `single_subject_fast`         | Sea turtles, satu kelompok hewan dengan klaim yang dibatasi spesies bila perlu    | `BLOCKED` di reservasi; triase dedup READ-only |
 | `DNA-TUT-01` | `themed_utility`              | Merawat buku kertas agar tidak cepat rusak; tindakan rumah tangga berisiko rendah | `QUEUED`     |
 | `DNA-EAC-01` | `emotional_animal_collection` | Perilaku flamingo saat merawat anak; hanya perilaku teramati, bukan motif manusia | `QUEUED`     |
 
 Setelah tiap hasil, reviewer mencatat kasus di `results.jsonl` dan `runs/`, memberi enam skor DNA 0–2 (familiarity, surprise, specificity, coherence, scanability, utility/emotion), `format_fit`, gaya `en-US`, hook, CTA, dan risiko kritis. `KUAT` = 10–12, `PERLU REVISI` = 8–9, `LEMAH` = 0–7. Skor server editorial/system dilaporkan **terpisah**. Jika kasus tertahan atau tool gagal, hentikan urutan dan triase sebelum mengirim prompt berikutnya. Jika tiga kasus selesai, sintesis bersama dua retest sebelumnya untuk keputusan Issue #54; jangan otomatis memulai 30 kasus atau mengubah plugin.
+
+**Hasil sementara 27 Oktober 2026:** [`DNA-SSF-01`](runs/DNA-SSF-01-baseline.md) menghasilkan copy `UNSAVED` dengan DNA 11/12 (`KUAT`), tetapi satu reservasi ditolak `FACT_REVIEW_REQUIRED` karena tinjauan dedup eksplisit belum terpenuhi. Tidak ada draft. `DNA-TUT-01` dan `DNA-EAC-01` ditahan sementara untuk satu triase READ-only atas keputusan dan request dedup kasus SSF; jangan jalankan pilot baru atau retry Write sambil menunggu.
 
 Versi plugin v0.2.6 adalah konfirmasi pemilik sebelum dua retest, bukan release ID sesi. Setiap chat baru diminta melaporkan identitas runtime dan `config_updated_at` hanya bila benar-benar terlihat; jika tidak, `UNVERIFIED`. Source manifest repository yang saat audit masih `0.2.3` tidak boleh dipakai sebagai bukti versi plugin live. Kelima contoh boleh dibandingkan secara **deskriptif**, bukan digabung menjadi klaim peningkatan satu rilis.
 
