@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import { describe, expect, it } from 'vitest';
 import {
   candidate,
@@ -5,6 +7,7 @@ import {
   factInput,
   fixture,
   json,
+  quote,
   release,
   reserve,
   reserved,
@@ -14,8 +17,14 @@ import {
   sql,
 } from './helpers/trivia-rpc.js';
 
-function capturedError(expression: string): { message: string; detail: string } {
+function capturedError(expression: string, actor?: string): { message: string; detail: string } {
+  const claims = actor
+    ? `set local role authenticated;
+    do $context$ begin perform set_config('request.jwt.claims',
+      ${quote(JSON.stringify({ sub: actor, role: 'authenticated', client_id: randomUUID() }))},true); end $context$;`
+    : '';
   const output = sql(`begin;
+    ${claims}
     create temp table source_diagnostic_capture(message text,detail text) on commit drop;
     do $capture$ declare v_message text; v_detail text; begin
       perform ${expression};
@@ -96,7 +105,7 @@ describe('CR-051 trivia dedup diagnostics preserve rejection and redact candidat
       const created = rpc(f, reserve(f, [factInput(initial)]));
       rpc(f, release(f, created.data.reservation_token as string));
       const changed = { ...initial, claim_text: 'A differently worded action claim.' };
-      const denied = capturedError(reserve(f, [factInput(changed)]));
+      const denied = capturedError(reserve(f, [factInput(changed)]), f.owner);
       expect(denied).toEqual({
         message: 'FACT_REVIEW_REQUIRED',
         detail: 'REVIEW_DIAG:1:REVIEW_MISSING_OR_INVALID',
