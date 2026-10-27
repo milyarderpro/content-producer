@@ -190,6 +190,8 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
   it('holds incomplete dedup reads before reservation and does not treat clipped results as empty', () => {
     const text = read(niche + 'dedup-ontology.md');
     const sequence = read('references/core/tool-sequences.md');
+    expect(text).toContain('`max_matches_per_candidate: 20`');
+    expect(text).toContain('narrower default of 10');
     expect(text).toContain('account for every requested candidate position');
     expect(text).toContain('targeted `trivia_find_similar_facts` READ');
     expect(text).toContain('do not interpret unseen matches as none');
