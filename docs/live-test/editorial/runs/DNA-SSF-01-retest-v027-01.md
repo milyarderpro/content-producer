@@ -41,12 +41,12 @@ facts[0].dedup_reviews: A required semantic review decision is missing or incons
 
 Audit READ-only lanjutan terhadap payload asli F1 memastikan 20/20 `candidate_fact_public_id` valid, unik, dan cocok dengan READ terarah; tidak ada kandidat yang terlewat. Semua keputusan `distinct` mengirim `material_differences: ["other", "relation"]`. Sebanyak 16 keputusan konsisten, tetapi empat (indeks 9, 11, 15, 16) keliru menyebut `relation`: kandidat dan F1 sama-sama mempunyai `relation_key: "has_named_part_or_property"`. Keempatnya berbeda `subject_key`, sehingga `other` valid. Ini empat ketidakkonsistenan konkret yang sesuai dengan validasi SQL dan error `FACT_REVIEW_REQUIRED`; audit ini tidak membuktikan bahwa tidak ada penyebab lain. Tidak ada retry atau Write baru. Diagnostik posisi dari CR-051 terbukti tampak pada respons live; penghapusan batas total 28 baris **tidak** teruji oleh kasus ini karena tidak ada draft.
 
-| Indeks | `candidate_fact_public_id` | Kandidat |
-| --- | --- | --- |
-| 9 | `88722a0d-ab26-4128-aa2a-83c9fabcf481` | Honey bee pollen baskets |
-| 11 | `3656d186-f05f-41f5-8b43-0b6ddc816529` | Honey bee wax glands |
-| 15 | `5b5744d0-d6f9-4c27-b4d3-a1d5ba830ff6` | Saturn's rings |
-| 16 | `6aaf4eb2-5f6b-48e5-b399-9d83aa63303b` | Saturn composition |
+| Indeks | `candidate_fact_public_id`             | Kandidat                 |
+| ------ | -------------------------------------- | ------------------------ |
+| 9      | `88722a0d-ab26-4128-aa2a-83c9fabcf481` | Honey bee pollen baskets |
+| 11     | `3656d186-f05f-41f5-8b43-0b6ddc816529` | Honey bee wax glands     |
+| 15     | `5b5744d0-d6f9-4c27-b4d3-a1d5ba830ff6` | Saturn's rings           |
+| 16     | `6aaf4eb2-5f6b-48e5-b399-9d83aa63303b` | Saturn composition       |
 
 ## Penilaian editorial sementara
 
