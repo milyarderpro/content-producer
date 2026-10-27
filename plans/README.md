@@ -18,6 +18,9 @@ baru ada di [docs/README.md](../docs/README.md).
 
 Rencana kerja rinci di `plans/works/` telah dipindahkan ke
 [archive/plans/works](../archive/README.md#rencana-fase-dan-tracker-historis--14-file).
+[Rencana evaluasi editorial trivia](trivia-editorial-evaluation-plan.md) adalah
+rencana kerja baru yang diagnostik, bukan perubahan kontrak frozen atau kelanjutan
+fase historis.
 [Implementation plan](implementation-plan.md) sekarang menjadi pengarah singkat
 ke arsip dan mempertahankan anchor tracker lama. Referensi path literal di record
 lama dapat ditelusuri melalui tabel lokasi pada indeks arsip.
