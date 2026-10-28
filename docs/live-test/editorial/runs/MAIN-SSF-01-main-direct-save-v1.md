@@ -59,6 +59,12 @@ From eyes and arms to shelter-making and hunting, these seven octopus facts show
 - `save_post: NOT_CALLED`, `get_post: NOT_CALLED`. Tidak ada retry, second draft, revisi, approval atau publikasi.
 - Penyebab tepat keputusan dedup yang hilang/tidak konsisten `UNVERIFIED`; bukan bukti bug RPC. Terkait #56 dan #63 hanya sebagai konteks.
 
+### Pesan error lengkap yang diteruskan penguji
+
+```text
+INVALID_ARGUMENT: Error code: INVALID_ARGUMENT; Error: RuntimeException: Error calling MCP tool: [TextContent(type='text', text='FACT_REVIEW_REQUIRED: Semantic deduplication needs explicit review. facts[2].dedup_reviews: A required semantic review decision is missing or inconsistent.', annotations=None, meta=None)]
+```
+
 ## Critical checks dan editorial review
 
 - Tidak ada system/editorial checks post, `text_metrics`, atau server verdict `trivia.surprise_substantive`; semuanya `UNVERIFIED` pada kasus tanpa save.
