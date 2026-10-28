@@ -125,3 +125,41 @@ no,candidate_fact_public_id,subject_key,relation_key,object_key
 ```
 
 The `F1` source candidate is `saturn / is_classified_as / gas_giant`. No new `trivia_find_similar_facts` call was performed in this follow-up; no request was sent to any reservation validator.
+
+## F2 semantic review follow-up — all 20 assessed, 1 uncertain
+
+**Evidence level:** LIVE_OWNER_REPORTED, raw MCP response not independently accessible. User's F2 candidate: `saturn_rings / has_named_part_or_property / water_ice_abundant` ("Saturn's rings contain abundant water ice"). Result reported `review_required:true`, 20/20 matches with IDs and structured keys. One additional one-fact F2 `trivia_find_similar_facts` READ at top-20; cumulative diagnostic READs **13** (previously 12). No business Write.
+
+- All **20/20 matches assessed**: 19 `distinct`, **1 `uncertain`** (#1), 0 `same`. The F2 qualifier/source decision is deliberately not forced to become `same` or `distinct`.
+- F2 #1: existing fact ID `5b5744d0-d6f9-4c27-b4d3-a1d5ba830ff6`, existing `saturn_rings / has_named_part_or_property / ice_and_rock_particles`, text "Saturn's rings contain countless pieces of ice and rock." Claim shares subject/relation with the proposed claim but does not explicitly specify water ice abundance. Object difference alone is insufficient to establish distinct meaning, and incomplete specificity precludes a confident same. **`uncertain`, hold before reservation.**
+- For 19 `distinct` rows, the coordinator cross-checked visible primary-key differences: each `relation` label aligns with a different `relation_key`; each `other` aligns with a different subject or object key. All proposed label names belong to v0.2.10 allowed set; no unsupported `estimate`. Numeric/unit/qualifier details are based on tester's assertions and are **not** an independently verified raw tool/validator trace.
+- **Verdict F2: `BLOCKED / SEMANTIC_UNCERTAIN` with correct fail-closed handling.** No `trivia_register_and_reserve_facts`, `save_post`, approval, or publication. Distinguish this intentional semantic-policy hold from a failure of the dedup READ tool.
+- QA progression: F1 scoped PASS (20 distinct); F2 **20 match decisions assessed**, with 19 final distinct + 1 unresolved uncertain; F6 (20 match review) still pending. The 7-fact QA **not PASS**. Safe next diagnostic: finish F6 review READ-only, preserving F2 uncertain. The campaign remains **PAUSED 9/30**, #56 OPEN. Host/session fingerprint still UNVERIFIED.
+
+### Exact owner-reported F2 keys and decisions
+
+```tsv
+no	candidate_fact_public_id	subject_key	relation_key	object_key	decision	material_differences
+1	5b5744d0-d6f9-4c27-b4d3-a1d5ba830ff6	saturn_rings	has_named_part_or_property	ice_and_rock_particles	uncertain	-
+2	ddcbe303-1374-4731-8659-7d9ad396662f	camels	has_named_part_or_property	humps_store_fat_not_water	distinct	other,population
+3	5b16b774-8233-4cfc-852c-ffdb9b8e0551	raspberries_storage_container_depth	recommended_practice	use_shallow_container_to_avoid_crushing	distinct	relation,other,condition,scope
+4	17aeab85-8acb-4115-a82b-d8e9dada6b17	submerged_cut_flower_leaves	recommended_practice	remove_leaves_below_waterline_to_prevent_rot_and_cloudy_vase_water	distinct	relation,other,condition,method,scope
+5	fa40c202-51c4-4464-b2b6-88577a8a4572	saturn_north_pole	has_named_part_or_property	hexagonal_jet_stream	distinct	other
+6	fefafb0d-ff07-4d81-8a25-b49a0b91d6a2	saturn_rotation	has_measurement	10_7_hours	distinct	relation,other,number,unit
+7	6aaf4eb2-5f6b-48e5-b399-9d83aa63303b	saturn	has_named_part_or_property	hydrogen_helium_composition	distinct	other
+8	dc6f3ebe-2528-445f-bb47-b0d5b2e70018	sharks	has_named_part_or_property	cartilaginous_skeleton_no_true_bone	distinct	other,scope
+9	b24bab00-31e7-4080-94db-fe8d7f1c68f4	antarctic_glaciers	can_perform	extend_over_sea_to_form_ice_shelves	distinct	relation,other
+10	2d91d7b2-ffab-4d1f-8889-eab872e33b25	female_sea_turtles	behaves_as	nesting_on_sandy_beaches	distinct	relation,other
+11	61c934e8-2ef8-4a70-94c3-50ff32e19dad	ancient_olympic_games	is_located_in	olympia_greece	distinct	relation,other
+12	a095c090-5a03-4ad2-83fe-502118647741	saturn_orbit	has_measurement	29_4_earth_years	distinct	relation,other,number,unit,scope
+13	b6b698ea-1623-4880-a49f-9a0737e029be	octopus	has_named_part_or_property	blue_copper_hemocyanin_blood	distinct	other
+14	ec2d76e3-7e3d-4f41-88fe-ef81d34653b8	saturn_surface	has_named_part_or_property	lacks_true_solid_surface	distinct	other
+15	85e6d028-9602-44d3-8d17-0c83e5446e99	saturn	has_named_part_or_property	sixth_planet_from_sun	distinct	other
+16	2bc9391c-c8f1-46ea-80ed-ba92fbdae0bf	cut_flower_vase_water	recommended_practice	change_water_every_few_days_to_limit_bacterial_buildup	distinct	relation,other,time,condition,method,scope
+17	4861c95f-fa4d-4875-b7f0-3bbb5969b7ee	adult_flamingos	behaves_as	some_adults_guard_creche_chick_groups	distinct	relation,other,population,condition
+18	d208c10f-42d8-4084-b018-5140ee9872e2	migratory_bats	behaves_as	winter_migration	distinct	relation,other
+19	65ab08d7-8e64-46f3-bf27-eb00a5c30685	octopus	can_perform	move_by_jet_propulsion_through_siphon	distinct	relation,other,method
+20	74773b31-6b37-4f11-8b0e-4f2f3f4c0399	cut_flower_vase	recommended_practice	wash_with_soapy_water_before_use_to_reduce_stem_clogging_bacteria	distinct	relation,other,condition,method,scope
+```
+
+The table is a structured summary of the tester's visible report, **not** an independent direct MCP response. F2-specific qualifier claims include the numeric `10.7 hour` rotation and `29.4 year` orbital-period matches, plus population/condition/method/scope/time on other matches. These fields have not been server-validated in a reservation.
