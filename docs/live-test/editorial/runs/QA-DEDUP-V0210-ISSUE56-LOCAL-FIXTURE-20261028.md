@@ -3,8 +3,9 @@
 **Tanggal:** 28 Oktober 2026. **Bukti:** `CI/FIXTURE` lokal, bukan `LIVE`.
 **Branch lokal:** `codex/issue-56-local-dedup-regression`, dibuat dari
 `f37714aec51e7618438dc95881eeef6b3738c2c0` (`origin/main` lokal, source
-plugin v0.2.10). Tidak ada commit, push, PR, merge, perubahan plugin/backend,
-atau koneksi Supabase production dalam pengujian ini.
+plugin v0.2.10). Fixture dikirim melalui Draft PR #70 untuk review. Tidak ada
+merge, perubahan plugin/backend, atau koneksi Supabase production dalam
+pengujian ini.
 
 ## Cakupan
 
@@ -22,7 +23,9 @@ semantik hanya bila semua hasil dapat diperiksa. Mock tool hanya menyediakan
 READ; tidak tersedia metode registrasi, reservasi, penyimpanan, atau publikasi.
 Tes juga memeriksa jejak prosedur secara terpisah dan menyisipkan peristiwa
 `WRITE` sintetis hanya sebagai kontrol negatif; peristiwa itu tidak memanggil
-tool bisnis.
+tool bisnis. Event `OBSERVE` menyimpan kandidat yang terlihat agar pemeriksa
+jejak dapat mengikat `review_required`, ID match, dan material identity ke
+keputusan `REVIEW`.
 Keputusan semantik sintetis B diturunkan dari tiga primary key terstruktur;
 fixture memeriksa 20 ID unik dan label `relation`/`other` terhadap field yang
 terlihat. Ini bukan penilaian semantik oleh AI host.
@@ -68,6 +71,25 @@ menambahkan READ ketiga pada B, serta menyisipkan `WRITE` sebelum dan setelah
 HOLD; semua jejak tersebut ditolak sesuai aturan. Penghapusan satu keputusan
 review dari 20 juga ditolak. Ini menguji bahwa assertion dapat menangkap
 pelanggaran tersebut, bukan hanya menerima tiga jejak sukses yang dibuat tes.
+
+## Tindak lanjut review independen PR #70
+
+Komentar review [#issuecomment-6467489695](https://github.com/milyarderpro/content-producer/pull/70#issuecomment-6467489695)
+menemukan dua celah pada pemeriksa jejak awal. Koreksi lokal:
+
+1. `HOLD` hanya diterima setelah setiap kandidat yang masih tidak lengkap
+   mengalami READ kedua tertarget. Kontrol negatif memotong jejak sebelum B#2
+   dan memastikan `HOLD ISSUE56_B` terlalu dini ditolak.
+2. Pada hasil lengkap, pemeriksa jejak mewajibkan `REVIEW` untuk setiap kandidat
+   dengan `review_required:true`. Semua ID match yang terlihat harus mendapat
+   tepat satu keputusan; label `same`/`distinct` dan `material_differences`
+   diperiksa terhadap subject, relation, dan object terstruktur. Kontrol negatif
+   menghapus seluruh `REVIEW`, menghapus satu keputusan, menduplikasi ID, dan
+   mengosongkan label perbedaan yang diwajibkan; semuanya ditolak.
+
+Tiga jejak positif tetap **PASS 3/3** pada perintah Vitest terfokus di atas.
+Perubahan ini menguatkan pemeriksa fixture lokal; batas bukti LIVE di bawah
+tetap berlaku.
 
 ## Batas bukti dan keputusan
 

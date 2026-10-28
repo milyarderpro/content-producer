@@ -17,7 +17,14 @@ type Review = {
 };
 type TraceEvent =
   | { event: 'READ'; key: CandidateKey; attempt: number; max_matches_per_candidate: 20 }
-  | { event: 'OBSERVE'; key: CandidateKey; attempt: number; complete: boolean; missing: string[] }
+  | {
+      event: 'OBSERVE';
+      key: CandidateKey;
+      attempt: number;
+      complete: boolean;
+      missing: string[];
+      visible_candidate: Partial<MockCandidate> | undefined;
+    }
   | { event: 'RETRY_REASON'; key: CandidateKey; missing: string[] }
   | { event: 'REVIEW'; key: CandidateKey; decisions: Review[] }
   | { event: 'HOLD'; incomplete_keys: CandidateKey[] }
@@ -115,21 +122,16 @@ function verifyReviews(candidate: MockCandidate, reviews: Review[]): void {
   );
   for (const [index, review] of reviews.entries()) {
     const identity = candidate.matches[index].material_identity;
-    expect(review.reason.length).toBeGreaterThan(0);
-    if (review.decision === 'same') {
-      expect(review.material_differences).toEqual([]);
-    } else {
-      expect(review.material_differences.length).toBeGreaterThan(0);
-      if (review.material_differences.includes('relation')) {
-        expect(identity.relation_key).not.toBe(proposed.relation_key);
-      }
-      if (review.material_differences.includes('other')) {
-        expect(
-          identity.subject_key !== proposed.subject_key ||
-            identity.object_key !== proposed.object_key,
-        ).toBe(true);
-      }
-    }
+    const expectedDifferences: Review['material_differences'] = [];
+    if (identity.relation_key !== proposed.relation_key) expectedDifferences.push('relation');
+    if (
+      identity.subject_key !== proposed.subject_key ||
+      identity.object_key !== proposed.object_key
+    )
+      expectedDifferences.push('other');
+    expect(review.reason.trim().length).toBeGreaterThan(0);
+    expect(review.decision).toBe(expectedDifferences.length === 0 ? 'same' : 'distinct');
+    expect(review.material_differences).toEqual(expectedDifferences);
   }
 }
 
@@ -145,7 +147,14 @@ function simulate(scenario: Scenario): TraceEvent[] {
     const delivery = tool.read(key, 20);
     latest.set(key, delivery);
     const missing = missingFromVisible(key, delivery);
-    trace.push({ event: 'OBSERVE', key, attempt: 1, complete: missing.length === 0, missing });
+    trace.push({
+      event: 'OBSERVE',
+      key,
+      attempt: 1,
+      complete: missing.length === 0,
+      missing,
+      visible_candidate: structuredClone(delivery.visible.data.candidates[0]),
+    });
     if (missing.length) incomplete.set(key, missing);
   }
 
@@ -161,6 +170,7 @@ function simulate(scenario: Scenario): TraceEvent[] {
       attempt: 2,
       complete: secondMissing.length === 0,
       missing: secondMissing,
+      visible_candidate: structuredClone(delivery.visible.data.candidates[0]),
     });
     if (secondMissing.length) incomplete.set(key, secondMissing);
     else incomplete.delete(key);
@@ -203,10 +213,11 @@ function assertTraceContract(trace: TraceEvent[]): void {
       complete?: boolean;
       missing: string[];
       reasonLogged: boolean;
+      visibleCandidate?: MockCandidate;
     }
   >();
   let held = false;
-  let reviewed = false;
+  const reviewedKeys = new Set<CandidateKey>();
 
   for (const [index, event] of trace.entries()) {
     if (event.event === 'WRITE') {
@@ -215,7 +226,7 @@ function assertTraceContract(trace: TraceEvent[]): void {
     if (held) throw new Error('No event may follow HOLD');
 
     if (event.event === 'READ') {
-      if (reviewed) throw new Error('READ after semantic review');
+      if (reviewedKeys.size) throw new Error('READ after semantic review');
       if (event.max_matches_per_candidate !== 20) throw new Error('READ must request 20 matches');
       const state = states.get(event.key) ?? {
         reads: 0,
@@ -241,6 +252,27 @@ function assertTraceContract(trace: TraceEvent[]): void {
       state.observations++;
       state.complete = event.complete;
       state.missing = event.missing;
+      if (event.complete) {
+        const candidate = event.visible_candidate;
+        if (
+          !candidate ||
+          candidate.candidate_key !== event.key ||
+          typeof candidate.review_required !== 'boolean' ||
+          !Array.isArray(candidate.matches) ||
+          candidate.matches.some(
+            (match) =>
+              !match.fact_public_id ||
+              !match.material_identity?.subject_key ||
+              !match.material_identity.relation_key ||
+              !match.material_identity.object_key ||
+              !match.material_identity.qualifiers,
+          )
+        )
+          throw new Error('Complete observation needs match IDs and review evidence');
+        state.visibleCandidate = candidate as MockCandidate;
+      } else {
+        state.visibleCandidate = undefined;
+      }
     } else if (event.event === 'RETRY_REASON') {
       const state = states.get(event.key);
       if (
@@ -257,16 +289,25 @@ function assertTraceContract(trace: TraceEvent[]): void {
       state.reasonLogged = true;
     } else if (event.event === 'REVIEW') {
       if (
-        [...states.values()].some((state) => state.observations !== state.reads || !state.complete)
+        candidateKeys.some((key) => {
+          const state = states.get(key);
+          return !state || state.observations !== state.reads || !state.complete;
+        })
       )
         throw new Error('Semantic review requires complete responses for the whole set');
-      reviewed = true;
+      const candidate = states.get(event.key)?.visibleCandidate;
+      if (!candidate?.review_required || reviewedKeys.has(event.key))
+        throw new Error('REVIEW must belong to one unreviewed required candidate');
+      verifyReviews(candidate, event.decisions);
+      reviewedKeys.add(event.key);
     } else if (event.event === 'HOLD') {
       const incomplete = [...states.entries()]
         .filter(([, state]) => state.observations === state.reads && state.complete === false)
         .map(([key]) => key);
-      if (reviewed || index !== trace.length - 1 || incomplete.length === 0)
+      if (reviewedKeys.size || index !== trace.length - 1 || incomplete.length === 0)
         throw new Error('HOLD must be terminal and precede any review');
+      if (incomplete.some((key) => states.get(key)?.reads !== 2))
+        throw new Error('HOLD before targeted READ #2 for an incomplete candidate');
       if (JSON.stringify(event.incomplete_keys) !== JSON.stringify(incomplete))
         throw new Error('HOLD must name all incomplete candidates');
       held = true;
@@ -279,6 +320,16 @@ function assertTraceContract(trace: TraceEvent[]): void {
     throw new Error('Every READ needs an observation');
   if ([...states.values()].some((state) => state.complete === false) !== held)
     throw new Error('Incomplete result requires HOLD; complete result forbids HOLD');
+  if (!held) {
+    const requiredKeys = candidateKeys.filter(
+      (key) => states.get(key)?.visibleCandidate?.review_required,
+    );
+    if (
+      requiredKeys.length !== reviewedKeys.size ||
+      requiredKeys.some((key) => !reviewedKeys.has(key))
+    )
+      throw new Error('Missing required semantic REVIEW');
+  }
 }
 
 function logEvidence(name: string, trace: TraceEvent[]): void {
@@ -313,6 +364,42 @@ describe('Issue #56 local scripted dedup recovery with mock READ responses', () 
         .candidates[0] as MockCandidate;
       expect(() => verifyReviews(candidate, review.decisions.slice(1))).toThrow();
     }
+    expect(() => assertTraceContract(trace.filter((event) => event.event !== 'REVIEW'))).toThrow(
+      /Missing required semantic REVIEW/,
+    );
+    expect(() =>
+      assertTraceContract(
+        trace.map((event) =>
+          event.event === 'REVIEW' ? { ...event, decisions: event.decisions.slice(1) } : event,
+        ),
+      ),
+    ).toThrow();
+    expect(() =>
+      assertTraceContract(
+        trace.map((event) =>
+          event.event === 'REVIEW'
+            ? {
+                ...event,
+                decisions: [...event.decisions.slice(0, -1), event.decisions[0]],
+              }
+            : event,
+        ),
+      ),
+    ).toThrow();
+    expect(() =>
+      assertTraceContract(
+        trace.map((event) =>
+          event.event === 'REVIEW'
+            ? {
+                ...event,
+                decisions: event.decisions.map((decision, index) =>
+                  index === 1 ? { ...decision, material_differences: [] } : decision,
+                ),
+              }
+            : event,
+        ),
+      ),
+    ).toThrow();
     expect(trace.some((event) => event.event === 'HOLD')).toBe(false);
     expect(() =>
       assertTraceContract([
@@ -358,6 +445,11 @@ describe('Issue #56 local scripted dedup recovery with mock READ responses', () 
   it('holds the whole set when the targeted second view is still clipped', () => {
     const trace = simulate(scenarios[2]);
     assertTraceContract(trace);
+    const reasonIndex = trace.findIndex((event) => event.event === 'RETRY_REASON');
+    expect(reasonIndex).toBeGreaterThan(-1);
+    expect(() => assertTraceContract([...trace.slice(0, reasonIndex), trace.at(-1)!])).toThrow(
+      /HOLD before targeted READ #2/,
+    );
     expect(readKeys(trace)).toEqual([
       'ISSUE56_A#1@20',
       'ISSUE56_B#1@20',
