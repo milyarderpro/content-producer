@@ -53,48 +53,48 @@ A few familiar animal myths don't match the evidence. Which correction surprised
 
 ## Trace aksi yang dilaporkan (urutan semantik)
 
-| Tahap | Bukti yang diteruskan pemilik | Batas |
-| --- | --- | --- |
-| Page/generation context | Format dan topic sesuai Page/prompt | Snapshot config, recent_variety dan versi runtime tidak disertakan |
-| Riset/bukti | 7 sumber Tier B dari Bat Conservation International, San Diego Zoo Wildlife Alliance, American Kennel Club, Smithsonian (ringkasan “Bat Conservation International+6”) | Tidak tersedia pemetaan per-mitos/per-koreksi atau verifikasi bahwa semua mitos umum; URL tidak diaudit koordinator |
-| Dedup READ | 7 × 20 kandidat diperiksa; 120 keputusan `distinct` untuk yang perlu review; lengkap/passed menurut penguji | Array kandidat, per-fact flags, labels, dan detail `same`/ `distinct` tidak terlihat reviewer |
-| Reservasi | Satu `trivia_register_and_reserve_facts` berhasil; 7 fakta dialokasikan pada save | Reservation token disanitasi dan tidak dicatat |
-| `save_post` | Berhasil tepat satu kali, internal draft ID di atas, revision 1 | Raw operation key/request tidak tersedia |
-| `get_post` | `MATCH` untuk konten, status, revision, dan content hash; 7 facts allocated | Literal hash dan seluruh field asli tidak diberikan; caption/hashtag dinyatakan bagian dari draft tetapi exact per-field match tidak dirinci secara eksplisit |
-| Hasil akhir | Tidak ada revisi, approval, publikasi, atau save kedua | Quality pending; bukan ready |
+| Tahap                   | Bukti yang diteruskan pemilik                                                                                                                                          | Batas                                                                                                                                                         |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page/generation context | Format dan topic sesuai Page/prompt                                                                                                                                    | Snapshot config, recent_variety dan versi runtime tidak disertakan                                                                                            |
+| Riset/bukti             | 7 sumber Tier B dari Bat Conservation International, San Diego Zoo Wildlife Alliance, American Kennel Club, Smithsonian (ringkasan “Bat Conservation International+6”) | Tidak tersedia pemetaan per-mitos/per-koreksi atau verifikasi bahwa semua mitos umum; URL tidak diaudit koordinator                                           |
+| Dedup READ              | 7 × 20 kandidat diperiksa; 120 keputusan `distinct` untuk yang perlu review; lengkap/passed menurut penguji                                                            | Array kandidat, per-fact flags, labels, dan detail `same`/ `distinct` tidak terlihat reviewer                                                                 |
+| Reservasi               | Satu `trivia_register_and_reserve_facts` berhasil; 7 fakta dialokasikan pada save                                                                                      | Reservation token disanitasi dan tidak dicatat                                                                                                                |
+| `save_post`             | Berhasil tepat satu kali, internal draft ID di atas, revision 1                                                                                                        | Raw operation key/request tidak tersedia                                                                                                                      |
+| `get_post`              | `MATCH` untuk konten, status, revision, dan content hash; 7 facts allocated                                                                                            | Literal hash dan seluruh field asli tidak diberikan; caption/hashtag dinyatakan bagian dari draft tetapi exact per-field match tidak dirinci secara eksplisit |
+| Hasil akhir             | Tidak ada revisi, approval, publikasi, atau save kedua                                                                                                                 | Quality pending; bukan ready                                                                                                                                  |
 
 `save_post_outcome: CONFIRMED_OWNER_REPORTED`; `readback_outcome: MATCH_OWNER_REPORTED`; `last_completed_stage: READBACK`. Tidak ada Write `UNCONFIRMED` atau reservasi sisa yang perlu release.
 
 ## Checks, metrik, dan penilaian critical
 
-| Metrik/check server | Nilai reported |
-| --- | --- |
-| Blocking system checks | 18/18 passed; overall `passed` |
-| Preferred band | `needs_review`, satu warning nonblocking: 86 kata melewati preferensi maksimum 85 (hard limits tetap lolos) |
-| Editorial | 18/18 `pass`, overall `pass`, semua critical disebut pass |
-| `trivia.surprise_substantive` | `pass` server-reported, bukan skor DNA reviewer |
-| Source policy, dedup, exact rendering | `passed` menurut penguji |
-| Canva chars | 512/600 |
-| Facts block chars | 438/500 |
-| Words | 86 |
-| Visual lines | 27 |
-| Estimated read | 29 detik |
-| Replay ratio | 2.23 |
-| Estimated loops | 3 |
+| Metrik/check server                   | Nilai reported                                                                                              |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Blocking system checks                | 18/18 passed; overall `passed`                                                                              |
+| Preferred band                        | `needs_review`, satu warning nonblocking: 86 kata melewati preferensi maksimum 85 (hard limits tetap lolos) |
+| Editorial                             | 18/18 `pass`, overall `pass`, semua critical disebut pass                                                   |
+| `trivia.surprise_substantive`         | `pass` server-reported, bukan skor DNA reviewer                                                             |
+| Source policy, dedup, exact rendering | `passed` menurut penguji                                                                                    |
+| Canva chars                           | 512/600                                                                                                     |
+| Facts block chars                     | 438/500                                                                                                     |
+| Words                                 | 86                                                                                                          |
+| Visual lines                          | 27                                                                                                          |
+| Estimated read                        | 29 detik                                                                                                    |
+| Replay ratio                          | 2.23                                                                                                        |
+| Estimated loops                       | 3                                                                                                           |
 
 Checks kritis (`trivia.meaning_preserved`, `source_supported`, `time_context_valid`, `safety_appropriate`, `caption_no_new_claim`, `substantial_copying_absent`, `surprise_substantive`) dilaporkan lulus melalui agregat editorial 18/18, bukan inspeksi koordinator terhadap payload dan sumber mentah. Source accuracy, representasi mitos umum, dan plagiarisme **UNVERIFIED secara independen**. Tidak ada detail risk flag dalam jawaban; jangan mengarang `none` atau status lain. Nilai estimated read/replay bukan ukuran views aktual.
 
 ## DNA editorial — copy pertama, tidak direvisi
 
-| Unsur | Skor | Alasan |
-| --- | ---: | --- |
-| Familiarity | 2 | Kelelawar, unta, anjing, burung unta, bunglon, landak, dan hiu familiar; sebagian mitos dikenal luas |
-| Surprise | 1 | Beberapa koreksi mudah ditebak, meskipun bunglon dan hiu menyediakan nilai tambah |
-| Specificity | 1 | Myth/fact ringkas, tetapi beberapa correction sangat umum: “All bat species can see” universal; “They lie flat when threatened” menyederhanakan respons burung unta; perlu source-specific qualifiers sebelum publish |
-| Coherence | 2 | Tujuh pasangan koreksi konsisten dalam satu koleksi mitos hewan |
-| Scanability | 2 | Label Myth/Fact jelas, satu pasangan per baris, CTA tunggal; 86 kata sedikit melebihi preferensi namun bukan hard fail |
-| Utility/emotion | 1 | Bermanfaat untuk meluruskan miskonsepsi, tetapi hook generik dan emotional/utility payoff terbatas |
-| **Total** | **9/12 PERLU REVISI** | `format_fit: FIT`, penilaian diagnostik independen dari server editorial checks |
+| Unsur           |                  Skor | Alasan                                                                                                                                                                                                                |
+| --------------- | --------------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Familiarity     |                     2 | Kelelawar, unta, anjing, burung unta, bunglon, landak, dan hiu familiar; sebagian mitos dikenal luas                                                                                                                  |
+| Surprise        |                     1 | Beberapa koreksi mudah ditebak, meskipun bunglon dan hiu menyediakan nilai tambah                                                                                                                                     |
+| Specificity     |                     1 | Myth/fact ringkas, tetapi beberapa correction sangat umum: “All bat species can see” universal; “They lie flat when threatened” menyederhanakan respons burung unta; perlu source-specific qualifiers sebelum publish |
+| Coherence       |                     2 | Tujuh pasangan koreksi konsisten dalam satu koleksi mitos hewan                                                                                                                                                       |
+| Scanability     |                     2 | Label Myth/Fact jelas, satu pasangan per baris, CTA tunggal; 86 kata sedikit melebihi preferensi namun bukan hard fail                                                                                                |
+| Utility/emotion |                     1 | Bermanfaat untuk meluruskan miskonsepsi, tetapi hook generik dan emotional/utility payoff terbatas                                                                                                                    |
+| **Total**       | **9/12 PERLU REVISI** | `format_fit: FIT`, penilaian diagnostik independen dari server editorial checks                                                                                                                                       |
 
 Gaya `en-US` cukup natural, pertanyaan penutup cocok untuk CTA interaksi. Fakta bahwa server menganggap `trivia.surprise_substantive: pass` tidak membatalkan reviewer surprise 1/2: evaluasi berbeda. Laporan penguji **tidak secara terpisah menunjukkan bukti prevalence masing-masing myth**; jangan menganggap myth buatan atau salah tanpa evidensi, tetapi jangan pula menyatakan semua terbukti populer. Klaim universal pada kelelawar dan kalimat burung unta adalah **risiko ketepatan formulasi**, bukan fact-check debunk oleh koordinator.
 
