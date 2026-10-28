@@ -187,17 +187,47 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     expect(text).toContain('**Do not** change a');
   });
 
-  it('holds incomplete dedup reads before reservation and does not treat clipped results as empty', () => {
+  it('handles a complete no-review response without manufacturing semantic decisions', () => {
     const text = read(niche + 'dedup-ontology.md');
     const sequence = read('references/core/tool-sequences.md');
-    expect(text).toContain('`max_matches_per_candidate: 20`');
+    const skill = read('SKILL.md');
+    expect(skill).toContain('one proposed fact at a time with `max_matches_per_candidate: 20`');
+    expect(text).toContain('**one proposed fact per READ**');
+    expect(text).toContain('returns that one `candidate_key`');
+    expect(text).toContain('`review_required` plus every returned match');
+    expect(text).toContain('`review_required: false` and no candidate needs an explicit decision');
+    expect(sequence).toContain('one fact per READ at `max_matches_per_candidate: 20`');
+  });
+
+  it('continues a clipped batch with targeted READs and holds an uninspectable fact before Write', () => {
+    const text = read(niche + 'dedup-ontology.md');
+    const sequence = read('references/core/tool-sequences.md');
     expect(text).toContain('narrower default of 10');
-    expect(text).toContain('account for every requested candidate position');
-    expect(text).toContain('targeted `trivia_find_similar_facts` READ');
-    expect(text).toContain('do not interpret unseen matches as none');
+    expect(text).toContain('one-candidate follow-up READs for **every** unresolved position');
+    expect(text).toContain("repeat only that same candidate's READ once");
+    expect(text).toContain('hold the entire ordered set before Write');
+    expect(text).toContain('Never lower `max_matches_per_candidate`');
+    expect(text).toContain('Do not stop the workflow merely because the initial batch was long');
+    expect(text).toContain('**not** a no-match result');
+    expect(sequence).toContain('targeted one-fact READ for every unresolved position');
+  });
+
+  it('holds a complete review-required response until IDs, reasons and differences are supported', () => {
+    const text = read(niche + 'dedup-ontology.md');
+    const sequence = read('references/core/tool-sequences.md');
+    expect(text).toContain('For each complete result with `review_required: true`');
+    expect(text).toContain('decision for each returned match');
+    expect(text).toContain('response does not label which individual matches are strong');
+    expect(text).toContain(
+      'its exact candidate ID, a concrete reason, and supported material differences',
+    );
+    expect(text).toContain('candidate evidence is not inspectable, hold');
     expect(text).toContain('Use `dedup_reviews: []` only');
     expect(text).toContain('An incomplete or uncertain review holds the set');
-    expect(sequence).toContain('confirm complete results for every position');
+    expect(sequence).toContain(
+      'semantic same/distinct/uncertain review with exact candidate IDs and reasons',
+    );
+    expect(sequence).toContain('Hold an incomplete or inconsistent set before reservation');
   });
 
   it('requires per-candidate material differences that match actual structured fields', () => {
