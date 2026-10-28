@@ -57,35 +57,31 @@ African savanna and Asian elephants have distinct features. Here's a quick side-
 
 ## Sequential tool evidence (tester-reported; sanitized)
 
-| Stage                               | Observed in returned result                                                                                                                                                                                                | Limit                                                                                                                                         |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Context                             | Internal Page and `comparison` format identified                                                                                                                                                                           | No raw Page/config snapshot, config timestamp or recent_variety                                                                               |
-| Research                            | Seven anatomy comparisons reportedly verified using Tier B sources: International Elephant Foundation, Smithsonian's National Zoo, Zoo Atlanta, San Diego Zoo Wildlife Alliance, and International Fund for Animal Welfare | Reviewer did not inspect per-claim URLs/evidence, factual coverage, or provenance independence                                                |
-| Dedup                               | 140 review decisions reported complete and accepted                                                                                                                                                                        | No original candidate payload, decision labels or READ pagination retained; reviewer does not claim independently verified dedup completeness |
-| `trivia_register_and_reserve_facts` | One successful reservation for seven facts                                                                                                                                                                                 | No raw reservation token stored                                                                                                               |
-| `save_post`                         | One successful save; post ID above                                                                                                                                                                                         | No replay or second draft reported                                                                                                            |
-| `get_post`                          | MATCH: complete Canva copy, caption, hashtags, format, revision, content hash and 7 allocated fact bindings                                                                                                                | Evidence level `LIVE_OWNER_REPORTED`; exact hash not supplied and coordinator did not perform direct get_post                                 |
-| Additional writes                   | No revisions, approval, publication or cleanup                                                                                                                                                                             | Quality `pending`, not `ready`                                                                                                                |
+- **Context** — **Observed in returned result:** Internal Page and `comparison` format identified · **Limit:** No raw Page/config snapshot, config timestamp or recent_variety
+- **Research** — **Observed in returned result:** Seven anatomy comparisons reportedly verified using Tier B sources: International Elephant Foundation, Smithsonian's National Zoo, Zoo Atlanta, San Diego Zoo Wildlife Alliance, and International Fund for Animal Welfare · **Limit:** Reviewer did not inspect per-claim URLs/evidence, factual coverage, or provenance independence
+- **Dedup** — **Observed in returned result:** 140 review decisions reported complete and accepted · **Limit:** No original candidate payload, decision labels or READ pagination retained; reviewer does not claim independently verified dedup completeness
+- **`trivia_register_and_reserve_facts`** — **Observed in returned result:** One successful reservation for seven facts · **Limit:** No raw reservation token stored
+- **`save_post`** — **Observed in returned result:** One successful save; post ID above · **Limit:** No replay or second draft reported
+- **`get_post`** — **Observed in returned result:** MATCH: complete Canva copy, caption, hashtags, format, revision, content hash and 7 allocated fact bindings · **Limit:** Evidence level `LIVE_OWNER_REPORTED`; exact hash not supplied and coordinator did not perform direct get_post
+- **Additional writes** — **Observed in returned result:** No revisions, approval, publication or cleanup · **Limit:** Quality `pending`, not `ready`
 
 No response loss or `UNCONFIRMED` write is reported. All seven facts reportedly allocated at save.
 
 ## Server checks and metrics (reported by tester)
 
-| Item                          | Value                                                                                                         |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| System checks                 | 18 passed, 1 nonblocking `trivia.profile.preferred_band: needs_review`                                        |
-| Warning                       | 63 Canva words below preferred 65–85; some fact lines shorter than preferred length; no blocking check failed |
-| Editorial checks              | 18 pass; all critical pass                                                                                    |
-| `trivia.surprise_substantive` | `pass`, mainly trunk-tip, toenails, molars, tusks, head domes; others provide visual context                  |
-| Dedup                         | 140 decisions, accepted                                                                                       |
-| Canva characters              | 474                                                                                                           |
-| Fact characters               | 402                                                                                                           |
-| Word count                    | 63                                                                                                            |
-| Estimated visual lines        | 26                                                                                                            |
-| Estimated read time           | 22.1 seconds                                                                                                  |
-| Replay ratio                  | 1.7                                                                                                           |
-| Estimated loops               | 2                                                                                                             |
-| Quality status                | `pending`, no approval                                                                                        |
+- **System checks** — **Value:** 18 passed, 1 nonblocking `trivia.profile.preferred_band: needs_review`
+- **Warning** — **Value:** 63 Canva words below preferred 65–85; some fact lines shorter than preferred length; no blocking check failed
+- **Editorial checks** — **Value:** 18 pass; all critical pass
+- **`trivia.surprise_substantive`** — **Value:** `pass`, mainly trunk-tip, toenails, molars, tusks, head domes; others provide visual context
+- **Dedup** — **Value:** 140 decisions, accepted
+- **Canva characters** — **Value:** 474
+- **Fact characters** — **Value:** 402
+- **Word count** — **Value:** 63
+- **Estimated visual lines** — **Value:** 26
+- **Estimated read time** — **Value:** 22.1 seconds
+- **Replay ratio** — **Value:** 1.7
+- **Estimated loops** — **Value:** 2
+- **Quality status** — **Value:** `pending`, no approval
 
 These values are server-reported via tester, not independently recomputed by coordinator. Estimated read time and loops are not evidence of real video performance.
 
@@ -98,15 +94,13 @@ These values are server-reported via tester, not independently recomputed by coo
 
 ## Reviewer DNA assessment of first copy
 
-| Criterion (0–2) |          Score | Reason                                                                                 |
-| --------------- | -------------: | -------------------------------------------------------------------------------------- |
-| Familiarity     |              2 | Familiar large animals; recognizable side-by-side topic                                |
-| Surprise        |              2 | Five concrete less-obvious contrasts: trunk tips, nails, molars, tusks, head domes     |
-| Specificity     |              2 | Parallel units and anatomical categories, with usually/some qualifiers where necessary |
-| Coherence       |              2 | All seven lines compare the same anatomical dimensions                                 |
-| Scanability     |              2 | Short parallel lines are fast to scan; no irrelevant exposition                        |
-| Utility/emotion |              1 | Useful as recognition guide but limited emotional resonance and opening hook           |
-| **Total**       | **11/12 KUAT** | `format_fit: FIT`, based on first visible copy, not approval/readiness                 |
+- **Familiarity** — **Score:** 2 · **Reason:** Familiar large animals; recognizable side-by-side topic
+- **Surprise** — **Score:** 2 · **Reason:** Five concrete less-obvious contrasts: trunk tips, nails, molars, tusks, head domes
+- **Specificity** — **Score:** 2 · **Reason:** Parallel units and anatomical categories, with usually/some qualifiers where necessary
+- **Coherence** — **Score:** 2 · **Reason:** All seven lines compare the same anatomical dimensions
+- **Scanability** — **Score:** 2 · **Reason:** Short parallel lines are fast to scan; no irrelevant exposition
+- **Utility/emotion** — **Score:** 1 · **Reason:** Useful as recognition guide but limited emotional resonance and opening hook
+- **Total** — **Score:** **11/12 KUAT** · **Reason:** `format_fit: FIT`, based on first visible copy, not approval/readiness
 
 The text is natural and compact in `en-US`, with one question as comment CTA. The opening reads more like a title than a compelling curiosity hook. Format preference (5–8 parallel comparisons) is met, subject phrasing is sufficiently clear. One preferred-band warning is not a workflow failure. The first copy is not edited or replaced in this run.
 
