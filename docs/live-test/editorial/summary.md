@@ -1,6 +1,6 @@
 # Ringkasan evaluasi editorial trivia
 
-**Status aktif kampanye MAIN (28 Oktober 2026): 6/30 percobaan dijalankan.** Workflow: **4 PASS, 0 FAIL, 2 BLOCKED** (satu `POLICY_HOLD` pada SSF-01 dan satu `PREREQUISITE` pada SSF-05), 24 NOT RUN. DNA first copy: **5 KUAT, 1 PERLU REVISI**, dengan **4 PERSISTED dan 2 UNSAVED**. Seluruh copy PERSISTED adalah draft internal berkualitas `pending`; tidak ada approval/publikasi. Gelombang pertama (5 kasus) sudah digabung ke `main` melalui PR #68. Kasus keenam tercatat di branch `editorial/main-direct-save-v1-wave2-20261028`. Bukti `LIVE_OWNER_REPORTED`, bukan audit runtime/per-URL independen. Rekap pilot/retest di bawah merupakan kohort historis.
+**Status aktif kampanye MAIN (28 Oktober 2026): 9/30 percobaan dijalankan — PAUSED.** Workflow: **4 PASS, 0 FAIL, 5 BLOCKED** (3 `POLICY_HOLD`, 2 `PREREQUISITE`), 21 NOT RUN. DNA first copy: **6 KUAT, 3 PERLU REVISI**, dengan **4 PERSISTED dan 5 UNSAVED**; four persisted drafts remain quality `pending`, none approved/published. Wave 1 (five cases) merged through PR #68. Wave 2 cases 6–9 are in `editorial/main-direct-save-v1-wave2-20261028`. **PAUSE**: MAIN-SSF-05 and MAIN-CMP-05 both stopped at truncated dedup READ without reported targeted follow-up (same observable orchestration blocker, not a proven backend defect); see #56 and [wave-2 status](summary-wave2-20261028.md). Evidence `LIVE_OWNER_REPORTED`, runtime and per-URL verification `UNVERIFIED`. Pilot/retest figures below are historical.
 
 **Status:** kelima format pilot telah dicoba pada [Page uji](preflight.md). Baseline SSF dan TUT menyimpan draft; baseline EAC gagal pada render payload, lalu [percobaan koreksi EAC](runs/PILOT-EAC-01-render-correction-01.md) menyimpan draft dengan readback cocok. Baseline CMP dan MVF serta satu retest MVF awal berhenti pada `FACT_SOURCE_INSUFFICIENT`. Setelah perbaikan plugin/backend yang dilaporkan, [retest MVF](runs/PILOT-MVF-01-retest-v026-01.md) dan [retest CMP](runs/PILOT-CMP-01-retest-v026-01.md) masing-masing menyimpan satu draft dengan readback cocok; versi runtime persis dalam sesi tetap `UNVERIFIED`. **Kelima format kini mempunyai sekurangnya satu draft tersimpan**, tetapi kualitasnya tidak seragam dan seluruh 30 kasus utama tetap `NOT RUN` menurut keputusan hemat waktu. Baseline yang gagal/tertahan tidak dihapus oleh retest.
 
@@ -54,9 +54,9 @@ Tidak ada `approve_post`, revisi/publikasi, cleanup, atau Write lain yang tersir
 | Format                        | Terencana | Dijalankan | PASS | FAIL | BLOCKED | NOT RUN | Policy hold (bagian dari BLOCKED) |
 | ----------------------------- | --------: | ---------: | ---: | ---: | ------: | ------: | --------------------------------: |
 | `single_subject_fast`         |         6 |          2 |    0 |    0 |       2 |       4 |                                 1 |
-| `themed_utility`              |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
-| `emotional_animal_collection` |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
-| `comparison`                  |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
+| `themed_utility`              |         6 |          2 |    1 |    0 |       1 |       4 |                                 1 |
+| `emotional_animal_collection` |         6 |          2 |    1 |    0 |       1 |       4 |                                 1 |
+| `comparison`                  |         6 |          2 |    1 |    0 |       1 |       4 |                                 0 |
 | `myth_vs_fact`                |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
 
 `PASS` mensyaratkan `save_post` terkonfirmasi dan `get_post` cocok. `POLICY_HOLD`/izin/prasyarat/response Write tak pasti tidak dihitung `FAIL` tool. Penolakan validator yang benar atas payload salah dapat menjadi `FAIL` alur plugin, tetapi bukan otomatis bug RPC. Catat tahap terakhir agar kasus yang terhenti di dedup tidak disalahartikan sebagai kegagalan `save_post`.
@@ -66,9 +66,9 @@ Tidak ada `approve_post`, revisi/publikasi, cleanup, atau Write lain yang tersir
 | Format                        | Copy tersimpan yang dinilai | Copy `UNSAVED` yang dinilai | KUAT | PERLU REVISI | LEMAH |
 | ----------------------------- | --------------------------: | --------------------------: | ---: | -----------: | ----: |
 | `single_subject_fast`         |                           0 |                           2 |    2 |            0 |     0 |
-| `themed_utility`              |                           1 |                           0 |    1 |            0 |     0 |
-| `emotional_animal_collection` |                           1 |                           0 |    1 |            0 |     0 |
-| `comparison`                  |                           1 |                           0 |    1 |            0 |     0 |
+| `themed_utility`              |                           1 |                           1 |    2 |            0 |     0 |
+| `emotional_animal_collection` |                           1 |                           1 |    1 |            1 |     0 |
+| `comparison`                  |                           1 |                           1 |    1 |            1 |     0 |
 | `myth_vs_fact`                |                           1 |                           0 |    0 |            1 |     0 |
 
 Skor editorial diberikan hanya jika copy benar-benar terlihat, dengan label `PERSISTED` atau `UNSAVED`. Kasus tanpa copy tetap `NOT REVIEWED`; jangan menjadikannya `LEMAH`. Naskah `KUAT` dengan workflow `FAIL`/`BLOCKED` tetap dihitung pada kedua sumbu. Laporkan juga critical checks, `format_fit`, kasus format implisit dengan pilihan alternatif yang masuk akal, dan jumlah naskah yang belum layak terbit meski tersimpan.
