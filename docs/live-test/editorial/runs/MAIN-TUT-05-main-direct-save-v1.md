@@ -48,3 +48,5 @@ Your kitchen sponge works hard, but how you handle it between uses matters too. 
 ## Evidence note
 
 The tester stopped at source verification before dedup or writes. No source packet, server checks, reservation, save_post or get_post was available. There was no server error or uncertain Write.
+
+The tester required Tier A evidence and independent Tier A/B confirmation for each food-hygiene claim; verification remained incomplete. No full source packet or per-claim mapping was reported. This was a safe pre-dedup source hold, not a server error.
