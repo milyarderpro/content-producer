@@ -52,3 +52,37 @@ Do not start a new 8-fact diagnostic or MAIN case 10 until triage of this 60-rev
 - Count distinction: 20/20 semantic decisions **authored and owner-reported** for F1; **0/20 fully validated against actual structured match fields by coordinator**. This is not F1 PASS under the pre-Write contract. F2/F6 remain 0/20 authored decisions each. Overall 60-decision requirement remains **not verified**.
 - Next: in the **same QA chat**, re-audit F1 by showing concrete `candidate_key`, `candidate_fact_public_id`, `subject_key`, `relation_key`, `object_key` and relevant qualifier values for the exact match IDs; remove unsupported `estimate` and revise only labels that actual fields justify. No new READ if originals remain inspectable; otherwise at most one one-candidate F1 READ (top-20), then fail closed if still unreadable. Output final 20-row decision audit. No registration/reservation or other Write.
 - No host/runtime fingerprint was obtained, no claim of backend defect or #56 FIXED. MAIN campaign still PAUSED at 9/30.
+
+## F1 correction audit, second follow-up — semantic labels fixed; unresolved field rendering
+
+- Tester again reports **20/20 F1 `distinct` judgments**, 0 `same`, 0 `uncertain`; two labels modified for #4 and #7, removing unsupported `estimate` from `material_differences`. No additional READ or business Write.
+- All **label types** now belong to the allowed v0.2.10 ontology list; #8 and #19 appropriately omit `relation` *if* their claimed existing `relation_key` equals candidate `is_classified_as`. Numeric/qualifier differences #4 and #7 are described but exact existing structured identity still requires verification.
+- **Critical remaining evidence gap:** despite user's statement that actual fields are displayed, all 20 existing-match field cells visibly contain literal placeholder strings `{r[1]}`, `{r[2]}`, `{r[3]}`, not real `subject_key`, `relation_key`, `object_key` values. Therefore the coordinator **cannot independently validate** 18 `relation` claims, 20 `other` claims or qualifier differences against structured keys. This is a presentation/verification blocker; it does not establish that match IDs or semantic reasoning were fabricated.
+- **Verdict:** `F1_AUTHORED_20_OF_20; MATERIAL_LABEL_ENUM_CORRECTED; STRUCTURED_DIFFERENCE_EVIDENCE_BLOCKED`. Tester declares F1 PASS, but external coordinator withholds contract-level PASS pending visible literal field values. Overall attempt 02 remains BLOCKED; F2/F6 have 0/20 completed decisions. No changes to MAIN campaign 9/30, #56 OPEN.
+
+### Exact F1 fact IDs and proposed difference labels (owner-reported)
+
+| # | Existing fact ID | Proposed labels, all `distinct` |
+|---|---|---|
+| 1 | `6aaf4eb2-5f6b-48e5-b399-9d83aa63303b` | `relation,other` |
+| 2 | `85e6d028-9602-44d3-8d17-0c83e5446e99` | `relation,other` |
+| 3 | `ec2d76e3-7e3d-4f41-88fe-ef81d34653b8` | `relation,other` |
+| 4 | `fefafb0d-ff07-4d81-8a25-b49a0b91d6a2` | `relation,other,number,unit` |
+| 5 | `5b5744d0-d6f9-4c27-b4d3-a1d5ba830ff6` | `relation,other` |
+| 6 | `fa40c202-51c4-4464-b2b6-88577a8a4572` | `relation,other` |
+| 7 | `a095c090-5a03-4ad2-83fe-502118647741` | `relation,other,number,unit,scope` |
+| 8 | `658c7001-0743-4bb5-8a56-d2cab432fa69` | `other` |
+| 9 | `f1a47230-3725-49a3-95a6-18327021223c` | `relation,other,location,scope` |
+| 10 | `6adaf535-e154-499a-be7a-30489c52f7c5` | `relation,other` |
+| 11 | `fd8dcda0-0251-463f-a26f-ef578614653c` | `relation,other` |
+| 12 | `4256034e-f0ff-4dcd-88a6-182c17bdda8a` | `relation,other,number` |
+| 13 | `2d91d7b2-ffab-4d1f-8889-eab872e33b25` | `relation,other` |
+| 14 | `aaac577d-7cec-4b63-93a0-85097ed73327` | `relation,other` |
+| 15 | `b24bab00-31e7-4080-94db-fe8d7f1c68f4` | `relation,other` |
+| 16 | `6e48e9cf-73f3-41f3-8e7f-f2093030cdc7` | `relation,other` |
+| 17 | `c08094f7-41b1-4f3f-839d-0da637b76a6c` | `relation,other` |
+| 18 | `d73f1c3c-1724-483a-be1f-34ba147dd016` | `relation,other,method,scope` |
+| 19 | `4252592f-dd41-4f21-9bb3-fb575a8886e5` | `other` |
+| 20 | `471239ff-5139-4b2e-b74a-82cbfee02d11` | `relation,other,location` |
+
+This table preserves the proposed labels for audit, **not** actual existing `subject_key`/`relation_key`/`object_key` values and not any server acceptance. The 20 existing field triplets were not rendered, only placeholder syntax appeared. One more **bounded, READ-only** serialization audit of the 20 existing triplets in a literal code block in the same tester chat is warranted. Do not issue new READ if the original match objects remain inspectable; if unavailable, a single one-fact F1 READ at top-20 is allowed, otherwise STOP. Do not request new semantic rationale, register, reserve, save or publish.
