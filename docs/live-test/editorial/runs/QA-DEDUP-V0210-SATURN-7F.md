@@ -163,3 +163,53 @@ no	candidate_fact_public_id	subject_key	relation_key	object_key	decision	materia
 ```
 
 The table is a structured summary of the tester's visible report, **not** an independent direct MCP response. F2-specific qualifier claims include the numeric `10.7 hour` rotation and `29.4 year` orbital-period matches, plus population/condition/method/scope/time on other matches. These fields have not been server-validated in a reservation.
+
+## F6 semantic review — owner-reported 20/20 and field audit
+
+**Scope:** same 7-fact Saturn diagnostic, not a new MAIN test. Proposed F6: `saturn / has_named_part_or_property / north_polar_atmospheric_hexagon` ("Saturn has a hexagonal atmospheric pattern near its north pole"). The owner-reported tester performed **one additional F6-only** `trivia_find_similar_facts` READ with `max_matches_per_candidate:20` and returned 20 complete match entries, `review_required:true`. Total Saturn attempt 02 dedup READ calls now **14** (7 initial, 5 follow-ups F2–F6, extra F2, extra F6). No business Write.
+
+- F6 **20/20 semantic decisions complete**: **1 `same`, 19 `distinct`, 0 `uncertain`**. Match #1: `fa40c202-51c4-4464-b2b6-88577a8a4572`, `saturn_north_pole / has_named_part_or_property / hexagonal_jet_stream` ("A six-sided jet-stream pattern swirls around Saturn's north pole.") judged `same` with proposed F6 despite different normalized subject/object. `material_differences: []` is correct for `same`; `reuse_eligibility: eligible` was **reported in READ**, not used or independently confirmed for an actual reservation.
+- Reviewer cross-checked the **visible** IDs and structured `subject_key`/`relation_key`/`object_key` fields: 20 unique IDs, **11/11** `relation` labels supported by differing relation keys, **19/19** `other` labels by differing subject/object. No disallowed label; `estimate` correctly excluded. Counts for additional labels: number 5, unit 4, negation 1, population 2, condition 2, method 2, scope 4. Their detailed normalized evidence remains owner-reported, not independently retrieved from raw tool payload or validated by registration.
+- F6 **scoped verdict: PASS for READ-only semantic review and displayed main-field labels**. No host runtime fingerprint verified, no server validation or reuse action attempted.
+
+### F6 exact owner-reported match IDs and keys
+
+```tsv
+no	candidate_fact_public_id	subject_key	relation_key	object_key	decision	material_differences
+1	fa40c202-51c4-4464-b2b6-88577a8a4572	saturn_north_pole	has_named_part_or_property	hexagonal_jet_stream	same	[]
+2	fefafb0d-ff07-4d81-8a25-b49a0b91d6a2	saturn_rotation	has_measurement	10_7_hours	distinct	relation,other,number,unit
+3	6adaf535-e154-499a-be7a-30489c52f7c5	grand_canyon_national_park	is_located_in	northwestern_arizona	distinct	relation,other
+4	ec2d76e3-7e3d-4f41-88fe-ef81d34653b8	saturn_surface	has_named_part_or_property	lacks_true_solid_surface	distinct	other
+5	6aaf4eb2-5f6b-48e5-b399-9d83aa63303b	saturn	has_named_part_or_property	hydrogen_helium_composition	distinct	other
+6	7dae1c76-06ce-4cda-b165-c51b0315d159	grand_canyon_national_park	has_count	north_american_life_zones_represented	distinct	relation,other,number,unit
+7	a095c090-5a03-4ad2-83fe-502118647741	saturn_orbit	has_measurement	29_4_earth_years	distinct	relation,other,number,unit,scope
+8	85e6d028-9602-44d3-8d17-0c83e5446e99	saturn	has_named_part_or_property	sixth_planet_from_sun	distinct	other
+9	c5d8dd71-35a3-4cd6-8d12-998b8bfcd140	african_savanna_vs_asian_elephant_molars	has_named_part_or_property	molar_ridge_pattern_african_diamond_asian_parallel	distinct	other
+10	7d4e921d-3eac-4956-b9b6-dff6c164bc93	nectar_eating_bats	can_perform	pollinate_blue_agave	distinct	relation,other
+11	f56a11b0-3e1b-4fe6-8a91-4a50a2dceef6	antarctica	has_named_part_or_property	active_volcanoes	distinct	other
+12	624d3890-decf-4985-8970-496c05fa388e	north_american_porcupines	can_perform	shoot_quills	distinct	relation,other,negation,population
+13	be16c634-2b09-496d-a6af-f8c38b742b77	lunar_phase_cycle	has_measurement	synodic_month_duration	distinct	relation,other,number,unit,condition,scope
+14	5b5744d0-d6f9-4c27-b4d3-a1d5ba830ff6	saturn_rings	has_named_part_or_property	ice_and_rock_particles	distinct	other
+15	ce5ce985-09af-4108-ab61-3ae0a76b061e	bats	has_named_part_or_property	functional_vision	distinct	other,population
+16	8d1387b9-426e-4542-9531-c8cd11a12fcf	paper_books	recommended_practice	cool dry stable storage away from damp attics and basements	distinct	relation,other,scope
+17	5e2bf354-a3e0-4936-ad73-55d2ebc94dc5	lion_tiger_individual_identification	has_named_part_or_property	lion_unique_whisker_spots_vs_tiger_unique_stripe_patterns	distinct	other,method,scope
+18	4256034e-f0ff-4dcd-88a6-182c17bdda8a	african_savanna_vs_asian_elephant_foreheads	has_count	prominent_head_domes_african_1_asian_2	distinct	relation,other,number
+19	a2bee2e8-b13a-46b5-94e5-4fa2d8d9aa3d	sharks	can_perform	detect_electric_fields_of_nearby_animals	distinct	relation,other,condition,method
+20	ce193a77-5b91-40ba-8b70-00510f6f6852	retinal_photoreceptors	can_perform	convert_light_to_electrical_signals	distinct	relation,other
+```
+
+## Saturn attempt 02 — 7-fact closeout
+
+| Diagnostic gate | Evidence / verdict |
+|---|---|
+| Per-fact dedup READ | 7/7 proposed candidate keys visited individually, `max_matches_per_candidate:20`, 14 total one-candidate READ calls; 7/7 complete structured responses, **PASS owner-reported** |
+| Returned match inspection | 20 per fact, 140 total; all positions reported inspectable; F3/F4/F5/F7 `review_required:false` |
+| Required semantic review | 3 facts `review_required:true`: F1 20 decisions, F2 20 decisions including one `uncertain`, F6 20 decisions: **60/60 assessed** |
+| Decision summary | **58 `distinct`, 1 `same`, 1 `uncertain`** (F2 match #1; semantic overlap cannot be resolved safely) |
+| Safe hold | F2 `uncertain`: whole proposed set **must not be reserved**. `BLOCKED / SEMANTIC_UNCERTAIN` for registration-readiness, a correct fail-closed behavior; no server Write ever attempted |
+| READ orchestration objective | **PASS on owner-reported execution**, including targeted per-fact READ continuation; initial wave2 symptom (stop without targeted READ) did not recur in this diagnostic |
+| Plugin host/runtime | Account release `0.2.10` verified separately via Plugin Creator; exact chat-session runtime fingerprint and raw full tool trace **UNVERIFIED** |
+| Issue #56 | **OPEN** pending independent 8-fact READ-only test and assessment of verified runtime/trace; no automatic FIXED declaration |
+| MAIN editorial campaign | **PAUSED at 9/30**, unchanged; no baseline reruns or subsequent MAIN case, no content Write |
+
+**Final classification:** `READ_ORCHESTRATION_PASS` + `SEMANTIC_REVIEW_ASSESSED_60_OF_60` + `RESERVATION_READINESS_BLOCKED_EXPECTED_SEMANTIC_UNCERTAIN`, not end-to-end content workflow PASS. The next independent stress diagnostic may use **8 new facts** READ-only, retaining any uncertain holds but continuing fact-by-fact observations without business Write. This does not approve resuming MAIN.
