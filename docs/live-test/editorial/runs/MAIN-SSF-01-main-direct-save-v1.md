@@ -1,15 +1,15 @@
-# MAIN-SSF-01 — direct-save v1 baseline
+# MAIN-SSF-01 — baseline
 
-## Identitas dan verdict
+## Identitas dan hasil
 
-- `case_id: MAIN-SSF-01`; `attempt_id: baseline`; `cohort_id: main-direct-save-v1-owner-reported`.
-- `page_public_id: f3984ee4-8ae7-4043-8c93-45765f82f46e`; format `single_subject_fast`, topic `animals`, `en-US`, tujuh fakta, mode `guided_explicit`.
-- Tanggal sesi, actual Page config, `config_updated_at`, `recent_variety`, dan versi runtime plugin/backend: `UNVERIFIED`. Laporan diteruskan pemilik pada 28 Oktober 2026, Asia/Jakarta.
-- `execution_status: BLOCKED`, `workflow_verdict: BLOCKED`, `stop_category: POLICY_HOLD`. Tahap terakhir `DEDUP`, failure `RESERVATION`; alasan `FACT_REVIEW_REQUIRED`.
-- `editorial_basis: UNSAVED`; `format_fit: FIT`; reviewer DNA `11/12 KUAT`. Tidak ada post ID, status, revision, quality checks pada post tersimpan, atau approval.
-- `evidence_level: LIVE_OWNER_REPORTED`. Ini bukti jawaban penguji yang diteruskan pemilik, bukan inspeksi langsung tool. Identitas byte prompt yang ditempel pemilik tidak dibuktikan.
+- Case `MAIN-SSF-01`, attempt `baseline`, cohort `main-direct-save-v1-owner-reported`; mode `guided_explicit`.
+- Page internal `f3984ee4-8ae7-4043-8c93-45765f82f46e`, format `single_subject_fast`, topic `animals`, `en-US`, tujuh fakta.
+- `execution_status: BLOCKED`, `workflow_verdict: BLOCKED`, `stop_category: POLICY_HOLD`, `failure_stage: RESERVATION`, `last_completed_stage: DEDUP`.
+- `editorial_basis: UNSAVED`, `format_fit: FIT`, DNA `11/12 KUAT`; tidak ada draft, post ID, revision, quality checks atau readback.
+- Evidence `LIVE_OWNER_REPORTED`, diteruskan 28 Oktober 2026. Waktu sesi, plugin/backend runtime, Page config dan `config_updated_at` tidak dapat diverifikasi.
+- Prompt berikut disiapkan koordinator; teks yang sebenarnya ditempel tidak terbukti identik.
 
-## Prompt final yang sebelumnya disiapkan koordinator
+## Prompt koordinator
 
 ```text
 Jalankan `MAIN-SSF-01` dengan hanya PRIVATE Content Producer pada Page internal `f3984ee4-8ae7-4043-8c93-45765f82f46e`. Buat dan simpan tepat satu draft `single_subject_fast` tentang octopuses sebagai satu subjek; variasikan anatomi dan perilaku tanpa mengulang makna. Tulis naskah orisinal `en-US` yang natural, konkret, mengejutkan atau berguna tanpa clickbait, dan cepat dipindai.
@@ -39,56 +39,29 @@ Day octopuses sometimes punch fish during group hunts.
 Follow for more unexpected animal science.
 ```
 
-## Facebook caption pertama — UNSAVED
+## Facebook caption
 
 ```text
 From eyes and arms to shelter-making and hunting, these seven octopus facts show just how varied their adaptations can be.
 ```
 
-## Hashtags pertama — UNSAVED
+## Hashtags
 
 ```text
 #OctopusFacts #MarineBiology #OceanLife
 ```
 
-## Jejak pelaksanaan penguji
+## Jejak tool yang dilaporkan
 
-- **Page/context:** target internal benar menurut prompt. Snapshot context/config dan waktu pengambilan `UNVERIFIED`.
-- **Research:** penguji menyebut Natural History Museum, Smithsonian Ocean, Monterey Bay Aquarium dan riset primer di *Cell* serta *Nature Ecology & Evolution*. Dukungan per-klaim dan URL tidak diaudit reviewer; ringkasan sumber “Natural History Museum+4” bukan peta klaim.
-- **Dedup:** tujuh READ lengkap dilaporkan, lima posisi memerlukan review; 100 keputusan dikirim (99 `distinct`, satu `same`). Kandidat ID, `material_differences`, dan relasi pada request sebenarnya tidak tersedia untuk reviewer.
-- **Reservasi:** tepat satu `trivia_register_and_reserve_facts` ditolak `FACT_REVIEW_REQUIRED` pada `facts[2].dedup_reviews`, F3 tentang octopus suckers tasting chemicals. Tidak ada reservasi terkonfirmasi.
-- **Save/readback:** `save_post: NOT_CALLED`, `get_post: NOT_CALLED`, sehingga `readback_outcome: NO_POST_ID`. Tidak ada retry, draft kedua, revisi, approval atau publikasi; release tidak relevan karena tidak ada reservasi.
-- **Batas diagnosis:** 100 review terkirim tidak menjamin kelengkapan/konsistensi semantic decision per kandidat; sebab tepatnya `UNVERIFIED`. Jangan mengklaim bug RPC atau atribusi otomatis ke Issue #56/#63.
+- Riset memakai Natural History Museum, Smithsonian Ocean, Monterey Bay Aquarium, serta publikasi primer di *Cell* dan *Nature Ecology & Evolution*. Kesesuaian sumber per fakta belum diaudit independen.
+- Dedup READ 7/7 lengkap menurut penguji; lima posisi wajib review; 100 keputusan dikirim (99 `distinct`, 1 `same`). Payload detail dan candidate IDs tidak diberikan.
+- Satu `trivia_register_and_reserve_facts` ditolak: `INVALID_ARGUMENT` / `FACT_REVIEW_REQUIRED` di `facts[2].dedup_reviews`. Pesan: “A required semantic review decision is missing or inconsistent.” Penguji melaporkan tidak ada reservasi terbentuk.
+- `save_post: NOT_CALLED`, `get_post: NOT_CALLED`. Tidak ada retry, second draft, revisi, approval atau publikasi.
+- Penyebab tepat keputusan dedup yang hilang/tidak konsisten `UNVERIFIED`; bukan bukti bug RPC. Terkait #56 dan #63 hanya sebagai konteks.
 
-### Error reservasi yang dilaporkan
+## Critical checks dan editorial review
 
-- Kode terluar: `INVALID_ARGUMENT` (runtime MCP).
-- Kode validator: `FACT_REVIEW_REQUIRED`.
-- Field: `facts[2].dedup_reviews`.
-- Pesan validator: “Semantic deduplication needs explicit review. A required semantic review decision is missing or inconsistent.”
-- Informasi error lengkap dari penguji mencakup pembungkus `RuntimeException` dan `TextContent`. Identitas kandidat yang bermasalah tidak diketahui.
-
-## Critical checks, source evidence, dan metrik
-
-- `trivia.meaning_preserved`: dukungan sumber `UNVERIFIED` oleh reviewer, tidak ada matching source packet.
-- `trivia.source_supported`: penguji menyebut institusi/jurnal, tetapi dukungan per klaim dan pemeriksaan server post `UNVERIFIED`.
-- `trivia.time_context_valid`: tidak terlihat klaim time-sensitive, check server `UNVERIFIED`.
-- `trivia.safety_appropriate`: tidak terlihat saran high-risk, check server `UNVERIFIED`.
-- `trivia.caption_no_new_claim`: caption tampak merangkum copy tanpa fakta baru; check server `UNVERIFIED`.
-- `trivia.substantial_copying_absent`: tidak dilakukan audit per-sumber dan check server `UNVERIFIED`.
-- `trivia.surprise_substantive`: kejutan dinilai substantif oleh penguji/reviewer dari copy pertama, **tidak ada hasil PASS server**.
-- System checks, editorial checks, `text_metrics`, `quality_status` dan `save_post` belum tersedia karena tidak ada post.
-
-## DNA reviewer — first visible copy
-
-- **Familiarity 2/2:** octopuses mudah dikenali.
-- **Surprise 2/2:** coconut shelters, taste through suckers, fish-punching terasa konkret dan mengejutkan.
-- **Specificity 2/2:** beberapa spesies, ciri, dan perilaku disebut eksplisit.
-- **Coherence 2/2:** tujuh fakta bervariasi tanpa pengulangan makna yang jelas.
-- **Scanability 2/2:** satu ide utama per baris, struktur jelas dan bahasa natural.
-- **Utility/emotion 1/2:** rasa ingin tahu kuat, manfaat/emotional beat langsung terbatas.
-- **Total 11/12 KUAT, FIT, UNSAVED:** hook dan CTA generik; skor tidak membuktikan akurasi fakta atau layak terbit.
-
-## Keputusan
-
-Satu `BLOCKED / POLICY_HOLD` dihitung sebagai percobaan utama, tanpa mengubah draft atau mengulangi Write. SSF tidak disamakan dengan kegagalan save karena `save_post` tidak dipanggil. Terkait #47; konteks #56/#63 bukan bukti akar yang sama. Berikutnya `MAIN-TUT-01` dalam urutan beku. Catatan telah disanitasi: tanpa token, OAuth, operation key, claim credentials, atau URL fakta rinci.
+- Tidak ada system/editorial checks post, `text_metrics`, atau server verdict `trivia.surprise_substantive`; semuanya `UNVERIFIED` pada kasus tanpa save.
+- Klaim sumber, meaning preserved, safety, caption no-new-claim, substantial copying dan time-context tidak diaudit per-URL oleh reviewer.
+- Skor reviewer: familiarity 2, surprise 2, specificity 2, coherence 2, scanability 2, utility/emotion 1. Total `11/12 KUAT`, `FIT`, copy `UNSAVED`. Hook dan CTA generik; tujuh fakta variatif dan konkret.
+- Kasus dihitung sebagai satu dari 30 tanpa retry; tak ada `UNCONFIRMED` Write. Catatan ini tidak mengklaim `ready` atau publikasi. Rahasia, operation key dan reservation token tidak disertakan.
