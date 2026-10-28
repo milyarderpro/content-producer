@@ -54,3 +54,12 @@ Both ends of Earth are icy, but their geography, wildlife, and human histories a
 ```text
 #Arctic #Antarctica #GeographyFacts
 ```
+
+## Tool trace and boundaries
+
+- Internal Page and `comparison` format confirmed as valid, per tester. Raw Page context not supplied.
+- Research/source packet for all eight individual claims was not finalized; no per-claim URL or independent source verification by reviewer.
+- An initial `trivia_find_similar_facts` READ succeeded but was too long to confirm every candidate and required semantic review. Targeted follow-up READ was **not reported**, despite the frozen prompt explicitly requiring it when truncated.
+- No complete dedup, reservation, `save_post`, or `get_post`. No rejected Write, server error, post, allocation, release, retry, revision, approval or publication. No `UNCONFIRMED` Write.
+- No server system/editorial checks, server metrics, quality status, or confirmed `trivia.surprise_substantive`. Reported `needs_review` was a **provisional tester assessment**, not a persisted server check.
+- This reproduces the *observable orchestration blocker* in `MAIN-SSF-05`: truncated initial dedup view without targeted READ completion before stopping. It does not prove a common RPC/backend defect. Under the frozen two-case repeated-blocker rule, **PAUSE the campaign** pending targeted-read orchestration triage (#56).
