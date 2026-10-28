@@ -60,15 +60,13 @@ From eyes and arms to shelter-making and hunting, these seven octopus facts show
 
 ## Jejak tindakan — dari laporan penguji, urutan dipertahankan
 
-| Tahap                                               | Hasil yang dilaporkan                                                                                                                                                          | Batas bukti                                                                                                                                                           |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page / generation context                           | Target Page tercantum dalam prompt; output config atau `config_updated_at` tidak tercantum dalam respons                                                                       | Identitas Page internal dalam respons/izin, readback config tidak terlihat                                                                                            |
-| Research + source evidence                          | Riset/bukti disebut selesai; organisasi yang disebut Natural History Museum, Smithsonian Ocean, Monterey Bay Aquarium, studi primer di *Cell* dan *Nature Ecology & Evolution* | Tidak tersedia per-claim packet, tier, URL, atau audit independen; teks sumber tambahan “Natural History Museum+4” tidak menjelaskan pasangan fakta/sumber            |
-| Semantic dedup READ                                 | Dilaporkan 7/7 lengkap; 5 posisi membutuhkan review; 100 keputusan (99 `distinct`, 1 `same`)                                                                                   | Tidak ada daftar 100 kandidat, `candidate_fact_public_id`, `relation_key`, `material_differences`, atau array request aktual; kesesuaian semantik tidak dapat dinilai |
-| Satu reservasi: `trivia_register_and_reserve_facts` | **Ditolak** `FACT_REVIEW_REQUIRED` pada `facts[2].dedup_reviews` (F3: suckers can taste chemicals); tester melaporkan reservasi tidak terbentuk                                | Satu penolakan yang terlapor, bukan bukti pasti kandidat mana/label mana tidak konsisten                                                                              |
-| `save_post`                                         | **NOT_CALLED**                                                                                                                                                                 | Tidak ada draft tersimpan                                                                                                                                             |
-| `get_post`                                          | **NOT_CALLED**                                                                                                                                                                 | Tidak ada post ID/readback, dan tidak ada server checks pada post                                                                                                     |
-| Retry / release / approve / publication             | Tidak ada retry, draft kedua, revisi, approval, atau publikasi menurut laporan; release tidak relevan karena reservasi tidak terbentuk                                         | Tidak memverifikasi runtime di luar laporan                                                                                                                           |
+- **Page / generation context** — **Hasil yang dilaporkan:** Target Page tercantum dalam prompt; output config atau `config_updated_at` tidak tercantum dalam respons · **Batas bukti:** Identitas Page internal dalam respons/izin, readback config tidak terlihat
+- **Research + source evidence** — **Hasil yang dilaporkan:** Riset/bukti disebut selesai; organisasi yang disebut Natural History Museum, Smithsonian Ocean, Monterey Bay Aquarium, studi primer di *Cell* dan *Nature Ecology & Evolution* · **Batas bukti:** Tidak tersedia per-claim packet, tier, URL, atau audit independen; teks sumber tambahan “Natural History Museum+4” tidak menjelaskan pasangan fakta/sumber
+- **Semantic dedup READ** — **Hasil yang dilaporkan:** Dilaporkan 7/7 lengkap; 5 posisi membutuhkan review; 100 keputusan (99 `distinct`, 1 `same`) · **Batas bukti:** Tidak ada daftar 100 kandidat, `candidate_fact_public_id`, `relation_key`, `material_differences`, atau array request aktual; kesesuaian semantik tidak dapat dinilai
+- **Satu reservasi: `trivia_register_and_reserve_facts`** — **Hasil yang dilaporkan:** **Ditolak** `FACT_REVIEW_REQUIRED` pada `facts[2].dedup_reviews` (F3: suckers can taste chemicals); tester melaporkan reservasi tidak terbentuk · **Batas bukti:** Satu penolakan yang terlapor, bukan bukti pasti kandidat mana/label mana tidak konsisten
+- **`save_post`** — **Hasil yang dilaporkan:** **NOT_CALLED** · **Batas bukti:** Tidak ada draft tersimpan
+- **`get_post`** — **Hasil yang dilaporkan:** **NOT_CALLED** · **Batas bukti:** Tidak ada post ID/readback, dan tidak ada server checks pada post
+- **Retry / release / approve / publication** — **Hasil yang dilaporkan:** Tidak ada retry, draft kedua, revisi, approval, atau publikasi menurut laporan; release tidak relevan karena reservasi tidak terbentuk · **Batas bukti:** Tidak memverifikasi runtime di luar laporan
 
 ### Error yang diteruskan (tanpa credential)
 
@@ -80,30 +78,26 @@ Diagnosis terbatas: penolakan menandai `facts[2].dedup_reviews` sebagai keputusa
 
 ## Reviewer — critical checks dan batas sumber
 
-| Pemeriksaan                                | Penilaian reviewer / bukti                                                                                        |
-| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `trivia.meaning_preserved`                 | `UNVERIFIED` terhadap sumber asli; tidak ada bukti tiap qualifier dipertahankan, meskipun naskah tampak bernuansa |
-| `trivia.source_supported`                  | `UNVERIFIED` secara independen; penguji menyebut institusi/jurnal, tanpa paket per klaim maupun checks server     |
-| `trivia.time_context_valid`                | Tidak ada as-of/tanggal relevan yang diminta dalam copy; check server `UNVERIFIED`                                |
-| `trivia.safety_appropriate`                | Tidak tampak instruksi berisiko tinggi pada copy; check server `UNVERIFIED`                                       |
-| `trivia.caption_no_new_claim`              | Caption terlihat meringkas isi tanpa klaim faktual baru yang jelas; check server `UNVERIFIED`                     |
-| `trivia.substantial_copying_absent`        | `UNVERIFIED`; tidak dilakukan pemeriksaan kesamaan teks terhadap sumber                                           |
-| `trivia.surprise_substantive`              | Reviewer menilai variasi kejutan kuat; **bukan PASS server**, karena reservasi ditolak sebelum penyimpanan        |
-| System/editorial checks dan `text_metrics` | **UNVERIFIED/NOT AVAILABLE**; tidak ada `save_post`/`get_post`                                                    |
+- **`trivia.meaning_preserved`** — **Penilaian reviewer / bukti:** `UNVERIFIED` terhadap sumber asli; tidak ada bukti tiap qualifier dipertahankan, meskipun naskah tampak bernuansa
+- **`trivia.source_supported`** — **Penilaian reviewer / bukti:** `UNVERIFIED` secara independen; penguji menyebut institusi/jurnal, tanpa paket per klaim maupun checks server
+- **`trivia.time_context_valid`** — **Penilaian reviewer / bukti:** Tidak ada as-of/tanggal relevan yang diminta dalam copy; check server `UNVERIFIED`
+- **`trivia.safety_appropriate`** — **Penilaian reviewer / bukti:** Tidak tampak instruksi berisiko tinggi pada copy; check server `UNVERIFIED`
+- **`trivia.caption_no_new_claim`** — **Penilaian reviewer / bukti:** Caption terlihat meringkas isi tanpa klaim faktual baru yang jelas; check server `UNVERIFIED`
+- **`trivia.substantial_copying_absent`** — **Penilaian reviewer / bukti:** `UNVERIFIED`; tidak dilakukan pemeriksaan kesamaan teks terhadap sumber
+- **`trivia.surprise_substantive`** — **Penilaian reviewer / bukti:** Reviewer menilai variasi kejutan kuat; **bukan PASS server**, karena reservasi ditolak sebelum penyimpanan
+- **System/editorial checks dan `text_metrics`** — **Penilaian reviewer / bukti:** **UNVERIFIED/NOT AVAILABLE**; tidak ada `save_post`/`get_post`
 
 Penguji tetap memikul kewajiban riset/policy sumber. Reviewer tidak membuka URL per fakta; klaim seperti pupil rectangular, lingkar otak pada saluran makan, dan fish punching belum divalidasi independen di sini. Tidak ada jaminan `ready`, publikasi, atau views.
 
 ## DNA 0–2 — copy pertama
 
-| Unsur           |      Skor | Bukti editorial                                                                                  |
-| --------------- | --------: | ------------------------------------------------------------------------------------------------ |
-| Familiarity     |         2 | Subjek octopuses mudah dikenali; hook jelas                                                      |
-| Surprise        |         2 | Coconut shelters, taste through suckers, dan fish-punching menyediakan kejutan substantif        |
-| Specificity     |         2 | Spesies/konteks dan mekanisme konkret pada sebagian besar baris; bukan slogan umum               |
-| Coherence       |         2 | Tujuh fakta tentang satu hewan, anatomi dan perilaku bervariasi tanpa pengulangan makna material |
-| Scanability     |         2 | Satu gagasan utama per baris pendek, baris terpisah, en-US percakapan                            |
-| Utility/emotion |         1 | Rasa ingin tahu kuat; tidak ada utilitas langsung atau ikatan emosi yang menonjol                |
-| **Total**       | **11/12** | **KUAT** secara DNA pada copy `UNSAVED`, tidak berarti kebenaran fakta/kelayakan publikasi       |
+- **Familiarity** — **Skor:** 2 · **Bukti editorial:** Subjek octopuses mudah dikenali; hook jelas
+- **Surprise** — **Skor:** 2 · **Bukti editorial:** Coconut shelters, taste through suckers, dan fish-punching menyediakan kejutan substantif
+- **Specificity** — **Skor:** 2 · **Bukti editorial:** Spesies/konteks dan mekanisme konkret pada sebagian besar baris; bukan slogan umum
+- **Coherence** — **Skor:** 2 · **Bukti editorial:** Tujuh fakta tentang satu hewan, anatomi dan perilaku bervariasi tanpa pengulangan makna material
+- **Scanability** — **Skor:** 2 · **Bukti editorial:** Satu gagasan utama per baris pendek, baris terpisah, en-US percakapan
+- **Utility/emotion** — **Skor:** 1 · **Bukti editorial:** Rasa ingin tahu kuat; tidak ada utilitas langsung atau ikatan emosi yang menonjol
+- **Total** — **Skor:** **11/12** · **Bukti editorial:** **KUAT** secara DNA pada copy `UNSAVED`, tidak berarti kebenaran fakta/kelayakan publikasi
 
 `format_fit: FIT`: tujuh fakta sesuai preferensi `single_subject_fast`. Teks berbahasa Inggris natural untuk audiens lintas negara. Hook “Octopuses have a few unexpected tricks” relatif generik; CTA “Follow for more unexpected animal science” hanya satu aksi tetapi tidak menonjol. Caption dan hashtag konsisten dengan copy yang terlihat. Struktur tidak cukup untuk menyatakan source/checks PASS. Naskah pertama tidak diperbaiki atau direvisi pada kasus ini.
 
