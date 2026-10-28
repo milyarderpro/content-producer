@@ -86,3 +86,42 @@ Do not start a new 8-fact diagnostic or MAIN case 10 until triage of this 60-rev
 | 20 | `471239ff-5139-4b2e-b74a-82cbfee02d11` | `relation,other,location` |
 
 This table preserves the proposed labels for audit, **not** actual existing `subject_key`/`relation_key`/`object_key` values and not any server acceptance. The 20 existing field triplets were not rendered, only placeholder syntax appeared. One more **bounded, READ-only** serialization audit of the 20 existing triplets in a literal code block in the same tester chat is warranted. Do not issue new READ if the original match objects remain inspectable; if unavailable, a single one-fact F1 READ at top-20 is allowed, otherwise STOP. Do not request new semantic rationale, register, reserve, save or publish.
+
+## F1 field-triplet serialization follow-up — main structured differences verified
+
+Owner-provided CSV of all 20 existing fact ID, subject, relation, and object key triplets resolves the prior placeholder-rendering blocker. Coordinator compared these literal values with F1 proposed `saturn / is_classified_as / gas_giant`, and checked all 20 IDs occur in the previous F1 match/label inventory:
+
+- 20 distinct existing IDs, order #1–#20 consistent.
+- `relation`: justified on **18/18** match labels (relation differs from `is_classified_as`); #8/#19 correctly omit it.
+- `other`: justified on **20/20** match labels (every object differs from `gas_giant`). 18 existing subjects differ from `saturn`; #1/#2 retain the same subject.
+- All semantic outcomes remain `distinct`; the unsupported `estimate` label on #4/#7 was removed in the previous correction. No new READ or business Write.
+- **Scoped F1 verdict: PASS for semantic review and visible `subject_key`/`relation_key`/`object_key` label validation (owner-reported evidence).** Other labels `number`, `unit`, `scope`, `location`, `method` still rely on earlier tester-reported normalized number/qualifier fields; this CSV alone is not a complete independent audit of every qualifier or evidence of server acceptance. Retain distinction between tester claim and coordinator-validated visible fields.
+- F2 and F6 each still require 20 semantic match decisions. **Overall Saturn 7-fact diagnostic remains BLOCKED**; Issue #56 OPEN, MAIN campaign 9/30 PAUSED.
+
+### Exact owner-reported structured triplets
+
+```csv
+no,candidate_fact_public_id,subject_key,relation_key,object_key
+1,6aaf4eb2-5f6b-48e5-b399-9d83aa63303b,saturn,has_named_part_or_property,hydrogen_helium_composition
+2,85e6d028-9602-44d3-8d17-0c83e5446e99,saturn,has_named_part_or_property,sixth_planet_from_sun
+3,ec2d76e3-7e3d-4f41-88fe-ef81d34653b8,saturn_surface,has_named_part_or_property,lacks_true_solid_surface
+4,fefafb0d-ff07-4d81-8a25-b49a0b91d6a2,saturn_rotation,has_measurement,10_7_hours
+5,5b5744d0-d6f9-4c27-b4d3-a1d5ba830ff6,saturn_rings,has_named_part_or_property,ice_and_rock_particles
+6,fa40c202-51c4-4464-b2b6-88577a8a4572,saturn_north_pole,has_named_part_or_property,hexagonal_jet_stream
+7,a095c090-5a03-4ad2-83fe-502118647741,saturn_orbit,has_measurement,29_4_earth_years
+8,658c7001-0743-4bb5-8a56-d2cab432fa69,antarctica,is_classified_as,desert
+9,f1a47230-3725-49a3-95a6-18327021223c,statue_of_liberty,originated_in_time_place,gift_from_people_of_france_to_united_states
+10,6adaf535-e154-499a-be7a-30489c52f7c5,grand_canyon_national_park,is_located_in,northwestern_arizona
+11,fd8dcda0-0251-463f-a26f-ef578614653c,sea_turtles,has_named_part_or_property,air_breathing_lungs
+12,4256034e-f0ff-4dcd-88a6-182c17bdda8a,african_savanna_vs_asian_elephant_foreheads,has_count,prominent_head_domes_african_1_asian_2
+13,2d91d7b2-ffab-4d1f-8889-eab872e33b25,female_sea_turtles,behaves_as,nesting_on_sandy_beaches
+14,aaac577d-7cec-4b63-93a0-85097ed73327,fovea,is_located_in,center_of_macula
+15,b24bab00-31e7-4080-94db-fe8d7f1c68f4,antarctic_glaciers,can_perform,extend_over_sea_to_form_ice_shelves
+16,6e48e9cf-73f3-41f3-8e7f-f2093030cdc7,pupil,is_located_in,center_of_iris
+17,c08094f7-41b1-4f3f-839d-0da637b76a6c,developing_sea_turtles,affects,sex_determined_by_incubation_temperature
+18,d73f1c3c-1724-483a-be1f-34ba147dd016,sand_tiger_shark_carcharias_taurus,can_perform,swallow_air_into_stomach_for_buoyancy
+19,4252592f-dd41-4f21-9bb3-fb575a8886e5,ancient_olympic_games,is_classified_as,religious_festival_honoring_zeus
+20,471239ff-5139-4b2e-b74a-82cbfee02d11,old_faithful_geyser,is_located_in,upper_geyser_basin_yellowstone
+```
+
+The `F1` source candidate is `saturn / is_classified_as / gas_giant`. No new `trivia_find_similar_facts` call was performed in this follow-up; no request was sent to any reservation validator.
