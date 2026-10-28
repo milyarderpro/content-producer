@@ -175,13 +175,13 @@ Tiga kasus baru selesai. Tambahkan dua retest MVF/CMP terdahulu hanya sebagai pe
 
 ## Rekap gelombang MAIN pertama — lima format terpandu (28 Oktober 2026)
 
-| Case | Format | Workflow | Basis copy pertama | DNA | Format fit | Temuan ringkas |
-| --- | --- | --- | --- | --- | --- | --- |
-| [MAIN-SSF-01](runs/MAIN-SSF-01-main-direct-save-v1.md) | SSF | BLOCKED / POLICY_HOLD | UNSAVED | 11/12 KUAT | FIT | `FACT_REVIEW_REQUIRED` F3, review semantic invalid/missing, akar spesifik UNVERIFIED |
-| [MAIN-TUT-01](runs/MAIN-TUT-01-main-direct-save-v1.md) | TUT | PASS | PERSISTED | 11/12 KUAT | FIT | Tips berry berguna, beberapa umum; satu warning panjang preferred |
-| [MAIN-EAC-01](runs/MAIN-EAC-01-main-direct-save-v1.md) | EAC | PASS | PERSISTED | 10/12 KUAT | FIT | Observasi sosial spesifik, nada klinis; warning preferred |
-| [MAIN-CMP-01](runs/MAIN-CMP-01-main-direct-save-v1.md) | CMP | PASS | PERSISTED | 11/12 KUAT | FIT | Kontras anatomis paralel; qualifier angka kuku/gading dipertahankan; warning preferred |
-| [MAIN-MVF-01](runs/MAIN-MVF-01-main-direct-save-v1.md) | MVF | PASS | PERSISTED | 9/12 PERLU REVISI | FIT | Banyak koreksi mudah ditebak, beberapa terlalu luas; warning preferred |
+| Case                                                   | Format | Workflow              | Basis copy pertama | DNA               | Format fit | Temuan ringkas                                                                         |
+| ------------------------------------------------------ | ------ | --------------------- | ------------------ | ----------------- | ---------- | -------------------------------------------------------------------------------------- |
+| [MAIN-SSF-01](runs/MAIN-SSF-01-main-direct-save-v1.md) | SSF    | BLOCKED / POLICY_HOLD | UNSAVED            | 11/12 KUAT        | FIT        | `FACT_REVIEW_REQUIRED` F3, review semantic invalid/missing, akar spesifik UNVERIFIED   |
+| [MAIN-TUT-01](runs/MAIN-TUT-01-main-direct-save-v1.md) | TUT    | PASS                  | PERSISTED          | 11/12 KUAT        | FIT        | Tips berry berguna, beberapa umum; satu warning panjang preferred                      |
+| [MAIN-EAC-01](runs/MAIN-EAC-01-main-direct-save-v1.md) | EAC    | PASS                  | PERSISTED          | 10/12 KUAT        | FIT        | Observasi sosial spesifik, nada klinis; warning preferred                              |
+| [MAIN-CMP-01](runs/MAIN-CMP-01-main-direct-save-v1.md) | CMP    | PASS                  | PERSISTED          | 11/12 KUAT        | FIT        | Kontras anatomis paralel; qualifier angka kuku/gading dipertahankan; warning preferred |
+| [MAIN-MVF-01](runs/MAIN-MVF-01-main-direct-save-v1.md) | MVF    | PASS                  | PERSISTED          | 9/12 PERLU REVISI | FIT        | Banyak koreksi mudah ditebak, beberapa terlalu luas; warning preferred                 |
 
 **Dua sumbu berbeda:** 5 percobaan dijalankan/30 direncanakan; 4 `PASS`, 1 `BLOCKED` hanya di reservasi SSF, tanpa Write `UNCONFIRMED`. Lima CANVA COPY pertama semuanya terlihat; empat `PERSISTED` (3 KUAT, 1 PERLU REVISI) dan satu `UNSAVED` (KUAT). `format_fit` 5/5 FIT. Skor diagnostik rata-rata kelima first copy = **10.4/12**; **bukan** tingkat viralitas, representativitas statistik, atau rate sukses versi plugin tertentu. Tiga draft KUAT tersimpan juga quality `pending`, sehingga belum ada yang dinyatakan `ready`; satu PERSISTED PERLU REVISI dan satu UNSAVED KUAT dicatat pada sumbu masing-masing.
 
