@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { candidateKeys, scenarios, type Scenario } from './fixtures/issue-56-dedup-recovery.js';
 
 const root = join(process.cwd(), 'plugin', 'skills', 'content-producer');
 const niche = 'references/niches/trivia/';
@@ -210,6 +211,44 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     expect(text).toContain('Do not stop the workflow merely because the initial batch was long');
     expect(text).toContain('**not** a no-match result');
     expect(sequence).toContain('targeted one-fact READ for every unresolved position');
+  });
+
+  it('packages mandatory same-workflow recovery before HOLD for Issue #56 fixtures', () => {
+    // These are source-instruction assertions and local mock views, not a host AI test.
+    const unresolvedFirstView = (scenario: Scenario) =>
+      candidateKeys.filter((key) => {
+        const delivery = scenario.responses[key][0];
+        const visible = delivery.visible.data.candidates[0];
+        return delivery.display_truncated || typeof visible.review_required !== 'boolean';
+      });
+    expect(unresolvedFirstView(scenarios[0])).toEqual([]);
+    expect(unresolvedFirstView(scenarios[1])).toEqual(['ISSUE56_B']);
+    expect(unresolvedFirstView(scenarios[2])).toEqual(['ISSUE56_B']);
+    expect(scenarios[1].responses.ISSUE56_B[1].display_truncated).toBe(false);
+    expect(scenarios[2].responses.ISSUE56_B[1].display_truncated).toBe(true);
+
+    const skill = read('SKILL.md');
+    const ontology = read(niche + 'dedup-ontology.md');
+    const sequence = read('references/core/tool-sequences.md');
+    expect(skill).toContain('keep this workflow active and **call targeted');
+    expect(skill).toContain('record the specific missing fields or clipping reason before retry');
+    expect(skill).toContain('Do not end the turn by only listing incomplete candidates');
+    expect(skill).toContain('Never repeat a candidate whose result is already complete');
+    expect(skill).toContain('repeat only that candidate once');
+    expect(skill).toContain('If the READ tool genuinely cannot be called');
+    expect(ontology).toContain('The next action in this same workflow is a');
+    expect(ontology).toContain('specific missing fields or clipping reason before each retry');
+    expect(ontology).toContain('a recovery queue, **not** a final response');
+    expect(ontology).toContain('without rereading complete ones');
+    expect(ontology).toContain('retry that same candidate only once');
+    expect(ontology).toContain('HOLD before every business Write only after');
+    expect(sequence).toContain('starts an active recovery queue, not a final answer');
+    expect(sequence).toContain('Record the missing fields or clipping reason before each retry');
+    expect(sequence).toContain('call `trivia_find_similar_facts` next for each unresolved');
+    expect(sequence).toContain('keep already complete candidates out of the queue');
+    expect(sequence).toContain('Do not report only “incomplete” or enter HOLD');
+    expect(sequence).toContain('After the second incomplete one-candidate view, HOLD');
+    expect(sequence).toContain('If the tool actually cannot be called');
   });
 
   it('holds a complete review-required response until IDs, reasons and differences are supported', () => {
