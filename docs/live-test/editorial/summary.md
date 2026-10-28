@@ -1,6 +1,6 @@
 # Ringkasan evaluasi editorial trivia
 
-**Status aktif kampanye MAIN (28 Oktober 2026): 5/30 percobaan dijalankan — gelombang pertama lima format lengkap.** Workflow: **4 PASS, 0 FAIL, 1 BLOCKED / POLICY_HOLD**, 25 NOT RUN. DNA naskah pertama: **4 KUAT, 1 PERLU REVISI**, dengan **4 PERSISTED dan 1 UNSAVED**. `MAIN-SSF-01` BLOCKED di reservasi dedup tanpa post; TUT/EAC/CMP/MVF masing-masing satu draft dengan `get_post` cocok menurut penguji dan quality `pending`. Bukti `LIVE_OWNER_REPORTED`, bukan audit runtime/per-URL independen. Catatan historis pilot/retest di bawah tetap tidak masuk denominator MAIN. Record ada pada branch `editorial/main-direct-save-v1-20261028` sampai PR batch pertama ditinjau/digabung.
+**Status aktif kampanye MAIN (28 Oktober 2026): 6/30 percobaan dijalankan.** Workflow: **4 PASS, 0 FAIL, 2 BLOCKED** (satu `POLICY_HOLD` pada SSF-01 dan satu `PREREQUISITE` pada SSF-05), 24 NOT RUN. DNA first copy: **5 KUAT, 1 PERLU REVISI**, dengan **4 PERSISTED dan 2 UNSAVED**. Seluruh copy PERSISTED adalah draft internal berkualitas `pending`; tidak ada approval/publikasi. Gelombang pertama (5 kasus) sudah digabung ke `main` melalui PR #68. Kasus keenam tercatat di branch `editorial/main-direct-save-v1-wave2-20261028`. Bukti `LIVE_OWNER_REPORTED`, bukan audit runtime/per-URL independen. Rekap pilot/retest di bawah merupakan kohort historis.
 
 **Status:** kelima format pilot telah dicoba pada [Page uji](preflight.md). Baseline SSF dan TUT menyimpan draft; baseline EAC gagal pada render payload, lalu [percobaan koreksi EAC](runs/PILOT-EAC-01-render-correction-01.md) menyimpan draft dengan readback cocok. Baseline CMP dan MVF serta satu retest MVF awal berhenti pada `FACT_SOURCE_INSUFFICIENT`. Setelah perbaikan plugin/backend yang dilaporkan, [retest MVF](runs/PILOT-MVF-01-retest-v026-01.md) dan [retest CMP](runs/PILOT-CMP-01-retest-v026-01.md) masing-masing menyimpan satu draft dengan readback cocok; versi runtime persis dalam sesi tetap `UNVERIFIED`. **Kelima format kini mempunyai sekurangnya satu draft tersimpan**, tetapi kualitasnya tidak seragam dan seluruh 30 kasus utama tetap `NOT RUN` menurut keputusan hemat waktu. Baseline yang gagal/tertahan tidak dihapus oleh retest.
 
@@ -53,7 +53,7 @@ Tidak ada `approve_post`, revisi/publikasi, cleanup, atau Write lain yang tersir
 
 | Format                        | Terencana | Dijalankan | PASS | FAIL | BLOCKED | NOT RUN | Policy hold (bagian dari BLOCKED) |
 | ----------------------------- | --------: | ---------: | ---: | ---: | ------: | ------: | --------------------------------: |
-| `single_subject_fast`         |         6 |          1 |    0 |    0 |       1 |       5 |                                 1 |
+| `single_subject_fast`         |         6 |          2 |    0 |    0 |       2 |       4 |                                 1 |
 | `themed_utility`              |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
 | `emotional_animal_collection` |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
 | `comparison`                  |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
@@ -65,7 +65,7 @@ Tidak ada `approve_post`, revisi/publikasi, cleanup, atau Write lain yang tersir
 
 | Format                        | Copy tersimpan yang dinilai | Copy `UNSAVED` yang dinilai | KUAT | PERLU REVISI | LEMAH |
 | ----------------------------- | --------------------------: | --------------------------: | ---: | -----------: | ----: |
-| `single_subject_fast`         |                           0 |                           1 |    1 |            0 |     0 |
+| `single_subject_fast`         |                           0 |                           2 |    2 |            0 |     0 |
 | `themed_utility`              |                           1 |                           0 |    1 |            0 |     0 |
 | `emotional_animal_collection` |                           1 |                           0 |    1 |            0 |     0 |
 | `comparison`                  |                           1 |                           0 |    1 |            0 |     0 |
@@ -188,3 +188,13 @@ Tiga kasus baru selesai. Tambahkan dua retest MVF/CMP terdahulu hanya sebagai pe
 **Pola yang perlu diperhatikan:** hook generik/titel serta beberapa fakta mudah ditebak atau klaim terlalu luas masih tampak di lebih dari satu format, selaras dengan [Issue #54](https://github.com/milyarderpro/content-producer/issues/54). Warning `trivia.profile.preferred_band` adalah preferensi editorial yang nonblocking pada empat draft, bukan defect penyimpanan; cek hanya saat relevan dengan scanability copy pertama. Dedup SSF `FACT_REVIEW_REQUIRED` adalah satu policy hold yang perlu dipertahankan terkait [#56](https://github.com/milyarderpro/content-producer/issues/56) dan [#63](https://github.com/milyarderpro/content-producer/issues/63), **tanpa** menamai akar sama atau bug backend terbukti. Source checks hanya owner-reported; versi runtime pada semua sesi `UNVERIFIED`. Tidak ada persetujuan/Publikasi konten ataupun janji performa sosial.
 
 **Keputusan release record:** batch pertama mencakup **tepat lima case ID utama**, disimpan sebagai lima run file, lima entri indeks baru, dan summary terbarui pada branch kampanye. Buka PR dokumentasi gelombang 1 ke `main`, jalankan pemeriksaan diff/CI ringan, lalu merge hanya bila hasil memadai dan tidak ada pergeseran baseline. Setelah merge, urutan prompt berikutnya adalah **kasus implisit** `MAIN-SSF-05` (Moon) dan tidak boleh memasukkan kode format/ID internal/angka fakta ke prompt penguji. Tidak ada alasan pause kampanye dari lima hasil ini.
+
+## Kampanye MAIN direct-save v1 — gelombang 2 mulai 28 Oktober 2026
+
+**MAIN-SSF-05 — kasus 6/30, format implisit (Moon).** [Record baseline](runs/MAIN-SSF-05-main-direct-save-v1.md) mempertahankan prompt koordinator dan copy pertama utuh; kesamaan byte prompt di chat penguji `UNVERIFIED`. Tanpa diberikan ID/format, penguji memilih `single_subject_fast`, sama dengan ekspektasi matriks reviewer; `format_fit: FIT`. Reviewer DNA **11/12 KUAT** pada copy **UNSAVED**, dengan variasi tujuh fakta tentang lunar ice, moonquakes, crust, geology, atmosphere dan orbit. Semua klaim bersumber dari laporan riset NASA Science, **bukan audit per-fakta independen**.
+
+**Workflow: `BLOCKED / PREREQUISITE` pada dedup READ.** Hanya initial `trivia_find_similar_facts` READ yang dilaporkan; output terlalu panjang atau terpotong dan tidak memungkinkan konfirmasi review wajib. Prompt beku secara eksplisit meminta READ terarah bila output terpotong, tetapi penguji **tidak melaporkan READ terarah lanjutan**. Ini celah orkestrasi penguji, bukan bukti bahwa RPC targeted READ gagal. Tidak ada reservasi, `save_post`, `get_post`, post ID, revision, server checks atau metrik. Tidak ada error server, approval, publikasi, atau Write `UNCONFIRMED`. Status context Page (selain batas 600/500/90 karakter yang dilaporkan) dan runtime version tetap `UNVERIFIED`.
+
+**Triase aturan jeda:** SSF-01 sebelumnya gagal di **reservation validator** (`FACT_REVIEW_REQUIRED` pada `facts[2].dedup_reviews`) setelah laporan 7/7 READ lengkap. SSF-05 berhenti pada **truncated initial READ**, tanpa mencoba targeted READ atau reservation. Dua observasi terkait dedup readiness tetapi **belum membuktikan blocker teknis identik** pada dua kasus. Kaitkan temuan follow-up READ dengan Issue #56 dan pertahankan kedua kasus tanpa retry. Tidak ada masalah otorisasi atau keamanan, sehingga tidak ada trigger pause menurut bukti saat ini. Berikutnya brief implisit tentang practical care of kitchen sponges pada `MAIN-TUT-05`, tanpa menyebut ID internal atau format di prompt penguji.
+
+Catatan gelombang sebelumnya yang menyebut PR #68 masih perlu dibuka adalah status historis pada saat rekap dibuat; PR #68 sudah merged dan readback `main` telah diverifikasi.
