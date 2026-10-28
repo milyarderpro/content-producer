@@ -60,11 +60,13 @@ From eyes and arms to shelter-making and hunting, these seven octopus facts show
 - **Save/readback:** `save_post: NOT_CALLED`, `get_post: NOT_CALLED`, sehingga `readback_outcome: NO_POST_ID`. Tidak ada retry, draft kedua, revisi, approval atau publikasi; release tidak relevan karena tidak ada reservasi.
 - **Batas diagnosis:** 100 review terkirim tidak menjamin kelengkapan/konsistensi semantic decision per kandidat; sebab tepatnya `UNVERIFIED`. Jangan mengklaim bug RPC atau atribusi otomatis ke Issue #56/#63.
 
-### Error verbatim dari respons penguji
+### Error reservasi yang dilaporkan
 
-```text
-INVALID_ARGUMENT: Error code: INVALID_ARGUMENT; Error: RuntimeException: Error calling MCP tool: [TextContent(type='text', text='FACT_REVIEW_REQUIRED: Semantic deduplication needs explicit review. facts[2].dedup_reviews: A required semantic review decision is missing or inconsistent.', annotations=None, meta=None)]
-```
+- Kode terluar: `INVALID_ARGUMENT` (runtime MCP).
+- Kode validator: `FACT_REVIEW_REQUIRED`.
+- Field: `facts[2].dedup_reviews`.
+- Pesan validator: “Semantic deduplication needs explicit review. A required semantic review decision is missing or inconsistent.”
+- Informasi error lengkap dari penguji mencakup pembungkus `RuntimeException` dan `TextContent`. Identitas kandidat yang bermasalah tidak diketahui.
 
 ## Critical checks, source evidence, dan metrik
 
