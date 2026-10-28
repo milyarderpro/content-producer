@@ -24,6 +24,8 @@ Frozen authority: `plans/trivia-content-dna.md` sections 19–21 and `plans/phas
 - `trivia.cta_goal_aligned`, `trivia.caption_supportive`, `trivia.hashtags_relevant`.
 - `trivia.visual_rhythm_clear` and `trivia.format_conformant`.
 
+For `trivia.surprise_substantive`, judge the **whole first-draft collection**, not just its best line or whether every claim is true. On a 7–9-fact fast-trivia card, two or more obvious filler lines warrant `needs_review` even if the set also has several distinctive facts. Do not attest `pass` merely because the hook promises “facts worth knowing” or the server accepts the draft. For utility, count a specific overlooked action/condition/outcome as substantive interest; the goal is useful novelty, not forced shock. Prefer replacing weak candidates during the existing pre-reservation selection pass; if a saved draft remains weak, report that honestly without silently revising it.
+
 A noncritical style warning is not secretly changed to `pass`. Only a server-allowlisted warning with explicit owner reasoning may be accepted; serious grammar/layout failure may still block ready. Hard budgets, source, safety, copying and critical editorial status have **no waiver**.
 
 Optional editorial DNA strength score: 0–2 each for familiarity, surprise, specificity, coherence, scanability and utility/emotion. 10–12 is strong, 8–9 improvable, 0–7 weak. A high score does **not** override critical safety/source/dedup/renderer failure. Prefer revise/replace weak facts rather than artificially boost claims.
