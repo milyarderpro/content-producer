@@ -1,6 +1,6 @@
 # Ringkasan evaluasi editorial trivia
 
-**Status aktif kampanye MAIN (28 Oktober 2026): 2/30 percobaan dijalankan.** `MAIN-SSF-01` = `BLOCKED / POLICY_HOLD` pada reservasi, copy `UNSAVED` dan DNA **11/12 KUAT**; `MAIN-TUT-01` = workflow `PASS` dengan draft tersimpan/readback cocok, copy `PERSISTED` dan DNA **11/12 KUAT**, quality `pending`. Sisa **28 NOT RUN**. Ringkasan pilot/retest dan kalimat-kalimat status historis di bawah tetap merupakan bukti sebelum kampanye v1 dan tidak menggantikan status aktif ini. Record berada pada branch kampanye `editorial/main-direct-save-v1-20261028` sampai gelombang PR maksimal lima kasus digabung.
+**Status aktif kampanye MAIN (28 Oktober 2026): 3/30 percobaan dijalankan.** `MAIN-SSF-01` = `BLOCKED / POLICY_HOLD` pada reservasi, copy `UNSAVED`, DNA **11/12 KUAT**; `MAIN-TUT-01` dan `MAIN-EAC-01` = workflow `PASS` dengan draft/readback cocok, copy `PERSISTED`, DNA masing-masing **11/12 KUAT** dan **10/12 KUAT**, quality keduanya `pending`. Sisa **27 NOT RUN**. Tabel pilot/retest dan catatan status historis di bawah berlaku untuk kohort sebelumnya, bukan sebagai status aktif MAIN. Record MAIN tersimpan pada branch kampanye `editorial/main-direct-save-v1-20261028` sampai PR gelombang maksimal lima kasus digabung.
 
 **Status:** kelima format pilot telah dicoba pada [Page uji](preflight.md). Baseline SSF dan TUT menyimpan draft; baseline EAC gagal pada render payload, lalu [percobaan koreksi EAC](runs/PILOT-EAC-01-render-correction-01.md) menyimpan draft dengan readback cocok. Baseline CMP dan MVF serta satu retest MVF awal berhenti pada `FACT_SOURCE_INSUFFICIENT`. Setelah perbaikan plugin/backend yang dilaporkan, [retest MVF](runs/PILOT-MVF-01-retest-v026-01.md) dan [retest CMP](runs/PILOT-CMP-01-retest-v026-01.md) masing-masing menyimpan satu draft dengan readback cocok; versi runtime persis dalam sesi tetap `UNVERIFIED`. **Kelima format kini mempunyai sekurangnya satu draft tersimpan**, tetapi kualitasnya tidak seragam dan seluruh 30 kasus utama tetap `NOT RUN` menurut keputusan hemat waktu. Baseline yang gagal/tertahan tidak dihapus oleh retest.
 
@@ -55,7 +55,7 @@ Tidak ada `approve_post`, revisi/publikasi, cleanup, atau Write lain yang tersir
 | ----------------------------- | --------: | ---------: | ---: | ---: | ------: | ------: | --------------------------------: |
 | `single_subject_fast`         |         6 |          1 |    0 |    0 |       1 |       5 |                                 1 |
 | `themed_utility`              |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
-| `emotional_animal_collection` |         6 |          0 |    0 |    0 |       0 |       6 |                                 0 |
+| `emotional_animal_collection` |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
 | `comparison`                  |         6 |          0 |    0 |    0 |       0 |       6 |                                 0 |
 | `myth_vs_fact`                |         6 |          0 |    0 |    0 |       0 |       6 |                                 0 |
 
@@ -67,7 +67,7 @@ Tidak ada `approve_post`, revisi/publikasi, cleanup, atau Write lain yang tersir
 | ----------------------------- | --------------------------: | --------------------------: | ---: | -----------: | ----: |
 | `single_subject_fast`         |                           0 |                           1 |    1 |            0 |     0 |
 | `themed_utility`              |                           1 |                           0 |    1 |            0 |     0 |
-| `emotional_animal_collection` |                           0 |                           0 |    0 |            0 |     0 |
+| `emotional_animal_collection` |                           1 |                           0 |    1 |            0 |     0 |
 | `comparison`                  |                           0 |                           0 |    0 |            0 |     0 |
 | `myth_vs_fact`                |                           0 |                           0 |    0 |            0 |     0 |
 
@@ -144,3 +144,13 @@ Tiga kasus baru selesai. Tambahkan dua retest MVF/CMP terdahulu hanya sebagai pe
 **DNA reviewer:** 11/12 `KUAT`, `format_fit: FIT`, enam tips jelas, konkret, dan praktis dengan CTA `save` tunggal. Kejutan mendapat 1/2 karena sebagian tip seperti refrigeration, washing, dan removing mold cukup umum, meskipun green tops, shallow raspberry containers, dan tray freezing lebih spesifik. Tidak menimpa atau merevisi copy pertama. Server-reported: system **18/19 passed** dengan satu warning nonblocking `trivia.profile.preferred_band` (dua fakta 9 kata vs preferensi 10–14), editorial **18/18 pass** termasuk `trivia.surprise_substantive: pass`, risk `safety` menurut penguji sudah ditinjau melalui bukti sumber. Metrik: 505 Canva chars, 429 facts chars, 75 words, 28 rendered lines, 25.3 s estimated read time, replay ratio 1.946, 2 estimated loops. **Source accuracy dan safety evidence tidak diaudit independen oleh koordinator**; server checks tidak berarti draft `ready` atau aman diterbitkan tanpa approval.
 
 **Keputusan sesudah 2/30:** Tidak ada `UNCONFIRMED` Write, masalah izin/keamanan baru, atau blocker teknis sama pada dua kasus MAIN: SSF berhenti `FACT_REVIEW_REQUIRED`, sementara TUT berhasil. Dengan hasil TUT dicatat di branch, lanjut ke `MAIN-EAC-01` sesuai matriks v1 beku dan tunggu jawaban penguji kasus itu sebelum menyiapkan kasus keempat. Rekap lintas format dilakukan setelah kelima kasus gelombang pertama; belum dibuat PR sebelum batas gelombang.
+
+### MAIN-EAC-01 — kasus 3/30
+
+[Record baseline](runs/MAIN-EAC-01-main-direct-save-v1.md): `emotional_animal_collection` tentang perilaku sosial gajah Afrika (guided explicit), delapan fakta. Copy pertama **PERSISTED** berdasarkan laporan penguji: tepat satu reservasi dan satu `save_post`, kemudian `get_post` cocok seluruh naskah/caption/hashtags untuk draft `b9c2ab3b-70e6-4874-b0e3-d28cadbe782b`, revision 1, delapan fakta dialokasikan. Workflow `COMPLETED / PASS`; quality `pending`, tanpa revisi, approval, atau publikasi. Bukti `LIVE_OWNER_REPORTED`; runtime plugin/backend, Page config, klaim sumber per URL, dan exact hash tetap `UNVERIFIED`.
+
+**DNA reviewer:** 10/12 `KUAT`, `format_fit: FIT`, 8 perilaku sosial teramati beragam dan relatif spesifik (panggilan individual, reunions, matriarch tests, calf care, kin ties, remains). Kejutan substantif 2/2, tetapi hook generik, repetisi “studied”, dan nada agak akademis menurunkan scanability dan daya emosional ke 1/2 masing-masing. Tidak ada anthropomorphic motive yang jelas. Pemeriksaan fakta dari 7 publikasi (6 primer dan 1 review) bukan audit independen reviewer.
+
+**Checks server yang dilaporkan:** 18 blocking system checks pass, editorial 18/18 pass termasuk `trivia.surprise_substantive: pass`; no risk flags; warning nonblocking `trivia.profile.preferred_band: needs_review` pada beberapa baris lebih pendek dari 8 kata. Canva 579/600 chars; facts 488/500 chars; 76 words; 30 visual lines; estimated read 26.3s; replay ratio 2.023; 3 estimated loops. Batas total 28 lines historis **tidak berlaku** setelah CR-051. Semua metrik bukan bukti performa Reel/views.
+
+**Keputusan sesudah 3/30:** dua kasus utama berturut-turut berhasil (TUT dan EAC); SSF sebelumnya tetap `BLOCKED / POLICY_HOLD` tanpa retry, bukan `UNCONFIRMED`. Tidak ditemukan blocker teknis sama pada dua kasus MAIN maupun masalah izin/keamanan baru. Lanjut sesuai matriks beku ke `MAIN-CMP-01` — comparison African vs Asian elephants — setelah record disimpan dan divalidasi di GitHub. Kesamaan subjek lintas EAC/CMP bisa menguji dedup, tetapi jangan mengganti brief atau melebihkan atribusi konflik bila terjadi.
