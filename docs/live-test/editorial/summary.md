@@ -1,6 +1,6 @@
 # Ringkasan evaluasi editorial trivia
 
-**Status aktif kampanye MAIN (28 Oktober 2026): 4/30 percobaan dijalankan.** `MAIN-SSF-01` = `BLOCKED / POLICY_HOLD` di reservasi (copy `UNSAVED`, DNA **11/12 KUAT**). `MAIN-TUT-01`, `MAIN-EAC-01`, dan `MAIN-CMP-01` = workflow `PASS` dengan draft/readback cocok, copy `PERSISTED` dan DNA berturut-turut **11/12**, **10/12**, **11/12** (`KUAT`); ketiganya quality `pending`. Sisa **26 NOT RUN**. Tabel pilot/retest dan catatan status historis di bawah berlaku untuk kohort sebelumnya, bukan status aktif MAIN. Record MAIN disimpan di branch kampanye `editorial/main-direct-save-v1-20261028` hingga PR gelombang maksimal lima kasus digabung.
+**Status aktif kampanye MAIN (28 Oktober 2026): 5/30 percobaan dijalankan — gelombang pertama lima format lengkap.** Workflow: **4 PASS, 0 FAIL, 1 BLOCKED / POLICY_HOLD**, 25 NOT RUN. DNA naskah pertama: **4 KUAT, 1 PERLU REVISI**, dengan **4 PERSISTED dan 1 UNSAVED**. `MAIN-SSF-01` BLOCKED di reservasi dedup tanpa post; TUT/EAC/CMP/MVF masing-masing satu draft dengan `get_post` cocok menurut penguji dan quality `pending`. Bukti `LIVE_OWNER_REPORTED`, bukan audit runtime/per-URL independen. Catatan historis pilot/retest di bawah tetap tidak masuk denominator MAIN. Record ada pada branch `editorial/main-direct-save-v1-20261028` sampai PR batch pertama ditinjau/digabung.
 
 **Status:** kelima format pilot telah dicoba pada [Page uji](preflight.md). Baseline SSF dan TUT menyimpan draft; baseline EAC gagal pada render payload, lalu [percobaan koreksi EAC](runs/PILOT-EAC-01-render-correction-01.md) menyimpan draft dengan readback cocok. Baseline CMP dan MVF serta satu retest MVF awal berhenti pada `FACT_SOURCE_INSUFFICIENT`. Setelah perbaikan plugin/backend yang dilaporkan, [retest MVF](runs/PILOT-MVF-01-retest-v026-01.md) dan [retest CMP](runs/PILOT-CMP-01-retest-v026-01.md) masing-masing menyimpan satu draft dengan readback cocok; versi runtime persis dalam sesi tetap `UNVERIFIED`. **Kelima format kini mempunyai sekurangnya satu draft tersimpan**, tetapi kualitasnya tidak seragam dan seluruh 30 kasus utama tetap `NOT RUN` menurut keputusan hemat waktu. Baseline yang gagal/tertahan tidak dihapus oleh retest.
 
@@ -57,7 +57,7 @@ Tidak ada `approve_post`, revisi/publikasi, cleanup, atau Write lain yang tersir
 | `themed_utility`              |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
 | `emotional_animal_collection` |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
 | `comparison`                  |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
-| `myth_vs_fact`                |         6 |          0 |    0 |    0 |       0 |       6 |                                 0 |
+| `myth_vs_fact`                |         6 |          1 |    1 |    0 |       0 |       5 |                                 0 |
 
 `PASS` mensyaratkan `save_post` terkonfirmasi dan `get_post` cocok. `POLICY_HOLD`/izin/prasyarat/response Write tak pasti tidak dihitung `FAIL` tool. Penolakan validator yang benar atas payload salah dapat menjadi `FAIL` alur plugin, tetapi bukan otomatis bug RPC. Catat tahap terakhir agar kasus yang terhenti di dedup tidak disalahartikan sebagai kegagalan `save_post`.
 
@@ -69,7 +69,7 @@ Tidak ada `approve_post`, revisi/publikasi, cleanup, atau Write lain yang tersir
 | `themed_utility`              |                           1 |                           0 |    1 |            0 |     0 |
 | `emotional_animal_collection` |                           1 |                           0 |    1 |            0 |     0 |
 | `comparison`                  |                           1 |                           0 |    1 |            0 |     0 |
-| `myth_vs_fact`                |                           0 |                           0 |    0 |            0 |     0 |
+| `myth_vs_fact`                |                           1 |                           0 |    0 |            1 |     0 |
 
 Skor editorial diberikan hanya jika copy benar-benar terlihat, dengan label `PERSISTED` atau `UNSAVED`. Kasus tanpa copy tetap `NOT REVIEWED`; jangan menjadikannya `LEMAH`. Naskah `KUAT` dengan workflow `FAIL`/`BLOCKED` tetap dihitung pada kedua sumbu. Laporkan juga critical checks, `format_fit`, kasus format implisit dengan pilihan alternatif yang masuk akal, dan jumlah naskah yang belum layak terbit meski tersimpan.
 
@@ -164,3 +164,27 @@ Tiga kasus baru selesai. Tambahkan dua retest MVF/CMP terdahulu hanya sebagai pe
 **System/editorial checks yang dilaporkan:** system 18 passed + satu nonblocking `trivia.profile.preferred_band: needs_review` karena 63 Canva words di bawah rentang preferensi 65–85 dan beberapa baris pendek; editorial 18 pass, semua critical pass, `trivia.surprise_substantive: pass`. Metrik server: 474 Canva characters, 402 fact characters, 63 words, 26 estimated visual lines, 22.1 s read-time estimate, replay ratio 1.7, estimated loops 2. Quality pending bukan `ready`. Tidak ada bukti viralitas atau performance video nyata.
 
 **Keputusan 4/30:** kumulatif 3 `PASS` (TUT/EAC/CMP), 1 `BLOCKED` (SSF), 0 `FAIL`. Tidak ada `UNCONFIRMED` Write, insiden izin/keamanan, atau blocker teknis identik pada dua kasus MAIN. Lanjut ke `MAIN-MVF-01` menurut prompt beku tentang miskonsepsi hewan yang benar-benar umum; tunggu hasilnya untuk evaluasi gelombang lima format dan PR pertama.
+
+### MAIN-MVF-01 — kasus 5/30
+
+[Record baseline](runs/MAIN-MVF-01-main-direct-save-v1.md) berisi tujuh mitos hewan dan koreksi pada `myth_vs_fact` (`guided_explicit`). Penguji melaporkan dedup 7×20 kandidat, 120 keputusan `distinct`, satu reservasi dialokasikan tujuh fakta, satu `save_post`, dan `get_post` `MATCH` dengan konten/hash/status/revision, pada draft internal `0ac5f74b-1db6-4820-8c2f-8c80d9feeb3f`, revision 1, quality `pending`, tanpa revisi/approval/publikasi. **Workflow COMPLETED / PASS**, bukti `LIVE_OWNER_REPORTED`. Literal hash, Page config dan versi plugin/backend tidak tersedia untuk diverifikasi mandiri.
+
+**DNA reviewer: 9/12 PERLU REVISI, copy PERSISTED, format_fit FIT.** Familiarity 2, surprise 1, specificity 1, coherence 2, scanability 2, utility/emotion 1. Struktur mitos/koreksi jelas dan tema mudah dikenali, tetapi banyak jawaban dapat ditebak serta ada kalimat yang terlalu luas (bats universal vision, klaim respons ostrich saat terancam); ini risiko kebutuhan qualifier, **bukan temuan klaim salah terverifikasi**. Penguji menyebut 7 sumber Tier B dari BCI, San Diego Zoo Wildlife Alliance, AKC dan Smithsonian, tetapi tidak memberikan bukti tersendiri bahwa setiap mitos dikenal luas. Reviewer tidak mengaudit URL/akurasi per fakta.
+
+**Server checks yang dilaporkan:** blocking system 18/18 passed, editorial 18/18 pass termasuk `trivia.surprise_substantive: pass`, source policy/dedup/exact rendering passed. Satu warning nonblocking preferred band: 86 kata, satu kata melebihi preferensi maksimum 85; hard limits tetap lolos. Metrik: Canva 512/600 chars; facts 438/500; 86 words; 27 visual lines; 29 s estimated read; replay ratio 2.23; estimated loops 3. Checks server tidak mengesahkan kelayakan `ready` dan bukan diagnosis DNA reviewer.
+
+## Rekap gelombang MAIN pertama — lima format terpandu (28 Oktober 2026)
+
+| Case | Format | Workflow | Basis copy pertama | DNA | Format fit | Temuan ringkas |
+| --- | --- | --- | --- | --- | --- | --- |
+| [MAIN-SSF-01](runs/MAIN-SSF-01-main-direct-save-v1.md) | SSF | BLOCKED / POLICY_HOLD | UNSAVED | 11/12 KUAT | FIT | `FACT_REVIEW_REQUIRED` F3, review semantic invalid/missing, akar spesifik UNVERIFIED |
+| [MAIN-TUT-01](runs/MAIN-TUT-01-main-direct-save-v1.md) | TUT | PASS | PERSISTED | 11/12 KUAT | FIT | Tips berry berguna, beberapa umum; satu warning panjang preferred |
+| [MAIN-EAC-01](runs/MAIN-EAC-01-main-direct-save-v1.md) | EAC | PASS | PERSISTED | 10/12 KUAT | FIT | Observasi sosial spesifik, nada klinis; warning preferred |
+| [MAIN-CMP-01](runs/MAIN-CMP-01-main-direct-save-v1.md) | CMP | PASS | PERSISTED | 11/12 KUAT | FIT | Kontras anatomis paralel; qualifier angka kuku/gading dipertahankan; warning preferred |
+| [MAIN-MVF-01](runs/MAIN-MVF-01-main-direct-save-v1.md) | MVF | PASS | PERSISTED | 9/12 PERLU REVISI | FIT | Banyak koreksi mudah ditebak, beberapa terlalu luas; warning preferred |
+
+**Dua sumbu berbeda:** 5 percobaan dijalankan/30 direncanakan; 4 `PASS`, 1 `BLOCKED` hanya di reservasi SSF, tanpa Write `UNCONFIRMED`. Lima CANVA COPY pertama semuanya terlihat; empat `PERSISTED` (3 KUAT, 1 PERLU REVISI) dan satu `UNSAVED` (KUAT). `format_fit` 5/5 FIT. Skor diagnostik rata-rata kelima first copy = **10.4/12**; **bukan** tingkat viralitas, representativitas statistik, atau rate sukses versi plugin tertentu. Tiga draft KUAT tersimpan juga quality `pending`, sehingga belum ada yang dinyatakan `ready`; satu PERSISTED PERLU REVISI dan satu UNSAVED KUAT dicatat pada sumbu masing-masing.
+
+**Pola yang perlu diperhatikan:** hook generik/titel serta beberapa fakta mudah ditebak atau klaim terlalu luas masih tampak di lebih dari satu format, selaras dengan [Issue #54](https://github.com/milyarderpro/content-producer/issues/54). Warning `trivia.profile.preferred_band` adalah preferensi editorial yang nonblocking pada empat draft, bukan defect penyimpanan; cek hanya saat relevan dengan scanability copy pertama. Dedup SSF `FACT_REVIEW_REQUIRED` adalah satu policy hold yang perlu dipertahankan terkait [#56](https://github.com/milyarderpro/content-producer/issues/56) dan [#63](https://github.com/milyarderpro/content-producer/issues/63), **tanpa** menamai akar sama atau bug backend terbukti. Source checks hanya owner-reported; versi runtime pada semua sesi `UNVERIFIED`. Tidak ada persetujuan/Publikasi konten ataupun janji performa sosial.
+
+**Keputusan release record:** batch pertama mencakup **tepat lima case ID utama**, disimpan sebagai lima run file, lima entri indeks baru, dan summary terbarui pada branch kampanye. Buka PR dokumentasi gelombang 1 ke `main`, jalankan pemeriksaan diff/CI ringan, lalu merge hanya bila hasil memadai dan tidak ada pergeseran baseline. Setelah merge, urutan prompt berikutnya adalah **kasus implisit** `MAIN-SSF-05` (Moon) dan tidak boleh memasukkan kode format/ID internal/angka fakta ke prompt penguji. Tidak ada alasan pause kampanye dari lima hasil ini.
