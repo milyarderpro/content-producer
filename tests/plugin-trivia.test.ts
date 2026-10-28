@@ -221,9 +221,16 @@ describe('Phase 7.3 trivia editorial reference contract', () => {
     expect(dna).toContain('Before reserving the final ordered set');
     expect(dna).toContain('replace weak candidates while still in research');
     expect(dna).toContain('not a separate preview/GO checkpoint');
+    expect(dna).toContain('classify each proposed line privately');
+    expect(dna).toContain('replace a second obvious-filler line before reserving');
+    expect(dna).toContain('not** a source for those claims');
     expect(formats).toContain('aim comfortably within the preferred word range');
     expect(formats).toContain('never supply calculated `text_metrics`');
     expect(formats).toContain('Preserve material qualifiers');
+    const rubric = read(niche + 'quality-rubric.md');
+    expect(rubric).toContain('judge the **whole first-draft collection**');
+    expect(rubric).toContain('two or more obvious filler lines warrant `needs_review`');
+    expect(rubric).toContain('useful novelty, not forced shock');
   });
 
   it('handles all formats, mismatched hooks, CTA pressure and critical quality failures', () => {
