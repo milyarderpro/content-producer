@@ -2,8 +2,8 @@
 
 Direktori ini berisi manifest dan instruksi yang digunakan ChatGPT untuk alur
 Content Producer. [plugin.json](plugin.json) menyatakan kandidat source versi
-`0.2.10`; [.app.json](.app.json) memetakan satu app owner OAuth `mcpku2` yang sudah
-ada. Rilis terpasang terakhir yang dikonfirmasi sebelum kandidat ini adalah `0.2.8`;
+`0.2.11`; [.app.json](.app.json) memetakan satu app owner OAuth `mcpku2` yang sudah
+ada. Rilis terpasang terakhir yang dikonfirmasi sebelum kandidat ini adalah `0.2.10`;
 perubahan source sesudahnya tidak boleh diberi ulang nomor rilis tersebut. Source paket, archive
 kandidat, dan release yang terpasang adalah bukti berbeda; ringkasan bertanggal
 ada di [operations](../docs/operations.md).
