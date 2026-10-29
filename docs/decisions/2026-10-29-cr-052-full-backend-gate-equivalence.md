@@ -2,32 +2,32 @@
 
 - **Tanggal:** 2026-10-29
 - **Status:** **PROPOSED — NOT ACCEPTED / NOT EFFECTIVE**; untuk review orchestrator
-  [Issue #74](https://github.com/milyarderpro/content-producer/issues/74) , G1-T3. Ini keputusan
+  [Issue #74](https://github.com/milyarderpro/content-producer/issues/74), G1-T3. Ini keputusan
   rancangan, **bukan** izin mengubah scripts, workflow, test, expected, deployment atau production
   Write.
 - **Baseline source:** `main` merge
-  [PR #73](https://github.com/milyarderpro/content-producer/pull/73) ,
-  `4191caf7943e313b43ab0dc52f4311165e6c229d` . Bukti pengukuran dari
+  [PR #73](https://github.com/milyarderpro/content-producer/pull/73),
+  `4191caf7943e313b43ab0dc52f4311165e6c229d`. Bukti pengukuran dari
   [22 Okt](https://github.com/milyarderpro/content-producer/actions/runs/39768822314) dan
   [26 Okt](https://github.com/milyarderpro/content-producer/actions/runs/40364895835) adalah
   **HISTORICAL PASS** pada SHA masing-masing, bukan kandidat release G1.
 - **Relasi:** merancang pengganti pemeriksaan yang diwajibkan
   [CR-020](2026-10-15-phase-9-10-risk-based-mvp-acceptance.md) dan urutan/reuse
-  [CR-044](2026-10-20-phase-10-gate-order-and-backend-sha-reuse.md) . **CR-020, CR-044, dan gate
+  [CR-044](2026-10-20-phase-10-gate-order-and-backend-sha-reuse.md). **CR-020, CR-044, dan gate
   lama tetap sepenuhnya berlaku sampai G4-T3 membuktikan kesetaraan, menerima CR ini secara
   eksplisit, dan menyelesaikan cutover. Tidak ada supersession saat G1.**
 - **Landasan penilaian:**
-  [rencana G1–G4](../../plans/full-backend-gate-optimization-implementation-plan.md) ,
-  [baseline/inventaris](../gate-optimization/baseline-and-inventory.md) ,
-  [matriks invariant/case](../gate-optimization/invariant-matrix.md) , [testing](../testing.md) ,
-  [operations](../operations.md) , [AGENTS](../../AGENTS.md) .
+  [rencana G1–G4](../../plans/full-backend-gate-optimization-implementation-plan.md),
+  [baseline/inventaris](../gate-optimization/baseline-and-inventory.md),
+  [matriks invariant/case](../gate-optimization/invariant-matrix.md), [testing](../testing.md),
+  [operations](../operations.md), [AGENTS](../../AGENTS.md).
 
 ## Masalah dan ruang keputusan
 
 `backend-technical-gate.yml` pada `main` memakai satu Supabase ephemeral stack dan clean reset,
 `pnpm run test:mcp` sebelum Inspector, audit, HTTP/Inspector 33 tools, audit lagi,
-`pnpm run test-all` , applied migration history, DB lint, final RLS/ACL/audit, whitespace, dan
-redacted evidence. `scripts/test-all.ts` mengulang `test:mcp` ; duplikasi **pemanggilan suite** ini
+`pnpm run test-all`, applied migration history, DB lint, final RLS/ACL/audit, whitespace, dan
+redacted evidence. `scripts/test-all.ts` mengulang `test:mcp`; duplikasi **pemanggilan suite** ini
 terbukti pada source dan run 26 Okt. `test:database` memakai Vitest serial atas shared DB. Hipotesis
 overhead `supabase db query` tidak terbukti secara kausal: instrumentasi G2 wajib, bukan alasan
 melonggarkan invariant.
@@ -39,8 +39,8 @@ per-case/query pada snapshot ini **UNKNOWN**; jangan merekayasa angka.
 ## Keputusan yang diusulkan: pengganti tepat `pnpm run test-all`
 
 Pada **G3** buat manifest versioned yang memuat daftar seluruh test, kasus aktif/opsional/historis,
-shell command serta komponen berikut. **Nama perintah usulan** (`gate:source`, `gate:backend` ,
-`gate:full` ) belum ada di `package.json` ; menjalankannya sebelum implementasi tidak sah.
+shell command serta komponen berikut. **Nama perintah usulan** (`gate:source`, `gate:backend`,
+`gate:full`) belum ada di `package.json`; menjalankannya sebelum implementasi tidak sah.
 
 1. **`gate:source` — satu PASS source** pada candidate commit/working tree bersih: `pnpm run check`
    dengan format, lint, typecheck, root Vitest, frontend typecheck/build/Node tests; package
@@ -78,14 +78,14 @@ history + DB lint + audit akhir**. Ini mempercepat *failure feedback* dan menghi
 Inspector setelah DB lama, tanpa membuang tes.
 
 Inspector wajib menggunakan host HTTP loopback + token owner sintetis yang valid dan principal
-non-owner terpisah, bukan hanya mocked `mcp/transport_test.ts` . Buktikan `initialize` ,
-`tools/list` , batas auth/resource, **semua 33 tool valid dan invalid calls** sesuai kontrak,
+non-owner terpisah, bukan hanya mocked `mcp/transport_test.ts`. Buktikan `initialize`,
+`tools/list`, batas auth/resource, **semua 33 tool valid dan invalid calls** sesuai kontrak,
 unauthorized/no token/inactive owner/cross-owner denial (termasuk HTTP 403 bila diniatkan), stable
 JSON-RPC errors, tidak ada mutation ilegal, serta kebersihan fixture sesudahnya. Catat
 tool/count/result dan evidence sanitasi tanpa token/payload privat.
 `scripts/phase-6-13.ts --preflight` tetap berpotensi membuat fixture/write lokal; **bukan**
 pengganti Inspector ataupun dry-run no-write. `mcp-probe/handler_test.ts` adalah jalur lain yang
-conditional, bukan bagian `test:mcp` .
+conditional, bukan bagian `test:mcp`.
 
 `scripts/phase-6-catalog-audit.ts` harus tetap memeriksa 72 migration source/pinned hashes, applied
 history, 33 RPC, 15 tabel RLS, owner privilege, default ACL, helper/table/sequence grants, serta
@@ -120,15 +120,14 @@ Bukti gabungan minimal: identity kandidat, manifest berisi status untuk tiap gro
 dan optional), jumlah file/kasus, run ID/URL, timestamps + durasi tiap tahap dan top lima file,
 migration/history/lint, cross-owner denial, Inspector 33 valid/invalid, catalog/ACL/RLS/fixture
 pre/post/final, source/frontend, perubahan dan redaction/artifact. Jika timing case/query tidak
-tersedia tulis `UNKNOWN` ; jika check tidak dijalankan tulis `NOT RUN` ; jika API/runner menolak
+tersedia tulis `UNKNOWN`; jika check tidak dijalankan tulis `NOT RUN`; jika API/runner menolak
 atau data tidak dapat diambil tulis `BLOCKED` dengan alasan dan URL. `SKIPPED` tidak boleh disamakan
 dengan PASS bila invariant wajib terdampak.
 
 `gate:full` harus exit nonzero dan melaporkan `FAIL` pada sub-command wajib gagal, file/case wajib
 hilang, manifest drift, migration/source mismatch, unexpected skip, RLS/grant denial fail, test race
 flake, Inspector missing/failed, audit cleanup kotor, dirty checkout formal, SHA berbeda, token
-leak, atau evidence wajib hilang. Jika pihak luar belum dapat membuktikan status, gunakan `BLOCKED`
-; jangan menganggap sukses dari HTTP 200, green light CI, merge PR, atau deploy metadata. CI fixture
+leak, atau evidence wajib hilang. Jika pihak luar belum dapat membuktikan status, gunakan `BLOCKED`; jangan menganggap sukses dari HTTP 200, green light CI, merge PR, atau deploy metadata. CI fixture
 PASS tidak membuktikan real ChatGPT owner OAuth atau business Write production.
 
 Semua write test menggunakan fixture ephemeralnya sendiri tanpa credential production; tidak ada
@@ -142,10 +141,9 @@ kontrak. `fileParallelism: true` pada DB bersama tidak diterima tanpa isolasi an
    G2 mengubah helper/suite. Status sekarang: **DRAFT / REVIEW REQUIRED**.
 2. **G2** mengukur overhead query/proses via instrumentasi tanpa rahasia, lalu membuktikan
    equivalence input/role/JWT/session/DB error pada test lambat. Setiap
-   penggabungan/pemindahan/penghapusan harus punya `old_case → new_case/check → assertion/evidence`
-   . Tidak ada pengurangan hanya karena nama `phase` ; v1 dan archived compatibility tetap wajib
+   penggabungan/pemindahan/penghapusan harus punya `old_case → new_case/check → assertion/evidence`. Tidak ada pengurangan hanya karena nama `phase`; v1 dan archived compatibility tetap wajib
    bila runtime mendukungnya.
-3. **G3** menghadirkan `gate:source` , `gate:backend` , `gate:full` , manifest yang sama
+3. **G3** menghadirkan `gate:source`, `gate:backend`, `gate:full`, manifest yang sama
    lokal/Actions, signature SHA, local-only refusal, focused PR checks serta sanitasi output. Audit
    required checks dan klasifikasi CI terhadap perubahan file sebelum mengubah workflow.
 4. **G4-T1** jalankan gate lama dan gate calon pada satu exact SHA kandidat dalam isolated
@@ -177,5 +175,5 @@ adalah perubahan CI terpisah, bukan operasi produksi.
 - **Review orchestrator:** kelengkapan matrix 41 file/parametric tests dan sumber v1; definisi
   manifest/runner dari G3; kewajiban Inspector 33 + audit pre/post; keamanan SHA reuse vs full
   equivalence; required check names serta fallback rollback.
-- **Keputusan saat ini:** `PROPOSED` ; belum mengganti CR-020/044. **Test/workflow/source/production
+- **Keputusan saat ini:** `PROPOSED`; belum mengganti CR-020/044. **Test/workflow/source/production
   tidak diubah oleh PR Issue #74.**
