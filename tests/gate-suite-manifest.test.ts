@@ -55,7 +55,9 @@ describe('mandatory suite inventory (not a release gate)', () => {
 
   it('matches all source files discovered by the root Vitest include', () => {
     expect(read('vitest.config.ts')).toContain("include: ['tests/**/*.test.ts']");
-    const discovered = walk('tests').filter((path) => path.endsWith('.test.ts')).sort();
+    const discovered = walk('tests')
+      .filter((path) => path.endsWith('.test.ts'))
+      .sort();
     const paths = manifest.suites.source.files.map((file) => file.path);
     expect(paths.sort()).toEqual(discovered);
   });
