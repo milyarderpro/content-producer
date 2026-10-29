@@ -55,7 +55,8 @@ describe('mandatory suite inventory (not a release gate)', () => {
   it('matches all source files discovered by the root Vitest include', () => {
     expect(read('vitest.config.ts')).toContain("include: ['tests/**/*.test.ts']");
     const discovered = walk('tests').filter((path) => path.endsWith('.test.ts')).sort();
-    expect(manifest.suites.source.files.map((file) => file.path).sort()).toEqual(discovered);
+    const paths = manifest.suites.source.files.map((file) => file.path);
+    expect(paths.sort()).toEqual(discovered);
   });
 
   it('matches the database Vitest include, including new and removed files', () => {
@@ -65,7 +66,8 @@ describe('mandatory suite inventory (not a release gate)', () => {
     const discovered = walk('supabase/tests/database')
       .filter((path) => path.endsWith('.test.ts'))
       .sort();
-    expect(manifest.suites.database.files.map((file) => file.path).sort()).toEqual(discovered);
+    const paths = manifest.suites.database.files.map((file) => file.path);
+    expect(paths.sort()).toEqual(discovered);
   });
 
   it('matches the exact files executed by the test:mcp Deno command', () => {
@@ -82,6 +84,7 @@ describe('mandatory suite inventory (not a release gate)', () => {
     expect(paths.every((path) => path.endsWith('_test.ts'))).toBe(true);
     const invoked = paths.map((path) => 'supabase/functions/' + path);
     expect(new Set(invoked).size).toBe(invoked.length);
-    expect(manifest.suites.mcp.files.map((file) => file.path).sort()).toEqual(invoked.sort());
+    const manifestPaths = manifest.suites.mcp.files.map((file) => file.path);
+    expect(manifestPaths.sort()).toEqual(invoked.sort());
   });
 });
