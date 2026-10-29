@@ -1,0 +1,208 @@
+# G1-T1 — Baseline full gate dan inventaris pemanggilan
+
+**Status:** observasi berbasis source/log; bukan hasil menjalankan gate baru. **Snapshot:** `main`
+`4191caf7943e313b43ab0dc52f4311165e6c229d` (merge
+[PR #73](https://github.com/milyarderpro/content-producer/pull/73));
+[Issue #74](https://github.com/milyarderpro/content-producer/issues/74). Tanggal 2026-10-29. Satuan
+tabel per-file adalah **detik durasi Vitest**, bukan durasi waktu kalender seluruh job.
+
+## Sumber dan batas hasil
+
+- [Run lama 39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314), `push`, SHA `67e3fbcef48a052d089a0d6fe8854a070a6ea2de`, 2026-10-22 11:12:22–11:35:44 UTC,
+  `completed/success`. Job bernama _One local reset, full suites, security, 33-tool Inspector,
+  non-owner_. Log: 40 file/176 tes database, `1095.02s` untuk Vitest DB, dan
+  `test-all exit=0 elapsed=1120s`. Run total dari timestamp awal/akhir sekitar **23m22s** (rencana
+  menyebut 23m19s untuk job). Bukti historis; bukan SHA main kini.
+- [Run lama 40364895835](https://github.com/milyarderpro/content-producer/actions/runs/40364895835), `workflow_dispatch`, SHA `be7ce5455863d3c51f4cfdd9ec6c9263e837ede3`, 2026-10-26
+  17:02:40–17:16:36 UTC, `completed/success`; sekitar **13m56s** dari timestamp run (sekitar 13m46s
+  dari langkah job). Log Vitest DB: **41 file/180 tes**, `551.12s`, selesai 17:16:27Z. Itu bukan
+  hasil pada `main` terkini.
+- [Rencana G1–G4](../../plans/full-backend-gate-optimization-implementation-plan.md) menyebut 41/180
+  sebagai historis. Tree `main` saat G1 memuat **41 file `*.test.ts` langsung di
+  `supabase/tests/database/` ** (tidak termasuk `setup.ts`, 6 helper `helpers/`, dan fixture
+  JSON). Sejak run 26 Oktober,
+  [diff SHA historis → main](https://github.com/milyarderpro/content-producer/compare/be7ce5455863d3c51f4cfdd9ec6c9263e837ede3...4191caf7943e313b43ab0dc52f4311165e6c229d)
+  memperlihatkan tambahan kasus CR-051 dalam `api-trivia-source-diagnostics.test.ts`. Source kini
+  memiliki 6 `it` di sana, dibanding 4 pada log historis: **182 kasus adalah perkiraan statis** bila
+  seluruh file lain tak berubah; **jumlah tes yang benar-benar dikoleksi/dijalankan pada SHA main =
+  UNKNOWN**, sebab tidak menjalankan database gate. Jangan mengulang 180 sebagai jumlah PASS saat
+  ini.
+- Timestamp langkah dihitung dari awal baris `##[group]Run` sampai awal langkah berikutnya;
+  pembulatan detik meliputi overhead. Tidak ada per-case/SQL query latency resmi; **per-case =
+  UNKNOWN** (Vitest hanya memberi durasi file), jumlah query CLI dan besaran penghematannya
+  **UNKNOWN** tanpa instrumentasi. Dilarang menyimpulkan biaya CLI sebagai penyebab yang telah
+  terbukti.
+
+## Gap bukti local security advisors (CR-020)
+
+- **Kewajiban:** [CR-020](../decisions/2026-10-15-phase-9-10-risk-based-mvp-acceptance.md)
+  mensyaratkan **local security advisors** selain audit catalog/RLS/grant.
+- **Source teramati:** [workflow backend](../../.github/workflows/backend-technical-gate.yml)
+  menjalankan `pnpm exec supabase db lint --local --fail-on error` pada langkah
+  `Local database lint`, serta `pnpm exec tsx scripts/phase-6-catalog-audit.ts`
+  sebelum/sesudah Inspector dan pada audit akhir. Pemeriksaan 17 file
+  `scripts/*.ts` dan `.github/workflows/*.yml` aktif tidak menemukan command
+  local security advisors yang eksplisit. DB lint dan audit katalog **tidak**
+  boleh dianggap pemeriksaan advisors yang setara tanpa bukti terpisah.
+- **Actions teramati:** [run 39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314)
+  memiliki langkah `Local DB lint (not hosted Security Advisor)` dan audit
+  katalog yang berhasil; [run 40364895835](https://github.com/milyarderpro/content-producer/actions/runs/40364895835)
+  mencatat command lint yang sama dan audit pre/post/final. Tidak ditemukan
+  command atau keluaran advisor lokal tersendiri pada log kedua run.
+  Disclaimer `Tidak membuktikan hosted Security Advisor` pada workflow
+  **bukan** bukti bahwa local security advisors pernah dijalankan.
+- **Status local security advisors: UNKNOWN / NOT EVIDENCED**, bukan PASS;
+  nama command, output dan durasi advisor = **UNKNOWN** karena tidak ada
+  langkah/log yang membuktikannya. `completed/success` kedua run hanya
+  membuktikan langkah lint dan audit yang benar-benar tercatat.
+- **Gap pemblokir cutover G4:** tentukan command/alat/versi advisors yang
+  memenuhi kewajiban CR-020, jalankan secara terpisah pada stack uji lokal
+  kandidat yang sama, lalu rekam hasil, durasi, exit status, dan artefak
+  teredaksi dalam pembandingan G4. Jika tidak tersedia, minta keputusan
+  kontrak eksplisit dari pemilik/orchestrator sebelum cutover; jangan
+  mengganti advisors diam-diam dengan lint atau catalog audit.
+
+## Profil tahap berdasar log Actions
+
+| Tahap                                                      |                                                               22 Okt (perkiraan) |                   26 Okt (perkiraan) | Penafsiran                                                                 |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------: | -----------------------------------: | -------------------------------------------------------------------------- |
+| Setup/checkout/pin/preflight/install                       |                17s menuju start stack setelah setup awal; bagian sampai 11:12:44 |                  17s hingga 17:03:05 | Tidak setara total proses setup antar run                                  |
+| Mulai stack lokal                                          |                                                          94s (11:12:44–11:14:18) |             118s (17:03:05–17:05:03) | Biaya mesin/stack, bukan query test                                        |
+| Clean reset/migrations                                     |                                                          32s (11:14:18–11:14:50) |              29s (17:05:03–17:05:32) | Satu reset wajib                                                           |
+| `test:mcp` focused sebelum Inspector                       |                                                          13s (11:14:50–11:15:03) |               8s (17:05:32–17:05:40) | Termasuk Deno check/lint/test                                              |
+| Audit sebelum Inspector                                    | Dalam langkah berikut yang teragregasi dengan Inspector 22 Okt: UNKNOWN terpisah |             1.3s (17:05:40–17:05:41) | Audit baseline tak boleh dihapus sebagai duplikat tanpa memeriksa boundary |
+| Inspector HTTP/auth 33 tool                                |                      109s (11:15:03–11:16:52; 22 Okt termasuk aktivitas terkait) |            77.6s (17:05:41–17:06:59) | Jalur HTTP/owner/non-owner berbeda dari unit suite                         |
+| Audit sesudah Inspector                                    |                                        UNKNOWN terpisah pada workflow run 22 Okt |             1.2s (17:06:59–17:07:00) | Menjaga state/fixture pasca-Inspector                                      |
+| `pnpm run test-all`                                        |                                                        1120s (11:16:52–11:35:32) |           566.6s (17:07:00–17:16:27) | Check + migration names + **MCP kedua** + DB                               |
+| Database Vitest di dalam `test-all`                        |                                                                 1095.02s; 40/176 |                      551.12s; 41/180 | Durasi internal; jangan dijumlahkan lagi dengan `test-all`                 |
+| History, DB lint, final audit, whitespace, evidence/upload |                          11:35:32–11:35:44; tidak semua komponen dapat diisolasi | 17:16:27–17:16:36; termasuk overhead | Lint/history/audit wajib; detail durasi lihat Actions                      |
+
+Log per-file tersedia di bawah. Kolom 22 Okt memiliki tanda `UNKNOWN` jika file belum ada; 26 Okt
+tetap menjadi referensi durasi paling relevan tetapi bukan prediksi yang dijamin. **Top lima 26
+Okt:** `api-security-kernel` 45.46s, `api-post-lifecycle-concurrency` 43.81s, `api-read-rpcs`
+40.53s, `api-plan-lifecycle` 36.86s, `api-trivia-public-gold` 32.37s; total **199.0s** (pembulatan).
+Pada 22 Okt `api-page-plan-writes` 332.99s versus 29.32s pada 26 Okt; perubahan helper adalah
+penjelasan yang masuk akal, namun perbandingan run lintas SHA/mesin **bukan pengukuran query setara
+terkendali**.
+
+## Seluruh file database yang aktif dan profil historis
+
+Kolom `kasus`: jumlah **22 Okt / 26 Okt** dari log, **bukan** jumlah kasus runtime SHA main. Sesuai
+[konfigurasi database](../../vitest.database.config.ts), pola
+`supabase/tests/database/**/*.test.ts`, `passWithNoTests: false`, `fileParallelism: false`,
+`setupFiles: setup.ts`. Setiap path mempunyai pemetaan invariant di [matriks](invariant-matrix.md).
+
+| File aktif                                                                                                                         | Kasus 22/26 Okt | 22 Okt (s) | 26 Okt (s) |
+| ---------------------------------------------------------------------------------------------------------------------------------- | --------------: | ---------: | ---------: |
+| [`api-batch-b-remediation.test.ts`](../../supabase/tests/database/api-batch-b-remediation.test.ts)                                 |           8 / 8 |      30.99 |      20.52 |
+| [`api-metrics-concurrency.test.ts`](../../supabase/tests/database/api-metrics-concurrency.test.ts)                                 |           3 / 3 |      15.91 |      13.19 |
+| [`api-metrics-insights.test.ts`](../../supabase/tests/database/api-metrics-insights.test.ts)                                       |           4 / 4 |      14.03 |       8.78 |
+| [`api-metrics.test.ts`](../../supabase/tests/database/api-metrics.test.ts)                                                         |           5 / 5 |      18.36 |      12.05 |
+| [`api-page-plan-writes.test.ts`](../../supabase/tests/database/api-page-plan-writes.test.ts)                                       |         18 / 18 |     332.99 |      29.32 |
+| [`api-phase-five-acceptance.test.ts`](../../supabase/tests/database/api-phase-five-acceptance.test.ts)                             |           4 / 4 |      12.92 |       8.14 |
+| [`api-plan-concurrency.test.ts`](../../supabase/tests/database/api-plan-concurrency.test.ts)                                       |           8 / 8 |      29.04 |      25.16 |
+| [`api-plan-lifecycle.test.ts`](../../supabase/tests/database/api-plan-lifecycle.test.ts)                                           |         12 / 12 |      52.52 |      36.85 |
+| [`api-post-approval-quality.test.ts`](../../supabase/tests/database/api-post-approval-quality.test.ts)                             |           9 / 9 |      43.36 |      29.05 |
+| [`api-post-concurrency.test.ts`](../../supabase/tests/database/api-post-concurrency.test.ts)                                       |           5 / 5 |      26.12 |      22.17 |
+| [`api-post-lifecycle-concurrency.test.ts`](../../supabase/tests/database/api-post-lifecycle-concurrency.test.ts)                   |           6 / 6 |      54.15 |      43.80 |
+| [`api-post-lifecycle.test.ts`](../../supabase/tests/database/api-post-lifecycle.test.ts)                                           |           8 / 8 |      45.69 |      29.82 |
+| [`api-post-render-quality.test.ts`](../../supabase/tests/database/api-post-render-quality.test.ts)                                 |           5 / 5 |      15.65 |       9.97 |
+| [`api-post-reschedule.test.ts`](../../supabase/tests/database/api-post-reschedule.test.ts)                                         |           6 / 6 |      21.65 |      13.52 |
+| [`api-post-save-revise.test.ts`](../../supabase/tests/database/api-post-save-revise.test.ts)                                       |           8 / 8 |      18.67 |      12.00 |
+| [`api-read-rpcs.test.ts`](../../supabase/tests/database/api-read-rpcs.test.ts)                                                     |           4 / 4 |      59.71 |      40.53 |
+| [`api-security-kernel.test.ts`](../../supabase/tests/database/api-security-kernel.test.ts)                                         |           8 / 8 |      65.92 |      45.46 |
+| [`api-source-evidence-mcp-compat.test.ts`](../../supabase/tests/database/api-source-evidence-mcp-compat.test.ts)                   |           2 / 2 |       4.63 |       2.25 |
+| [`api-trivia-concurrency.test.ts`](../../supabase/tests/database/api-trivia-concurrency.test.ts)                                   |           7 / 7 |      14.88 |      10.87 |
+| [`api-trivia-correction.test.ts`](../../supabase/tests/database/api-trivia-correction.test.ts)                                     |           7 / 7 |      16.22 |      10.40 |
+| [`api-trivia-facts.test.ts`](../../supabase/tests/database/api-trivia-facts.test.ts)                                               |           9 / 9 |      14.70 |       9.61 |
+| [`api-trivia-populated-performance.test.ts`](../../supabase/tests/database/api-trivia-populated-performance.test.ts)               |           1 / 1 |       7.87 |       4.56 |
+| [`api-trivia-public-gold.test.ts`](../../supabase/tests/database/api-trivia-public-gold.test.ts)                                   |           2 / 2 |      48.75 |      32.37 |
+| [`api-trivia-source-diagnostics.test.ts`](../../supabase/tests/database/api-trivia-source-diagnostics.test.ts)                     |           — / 4 |    UNKNOWN |       0.85 |
+| [`baseline.test.ts`](../../supabase/tests/database/baseline.test.ts)                                                               |           1 / 1 |       5.29 |       3.24 |
+| [`content-plans-and-plan-items.test.ts`](../../supabase/tests/database/content-plans-and-plan-items.test.ts)                       |           1 / 1 |       0.93 |       0.58 |
+| [`core-primitives-and-validators.test.ts`](../../supabase/tests/database/core-primitives-and-validators.test.ts)                   |           3 / 3 |       5.79 |       3.72 |
+| [`final-remediation.test.ts`](../../supabase/tests/database/final-remediation.test.ts)                                             |           1 / 1 |       1.14 |       0.76 |
+| [`oauth-resource-audience-hook.test.ts`](../../supabase/tests/database/oauth-resource-audience-hook.test.ts)                       |           1 / 1 |       0.86 |       0.52 |
+| [`operation-ledger-and-rate-limit-buckets.test.ts`](../../supabase/tests/database/operation-ledger-and-rate-limit-buckets.test.ts) |           1 / 1 |      22.64 |      13.33 |
+| [`pages-and-page-niche-configs.test.ts`](../../supabase/tests/database/pages-and-page-niche-configs.test.ts)                       |           1 / 1 |      25.29 |      15.87 |
+| [`phase-5-operation-map.test.ts`](../../supabase/tests/database/phase-5-operation-map.test.ts)                                     |           1 / 1 |       0.01 |       0.00 |
+| [`posts-and-post-metrics.test.ts`](../../supabase/tests/database/posts-and-post-metrics.test.ts)                                   |           1 / 1 |       0.96 |       0.56 |
+| [`trivia-audit-remediation.test.ts`](../../supabase/tests/database/trivia-audit-remediation.test.ts)                               |           1 / 1 |       0.93 |       0.49 |
+| [`trivia-candidate-retrieval.test.ts`](../../supabase/tests/database/trivia-candidate-retrieval.test.ts)                           |           6 / 6 |      22.47 |      13.11 |
+| [`trivia-facts-schema.test.ts`](../../supabase/tests/database/trivia-facts-schema.test.ts)                                         |           1 / 1 |       0.95 |       0.59 |
+| [`trivia-identity-and-source.test.ts`](../../supabase/tests/database/trivia-identity-and-source.test.ts)                           |           1 / 1 |       0.99 |       0.51 |
+| [`trivia-lineage-and-reverification.test.ts`](../../supabase/tests/database/trivia-lineage-and-reverification.test.ts)             |           3 / 3 |       6.28 |       3.90 |
+| [`trivia-post-facts.test.ts`](../../supabase/tests/database/trivia-post-facts.test.ts)                                             |           1 / 1 |       1.02 |       0.62 |
+| [`trivia-reservation-and-reuse.test.ts`](../../supabase/tests/database/trivia-reservation-and-reuse.test.ts)                       |           2 / 2 |      11.31 |       7.42 |
+| [`workspaces-and-niches.test.ts`](../../supabase/tests/database/workspaces-and-niches.test.ts)                                     |           1 / 1 |      17.43 |      10.79 |
+
+Total historis: **40/176** pada 22 Okt dan **41/180** pada 26 Okt; file baru
+`api-trivia-source-diagnostics.test.ts` menjelaskan perbedaan file, sementara perkembangan jumlah
+kasus perlu memperhitungkan revisi konten test antar SHA. Sum durasi per-file tidak identik dengan
+durasi Vitest karena overhead setup/transisi. Kedua run berhasil pada SHA masing-masing; tidak ada
+per-file run main terkini.
+
+## Peta eksekusi seluruh suite dan pemeriksaan
+
+| Jalur                                                                              | Pemanggilan dan cakupan pada `main`                                                                                                                                                                                                                                                                                                            | Status                                                                     |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [`scripts/check.ts`](../../scripts/check.ts) via `pnpm run check`                  | `format:check` → `lint` → `typecheck` → root `test` (`vitest.config.ts`: **10** file `tests/*.test.ts`, termasuk issue-56, workflow classifiers, plugin/coverage/evidence) → `frontend:typecheck` → `frontend:build` → `frontend:test` (**3** `auth-frontend/tests/*.test.mjs`, Node serial).                                                  | Wajib source pada full candidate; light CI hanya untuk diff terdampak      |
+| [`package.json`](../../package.json) `test:mcp`                                    | Deno check + lint `mcp` + Deno test **15** `supabase/functions/mcp/*_test.ts` (pilot DB adapter, transport, auth, OAuth production, foundation, page/plan, plan claim/recovery, trivia fact/correction, post base/edit/approval/publication/metrics).                                                                                          | Wajib full backend dan focused pre-Inspector saat ini                      |
+| [`scripts/test-all.ts`](../../scripts/test-all.ts)                                 | `check` → `verify-migrations` (nama file, **bukan** applied history/lint) → `test:mcp` → `test:database` (**41** file). Tidak start/reset stack.                                                                                                                                                                                               | Masih kewajiban aktif CR-020/044                                           |
+| [`scripts/supabase-local.ts`](../../scripts/supabase-local.ts)                     | `test:database` → `vitest run --config vitest.database.config.ts`; `supabase:reset` terpisah; `supabase:verify` → migration list lokal.                                                                                                                                                                                                        | DB lokal, bukan production                                                 |
+| [`scripts/smoke-test.ts`](../../scripts/smoke-test.ts)                             | Struktur repo → `verify-migrations` → **`test:database` lagi**. Tidak dipanggil di full workflow; jangan ditambahkan ke `test-all`.                                                                                                                                                                                                            | Alternatif/diagnostik, bukan smoke HTTP                                    |
+| [`scripts/phase-6-13.ts`](../../scripts/phase-6-13.ts)                             | Authenticated HTTP/MCP, valid/invalid 33 tools, denial owner/non-owner, fixture, Inspector; `--preflight` bukan no-write dry run.                                                                                                                                                                                                              | Wajib full backend, tidak diganti unit MCP                                 |
+| [`scripts/phase-6-catalog-audit.ts`](../../scripts/phase-6-catalog-audit.ts)       | 72 migration pinned (67 baseline + 5 baru), applied/source history, 33 RPC, 15 tabel ber-RLS, privileges/ACL/default ACL/fixture. Input audit `docs/phase-5-7-catalog-audit.sql`, `docs/phase-5-8-catalog-audit.sql`, `docs/phase-5-batch-b-remediation-final-catalog.json`, dan `docs/phase-5-9-final-catalog.json` mengikuti source pembaca. | Pre-/post-Inspector dan final audit adalah pemeriksaan batas state berbeda |
+| [`backend-technical-gate.yml`](../../.github/workflows/backend-technical-gate.yml) | Manual `workflow_dispatch` di `main`, **exact SHA**, pinned install → stack → clean reset → `test:mcp` → audit → Inspector → audit → `test-all` → history → lint → final audit → whitespace → evidence/artifact.                                                                                                                               | Full CR-020/044; **pengulangan terkonfirmasi** `test:mcp` dua kali         |
+| [`ci.yml`](../../.github/workflows/ci.yml)                                         | PR/main: checkout head SHA, `git diff --check`, changed Markdown Prettier + indeks, locked install, migration filename validation; `check` bila source/dependency; `test:mcp` bila MCP; `mcp-probe/handler_test.ts` bila probe; paket ZIP bila package. **Tidak** DB/reset/Inspector.                                                          | Light CI; perhatikan classifier, rename/deletion, dan skip                 |
+| [`hosted-oauth-probe.yml`](../../.github/workflows/hosted-oauth-probe.yml)         | Dispatch manual metadata OAuth anonim HTTP 200/challenge 401, tanpa token atau business call.                                                                                                                                                                                                                                                  | Bukan substitusi owner/Inspector                                           |
+| [`scripts/phase-6-1-http-smoke.ts`](../../scripts/phase-6-1-http-smoke.ts)         | Local /health, OAuth metadata/challenge, CORS/unknown route; tidak otomatis di `test-all`.                                                                                                                                                                                                                                                     | Focused HTTP, bukan 33-tool Inspector                                      |
+| `supabase/functions/mcp-probe/handler_test.ts`                                     | Satu file probe terpisah dari 15 test MCP; dijalankan kondisional oleh `ci.yml`.                                                                                                                                                                                                                                                               | Coverage wajib bila probe terdampak                                        |
+| Migration dan fixture                                                              | **72** file SQL migration, `supabase/seed.sql`, `supabase/tests/database/fixtures/post-render-v1.json`, trivia dedup gold/holdout checksum dan snapshot history, serta katalog Phase 5/8; sebagian adalah input test aktif walau namanya historis.                                                                                             | Tidak boleh dihapus/diubah karena nama fase                                |
+
+**Inventaris source/frontend di luar DB:** 10 root test file (`evidence-output`, `foundation`,
+`issue-56-dedup-recovery`, `phase-8-coverage`, `plugin-config`, `plugin-package`, `plugin-skill`, `plugin-trivia`, `workflow-change-classification`, `workflow-config`), 3 frontend (`auth`,
+`direct-routes`, `phase95`), 15 MCP, 1 probe terpisah. Source tests semuanya tercakup pola
+`vitest.config.ts`; jumlah kasus source saat HEAD **UNKNOWN** tanpa run pada SHA tersebut.
+
+## Duplikasi yang terbukti, hipotesis, dan penjagaan
+
+1. **Terbukti:** full workflow menjalankan `test:mcp` sebelum Inspector dan `test-all`
+   menjalankannya lagi. Kandidat G2: satu **eksekusi penuh** Deno check/lint/15 test sebelum
+   Inspector, lalu ganti `test-all` dengan komponen eksplisit yang tidak memanggil MCP lagi.
+   Penggantinya harus terlihat pada manifest dan bukti PASS SHA sama; jangan mengubah G1.
+2. **Terbukti secara wiring, tidak terjadi pada dua run:** `smoke-test` memanggil DB suite yang juga
+   ada di `test-all`; jangan jalankan keduanya dalam satu gate. `verify-migrations` nama file
+   berbeda dengan applied history/lint dan **bukan** duplikat semantik.
+3. **Bukan duplikat otomatis:** audit sebelum/selepas Inspector/akhir mengamati state berbeda; root,
+   DB, MCP mock, dan Inspector HTTP menjaga boundary berbeda. `fileParallelism: false` mencegah
+   interferensi shared DB; tidak boleh diaktifkan tanpa isolasi dan eksperimen.
+4. **Hipotesis yang belum terukur:**
+   [rencana](../../plans/full-backend-gate-optimization-implementation-plan.md) melaporkan **15
+   file** memakai panggilan `supabase db query`; jumlah invokasi, latency tiap query/proses, serta
+   kontribusi pada total 551s **UNKNOWN** hingga instrumentasi G2-T1. Ukur role/JWT dan lintasan
+   session sebelum mengganti helper. Tidak ada pengurangan tes pada PR G1.
+
+## Riwayat light CI untuk preflight dokumentasi
+
+- [40835652793](https://github.com/milyarderpro/content-producer/actions/runs/40835652793)
+  `4191caf...`, 29 Okt 07:28:29–07:28:48Z, **19s**, `completed/success`. Format dan migration
+  names PASS; project checks/MCP/probe/package **SKIPPED** karena classifier dokumen.
+- [40835410785](https://github.com/milyarderpro/content-producer/actions/runs/40835410785)
+  `fda9349...`, 29 Okt 07:26:12–07:26:33Z, **21s**, `completed/success`, perilaku light CI sama.
+- [40687939346](https://github.com/milyarderpro/content-producer/actions/runs/40687939346)
+  `d3f62d...`, 28 Okt 12:27:22–12:28:07Z, **45s**, `completed/success` (project/package check
+  dijalankan). Light run lain pada tanggal 28 Okt beragam termasuk FAIL/CANCELLED; keberhasilan
+  terbaru tidak menjamin hasil kandidat.
+- **Estimasi untuk PR G1 docs-only:** sekitar 20–60 detik eksekusi normal; sisihkan **1–2 menit**
+  untuk antrean/varians. Ini estimasi, bukan hasil; dokumentasi harus melewati format/referensi/diff
+  dan Actions CI, tanpa full DB gate.
+
+## Status pengukuran dan batas G1
+
+**HISTORICAL PASS** hanya untuk dua SHA run lama. **NOT RUN** database, Inspector, deployment, dan
+production Write untuk dokumentasi ini. **UNKNOWN** angka aktual runtime kasus pada kandidat G1,
+durasi per-case dan per-query, dampak query CLI, dan timing komponen yang tidak dipisah log.
+Keputusan pengurangan harus mengacu [invariant-matrix.md](invariant-matrix.md) dan
+[CR-052](../decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md); **tidak ada
+test/workflow yang dipindah atau dihapus dalam G1**.
