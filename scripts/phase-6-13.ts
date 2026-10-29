@@ -1,12 +1,15 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { generateKeyPairSync, randomUUID, sign } from 'node:crypto';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import {
   completeFixtureItem,
   createPlan,
   insertPost,
+  localDatabaseContainerId,
   row,
   sql,
   stateDigest,
@@ -27,12 +30,121 @@ import {
   time,
 } from '../supabase/tests/database/helpers/trivia-rpc.js';
 
-// No remote URL or cloud project accepted. Reuse only the local stack's image/network/DB URI.
-const resource = 'http://127.0.0.1:54330/mcp';
-const issuer = 'http://127.0.0.1:54330/auth/v1';
+// Validate the DB, REST and API containers before creating any fixture or HTTP host.
+type LocalContainer = {
+  Id: string;
+  Name: string;
+  State: { Running: boolean };
+  HostConfig: { NetworkMode: string };
+  NetworkSettings: {
+    Networks: Record<string, unknown>;
+    Ports: Record<string, Array<{ HostIp: string; HostPort: string }> | null>;
+  };
+  Mounts: Array<{ Name?: string }>;
+  Config: { Env: string[]; Image: string };
+};
+
+function localTarget() {
+  let config: string;
+  try {
+    config = readFileSync(join(process.cwd(), 'supabase', 'config.toml'), 'utf8');
+  } catch {
+    throw new Error('LOCAL_GATE_CONFIG_INVALID');
+  }
+  let section = '';
+  let projectId: string | undefined;
+  let apiPort: number | undefined;
+  for (const raw of config.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const header = /^\[([^\]]+)\](?:\s*#.*)?$/.exec(line);
+    if (header) {
+      section = header[1]!;
+      continue;
+    }
+    if (section === '' && /^project_id\s*=/.test(line)) {
+      const match = /^project_id\s*=\s*(["'])([A-Za-z0-9][A-Za-z0-9_-]*)\1(?:\s*#.*)?$/.exec(line);
+      if (projectId !== undefined || !match) throw new Error('LOCAL_GATE_CONFIG_INVALID');
+      projectId = match[2];
+    }
+    if (section === 'api' && /^port\s*=/.test(line)) {
+      const match = /^port\s*=\s*([0-9]+)(?:\s*#.*)?$/.exec(line);
+      if (apiPort !== undefined || !match) throw new Error('LOCAL_GATE_CONFIG_INVALID');
+      apiPort = Number(match[1]);
+    }
+  }
+  if (!projectId || !Number.isInteger(apiPort) || apiPort! < 1 || apiPort! > 65535) {
+    throw new Error('LOCAL_GATE_CONFIG_INVALID');
+  }
+  const dbName = `supabase_db_${projectId}`;
+  const restName = `supabase_rest_${projectId}`;
+  const kongName = `supabase_kong_${projectId}`;
+  const network = `supabase_network_${projectId}`;
+  const dbId = localDatabaseContainerId();
+  let inspected: LocalContainer[];
+  try {
+    inspected = JSON.parse(docker(['inspect', dbId, restName, kongName])) as LocalContainer[];
+  } catch {
+    throw new Error('LOCAL_GATE_TARGET_MISMATCH');
+  }
+  const [db, rest, kong] = inspected;
+  const matches = (entry: LocalContainer | undefined, name: string) =>
+    entry?.Name === `/${name}` &&
+    entry.State?.Running === true &&
+    entry.HostConfig?.NetworkMode === network &&
+    Object.hasOwn(entry.NetworkSettings?.Networks ?? {}, network);
+  const bindings = kong?.NetworkSettings?.Ports?.['8000/tcp'];
+  const uri = rest?.Config?.Env?.find((value: string) => value.startsWith('PGRST_DB_URI='));
+  let dbHost: string | undefined;
+  try {
+    if (!uri) throw new Error('LOCAL_GATE_TARGET_MISMATCH');
+    dbHost = new URL(uri.slice('PGRST_DB_URI='.length)).hostname;
+  } catch {
+    throw new Error('LOCAL_GATE_TARGET_MISMATCH');
+  }
+  if (
+    !Array.isArray(inspected) ||
+    inspected.length !== 3 ||
+    db?.Id !== dbId ||
+    !matches(db, dbName) ||
+    !matches(rest, restName) ||
+    !matches(kong, kongName) ||
+    !db.Mounts?.some((mount: { Name?: string }) => mount.Name === dbName) ||
+    dbHost !== dbName ||
+    !Array.isArray(bindings) ||
+    bindings.length === 0 ||
+    !bindings.every((binding: { HostPort?: string }) => binding.HostPort === String(apiPort))
+  ) {
+    throw new Error('LOCAL_GATE_TARGET_MISMATCH');
+  }
+  return { rest };
+}
+
+async function freeLoopbackPort(): Promise<number> {
+  const server = createServer();
+  try {
+    await new Promise<void>((resolve, reject) => {
+      server.once('error', reject);
+      server.listen(0, '127.0.0.1', resolve);
+    });
+    const address = server.address();
+    if (!address || typeof address === 'string') throw new Error('LOCAL_GATE_PORT_UNAVAILABLE');
+    return address.port;
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+}
+
+const target = localTarget();
+const hostPort = await freeLoopbackPort();
+let restPort = await freeLoopbackPort();
+while (restPort === hostPort) restPort = await freeLoopbackPort();
+const resource = `http://127.0.0.1:${hostPort}/mcp`;
+const issuer = `http://127.0.0.1:${hostPort}/auth/v1`;
 const dir = mkdtempSync(join(tmpdir(), 'phase-6-batch-a-'));
-const container = 'phase-6-batch-a-postgrest';
-const f = fixture();
+const container = `phase-6-batch-a-postgrest-${randomUUID().slice(0, 8)}`;
+let f!: ReturnType<typeof fixture>;
+let fixtureCreated = false;
 const { publicKey, privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const jwks = {
   keys: [
@@ -60,8 +172,8 @@ function token(actor = f.owner, audience = resource) {
     unsigned + '.' + sign('RSA-SHA256', Buffer.from(unsigned), privateKey).toString('base64url')
   );
 }
-const bearer = token();
-const foreignBearer = token(f.other);
+let bearer!: string;
+let foreignBearer!: string;
 function docker(args: string[]) {
   const result = spawnSync('docker', args, { encoding: 'utf8' });
   if (result.error || result.status !== 0) throw new Error('LOCAL_DOCKER_OPERATION_FAILED');
@@ -196,8 +308,8 @@ async function inspector(method: string, name?: string, input?: object, expected
   return parsed.result;
 }
 try {
-  const local = JSON.parse(docker(['inspect', 'supabase_rest_content-producer']))[0];
-  const network = Object.keys(local.NetworkSettings.Networks)[0];
+  const local = target.rest;
+  const network = local.HostConfig.NetworkMode;
   const env: string[] = local.Config.Env.filter(
     (s: string) => s.startsWith('PGRST_') && !s.startsWith('PGRST_JWT_'),
   );
@@ -212,11 +324,26 @@ try {
     '--network',
     network,
     '-p',
-    '127.0.0.1:54329:3000',
+    `127.0.0.1:${restPort}:3000`,
     '--env-file',
     envFile,
     local.Config.Image,
   ]);
+  const temporaryRest = JSON.parse(docker(['inspect', container]))[0];
+  check(
+    temporaryRest?.Name === `/${container}` &&
+      temporaryRest.State?.Running === true &&
+      temporaryRest.HostConfig?.NetworkMode === network &&
+      Object.hasOwn(temporaryRest.NetworkSettings?.Networks ?? {}, network) &&
+      temporaryRest.NetworkSettings?.Ports?.['3000/tcp']?.length === 1 &&
+      temporaryRest.NetworkSettings.Ports['3000/tcp'][0].HostIp === '127.0.0.1' &&
+      temporaryRest.NetworkSettings.Ports['3000/tcp'][0].HostPort === String(restPort),
+    'LOCAL_GATE_TARGET_MISMATCH',
+  );
+  f = fixture();
+  fixtureCreated = true;
+  bearer = token();
+  foreignBearer = token(f.other);
   const fixtureFile = join(dir, 'fixture.json');
   writeFileSync(
     fixtureFile,
@@ -227,10 +354,37 @@ try {
         issuer,
         jwksUrl: issuer + '/.well-known/jwks.json',
         ownerUserId: f.owner,
-        supabaseUrl: 'http://127.0.0.1:54330',
+        supabaseUrl: `http://127.0.0.1:${hostPort}`,
         publishableKey: 'local-fixture-public-key',
       },
     }),
+    { mode: 0o600 },
+  );
+  // The local-only host source has fixed ports. Generate an ephemeral copy with
+  // the two validated loopback ports; keep the product and test source unchanged.
+  const sourcePath = join(process.cwd(), 'supabase', 'functions', 'batch_a_server.ts');
+  const hostSource = readFileSync(sourcePath, 'utf8');
+  check(
+    hostSource.includes("from './mcp/edge.ts'") &&
+      hostSource.includes("from './mcp/auth.ts'") &&
+      hostSource.includes('port: 54330') &&
+      hostSource.includes("'http://127.0.0.1:54329'"),
+    'LOCAL_HTTP_HOST_SOURCE_MISMATCH',
+  );
+  const temporaryHostFile = join(dir, 'batch_a_server.ts');
+  writeFileSync(
+    temporaryHostFile,
+    hostSource
+      .replace(
+        "from './mcp/edge.ts'",
+        `from '${pathToFileURL(join(process.cwd(), 'supabase/functions/mcp/edge.ts')).href}'`,
+      )
+      .replace(
+        "from './mcp/auth.ts'",
+        `from '${pathToFileURL(join(process.cwd(), 'supabase/functions/mcp/auth.ts')).href}'`,
+      )
+      .replace('port: 54330', `port: ${hostPort}`)
+      .replace("'http://127.0.0.1:54329'", `'http://127.0.0.1:${restPort}'`),
     { mode: 0o600 },
   );
   host = spawn(
@@ -238,11 +392,11 @@ try {
     [
       'run',
       '--allow-env=NODE_ENV,AI_AGENT,APPVEYOR,CI,DEBUG,TEST,MODE,MINIMAL,NO_COLOR,FORCE_COLOR,TERM',
-      '--allow-net=127.0.0.1:54329,127.0.0.1:54330',
+      `--allow-net=127.0.0.1:${restPort},127.0.0.1:${hostPort}`,
       '--allow-read=' + fixtureFile,
       '--config',
       'supabase/functions/deno.json',
-      'supabase/functions/batch_a_server.ts',
+      temporaryHostFile,
       fixtureFile,
     ],
     {
@@ -2122,7 +2276,7 @@ try {
 } finally {
   host?.kill();
   spawnSync('docker', ['rm', '-f', container], { stdio: 'ignore' });
-  postCleanup(f);
+  if (fixtureCreated) postCleanup(f);
   rmSync(dir, { recursive: true, force: true });
 }
 

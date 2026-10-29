@@ -1,9 +1,10 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { sql as runLocalSql } from './helpers/plan-lifecycle.js';
+import { localDatabaseContainerId, sql as runLocalSql } from './helpers/plan-lifecycle.js';
 
 type JsonRecord = Record<string, unknown>;
+const dbContainerId = localDatabaseContainerId();
 
 type RpcResponse = {
   data: {
@@ -109,8 +110,10 @@ function psqlAsync(sql: string): Promise<{ code: number; output: string }> {
   return new Promise((resolve, reject) => {
     const child = spawn('docker', [
       'exec',
-      'supabase_db_content-producer',
+      '-i',
+      dbContainerId,
       'psql',
+      '-X',
       '-U',
       'postgres',
       '-d',
@@ -118,14 +121,13 @@ function psqlAsync(sql: string): Promise<{ code: number; output: string }> {
       '-v',
       'ON_ERROR_STOP=1',
       '-At',
-      '-c',
-      sql,
     ]);
     let output = '';
     child.stdout.on('data', (data) => (output += data));
     child.stderr.on('data', (data) => (output += data));
-    child.on('error', reject);
+    child.on('error', () => reject(new Error('LOCAL_TEST_QUERY_FAILED')));
     child.on('close', (code) => resolve({ code: code ?? 1, output }));
+    child.stdin.end(`set log_min_error_statement=panic;\n${sql}`);
   });
 }
 
@@ -134,21 +136,20 @@ function fixtureStatements(sql: string): void {
     'docker',
     [
       'exec',
-      'supabase_db_content-producer',
+      '-i',
+      dbContainerId,
       'psql',
+      '-X',
       '-U',
       'postgres',
       '-d',
       'postgres',
       '-v',
       'ON_ERROR_STOP=1',
-      '-c',
-      sql,
     ],
-    { encoding: 'utf8' },
+    { encoding: 'utf8', input: `set log_min_error_statement=panic;\n${sql}` },
   );
-  if (result.error) throw result.error;
-  if (result.status !== 0) throw new Error(result.stderr);
+  if (result.error || result.status !== 0) throw new Error('LOCAL_TEST_QUERY_FAILED');
 }
 
 function callerSql(owner: string, expression: string, clientId = randomUUID()): string {
