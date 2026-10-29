@@ -17,6 +17,15 @@ bersama [baseline](baseline-and-inventory.md) ,
   `scripts/phase-6-catalog-audit.ts` , `backend-technical-gate.yml` , `baseline.test.ts` ,
   `oauth-resource-audience-hook.test.ts` , serta audit akhir. Nama migration saja **tidak**
   menggantikan history/lint.
+- **I-ADVISOR — local security advisors (CR-020):** **WAJIB**, berbeda
+  dari I-MIG (`supabase db lint --local --fail-on error`) dan I-ACL
+  (catalog/RLS/grant audit). Test/command pengganti yang terbukti:
+  **TIDAK ADA pada source/log yang diperiksa**. [Run 22 Okt](https://github.com/milyarderpro/content-producer/actions/runs/39768822314)
+  dan [26 Okt](https://github.com/milyarderpro/content-producer/actions/runs/40364895835)
+  hanya menunjukkan lint/audit, bukan advisor lokal tersendiri.
+  **Status bukti: UNKNOWN / NOT EVIDENCED**. Sebelum cutover G4, wajib
+  ada command/report advisor terpisah dengan PASS pada kandidat SHA sama,
+  atau keputusan kontrak eksplisit dari pemilik/orchestrator.
 - **I-OWNER — OAuth dan penolakan owner/cross-owner:** JWT resource/audience, challenge, client
   context, inactive workspace, foreign workspace/page/post, malformed/anonymous denial tanpa
   existence leak; **WAJIB**. Pengawas: `mcp/auth_test.ts` , `mcp/oauth_production_test.ts` , DB
@@ -936,5 +945,11 @@ berlainan. Perubahan status membutuhkan pembanding G4, bukan nama fase.
 - Tidak ada kontrak v1 yang resmi dipensiunkan dalam sumber ini. Semua usul memindah/hapus test
   selain pemanggilan suite duplikat adalah **BELUM TERBUKTI** dan harus menunggu G2/G4 evidence;
   jangan menyatakan `phase` sebagai alasan.
+- **Blokir cutover G4 bila I-ADVISOR belum tertutup.** CR-020 meminta
+  local security advisors **selain** lint/katalog/RLS/grant. Bukti
+  pelaksanaannya kini UNKNOWN (lihat
+  [baseline](baseline-and-inventory.md)); G2/G3 harus menentukan check
+  eksplisit dan G4 harus memverifikasi output PASS per SHA. Tidak ada
+  pengecualian karena run lama hijau atau lint/audit telah sukses.
 - **CR-020/CR-044 masih efektif.** CR-052 hanya draft; jangan merge/mengganti full gate atau melepas
   backend sampai G4 dan cutover eksplisit.

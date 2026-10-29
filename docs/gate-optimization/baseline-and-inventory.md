@@ -33,6 +33,35 @@ tabel per-file adalah **detik durasi Vitest**, bukan durasi waktu kalender selur
   **UNKNOWN** tanpa instrumentasi. Dilarang menyimpulkan biaya CLI sebagai penyebab yang telah
   terbukti.
 
+## Gap bukti local security advisors (CR-020)
+
+- **Kewajiban:** [CR-020](../decisions/2026-10-15-phase-9-10-risk-based-mvp-acceptance.md)
+  mensyaratkan **local security advisors** selain audit catalog/RLS/grant.
+- **Source teramati:** [workflow backend](../../.github/workflows/backend-technical-gate.yml)
+  menjalankan `pnpm exec supabase db lint --local --fail-on error` pada langkah
+  `Local database lint`, serta `pnpm exec tsx scripts/phase-6-catalog-audit.ts`
+  sebelum/sesudah Inspector dan pada audit akhir. Pemeriksaan 17 file
+  `scripts/*.ts` dan `.github/workflows/*.yml` aktif tidak menemukan command
+  local security advisors yang eksplisit. DB lint dan audit katalog **tidak**
+  boleh dianggap pemeriksaan advisors yang setara tanpa bukti terpisah.
+- **Actions teramati:** [run 39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314)
+  memiliki langkah `Local DB lint (not hosted Security Advisor)` dan audit
+  katalog yang berhasil; [run 40364895835](https://github.com/milyarderpro/content-producer/actions/runs/40364895835)
+  mencatat command lint yang sama dan audit pre/post/final. Tidak ditemukan
+  command atau keluaran advisor lokal tersendiri pada log kedua run.
+  Disclaimer `Tidak membuktikan hosted Security Advisor` pada workflow
+  **bukan** bukti bahwa local security advisors pernah dijalankan.
+- **Status local security advisors: UNKNOWN / NOT EVIDENCED**, bukan PASS;
+  nama command, output dan durasi advisor = **UNKNOWN** karena tidak ada
+  langkah/log yang membuktikannya. `completed/success` kedua run hanya
+  membuktikan langkah lint dan audit yang benar-benar tercatat.
+- **Gap pemblokir cutover G4:** tentukan command/alat/versi advisors yang
+  memenuhi kewajiban CR-020, jalankan secara terpisah pada stack uji lokal
+  kandidat yang sama, lalu rekam hasil, durasi, exit status, dan artefak
+  teredaksi dalam pembandingan G4. Jika tidak tersedia, minta keputusan
+  kontrak eksplisit dari pemilik/orchestrator sebelum cutover; jangan
+  mengganti advisors diam-diam dengan lint atau catalog audit.
+
 ## Profil tahap berdasar log Actions
 
 | Tahap                                                      |                                                               22 Okt (perkiraan) |                   26 Okt (perkiraan) | Penafsiran                                                                 |

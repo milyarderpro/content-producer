@@ -36,6 +36,20 @@ CR ini menetapkan _semantik calon gate_, bukan implementasinya. Target ≤10 men
 identik GitHub** adalah target optimasi G4, bukan tanda lulus keamanan jika gagal dicapai. Durasi
 per-case/query pada snapshot ini **UNKNOWN**; jangan merekayasa angka.
 
+### Kewajiban local security advisors yang belum terbukti
+
+[CR-020](2026-10-15-phase-9-10-risk-based-mvp-acceptance.md) mewajibkan
+**local security advisors** **selain** catalog/RLS/grant audit. Source
+[workflow backend](../../.github/workflows/backend-technical-gate.yml)
+dan log [39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314)
+serta [40364895835](https://github.com/milyarderpro/content-producer/actions/runs/40364895835)
+memperlihatkan `pnpm exec supabase db lint --local --fail-on error` dan audit
+katalog; **tidak ada command/output advisor lokal terpisah yang terbukti**.
+Catatan workflow tentang _hosted_ Security Advisor tidak membuktikan
+pelaksanaan _local_ security advisors. **Status kewajiban: UNKNOWN /
+NOT EVIDENCED**, bukan PASS. Detail dan alasan ada pada
+[baseline G1](../gate-optimization/baseline-and-inventory.md).
+
 ## Keputusan yang diusulkan: pengganti tepat `pnpm run test-all`
 
 Pada **G3** buat manifest versioned yang memuat daftar seluruh test, kasus aktif/opsional/historis,
@@ -69,6 +83,17 @@ shell command serta komponen berikut. **Nama perintah usulan** (`gate:source`, `
 4. **Sampai cutover:** perintah asli `pnpm run test-all` dan `backend-technical-gate.yml` tetap
    wajib sebagaimana CR-020/044; `gate:full` hanya calon, tidak boleh diperlakukan sebagai bukti
    release.
+
+**Amendemen wajib untuk `gate:backend` pada butir 2:** urutan yang
+diusulkan harus menambahkan **langkah local security advisors yang eksplisit
+dan terpisah** dari DB lint dan catalog/RLS/grant audit. Command/alat
+yang secara sah memenuhi CR-020 saat ini **UNKNOWN**; G2/G3 harus
+mengidentifikasinya, mengunci versi/lingkungan lokal, dan mengeluarkan
+status, durasi, serta laporan teredaksi yang dapat diperiksa per SHA.
+Sebelum bukti advisor PASS tersedia pada G4 (atau ada keputusan kontrak
+eksplisit dari pemilik/orchestrator), `gate:full` **BLOCKED untuk cutover**
+walaupun seluruh lint, katalog, dan test lulus. Tidak ada pengganti
+implisit; CR-020/CR-044 tetap berlaku.
 
 ## Urutan CR-044 dan Inspector tidak boleh direduksi
 
@@ -155,6 +180,13 @@ kontrak. `fileParallelism: true` pada DB bersama tidak diterima tanpa isolasi an
    testing/operations/AGENTS, required checks, workflow release dan dokumentasi rollback dalam PR
    terpisah. Tidak ada default auto-merge, deployment otomatis atau izin business Write dari CR ini.
    **Effective date = UNKNOWN** sampai diterima; status sekarang NOT EFFECTIVE.
+
+**Kriteria G4 yang memblokir cutover:** cocokkan **local security advisors**
+dengan kewajiban CR-020 melalui command dan output terpisah di Actions
+dan local runner pada kandidat SHA identik. Jika hasil masih UNKNOWN,
+NOT RUN, atau BLOCKED, cutover **dilarang**; jangan menghitung DB lint
+atau catalog audit sebagai PASS advisors. Perubahan kontrak apa pun
+memerlukan keputusan eksplisit sebelum mengganti gate lama.
 
 ## Rollback
 
