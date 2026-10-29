@@ -40,7 +40,6 @@ function assertMandatory(suite: Suite, prefix: string): void {
   }
 }
 
-// prettier-ignore
 describe('mandatory suite inventory (not a release gate)', () => {
   it('has distinct mandatory source, MCP, and database groups', () => {
     expect(manifest.schemaVersion).toBe(1);
@@ -71,6 +70,7 @@ describe('mandatory suite inventory (not a release gate)', () => {
     expect(paths.sort()).toEqual(discovered);
   });
 
+  // prettier-ignore
   it('matches the exact files executed by the test:mcp Deno command', () => {
     const pkg = JSON.parse(read('package.json')) as { scripts: Record<string, string> };
     const command = pkg.scripts['test:mcp'];
