@@ -9,8 +9,8 @@ tabel per-file adalah **detik durasi Vitest**, bukan durasi waktu kalender selur
 ## Sumber dan batas hasil
 
 - [Run lama 39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314), `push`, SHA `67e3fbcef48a052d089a0d6fe8854a070a6ea2de`, 2026-10-22 11:12:22–11:35:44 UTC,
-  `completed/success`. Job bernama *One local reset, full suites, security, 33-tool Inspector,
-  non-owner*. Log: 40 file/176 tes database, `1095.02s` untuk Vitest DB, dan
+  `completed/success`. Job bernama _One local reset, full suites, security, 33-tool Inspector,
+  non-owner_. Log: 40 file/176 tes database, `1095.02s` untuk Vitest DB, dan
   `test-all exit=0 elapsed=1120s`. Run total dari timestamp awal/akhir sekitar **23m22s** (rencana
   menyebut 23m19s untuk job). Bukti historis; bukan SHA main kini.
 - [Run lama 40364895835](https://github.com/milyarderpro/content-producer/actions/runs/40364895835), `workflow_dispatch`, SHA `be7ce5455863d3c51f4cfdd9ec6c9263e837ede3`, 2026-10-26

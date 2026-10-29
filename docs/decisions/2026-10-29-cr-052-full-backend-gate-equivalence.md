@@ -32,7 +32,7 @@ terbukti pada source dan run 26 Okt. `test:database` memakai Vitest serial atas 
 overhead `supabase db query` tidak terbukti secara kausal: instrumentasi G2 wajib, bukan alasan
 melonggarkan invariant.
 
-CR ini menetapkan *semantik calon gate*, bukan implementasinya. Target ≤10 menit pada **tiga run
+CR ini menetapkan _semantik calon gate_, bukan implementasinya. Target ≤10 menit pada **tiga run
 identik GitHub** adalah target optimasi G4, bukan tanda lulus keamanan jika gagal dicapai. Durasi
 per-case/query pada snapshot ini **UNKNOWN**; jangan merekayasa angka.
 
@@ -74,7 +74,7 @@ shell command serta komponen berikut. **Nama perintah usulan** (`gate:source`, `
 
 Urutan backend setelah reset adalah **focused OAuth/owner → audit sebelum Inspector → authenticated
 Inspector 33 tool valid/invalid/denial → audit sesudah Inspector → suite database panjang → applied
-history + DB lint + audit akhir**. Ini mempercepat *failure feedback* dan menghindari kegagalan
+history + DB lint + audit akhir**. Ini mempercepat _failure feedback_ dan menghindari kegagalan
 Inspector setelah DB lama, tanpa membuang tes.
 
 Inspector wajib menggunakan host HTTP loopback + token owner sintetis yang valid dan principal
@@ -103,7 +103,7 @@ dilemahkan.
   menghasilkan gate evidence formal. Dirty working tree, altered local fixture/config atau linked DB
   menjadikan hasil **DIAGNOSTIC/NOT ACCEPTED**; tidak dipoles menjadi PASS untuk commit.
 - **Reuse backend mengikuti CR-044:** bila deployed backend source, semua migration,
-  authorization/security config dan runtime dependencies benar-benar *bit-for-bit* identik dengan
+  authorization/security config dan runtime dependencies benar-benar _bit-for-bit_ identik dengan
   kandidat PASS/yang ter-deploy, docs-only atau package-only commit boleh mereferensikan backend
   **PASS historis yang berlabel backend SHA aslinya**. Catat docs/package/merge SHA terpisah dan
   jalankan light/focused/MCP/manual cards yang terdampak. Reuse **bukan** PASS exact-SHA gabungan
