@@ -14,10 +14,16 @@ const manifest = JSON.parse(read('scripts/gate-suite-manifest.json')) as {
 };
 
 function walk(directory: string): string[] {
-  return readdirSync(join(root, directory), { withFileTypes: true }).flatMap((entry) => {
+  const files: string[] = [];
+  for (const entry of readdirSync(join(root, directory), { withFileTypes: true })) {
     const path = join(directory, entry.name);
-    return entry.isDirectory() ? walk(path) : entry.isFile() ? [path.split(sep).join('/')] : [];
-  });
+    if (entry.isDirectory()) {
+      files.push(...walk(path));
+    } else if (entry.isFile()) {
+      files.push(path.split(sep).join('/'));
+    }
+  }
+  return files;
 }
 
 function assertMandatory(suite: Suite, prefix: string): void {
