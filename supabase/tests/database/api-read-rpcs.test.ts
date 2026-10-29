@@ -1,5 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 interface JsonRecord {
@@ -25,29 +27,133 @@ function isJsonRecord(value: unknown): value is JsonRecord {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function runCli(sql: string): string {
-  const result = spawnSync('pnpm', ['exec', 'supabase', 'db', 'query', '--local', sql], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
-  });
-
-  if (result.error) throw result.error;
-  if (result.status !== 0) {
-    throw new Error(`Supabase local command failed: ${result.stderr}\n${result.stdout}`);
+function localDatabaseContainerId(): string {
+  let config: string;
+  try {
+    config = readFileSync(join(process.cwd(), 'supabase', 'config.toml'), 'utf8');
+  } catch {
+    throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
   }
-  return result.stdout;
+
+  let section = '';
+  let projectId: string | undefined;
+  let dbPort: number | undefined;
+  for (const rawLine of config.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+    const header = /^\[([^\]]+)\](?:\s*#.*)?$/.exec(line);
+    if (header) {
+      section = header[1]!;
+      continue;
+    }
+    if (section === '' && /^project_id\s*=/.test(line)) {
+      const match = /^project_id\s*=\s*(["'])([A-Za-z0-9][A-Za-z0-9_-]*)\1(?:\s*#.*)?$/.exec(line);
+      if (projectId !== undefined || !match) throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
+      projectId = match[2];
+    }
+    if (section === 'db' && /^port\s*=/.test(line)) {
+      const match = /^port\s*=\s*([0-9]+)(?:\s*#.*)?$/.exec(line);
+      if (dbPort !== undefined || !match) throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
+      dbPort = Number(match[1]);
+    }
+  }
+  if (!projectId || !Number.isInteger(dbPort) || dbPort! < 1 || dbPort! > 65535) {
+    throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
+  }
+
+  const name = `supabase_db_${projectId}`;
+  const network = `supabase_network_${projectId}`;
+  const inspected = spawnSync(
+    'docker',
+    [
+      'inspect',
+      '--format',
+      '{{.Id}}|{{.Name}}|{{.State.Running}}|{{.HostConfig.NetworkMode}}|{{range $name, $_ := .NetworkSettings.Networks}}{{$name}},{{end}}|{{range .Mounts}}{{.Name}},{{end}}|{{json (index .NetworkSettings.Ports "5432/tcp")}}',
+      name,
+    ],
+    { encoding: 'utf8' },
+  );
+  if (inspected.error || inspected.status !== 0) {
+    throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  }
+  const fields = inspected.stdout.trim().split('|');
+  if (fields.length !== 7) throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  const [containerId, containerName, running, networkMode, attachedNetworks, volumes, ports] =
+    fields;
+  let bindings: unknown;
+  try {
+    bindings = JSON.parse(ports!);
+  } catch {
+    throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  }
+  if (
+    !/^[0-9a-f]{64}$/.test(containerId!) ||
+    containerName !== `/${name}` ||
+    running !== 'true' ||
+    networkMode !== network ||
+    !attachedNetworks!.split(',').includes(network) ||
+    !volumes!.split(',').includes(name) ||
+    !Array.isArray(bindings) ||
+    bindings.length === 0 ||
+    !bindings.every((binding) => {
+      const port = (binding as { HostPort?: unknown } | null)?.HostPort;
+      return typeof port === 'string' && port === String(dbPort);
+    })
+  ) {
+    throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  }
+  return containerId!;
+}
+
+// A verified container ID is fixed before any case runs. Each call opens a new
+// PostgreSQL session; the RPC's role and JWT remain scoped to its own statement.
+const psqlArgs = [
+  'exec',
+  '-i',
+  localDatabaseContainerId(),
+  'psql',
+  '-X',
+  '-U',
+  'postgres',
+  '-d',
+  'postgres',
+  '-v',
+  'ON_ERROR_STOP=1',
+  '-v',
+  'VERBOSITY=terse',
+  '-Atq',
+];
+const logSetup = "set log_min_error_statement='panic'; set log_parameter_max_length_on_error=0;";
+
+function safeError(output: string): string {
+  const message = /ERROR:\s*([^\r\n]+)/.exec(output)?.[1] ?? '';
+  return /^[A-Z][A-Z_]+(?:\s|$)/.exec(message)?.[0].trim() ?? 'LOCAL_TEST_QUERY_FAILED';
+}
+
+function runCli(sql: string): string {
+  const result = spawnSync('docker', psqlArgs, {
+    input: `${logSetup}\n${sql}`,
+    encoding: 'utf8',
+  });
+  if (result.error) throw new Error('LOCAL_TEST_PROCESS_FAILED');
+  if (result.status !== 0) throw new Error(safeError(result.stderr));
+  return result.stdout.trim();
 }
 
 function queryRows(sql: string): JsonRecord[] {
-  const output = runCli(sql);
-  const jsonStart = output.indexOf('{');
-  if (jsonStart === -1) throw new Error('Expected JSON output from supabase db query.');
-  const parsed: unknown = JSON.parse(output.slice(jsonStart));
-  if (!isJsonRecord(parsed) || !Array.isArray(parsed.rows)) {
-    throw new Error('Expected database rows.');
-  }
-  return parsed.rows.filter(isJsonRecord);
+  const statement = sql.trim().replace(/;+\s*$/, '');
+  const output = runCli(`select row_to_json(q) from (${statement}) q;`);
+  if (!output) return [];
+  return output.split(/\r?\n/).map((line) => {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(line);
+    } catch {
+      throw new Error('LOCAL_TEST_QUERY_OUTPUT_INVALID');
+    }
+    if (!isJsonRecord(parsed)) throw new Error('LOCAL_TEST_QUERY_OUTPUT_INVALID');
+    return parsed;
+  });
 }
 
 function querySingleRow(sql: string): JsonRecord {
