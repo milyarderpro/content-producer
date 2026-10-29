@@ -1,5 +1,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 type JsonRecord = Record<string, unknown>;
@@ -23,13 +25,88 @@ function isJsonRecord(value: unknown): value is JsonRecord {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function localDatabaseContainerId(): string {
+  let config: string;
+  try {
+    config = readFileSync(join(process.cwd(), 'supabase', 'config.toml'), 'utf8');
+  } catch {
+    throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
+  }
+
+  let section = '';
+  let projectId: string | undefined;
+  let dbPort: number | undefined;
+  for (const rawLine of config.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+    const header = /^\[([^\]]+)\](?:\s*#.*)?$/.exec(line);
+    if (header) {
+      section = header[1]!;
+      continue;
+    }
+    if (section === '' && /^project_id\s*=/.test(line)) {
+      const match = /^project_id\s*=\s*(["'])([A-Za-z0-9][A-Za-z0-9_-]*)\1(?:\s*#.*)?$/.exec(line);
+      if (projectId !== undefined || !match) throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
+      projectId = match[2];
+    }
+    if (section === 'db' && /^port\s*=/.test(line)) {
+      const match = /^port\s*=\s*([0-9]+)(?:\s*#.*)?$/.exec(line);
+      if (dbPort !== undefined || !match) throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
+      dbPort = Number(match[1]);
+    }
+  }
+  if (!projectId || !Number.isInteger(dbPort) || dbPort! < 1 || dbPort! > 65535) {
+    throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
+  }
+
+  const name = `supabase_db_${projectId}`;
+  const network = `supabase_network_${projectId}`;
+  const inspected = spawnSync(
+    'docker',
+    [
+      'inspect',
+      '--format',
+      '{{.Id}}|{{.Name}}|{{.State.Running}}|{{.HostConfig.NetworkMode}}|{{range $name, $_ := .NetworkSettings.Networks}}{{$name}},{{end}}|{{range .Mounts}}{{.Name}},{{end}}|{{json (index .NetworkSettings.Ports "5432/tcp")}}',
+      name,
+    ],
+    { encoding: 'utf8' },
+  );
+  if (inspected.error || inspected.status !== 0) {
+    throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  }
+  const fields = inspected.stdout.trim().split('|');
+  if (fields.length !== 7) throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  const [containerId, containerName, running, networkMode, attachedNetworks, volumes, ports] =
+    fields;
+  let bindings: unknown;
+  try {
+    bindings = JSON.parse(ports!);
+  } catch {
+    throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  }
+  if (
+    !/^[0-9a-f]{64}$/.test(containerId!) ||
+    containerName !== `/${name}` ||
+    running !== 'true' ||
+    networkMode !== network ||
+    !attachedNetworks!.split(',').includes(network) ||
+    !volumes!.split(',').includes(name) ||
+    !Array.isArray(bindings) ||
+    bindings.length === 0 ||
+    !bindings.every((binding) => isJsonRecord(binding) && binding.HostPort === String(dbPort))
+  ) {
+    throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  }
+  return containerId!;
+}
+
 // Keep each call in its own PostgreSQL session, including concurrent race calls.
 // SQL travels on stdin, never process argv; error output exposes only expected
 // assertion labels, so fixture identifiers and statements stay out of logs.
 const psqlArgs = [
   'exec',
   '-i',
-  `supabase_db_${process.cwd().split('/').at(-1)}`,
+  localDatabaseContainerId(),
   'psql',
   '-X',
   '-U',
