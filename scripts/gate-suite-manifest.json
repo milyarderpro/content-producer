@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "baseSha": "7d9449816593818a3abbf4769b4af911158c84d0",
+  "suites": {
+    "source": {
+      "status": "mandatory",
+      "entrypoint": "pnpm run check",
+      "files": [
+        {
+          "path": "tests/evidence-output.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "tests/foundation.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "tests/gate-suite-manifest.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "tests/issue-56-dedup-recovery.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "tests/phase-8-coverage.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "tests/plugin-config.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "tests/plugin-package.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "tests/plugin-skill.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "tests/plugin-trivia.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "tests/workflow-change-classification.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "tests/workflow-config.test.ts",
+          "status": "mandatory"
+        }
+      ]
+    },
+    "mcp": {
+      "status": "mandatory",
+      "entrypoint": "pnpm run test:mcp",
+      "files": [
+        {
+          "path": "supabase/functions/mcp/auth_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/foundation_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/oauth_production_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/page_plan_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/pilot_db_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/plan_claim_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/plan_recovery_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/post_approval_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/post_base_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/post_edit_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/post_metrics_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/post_publication_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/transport_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/trivia_correction_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/trivia_fact_test.ts",
+          "status": "mandatory"
+        }
+      ]
+    },
+    "database": {
+      "status": "mandatory",
+      "entrypoint": "pnpm run test:database",
+      "files": [
+        {
+          "path": "supabase/tests/database/api-batch-b-remediation.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-metrics-concurrency.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-metrics-insights.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-metrics.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-page-plan-writes.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-phase-five-acceptance.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-plan-concurrency.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-plan-lifecycle.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-post-approval-quality.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-post-concurrency.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-post-lifecycle-concurrency.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-post-lifecycle.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-post-render-quality.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-post-reschedule.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-post-save-revise.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-read-rpcs.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-security-kernel.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-source-evidence-mcp-compat.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-trivia-concurrency.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-trivia-correction.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-trivia-facts.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-trivia-populated-performance.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-trivia-public-gold.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/api-trivia-source-diagnostics.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/baseline.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/content-plans-and-plan-items.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/core-primitives-and-validators.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/final-remediation.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/oauth-resource-audience-hook.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/operation-ledger-and-rate-limit-buckets.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/pages-and-page-niche-configs.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/phase-5-operation-map.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/posts-and-post-metrics.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/trivia-audit-remediation.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/trivia-candidate-retrieval.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/trivia-facts-schema.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/trivia-identity-and-source.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/trivia-lineage-and-reverification.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/trivia-post-facts.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/trivia-reservation-and-reuse.test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/tests/database/workspaces-and-niches.test.ts",
+          "status": "mandatory"
+        }
+      ]
+    }
+  }
+}
