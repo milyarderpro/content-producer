@@ -41,6 +41,7 @@ function assertMandatory(suite: Suite, prefix: string): void {
 }
 
 describe('mandatory suite inventory (not a release gate)', () => {
+  // prettier-ignore
   it('has distinct mandatory source, MCP, and database groups', () => {
     expect(manifest.schemaVersion).toBe(1);
     expect(manifest.baseSha).toMatch(/^[0-9a-f]{40}$/);
