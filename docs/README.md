@@ -42,6 +42,10 @@ metadata Read, format trivia, niche baru, dan penyajian hasil plugin.
 - [Audit cleanup](cleanup-audit.md) mencatat baseline lokal 25 Oktober 2026,
   dependensi, keputusan kandidat file, dan urutan Task 1–7.
 
+- [G1 baseline dan inventaris full gate](gate-optimization/baseline-and-inventory.md) — profil Actions, pemanggilan suite, dan durasi historis.
+- [Matriks invariant dan kasus gate](gate-optimization/invariant-matrix.md) — pemetaan cakupan 41 file dan bukti pengganti yang dibutuhkan.
+- [CR-052 rancangan kesetaraan gate](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md) — keputusan PROPOSED, belum efektif; CR-020/044 tetap berlaku.
+
 ## Referensi kontrak dan sejarah
 
 - [Kontrak frozen](../plans/README.md) menjelaskan peran dokumen `plans/` yang
