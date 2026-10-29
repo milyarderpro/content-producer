@@ -41,6 +41,7 @@ function assertMandatory(suite: Suite, prefix: string): void {
 }
 
 describe('mandatory suite inventory (not a release gate)', () => {
+  // prettier-ignore
   it('has distinct mandatory source, MCP, and database groups', () => {
     expect(manifest.schemaVersion).toBe(1);
     expect(manifest.baseSha).toMatch(/^[0-9a-f]{40}$/);
@@ -52,6 +53,7 @@ describe('mandatory suite inventory (not a release gate)', () => {
     expect(manifest.suites.database.files).toHaveLength(41);
   });
 
+  // prettier-ignore
   it('matches all source files discovered by the root Vitest include', () => {
     expect(read('vitest.config.ts')).toContain("include: ['tests/**/*.test.ts']");
     const discovered = walk('tests').filter((path) => path.endsWith('.test.ts')).sort();
@@ -59,6 +61,7 @@ describe('mandatory suite inventory (not a release gate)', () => {
     expect(paths.sort()).toEqual(discovered);
   });
 
+  // prettier-ignore
   it('matches the database Vitest include, including new and removed files', () => {
     expect(read('vitest.database.config.ts')).toContain(
       "include: ['supabase/tests/database/**/*.test.ts']",
