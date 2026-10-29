@@ -40,6 +40,7 @@ function assertMandatory(suite: Suite, prefix: string): void {
   }
 }
 
+// prettier-ignore
 describe('mandatory suite inventory (not a release gate)', () => {
   it('has distinct mandatory source, MCP, and database groups', () => {
     expect(manifest.schemaVersion).toBe(1);
