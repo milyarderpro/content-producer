@@ -86,7 +86,11 @@ describe('mandatory suite inventory (not a release gate)', () => {
     expect(paths.every((path) => path.endsWith('_test.ts'))).toBe(true);
     const invoked = paths.map((path) => 'supabase/functions/' + path);
     expect(new Set(invoked).size).toBe(invoked.length);
+    const discovered = walk('supabase/functions/mcp')
+      .filter((path) => path.endsWith('_test.ts'))
+      .sort();
     const manifestPaths = manifest.suites.mcp.files.map((file) => file.path);
-    expect(manifestPaths.sort()).toEqual(invoked.sort());
+    expect(invoked.sort()).toEqual(discovered);
+    expect(manifestPaths.sort()).toEqual(discovered);
   });
 });
