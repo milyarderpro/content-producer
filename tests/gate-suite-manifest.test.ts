@@ -42,6 +42,8 @@ describe('mandatory suite inventory (not a release gate)', () => {
     assertMandatory(manifest.suites.source, 'tests/');
     assertMandatory(manifest.suites.mcp, 'supabase/functions/mcp/');
     assertMandatory(manifest.suites.database, 'supabase/tests/database/');
+    expect(manifest.suites.mcp.files).toHaveLength(15);
+    expect(manifest.suites.database.files).toHaveLength(41);
   });
 
   it('matches all source files discovered by the root Vitest include', () => {
@@ -60,19 +62,19 @@ describe('mandatory suite inventory (not a release gate)', () => {
     expect(manifest.suites.database.files.map((file) => file.path).sort()).toEqual(discovered);
   });
 
-  it('matches only actual deno test entries in the test:mcp command', () => {
+  it('matches the exact files executed by the test:mcp Deno command', () => {
     const pkg = JSON.parse(read('package.json')) as { scripts: Record<string, string> };
     const command = pkg.scripts['test:mcp'];
     expect(command).toBeDefined();
-    const testCommand = command.split(/\s*&&\s*/).find((part) => /\bdeno test\b/.test(part));
+    const parts = command.split(/\s*&&\s*/);
+    const testCommand = parts.find((part) => /\bdeno test\b/.test(part));
     expect(testCommand).toBeDefined();
     const tokens = testCommand!.trim().split(/\s+/);
     const deno = tokens.indexOf('deno');
     expect(tokens[deno + 1]).toBe('test');
-    const invoked = tokens
-      .slice(deno + 2)
-      .filter((token) => token.endsWith('_test.ts'))
-      .map((path) => 'supabase/functions/' + path);
+    const paths = tokens.slice(deno + 2).filter((token) => token.endsWith('.ts'));
+    expect(paths.every((path) => path.endsWith('_test.ts'))).toBe(true);
+    const invoked = paths.map((path) => 'supabase/functions/' + path);
     expect(new Set(invoked).size).toBe(invoked.length);
     expect(manifest.suites.mcp.files.map((file) => file.path).sort()).toEqual(invoked.sort());
   });

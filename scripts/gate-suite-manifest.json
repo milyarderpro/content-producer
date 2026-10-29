@@ -15,6 +15,10 @@
           "status": "mandatory"
         },
         {
+          "path": "tests/gate-suite-manifest.test.ts",
+          "status": "mandatory"
+        },
+        {
           "path": "tests/issue-56-dedup-recovery.test.ts",
           "status": "mandatory"
         },
