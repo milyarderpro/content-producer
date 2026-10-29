@@ -1,5 +1,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 export type PlanItem = {
   plan_item_public_id: string;
@@ -54,6 +56,85 @@ export const json = (value: unknown): string => `${quote(JSON.stringify(value))}
 export const digest = (value: unknown): string =>
   createHash('sha256').update(JSON.stringify(value)).digest('hex');
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function localDatabaseContainerId(): string {
+  let config: string;
+  try {
+    config = readFileSync(join(process.cwd(), 'supabase', 'config.toml'), 'utf8');
+  } catch {
+    throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
+  }
+
+  let section = '';
+  let projectId: string | undefined;
+  let dbPort: number | undefined;
+  for (const rawLine of config.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+    const header = /^\[([^\]]+)\](?:\s*#.*)?$/.exec(line);
+    if (header) {
+      section = header[1]!;
+      continue;
+    }
+    if (section === '' && /^project_id\s*=/.test(line)) {
+      const match = /^project_id\s*=\s*(["'])([A-Za-z0-9][A-Za-z0-9_-]*)\1(?:\s*#.*)?$/.exec(line);
+      if (projectId !== undefined || !match) throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
+      projectId = match[2];
+    }
+    if (section === 'db' && /^port\s*=/.test(line)) {
+      const match = /^port\s*=\s*([0-9]+)(?:\s*#.*)?$/.exec(line);
+      if (dbPort !== undefined || !match) throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
+      dbPort = Number(match[1]);
+    }
+  }
+  if (!projectId || !Number.isInteger(dbPort) || dbPort! < 1 || dbPort! > 65535) {
+    throw new Error('LOCAL_DATABASE_CONFIG_INVALID');
+  }
+
+  const name = `supabase_db_${projectId}`;
+  const network = `supabase_network_${projectId}`;
+  const inspected = spawnSync(
+    'docker',
+    [
+      'inspect',
+      '--format',
+      '{{.Id}}|{{.Name}}|{{.State.Running}}|{{.HostConfig.NetworkMode}}|{{range $name, $_ := .NetworkSettings.Networks}}{{$name}},{{end}}|{{range .Mounts}}{{.Name}},{{end}}|{{json (index .NetworkSettings.Ports "5432/tcp")}}',
+      name,
+    ],
+    { encoding: 'utf8' },
+  );
+  if (inspected.error || inspected.status !== 0) {
+    throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  }
+  const fields = inspected.stdout.trim().split('|');
+  if (fields.length !== 7) throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  const [containerId, containerName, running, networkMode, attachedNetworks, volumes, ports] =
+    fields;
+  let bindings: unknown;
+  try {
+    bindings = JSON.parse(ports!);
+  } catch {
+    throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  }
+  if (
+    !/^[0-9a-f]{64}$/.test(containerId!) ||
+    containerName !== `/${name}` ||
+    running !== 'true' ||
+    networkMode !== network ||
+    !attachedNetworks!.split(',').includes(network) ||
+    !volumes!.split(',').includes(name) ||
+    !Array.isArray(bindings) ||
+    bindings.length === 0 ||
+    !bindings.every((binding) => isRecord(binding) && binding.HostPort === String(dbPort))
+  ) {
+    throw new Error('LOCAL_DATABASE_TARGET_MISMATCH');
+  }
+  return containerId!;
+}
+
 // SQL containing ephemeral lease tokens travels on stdin, not process argv.
 // Direct literal-SQL test sessions disable error-statement logging before caller
 // role switch. Production PostgREST binds parameters; it does not need this test
@@ -61,7 +142,7 @@ export const digest = (value: unknown): string =>
 const psqlArgs = [
   'exec',
   '-i',
-  'supabase_db_content-producer',
+  localDatabaseContainerId(),
   'psql',
   '-X',
   '-U',
