@@ -15,6 +15,10 @@
           "status": "mandatory"
         },
         {
+          "path": "tests/gate-runner.test.ts",
+          "status": "mandatory"
+        },
+        {
           "path": "tests/gate-suite-manifest.test.ts",
           "status": "mandatory"
         },

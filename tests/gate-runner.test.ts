@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { test } from 'node:test';
 import { URL } from 'node:url';
+import { test } from 'vitest';
 import {
   assertAdvisorsReport,
   assertClean,
@@ -12,12 +12,12 @@ import {
   stage,
   validateManifest,
   validateTarget,
-} from '../scripts/gate-runner.ts';
+} from '../scripts/gate-runner.js';
 
 const manifest = JSON.parse(
-  readFileSync(new URL('../scripts/gate-suite-manifest.json', import.meta.url)),
+  readFileSync(new URL('../scripts/gate-suite-manifest.json', import.meta.url), 'utf8'),
 );
-const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
+const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 const sha = 'b'.repeat(40);
 
 test('rejects a mismatched candidate SHA before any stage', () => {
@@ -35,7 +35,7 @@ test('rejects manifest drift and missing required database file', () => {
 });
 
 test('accepts the frozen manifest and rejects skipped required cases', () => {
-  assert.deepEqual(validateManifest(manifest, pkg.scripts), { source: 11, mcp: 15, database: 41 });
+  assert.deepEqual(validateManifest(manifest, pkg.scripts), { source: 12, mcp: 15, database: 41 });
   assert.throws(() => assertNoSkipped('Tests 179 passed, 1 skipped'), {
     code: 'REQUIRED_CASE_SKIPPED',
   });
@@ -72,7 +72,7 @@ test('rejects source/backend identity mismatch', () => {
     manifestHash: 'a',
     lockHash: 'b',
     inputsHash: 'c',
-    counts: { source: 11, mcp: 15, database: 41 },
+    counts: { source: 12, mcp: 15, database: 41 },
   };
   assert.throws(() => sameIdentity(identity, { ...identity, manifestHash: 'drift' }), {
     code: 'COMPONENT_IDENTITY_MISMATCH',

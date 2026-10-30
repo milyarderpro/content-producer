@@ -6,7 +6,7 @@
 
 `gate:source` menjalankan `pnpm run check` sekali. Preflight mengikat SHA checkout bersih, hash manifest, lockfile, input migration/fixture/config, serta versi Node, pnpm, Deno, dan Supabase CLI. `gate:backend` menjalankan satu stack lokal disposable dengan satu reset, nama migration, MCP sekali, audit awal, Inspector 33 valid/invalid dan owner denial, audit sesudah, 41 file database serial sesuai konfigurasi Vitest, history, lint, local security advisors sebagai langkah sendiri, audit akhir, dan whitespace. `gate:full` menggabungkan komponen pada identitas yang sama. Kegagalan atau bukti wajib yang hilang memberi exit nonzero.
 
-Tes runner berada di `tests/gate-runner.spec.mjs` dan dipanggil eksplisit dengan `node --import tsx tests/gate-runner.spec.mjs`. Pola `*.test.ts` milik manifest source tidak bertambah; manifest wajib tetap tidak diubah.
+Sembilan tes fail-closed runner berada di `tests/gate-runner.test.ts` sebagai file source mandatory ke-12 dalam `scripts/gate-suite-manifest.json`. `pnpm run check` menjalankannya melalui root Vitest; untuk tes fokus saja gunakan `pnpm exec vitest run tests/gate-runner.test.ts`. Manifest tetap berisi 15 file MCP dan 41 file database mandatory.
 
 ## Target lokal dan bukti
 
@@ -16,4 +16,4 @@ Runner membuat salinan runtime sementara untuk mengganti hanya `project_id` dan 
 
 ## Status bukti
 
-Catat preflight, diff, estimasi dari riwayat run, identitas stack, hasil check/tes fokus, satu run kandidat bila aman, cleanup, serta light CI head PR pada laporan akhir. `PASS` hanya untuk pemeriksaan yang selesai; `FAIL` untuk command/evidence wajib gagal; `BLOCKED` untuk preflight/target yang tidak aman; `NOT RUN` untuk tahap yang belum dimulai. Gate lama dan workflow kandidat GitHub tetap `NOT RUN` pada PR ini. Hasil lokal tidak membuktikan OAuth ChatGPT hosted, business Write production, atau kesetaraan G4.
+Catat preflight, diff, estimasi dari riwayat run, identitas stack, hasil check/tes fokus, satu run kandidat diagnostik yang sudah selesai, cleanup, serta light CI head PR pada laporan akhir. Jangan ulang full backend gate pada PR ini. `PASS` hanya untuk pemeriksaan yang selesai; `FAIL` untuk command/evidence wajib gagal; `BLOCKED` untuk preflight/target yang tidak aman; `NOT RUN` untuk tahap yang belum dimulai. Gate lama dan workflow kandidat GitHub tetap `NOT RUN` pada PR ini. Hasil lokal tidak membuktikan OAuth ChatGPT hosted, business Write production, atau kesetaraan G4.
