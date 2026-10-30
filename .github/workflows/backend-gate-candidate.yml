@@ -66,6 +66,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$(dirname "$GATE_EVIDENCE_FILE")"
+          pnpm install --frozen-lockfile > /dev/null
           pnpm run gate:source > /dev/null
       - name: Validate and export safe source evidence
         id: run
@@ -164,6 +165,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$(dirname "$GATE_EVIDENCE_FILE")"
+          pnpm install --frozen-lockfile > /dev/null
           pnpm run gate:backend > /dev/null
       - name: Validate and export safe backend evidence
         id: run
