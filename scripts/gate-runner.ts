@@ -648,7 +648,7 @@ export async function main(mode: Mode): Promise<void> {
       lockSha256: identity?.lockHash ?? 'UNVERIFIED',
       inputsSha256: identity?.inputsHash ?? 'UNVERIFIED',
       configOverlaySha256: overlayHash ?? null,
-      configMode: exactActions ? 'ACTIONS_EXACT_CONFIG' : 'LOCAL_DIAGNOSTIC_OVERLAY',
+      configMode: exactActions ? 'ACTIONS_EXACT_CONFIG' : mode === 'source' ? 'COMMITTED_SOURCE' : 'LOCAL_DIAGNOSTIC_OVERLAY',
       suites: identity?.counts ?? null,
       toolPins: {
         node: read('.nvmrc').toString().trim(),
