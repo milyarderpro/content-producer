@@ -23,6 +23,7 @@ import {
   validateShards,
   validateShardProofs,
   validateSingleMcpInspector,
+  requiredReportStages,
   assertShardDatabaseEvidence,
 } from '../scripts/gate-runner.js';
 
@@ -308,4 +309,66 @@ test('MCP 15 files/82 cases and authenticated Inspector belong to shard 1 exactl
       code: 'SHARD_SINGLE_OWNER_EVIDENCE_INVALID',
     });
   }
+});
+
+test('final shard report stages satisfy both aggregate validators without false NOT RUN', () => {
+  const partition = validateShards(
+    JSON.parse(readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8')),
+    manifest,
+  );
+  const hashes = {
+    manifestSha256: 'a'.repeat(64),
+    lockSha256: 'b'.repeat(64),
+    inputsSha256: 'c'.repeat(64),
+    shardSha256: 'd'.repeat(64),
+  };
+  const report = (shard: '1' | '2', cases: number): ShardProof => ({
+    shard,
+    sha,
+    ...hashes,
+    files: partition[shard],
+    cases,
+    status: 'PASS',
+    stages: requiredReportStages('backend', shard).map((name) => ({
+      name,
+      status: 'PASS',
+      durationMs: 1,
+      ...(name === 'mcp' ? { count: '82' } : {}),
+      ...(name === 'inspector' ? { count: '33 valid; 33 invalid; owner denial' } : {}),
+      ...(name === 'database' ? { count: String(cases) } : {}),
+    })),
+  });
+  const one = report('1', 92);
+  const two = report('2', 90);
+  assert.equal(validateShardProofs([one, two], sha, hashes, partition), 182);
+  assert.doesNotThrow(() => validateSingleMcpInspector([one, two]));
+  assert.equal(two.stages.some((item) => ['mcp', 'inspector'].includes(item.name)), false);
+  assert.equal(requiredReportStages('backend').includes('mcp'), true);
+  assert.equal(requiredReportStages('full').includes('inspector'), true);
+
+  for (const stageName of ['mcp', 'inspector']) {
+    const missing: ShardProof = {
+      ...one,
+      stages: one.stages.filter((stage) => stage.name !== stageName),
+    };
+    assert.doesNotThrow(() => validateShardProofs([missing, two], sha, hashes, partition));
+    assert.throws(() => validateSingleMcpInspector([missing, two]), {
+      code: 'SHARD_SINGLE_OWNER_EVIDENCE_INVALID',
+    });
+    const duplicate: ShardProof = {
+      ...two,
+      stages: [...two.stages, one.stages.find((stage) => stage.name === stageName)!],
+    };
+    assert.doesNotThrow(() => validateShardProofs([one, duplicate], sha, hashes, partition));
+    assert.throws(() => validateSingleMcpInspector([one, duplicate]), {
+      code: 'SHARD_SINGLE_OWNER_EVIDENCE_INVALID',
+    });
+  }
+  const broken: ShardProof = {
+    ...two,
+    stages: [...two.stages, { name: 'cleanup', status: 'NOT RUN', durationMs: 0 }],
+  };
+  assert.throws(() => validateShardProofs([one, broken], sha, hashes, partition), {
+    code: 'SHARD_EVIDENCE_MISMATCH',
+  });
 });

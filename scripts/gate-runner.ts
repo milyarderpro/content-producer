@@ -769,6 +769,29 @@ async function backendStages(
   }
 }
 
+export function requiredReportStages(mode: Mode, shard?: ShardId): string[] {
+  if (mode === 'source') return ['locked-install', 'source'];
+  const stages = [
+    'locked-install',
+    'cli-help',
+    'start',
+    'reset',
+    'migration-names',
+    'mcp',
+    'audit-before',
+    'inspector',
+    'audit-after',
+    'database',
+    'migration-history',
+    'db-lint',
+    'security-advisors',
+    'audit-final',
+    'whitespace',
+    'cleanup',
+  ];
+  return shard === '2' ? stages.filter((name) => name !== 'mcp' && name !== 'inspector') : stages;
+}
+
 export async function main(mode: Mode): Promise<void> {
   const started = performance.now();
   const stages: Stage[] = [];
@@ -798,27 +821,7 @@ export async function main(mode: Mode): Promise<void> {
     failureReason = error instanceof GateError ? error.code : 'UNEXPECTED_ERROR';
     process.exitCode = 1;
   }
-  const required =
-    mode === 'source'
-      ? ['locked-install', 'source']
-      : [
-          'locked-install',
-          'cli-help',
-          'start',
-          'reset',
-          'migration-names',
-          'mcp',
-          'audit-before',
-          'inspector',
-          'audit-after',
-          'database',
-          'migration-history',
-          'db-lint',
-          'security-advisors',
-          'audit-final',
-          'whitespace',
-          'cleanup',
-        ];
+  const required = requiredReportStages(mode, shard);
   for (const name of required) {
     if (!stages.some((item) => item.name === name))
       stages.push({ name, status: 'NOT RUN', durationMs: 0 });
