@@ -60,7 +60,7 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
     expect(candidate).toContain('candidate_sha:');
     expect(candidate).toContain('required: true');
     for (const job of ['source', 'database']) {
-      const section = candidate.split(`  ${job}:\\n`)[1]?.split('\\n  aggregate:')[0];
+      const section = candidate.split(`  ${job}:\n`)[1]?.split('\n  aggregate:')[0];
       expect(section).toBeDefined();
       expect(section).toContain("if: github.ref == 'refs/heads/main'");
       expect(section).toContain('ref: ${{ github.sha }}');
