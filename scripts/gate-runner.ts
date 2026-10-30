@@ -151,6 +151,23 @@ export function assertNoSkipped(output: string): void {
     fail('REQUIRED_CASE_SKIPPED', 'FAIL');
 }
 
+export function assertAdvisorsReport(output: string): void {
+  let report: unknown;
+  try {
+    report = JSON.parse(output);
+  } catch {
+    fail('ADVISOR_REPORT_INVALID', 'FAIL');
+  }
+  if (
+    !report ||
+    typeof report !== 'object' ||
+    Array.isArray(report) ||
+    typeof (report as { message?: unknown }).message !== 'string' ||
+    !Array.isArray((report as { results?: unknown }).results)
+  )
+    fail('ADVISOR_REPORT_INVALID', 'FAIL');
+}
+
 export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identity {
   const sha = git(['rev-parse', 'HEAD']);
   assertSha(expectedSha, sha);
@@ -241,17 +258,31 @@ function sourceProjectId(): string {
   return match![1]!;
 }
 
-function dockerVacant(projectId: string): void {
-  for (const [kind, name] of [
-    ['container', `supabase_db_${projectId}`],
-    ['network', `supabase_network_${projectId}`],
-    ['volume', `supabase_db_${projectId}`],
-  ]) {
-    const result = spawnSync('docker', [kind, 'inspect', name], { encoding: 'utf8' });
-    if (result.error || result.status === 0 || result.status !== 1)
+export function assertNoExistingStackResources(
+  projectId: string,
+  listings: { containers: string; networks: string; volumes: string },
+): void {
+  const marker = `_${projectId}`;
+  for (const listing of Object.values(listings)) {
+    if (
+      listing
+        .split(/\r?\n/)
+        .some(
+          (name) =>
+            name.startsWith('supabase_') && (name.endsWith(marker) || name.includes(`${marker}_`)),
+        )
+    )
       fail('DISPOSABLE_TARGET_OCCUPIED');
   }
+}
+
+function dockerVacant(projectId: string): void {
   command('docker', ['info', '--format', '{{.ServerVersion}}']);
+  assertNoExistingStackResources(projectId, {
+    containers: command('docker', ['container', 'ls', '--all', '--format', '{{.Names}}']).output,
+    networks: command('docker', ['network', 'ls', '--format', '{{.Name}}']).output,
+    volumes: command('docker', ['volume', 'ls', '--format', '{{.Name}}']).output,
+  });
 }
 
 function assertStartedTarget(projectId: string, base: number): void {
@@ -455,16 +486,7 @@ async function backendStages(
       () => {
         const result = command(cmd, args, stageRoot.path);
         if (['mcp', 'database'].includes(name)) assertNoSkipped(result.output);
-        if (name === 'security-advisors') {
-          const jsonStart = result.output.indexOf('[');
-          if (jsonStart < 0) fail('ADVISOR_REPORT_MISSING', 'FAIL');
-          try {
-            if (!Array.isArray(JSON.parse(result.output.slice(jsonStart))))
-              fail('ADVISOR_REPORT_INVALID', 'FAIL');
-          } catch {
-            fail('ADVISOR_REPORT_INVALID', 'FAIL');
-          }
-        }
+        if (name === 'security-advisors') assertAdvisorsReport(result.output);
         return result;
       },
       evidence,
@@ -505,26 +527,21 @@ async function backendStages(
     );
     run('migration-history', 'pnpm', ['run', 'supabase:verify'], /\d{14}/);
     run('db-lint', 'pnpm', ['exec', 'supabase', 'db', 'lint', '--local', '--fail-on', 'error']);
-    run(
-      'security-advisors',
-      'pnpm',
-      [
-        'exec',
-        'supabase',
-        'db',
-        'advisors',
-        '--local',
-        '--type',
-        'security',
-        '--level',
-        'info',
-        '--fail-on',
-        'error',
-        '--output-format',
-        'json',
-      ],
-      /\[/,
-    );
+    run('security-advisors', 'pnpm', [
+      'exec',
+      'supabase',
+      'db',
+      'advisors',
+      '--local',
+      '--type',
+      'security',
+      '--level',
+      'info',
+      '--fail-on',
+      'error',
+      '--output-format',
+      'json',
+    ]);
     run(
       'audit-final',
       'pnpm',

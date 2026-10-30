@@ -3,7 +3,9 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { URL } from 'node:url';
 import {
+  assertAdvisorsReport,
   assertClean,
+  assertNoExistingStackResources,
   assertNoSkipped,
   assertSha,
   sameIdentity,
@@ -48,6 +50,22 @@ test('rejects unsafe and user stack targets', () => {
   });
 });
 
+test('rejects any existing disposable stack resource before starting or cleaning it', () => {
+  const projectId = 'issue-88-runner-disposable';
+  for (const [kind, name] of [
+    ['containers', `supabase_rest_${projectId}`],
+    ['containers', `supabase_kong_${projectId}`],
+    ['containers', `supabase_realtime_${projectId}`],
+    ['networks', `supabase_network_${projectId}`],
+    ['volumes', `supabase_storage_${projectId}`],
+  ]) {
+    const listings = { containers: '', networks: '', volumes: '', [kind]: name };
+    assert.throws(() => assertNoExistingStackResources(projectId, listings), {
+      code: 'DISPOSABLE_TARGET_OCCUPIED',
+    });
+  }
+});
+
 test('rejects source/backend identity mismatch', () => {
   const identity = {
     sha,
@@ -72,4 +90,13 @@ test('fails closed when a required stage throws or lacks evidence', () => {
     stage('inspector', () => ({ output: '33 calls skipped' }), /33 valid and 33 invalid/).status,
     'FAIL',
   );
+});
+
+test('accepts the pinned CLI advisor report and rejects missing or malformed results', () => {
+  assert.doesNotThrow(() =>
+    assertAdvisorsReport('{"message":"No security issues found","results":[]}'),
+  );
+  for (const output of ['', '[]', '{"message":"ok"}', '{"message":"ok","results":null}']) {
+    assert.throws(() => assertAdvisorsReport(output), { code: 'ADVISOR_REPORT_INVALID' });
+  }
 });
