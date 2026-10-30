@@ -261,6 +261,7 @@ export function assertActionsEnvironment(env: NodeJS.ProcessEnv = process.env): 
     !/^[0-9a-f]{40}$/.test(env.GITHUB_SHA ?? '') ||
     env.GATE_CANDIDATE_SHA !== env.GITHUB_SHA ||
     !env.RUNNER_TEMP ||
+    env.RUNNER_OS !== 'Linux' ||
     env.GATE_ACTIONS_EXACT_CONFIG !== '1'
   ) fail('UNVERIFIED_ACTIONS_ENVIRONMENT');
 }
@@ -627,12 +628,17 @@ export async function main(mode: Mode): Promise<void> {
     failureReason = error instanceof GateError ? error.code : 'UNEXPECTED_ERROR';
     process.exitCode = 1;
   }
+  const required = mode === 'source'
+    ? ['locked-install', 'source']
+    : ['locked-install', 'cli-help', 'start', 'reset', 'migration-names', 'mcp', 'audit-before', 'inspector', 'audit-after', 'database', 'migration-history', 'db-lint', 'security-advisors', 'audit-final', 'whitespace', 'cleanup'];
+  for (const name of required) {
+    if (!stages.some((item) => item.name === name)) stages.push({ name, status: 'NOT RUN', durationMs: 0 });
+  }
   const top = [...stages]
     .sort((a, b) => b.durationMs - a.durationMs)
     .slice(0, 5)
     .map((s) => s.name);
-  console.log(
-    JSON.stringify({
+  const report = {
       mode,
       status,
       failureReason,
@@ -654,7 +660,12 @@ export async function main(mode: Mode): Promise<void> {
       topFiveSlowest: top,
       durationMs: Math.round(performance.now() - started),
       limits:
-        'Local fixture only; not G4 equivalence, hosted OAuth, production, or release authorization.',
-    }),
-  );
+        'Candidate only; not G4 equivalence, hosted OAuth, production, or release authorization.',
+  };
+  const serialized = JSON.stringify(report);
+  if (process.env.GATE_EVIDENCE_FILE) {
+    mkdirSync(resolve(process.env.GATE_EVIDENCE_FILE, '..'), { recursive: true });
+    writeFileSync(process.env.GATE_EVIDENCE_FILE, `${serialized}\n`);
+  }
+  console.log(serialized);
 }
