@@ -1,17 +1,5 @@
-import { spawnSync } from 'node:child_process';
+import { localQuery } from './helpers/local-query.js';
 import { describe, expect, it } from 'vitest';
-
-function localQuery(query: string): void {
-  const result = spawnSync('pnpm', ['exec', 'supabase', 'db', 'query', '--local', query], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
-    shell: process.platform === 'win32',
-  });
-
-  if (result.error) throw result.error;
-  if (result.status !== 0) throw new Error(`${result.stderr.trim()}\n${result.stdout.trim()}`);
-}
 
 describe('Phase 3 content plans and plan items', () => {
   it('enforces scoped plans, schedules, leases, and private privileges', () => {

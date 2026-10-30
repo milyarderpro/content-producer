@@ -1,35 +1,13 @@
-import { spawn, spawnSync } from 'node:child_process';
-
 import { describe, expect, it } from 'vitest';
 
-function query(sql: string): string {
-  const result = spawnSync('pnpm', ['exec', 'supabase', 'db', 'query', '--local', sql], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
-  });
-
-  if (result.status !== 0) throw new Error(`${result.stderr}\n${result.stdout}`);
-  return result.stdout;
-}
-
-function queryRows(sql: string): Array<Record<string, unknown>> {
-  return (JSON.parse(query(sql)) as { rows: Array<Record<string, unknown>> }).rows;
-}
+import {
+  localQuery as query,
+  localQueryRows as queryRows,
+  localQueryAsync,
+} from './helpers/local-query.js';
 
 function concurrentQuery(sql: string): Promise<number | null> {
-  return new Promise((resolve, reject) => {
-    const child = spawn(
-      'pnpm',
-      ['exec', 'supabase', 'db', 'query', '--local', '--output-format', 'json', sql],
-      {
-        cwd: process.cwd(),
-        env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
-      },
-    );
-    child.once('error', reject);
-    child.once('close', resolve);
-  });
+  return localQueryAsync(sql).then((result) => result.code);
 }
 
 describe('Phase 4 checkpoint 4.7 trivia lineage and reverification', () => {

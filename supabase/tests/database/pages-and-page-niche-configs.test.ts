@@ -1,53 +1,7 @@
-import { spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 
-type JsonRecord = Record<string, unknown>;
-
-function isJsonRecord(value: unknown): value is JsonRecord {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function localQuery(query: string): string {
-  const result = spawnSync('pnpm', ['exec', 'supabase', 'db', 'query', '--local', query], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
-    shell: process.platform === 'win32',
-  });
-
-  if (result.error) {
-    throw result.error;
-  }
-
-  if (result.status !== 0) {
-    throw new Error(`Supabase local command failed: ${result.stderr.trim()}`);
-  }
-
-  return result.stdout;
-}
-
-function querySingleRow(query: string): JsonRecord {
-  const output = localQuery(query);
-  const jsonStart = output.indexOf('{');
-
-  if (jsonStart === -1) {
-    throw new Error('supabase db query did not return JSON output.');
-  }
-
-  const parsed: unknown = JSON.parse(output.slice(jsonStart));
-
-  if (
-    !isJsonRecord(parsed) ||
-    !Array.isArray(parsed.rows) ||
-    parsed.rows.length !== 1 ||
-    !isJsonRecord(parsed.rows[0])
-  ) {
-    throw new Error('Expected exactly one JSON row from the local database query.');
-  }
-
-  return parsed.rows[0];
-}
+import { localQuery, localQueryRow as querySingleRow } from './helpers/local-query.js';
 
 function expectSqlFailure(statement: string): void {
   expect(() => localQuery(statement)).toThrow('Supabase local command failed');

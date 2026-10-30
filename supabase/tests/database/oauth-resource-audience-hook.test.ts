@@ -1,15 +1,5 @@
-import { spawnSync } from 'node:child_process';
+import { localQuery } from './helpers/local-query.js';
 import { describe, it } from 'vitest';
-
-function localQuery(sql: string): void {
-  const result = spawnSync('pnpm', ['exec', 'supabase', 'db', 'query', '--local', sql], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
-  });
-  if (result.error) throw result.error;
-  if (result.status !== 0) throw new Error(result.stderr.trim());
-}
 
 describe('CR-021 Supabase OAuth audience hook', () => {
   it('binds OAuth code and refresh tokens to MCP without changing ordinary sessions', () => {
