@@ -103,7 +103,6 @@ test('accepts the pinned CLI advisor report and rejects missing or malformed res
   }
 });
 
-
 test('exact Actions mode needs dispatch SHA and isolated GitHub context', () => {
   const env = {
     GITHUB_ACTIONS: 'true',
