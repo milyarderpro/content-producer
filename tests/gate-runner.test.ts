@@ -252,4 +252,3 @@ test('shard proof rejects missing, duplicate, skipped and wrong SHA', () => {
     assert.throws(() => assertShardDatabaseEvidence(output, 21));
   }
 });
-
