@@ -232,8 +232,7 @@ export function validateTarget(
 ): void {
   if (exactActions) {
     assertActionsEnvironment();
-    if (projectId !== sourceProject || portBase !== 54320)
-      fail('ACTIONS_CONFIG_TARGET_MISMATCH');
+    if (projectId !== sourceProject || portBase !== 54320) fail('ACTIONS_CONFIG_TARGET_MISMATCH');
   } else if (
     !/^issue-88-[a-z0-9-]+-disposable$/.test(projectId) ||
     projectId === sourceProject ||
@@ -278,8 +277,7 @@ export function assertConfigMode(
   config: Buffer,
   committed: Buffer,
 ): void {
-  if (mode !== 'ACTIONS_EXACT_CONFIG' || !config.equals(committed))
-    fail('EXACT_CONFIG_MISMATCH');
+  if (mode !== 'ACTIONS_EXACT_CONFIG' || !config.equals(committed)) fail('EXACT_CONFIG_MISMATCH');
 }
 
 function sourceProjectId(): string {
@@ -495,9 +493,7 @@ async function backendStages(
   const base = exactActions ? 54320 : Number(process.env.GATE_PORT_BASE ?? NaN);
   validateTarget(projectId, base, sourceProjectId(), exactActions);
   if (exactActions) {
-    const committed = spawnSync('git', ['show', 'HEAD:supabase/config.toml'], {
-      cwd: root,
-    });
+    const committed = spawnSync('git', ['show', 'HEAD:supabase/config.toml'], { cwd: root });
     if (committed.status !== 0 || !committed.stdout) fail('EXACT_CONFIG_UNAVAILABLE');
     assertConfigMode('ACTIONS_EXACT_CONFIG', read('supabase/config.toml'), committed.stdout);
   }
