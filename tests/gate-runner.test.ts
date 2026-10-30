@@ -4,6 +4,10 @@ import { URL } from 'node:url';
 import { test } from 'vitest';
 import {
   assertAdvisorsReport,
+  assertSourceTestEvidence,
+  assertDatabaseTestEvidence,
+  countFromOutput,
+  plainEvidence,
   assertActionsEnvironment,
   assertConfigMode,
   assertClean,
@@ -137,4 +141,43 @@ test('formal config requires byte-identical committed config', () => {
   assert.throws(() => assertConfigMode('ACTIONS_EXACT_CONFIG', Buffer.from('changed'), committed), {
     code: 'EXACT_CONFIG_MISMATCH',
   });
+});
+
+test('source Vitest ANSI and plain summaries', () => {
+  const plain = 'Test Files 12 passed\nTests 83 passed';
+  const ansi = 'Test Files \x1b[32m12 passed\x1b[0m\nTests \x1b[32m83 passed\x1b[0m';
+  for (const output of [plain, ansi]) {
+    assert.doesNotThrow(() => assertSourceTestEvidence(output, 12));
+    assert.equal(countFromOutput('source', output), 'root 12 files; root 83 cases');
+  }
+  assert.equal(plainEvidence(ansi), plain);
+  for (const output of [
+    'Test Files 11 passed\nTests 83 passed',
+    'Test Files 12 passed',
+    'Test Files 12 passed\nTests 82 passed, 1 failed',
+    'Test Files 12 passed\nTests 82 passed, 1 cancelled',
+  ]) {
+    assert.throws(() => assertSourceTestEvidence(output, 12), {
+      code: 'SOURCE_TEST_EVIDENCE_MISSING',
+    });
+  }
+});
+
+test('database Vitest ANSI and plain summaries', () => {
+  const plain = 'Test Files 41 passed\nTests 179 passed';
+  const ansi = 'Test Files \x1b[32m41 passed\x1b[0m\nTests \x1b[32m179 passed\x1b[0m';
+  for (const output of [plain, ansi]) {
+    assert.doesNotThrow(() => assertDatabaseTestEvidence(output));
+    assert.equal(countFromOutput('database', output), '179');
+  }
+  assert.equal(plainEvidence(ansi), plain);
+  for (const output of [
+    'Test Files 40 passed\nTests 179 passed',
+    'Test Files 41 passed',
+    'Test Files 41 passed\nTests 178 passed, 1 skipped',
+    'Test Files 41 passed\nTests 178 passed, 1 failed',
+    'Test Files 41 passed\nTests 178 passed, 1 cancelled',
+  ]) {
+    assert.throws(() => assertDatabaseTestEvidence(output));
+  }
 });
