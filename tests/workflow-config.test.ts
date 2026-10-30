@@ -87,7 +87,8 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
       'test "$BACKEND_SHA" = "$CANDIDATE_SHA"',
       'for item in MANIFEST LOCK INPUTS; do',
       'test "${!a}" = "${!b}"',
-    ]) expect(candidate).toContain(statement);
+    ])
+      expect(candidate).toContain(statement);
     expect(candidate).not.toContain('continue-on-error: true');
   });
 
