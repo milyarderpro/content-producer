@@ -231,7 +231,13 @@ test('shard proof rejects missing, duplicate, skipped and wrong SHA', () => {
     [mk('1'), mk('1')],
     [mk('1'), { ...mk('2'), sha: '0'.repeat(40) }],
     [mk('1'), { ...mk('2'), files: [...mk('2').files.slice(1), mk('1').files[0]!] }],
-    [mk('1'), { ...mk('2'), stages: [{ name: 'database', status: 'NOT RUN' as const, durationMs: 0 }] }],
+    [
+      mk('1'),
+      {
+        ...mk('2'),
+        stages: [{ name: 'database', status: 'NOT RUN' as const, durationMs: 0 }],
+      },
+    ],
     [mk('1'), { ...mk('2'), cases: 0 }],
   ])
     assert.throws(() => validateShardProofs(bad, sha, hashes, part), {

@@ -526,7 +526,7 @@ export function countFromOutput(name: string, rawOutput: string): string | undef
 export function assertSourceTestEvidence(output: string, sourceFiles: number): void {
   const plain = plainEvidence(output);
   if (
-    !new RegExp(`Test Files\s+${sourceFiles} passed`).test(plain) ||
+    !new RegExp(`Test Files\\s+${sourceFiles} passed`).test(plain) ||
     !/Tests\s+[1-9]\d* passed/.test(plain) ||
     /\b[1-9]\d* (?:skipped|ignored|failed|cancelled)\b/i.test(plain)
   )
@@ -808,6 +808,13 @@ export async function main(mode: Mode): Promise<void> {
     .sort((a, b) => b.durationMs - a.durationMs)
     .slice(0, 5)
     .map((s) => s.name);
+  const reportedFiles = shard
+    ? (JSON.parse(read('scripts/gate-db-shards.json').toString()) as ShardPartition).shards[shard]
+    : null;
+  const caseCount =
+    shard && status === 'PASS'
+      ? Number(stages.find((s) => s.name === 'database')?.count ?? 0)
+      : null;
   const report = {
     mode,
     status,
@@ -823,13 +830,8 @@ export async function main(mode: Mode): Promise<void> {
     inputsSha256: identity?.inputsHash ?? 'UNVERIFIED',
     shardSha256: identity?.shardHash ?? 'UNVERIFIED',
     shard: shard ?? null,
-    files: shard
-      ? (JSON.parse(read('scripts/gate-db-shards.json').toString()) as ShardPartition).shards[shard]
-      : null,
-    cases:
-      shard && status === 'PASS'
-        ? Number(stages.find((s) => s.name === 'database')?.count ?? 0)
-        : null,
+    files: reportedFiles,
+    cases: caseCount,
     configOverlaySha256: overlayHash ?? null,
     configMode: exactActions
       ? 'ACTIONS_EXACT_CONFIG'

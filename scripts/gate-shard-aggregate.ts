@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { validateManifest, validateShards, validateShardProofs } from './gate-runner.js';
 
+type SafeStage = { name: string; status: string; count?: string };
 const read = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
 const manifest = read('scripts/gate-suite-manifest.json');
 const pkg = read('package.json');
@@ -8,21 +9,22 @@ validateManifest(manifest, pkg.scripts);
 const partitions = validateShards(read('scripts/gate-db-shards.json'), manifest);
 const [sourcePath, onePath, twoPath, expectedSha] = process.argv.slice(2);
 if (!sourcePath || !onePath || !twoPath || !expectedSha) throw new Error('SHARD_PROOF_MISSING');
+
 const source = read(sourcePath);
 const one = read(onePath);
 const two = read(twoPath);
 const fields = ['manifestSha256', 'lockSha256', 'inputsSha256', 'shardSha256'] as const;
+const sourceStage = source.stages?.find((stage: SafeStage) => stage.name === 'source');
 if (
   source.status !== 'PASS' ||
   source.mode !== 'source' ||
   source.sha !== expectedSha ||
   source.evidence !== 'COMMITTED_SOURCE' ||
-  !source.stages?.some(
-    (s: { name: string; status: string }) => s.name === 'source' && s.status === 'PASS',
-  ) ||
-  fields.some((f) => !/^[0-9a-f]{64}$/.test(source[f]))
+  sourceStage?.status !== 'PASS' ||
+  fields.some((field) => !/^[0-9a-f]{64}$/.test(source[field]))
 )
   throw new Error('SOURCE_EVIDENCE_INVALID');
+
 const count = validateShardProofs(
   [one, two],
   expectedSha,
@@ -34,6 +36,7 @@ const count = validateShardProofs(
   },
   partitions,
 );
+
 const required = [
   'locked-install',
   'cli-help',
@@ -53,26 +56,21 @@ const required = [
   'cleanup',
 ];
 for (const proof of [one, two]) {
+  const stages = proof.stages as SafeStage[];
+  if (!Array.isArray(stages)) throw new Error('SHARD_STAGES_INVALID');
+  const inspector = stages.find((stage) => stage.name === 'inspector');
+  const database = stages.find((stage) => stage.name === 'database');
   if (
     proof.suites?.database !== 41 ||
     proof.mode !== 'backend' ||
     proof.evidence !== 'ACTIONS_EXACT_COMMIT_CONFIG' ||
     proof.configMode !== 'ACTIONS_EXACT_CONFIG' ||
     proof.configOverlaySha256 !== null ||
-    !required.every((name) =>
-      proof.stages.some(
-        (s: { name: string; status: string }) => s.name === name && s.status === 'PASS',
-      ),
+    required.some(
+      (name) => !stages.some((stage) => stage.name === name && stage.status === 'PASS'),
     ) ||
-    !proof.stages.some(
-      (s: { name: string; status: string; count?: string }) =>
-        s.name === 'inspector' &&
-        s.count === '33 valid; 33 invalid; owner denial',
-    ) ||
-    !proof.stages.some(
-      (s: { name: string; status: string; count?: string }) =>
-        s.name === 'database' && s.count === String(proof.cases),
-    )
+    inspector?.count !== '33 valid; 33 invalid; owner denial' ||
+    database?.count !== String(proof.cases)
   )
     throw new Error('SHARD_STAGES_INVALID');
 }
