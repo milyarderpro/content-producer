@@ -73,6 +73,10 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
     );
     expect(candidate).toContain("shard: ['1', '2']");
     expect(candidate).toContain('fail-fast: false');
+    const databaseJob = candidate.split('  database:\\n')[1]?.split('\\n  aggregate:')[0];
+    expect(databaseJob).toContain('fetch-depth: 2');
+    expect(databaseJob).toContain('ref: ${{ github.sha }}');
+    expect(candidate).toContain('scripts/gate-backend.ts --aggregate');
     expect(candidate).toContain('GATE_DB_SHARD: ${{ matrix.shard }}');
     expect(candidate).toContain('needs: [source, database]');
     expect(candidate).toContain('if: always()');

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { URL } from 'node:url';
 import { test } from 'vitest';
@@ -250,5 +251,21 @@ test('shard proof rejects missing, duplicate, skipped and wrong SHA', () => {
     'Test Files 21 passed\nTests 89 passed, 1 skipped',
   ]) {
     assert.throws(() => assertShardDatabaseEvidence(output, 21));
+  }
+});
+
+test('backend candidate aggregate accepts exactly 182 database cases', () => {
+  for (const [count, expectedExit] of [
+    [181, 1],
+    [182, 0],
+    [183, 1],
+  ]) {
+    const result = spawnSync(
+      'pnpm',
+      ['exec', 'tsx', 'scripts/gate-backend.ts', '--verify-case-count', String(count)],
+      { encoding: 'utf8' },
+    );
+    assert.equal(result.status, expectedExit === 0 ? 0 : 1, `count ${count}`);
+    if (expectedExit) assert.match(result.stderr, /SHARD_CASE_COUNT_MISMATCH/);
   }
 });

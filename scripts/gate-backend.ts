@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { main, validateManifest, validateShards, validateShardProofs } from './gate-runner.js';
 
+export function assertExactDatabaseCaseCount(count: number): void {
+  if (count !== 182) throw new Error('SHARD_CASE_COUNT_MISMATCH');
+}
+
 function aggregate(args: string[]): void {
   type SafeStage = { name: string; status: string; count?: string };
   const read = (path: string) => JSON.parse(readFileSync(path, 'utf8'));
@@ -75,7 +79,7 @@ function aggregate(args: string[]): void {
     )
       throw new Error('SHARD_STAGES_INVALID');
   }
-  if (count < 180) throw new Error('SHARD_CASE_COUNT_BELOW_BASELINE');
+  assertExactDatabaseCaseCount(count);
 
   process.stdout.write(
     'PASS: 41 disjoint database files, ' + count + ' cases, identical exact-SHA identity\n',
@@ -83,4 +87,6 @@ function aggregate(args: string[]): void {
 }
 
 if (process.argv[2] === '--aggregate') aggregate(process.argv.slice(3));
+else if (process.argv[2] === '--verify-case-count')
+  assertExactDatabaseCaseCount(Number(process.argv[3]));
 else await main('backend');
