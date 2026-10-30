@@ -253,25 +253,3 @@ test('shard proof rejects missing, duplicate, skipped and wrong SHA', () => {
   }
 });
 
-// prettier-ignore
-test('TEMP format oracle for shard runner', async () => {
-  const fs = await import('node:fs');
-  const os = await import('node:os');
-  const path = await import('node:path');
-  const child = await import('node:child_process');
-  const prettier = await import('prettier');
-  const target = 'scripts/gate-runner.ts';
-  const original = fs.readFileSync(target, 'utf8').replaceAll('// prettier-ignore\n', '');
-  const formatted = await prettier.format(original, {
-    ...(await prettier.resolveConfig(target)),
-    filepath: target,
-  });
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'issue-96-oracle-'));
-  const actual = path.join(dir, 'actual.ts');
-  const expected = path.join(dir, 'expected.ts');
-  fs.writeFileSync(actual, original);
-  fs.writeFileSync(expected, formatted);
-  const result = child.spawnSync('diff', ['-u', actual, expected], { encoding: 'utf8' });
-  console.log('FORMAT_ORACLE_DIFF_BEGIN\n' + result.stdout + '\nFORMAT_ORACLE_DIFF_END');
-  fs.rmSync(dir, { recursive: true, force: true });
-});

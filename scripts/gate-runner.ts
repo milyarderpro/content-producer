@@ -148,17 +148,17 @@ export function validateManifest(
   };
 }
 
-// prettier-ignore
 type ShardPartition = { schemaVersion: number; shards: Record<ShardId, string[]> };
 
-// prettier-ignore
 export function validateShards(
   partition: ShardPartition,
   manifest: Manifest,
 ): Record<ShardId, string[]> {
   if (
     partition?.schemaVersion !== 1 ||
-    Object.keys(partition.shards ?? {}).sort().join(',') !== '1,2'
+    Object.keys(partition.shards ?? {})
+      .sort()
+      .join(',') !== '1,2'
   )
     fail('SHARD_SCHEMA_DRIFT');
   if (!Array.isArray(partition.shards['1']) || !Array.isArray(partition.shards['2']))
@@ -181,7 +181,6 @@ export function validateShards(
   return partition.shards;
 }
 
-// prettier-ignore
 export type ShardProof = {
   shard: ShardId;
   sha: string;
@@ -194,7 +193,6 @@ export type ShardProof = {
   status: string;
   stages: Stage[];
 };
-// prettier-ignore
 export function validateShardProofs(
   proofs: ShardProof[],
   expectedSha: string,
@@ -229,8 +227,7 @@ export function validateShardProofs(
   )
     fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
   const files = proofs.flatMap((p) => p.files);
-  if (files.length !== 41 || new Set(files).size !== 41)
-    fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
+  if (files.length !== 41 || new Set(files).size !== 41) fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
   return proofs.reduce((sum, p) => sum + p.cases, 0);
 }
 
@@ -605,7 +602,6 @@ function sourceStages(sourceFiles: number, stages: Stage[]): void {
   requirePass([item]);
 }
 
-// prettier-ignore
 async function backendStages(
   identity: Identity,
   stages: Stage[],
