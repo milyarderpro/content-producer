@@ -4,6 +4,8 @@ import { URL } from 'node:url';
 import { test } from 'vitest';
 import {
   assertAdvisorsReport,
+  assertActionsEnvironment,
+  assertConfigMode,
   assertClean,
   assertNoExistingStackResources,
   assertNoSkipped,
@@ -99,4 +101,40 @@ test('accepts the pinned CLI advisor report and rejects missing or malformed res
   for (const output of ['', '[]', '{"message":"ok"}', '{"message":"ok","results":null}']) {
     assert.throws(() => assertAdvisorsReport(output), { code: 'ADVISOR_REPORT_INVALID' });
   }
+});
+
+
+test('exact Actions mode needs dispatch SHA and isolated GitHub context', () => {
+  const env = {
+    GITHUB_ACTIONS: 'true',
+    GITHUB_EVENT_NAME: 'workflow_dispatch',
+    GITHUB_REF: 'refs/heads/main',
+    GITHUB_SHA: sha,
+    GATE_CANDIDATE_SHA: sha,
+    GATE_ACTIONS_EXACT_CONFIG: '1',
+    RUNNER_TEMP: '/tmp/actions',
+  };
+  assert.doesNotThrow(() => assertActionsEnvironment(env));
+  for (const changed of [
+    { GITHUB_ACTIONS: 'false' },
+    { GITHUB_EVENT_NAME: 'pull_request' },
+    { GITHUB_REF: 'refs/heads/feature' },
+    { GATE_CANDIDATE_SHA: '0'.repeat(40) },
+    { GATE_ACTIONS_EXACT_CONFIG: '0' },
+  ]) {
+    assert.throws(() => assertActionsEnvironment({ ...env, ...changed }), {
+      code: 'UNVERIFIED_ACTIONS_ENVIRONMENT',
+    });
+  }
+});
+
+test('formal config requires byte-identical committed config', () => {
+  const committed = Buffer.from('project_id = "content-producer"\\n');
+  assert.doesNotThrow(() => assertConfigMode('ACTIONS_EXACT_CONFIG', committed, committed));
+  assert.throws(() => assertConfigMode('LOCAL_DIAGNOSTIC_OVERLAY', committed, committed), {
+    code: 'EXACT_CONFIG_MISMATCH',
+  });
+  assert.throws(() => assertConfigMode('ACTIONS_EXACT_CONFIG', Buffer.from('changed'), committed), {
+    code: 'EXACT_CONFIG_MISMATCH',
+  });
 });
