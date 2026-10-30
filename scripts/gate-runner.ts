@@ -542,9 +542,9 @@ export function assertShardDatabaseEvidence(output: string, expectedFiles: numbe
   assertNoSkipped(plain);
   const match = plain.match(/Test Files\s+(\d+) passed[\s\S]*Tests\s+(\d+) passed/);
   if (!match) fail('SHARD_TEST_EVIDENCE_MISSING', 'FAIL');
-  if (Number(match[1]) !== expectedFiles || Number(match[2]) <= 0)
+  if (Number(match![1]) !== expectedFiles || Number(match![2]) <= 0)
     fail('SHARD_TEST_EVIDENCE_MISSING', 'FAIL');
-  return Number(match[2]);
+  return Number(match![2]);
 }
 
 export function assertDatabaseTestEvidence(output: string): void {
