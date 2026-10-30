@@ -256,6 +256,22 @@ test('shard proof rejects missing, duplicate, skipped and wrong SHA', () => {
   }
 });
 
+test('rebalanced shards preserve two hotspot files in shard 2 with no duplicates', () => {
+  const partition = validateShards(
+    JSON.parse(readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8')),
+    manifest,
+  );
+  assert.equal(partition['1'].length + partition['2'].length, 41);
+  assert.equal(new Set([...partition['1'], ...partition['2']]).size, 41);
+  for (const file of [
+    'supabase/tests/database/api-trivia-public-gold.test.ts',
+    'supabase/tests/database/api-post-approval-quality.test.ts',
+  ]) {
+    assert.equal(partition['1'].includes(file), false);
+    assert.equal(partition['2'].includes(file), true);
+  }
+});
+
 test('backend candidate aggregate accepts exactly 182 database cases', () => {
   for (const [count, expectedExit] of [
     [181, 1],
