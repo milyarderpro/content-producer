@@ -11,24 +11,72 @@ if (!sourcePath || !onePath || !twoPath || !expectedSha) throw new Error('SHARD_
 const source = read(sourcePath);
 const one = read(onePath);
 const two = read(twoPath);
-const fields = ['manifestSha256','lockSha256','inputsSha256','shardSha256'] as const;
-if (source.status !== 'PASS' || source.mode !== 'source' || source.sha !== expectedSha ||
-  source.evidence !== 'COMMITTED_SOURCE' || !source.stages?.some((s: {name:string;status:string}) => s.name === 'source' && s.status === 'PASS') ||
-  fields.some(f => !/^[0-9a-f]{64}$/.test(source[f]))) throw new Error('SOURCE_EVIDENCE_INVALID');
-const count = validateShardProofs([one, two], expectedSha, {
-  manifestSha256: source.manifestSha256,
-  lockSha256: source.lockSha256,
-  inputsSha256: source.inputsSha256,
-  shardSha256: source.shardSha256,
-}, partitions);
-const required = ['locked-install','cli-help','start','reset','migration-names','mcp',
-'audit-before','inspector','audit-after','database','migration-history','db-lint',
-'security-advisors','audit-final','whitespace','cleanup'];
+const fields = ['manifestSha256', 'lockSha256', 'inputsSha256', 'shardSha256'] as const;
+if (
+  source.status !== 'PASS' ||
+  source.mode !== 'source' ||
+  source.sha !== expectedSha ||
+  source.evidence !== 'COMMITTED_SOURCE' ||
+  !source.stages?.some(
+    (s: { name: string; status: string }) => s.name === 'source' && s.status === 'PASS',
+  ) ||
+  fields.some((f) => !/^[0-9a-f]{64}$/.test(source[f]))
+)
+  throw new Error('SOURCE_EVIDENCE_INVALID');
+const count = validateShardProofs(
+  [one, two],
+  expectedSha,
+  {
+    manifestSha256: source.manifestSha256,
+    lockSha256: source.lockSha256,
+    inputsSha256: source.inputsSha256,
+    shardSha256: source.shardSha256,
+  },
+  partitions,
+);
+const required = [
+  'locked-install',
+  'cli-help',
+  'start',
+  'reset',
+  'migration-names',
+  'mcp',
+  'audit-before',
+  'inspector',
+  'audit-after',
+  'database',
+  'migration-history',
+  'db-lint',
+  'security-advisors',
+  'audit-final',
+  'whitespace',
+  'cleanup',
+];
 for (const proof of [one, two]) {
- if (proof.suites?.database !== 41 || proof.mode !== 'backend' || proof.evidence !== 'ACTIONS_EXACT_COMMIT_CONFIG' ||
-   proof.configMode !== 'ACTIONS_EXACT_CONFIG' || proof.configOverlaySha256 !== null ||
-   !required.every(name => proof.stages.some((s: {name:string;status:string}) => s.name === name && s.status === 'PASS')) ||
-   !proof.stages.some((s: {name:string;status:string;count?:string}) => s.name === 'inspector' && s.count === '33 valid; 33 invalid; owner denial'))
-   throw new Error('SHARD_STAGES_INVALID');
+  if (
+    proof.suites?.database !== 41 ||
+    proof.mode !== 'backend' ||
+    proof.evidence !== 'ACTIONS_EXACT_COMMIT_CONFIG' ||
+    proof.configMode !== 'ACTIONS_EXACT_CONFIG' ||
+    proof.configOverlaySha256 !== null ||
+    !required.every((name) =>
+      proof.stages.some(
+        (s: { name: string; status: string }) => s.name === name && s.status === 'PASS',
+      ),
+    ) ||
+    !proof.stages.some(
+      (s: { name: string; status: string; count?: string }) =>
+        s.name === 'inspector' &&
+        s.count === '33 valid; 33 invalid; owner denial',
+    ) ||
+    !proof.stages.some(
+      (s: { name: string; status: string; count?: string }) =>
+        s.name === 'database' && s.count === String(proof.cases),
+    )
+  )
+    throw new Error('SHARD_STAGES_INVALID');
 }
-process.stdout.write('PASS: 41 disjoint database files, ' + count + ' cases, identical exact-SHA identity\n');
+if (count < 180) throw new Error('SHARD_CASE_COUNT_BELOW_BASELINE');
+process.stdout.write(
+  'PASS: 41 disjoint database files, ' + count + ' cases, identical exact-SHA identity\n',
+);

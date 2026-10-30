@@ -150,35 +150,64 @@ export function validateManifest(
 
 type ShardPartition = { schemaVersion: number; shards: Record<ShardId, string[]> };
 
-export function validateShards(partition: ShardPartition, manifest: Manifest): Record<ShardId, string[]> {
-  if (partition?.schemaVersion !== 1 ||
-      Object.keys(partition.shards ?? {}).sort().join(',') !== '1,2')
+export function validateShards(
+  partition: ShardPartition,
+  manifest: Manifest,
+): Record<ShardId, string[]> {
+  if (
+    partition?.schemaVersion !== 1 ||
+    Object.keys(partition.shards ?? {}).sort().join(',') !== '1,2'
+  )
     fail('SHARD_SCHEMA_DRIFT');
-  const expected = manifest.suites.database.files.map(file => file.path).sort();
+  if (!Array.isArray(partition.shards['1']) || !Array.isArray(partition.shards['2']))
+    fail('SHARD_SCHEMA_DRIFT');
+  const expected = manifest.suites.database.files.map((file) => file.path).sort();
   const all = [...partition.shards['1'], ...partition.shards['2']];
-  if (!Array.isArray(partition.shards['1']) || !Array.isArray(partition.shards['2'])) fail('SHARD_SCHEMA_DRIFT');
-  if (partition.shards['1'].length === 0 || partition.shards['2'].length === 0 ||
-      all.length !== 41 || new Set(all).size !== 41 ||
-      all.some(path => typeof path !== 'string' ||
-        !/^supabase\/tests\/database\/[a-z0-9/_-]+\.test\.ts$/.test(path)) ||
-      all.slice().sort().join('\0') !== expected.join('\0'))
+  if (
+    partition.shards['1'].length === 0 ||
+    partition.shards['2'].length === 0 ||
+    all.length !== 41 ||
+    new Set(all).size !== 41 ||
+    all.some(
+      (path) =>
+        typeof path !== 'string' ||
+        !/^supabase\/tests\/database\/[a-z0-9/_-]+\.test\.ts$/.test(path),
+    ) ||
+    all.slice().sort().join('\0') !== expected.join('\0')
+  )
     fail('SHARD_FILE_DRIFT');
   return partition.shards;
 }
 
 export type ShardProof = {
-  shard: ShardId; sha: string; manifestSha256: string; lockSha256: string;
-  inputsSha256: string; shardSha256: string; files: string[]; cases: number;
-  status: string; stages: Stage[];
+  shard: ShardId;
+  sha: string;
+  manifestSha256: string;
+  lockSha256: string;
+  inputsSha256: string;
+  shardSha256: string;
+  files: string[];
+  cases: number;
+  status: string;
+  stages: Stage[];
 };
 export function validateShardProofs(
   proofs: ShardProof[],
   expectedSha: string,
-  expectedHashes: { manifestSha256: string; lockSha256: string; inputsSha256: string; shardSha256: string },
+  expectedHashes: {
+    manifestSha256: string;
+    lockSha256: string;
+    inputsSha256: string;
+    shardSha256: string;
+  },
   partitions: Record<ShardId, string[]>,
 ): number {
-  if (proofs.length !== 2 || new Set(proofs.map(p => p?.shard)).size !== 2 ||
-      proofs.some(p => p?.status !== 'PASS' ||
+  if (
+    proofs.length !== 2 ||
+    new Set(proofs.map((p) => p?.shard)).size !== 2 ||
+    proofs.some(
+      (p) =>
+        p?.status !== 'PASS' ||
         p.sha !== expectedSha ||
         p.manifestSha256 !== expectedHashes.manifestSha256 ||
         p.lockSha256 !== expectedHashes.lockSha256 ||
@@ -188,11 +217,14 @@ export function validateShardProofs(
         !Array.isArray(p.files) ||
         p.files.length !== partitions[p.shard]?.length ||
         p.files.join('\0') !== partitions[p.shard]?.join('\0') ||
-        !Number.isSafeInteger(p.cases) || p.cases <= 0 ||
+        !Number.isSafeInteger(p.cases) ||
+        p.cases <= 0 ||
         !Array.isArray(p.stages) ||
-        p.stages.some(stage => stage.status !== 'PASS')))
+        p.stages.some((stage) => stage.status !== 'PASS'),
+    )
+  )
     fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
-  const files = proofs.flatMap(p => p.files);
+  const files = proofs.flatMap((p) => p.files);
   if (files.length !== 41 || new Set(files).size !== 41)
     fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
   return proofs.reduce((sum, p) => sum + p.cases, 0);
@@ -577,7 +609,8 @@ async function backendStages(
   if (shard && !['1', '2'].includes(shard)) fail('SHARD_INVALID');
   const manifest = JSON.parse(read('scripts/gate-suite-manifest.json').toString()) as Manifest;
   const partitions = validateShards(
-    JSON.parse(read('scripts/gate-db-shards.json').toString()) as ShardPartition, manifest
+    JSON.parse(read('scripts/gate-db-shards.json').toString()) as ShardPartition,
+    manifest,
   );
   const exactActions = process.env.GATE_CONFIG_MODE === 'ACTIONS_EXACT_CONFIG';
   const projectId = exactActions
@@ -658,7 +691,15 @@ async function backendStages(
       'database',
       'pnpm',
       shard
-        ? ['exec', 'vitest', 'run', '--config', 'vitest.database.config.ts', '--no-file-parallelism', ...partitions[shard]]
+        ? [
+            'exec',
+            'vitest',
+            'run',
+            '--config',
+            'vitest.database.config.ts',
+            '--no-file-parallelism',
+            ...partitions[shard],
+          ]
         : ['run', 'test:database'],
       /Test Files\s+\d+ passed[\s\S]*Tests\s+\d+ passed/,
     );
@@ -782,8 +823,13 @@ export async function main(mode: Mode): Promise<void> {
     inputsSha256: identity?.inputsHash ?? 'UNVERIFIED',
     shardSha256: identity?.shardHash ?? 'UNVERIFIED',
     shard: shard ?? null,
-    files: shard ? (JSON.parse(read('scripts/gate-db-shards.json').toString()) as ShardPartition).shards[shard] : null,
-    cases: shard && status === 'PASS' ? Number(stages.find(s => s.name === 'database')?.count ?? 0) : null,
+    files: shard
+      ? (JSON.parse(read('scripts/gate-db-shards.json').toString()) as ShardPartition).shards[shard]
+      : null,
+    cases:
+      shard && status === 'PASS'
+        ? Number(stages.find((s) => s.name === 'database')?.count ?? 0)
+        : null,
     configOverlaySha256: overlayHash ?? null,
     configMode: exactActions
       ? 'ACTIONS_EXACT_CONFIG'

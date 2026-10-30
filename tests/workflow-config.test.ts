@@ -68,7 +68,9 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
       expect(section).toContain('test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"');
       expect(section).toContain('[[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]');
     }
-    expect(candidate).toContain('git show HEAD:supabase/config.toml | cmp -s - supabase/config.toml');
+    expect(candidate).toContain(
+      'git show HEAD:supabase/config.toml | cmp -s - supabase/config.toml',
+    );
     expect(candidate).toContain("shard: ['1', '2']");
     expect(candidate).toContain('fail-fast: false');
     expect(candidate).toContain('GATE_DB_SHARD: ${{ matrix.shard }}');
