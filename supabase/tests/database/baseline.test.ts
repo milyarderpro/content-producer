@@ -1,5 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
+import { localQuery, localQueryRow } from './helpers/local-query.js';
 
 const baselineQuery = `
   select
@@ -63,6 +64,9 @@ function isJsonRecord(value: unknown): value is JsonRecord {
 }
 
 function runCli(args: string[]): string {
+  if (args.length === 6 && args.slice(0, 5).join(' ') === 'exec supabase db query --local') {
+    return localQuery(args[5]!);
+  }
   const result = spawnSync('pnpm', args, {
     cwd: process.cwd(),
     encoding: 'utf8',
@@ -104,18 +108,7 @@ function parseJsonOutput(output: string, command: string): JsonRecord {
 }
 
 function querySingleRow(query: string): JsonRecord {
-  const output = runCli(['exec', 'supabase', 'db', 'query', '--local', query]);
-  const response = parseJsonOutput(output, 'supabase db query');
-
-  if (
-    !Array.isArray(response.rows) ||
-    response.rows.length !== 1 ||
-    !isJsonRecord(response.rows[0])
-  ) {
-    throw new Error('Expected exactly one JSON row from the local baseline query.');
-  }
-
-  return response.rows[0];
+  return localQueryRow(query);
 }
 
 function requiredString(value: unknown, name: string): string {

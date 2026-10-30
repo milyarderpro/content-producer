@@ -1,29 +1,6 @@
-import { spawn, spawnSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 
-function query(sql: string): string {
-  const result = spawnSync('pnpm', ['exec', 'supabase', 'db', 'query', '--local', sql], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
-  });
-  if (result.status !== 0) throw new Error(`${result.stderr}\n${result.stdout}`);
-  return result.stdout;
-}
-
-function queryAsync(sql: string): Promise<{ code: number; output: string }> {
-  return new Promise((resolve, reject) => {
-    const child = spawn('pnpm', ['exec', 'supabase', 'db', 'query', '--local', sql], {
-      cwd: process.cwd(),
-      env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
-    });
-    let output = '';
-    child.stdout.on('data', (data) => (output += data));
-    child.stderr.on('data', (data) => (output += data));
-    child.on('error', reject);
-    child.on('close', (code) => resolve({ code: code ?? 1, output }));
-  });
-}
+import { localQuery as query, localQueryAsync as queryAsync } from './helpers/local-query.js';
 
 describe('Phase 3 core validators and private primitives', () => {
   it('validates versions and classifies private replay and schedule conflicts', () => {

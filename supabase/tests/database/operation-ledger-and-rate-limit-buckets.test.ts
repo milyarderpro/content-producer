@@ -1,54 +1,19 @@
-import { spawnSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 
+import { localQuery, localQueryRow } from './helpers/local-query.js';
+
 type JsonRecord = Record<string, unknown>;
 
-function isJsonRecord(value: unknown): value is JsonRecord {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
 function runCli(args: string[]): string {
-  const result = spawnSync('pnpm', args, {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
-    shell: process.platform === 'win32',
-  });
-
-  if (result.error) {
-    throw result.error;
+  if (args.length !== 6 || args.slice(0, 5).join(' ') !== 'exec supabase db query --local') {
+    throw new Error('LOCAL_TEST_COMMAND_INVALID');
   }
-
-  if (result.status !== 0) {
-    throw new Error(
-      `Supabase local command failed: ${result.stderr.trim()}\n${result.stdout.trim()}`,
-    );
-  }
-
-  return result.stdout;
+  return localQuery(args[5]!);
 }
 
 function querySingleRow(query: string): JsonRecord {
-  const output = runCli(['exec', 'supabase', 'db', 'query', '--local', query]);
-  const jsonStart = output.indexOf('{');
-
-  if (jsonStart === -1) {
-    throw new Error('supabase db query did not return JSON output.');
-  }
-
-  const parsed: unknown = JSON.parse(output.slice(jsonStart));
-
-  if (
-    !isJsonRecord(parsed) ||
-    !Array.isArray(parsed.rows) ||
-    parsed.rows.length !== 1 ||
-    !isJsonRecord(parsed.rows[0])
-  ) {
-    throw new Error('Expected exactly one JSON row from the local database query.');
-  }
-
-  return parsed.rows[0];
+  return localQueryRow(query);
 }
 
 function expectSqlFailure(statement: string, constraint?: string): void {
