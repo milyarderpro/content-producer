@@ -22,6 +22,7 @@ import {
   type ShardProof,
   validateShards,
   validateShardProofs,
+  validateSingleMcpInspector,
   assertShardDatabaseEvidence,
 } from '../scripts/gate-runner.js';
 
@@ -267,5 +268,38 @@ test('backend candidate aggregate accepts exactly 182 database cases', () => {
     );
     assert.equal(result.status, expectedExit === 0 ? 0 : 1, `count ${count}`);
     if (expectedExit) assert.match(result.stderr, /SHARD_CASE_COUNT_MISMATCH/);
+  }
+});
+
+test('MCP 15 files/82 cases and authenticated Inspector belong to shard 1 exactly once', () => {
+  const stages = [
+    { name: 'mcp', status: 'PASS' as const, durationMs: 1, count: '82' },
+    {
+      name: 'inspector',
+      status: 'PASS' as const,
+      durationMs: 1,
+      count: '33 valid; 33 invalid; owner denial',
+    },
+  ];
+  const make = (shard: '1' | '2', items: typeof stages): ShardProof => ({
+    shard, sha,
+    manifestSha256: 'a'.repeat(64), lockSha256: 'b'.repeat(64),
+    inputsSha256: 'c'.repeat(64), shardSha256: 'd'.repeat(64),
+    files: [], cases: 91, status: 'PASS', stages: items,
+  });
+  const owner = make('1', stages);
+  const other = make('2', []);
+  assert.doesNotThrow(() => validateSingleMcpInspector([owner, other]));
+  for (const proofs of [
+    [make('1', []), other],
+    [make('1', stages.slice(0, 1)), other],
+    [owner, make('2', stages)],
+    [make('1', [{ ...stages[0]!, count: '81' }, stages[1]!]), other],
+    [make('1', [{ ...stages[0]!, status: 'FAIL' as const }, stages[1]!]), other],
+    [other, make('2', stages)],
+  ]) {
+    assert.throws(() => validateSingleMcpInspector(proofs), {
+      code: 'SHARD_SINGLE_OWNER_EVIDENCE_INVALID',
+    });
   }
 });

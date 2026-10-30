@@ -231,6 +231,22 @@ export function validateShardProofs(
   return proofs.reduce((sum, p) => sum + p.cases, 0);
 }
 
+export function validateSingleMcpInspector(proofs: ShardProof[]): void {
+  const required = ['mcp', 'inspector'] as const;
+  for (const name of required) {
+    const owners = proofs.filter((proof) => proof.stages.some((item) => item.name === name));
+    if (owners.length !== 1 || owners[0]?.shard !== '1')
+      fail('SHARD_SINGLE_OWNER_EVIDENCE_INVALID', 'FAIL');
+    const item = owners[0].stages.find((stage) => stage.name === name);
+    if (
+      item?.status !== 'PASS' ||
+      (name === 'mcp' && item.count !== '82') ||
+      (name === 'inspector' && item.count !== '33 valid; 33 invalid; owner denial')
+    )
+      fail('SHARD_SINGLE_OWNER_EVIDENCE_INVALID', 'FAIL');
+  }
+}
+
 export function assertClean(status: string): void {
   if (status.trim()) fail('DIRTY_CHECKOUT');
 }
@@ -670,14 +686,14 @@ async function backendStages(
     assertStartedTarget(projectId, base);
     run('reset', 'pnpm', ['run', 'supabase:reset']);
     run('migration-names', 'pnpm', ['run', 'verify-migrations'], /Validated 72 migration filename/);
-    run('mcp', 'pnpm', ['run', 'test:mcp'], /\b[1-9]\d* passed/);
+    if (!shard || shard === '1') run('mcp', 'pnpm', ['run', 'test:mcp'], /\b82 passed/);
     run(
       'audit-before',
       'pnpm',
       ['exec', 'tsx', 'scripts/phase-6-catalog-audit.ts'],
       /PASS|catalog/i,
     );
-    run(
+    if (!shard || shard === '1') run(
       'inspector',
       'pnpm',
       ['exec', 'tsx', 'scripts/phase-6-13.ts'],

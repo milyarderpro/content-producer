@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { main, validateManifest, validateShards, validateShardProofs } from './gate-runner.js';
+import { main, validateManifest, validateShards, validateShardProofs, validateSingleMcpInspector } from './gate-runner.js';
 
 export function assertExactDatabaseCaseCount(count: number): void {
   if (count !== 182) throw new Error('SHARD_CASE_COUNT_MISMATCH');
@@ -42,15 +42,15 @@ function aggregate(args: string[]): void {
     partitions,
   );
 
+  validateSingleMcpInspector([one, two]);
+
   const required = [
     'locked-install',
     'cli-help',
     'start',
     'reset',
     'migration-names',
-    'mcp',
     'audit-before',
-    'inspector',
     'audit-after',
     'database',
     'migration-history',
@@ -63,7 +63,6 @@ function aggregate(args: string[]): void {
   for (const proof of [one, two]) {
     const stages = proof.stages as SafeStage[];
     if (!Array.isArray(stages)) throw new Error('SHARD_STAGES_INVALID');
-    const inspector = stages.find((stage) => stage.name === 'inspector');
     const database = stages.find((stage) => stage.name === 'database');
     if (
       proof.suites?.database !== 41 ||
@@ -74,7 +73,6 @@ function aggregate(args: string[]): void {
       required.some(
         (name) => !stages.some((stage) => stage.name === name && stage.status === 'PASS'),
       ) ||
-      inspector?.count !== '33 valid; 33 invalid; owner denial' ||
       database?.count !== String(proof.cases)
     )
       throw new Error('SHARD_STAGES_INVALID');
