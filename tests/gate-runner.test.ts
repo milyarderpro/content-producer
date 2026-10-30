@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { URL } from 'node:url';
 import { test } from 'vitest';
@@ -18,6 +19,12 @@ import {
   stage,
   validateManifest,
   validateTarget,
+  type ShardProof,
+  validateShards,
+  validateShardProofs,
+  validateSingleMcpInspector,
+  requiredReportStages,
+  assertShardDatabaseEvidence,
 } from '../scripts/gate-runner.js';
 
 const manifest = JSON.parse(
@@ -78,6 +85,7 @@ test('rejects source/backend identity mismatch', () => {
     manifestHash: 'a',
     lockHash: 'b',
     inputsHash: 'c',
+    shardHash: 'd',
     counts: { source: 12, mcp: 15, database: 41 },
   };
   assert.throws(() => sameIdentity(identity, { ...identity, manifestHash: 'drift' }), {
@@ -180,4 +188,190 @@ test('database Vitest ANSI and plain summaries', () => {
   ]) {
     assert.throws(() => assertDatabaseTestEvidence(output));
   }
+});
+
+test('partition covers all 41 mandatory files exactly once', () => {
+  const partition = JSON.parse(
+    readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8'),
+  );
+  const shards = validateShards(partition, manifest);
+  assert.equal(shards['1'].length + shards['2'].length, 41);
+  for (const broken of [
+    { ...partition, shards: { ...partition.shards, '2': partition.shards['2'].slice(1) } },
+    {
+      ...partition,
+      shards: {
+        ...partition.shards,
+        '2': [partition.shards['1'][0], ...partition.shards['2'].slice(1)],
+      },
+    },
+  ])
+    assert.throws(() => validateShards(broken, manifest), { code: 'SHARD_FILE_DRIFT' });
+});
+
+test('shard proof rejects missing, duplicate, skipped and wrong SHA', () => {
+  const part = validateShards(
+    JSON.parse(readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8')),
+    manifest,
+  );
+  const hashes = {
+    manifestSha256: 'a'.repeat(64),
+    lockSha256: 'b'.repeat(64),
+    inputsSha256: 'c'.repeat(64),
+    shardSha256: 'd'.repeat(64),
+  };
+  const mk = (shard: '1' | '2'): ShardProof => ({
+    shard,
+    sha,
+    ...hashes,
+    files: part[shard],
+    cases: 90,
+    status: 'PASS',
+    stages: [{ name: 'database', status: 'PASS', durationMs: 1 }],
+  });
+  assert.equal(validateShardProofs([mk('1'), mk('2')], sha, hashes, part), 180);
+  for (const bad of [
+    [mk('1')],
+    [mk('1'), mk('1')],
+    [mk('1'), { ...mk('2'), sha: '0'.repeat(40) }],
+    [mk('1'), { ...mk('2'), files: [...mk('2').files.slice(1), mk('1').files[0]!] }],
+    [
+      mk('1'),
+      {
+        ...mk('2'),
+        stages: [{ name: 'database', status: 'NOT RUN' as const, durationMs: 0 }],
+      },
+    ],
+    [mk('1'), { ...mk('2'), cases: 0 }],
+  ])
+    assert.throws(() => validateShardProofs(bad, sha, hashes, part), {
+      code: 'SHARD_EVIDENCE_MISMATCH',
+    });
+  assert.equal(assertShardDatabaseEvidence('Test Files 21 passed\nTests 90 passed', 21), 90);
+  for (const output of [
+    'Test Files 20 passed\nTests 90 passed',
+    'Test Files 21 passed\nTests 89 passed, 1 skipped',
+  ]) {
+    assert.throws(() => assertShardDatabaseEvidence(output, 21));
+  }
+});
+
+test('backend candidate aggregate accepts exactly 182 database cases', () => {
+  for (const [count, expectedExit] of [
+    [181, 1],
+    [182, 0],
+    [183, 1],
+  ]) {
+    const result = spawnSync(
+      'pnpm',
+      ['exec', 'tsx', 'scripts/gate-backend.ts', '--verify-case-count', String(count)],
+      { encoding: 'utf8' },
+    );
+    assert.equal(result.status, expectedExit === 0 ? 0 : 1, `count ${count}`);
+    if (expectedExit) assert.match(result.stderr, /SHARD_CASE_COUNT_MISMATCH/);
+  }
+});
+
+test('MCP 15 files/82 cases and authenticated Inspector belong to shard 1 exactly once', () => {
+  const stages: ShardProof['stages'] = [
+    { name: 'mcp', status: 'PASS' as const, durationMs: 1, count: '82' },
+    {
+      name: 'inspector',
+      status: 'PASS' as const,
+      durationMs: 1,
+      count: '33 valid; 33 invalid; owner denial',
+    },
+  ];
+  const make = (shard: '1' | '2', items: typeof stages): ShardProof => ({
+    shard,
+    sha,
+    manifestSha256: 'a'.repeat(64),
+    lockSha256: 'b'.repeat(64),
+    inputsSha256: 'c'.repeat(64),
+    shardSha256: 'd'.repeat(64),
+    files: [],
+    cases: 91,
+    status: 'PASS',
+    stages: items,
+  });
+  const owner = make('1', stages);
+  const other = make('2', []);
+  assert.doesNotThrow(() => validateSingleMcpInspector([owner, other]));
+  for (const proofs of [
+    [make('1', []), other],
+    [make('1', stages.slice(0, 1)), other],
+    [owner, make('2', stages)],
+    [make('1', [{ ...stages[0]!, count: '81' }, stages[1]!]), other],
+    [make('1', [{ ...stages[0]!, status: 'FAIL' as const }, stages[1]!]), other],
+    [other, make('2', stages)],
+  ]) {
+    assert.throws(() => validateSingleMcpInspector(proofs), {
+      code: 'SHARD_SINGLE_OWNER_EVIDENCE_INVALID',
+    });
+  }
+});
+
+test('final two-shard reports satisfy both validators', () => {
+  const partition = validateShards(
+    JSON.parse(readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8')),
+    manifest,
+  );
+  const hashes = {
+    manifestSha256: 'a'.repeat(64),
+    lockSha256: 'b'.repeat(64),
+    inputsSha256: 'c'.repeat(64),
+    shardSha256: 'd'.repeat(64),
+  };
+  const report = (shard: '1' | '2', cases: number): ShardProof => ({
+    shard,
+    sha,
+    ...hashes,
+    files: partition[shard],
+    cases,
+    status: 'PASS',
+    stages: requiredReportStages('backend', shard).map((name) => ({
+      name,
+      status: 'PASS',
+      durationMs: 1,
+      ...(name === 'mcp' ? { count: '82' } : {}),
+      ...(name === 'inspector' ? { count: '33 valid; 33 invalid; owner denial' } : {}),
+      ...(name === 'database' ? { count: String(cases) } : {}),
+    })),
+  });
+  const one = report('1', 92);
+  const two = report('2', 90);
+  assert.equal(validateShardProofs([one, two], sha, hashes, partition), 182);
+  assert.doesNotThrow(() => validateSingleMcpInspector([one, two]));
+  assert.deepEqual(
+    two.stages.filter((item) => ['mcp', 'inspector'].includes(item.name)),
+    [],
+  );
+  assert.equal(requiredReportStages('backend').includes('mcp'), true);
+  assert.equal(requiredReportStages('full').includes('inspector'), true);
+
+  for (const stageName of ['mcp', 'inspector']) {
+    const missing: ShardProof = {
+      ...one,
+      stages: one.stages.filter((stage) => stage.name !== stageName),
+    };
+    assert.doesNotThrow(() => validateShardProofs([missing, two], sha, hashes, partition));
+    assert.throws(() => validateSingleMcpInspector([missing, two]), {
+      code: 'SHARD_SINGLE_OWNER_EVIDENCE_INVALID',
+    });
+    const duplicate: ShardProof = {
+      ...two,
+      stages: [...two.stages, one.stages.find((stage) => stage.name === stageName)!],
+    };
+    assert.doesNotThrow(() => validateShardProofs([one, duplicate], sha, hashes, partition));
+    assert.throws(() => validateSingleMcpInspector([one, duplicate]), {
+      code: 'SHARD_SINGLE_OWNER_EVIDENCE_INVALID',
+    });
+  }
+  const broken: ShardProof = {
+    ...two,
+    stages: [...two.stages, { name: 'cleanup', status: 'NOT RUN', durationMs: 0 }],
+  };
+  assert.throws(() => validateShardProofs([one, broken], sha, hashes, partition), {
+    code: 'SHARD_EVIDENCE_MISMATCH',
+  });
 });

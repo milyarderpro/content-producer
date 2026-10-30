@@ -52,44 +52,39 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
     }
   });
 
-  it('candidate manual mengunci SHA dan agregasi bukti dua job', () => {
+  it('candidate manual mengunci SHA dan agregasi bukti dua shard', () => {
     expect(candidate).toMatch(/^on:\n {2}workflow_dispatch:/m);
     expect(candidate).not.toMatch(/^ {2}(push|pull_request|schedule|workflow_run):/m);
     expect(candidate).toMatch(/^permissions:\n {2}contents: read\n/m);
     expect(candidate).not.toMatch(/(?:contents|actions|id-token|deployments): write/);
     expect(candidate).toContain('candidate_sha:');
     expect(candidate).toContain('required: true');
-    for (const job of ['source', 'backend']) {
-      const start = candidate.indexOf(`  ${job}:\n`);
-      const next = job === 'source' ? '\n  backend:' : '\n  aggregate:';
-      const end = candidate.indexOf(next, start + 3);
-      expect(start).toBeGreaterThan(-1);
-      const section = candidate.slice(start, end > start ? end : undefined);
+    for (const job of ['source', 'database']) {
+      const section = candidate.split(`  ${job}:\n`)[1]?.split('\n  aggregate:')[0];
+      expect(section).toBeDefined();
       expect(section).toContain("if: github.ref == 'refs/heads/main'");
       expect(section).toContain('ref: ${{ github.sha }}');
       expect(section).toContain('test "$GITHUB_SHA" = "$CANDIDATE_SHA"');
       expect(section).toContain('test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"');
       expect(section).toContain('[[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]');
-      expect(section.indexOf('test "$GITHUB_SHA" = "$CANDIDATE_SHA"')).toBeLessThan(
-        section.indexOf('pnpm run gate:'),
-      );
     }
     expect(candidate).toContain(
       'git show HEAD:supabase/config.toml | cmp -s - supabase/config.toml',
     );
-    expect(candidate).toContain('needs: [source, backend]');
+    expect(candidate).toContain("shard: ['1', '2']");
+    expect(candidate).toContain('fail-fast: false');
+    const databaseJob = candidate.split('  database:\n')[1]?.split('\n  aggregate:')[0];
+    expect(databaseJob).toContain('fetch-depth: 2');
+    expect(databaseJob).toContain('ref: ${{ github.sha }}');
+    expect(candidate).toContain('scripts/gate-backend.ts --aggregate');
+    expect(candidate).toContain('GATE_DB_SHARD: ${{ matrix.shard }}');
+    expect(candidate).toContain('needs: [source, database]');
     expect(candidate).toContain('if: always()');
-    for (const statement of [
-      'test "$SOURCE_JOB" = success',
-      'test "$BACKEND_JOB" = success',
-      'test "$SOURCE_RESULT" = PASS',
-      'test "$BACKEND_RESULT" = PASS',
-      'test "$SOURCE_SHA" = "$CANDIDATE_SHA"',
-      'test "$BACKEND_SHA" = "$CANDIDATE_SHA"',
-      'for item in MANIFEST LOCK INPUTS; do',
-      'test "${!a}" = "${!b}"',
-    ])
-      expect(candidate).toContain(statement);
+    expect(candidate).toContain('test "$SOURCE_JOB" = success');
+    expect(candidate).toContain('test "$DATABASE_JOB" = success');
+    expect(candidate).toContain('scripts/gate-backend.ts --aggregate');
+    expect(candidate).toContain('candidate-db-shard-1-');
+    expect(candidate).toContain('candidate-db-shard-2-');
     expect(candidate).not.toContain('continue-on-error: true');
   });
 

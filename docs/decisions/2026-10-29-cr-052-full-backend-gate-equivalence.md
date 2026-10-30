@@ -209,3 +209,7 @@ adalah perubahan CI terpisah, bukan operasi produksi.
   equivalence; required check names serta fallback rollback.
 - **Keputusan saat ini:** `PROPOSED`; belum mengganti CR-020/044. **Test/workflow/source/production
   tidak diubah oleh PR Issue #74.**
+
+## Amendemen rancangan Issue #96 (tetap PROPOSED)
+
+Arsitektur kandidat memperbolehkan **dua runner GitHub/stack Supabase mandiri** dengan reset dan fixture masing-masing, MCP **15 file/82 kasus** dan Inspector authenticated **33 valid/33 invalid dengan owner denial tepat sekali pada shard 1**, sementara file DB tetap serial per shard (21+20). Partisi versioned harus tepat seluruh 41 file mandatory, disjoint, tanpa kasus dihapus; run lokal tanpa pilihan shard tetap mengeksekusi manifest lengkap. Aggregate wajib memeriksa status tiap job, report tiap shard, status semua tahap, SHA kandidat dan hash manifest/lock/input/partisi, count file serta **tepat 182 kasus database** tanpa skipped, dan bukti MCP/Inspector wajib PASS tepat satu kali pada shard 1 (hilang, gagal, duplikat, atau salah shard ditolak). Bukti dua-shard **NOT RUN** pada PR ini; baru dievaluasi sesudah Issue #95/#96 terintegrasi pada SHA final. Ini **tidak mengubah** CR-020/CR-044, workflow release, syarat G4, atau status **PROPOSED — NOT EFFECTIVE**.

@@ -17,6 +17,7 @@ import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 type Mode = 'source' | 'backend' | 'full';
+type ShardId = '1' | '2';
 type Status = 'PASS' | 'FAIL' | 'BLOCKED' | 'NOT RUN';
 type Stage = { name: string; status: Status; durationMs: number; count?: string; reason?: string };
 type Suite = { status: string; entrypoint: string; files: { path: string; status: string }[] };
@@ -27,6 +28,7 @@ type Identity = {
   lockHash: string;
   inputsHash: string;
   counts: Record<string, number>;
+  shardHash: string;
 };
 export class GateError extends Error {
   constructor(
@@ -146,6 +148,105 @@ export function validateManifest(
   };
 }
 
+type ShardPartition = { schemaVersion: number; shards: Record<ShardId, string[]> };
+
+export function validateShards(
+  partition: ShardPartition,
+  manifest: Manifest,
+): Record<ShardId, string[]> {
+  if (
+    partition?.schemaVersion !== 1 ||
+    Object.keys(partition.shards ?? {})
+      .sort()
+      .join(',') !== '1,2'
+  )
+    fail('SHARD_SCHEMA_DRIFT');
+  if (!Array.isArray(partition.shards['1']) || !Array.isArray(partition.shards['2']))
+    fail('SHARD_SCHEMA_DRIFT');
+  const expected = manifest.suites.database.files.map((file) => file.path).sort();
+  const all = [...partition.shards['1'], ...partition.shards['2']];
+  if (
+    partition.shards['1'].length === 0 ||
+    partition.shards['2'].length === 0 ||
+    all.length !== 41 ||
+    new Set(all).size !== 41 ||
+    all.some(
+      (path) =>
+        typeof path !== 'string' ||
+        !/^supabase\/tests\/database\/[a-z0-9/_-]+\.test\.ts$/.test(path),
+    ) ||
+    all.slice().sort().join('\0') !== expected.join('\0')
+  )
+    fail('SHARD_FILE_DRIFT');
+  return partition.shards;
+}
+
+export type ShardProof = {
+  shard: ShardId;
+  sha: string;
+  manifestSha256: string;
+  lockSha256: string;
+  inputsSha256: string;
+  shardSha256: string;
+  files: string[];
+  cases: number;
+  status: string;
+  stages: Stage[];
+};
+export function validateShardProofs(
+  proofs: ShardProof[],
+  expectedSha: string,
+  expectedHashes: {
+    manifestSha256: string;
+    lockSha256: string;
+    inputsSha256: string;
+    shardSha256: string;
+  },
+  partitions: Record<ShardId, string[]>,
+): number {
+  if (
+    proofs.length !== 2 ||
+    new Set(proofs.map((p) => p?.shard)).size !== 2 ||
+    proofs.some(
+      (p) =>
+        p?.status !== 'PASS' ||
+        p.sha !== expectedSha ||
+        p.manifestSha256 !== expectedHashes.manifestSha256 ||
+        p.lockSha256 !== expectedHashes.lockSha256 ||
+        p.inputsSha256 !== expectedHashes.inputsSha256 ||
+        p.shardSha256 !== expectedHashes.shardSha256 ||
+        !['1', '2'].includes(p.shard) ||
+        !Array.isArray(p.files) ||
+        p.files.length !== partitions[p.shard]?.length ||
+        p.files.join('\0') !== partitions[p.shard]?.join('\0') ||
+        !Number.isSafeInteger(p.cases) ||
+        p.cases <= 0 ||
+        !Array.isArray(p.stages) ||
+        p.stages.some((stage) => stage.status !== 'PASS'),
+    )
+  )
+    fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
+  const files = proofs.flatMap((p) => p.files);
+  if (files.length !== 41 || new Set(files).size !== 41) fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
+  return proofs.reduce((sum, p) => sum + p.cases, 0);
+}
+
+export function validateSingleMcpInspector(proofs: ShardProof[]): void {
+  const required = ['mcp', 'inspector'] as const;
+  for (const name of required) {
+    const owners = proofs.filter((proof) => proof.stages.some((item) => item.name === name));
+    if (owners.length !== 1 || owners[0]?.shard !== '1')
+      fail('SHARD_SINGLE_OWNER_EVIDENCE_INVALID', 'FAIL');
+    const item = owners[0].stages.find((stage) => stage.name === name);
+    if (
+      item?.status !== 'PASS' ||
+      (name === 'mcp' && item.count !== '82') ||
+      (name === 'inspector' && item.count !== '33 valid; 33 invalid; owner denial')
+    )
+      fail('SHARD_SINGLE_OWNER_EVIDENCE_INVALID', 'FAIL');
+  }
+}
+
 export function assertClean(status: string): void {
   if (status.trim()) fail('DIRTY_CHECKOUT');
 }
@@ -188,6 +289,8 @@ export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identit
   const manifestBytes = read('scripts/gate-suite-manifest.json');
   const manifest = JSON.parse(manifestBytes.toString()) as Manifest;
   const counts = validateManifest(manifest, pkg.scripts);
+  const shardBytes = read('scripts/gate-db-shards.json');
+  validateShards(JSON.parse(shardBytes.toString()) as ShardPartition, manifest);
   if (
     pkg.packageManager !== 'pnpm@10.33.2' ||
     pkg.devDependencies.supabase !== '2.120.0' ||
@@ -219,6 +322,7 @@ export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identit
     lockHash: hash(read('pnpm-lock.yaml')),
     inputsHash,
     counts,
+    shardHash: hash(shardBytes),
   };
 }
 
@@ -227,7 +331,8 @@ export function sameIdentity(a: Identity, b: Identity): void {
     a.sha !== b.sha ||
     a.manifestHash !== b.manifestHash ||
     a.lockHash !== b.lockHash ||
-    a.inputsHash !== b.inputsHash
+    a.inputsHash !== b.inputsHash ||
+    a.shardHash !== b.shardHash
   )
     fail('COMPONENT_IDENTITY_MISMATCH');
 }
@@ -423,7 +528,7 @@ export function countFromOutput(name: string, rawOutput: string): string | undef
       ? '33 valid; 33 invalid; owner denial'
       : undefined;
   if (name === 'database')
-    return /Test Files\s+41 passed/.test(output) && /Tests\s+\d+ passed/.test(output)
+    return /Test Files\s+\d+ passed/.test(output) && /Tests\s+\d+ passed/.test(output)
       ? output.match(/Tests\s+(\d+) passed/)?.[1]
       : undefined;
   if (name === 'mcp')
@@ -443,6 +548,16 @@ export function assertSourceTestEvidence(output: string, sourceFiles: number): v
     /\b[1-9]\d* (?:skipped|ignored|failed|cancelled)\b/i.test(plain)
   )
     fail('SOURCE_TEST_EVIDENCE_MISSING', 'FAIL');
+}
+
+export function assertShardDatabaseEvidence(output: string, expectedFiles: number): number {
+  const plain = plainEvidence(output);
+  assertNoSkipped(plain);
+  const match = plain.match(/Test Files\s+(\d+) passed[\s\S]*Tests\s+(\d+) passed/);
+  if (!match) fail('SHARD_TEST_EVIDENCE_MISSING', 'FAIL');
+  if (Number(match![1]) !== expectedFiles || Number(match![2]) <= 0)
+    fail('SHARD_TEST_EVIDENCE_MISSING', 'FAIL');
+  return Number(match![2]);
 }
 
 export function assertDatabaseTestEvidence(output: string): void {
@@ -508,6 +623,13 @@ async function backendStages(
   stages: Stage[],
   onOverlay: (hash: string) => void,
 ): Promise<void> {
+  const shard = process.env.GATE_DB_SHARD as ShardId | undefined;
+  if (shard && !['1', '2'].includes(shard)) fail('SHARD_INVALID');
+  const manifest = JSON.parse(read('scripts/gate-suite-manifest.json').toString()) as Manifest;
+  const partitions = validateShards(
+    JSON.parse(read('scripts/gate-db-shards.json').toString()) as ShardPartition,
+    manifest,
+  );
   const exactActions = process.env.GATE_CONFIG_MODE === 'ACTIONS_EXACT_CONFIG';
   const projectId = exactActions
     ? sourceProjectId()
@@ -546,7 +668,10 @@ async function backendStages(
       () => {
         const result = command(cmd, args, stageRoot.path);
         if (['mcp', 'database'].includes(name)) assertNoSkipped(result.output);
-        if (name === 'database') assertDatabaseTestEvidence(result.output);
+        if (name === 'database') {
+          if (shard) assertShardDatabaseEvidence(result.output, partitions[shard].length);
+          else assertDatabaseTestEvidence(result.output);
+        }
         if (name === 'security-advisors') assertAdvisorsReport(result.output);
         return result;
       },
@@ -561,19 +686,20 @@ async function backendStages(
     assertStartedTarget(projectId, base);
     run('reset', 'pnpm', ['run', 'supabase:reset']);
     run('migration-names', 'pnpm', ['run', 'verify-migrations'], /Validated 72 migration filename/);
-    run('mcp', 'pnpm', ['run', 'test:mcp'], /\b[1-9]\d* passed/);
+    if (!shard || shard === '1') run('mcp', 'pnpm', ['run', 'test:mcp'], /\b82 passed/);
     run(
       'audit-before',
       'pnpm',
       ['exec', 'tsx', 'scripts/phase-6-catalog-audit.ts'],
       /PASS|catalog/i,
     );
-    run(
-      'inspector',
-      'pnpm',
-      ['exec', 'tsx', 'scripts/phase-6-13.ts'],
-      /33\/33 valid and 33\/33 invalid tool calls.*PASS/,
-    );
+    if (!shard || shard === '1')
+      run(
+        'inspector',
+        'pnpm',
+        ['exec', 'tsx', 'scripts/phase-6-13.ts'],
+        /33\/33 valid and 33\/33 invalid tool calls.*PASS/,
+      );
     run(
       'audit-after',
       'pnpm',
@@ -583,8 +709,18 @@ async function backendStages(
     run(
       'database',
       'pnpm',
-      ['run', 'test:database'],
-      /Test Files\s+41 passed[\s\S]*Tests\s+\d+ passed/,
+      shard
+        ? [
+            'exec',
+            'vitest',
+            'run',
+            '--config',
+            'vitest.database.config.ts',
+            '--no-file-parallelism',
+            ...partitions[shard],
+          ]
+        : ['run', 'test:database'],
+      /Test Files\s+\d+ passed[\s\S]*Tests\s+\d+ passed/,
     );
     run('migration-history', 'pnpm', ['run', 'supabase:verify'], /\d{14}/);
     run('db-lint', 'pnpm', ['exec', 'supabase', 'db', 'lint', '--local', '--fail-on', 'error']);
@@ -633,6 +769,29 @@ async function backendStages(
   }
 }
 
+export function requiredReportStages(mode: Mode, shard?: ShardId): string[] {
+  if (mode === 'source') return ['locked-install', 'source'];
+  const stages = [
+    'locked-install',
+    'cli-help',
+    'start',
+    'reset',
+    'migration-names',
+    'mcp',
+    'audit-before',
+    'inspector',
+    'audit-after',
+    'database',
+    'migration-history',
+    'db-lint',
+    'security-advisors',
+    'audit-final',
+    'whitespace',
+    'cleanup',
+  ];
+  return shard === '2' ? stages.filter((name) => name !== 'mcp' && name !== 'inspector') : stages;
+}
+
 export async function main(mode: Mode): Promise<void> {
   const started = performance.now();
   const stages: Stage[] = [];
@@ -641,7 +800,9 @@ export async function main(mode: Mode): Promise<void> {
   let status: Status;
   let failureReason: string | undefined;
   const exactActions = process.env.GATE_CONFIG_MODE === 'ACTIONS_EXACT_CONFIG';
+  const shard = process.env.GATE_DB_SHARD as ShardId | undefined;
   try {
+    if (shard && (mode !== 'backend' || !['1', '2'].includes(shard))) fail('SHARD_INVALID');
     if (exactActions) assertActionsEnvironment();
     identity = preflight();
     stages.push(stage('locked-install', () => command('pnpm', ['install', '--frozen-lockfile'])));
@@ -660,27 +821,7 @@ export async function main(mode: Mode): Promise<void> {
     failureReason = error instanceof GateError ? error.code : 'UNEXPECTED_ERROR';
     process.exitCode = 1;
   }
-  const required =
-    mode === 'source'
-      ? ['locked-install', 'source']
-      : [
-          'locked-install',
-          'cli-help',
-          'start',
-          'reset',
-          'migration-names',
-          'mcp',
-          'audit-before',
-          'inspector',
-          'audit-after',
-          'database',
-          'migration-history',
-          'db-lint',
-          'security-advisors',
-          'audit-final',
-          'whitespace',
-          'cleanup',
-        ];
+  const required = requiredReportStages(mode, shard);
   for (const name of required) {
     if (!stages.some((item) => item.name === name))
       stages.push({ name, status: 'NOT RUN', durationMs: 0 });
@@ -689,6 +830,13 @@ export async function main(mode: Mode): Promise<void> {
     .sort((a, b) => b.durationMs - a.durationMs)
     .slice(0, 5)
     .map((s) => s.name);
+  const reportedFiles = shard
+    ? (JSON.parse(read('scripts/gate-db-shards.json').toString()) as ShardPartition).shards[shard]
+    : null;
+  const caseCount =
+    shard && status === 'PASS'
+      ? Number(stages.find((s) => s.name === 'database')?.count ?? 0)
+      : null;
   const report = {
     mode,
     status,
@@ -702,6 +850,10 @@ export async function main(mode: Mode): Promise<void> {
     manifestSha256: identity?.manifestHash ?? 'UNVERIFIED',
     lockSha256: identity?.lockHash ?? 'UNVERIFIED',
     inputsSha256: identity?.inputsHash ?? 'UNVERIFIED',
+    shardSha256: identity?.shardHash ?? 'UNVERIFIED',
+    shard: shard ?? null,
+    files: reportedFiles,
+    cases: caseCount,
     configOverlaySha256: overlayHash ?? null,
     configMode: exactActions
       ? 'ACTIONS_EXACT_CONFIG'
