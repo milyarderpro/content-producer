@@ -148,8 +148,10 @@ export function validateManifest(
   };
 }
 
+// prettier-ignore
 type ShardPartition = { schemaVersion: number; shards: Record<ShardId, string[]> };
 
+// prettier-ignore
 export function validateShards(
   partition: ShardPartition,
   manifest: Manifest,
@@ -179,6 +181,7 @@ export function validateShards(
   return partition.shards;
 }
 
+// prettier-ignore
 export type ShardProof = {
   shard: ShardId;
   sha: string;
@@ -191,6 +194,7 @@ export type ShardProof = {
   status: string;
   stages: Stage[];
 };
+// prettier-ignore
 export function validateShardProofs(
   proofs: ShardProof[],
   expectedSha: string,
@@ -260,6 +264,7 @@ export function assertAdvisorsReport(output: string): void {
     fail('ADVISOR_REPORT_INVALID', 'FAIL');
 }
 
+// prettier-ignore
 export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identity {
   const sha = git(['rev-parse', 'HEAD']);
   assertSha(expectedSha, sha);
@@ -309,6 +314,7 @@ export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identit
   };
 }
 
+// prettier-ignore
 export function sameIdentity(a: Identity, b: Identity): void {
   if (
     a.sha !== b.sha ||
@@ -504,6 +510,7 @@ function stageCopy(projectId: string, base: number): { path: string; overlayHash
   return { path, overlayHash: hash(config) };
 }
 
+// prettier-ignore
 export function countFromOutput(name: string, rawOutput: string): string | undefined {
   const output = plainEvidence(rawOutput);
   if (name === 'inspector')
@@ -533,6 +540,7 @@ export function assertSourceTestEvidence(output: string, sourceFiles: number): v
     fail('SOURCE_TEST_EVIDENCE_MISSING', 'FAIL');
 }
 
+// prettier-ignore
 export function assertShardDatabaseEvidence(output: string, expectedFiles: number): number {
   const plain = plainEvidence(output);
   assertNoSkipped(plain);
@@ -600,6 +608,7 @@ function sourceStages(sourceFiles: number, stages: Stage[]): void {
   requirePass([item]);
 }
 
+// prettier-ignore
 async function backendStages(
   identity: Identity,
   stages: Stage[],
@@ -750,6 +759,7 @@ async function backendStages(
   }
 }
 
+// prettier-ignore
 export async function main(mode: Mode): Promise<void> {
   const started = performance.now();
   const stages: Stage[] = [];
