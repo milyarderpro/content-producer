@@ -171,7 +171,11 @@ test('ANSI and plain database evidence require all 41 files, cases and no skippe
     assert.doesNotThrow(() => assertDatabaseTestEvidence(output));
     assert.equal(countFromOutput('database', output), '179');
     assert.equal(
-      stage('database', () => ({ output }), /Test Files\s+41 passed[\s\S]*Tests\s+\d+ passed/).status,
+      stage(
+        'database',
+        () => ({ output }),
+        /Test Files\s+41 passed[\s\S]*Tests\s+\d+ passed/,
+      ).status,
       'PASS',
     );
   }
