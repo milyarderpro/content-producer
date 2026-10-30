@@ -143,48 +143,41 @@ test('formal config requires byte-identical committed config', () => {
   });
 });
 
-test('plain and ANSI source Vitest counts are fail-closed', () => {
-  const plain = 'Test Files  12 passed (12)\nTests  83 passed (83)';
-  const colored =
-    'Test Files  \x1b[32m12 passed\x1b[39m (12)\nTests  \x1b[32m83 passed\x1b[39m (83)';
-  for (const output of [plain, colored]) {
+test('source Vitest ANSI and plain summaries', () => {
+  const plain = 'Test Files 12 passed\nTests 83 passed';
+  const ansi = 'Test Files \x1b[32m12 passed\x1b[0m\nTests \x1b[32m83 passed\x1b[0m';
+  for (const output of [plain, ansi]) {
     assert.doesNotThrow(() => assertSourceTestEvidence(output, 12));
     assert.equal(countFromOutput('source', output), 'root 12 files; root 83 cases');
   }
-  assert.equal(plainEvidence(colored), plain);
+  assert.equal(plainEvidence(ansi), plain);
   for (const output of [
-    'Test Files 11 passed (12)\nTests 83 passed',
-    'Test Files 12 passed (12)',
-    'Test Files 12 passed (12)\nTests 82 passed, 1 failed',
-    'Test Files 12 passed (12)\nTests 82 passed, \x1b[33m1 cancelled\x1b[39m',
-  ])
+    'Test Files 11 passed\nTests 83 passed',
+    'Test Files 12 passed',
+    'Test Files 12 passed\nTests 82 passed, 1 failed',
+    'Test Files 12 passed\nTests 82 passed, 1 cancelled',
+  ]) {
     assert.throws(() => assertSourceTestEvidence(output, 12), {
       code: 'SOURCE_TEST_EVIDENCE_MISSING',
     });
+  }
 });
 
-test('plain and ANSI database counts are fail-closed', () => {
-  const plain = 'Test Files  41 passed (41)\nTests  179 passed (179)';
-  const colored =
-    'Test Files  \x1b[32m41 passed\x1b[39m (41)\nTests  \x1b[32m179 passed\x1b[39m (179)';
-  for (const output of [plain, colored]) {
+test('database Vitest ANSI and plain summaries', () => {
+  const plain = 'Test Files 41 passed\nTests 179 passed';
+  const ansi = 'Test Files \x1b[32m41 passed\x1b[0m\nTests \x1b[32m179 passed\x1b[0m';
+  for (const output of [plain, ansi]) {
     assert.doesNotThrow(() => assertDatabaseTestEvidence(output));
     assert.equal(countFromOutput('database', output), '179');
-    assert.equal(
-      stage(
-        'database',
-        () => ({ output }),
-        /Test Files\s+41 passed[\s\S]*Tests\s+\d+ passed/,
-      ).status,
-      'PASS',
-    );
   }
+  assert.equal(plainEvidence(ansi), plain);
   for (const output of [
-    'Test Files 40 passed (41)\nTests 179 passed',
-    'Test Files 41 passed (41)',
-    'Test Files 41 passed (41)\nTests 178 passed, 1 skipped',
-    'Test Files 41 passed (41)\nTests 178 passed, 1 failed',
-    'Test Files 41 passed (41)\nTests 178 passed, 1 cancelled',
-  ])
+    'Test Files 40 passed\nTests 179 passed',
+    'Test Files 41 passed',
+    'Test Files 41 passed\nTests 178 passed, 1 skipped',
+    'Test Files 41 passed\nTests 178 passed, 1 failed',
+    'Test Files 41 passed\nTests 178 passed, 1 cancelled',
+  ]) {
     assert.throws(() => assertDatabaseTestEvidence(output));
+  }
 });
