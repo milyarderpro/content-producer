@@ -224,7 +224,11 @@ export function sameIdentity(a: Identity, b: Identity): void {
     fail('COMPONENT_IDENTITY_MISMATCH');
 }
 
-export function validateTarget(projectId: string, portBase: number, sourceProject: string): void {
+export function validateTarget(projectId: string, portBase: number, sourceProject: string, exactActions = false): void {
+  if (exactActions) {
+    assertActionsEnvironment();
+    if (projectId !== sourceProject || portBase !== 54320) fail('ACTIONS_CONFIG_TARGET_MISMATCH');
+  } else {
   if (
     !/^issue-88-[a-z0-9-]+-disposable$/.test(projectId) ||
     projectId === sourceProject ||
@@ -235,6 +239,7 @@ export function validateTarget(projectId: string, portBase: number, sourceProjec
     portBase === 54320
   )
     fail('UNSAFE_DISPOSABLE_TARGET');
+  }
   for (const key of [
     'SUPABASE_ACCESS_TOKEN',
     'SUPABASE_DB_PASSWORD',
@@ -248,6 +253,24 @@ export function validateTarget(projectId: string, portBase: number, sourceProjec
     existsSync(join(root, '.supabase', 'project-ref'))
   )
     fail('LINKED_PROJECT_PRESENT');
+}
+
+export function assertActionsEnvironment(env: NodeJS.ProcessEnv = process.env): void {
+  if (
+    env.GITHUB_ACTIONS !== 'true' ||
+    env.RUNNER_ENVIRONMENT !== 'github-hosted' ||
+    env.GITHUB_EVENT_NAME !== 'workflow_dispatch' ||
+    env.GITHUB_REF !== 'refs/heads/main' ||
+    !/^[0-9a-f]{40}$/.test(env.GITHUB_SHA ?? '') ||
+    env.GATE_CANDIDATE_SHA !== env.GITHUB_SHA ||
+    !env.RUNNER_TEMP ||
+    env.GATE_ACTIONS_EXACT_CONFIG !== '1'
+  ) fail('UNVERIFIED_ACTIONS_ENVIRONMENT');
+}
+
+export function assertConfigMode(mode: string | undefined, config: Buffer, committed: Buffer): void {
+  if (mode !== 'ACTIONS_EXACT_CONFIG' || !config.equals(committed))
+    fail('EXACT_CONFIG_MISMATCH');
 }
 
 function sourceProjectId(): string {
@@ -456,9 +479,11 @@ async function backendStages(
   stages: Stage[],
   onOverlay: (hash: string) => void,
 ): Promise<void> {
-  const projectId = process.env.GATE_DISPOSABLE_PROJECT_ID ?? '';
-  const base = Number(process.env.GATE_PORT_BASE ?? NaN);
-  validateTarget(projectId, base, sourceProjectId());
+  const exactActions = process.env.GATE_CONFIG_MODE === 'ACTIONS_EXACT_CONFIG';
+  const projectId = exactActions ? sourceProjectId() : (process.env.GATE_DISPOSABLE_PROJECT_ID ?? '');
+  const base = exactActions ? 54320 : Number(process.env.GATE_PORT_BASE ?? NaN);
+  validateTarget(projectId, base, sourceProjectId(), exactActions);
+  if (exactActions) assertConfigMode('ACTIONS_EXACT_CONFIG', read('supabase/config.toml'), Buffer.from(git(['show', 'HEAD:supabase/config.toml'])));
   stages.push(
     stage('cli-help', () => {
       for (const args of [
@@ -476,8 +501,10 @@ async function backendStages(
   requirePass(stages.filter((item) => item.name === 'cli-help'));
   dockerVacant(projectId);
   await portsVacant(base);
-  const stageRoot = stageCopy(projectId, base);
-  onOverlay(stageRoot.overlayHash);
+  const stageRoot = exactActions
+    ? { path: root, overlayHash: '' }
+    : stageCopy(projectId, base);
+  if (!exactActions) onOverlay(stageRoot.overlayHash);
   let started = false;
   const run = (name: string, cmd: string, args: string[], evidence?: RegExp) => {
     if (started && name !== 'start') assertStartedTarget(projectId, base);
@@ -567,7 +594,7 @@ async function backendStages(
           return result;
         }),
       );
-    rmSync(stageRoot.path, { recursive: true, force: true });
+    if (!exactActions) rmSync(stageRoot.path, { recursive: true, force: true });
     requirePass(stages.filter((item) => item.name === 'cleanup'));
   }
 }
@@ -579,7 +606,9 @@ export async function main(mode: Mode): Promise<void> {
   let overlayHash: string | undefined;
   let status: Status;
   let failureReason: string | undefined;
+  const exactActions = process.env.GATE_CONFIG_MODE === 'ACTIONS_EXACT_CONFIG';
   try {
+    if (exactActions) assertActionsEnvironment();
     identity = preflight();
     stages.push(stage('locked-install', () => command('pnpm', ['install', '--frozen-lockfile'])));
     requirePass(stages);
@@ -606,12 +635,13 @@ export async function main(mode: Mode): Promise<void> {
       mode,
       status,
       failureReason,
-      evidence: overlayHash ? 'DIAGNOSTIC_CONFIG_OVERLAY' : 'COMMITTED_SOURCE',
+      evidence: exactActions ? 'ACTIONS_EXACT_COMMIT_CONFIG' : mode === 'source' ? 'COMMITTED_SOURCE' : 'DIAGNOSTIC_CONFIG_OVERLAY',
       sha: identity?.sha ?? 'UNVERIFIED',
       manifestSha256: identity?.manifestHash ?? 'UNVERIFIED',
       lockSha256: identity?.lockHash ?? 'UNVERIFIED',
       inputsSha256: identity?.inputsHash ?? 'UNVERIFIED',
       configOverlaySha256: overlayHash ?? null,
+      configMode: exactActions ? 'ACTIONS_EXACT_CONFIG' : 'LOCAL_DIAGNOSTIC_OVERLAY',
       suites: identity?.counts ?? null,
       toolPins: {
         node: read('.nvmrc').toString().trim(),
