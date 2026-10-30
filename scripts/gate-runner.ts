@@ -438,7 +438,8 @@ export function assertSourceTestEvidence(output: string, sourceFiles: number): v
     !new RegExp(`Test Files\\s+${sourceFiles} passed`).test(plain) ||
     !/Tests\s+[1-9]\d* passed/.test(plain) ||
     /\b[1-9]\d* (?:skipped|ignored|failed|cancelled)\b/i.test(plain)
-  ) fail('SOURCE_TEST_EVIDENCE_MISSING', 'FAIL');
+  )
+    fail('SOURCE_TEST_EVIDENCE_MISSING', 'FAIL');
 }
 
 export function assertDatabaseTestEvidence(output: string): void {
