@@ -113,6 +113,7 @@ test('exact Actions mode needs dispatch SHA and isolated GitHub context', () => 
     GATE_CANDIDATE_SHA: sha,
     GATE_ACTIONS_EXACT_CONFIG: '1',
     RUNNER_TEMP: '/tmp/actions',
+    RUNNER_OS: 'Linux',
   };
   assert.doesNotThrow(() => assertActionsEnvironment(env));
   for (const changed of [
