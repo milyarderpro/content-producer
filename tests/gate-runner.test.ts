@@ -135,7 +135,8 @@ test('formal config requires byte-identical committed config', () => {
   assert.throws(() => assertConfigMode('LOCAL_DIAGNOSTIC_OVERLAY', committed, committed), {
     code: 'EXACT_CONFIG_MISMATCH',
   });
-  assert.throws(() => assertConfigMode('ACTIONS_EXACT_CONFIG', Buffer.from('changed'), committed), {
-    code: 'EXACT_CONFIG_MISMATCH',
-  });
+  assert.throws(
+    () => assertConfigMode('ACTIONS_EXACT_CONFIG', Buffer.from('changed'), committed),
+    { code: 'EXACT_CONFIG_MISMATCH' },
+  );
 });
