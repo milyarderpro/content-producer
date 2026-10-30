@@ -61,7 +61,8 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
     expect(candidate).toContain('required: true');
     for (const job of ['source', 'backend']) {
       const start = candidate.indexOf(`  ${job}:\n`);
-      const end = candidate.indexOf('\n  ', start + 3);
+      const next = job === 'source' ? '\n  backend:' : '\n  aggregate:';
+      const end = candidate.indexOf(next, start + 3);
       expect(start).toBeGreaterThan(-1);
       const section = candidate.slice(start, end > start ? end : undefined);
       expect(section).toContain("if: github.ref == 'refs/heads/main'");
