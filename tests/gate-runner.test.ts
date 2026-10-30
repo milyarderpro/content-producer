@@ -82,6 +82,7 @@ test('rejects source/backend identity mismatch', () => {
     manifestHash: 'a',
     lockHash: 'b',
     inputsHash: 'c',
+    shardHash: 'd',
     counts: { source: 12, mcp: 15, database: 41 },
   };
   assert.throws(() => sameIdentity(identity, { ...identity, manifestHash: 'drift' }), {

@@ -264,7 +264,6 @@ export function assertAdvisorsReport(output: string): void {
     fail('ADVISOR_REPORT_INVALID', 'FAIL');
 }
 
-// prettier-ignore
 export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identity {
   const sha = git(['rev-parse', 'HEAD']);
   assertSha(expectedSha, sha);
@@ -314,7 +313,6 @@ export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identit
   };
 }
 
-// prettier-ignore
 export function sameIdentity(a: Identity, b: Identity): void {
   if (
     a.sha !== b.sha ||
@@ -510,7 +508,6 @@ function stageCopy(projectId: string, base: number): { path: string; overlayHash
   return { path, overlayHash: hash(config) };
 }
 
-// prettier-ignore
 export function countFromOutput(name: string, rawOutput: string): string | undefined {
   const output = plainEvidence(rawOutput);
   if (name === 'inspector')
@@ -540,12 +537,12 @@ export function assertSourceTestEvidence(output: string, sourceFiles: number): v
     fail('SOURCE_TEST_EVIDENCE_MISSING', 'FAIL');
 }
 
-// prettier-ignore
 export function assertShardDatabaseEvidence(output: string, expectedFiles: number): number {
   const plain = plainEvidence(output);
   assertNoSkipped(plain);
   const match = plain.match(/Test Files\s+(\d+) passed[\s\S]*Tests\s+(\d+) passed/);
-  if (!match || Number(match[1]) !== expectedFiles || Number(match[2]) <= 0)
+  if (!match) fail('SHARD_TEST_EVIDENCE_MISSING', 'FAIL');
+  if (Number(match[1]) !== expectedFiles || Number(match[2]) <= 0)
     fail('SHARD_TEST_EVIDENCE_MISSING', 'FAIL');
   return Number(match[2]);
 }
@@ -759,7 +756,6 @@ async function backendStages(
   }
 }
 
-// prettier-ignore
 export async function main(mode: Mode): Promise<void> {
   const started = performance.now();
   const stages: Stage[] = [];
