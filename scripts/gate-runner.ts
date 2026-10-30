@@ -156,6 +156,7 @@ export function validateShards(partition: ShardPartition, manifest: Manifest): R
     fail('SHARD_SCHEMA_DRIFT');
   const expected = manifest.suites.database.files.map(file => file.path).sort();
   const all = [...partition.shards['1'], ...partition.shards['2']];
+  if (!Array.isArray(partition.shards['1']) || !Array.isArray(partition.shards['2'])) fail('SHARD_SCHEMA_DRIFT');
   if (partition.shards['1'].length === 0 || partition.shards['2'].length === 0 ||
       all.length !== 41 || new Set(all).size !== 41 ||
       all.some(path => typeof path !== 'string' ||
@@ -657,7 +658,7 @@ async function backendStages(
       'database',
       'pnpm',
       shard
-        ? ['exec', 'vitest', 'run', '--config', 'supabase/vitest.config.ts', '--no-file-parallelism', ...partitions[shard]]
+        ? ['exec', 'vitest', 'run', '--config', 'vitest.database.config.ts', '--no-file-parallelism', ...partitions[shard]]
         : ['run', 'test:database'],
       /Test Files\s+\d+ passed[\s\S]*Tests\s+\d+ passed/,
     );
@@ -717,11 +718,8 @@ export async function main(mode: Mode): Promise<void> {
   let failureReason: string | undefined;
   const exactActions = process.env.GATE_CONFIG_MODE === 'ACTIONS_EXACT_CONFIG';
   const shard = process.env.GATE_DB_SHARD as ShardId | undefined;
-  if (shard && (mode !== 'backend' || !['1', '2'].includes(shard))) {
-    process.exitCode = 1;
-    throw new GateError('SHARD_INVALID');
-  }
   try {
+    if (shard && (mode !== 'backend' || !['1', '2'].includes(shard))) fail('SHARD_INVALID');
     if (exactActions) assertActionsEnvironment();
     identity = preflight();
     stages.push(stage('locked-install', () => command('pnpm', ['install', '--frozen-lockfile'])));

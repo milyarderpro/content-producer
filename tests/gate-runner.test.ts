@@ -211,9 +211,9 @@ test('shard proof rejects missing, duplicate, skipped and wrong SHA', () => {
     [mk('1'),{...mk('2'),stages:[{name:'database',status:'NOT RUN',durationMs:0}]}],
     [mk('1'),{...mk('2'),cases:0}],
  ]) assert.throws(() => validateShardProofs(bad,sha,hashes,part),{code:'SHARD_EVIDENCE_MISMATCH'});
- assert.equal(assertShardDatabaseEvidence('Test Files 21 passed\\nTests 90 passed',21),90);
- for (const output of ['Test Files 20 passed\\nTests 90 passed',
-    'Test Files 21 passed\\nTests 89 passed, 1 skipped']) {
+ assert.equal(assertShardDatabaseEvidence('Test Files 21 passed\nTests 90 passed',21),90);
+ for (const output of ['Test Files 20 passed\nTests 90 passed',
+    'Test Files 21 passed\nTests 89 passed, 1 skipped']) {
    assert.throws(() => assertShardDatabaseEvidence(output,21));
  }
 });
