@@ -272,7 +272,7 @@ test('backend candidate aggregate accepts exactly 182 database cases', () => {
 });
 
 test('MCP 15 files/82 cases and authenticated Inspector belong to shard 1 exactly once', () => {
-  const stages = [
+  const stages: ShardProof['stages'] = [
     { name: 'mcp', status: 'PASS' as const, durationMs: 1, count: '82' },
     {
       name: 'inspector',
