@@ -693,12 +693,13 @@ async function backendStages(
       ['exec', 'tsx', 'scripts/phase-6-catalog-audit.ts'],
       /PASS|catalog/i,
     );
-    if (!shard || shard === '1') run(
-      'inspector',
-      'pnpm',
-      ['exec', 'tsx', 'scripts/phase-6-13.ts'],
-      /33\/33 valid and 33\/33 invalid tool calls.*PASS/,
-    );
+    if (!shard || shard === '1')
+      run(
+        'inspector',
+        'pnpm',
+        ['exec', 'tsx', 'scripts/phase-6-13.ts'],
+        /33\/33 valid and 33\/33 invalid tool calls.*PASS/,
+      );
     run(
       'audit-after',
       'pnpm',

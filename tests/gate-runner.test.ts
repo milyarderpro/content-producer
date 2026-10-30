@@ -282,10 +282,16 @@ test('MCP 15 files/82 cases and authenticated Inspector belong to shard 1 exactl
     },
   ];
   const make = (shard: '1' | '2', items: typeof stages): ShardProof => ({
-    shard, sha,
-    manifestSha256: 'a'.repeat(64), lockSha256: 'b'.repeat(64),
-    inputsSha256: 'c'.repeat(64), shardSha256: 'd'.repeat(64),
-    files: [], cases: 91, status: 'PASS', stages: items,
+    shard,
+    sha,
+    manifestSha256: 'a'.repeat(64),
+    lockSha256: 'b'.repeat(64),
+    inputsSha256: 'c'.repeat(64),
+    shardSha256: 'd'.repeat(64),
+    files: [],
+    cases: 91,
+    status: 'PASS',
+    stages: items,
   });
   const owner = make('1', stages);
   const other = make('2', []);

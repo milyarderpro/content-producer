@@ -1,5 +1,11 @@
 import { readFileSync } from 'node:fs';
-import { main, validateManifest, validateShards, validateShardProofs, validateSingleMcpInspector } from './gate-runner.js';
+import {
+  main,
+  validateManifest,
+  validateShards,
+  validateShardProofs,
+  validateSingleMcpInspector,
+} from './gate-runner.js';
 
 export function assertExactDatabaseCaseCount(count: number): void {
   if (count !== 182) throw new Error('SHARD_CASE_COUNT_MISMATCH');
