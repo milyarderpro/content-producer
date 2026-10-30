@@ -224,8 +224,16 @@ export function sameIdentity(a: Identity, b: Identity): void {
     fail('COMPONENT_IDENTITY_MISMATCH');
 }
 
-export function validateTarget(projectId: string, portBase: number, sourceProject: string): void {
-  if (
+export function validateTarget(
+  projectId: string,
+  portBase: number,
+  sourceProject: string,
+  exactActions = false,
+): void {
+  if (exactActions) {
+    assertActionsEnvironment();
+    if (projectId !== sourceProject || portBase !== 54320) fail('ACTIONS_CONFIG_TARGET_MISMATCH');
+  } else if (
     !/^issue-88-[a-z0-9-]+-disposable$/.test(projectId) ||
     projectId === sourceProject ||
     !Number.isInteger(portBase) ||
@@ -248,6 +256,28 @@ export function validateTarget(projectId: string, portBase: number, sourceProjec
     existsSync(join(root, '.supabase', 'project-ref'))
   )
     fail('LINKED_PROJECT_PRESENT');
+}
+
+export function assertActionsEnvironment(env: NodeJS.ProcessEnv = process.env): void {
+  if (
+    env.GITHUB_ACTIONS !== 'true' ||
+    env.GITHUB_EVENT_NAME !== 'workflow_dispatch' ||
+    env.GITHUB_REF !== 'refs/heads/main' ||
+    !/^[0-9a-f]{40}$/.test(env.GITHUB_SHA ?? '') ||
+    env.GATE_CANDIDATE_SHA !== env.GITHUB_SHA ||
+    !env.RUNNER_TEMP ||
+    env.RUNNER_OS !== 'Linux' ||
+    env.GATE_ACTIONS_EXACT_CONFIG !== '1'
+  )
+    fail('UNVERIFIED_ACTIONS_ENVIRONMENT');
+}
+
+export function assertConfigMode(
+  mode: string | undefined,
+  config: Buffer,
+  committed: Buffer,
+): void {
+  if (mode !== 'ACTIONS_EXACT_CONFIG' || !config.equals(committed)) fail('EXACT_CONFIG_MISMATCH');
 }
 
 function sourceProjectId(): string {
@@ -456,9 +486,17 @@ async function backendStages(
   stages: Stage[],
   onOverlay: (hash: string) => void,
 ): Promise<void> {
-  const projectId = process.env.GATE_DISPOSABLE_PROJECT_ID ?? '';
-  const base = Number(process.env.GATE_PORT_BASE ?? NaN);
-  validateTarget(projectId, base, sourceProjectId());
+  const exactActions = process.env.GATE_CONFIG_MODE === 'ACTIONS_EXACT_CONFIG';
+  const projectId = exactActions
+    ? sourceProjectId()
+    : (process.env.GATE_DISPOSABLE_PROJECT_ID ?? '');
+  const base = exactActions ? 54320 : Number(process.env.GATE_PORT_BASE ?? NaN);
+  validateTarget(projectId, base, sourceProjectId(), exactActions);
+  if (exactActions) {
+    const committed = spawnSync('git', ['show', 'HEAD:supabase/config.toml'], { cwd: root });
+    if (committed.status !== 0 || !committed.stdout) fail('EXACT_CONFIG_UNAVAILABLE');
+    assertConfigMode('ACTIONS_EXACT_CONFIG', read('supabase/config.toml'), committed.stdout);
+  }
   stages.push(
     stage('cli-help', () => {
       for (const args of [
@@ -476,8 +514,8 @@ async function backendStages(
   requirePass(stages.filter((item) => item.name === 'cli-help'));
   dockerVacant(projectId);
   await portsVacant(base);
-  const stageRoot = stageCopy(projectId, base);
-  onOverlay(stageRoot.overlayHash);
+  const stageRoot = exactActions ? { path: root, overlayHash: '' } : stageCopy(projectId, base);
+  if (!exactActions) onOverlay(stageRoot.overlayHash);
   let started = false;
   const run = (name: string, cmd: string, args: string[], evidence?: RegExp) => {
     if (started && name !== 'start') assertStartedTarget(projectId, base);
@@ -567,7 +605,7 @@ async function backendStages(
           return result;
         }),
       );
-    rmSync(stageRoot.path, { recursive: true, force: true });
+    if (!exactActions) rmSync(stageRoot.path, { recursive: true, force: true });
     requirePass(stages.filter((item) => item.name === 'cleanup'));
   }
 }
@@ -579,7 +617,9 @@ export async function main(mode: Mode): Promise<void> {
   let overlayHash: string | undefined;
   let status: Status;
   let failureReason: string | undefined;
+  const exactActions = process.env.GATE_CONFIG_MODE === 'ACTIONS_EXACT_CONFIG';
   try {
+    if (exactActions) assertActionsEnvironment();
     identity = preflight();
     stages.push(stage('locked-install', () => command('pnpm', ['install', '--frozen-lockfile'])));
     requirePass(stages);
@@ -597,33 +637,71 @@ export async function main(mode: Mode): Promise<void> {
     failureReason = error instanceof GateError ? error.code : 'UNEXPECTED_ERROR';
     process.exitCode = 1;
   }
+  const required =
+    mode === 'source'
+      ? ['locked-install', 'source']
+      : [
+          'locked-install',
+          'cli-help',
+          'start',
+          'reset',
+          'migration-names',
+          'mcp',
+          'audit-before',
+          'inspector',
+          'audit-after',
+          'database',
+          'migration-history',
+          'db-lint',
+          'security-advisors',
+          'audit-final',
+          'whitespace',
+          'cleanup',
+        ];
+  for (const name of required) {
+    if (!stages.some((item) => item.name === name))
+      stages.push({ name, status: 'NOT RUN', durationMs: 0 });
+  }
   const top = [...stages]
     .sort((a, b) => b.durationMs - a.durationMs)
     .slice(0, 5)
     .map((s) => s.name);
-  console.log(
-    JSON.stringify({
-      mode,
-      status,
-      failureReason,
-      evidence: overlayHash ? 'DIAGNOSTIC_CONFIG_OVERLAY' : 'COMMITTED_SOURCE',
-      sha: identity?.sha ?? 'UNVERIFIED',
-      manifestSha256: identity?.manifestHash ?? 'UNVERIFIED',
-      lockSha256: identity?.lockHash ?? 'UNVERIFIED',
-      inputsSha256: identity?.inputsHash ?? 'UNVERIFIED',
-      configOverlaySha256: overlayHash ?? null,
-      suites: identity?.counts ?? null,
-      toolPins: {
-        node: read('.nvmrc').toString().trim(),
-        pnpm: '10.33.2',
-        deno: read('.deno-version').toString().trim(),
-        supabase: '2.120.0',
-      },
-      stages,
-      topFiveSlowest: top,
-      durationMs: Math.round(performance.now() - started),
-      limits:
-        'Local fixture only; not G4 equivalence, hosted OAuth, production, or release authorization.',
-    }),
-  );
+  const report = {
+    mode,
+    status,
+    failureReason,
+    evidence: exactActions
+      ? 'ACTIONS_EXACT_COMMIT_CONFIG'
+      : mode === 'source'
+        ? 'COMMITTED_SOURCE'
+        : 'DIAGNOSTIC_CONFIG_OVERLAY',
+    sha: identity?.sha ?? 'UNVERIFIED',
+    manifestSha256: identity?.manifestHash ?? 'UNVERIFIED',
+    lockSha256: identity?.lockHash ?? 'UNVERIFIED',
+    inputsSha256: identity?.inputsHash ?? 'UNVERIFIED',
+    configOverlaySha256: overlayHash ?? null,
+    configMode: exactActions
+      ? 'ACTIONS_EXACT_CONFIG'
+      : mode === 'source'
+        ? 'COMMITTED_SOURCE'
+        : 'LOCAL_DIAGNOSTIC_OVERLAY',
+    suites: identity?.counts ?? null,
+    toolPins: {
+      node: read('.nvmrc').toString().trim(),
+      pnpm: '10.33.2',
+      deno: read('.deno-version').toString().trim(),
+      supabase: '2.120.0',
+    },
+    stages,
+    topFiveSlowest: top,
+    durationMs: Math.round(performance.now() - started),
+    limits:
+      'Candidate only; not G4 equivalence, hosted OAuth, production, or release authorization.',
+  };
+  const serialized = JSON.stringify(report);
+  if (process.env.GATE_EVIDENCE_FILE) {
+    mkdirSync(resolve(process.env.GATE_EVIDENCE_FILE, '..'), { recursive: true });
+    writeFileSync(process.env.GATE_EVIDENCE_FILE, `${serialized}\n`);
+  }
+  console.log(serialized);
 }
