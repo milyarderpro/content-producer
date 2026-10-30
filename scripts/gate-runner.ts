@@ -64,7 +64,10 @@ export function command(
   });
   // Raw child output can contain JWTs, SQL, and private fixture values. Never echo it.
   if (result.error || result.status !== 0) fail('STAGE_COMMAND_FAILED', 'FAIL');
-  return { output: plainEvidence(result.stdout ?? ''), durationMs: Math.round(performance.now() - start) };
+  return {
+    output: plainEvidence(result.stdout ?? ''),
+    durationMs: Math.round(performance.now() - start),
+  };
 }
 
 function git(args: string[]): string {
