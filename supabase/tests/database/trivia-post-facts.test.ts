@@ -1,16 +1,5 @@
-import { spawnSync } from 'node:child_process';
-
+import { localQuery as query } from './helpers/local-query.js';
 import { describe, expect, it } from 'vitest';
-
-function query(sql: string): void {
-  const result = spawnSync('pnpm', ['exec', 'supabase', 'db', 'query', '--local', sql], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: { ...process.env, SUPABASE_TELEMETRY_DISABLED: '1' },
-  });
-
-  if (result.status !== 0) throw new Error(`${result.stderr}\n${result.stdout}`);
-}
 
 describe('Phase 4 checkpoint 4.5 trivia post-fact usage snapshots', () => {
   it('enforces scoped immutable fact usage and the closed caller boundary', () => {

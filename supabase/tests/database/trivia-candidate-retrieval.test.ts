@@ -1,25 +1,11 @@
+import { localQuery as query } from './helpers/local-query.js';
 import { createHash } from 'node:crypto';
-import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { gunzipSync } from 'node:zlib';
 import { describe, expect, it } from 'vitest';
 
 import { goldCases } from '../fixtures/trivia/dedup-v1/gold-cases.js';
-
-function query(sql: string): string {
-  const result = spawnSync('pnpm', ['exec', 'supabase', 'db', 'query', '--local', sql], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: {
-      ...process.env,
-      SUPABASE_TELEMETRY_DISABLED: '1',
-    },
-  });
-
-  if (result.status !== 0) throw new Error(`${result.stderr}\n${result.stdout}`);
-  return result.stdout;
-}
 
 function sqlLiteral(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
