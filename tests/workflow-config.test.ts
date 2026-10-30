@@ -8,6 +8,7 @@ const readWorkflow = (name: string) => readFileSync(join('.github/workflows', na
 const ci = readWorkflow('ci.yml');
 const gate = readWorkflow('backend-technical-gate.yml');
 const probe = readWorkflow('hosted-oauth-probe.yml');
+const candidate = readWorkflow('backend-gate-candidate.yml');
 const temporary: string[] = [];
 afterEach(() => {
   for (const directory of temporary.splice(0)) rmSync(directory, { recursive: true, force: true });
@@ -31,23 +32,62 @@ const identity = identityBlock
   .join('\n');
 
 describe('Workflow aktif menjaga batas CI dan gate backend', () => {
-  it('menyisakan satu CI ringan dan dua workflow manual yang terpisah', () => {
+  it('menyisakan satu CI ringan dan tiga workflow manual yang terpisah', () => {
     expect(readdirSync('.github/workflows').sort()).toEqual([
+      'backend-gate-candidate.yml',
       'backend-technical-gate.yml',
       'ci.yml',
       'hosted-oauth-probe.yml',
     ]);
     expect(ci).toMatch(/^ {2}push:/m);
     expect(ci).toMatch(/^ {2}pull_request:/m);
-    for (const source of [gate, probe]) {
+    for (const source of [gate, probe, candidate]) {
       expect(source).toMatch(/^ {2}workflow_dispatch:/m);
       expect(source).not.toMatch(/^ {2}(push|pull_request|schedule|workflow_run):/m);
       expect(source).toContain("if: github.ref == 'refs/heads/main'");
     }
-    for (const source of [ci, gate, probe]) {
+    for (const source of [ci, gate, probe, candidate]) {
       expect(source).toContain('contents: read');
       expect(source).not.toMatch(/(?:contents|actions|id-token|deployments): write/);
     }
+  });
+
+  it('candidate manual mengunci SHA dan agregasi bukti dua job', () => {
+    expect(candidate).toMatch(/^on:\n {2}workflow_dispatch:/m);
+    expect(candidate).not.toMatch(/^ {2}(push|pull_request|schedule|workflow_run):/m);
+    expect(candidate).toMatch(/^permissions:\n {2}contents: read\n/m);
+    expect(candidate).not.toMatch(/(?:contents|actions|id-token|deployments): write/);
+    expect(candidate).toContain('candidate_sha:');
+    expect(candidate).toContain('required: true');
+    for (const job of ['source', 'backend']) {
+      const start = candidate.indexOf(`  ${job}:\n`);
+      const end = candidate.indexOf('\n  ', start + 3);
+      expect(start).toBeGreaterThan(-1);
+      const section = candidate.slice(start, end > start ? end : undefined);
+      expect(section).toContain("if: github.ref == 'refs/heads/main'");
+      expect(section).toContain('ref: ${{ github.sha }}');
+      expect(section).toContain('test "$GITHUB_SHA" = "$CANDIDATE_SHA"');
+      expect(section).toContain('test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"');
+      expect(section).toContain('[[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]');
+      expect(section.indexOf('test "$GITHUB_SHA" = "$CANDIDATE_SHA"')).toBeLessThan(
+        section.indexOf('pnpm run gate:'),
+      );
+    }
+    expect(candidate).toContain('git show HEAD:supabase/config.toml | cmp -s - supabase/config.toml');
+    expect(candidate).toContain('needs: [source, backend]');
+    expect(candidate).toContain('if: always()');
+    for (const statement of [
+      'test "$SOURCE_JOB" = success',
+      'test "$BACKEND_JOB" = success',
+      'test "$SOURCE_RESULT" = PASS',
+      'test "$BACKEND_RESULT" = PASS',
+      'test "$SOURCE_SHA" = "$CANDIDATE_SHA"',
+      'test "$BACKEND_SHA" = "$CANDIDATE_SHA"',
+      'for item in MANIFEST LOCK INPUTS; do',
+      'test "${!a}" = "${!b}"',
+    ])
+      expect(candidate).toContain(statement);
+    expect(candidate).not.toContain('continue-on-error: true');
   });
 
   it('full gate mengunci main SHA dan menjaga urutan CR-044 tanpa DB suite duplikat', () => {
