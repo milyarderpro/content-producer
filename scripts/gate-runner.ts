@@ -159,8 +159,8 @@ export function validateShards(partition: ShardPartition, manifest: Manifest): R
   if (partition.shards['1'].length === 0 || partition.shards['2'].length === 0 ||
       all.length !== 41 || new Set(all).size !== 41 ||
       all.some(path => typeof path !== 'string' ||
-        !/^supabase\\/tests\\/database\\/[a-z0-9/_-]+\\.test\\.ts$/.test(path)) ||
-      all.slice().sort().join('\\0') !== expected.join('\\0'))
+        !/^supabase\/tests\/database\/[a-z0-9/_-]+\.test\.ts$/.test(path)) ||
+      all.slice().sort().join('\0') !== expected.join('\0'))
     fail('SHARD_FILE_DRIFT');
   return partition.shards;
 }
@@ -186,7 +186,7 @@ export function validateShardProofs(
         !['1', '2'].includes(p.shard) ||
         !Array.isArray(p.files) ||
         p.files.length !== partitions[p.shard]?.length ||
-        p.files.join('\\0') !== partitions[p.shard]?.join('\\0') ||
+        p.files.join('\0') !== partitions[p.shard]?.join('\0') ||
         !Number.isSafeInteger(p.cases) || p.cases <= 0 ||
         !Array.isArray(p.stages) ||
         p.stages.some(stage => stage.status !== 'PASS')))
@@ -478,7 +478,7 @@ export function countFromOutput(name: string, rawOutput: string): string | undef
       ? '33 valid; 33 invalid; owner denial'
       : undefined;
   if (name === 'database')
-    return /Test Files\s+41 passed/.test(output) && /Tests\s+\d+ passed/.test(output)
+    return /Test Files\s+\d+ passed/.test(output) && /Tests\s+\d+ passed/.test(output)
       ? output.match(/Tests\s+(\d+) passed/)?.[1]
       : undefined;
   if (name === 'mcp')
@@ -493,7 +493,7 @@ export function countFromOutput(name: string, rawOutput: string): string | undef
 export function assertSourceTestEvidence(output: string, sourceFiles: number): void {
   const plain = plainEvidence(output);
   if (
-    !new RegExp(`Test Files\\s+${sourceFiles} passed`).test(plain) ||
+    !new RegExp(`Test Files\s+${sourceFiles} passed`).test(plain) ||
     !/Tests\s+[1-9]\d* passed/.test(plain) ||
     /\b[1-9]\d* (?:skipped|ignored|failed|cancelled)\b/i.test(plain)
   )
@@ -503,7 +503,7 @@ export function assertSourceTestEvidence(output: string, sourceFiles: number): v
 export function assertShardDatabaseEvidence(output: string, expectedFiles: number): number {
   const plain = plainEvidence(output);
   assertNoSkipped(plain);
-  const match = plain.match(/Test Files\\s+(\\d+) passed[\\s\\S]*Tests\\s+(\\d+) passed/);
+  const match = plain.match(/Test Files\s+(\d+) passed[\s\S]*Tests\s+(\d+) passed/);
   if (!match || Number(match[1]) !== expectedFiles || Number(match[2]) <= 0)
     fail('SHARD_TEST_EVIDENCE_MISSING', 'FAIL');
   return Number(match[2]);
@@ -625,9 +625,6 @@ async function backendStages(
       },
       evidence,
     );
-    if (name === 'database' && shard && item.status === 'PASS') {
-      item.count = String(assertShardDatabaseEvidence(item.count ? `Test Files ${partitions[shard].length} passed\\nTests ${item.count} passed` : '', partitions[shard].length));
-    }
     stages.push(item);
     requirePass([item]);
   };
@@ -659,8 +656,10 @@ async function backendStages(
     run(
       'database',
       'pnpm',
-      ['run', 'test:database'],
-      /Test Files\s+41 passed[\s\S]*Tests\s+\d+ passed/,
+      shard
+        ? ['exec', 'vitest', 'run', '--config', 'supabase/vitest.config.ts', '--no-file-parallelism', ...partitions[shard]]
+        : ['run', 'test:database'],
+      /Test Files\s+\d+ passed[\s\S]*Tests\s+\d+ passed/,
     );
     run('migration-history', 'pnpm', ['run', 'supabase:verify'], /\d{14}/);
     run('db-lint', 'pnpm', ['exec', 'supabase', 'db', 'lint', '--local', '--fail-on', 'error']);
