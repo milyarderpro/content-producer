@@ -143,7 +143,7 @@ test('formal config requires byte-identical committed config', () => {
   });
 });
 
-test('ANSI and plain Vitest evidence require exact source file count and positive case count', () => {
+test('plain and ANSI source Vitest counts are fail-closed', () => {
   const plain = 'Test Files  12 passed (12)\nTests  83 passed (83)';
   const colored =
     'Test Files  \x1b[32m12 passed\x1b[39m (12)\nTests  \x1b[32m83 passed\x1b[39m (83)';
@@ -163,7 +163,7 @@ test('ANSI and plain Vitest evidence require exact source file count and positiv
     });
 });
 
-test('ANSI and plain database evidence require all 41 files, cases and no skipped or failed', () => {
+test('plain and ANSI database counts are fail-closed', () => {
   const plain = 'Test Files  41 passed (41)\nTests  179 passed (179)';
   const colored =
     'Test Files  \x1b[32m41 passed\x1b[39m (41)\nTests  \x1b[32m179 passed\x1b[39m (179)';
