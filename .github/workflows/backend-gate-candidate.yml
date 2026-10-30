@@ -21,31 +21,11 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    outputs:
-      result: ${{ steps.run.outputs.result }}
-      sha: ${{ steps.run.outputs.sha }}
-      manifest: ${{ steps.run.outputs.manifest }}
-      lock: ${{ steps.run.outputs.lock }}
-      inputs: ${{ steps.run.outputs.inputs }}
-      evidence: ${{ steps.run.outputs.evidence }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 2
           persist-credentials: false
-      - name: Verify dispatch and checked-out HEAD before any stack
-        shell: bash
-        env:
-          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
-        run: |
-          set -euo pipefail
-          [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
-          test "$GITHUB_EVENT_NAME" = workflow_dispatch
-          test "$GITHUB_REF" = refs/heads/main
-          test "$GITHUB_SHA" = "$CANDIDATE_SHA"
-          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
-          test -z "$(git status --porcelain=v1 --untracked-files=all)"
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.2
@@ -57,75 +37,51 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version-file: .deno-version
-      - name: Run source component without echoing child output
-        id: execute
+      - name: Verify exact dispatch identity
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$GITHUB_EVENT_NAME" = workflow_dispatch
+          test "$GITHUB_REF" = refs/heads/main
+          test "$GITHUB_SHA" = "$CANDIDATE_SHA"
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+      - name: Source gate
         shell: bash
         env:
           GATE_CANDIDATE_SHA: ${{ inputs.candidate_sha }}
-          GATE_EVIDENCE_FILE: ${{ runner.temp }}/candidate-source/report.json
+          GATE_EVIDENCE_FILE: ${{ runner.temp }}/source/report.json
         run: |
           set -euo pipefail
           mkdir -p "$(dirname "$GATE_EVIDENCE_FILE")"
-          pnpm install --frozen-lockfile > /dev/null
-          pnpm run gate:source > /dev/null
-      - name: Validate and export safe source evidence
-        id: run
+          pnpm install --frozen-lockfile >/dev/null
+          pnpm run gate:source >/dev/null
+      - uses: actions/upload-artifact@v4
         if: always()
-        shell: bash
-        env:
-          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
-          EXECUTE_OUTCOME: ${{ steps.execute.outcome }}
-        run: |
-          set -euo pipefail
-          file="$RUNNER_TEMP/candidate-source/report.json"
-          if [ "$EXECUTE_OUTCOME" != success ] || [ ! -s "$file" ]; then
-            echo 'result=FAIL' >> "$GITHUB_OUTPUT"
-            exit 1
-          fi
-          node - "$file" "$CANDIDATE_SHA" <<'NODE'
-          const fs = require('node:fs');
-          const [path, expected] = process.argv.slice(2);
-          const r = JSON.parse(fs.readFileSync(path, 'utf8'));
-          const hex = x => typeof x === 'string' && /^[0-9a-f]{64}$/.test(x);
-          if (r.status !== 'PASS' || r.mode !== 'source' || r.sha !== expected ||
-              !hex(r.manifestSha256) || !hex(r.lockSha256) || !hex(r.inputsSha256) ||
-              r.evidence !== 'COMMITTED_SOURCE' ||
-              !r.stages.some(x => x.name === 'source' && x.status === 'PASS')) process.exit(1);
-          const out = process.env.GITHUB_OUTPUT;
-          fs.appendFileSync(out, [
-            'result=PASS', 'sha=' + r.sha, 'manifest=' + r.manifestSha256,
-            'lock=' + r.lockSha256, 'inputs=' + r.inputsSha256,
-            'evidence=' + r.evidence
-          ].join('\n') + '\n');
-          NODE
-      - name: Upload safe source report
-        if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: candidate-source-${{ github.sha }}
-          path: ${{ runner.temp }}/candidate-source/report.json
-          if-no-files-found: warn
+          path: ${{ runner.temp }}/source/report.json
+          if-no-files-found: error
           retention-days: 14
 
-  backend:
-    name: Candidate backend at exact SHA
+  database:
+    name: Candidate DB shard ${{ matrix.shard }} exact SHA
     if: github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ['1', '2']
     runs-on: ubuntu-24.04
     timeout-minutes: 120
-    outputs:
-      result: ${{ steps.run.outputs.result }}
-      sha: ${{ steps.run.outputs.sha }}
-      manifest: ${{ steps.run.outputs.manifest }}
-      lock: ${{ steps.run.outputs.lock }}
-      inputs: ${{ steps.run.outputs.inputs }}
-      evidence: ${{ steps.run.outputs.evidence }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 2
           persist-credentials: false
-      - name: Verify dispatch, checkout, exact committed config and target vacancy
+      - name: Verify exact dispatch, config, and vacant stack
         shell: bash
         env:
           CANDIDATE_SHA: ${{ inputs.candidate_sha }}
@@ -154,107 +110,80 @@ jobs:
       - uses: denoland/setup-deno@v2
         with:
           deno-version-file: .deno-version
-      - name: Run exact-commit backend component
-        id: execute
+      - name: Run isolated Supabase stack, reset, fixtures and serial shard
         shell: bash
         env:
           GATE_CANDIDATE_SHA: ${{ inputs.candidate_sha }}
           GATE_ACTIONS_EXACT_CONFIG: '1'
           GATE_CONFIG_MODE: ACTIONS_EXACT_CONFIG
-          GATE_EVIDENCE_FILE: ${{ runner.temp }}/candidate-backend/report.json
+          GATE_DB_SHARD: ${{ matrix.shard }}
+          GATE_EVIDENCE_FILE: ${{ runner.temp }}/database/report.json
         run: |
           set -euo pipefail
           mkdir -p "$(dirname "$GATE_EVIDENCE_FILE")"
-          pnpm install --frozen-lockfile > /dev/null
-          pnpm run gate:backend > /dev/null
-      - name: Validate and export safe backend evidence
-        id: run
-        if: always()
-        shell: bash
-        env:
-          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
-          EXECUTE_OUTCOME: ${{ steps.execute.outcome }}
-        run: |
-          set -euo pipefail
-          file="$RUNNER_TEMP/candidate-backend/report.json"
-          if [ "$EXECUTE_OUTCOME" != success ] || [ ! -s "$file" ]; then
-            echo 'result=FAIL' >> "$GITHUB_OUTPUT"
-            exit 1
-          fi
-          node - "$file" "$CANDIDATE_SHA" <<'NODE'
-          const fs = require('node:fs');
-          const [path, expected] = process.argv.slice(2);
-          const r = JSON.parse(fs.readFileSync(path, 'utf8'));
-          const hex = x => typeof x === 'string' && /^[0-9a-f]{64}$/.test(x);
-          const required = ['cli-help','start','reset','migration-names','mcp',
-            'audit-before','inspector','audit-after','database','migration-history',
-            'db-lint','security-advisors','audit-final','whitespace','cleanup'];
-          if (r.status !== 'PASS' || r.mode !== 'backend' || r.sha !== expected ||
-              !hex(r.manifestSha256) || !hex(r.lockSha256) || !hex(r.inputsSha256) ||
-              r.evidence !== 'ACTIONS_EXACT_COMMIT_CONFIG' ||
-              r.configMode !== 'ACTIONS_EXACT_CONFIG' || r.configOverlaySha256 !== null ||
-              !required.every(name => r.stages.some(x => x.name === name && x.status === 'PASS')))
-            process.exit(1);
-          fs.appendFileSync(process.env.GITHUB_OUTPUT, [
-            'result=PASS', 'sha=' + r.sha, 'manifest=' + r.manifestSha256,
-            'lock=' + r.lockSha256, 'inputs=' + r.inputsSha256,
-            'evidence=' + r.evidence
-          ].join('\n') + '\n');
-          NODE
-      - name: Upload safe backend report
+          pnpm install --frozen-lockfile >/dev/null
+          pnpm run gate:backend >/dev/null
+      - name: Upload safe shard report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: candidate-backend-${{ github.sha }}
-          path: ${{ runner.temp }}/candidate-backend/report.json
-          if-no-files-found: warn
+          name: candidate-db-shard-${{ matrix.shard }}-${{ github.sha }}
+          path: ${{ runner.temp }}/database/report.json
+          if-no-files-found: error
           retention-days: 14
 
   aggregate:
     name: Candidate evidence conjunction (not release check)
-    needs: [source, backend]
+    needs: [source, database]
     if: always()
     runs-on: ubuntu-24.04
     steps:
-      - name: Require both PASS and identical exact-SHA identities
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Verify both jobs succeeded before evidence
         shell: bash
         env:
           CANDIDATE_SHA: ${{ inputs.candidate_sha }}
           SOURCE_JOB: ${{ needs.source.result }}
-          BACKEND_JOB: ${{ needs.backend.result }}
-          SOURCE_RESULT: ${{ needs.source.outputs.result }}
-          BACKEND_RESULT: ${{ needs.backend.outputs.result }}
-          SOURCE_SHA: ${{ needs.source.outputs.sha }}
-          BACKEND_SHA: ${{ needs.backend.outputs.sha }}
-          SOURCE_MANIFEST: ${{ needs.source.outputs.manifest }}
-          BACKEND_MANIFEST: ${{ needs.backend.outputs.manifest }}
-          SOURCE_LOCK: ${{ needs.source.outputs.lock }}
-          BACKEND_LOCK: ${{ needs.backend.outputs.lock }}
-          SOURCE_INPUTS: ${{ needs.source.outputs.inputs }}
-          BACKEND_INPUTS: ${{ needs.backend.outputs.inputs }}
-          SOURCE_EVIDENCE: ${{ needs.source.outputs.evidence }}
-          BACKEND_EVIDENCE: ${{ needs.backend.outputs.evidence }}
+          DATABASE_JOB: ${{ needs.database.result }}
         run: |
           set -euo pipefail
-          {
-            echo '## G3 candidate (NOT a release gate)'
-            echo "Candidate: $CANDIDATE_SHA; source job: $SOURCE_JOB; backend job: $BACKEND_JOB"
-            echo 'No production deployment, hosted OAuth or business Write is claimed.'
-          } >> "$GITHUB_STEP_SUMMARY"
           test "$SOURCE_JOB" = success
-          test "$BACKEND_JOB" = success
-          test "$SOURCE_RESULT" = PASS
-          test "$BACKEND_RESULT" = PASS
+          test "$DATABASE_JOB" = success
           [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
           test "$GITHUB_SHA" = "$CANDIDATE_SHA"
-          test "$SOURCE_SHA" = "$CANDIDATE_SHA"
-          test "$BACKEND_SHA" = "$CANDIDATE_SHA"
-          test "$SOURCE_EVIDENCE" = COMMITTED_SOURCE
-          test "$BACKEND_EVIDENCE" = ACTIONS_EXACT_COMMIT_CONFIG
-          for item in MANIFEST LOCK INPUTS; do
-            a="SOURCE_$item"
-            b="BACKEND_$item"
-            [[ "${!a}" =~ ^[0-9a-f]{64}$ ]]
-            test "${!a}" = "${!b}"
-          done
-          echo 'Both components PASS at one SHA with equal manifest/lock/input hashes.' >> "$GITHUB_STEP_SUMMARY"
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+      - uses: actions/download-artifact@v4
+        with:
+          name: candidate-source-${{ github.sha }}
+          path: ${{ runner.temp }}/source
+      - uses: actions/download-artifact@v4
+        with:
+          name: candidate-db-shard-1-${{ github.sha }}
+          path: ${{ runner.temp }}/one
+      - uses: actions/download-artifact@v4
+        with:
+          name: candidate-db-shard-2-${{ github.sha }}
+          path: ${{ runner.temp }}/two
+      - name: Fail closed on identity, missing or duplicate files, skipped cases and stages
+        shell: bash
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile >/dev/null
+          pnpm exec tsx scripts/gate-shard-aggregate.ts \
+            "$RUNNER_TEMP/source/report.json" \
+            "$RUNNER_TEMP/one/report.json" \
+            "$RUNNER_TEMP/two/report.json" "$CANDIDATE_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Candidate only; no cutover, release or hosted OAuth claim.' >> "$GITHUB_STEP_SUMMARY"

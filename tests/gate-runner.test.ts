@@ -18,6 +18,9 @@ import {
   stage,
   validateManifest,
   validateTarget,
+  validateShards,
+  validateShardProofs,
+  assertShardDatabaseEvidence,
 } from '../scripts/gate-runner.js';
 
 const manifest = JSON.parse(
@@ -180,4 +183,37 @@ test('database Vitest ANSI and plain summaries', () => {
   ]) {
     assert.throws(() => assertDatabaseTestEvidence(output));
   }
+});
+
+test('partition covers all 41 mandatory files exactly once', () => {
+ const partition = JSON.parse(readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8'));
+ const shards = validateShards(partition, manifest);
+ assert.equal(shards['1'].length + shards['2'].length, 41);
+ for (const broken of [
+   { ...partition, shards: { ...partition.shards, '2': partition.shards['2'].slice(1) } },
+   { ...partition, shards: { ...partition.shards, '2': [partition.shards['1'][0], ...partition.shards['2'].slice(1)] } },
+ ]) assert.throws(() => validateShards(broken, manifest), {code:'SHARD_FILE_DRIFT'});
+});
+
+test('shard proof rejects missing, duplicate, skipped and wrong SHA', () => {
+ const part = validateShards(JSON.parse(readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8')), manifest);
+ const hashes = {manifestSha256:'a'.repeat(64),lockSha256:'b'.repeat(64),inputsSha256:'c'.repeat(64),shardSha256:'d'.repeat(64)};
+ const mk = (shard: '1' | '2') => ({
+    shard, sha, ...hashes, files:part[shard], cases:90, status:'PASS',
+    stages:[{name:'database',status:'PASS',durationMs:1}]
+ });
+ assert.equal(validateShardProofs([mk('1'),mk('2')],sha,hashes,part),180);
+ for (const bad of [
+    [mk('1')],
+    [mk('1'),mk('1')],
+    [mk('1'),{...mk('2'),sha:'0'.repeat(40)}],
+    [mk('1'),{...mk('2'),files:[...mk('2').files.slice(1),mk('1').files[0]]}],
+    [mk('1'),{...mk('2'),stages:[{name:'database',status:'NOT RUN',durationMs:0}]}],
+    [mk('1'),{...mk('2'),cases:0}],
+ ]) assert.throws(() => validateShardProofs(bad,sha,hashes,part),{code:'SHARD_EVIDENCE_MISMATCH'});
+ assert.equal(assertShardDatabaseEvidence('Test Files 21 passed\\nTests 90 passed',21),90);
+ for (const output of ['Test Files 20 passed\\nTests 90 passed',
+    'Test Files 21 passed\\nTests 89 passed, 1 skipped']) {
+   assert.throws(() => assertShardDatabaseEvidence(output,21));
+ }
 });

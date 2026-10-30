@@ -17,3 +17,7 @@ Runner membuat salinan runtime sementara untuk mengganti hanya `project_id` dan 
 ## Status bukti
 
 Catat preflight, diff, estimasi dari riwayat run, identitas stack, hasil check/tes fokus, satu run kandidat diagnostik yang sudah selesai, cleanup, serta light CI head PR pada laporan akhir. Jangan ulang full backend gate pada PR ini. `PASS` hanya untuk pemeriksaan yang selesai; `FAIL` untuk command/evidence wajib gagal; `BLOCKED` untuk preflight/target yang tidak aman; `NOT RUN` untuk tahap yang belum dimulai. Gate lama dan workflow kandidat GitHub tetap `NOT RUN` pada PR ini. Hasil lokal tidak membuktikan OAuth ChatGPT hosted, business Write production, atau kesetaraan G4.
+
+## Issue #96 — shard candidate terisolasi
+
+`GATE_DB_SHARD=1|2` pada mode `gate:backend` memilih tepat satu daftar file dari `scripts/gate-db-shards.json`. Tiap file dijalankan dengan `vitest run --no-file-parallelism` pada runner/stack/reset/fixture tersendiri. Tanpa variabel tersebut, runner lokal tetap menjalankan **semua 41 file** manifest via `pnpm run test:database`. Laporan shard menyimpan ID, 21/20 nama file mandatory, case count, hash partisi serta identitas SHA/manifest/lock/input; agregat menolak laporan hilang, duplikat, skipped, salah SHA/hash atau tahap non-PASS. MCP, Inspector 33 valid/33 invalid dan owner denial, audit before/after/final, migration history, lint/advisor dan cleanup tidak dipotong dari tiap shard. Formal two-shard runtime **NOT RUN** hingga integrasi PR #95/#96 pada SHA final.

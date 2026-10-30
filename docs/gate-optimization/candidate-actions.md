@@ -21,3 +21,9 @@ Backend mempertahankan satu start dan satu reset, validasi 72 migration, satu MC
 ## Bukti dan batas penerimaan
 
 Reports per job berada di artifact `candidate-source-<sha>` dan `candidate-backend-<sha>` (retensi 14 hari); summary agregat menyebut kandidat serta hasil konjungsi. Tidak ada raw logs dalam artifact. Agar kesetaraan release dapat dinyatakan, G4 masih harus membandingkan gate lama dan kandidat pada SHA yang sama, menguji local advisor PASS, memastikan seluruh invariant dan fixture clean, dan menyelesaikan keputusan CR-052. CI fixture bukan bukti OAuth hosted atau business Write production.
+
+## Issue #96 — desain dua runner database (belum dieksekusi)
+
+Base `01531fc8dc7bb1e6f9365525b7324a8fc9686b28`, branch `codex/issue-96-isolated-db-shards`. Candidate manual-only kini memiliki source, matrix dua database runner Ubuntu independen, dan aggregate. Setiap runner memiliki Supabase stack, clean reset, MCP, Inspector 33/33, audit before/after/final, 41-file coverage melalui shard 21+20 yang disjoint, serial Vitest per runner, migration history, DB lint, advisor lokal dan cleanup. Shard list berada di `scripts/gate-db-shards.json` dan divalidasi terhadap seluruh 41 manifest entries.
+
+Aggregate mengunduh tiga report aman, mensyaratkan kedua job success serta stage PASS, SHA/hash manifest-lock-input-partisi identik, file 41 unik, case positif per shard tanpa skip, dan Inspector count. Bukti runtime dua shard **NOT RUN** sampai PR #95/#96 digabung di final SHA; tidak dispatch dari PR ini. Satu-stack baseline [41011838448](https://github.com/milyarderpro/content-producer/actions/runs/41011838448) PASS 15m48s, DB sekitar 10m43s. Proyeksi dua stack sekitar **10m27–10m47s** wall clock dan tambahan **3–5 CI runner-minutes**, belum dibuktikan. Light CI base [41011729873](https://github.com/milyarderpro/content-producer/actions/runs/41011729873) PASS ~40s; estimasi light CI PR ~1 menit.
