@@ -311,7 +311,7 @@ test('MCP 15 files/82 cases and authenticated Inspector belong to shard 1 exactl
   }
 });
 
-test('final shard report stages satisfy both aggregate validators without false NOT RUN', () => {
+test('final two-shard reports satisfy both validators', () => {
   const partition = validateShards(
     JSON.parse(readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8')),
     manifest,
@@ -342,7 +342,10 @@ test('final shard report stages satisfy both aggregate validators without false 
   const two = report('2', 90);
   assert.equal(validateShardProofs([one, two], sha, hashes, partition), 182);
   assert.doesNotThrow(() => validateSingleMcpInspector([one, two]));
-  assert.equal(two.stages.some((item) => ['mcp', 'inspector'].includes(item.name)), false);
+  assert.deepEqual(
+    two.stages.filter((item) => ['mcp', 'inspector'].includes(item.name)),
+    [],
+  );
   assert.equal(requiredReportStages('backend').includes('mcp'), true);
   assert.equal(requiredReportStages('full').includes('inspector'), true);
 
