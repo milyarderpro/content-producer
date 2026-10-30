@@ -44,6 +44,11 @@ const fail = (code: string, status: Status = 'BLOCKED'): never => {
   throw new GateError(code, status);
 };
 
+// ANSI SGR sequences are presentation only; they must not alter evidence matching.
+export function plainEvidence(output: string): string {
+  return output.replace(/\x1b\[[0-9;]*m/g, '');
+}
+
 export function command(
   command: string,
   args: string[],
@@ -59,7 +64,7 @@ export function command(
   });
   // Raw child output can contain JWTs, SQL, and private fixture values. Never echo it.
   if (result.error || result.status !== 0) fail('STAGE_COMMAND_FAILED', 'FAIL');
-  return { output: result.stdout ?? '', durationMs: Math.round(performance.now() - start) };
+  return { output: plainEvidence(result.stdout ?? ''), durationMs: Math.round(performance.now() - start) };
 }
 
 function git(args: string[]): string {
@@ -147,7 +152,7 @@ export function assertSha(expected: string | undefined, actual: string): void {
 }
 
 export function assertNoSkipped(output: string): void {
-  if (/\b[1-9]\d* (?:skipped|ignored|failed)\b/i.test(output))
+  if (/\b[1-9]\d* (?:skipped|ignored|failed|cancelled)\b/i.test(plainEvidence(output)))
     fail('REQUIRED_CASE_SKIPPED', 'FAIL');
 }
 
@@ -408,7 +413,8 @@ function stageCopy(projectId: string, base: number): { path: string; overlayHash
   return { path, overlayHash: hash(config) };
 }
 
-function countFromOutput(name: string, output: string): string | undefined {
+export function countFromOutput(name: string, rawOutput: string): string | undefined {
+  const output = plainEvidence(rawOutput);
   if (name === 'inspector')
     return /33\/33 valid and 33\/33 invalid tool calls.*PASS/.test(output)
       ? '33 valid; 33 invalid; owner denial'
@@ -426,6 +432,22 @@ function countFromOutput(name: string, output: string): string | undefined {
   return undefined;
 }
 
+export function assertSourceTestEvidence(output: string, sourceFiles: number): void {
+  const plain = plainEvidence(output);
+  if (
+    !new RegExp(`Test Files\\s+${sourceFiles} passed`).test(plain) ||
+    !/Tests\s+[1-9]\d* passed/.test(plain) ||
+    /\b[1-9]\d* (?:skipped|ignored|failed|cancelled)\b/i.test(plain)
+  ) fail('SOURCE_TEST_EVIDENCE_MISSING', 'FAIL');
+}
+
+export function assertDatabaseTestEvidence(output: string): void {
+  const plain = plainEvidence(output);
+  assertNoSkipped(plain);
+  if (!/Test Files\s+41 passed[\s\S]*Tests\s+[1-9]\d* passed/.test(plain))
+    fail('REQUIRED_EVIDENCE_MISSING', 'FAIL');
+}
+
 export function stage(
   name: string,
   action: () => { output?: string; durationMs?: number },
@@ -434,7 +456,7 @@ export function stage(
   const start = performance.now();
   try {
     const result = action();
-    if (requiredEvidence && !requiredEvidence.test(result.output ?? ''))
+    if (requiredEvidence && !requiredEvidence.test(plainEvidence(result.output ?? '')))
       fail('REQUIRED_EVIDENCE_MISSING', 'FAIL');
     return {
       name,
@@ -470,11 +492,7 @@ function sourceStages(sourceFiles: number, stages: Stage[]): void {
     ]) {
       if (!run.output.includes(` ${subcheck} ${root}`)) fail('SOURCE_SUBCHECK_MISSING', 'FAIL');
     }
-    if (
-      !new RegExp(`Test Files\\s+${sourceFiles} passed`).test(run.output) ||
-      /\d+ skipped|\d+ failed|\d+ cancelled/i.test(run.output)
-    )
-      fail('SOURCE_TEST_EVIDENCE_MISSING', 'FAIL');
+    assertSourceTestEvidence(run.output, sourceFiles);
     return run;
   });
   stages.push(item);
@@ -524,6 +542,7 @@ async function backendStages(
       () => {
         const result = command(cmd, args, stageRoot.path);
         if (['mcp', 'database'].includes(name)) assertNoSkipped(result.output);
+        if (name === 'database') assertDatabaseTestEvidence(result.output);
         if (name === 'security-advisors') assertAdvisorsReport(result.output);
         return result;
       },
