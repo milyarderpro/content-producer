@@ -73,7 +73,9 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
         section.indexOf('pnpm run gate:'),
       );
     }
-    expect(candidate).toContain('git show HEAD:supabase/config.toml | cmp -s - supabase/config.toml');
+    expect(candidate).toContain(
+      'git show HEAD:supabase/config.toml | cmp -s - supabase/config.toml',
+    );
     expect(candidate).toContain('needs: [source, backend]');
     expect(candidate).toContain('if: always()');
     for (const statement of [
@@ -85,8 +87,7 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
       'test "$BACKEND_SHA" = "$CANDIDATE_SHA"',
       'for item in MANIFEST LOCK INPUTS; do',
       'test "${!a}" = "${!b}"',
-    ])
-      expect(candidate).toContain(statement);
+    ]) expect(candidate).toContain(statement);
     expect(candidate).not.toContain('continue-on-error: true');
   });
 
