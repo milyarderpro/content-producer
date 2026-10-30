@@ -261,7 +261,7 @@ test('TEMP format oracle for shard runner', async () => {
   const child = await import('node:child_process');
   const prettier = await import('prettier');
   const target = 'scripts/gate-runner.ts';
-  const original = fs.readFileSync(target, 'utf8').replaceAll('// prettier-ignore\\n', '');
+  const original = fs.readFileSync(target, 'utf8').replaceAll('// prettier-ignore\n', '');
   const formatted = await prettier.format(original, {
     ...(await prettier.resolveConfig(target)),
     filepath: target,
@@ -272,6 +272,6 @@ test('TEMP format oracle for shard runner', async () => {
   fs.writeFileSync(actual, original);
   fs.writeFileSync(expected, formatted);
   const result = child.spawnSync('diff', ['-u', actual, expected], { encoding: 'utf8' });
-  console.log('FORMAT_ORACLE_DIFF_BEGIN\\n' + result.stdout + '\\nFORMAT_ORACLE_DIFF_END');
+  console.log('FORMAT_ORACLE_DIFF_BEGIN\n' + result.stdout + '\nFORMAT_ORACLE_DIFF_END');
   fs.rmSync(dir, { recursive: true, force: true });
 });
