@@ -46,7 +46,7 @@ const fail = (code: string, status: Status = 'BLOCKED'): never => {
 
 // ANSI SGR sequences are presentation only; they must not alter evidence matching.
 export function plainEvidence(output: string): string {
-  return output.replace(/\x1b\[[0-9;]*m/g, '');
+  return output.replace(new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g'), '');
 }
 
 export function command(
