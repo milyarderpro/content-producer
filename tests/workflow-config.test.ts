@@ -78,7 +78,7 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
     expect(candidate).toContain('if: always()');
     expect(candidate).toContain('test "$SOURCE_JOB" = success');
     expect(candidate).toContain('test "$DATABASE_JOB" = success');
-    expect(candidate).toContain('scripts/gate-shard-aggregate.ts');
+    expect(candidate).toContain('scripts/gate-backend.ts --aggregate');
     expect(candidate).toContain('candidate-db-shard-1-');
     expect(candidate).toContain('candidate-db-shard-2-');
     expect(candidate).not.toContain('continue-on-error: true');

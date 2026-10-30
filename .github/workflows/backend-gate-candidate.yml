@@ -182,7 +182,7 @@ jobs:
         run: |
           set -euo pipefail
           pnpm install --frozen-lockfile >/dev/null
-          pnpm exec tsx scripts/gate-shard-aggregate.ts \
+          pnpm exec tsx scripts/gate-backend.ts --aggregate \
             "$RUNNER_TEMP/source/report.json" \
             "$RUNNER_TEMP/one/report.json" \
             "$RUNNER_TEMP/two/report.json" "$CANDIDATE_SHA" >> "$GITHUB_STEP_SUMMARY"
