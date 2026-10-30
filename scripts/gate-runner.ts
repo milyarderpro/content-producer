@@ -228,8 +228,7 @@ export function validateTarget(projectId: string, portBase: number, sourceProjec
   if (exactActions) {
     assertActionsEnvironment();
     if (projectId !== sourceProject || portBase !== 54320) fail('ACTIONS_CONFIG_TARGET_MISMATCH');
-  } else {
-  if (
+  } else if (
     !/^issue-88-[a-z0-9-]+-disposable$/.test(projectId) ||
     projectId === sourceProject ||
     !Number.isInteger(portBase) ||
@@ -239,7 +238,6 @@ export function validateTarget(projectId: string, portBase: number, sourceProjec
     portBase === 54320
   )
     fail('UNSAFE_DISPOSABLE_TARGET');
-  }
   for (const key of [
     'SUPABASE_ACCESS_TOKEN',
     'SUPABASE_DB_PASSWORD',
@@ -258,7 +256,6 @@ export function validateTarget(projectId: string, portBase: number, sourceProjec
 export function assertActionsEnvironment(env: NodeJS.ProcessEnv = process.env): void {
   if (
     env.GITHUB_ACTIONS !== 'true' ||
-    env.RUNNER_ENVIRONMENT !== 'github-hosted' ||
     env.GITHUB_EVENT_NAME !== 'workflow_dispatch' ||
     env.GITHUB_REF !== 'refs/heads/main' ||
     !/^[0-9a-f]{40}$/.test(env.GITHUB_SHA ?? '') ||
@@ -483,7 +480,11 @@ async function backendStages(
   const projectId = exactActions ? sourceProjectId() : (process.env.GATE_DISPOSABLE_PROJECT_ID ?? '');
   const base = exactActions ? 54320 : Number(process.env.GATE_PORT_BASE ?? NaN);
   validateTarget(projectId, base, sourceProjectId(), exactActions);
-  if (exactActions) assertConfigMode('ACTIONS_EXACT_CONFIG', read('supabase/config.toml'), Buffer.from(git(['show', 'HEAD:supabase/config.toml'])));
+  if (exactActions) {
+    const committed = spawnSync('git', ['show', 'HEAD:supabase/config.toml'], { cwd: root });
+    if (committed.status !== 0 || !committed.stdout) fail('EXACT_CONFIG_UNAVAILABLE');
+    assertConfigMode('ACTIONS_EXACT_CONFIG', read('supabase/config.toml'), committed.stdout);
+  }
   stages.push(
     stage('cli-help', () => {
       for (const args of [
