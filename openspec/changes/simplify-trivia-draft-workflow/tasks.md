@@ -11,8 +11,9 @@ kebutuhan adalah [PRD](../../../plans/simplified-trivia-draft-workflow-prd.md),
 
 Pernyataan scope proposal/design tentang pencatatan dua artefak merujuk langkah
 sebelumnya. Permintaan berikutnya mengizinkan penambahan specs dan checklist ini
-sebagai perencanaan; isi keputusan proposal/design dipertahankan. Semua checkbox
-implementasi masih kosong dan seluruh pengujian perilaku masih **NOT RUN**.
+sebagai perencanaan; isi keputusan proposal/design dipertahankan. Progres apply
+dicatat per task beserta bukti. Verifikasi kontrak/mock P1 terpisah dari
+pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
 
 ### Prasyarat dan batas keputusan
 
@@ -46,26 +47,42 @@ implementasi masih kosong dan seluruh pengujian perilaku masih **NOT RUN**.
 
 ## 1. Baseline dan keputusan
 
-- [ ] 1.1 **P1-T1 Baseline:** rekonsiliasi HEAD/source dengan bukti backend,
+- [x] 1.1 **P1-T1 Baseline:** rekonsiliasi HEAD/source dengan bukti backend,
       plugin, dan runtime terpasang; inventaris fakta/post/plan v1 serta dependensi
       registry tool pada ontologi, sumber, reservasi, binding/snapshot, dan gate
       lifecycle. Catat instalasi plugin lama yang diketahui serta bukti observasi
       yang tersedia tanpa mutasi production. **Verifikasi:** inventaris tersanitasi
       mencantumkan SHA/versi dan sumber bukti masing-masing, ketidakpastian, serta
       pemetaan area source/test yang sudah diidentifikasi pada design.
-- [ ] 1.2 **P1-T2 Change record:** ajukan override eksplisit untuk sumber satu
+      **Bukti:** [inventaris P1-T1](phase-1-baseline.md), source
+      `3b385a679770e20c5ba193b470874a35c08b786a`; format/whitespace dokumen lulus.
+      Selesai sebagai inventaris bukti yang tersedia dan ketidakpastiannya,
+      bukan verifikasi live baru; runtime/data/instalasi aktif tetap NOT RUN.
+- [x] 1.2 **P1-T2 Change record:** ajukan override eksplisit untuk sumber satu
       URL, dedup, reservasi, izin jumlah draft/plan, editorial/approval, schema v2,
       dan kompatibilitas v1; pertahankan A serta batas alternatif. **Verifikasi:**
       perubahan menunjuk kontrak frozen yang tepat, keputusan pemilik diterima
       sebelum coding terkait, dan tidak memberi izin rilis/Write tersirat atau
       mengaktifkan B, ambang cutover, maupun rilis D1 saja.
-- [ ] 1.3 **P1-T3 Kontrak contoh:** bekukan request/response sukses dan error
+      **Bukti:** pemilik menerima
+      [CR-053](../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
+      secara eksplisit pada 31 Oktober 2026 dengan baseline A. Pengecualian B,
+      angka cutover, rilis D1 sebelum D2, pensiun v1, deployment, dan Write
+      production tetap tidak diterima; ketidakpastian P1-T1 tidak ditutup.
+- [x] 1.3 **P1-T3 Kontrak contoh:** bekukan request/response sukses dan error
       untuk satu draft, lima draft bertema, hasil sebagian, Read incomplete,
       katalog/config stale, reuse, URL/budget, claim, lost response, dan CAS. Tetapkan
       taksonomi seluruh tool, kepastian hasil Write, recovery, lokasi, waktu tunggu,
       ID diagnostik aman, tiga editorial, dan gate Setujui. **Verifikasi:** contoh
       ditinjau terhadap TDW/TFL/TDX, fixture kontrak/schema memeriksa bentuk dan
       kompatibilitas v1, serta dokumentasi menjelaskan izin scoped dan batas bukti.
+      **Bukti:** [kontrak contoh](../../../docs/contracts/trivia-draft-v2.md),
+      [taksonomi error](../../../docs/contracts/tool-errors-v2.md), serta
+      [hasil Phase 1](phase-1-results.md), versi `cr-053-p1-v1`.
+      `pnpm run check` PASS (13 file/122 root cases, termasuk 31 kontrak baru,
+      frontend 19), focused MCP v1 Deno 2.9.7 PASS (6 file/36 kasus).
+      Ini verifikasi schema/fixture/mock, bukan implementasi backend/tool v2,
+      full gate G4, host atau LIVE. Sesi berhenti setelah Phase 1 (3/23).
 
 ## 2. Identitas dan tolok ukur duplikasi
 

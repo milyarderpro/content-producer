@@ -47,8 +47,9 @@ test('rejects manifest drift and missing required database file', () => {
   assert.throws(() => validateManifest(changed, pkg.scripts), { code: 'MANIFEST_FILE_DRIFT' });
 });
 
-test('accepts the frozen manifest and rejects skipped required cases', () => {
-  assert.deepEqual(validateManifest(manifest, pkg.scripts), { source: 12, mcp: 15, database: 41 });
+test('accepts the mandatory manifest including P1 contract tests and rejects skipped cases', () => {
+  // P1-T3 adds one source test file; MCP/database release coverage is unchanged.
+  assert.deepEqual(validateManifest(manifest, pkg.scripts), { source: 13, mcp: 15, database: 41 });
   assert.throws(() => assertNoSkipped('Tests 179 passed, 1 skipped'), {
     code: 'REQUIRED_CASE_SKIPPED',
   });

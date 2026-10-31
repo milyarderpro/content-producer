@@ -47,6 +47,10 @@
           "status": "mandatory"
         },
         {
+          "path": "tests/trivia-draft-v2-contracts.test.ts",
+          "status": "mandatory"
+        },
+        {
           "path": "tests/workflow-change-classification.test.ts",
           "status": "mandatory"
         },
