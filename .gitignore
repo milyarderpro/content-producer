@@ -24,3 +24,5 @@ supabase/functions/_shared/generated/
 reports/
 
 auth-frontend/dist/
+.agents
+.opencode
