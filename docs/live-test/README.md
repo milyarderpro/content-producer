@@ -38,18 +38,19 @@ Setiap bug Issue harus memuat **ID LT, gejala, expected vs actual, prasyarat dan
 - **P1:** alur utama gagal pada skenario valid atau berisiko menyebabkan data salah; ada workaround atau cakupan terbatas.
 - **P2:** minor, UX, diagnostik, atau edge case non-kritis. Tingkat keparahan harus berdasarkan bukti, bukan kekhawatiran.
 
-Implementer memulai dari Issue, membuat branch/PR yang menyebut `Refs #N`, menambah tes yang gagal sebelum perbaikan (jika bisa), menulis perbaikan minimum tanpa kontrak baru yang diam-diam, lalu merekam run Actions/commit SHA. **Docs-only:** gunakan existing light PR CI; **TypeScript/config:** `pnpm run check` + focused tests; **auth, RLS, migration, backend write/security:** gunakan gate CR-020/044 yang relevan pada SHA final sebelum deployment. Lulus CI lokal/terisolasi tidak sama dengan PASS plugin live. PR merge/deployment dan perubahan production hanya dengan keputusan pemilik yang sesuai; jangan merunning full gate hanya untuk Markdown.
+Implementer memulai dari Issue, membuat branch/PR yang menyebut `Refs #N`, menambah tes yang gagal sebelum perbaikan (jika bisa), menulis perbaikan minimum tanpa kontrak baru yang diam-diam, lalu merekam run Actions/commit SHA. **Docs-only:** gunakan existing light PR CI; **TypeScript/config:** `pnpm run check` + focused tests; **auth, RLS, migration, backend write/security:** pertahankan kontrol CR-020/044 dan gunakan [gate CR-052](../decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md) manual exact final SHA `main` (efektif sejak merge PR #105) sebelum deployment yang diotorisasi. Lulus CI lokal/terisolasi tidak sama dengan PASS plugin live. PR merge/deployment dan perubahan production hanya dengan keputusan pemilik yang sesuai; jangan merunning full gate hanya untuk Markdown.
 
 ## Batas durasi CI wajib — estimasi sebelum dijalankan
 
 Seluruh implementer mengikuti **aturan utama di
 [`AGENTS.md`](../../AGENTS.md)**. Sebelum menjalankan/men-trigger GitHub
 Actions atau CI lokal, tentukan **estimasi durasi** dengan merujuk isi job
-dan run sebelumnya. Jika dibutuhkan gate yang **diperkirakan lebih dari
-10 menit**, **jangan memulai gate itu** (termasuk push/PR yang otomatis
-men-trigger-nya). Implementer melaporkan check, estimasi, SHA, bukti yang
-sudah tersedia, dan apa yang masih tertunda, **lalu berhenti tanpa
-menunggu atau memantau** sampai pemilik mengetik **`lanjutkan`**.
+dan run sebelumnya. Jika gate yang **sudah diizinkan diperkirakan lebih dari
+10 menit**, **mulai/dispatch sesuai izin**, catat check, estimasi,
+candidate SHA, URL dan status sementara, lalu **hentikan pemantauan
+chat tanpa menunggu hasil atau polling berulang**. Periksa kembali
+setelah pemilik mengetik **`lanjutkan`**. Push/PR tetap memerlukan izin
+tersendiri; run yang masih berjalan **bukan PASS**.
 
 Ini **bukan** aturan menunggu 10 menit lalu berhenti. Jika workflow
 sudah berjalan, jangan membatalkannya sepihak; cukup cantumkan URL/status

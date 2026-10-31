@@ -33,3 +33,23 @@ Kontrol negatif dibuat **hanya** pada DB disposable: tabel `public.issue_82_advi
 - **Sensitivitas dan exit gate lokal:** `PASS` untuk kontrol `rls_disabled_in_public`; temuan `ERROR` muncul dan `--fail-on error` keluar nonzero. Baseline/final bersih pada migration source base di atas. Ini tidak menyatakan semua aturan advisor telah diuji.
 - **Pemasangan pada runner/Actions G3 dan bukti exact-SHA G4:** `NOT RUN` / belum terbukti. Dokumen ini tidak mengubah gate. G3 masih perlu langkah advisor eksplisit yang terpisah; G4 harus membuktikannya pada kandidat SHA yang sesuai dengan kontrak CR-020/044/052.
 - `db lint`, audit katalog, full backend gate, hosted Security Advisor, deployment, dan kondisi production: `NOT RUN` / tidak dibuktikan oleh uji ini. Light CI PR hanya memeriksa cakupan docs/source yang benar-benar dijalankan; hasilnya dicatat terpisah pada head PR.
+
+## Status setelah G4 (verdict Issue #82 tetap historis)
+
+`NOT RUN` pada bagian sebelumnya adalah status terbatas untuk Issue #82,
+bukan kesimpulan bahwa local security advisors tetap hilang. Dalam G4,
+advisors dijalankan sebagai tahap **terpisah** dari lint dan catalog audit
+pada kedua shard, sebagaimana dibuktikan oleh tiga run formal berikut.
+Sejak merge [PR #105](https://github.com/milyarderpro/content-producer/pull/105)
+(`ca5c43597af97c95ea9eaa87876237fd2d45e10c`), [CR-052](../decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md) **efektif** sebagai gate rilis
+manual exact final SHA `main`. Tiga Actions formal pada
+`a64a55ebb1e3c76112cd211724c2eb6bc256699a`:
+[#41072354433](https://github.com/milyarderpro/content-producer/actions/runs/41072354433) **9m41s**, [#41074001136](https://github.com/milyarderpro/content-producer/actions/runs/41074001136) **9m43s**, dan [#41157962349](https://github.com/milyarderpro/content-producer/actions/runs/41157962349) **9m50s**. Partisi **19+22 = 41 file/182 kasus DB**,
+MCP **15/82**, Inspector **33 valid/33 invalid + owner denial** tepat sekali
+di shard 1, local security advisors terpisah, migration/history/lint,
+audit RLS/grants/ACL/fixture dan cleanup, serta source dan aggregate PASS.
+Lokal `gate:full` **18m50s** dengan `DIAGNOSTIC_CONFIG_OVERLAY` **bukan**
+bukti formal exact-config. CR-020/044 tetap kontrol keamanan; workflow legacy
+`backend-technical-gate.yml`/`pnpm run test-all` adalah rollback, bukan
+release gate utama. Tidak ada required check/branch protection otomatis,
+deployment, OAuth hosted, atau live business Write yang dibuktikan.

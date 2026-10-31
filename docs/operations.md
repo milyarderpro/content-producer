@@ -78,7 +78,9 @@ perlu membuat plugin atau koneksi kedua.
   Edge, frontend, atau paket plugin; jangan merilis komponen lain karena kebetulan
   berada dalam repository yang sama.
 - Tetapkan candidate SHA dan scope, periksa Git diff, serta estimasikan seluruh
-  CI sebelum push/PR/dispatch. Ikuti stop rule jika gate wajib lebih dari 10 menit.
+  CI sebelum push/PR/dispatch. Untuk gate yang diizinkan dan diperkirakan
+  lebih dari 10 menit, mulai/dispatch, catat SHA/URL/status sementara, lalu
+  hentikan pemantauan chat; run berjalan bukan PASS.
 - Perubahan migration/RLS/grant/identity/owner/write permission/business RPC
   memerlukan **satu full gate PASS pada exact SHA kandidat final** sebelum
   deployment yang diotorisasi. **Sebelum PR #105 merge**, gate yang berlaku
@@ -271,11 +273,12 @@ diperiksa dalam pekerjaan operasional yang benar-benar diotorisasi.
 
 ## 9. Release gate G4 manual dan rollback (Issue #104)
 
-**Efektif hanya setelah merge PR #105 oleh orchestrator.** Pada draft,
-workflow legacy CR-020/044 tetap gate aktif. Keputusan
+**Efektif sejak merge [PR #105](https://github.com/milyarderpro/content-producer/pull/105)**
+ke `main` pada `ca5c43597af97c95ea9eaa87876237fd2d45e10c` (31 Oktober 2026).
 [CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
-menerima bukti kandidat exact-SHA dan reproduksibilitas lokal yang
-terbatas; tidak memberi izin merge otomatis, deploy atau production Write.
+menjadikan workflow G4 manual exact-SHA jalur rilis backend normal;
+CR-020/044 legacy tetap tersedia untuk rollback. Tidak ada izin
+deployment, hosted OAuth atau production business Write.
 
 Bukti formal Actions pada `a64a55ebb1e3c76112cd211724c2eb6bc256699a`:
 [#41072354433](https://github.com/milyarderpro/content-producer/actions/runs/41072354433)
@@ -291,7 +294,7 @@ RLS/grant/ACL/fixture audit dan cleanup PASS.
 Lokal pada SHA sama **PASS 18m50s** seluruh tahap tetapi label
 **`DIAGNOSTIC_CONFIG_OVERLAY`**, **bukan** formal exact-config.
 
-**Prosedur pemeriksaan rilis setelah keputusan berlaku:**
+**Prosedur pemeriksaan rilis yang berlaku sekarang:**
 
 1. Tetapkan exact SHA final `main`, diff, tool pin, config,
    manifest/lock/input/partisi, lalu pilih runner Actions ephemeral

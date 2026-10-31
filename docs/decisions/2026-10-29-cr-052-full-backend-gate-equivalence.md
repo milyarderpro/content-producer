@@ -1,10 +1,11 @@
 # CR-052 — Full backend gate equivalence, source/backend evidence, and cutover
 
 - **Tanggal:** 2026-10-29
-- **Status keputusan G4:** **DITERIMA BERSYARAT OLEH ORCHESTRATOR (2026-10-31)** untuk kesetaraan
-  cakupan dan model bukti; **efektif hanya setelah PR #105 di-merge**. Selama PR masih draft,
-  **belum efektif** dan gate legacy CR-020/CR-044 tetap berlaku. Tidak ada izin merge otomatis,
-  deployment, required-check automation, maupun production Write.
+- **Status keputusan G4:** **EFEKTIF sejak merge PR #105** pada
+  `ca5c43597af97c95ea9eaa87876237fd2d45e10c` (31 Oktober 2026), setelah orchestrator
+  menerima kesetaraan cakupan dan model bukti. Gate rilis formal adalah
+  Actions manual exact-SHA, bukan required check otomatis, izin deployment,
+  hosted OAuth atau production business Write.
 - **Baseline source:** `main` merge
   [PR #73](https://github.com/milyarderpro/content-producer/pull/73),
   `4191caf7943e313b43ab0dc52f4311165e6c229d`. Bukti pengukuran dari
@@ -13,10 +14,11 @@
   **HISTORICAL PASS** pada SHA masing-masing, bukan kandidat release G1.
 - **Relasi:** merancang pengganti pemeriksaan yang diwajibkan
   [CR-020](2026-10-15-phase-9-10-risk-based-mvp-acceptance.md) dan urutan/reuse
-  [CR-044](2026-10-20-phase-10-gate-order-and-backend-sha-reuse.md). **CR-020, CR-044, dan gate
-  lama tetap berlaku sampai **merge PR #105** mengaktifkan keputusan manual release gate ini.
-  Sesudah merge, workflow lama dan `pnpm run test-all` tetap tersedia untuk rollback;
-  tidak ada supersession otomatis terhadap kontrol keamanan CR-020/CR-044.**
+  [CR-044](2026-10-20-phase-10-gate-order-and-backend-sha-reuse.md). CR-020/044
+  tetap **kontrol keamanan wajib**. Sejak merge PR #105 gate rilis aktif
+  `.github/workflows/backend-gate-candidate.yml` **manual exact final SHA
+  `main`**, dengan source, dua shard dan aggregate PASS. Workflow legacy
+  `backend-technical-gate.yml` dan `pnpm run test-all` tetap rollback.
 - **Landasan penilaian:**
   [rencana G1–G4](../../plans/full-backend-gate-optimization-implementation-plan.md),
   [baseline/inventaris](../gate-optimization/baseline-and-inventory.md),
@@ -189,7 +191,7 @@ kontrak. `fileParallelism: true` pada DB bersama tidak diterima tanpa isolasi an
 berlabel diagnostik di SHA identik; DB lint/catalog audit bukan penggantinya.
 Keputusan orchestrator menerima model bukti Actions formal + lokal diagnostik terbatas.
 Setiap deviasi overlay di luar `project_id`/port atau kehilangan tahap advisor
-**memblokir rilis (fail-closed)**. Penerapan keputusan tetap menunggu merge PR #105.
+**memblokir rilis (fail-closed)**. Penerapan telah aktif sejak merge PR #105 pada `ca5c43597af97c95ea9eaa87876237fd2d45e10c`.
 
 ## Rollback
 
@@ -209,7 +211,7 @@ adalah perubahan CI terpisah, bukan operasi produksi.
   Inspector, audit, advisors dan cleanup; review orchestrator tercatat pada PR #105.
 - **Masih terbatas:** endpoint branch protection detail tidak dapat dibaca konektor (403),
   required contexts belum disetel, dan bukti lokal overlay bukan formal exact-config.
-  **Efektivitas keputusan menunggu merge PR #105;** tidak ada deployment atau live PASS.
+  **CR-052 efektif sejak merge PR #105;** tidak ada deployment atau live PASS.
 
 ## Riwayat rancangan Issue #96 (status saat itu; implementasi kini diverifikasi)
 
@@ -311,6 +313,9 @@ bukan payload/machine ID/port/token/SQL/fixture yang diunggah ke GitHub.
    final SHA yang benar di stack ephemeral, dan dokumentasikan hasil.
    Jangan melakukan destructive reset/migration production untuk rollback CI.
 
-**Effective condition = merge PR #105 oleh orchestrator sesudah review ulang head
-dan light CI.** Sebelum itu belum efektif; tidak ada merge atau deployment
-oleh implementer.
+**Kondisi efektivitas telah terpenuhi:** PR #105 di-merge orchestrator ke
+`main` pada `ca5c43597af97c95ea9eaa87876237fd2d45e10c`. Ini mengaktifkan gate rilis
+**manual**, bukan required check ataupun deployment otomatis. Bukti formal
+untuk setiap rilis berikutnya tetap harus diperiksa pada exact final SHA
+`main`; tiga run G4 yang tercatat adalah kesetaraan historis pada SHA
+`a64a55ebb1e3c76112cd211724c2eb6bc256699a`.

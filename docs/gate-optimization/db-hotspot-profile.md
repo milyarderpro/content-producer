@@ -255,3 +255,21 @@ Run [#41058481162](https://github.com/milyarderpro/content-producer/actions/runs
 Dua file dipindah **dari shard 1 ke shard 2**: `api-trivia-public-gold.test.ts` dan `api-post-approval-quality.test.ts`. Profil serial **lokal diagnostik historis** Issue #95 memperkirakan masing-masing **65,080 s** dan **52,880 s**, total **117,960 s**; angka lokal ini **bukan** timing Actions pada run #41058481162. Proyeksi sederhana dengan asumsi transfer biaya serupa: shard 1 ~**553 s (9m13s)**, shard 2 ~**536 s (8m56s)**, di luar ketidakpastian perubahan hardware, overhead fixture, cross-run variance dan antrian aggregate. Jika perhitungan dari awal workflow mengikuti overhead run sebelumnya, wall clock dapat tetap lebih dari 10 menit. Proyeksi **NOT RUN / belum divalidasi**; target <=10 menit untuk tiga run identik tetap belum terbukti.
 
 Partisi baru **19+22 file**; 41 nama tepat sekali terhadap manifest, 182 kasus wajib PASS pada aggregate tanpa skipped. Shard 1 tetap memegang MCP/Inspector **tepat sekali**; kedua shard tetap menjalankan stack/start/reset/fixtures mandiri, database serial, audit pre/post/final, migration/history, lint, local security advisors, whitespace dan cleanup. Tidak ada perubahan runner, gate lama, workflow rilis atau CR-052 yang masih **PROPOSED — NOT EFFECTIVE**. Full candidate pada partisi baru dan G4 **NOT RUN**; orchestrator yang akan dispatch pada SHA integrasi final.
+
+## Status akhir G4 setelah merge PR #105
+
+Semua proyeksi, timing lokal per-file, dan `NOT RUN` di atas adalah
+**snapshot Issue #95/#99**, bukan status rilis sekarang.
+Sejak merge [PR #105](https://github.com/milyarderpro/content-producer/pull/105)
+(`ca5c43597af97c95ea9eaa87876237fd2d45e10c`), [CR-052](../decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md) **efektif** sebagai gate rilis
+manual exact final SHA `main`. Tiga Actions formal pada
+`a64a55ebb1e3c76112cd211724c2eb6bc256699a`:
+[#41072354433](https://github.com/milyarderpro/content-producer/actions/runs/41072354433) **9m41s**, [#41074001136](https://github.com/milyarderpro/content-producer/actions/runs/41074001136) **9m43s**, dan [#41157962349](https://github.com/milyarderpro/content-producer/actions/runs/41157962349) **9m50s**. Partisi **19+22 = 41 file/182 kasus DB**,
+MCP **15/82**, Inspector **33 valid/33 invalid + owner denial** tepat sekali
+di shard 1, local security advisors terpisah, migration/history/lint,
+audit RLS/grants/ACL/fixture dan cleanup, serta source dan aggregate PASS.
+Lokal `gate:full` **18m50s** dengan `DIAGNOSTIC_CONFIG_OVERLAY` **bukan**
+bukti formal exact-config. CR-020/044 tetap kontrol keamanan; workflow legacy
+`backend-technical-gate.yml`/`pnpm run test-all` adalah rollback, bukan
+release gate utama. Tidak ada required check/branch protection otomatis,
+deployment, OAuth hosted, atau live business Write yang dibuktikan.

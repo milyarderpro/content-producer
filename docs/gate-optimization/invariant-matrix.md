@@ -951,5 +951,23 @@ berlainan. Perubahan status membutuhkan pembanding G4, bukan nama fase.
   [baseline](baseline-and-inventory.md)); G2/G3 harus menentukan check
   eksplisit dan G4 harus memverifikasi output PASS per SHA. Tidak ada
   pengecualian karena run lama hijau atau lint/audit telah sukses.
-- **CR-020/CR-044 masih efektif.** CR-052 hanya draft; jangan merge/mengganti full gate atau melepas
-  backend sampai G4 dan cutover eksplisit.
+- **Status saat matriks G1 disusun:** CR-020/044 gate rilis legacy aktif,
+  CR-052 masih draft dan belum ada izin cutover pada waktu itu. Pernyataan
+  `I-ADVISOR UNKNOWN` di atas adalah status **G1**, bukan hasil G4 kini.
+
+## Status efektif G4 (tanpa mengubah hasil G1)
+
+Sejak merge [PR #105](https://github.com/milyarderpro/content-producer/pull/105)
+(`ca5c43597af97c95ea9eaa87876237fd2d45e10c`), [CR-052](../decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md) **efektif** sebagai gate rilis
+manual exact final SHA `main`. Tiga Actions formal pada
+`a64a55ebb1e3c76112cd211724c2eb6bc256699a`:
+[#41072354433](https://github.com/milyarderpro/content-producer/actions/runs/41072354433) **9m41s**, [#41074001136](https://github.com/milyarderpro/content-producer/actions/runs/41074001136) **9m43s**, dan [#41157962349](https://github.com/milyarderpro/content-producer/actions/runs/41157962349) **9m50s**. Partisi **19+22 = 41 file/182 kasus DB**,
+MCP **15/82**, Inspector **33 valid/33 invalid + owner denial** tepat sekali
+di shard 1, local security advisors terpisah, migration/history/lint,
+audit RLS/grants/ACL/fixture dan cleanup, serta source dan aggregate PASS.
+Lokal `gate:full` **18m50s** dengan `DIAGNOSTIC_CONFIG_OVERLAY` **bukan**
+bukti formal exact-config. CR-020/044 tetap kontrol keamanan; workflow legacy
+`backend-technical-gate.yml`/`pnpm run test-all` adalah rollback, bukan
+release gate utama. Tidak ada required check/branch protection otomatis,
+deployment, OAuth hosted, atau live business Write yang dibuktikan.
+Pernyataan `UNKNOWN`/`NOT RUN` pada G1 tetap historis.

@@ -222,3 +222,15 @@ Dokumen keputusan menyimpan keadaan pada saat ditulis. Bagian berstatus pending
 tidak boleh dianggap sebagai keadaan live sekarang tanpa membaca bukti lanjutan.
 Jika kontrak dan implementasi tidak cocok, catat konflik dan rujuk keputusan yang
 relevan; jangan menyelesaikannya hanya dengan mengubah panduan ini.
+
+## Gate rilis backend yang berlaku
+
+Setelah merge [PR #105](https://github.com/milyarderpro/content-producer/pull/105)
+pada `ca5c43597af97c95ea9eaa87876237fd2d45e10c`,
+[CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
+menetapkan `.github/workflows/backend-gate-candidate.yml` sebagai gate rilis
+**manual exact final SHA `main`**: source, dua shard database terisolasi
+19+22 (41 file/182 kasus) dan aggregate PASS. CR-020/044 tetap mengikat
+kontrol keamanan. Gate tidak otomatis diwajibkan branch protection;
+`backend-technical-gate.yml`/`pnpm run test-all` adalah legacy/rollback.
+Lihat [testing](testing.md) dan [operations](operations.md).

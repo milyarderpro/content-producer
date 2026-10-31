@@ -6,8 +6,9 @@ atau mengulang suite berat yang sama. Instruksi mengikat ada di
 [CR-020](decisions/2026-10-15-phase-9-10-risk-based-mvp-acceptance.md) dan
 [CR-044](decisions/2026-10-20-phase-10-gate-order-and-backend-sha-reuse.md).
 [CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md) menetapkan
-**gate rilis G4 manual exact-SHA setelah merge PR #105**; sebelum merge gate
-legacy CR-020/044 tetap berlaku, dan sesudah merge legacy menjadi rollback.
+**gate rilis G4 manual exact-SHA yang efektif sejak merge PR #105**
+(`ca5c43597af97c95ea9eaa87876237fd2d45e10c`). Gate legacy CR-020/044 berlaku sebelum merge;
+kini hanya rollback tanpa mengurangi kontrol keamanannya.
 
 **Dasar peninjauan:** baseline `d6e7fe83ea006931f85624c4d60486f92ab3438c` dan
 pembaruan script/workflow cleanup lokal, ditinjau 25 Oktober 2026. File workflow
@@ -142,7 +143,7 @@ tetap dijalankan. Pada checkout lokal 26 Oktober 2026, durasi file ini turun
 dari sekitar 333 detik (Actions sebelumnya) menjadi 49 detik (test fokus);
 angka ini tetap hasil test fokus historis, bukan durasi full gate G4.
 
-**Sebelum merge PR #105 — full gate legacy CR-020/044:** satu stack lokal
+**Gate historis sebelum merge PR #105 (kini legacy/rollback CR-020/044):** satu stack lokal
 terisolasi dengan satu clean reset, focused OAuth/owner, audit awal,
 authenticated Inspector, audit sesudah Inspector, lalu `pnpm run test-all`
 termasuk suite database; lanjutkan migration history, DB lint, final catalog
@@ -150,7 +151,7 @@ ACL/RLS/fixture audit, whitespace, cleanup dan evidence teredaksi. Urutan
 satu-reset/`test-all` ini tetap didokumentasikan untuk **rollback**, bukan
 syarat rilis yang berlaku setelah CR-052 efektif.
 
-**Setelah merge — full gate rilis G4 CR-052:** dispatch
+**Gate rilis aktif sejak merge PR #105 — G4 CR-052:** dispatch
 [`backend-gate-candidate.yml`](../.github/workflows/backend-gate-candidate.yml)
 **manual di `main` pada exact final SHA**. Job source/frontend dan **dua
 Supabase stack terisolasi** berjalan dengan **satu clean reset per shard**;
@@ -185,7 +186,7 @@ fokus untuk paket/MCP dan manual card yang terdampak sesuai scope perubahan.
 | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [ci.yml](../.github/workflows/ci.yml)                                         | PR/push ke main dan manual: format, check source/frontend, MCP/probe/paket sesuai dependency; tanpa database/reset/hosted request                       |
 | [backend-gate-candidate.yml](../.github/workflows/backend-gate-candidate.yml) | **G4 release gate manual exact-SHA setelah merge PR #105**: source + dua shard terisolasi + aggregate PASS, dengan committed config; **tidak otomatis** |
-| [backend-technical-gate.yml](../.github/workflows/backend-technical-gate.yml) | Full legacy CR-020/044 manual exact-SHA: gate aktif **sebelum merge**, tersedia sebagai **rollback setelah merge**; satu stack + `test-all`             |
+| [backend-technical-gate.yml](../.github/workflows/backend-technical-gate.yml) | Full legacy CR-020/044 manual exact-SHA: **rollback sekarang**, gate historis sebelum merge; satu stack + `test-all`             |
 | [hosted-oauth-probe.yml](../.github/workflows/hosted-oauth-probe.yml)         | Probe hosted manual pada main: metadata publik dan challenge tanpa token; tanpa business tools/call                                                     |
 
 Task 6 memeriksa GitHub sebagai admin pada 25 Oktober 2026: branch protection
@@ -241,7 +242,8 @@ tidak membuktikan publikasi Facebook maupun pengamatan performa nyata.
 ## 7. Gate rilis G4 manual exact-SHA dan batas bukti
 
 Workflow [`backend-gate-candidate.yml`](../.github/workflows/backend-gate-candidate.yml)
-menjadi **gate rilis manual exact-SHA setelah PR #105 di-merge**.
+menjadi **gate rilis manual exact-SHA sejak merge PR #105** pada
+`ca5c43597af97c95ea9eaa87876237fd2d45e10c`.
 Trigger tetap `workflow_dispatch` pada `main`; **tidak ada required status
 context maupun branch protection** yang mengeksekusi gate secara otomatis.
 Operator wajib memeriksa input `candidate_sha`, `github.sha`, checkout SHA,
@@ -250,7 +252,7 @@ input/partisi dan artifact aman. Job aggregate bernama
 `G4 release evidence aggregate (manual exact SHA)`. Workflow
 [`backend-technical-gate.yml`](../.github/workflows/backend-technical-gate.yml)
 dan `pnpm run test-all` tetap tersedia sebagai rollback CR-020/044.
-Selama PR #105 belum merge, gate legacy tetap berlaku.
+Gate legacy hanya digunakan sebagai rollback setelah merge PR #105.
 
 Perbandingan same-SHA `aa0c38bd1d9df941128802a0c4848d507a8f6077`:
 [candidate #41058481162](https://github.com/milyarderpro/content-producer/actions/runs/41058481162)

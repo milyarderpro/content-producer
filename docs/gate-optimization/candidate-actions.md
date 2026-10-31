@@ -1,9 +1,10 @@
 # Gate rilis G4 — Actions manual exact-SHA (riwayat G3 dan keputusan G4)
 
 **Status:** rancangan Issue #90 adalah riwayat G3. Orchestrator telah menerima kesetaraan G4
-pada SHA `a64a55ebb1e3c76112cd211724c2eb6bc256699a`; **CR-052 efektif hanya
-setelah PR #105 di-merge**. Sebelum merge gate legacy tetap berlaku; setelah merge
-workflow ini menjadi gate rilis **manual exact-SHA** dan legacy/`test-all` tetap rollback.
+pada SHA `a64a55ebb1e3c76112cd211724c2eb6bc256699a`;
+**CR-052 efektif sejak merge PR #105** pada `ca5c43597af97c95ea9eaa87876237fd2d45e10c`.
+Workflow kini gate rilis **manual exact final SHA `main`** dan legacy/`test-all`
+tetap rollback.
 
 ## Kontrak eksekusi
 
@@ -24,7 +25,7 @@ Kedua shard database masing-masing mempertahankan satu start dan satu reset (tot
 ## Bukti dan batas penerimaan
 
 Tiga report aman berada dalam artifact `candidate-source-<sha>`, `candidate-db-shard-1-<sha>`, dan `candidate-db-shard-2-<sha>` (retensi 14 hari); summary agregat menyebut kandidat serta hasil konjungsi. Tidak ada raw logs dalam artifact. Kesetaraan cakupan dan target tiga run telah diterima orchestrator pada SHA final; efektivitas
-CR-052 tetap bersyarat pada merge PR #105. Bukti Actions dengan committed exact config
+CR-052 sudah aktif sejak merge PR #105 (`ca5c43597af97c95ea9eaa87876237fd2d45e10c`). Bukti Actions dengan committed exact config
 adalah formal, sedangkan overlay PC hanya diagnostik. CI fixture bukan bukti OAuth hosted atau business Write production.
 
 ## Issue #96 — desain dua runner database (belum dieksekusi)
@@ -56,8 +57,8 @@ Dua file dipindah **dari shard 1 ke shard 2**: `api-trivia-public-gold.test.ts` 
 sebagai timing Actions per-file.
 
 Partisi baru **19+22 file**; 41 nama tepat sekali terhadap manifest, 182 kasus wajib PASS pada aggregate tanpa skipped. Shard 1 tetap memegang MCP/Inspector **tepat sekali**; kedua shard tetap menjalankan stack/start/reset/fixtures mandiri, database serial, audit pre/post/final, migration/history, lint, local security advisors, whitespace dan cleanup. Tidak ada perubahan runner ataupun gate legacy dari rebalance; tiga run Actions pada
-partisi baru kini **PASS** dan diterima orchestrator. CR-052 efektif **setelah
-merge PR #105**; tidak ada full gate tambahan pada pekerjaan ini.
+partisi baru kini **PASS** dan diterima orchestrator. CR-052 **sudah efektif
+sejak merge PR #105**; tidak ada full gate tambahan pada pekerjaan ini.
 
 ## Issue #104 — G4 final evidence, pre-push dan release manual (2026-10-31)
 
@@ -99,7 +100,7 @@ merge PR #105**; tidak ada full gate tambahan pada pekerjaan ini.
   migration, fixture, suite atau SHA **fail-closed**. Ini **tidak**
   menggantikan formal Actions committed exact config.
 - **Keputusan operasi:** CR-052 diterima untuk cakupan/model bukti,
-  **efektif setelah merge PR #105**. Workflow kandidat menjadi gate
+  **efektif sejak merge PR #105**. Workflow kandidat menjadi gate
   rilis **manual exact-SHA**: source, dua shard, aggregate dan semua
   report harus PASS pada SHA final. Tidak ada required status
   context/branch protection untuk mengotomatisasi gate; operator
