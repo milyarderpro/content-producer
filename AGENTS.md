@@ -85,12 +85,24 @@ chat**, bukan melarang pemicu gate yang sudah diizinkan.
   hanya karena SHA dokumentasi/paket berubah.
 - Transport-only tanpa perubahan keputusan izin memakai focused protocol/security
   tests menurut CR-044. Perubahan migration, RLS, grant, identity/owner,
-  write permission, atau business RPC membutuhkan satu full CR-020 gate pada
-  kandidat final sebelum deployment yang diotorisasi.
-- Dalam full gate: satu clean reset lokal, focused OAuth/owner dan authenticated
-  Inspector lebih dahulu, baru `test-all`; pertahankan migration history, DB lint,
-  audit katalog/ACL/RLS/kebersihan fixture dan evidence. Buktikan cross-owner
-  denial otomatis. Jangan mengulang DB suite dengan smoke-test duplikat.
+  write permission, atau business RPC wajib melewati **satu full gate pada SHA
+  kandidat final** sebelum deployment yang diotorisasi: **sebelum PR #105 merge**
+  gunakan legacy CR-020/044; **setelah merge** gunakan gate rilis
+  [CR-052](docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
+  **Actions manual exact-SHA** dengan committed config dan aggregate PASS.
+- **Full gate G4 setelah merge:** dua Supabase stack terisolasi dengan **satu clean
+  reset per shard**, source/frontend PASS, **19+22 = 41 file/182 kasus database**
+  tanpa skip; MCP 15 file/82 kasus dan authenticated Inspector **33 valid/33
+  invalid + owner denial** tepat sekali pada shard 1. Kedua shard wajib PASS
+  migration names/history, DB lint, **local security advisors terpisah**, audit
+  katalog/grant/ACL/RLS/fixture sebelum/sesudah/akhir, dan cleanup; periksa
+  kesamaan SHA/hash/report serta **aggregate PASS**. Tidak ada required status
+  context otomatis: operator harus memeriksa URL run pada exact SHA.
+- **Full gate legacy sebelum merge atau saat rollback:** satu clean reset di
+  stack legacy, focused OAuth/owner dan authenticated Inspector sebelum
+  `pnpm run test-all`, dengan history, lint, audit dan denial tetap diwajibkan.
+  Workflow legacy dan `test-all` tidak dihapus; jangan jadikan urutan satu-stack
+  ini persyaratan tunggal rilis **setelah** CR-052 efektif.
 - Reuse gate hanya selama source backend terpasang, migration, security config,
   dan runtime dependency terkait tetap identik. Catat backend SHA dan SHA
   dokumen/paket terpisah; merge SHA berbeda bukan exact-SHA PASS otomatis.
@@ -133,3 +145,29 @@ rewrite migration, force-push, atau memakai Git destruktif tanpa instruksi ekspl
 Commit, push, PR, merge, deployment, dan perubahan data adalah tindakan berbeda;
 ikuti izin masing-masing. Catat perubahan, verifikasi, batas bukti, dan handoff
 secukupnya. Untuk cleanup berurutan gunakan [audit cleanup](docs/cleanup-audit.md).
+
+## 7. Gate rilis G4 manual exact-SHA (efektif setelah merge PR #105)
+
+Orchestrator menerima kesetaraan cakupan dan tiga run kandidat SHA
+`a64a55ebb1e3c76112cd211724c2eb6bc256699a`: **PASS 9m41s, 9m43s,
+9m50s**, termasuk source/frontend, 41 file/182 kasus DB, MCP 15/82,
+Inspector 33 valid/33 invalid + owner denial, migration/history, lint,
+**local security advisors terpisah**, audit RLS/grant/ACL/fixture dan cleanup.
+Review [CR-052](docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
+menetapkan **efektivitas hanya setelah PR #105 di-merge**. Selama draft,
+legacy CR-020/044 tetap gate yang berlaku; jangan merge/deploy sendiri.
+
+**Bukti formal rilis:** Actions `backend-gate-candidate.yml` manual pada
+`main`, committed exact config, input dan checkout SHA sama, source, dua
+DB jobs dan aggregate PASS serta report/hash lengkap. **Lokal:** run
+`gate:full` pada SHA identik PASS 18m50s tetapi mode
+`DIAGNOSTIC_CONFIG_OVERLAY` bukan formal exact-config: hanya
+`project_id`/port boleh diganti untuk isolasi. Perubahan security
+config, migration, fixture, suite atau SHA **fail-closed**.
+
+Belum ada required status context atau branch protection yang secara
+otomatis menjalankan atau mewajibkan gate ini: operator harus mengecek
+run manual dan aggregate pada exact SHA. Pertahankan workflow legacy
+`backend-technical-gate.yml` dan `pnpm run test-all` untuk rollback;
+[prosedur](docs/operations.md) tidak memberi izin hosted OAuth, deployment
+atau business Write.

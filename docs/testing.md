@@ -5,6 +5,9 @@ atau mengulang suite berat yang sama. Instruksi mengikat ada di
 [AGENTS.md](../AGENTS.md); aturan pelepasan perubahan mengikuti
 [CR-020](decisions/2026-10-15-phase-9-10-risk-based-mvp-acceptance.md) dan
 [CR-044](decisions/2026-10-20-phase-10-gate-order-and-backend-sha-reuse.md).
+[CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md) menetapkan
+**gate rilis G4 manual exact-SHA setelah merge PR #105**; sebelum merge gate
+legacy CR-020/044 tetap berlaku, dan sesudah merge legacy menjadi rollback.
 
 **Dasar peninjauan:** baseline `d6e7fe83ea006931f85624c4d60486f92ab3438c` dan
 pembaruan script/workflow cleanup lokal, ditinjau 25 Oktober 2026. File workflow
@@ -37,23 +40,36 @@ belum PASS. Gate wajib tetap dijalankan sebelum deployment yang memerlukannya.
 
 ## 2. Arti setiap command
 
-| Command dari root                                  | Cakupan                                                        | Prasyarat / efek                                                                   |
-| -------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `pnpm run format:check`                            | Format repository sesuai ignore/config Prettier                | Membaca source; cakupannya lebih luas dari file yang diubah                        |
-| `pnpm run lint`                                    | ESLint                                                         | Dependency root                                                                    |
-| `pnpm run typecheck`                               | TypeScript Node tooling, root test, dan test database          | Tidak menjalankan query database                                                   |
-| `pnpm run test`                                    | Vitest untuk `tests/**/*.test.ts`                              | Bukan suite database atau Deno; mencakup input kontrak/dokumen dan paket           |
-| `pnpm run frontend:typecheck`                      | `checkJs` source browser                                       | Tidak membuktikan browser/hosting/OAuth live                                       |
-| `pnpm run frontend:build`                          | Build statis frontend                                          | Menulis `auth-frontend/dist/` dengan konfigurasi publik proses                     |
-| `pnpm run frontend:test`                           | Tiga file test Node frontend                                   | Menggunakan fixture/mocking; termasuk route/callback                               |
-| `pnpm run check`                                   | Seluruh tujuh command di atas, berurutan                       | Tidak menjalankan suite MCP atau database; membangun frontend                      |
-| `pnpm run verify-migrations`                       | Pola nama file SQL migration                                   | Tidak memeriksa SQL, applied history, atau drift                                   |
-| `pnpm run test:mcp`                                | Deno check, lint MCP, dan 15 file test MCP yang disebut script | Deno; mock/fixture protokol, tanpa stack DB untuk suite ini                        |
-| `pnpm run test:database`                           | Vitest config database, 40 file test pada baseline             | Docker/Supabase lokal berjalan dengan migration yang sesuai; menulis fixture lokal |
-| `pnpm run test-all`                                | `check` → `verify-migrations` → `test:mcp` → `test:database`   | Deno dan DB lokal siap; tidak menyalakan/reset stack sendiri                       |
-| `pnpm run smoke-test`                              | Struktur repository, `verify-migrations`, lalu suite database  | Bukan health-only check; menjalankan DB suite lagi bila dipakai bersama test-all   |
-| `pnpm run package-plugin`                          | Validasi source dan pembuatan kandidat 13 file                 | Mengganti kandidat output lama; tidak membuat ZIP/install                          |
-| `pnpm exec tsx scripts/verify-plugin-candidate.ts` | Kesamaan daftar file, byte, dan hash kandidat/source           | Kandidat/filelist sudah dibuat                                                     |
+| Command dari root                                  | Cakupan                                                                             | Prasyarat / efek                                                                                  |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `pnpm run format:check`                            | Format repository sesuai ignore/config Prettier                                     | Membaca source; cakupannya lebih luas dari file yang diubah                                       |
+| `pnpm run lint`                                    | ESLint                                                                              | Dependency root                                                                                   |
+| `pnpm run typecheck`                               | TypeScript Node tooling, root test, dan test database                               | Tidak menjalankan query database                                                                  |
+| `pnpm run test`                                    | Vitest untuk `tests/**/*.test.ts`                                                   | Bukan suite database atau Deno; mencakup input kontrak/dokumen dan paket                          |
+| `pnpm run frontend:typecheck`                      | `checkJs` source browser                                                            | Tidak membuktikan browser/hosting/OAuth live                                                      |
+| `pnpm run frontend:build`                          | Build statis frontend                                                               | Menulis `auth-frontend/dist/` dengan konfigurasi publik proses                                    |
+| `pnpm run frontend:test`                           | Tiga file test Node frontend                                                        | Menggunakan fixture/mocking; termasuk route/callback                                              |
+| `pnpm run check`                                   | Seluruh tujuh command di atas, berurutan                                            | Tidak menjalankan suite MCP atau database; membangun frontend                                     |
+| `pnpm run verify-migrations`                       | Pola nama file SQL migration                                                        | Tidak memeriksa SQL, applied history, atau drift                                                  |
+| `pnpm run test:mcp`                                | Deno check, lint MCP, dan 15 file test MCP yang disebut script                      | Deno; mock/fixture protokol, tanpa stack DB untuk suite ini                                       |
+| `pnpm run test:database`                           | Vitest database **41 file saat ini** (40 pada baseline historis)                    | Docker/Supabase lokal dengan migration sesuai; menulis fixture lokal                              |
+| `pnpm run test-all`                                | **Legacy CR-020/044**: `check` → `verify-migrations` → `test:mcp` → `test:database` | Tidak start/reset stack; tetap dipertahankan untuk gate sebelum merge dan rollback, bukan gate G4 |
+| `pnpm run gate:source`                             | Source/frontend, versi/manifest, bukti source untuk G4                              | Komponen source kandidat; PASS saja bukan release evidence lengkap                                |
+| `pnpm run gate:backend`                            | Isolated reset/audit, DB dan MCP/Inspector, history/lint/advisors                   | Mendukung shard 19+22 di Actions; masing-masing shard memiliki stack mandiri                      |
+| `pnpm run gate:full`                               | Konjungsi source dan backend suite kandidat G4                                      | Lokal dengan overlay adalah `DIAGNOSTIC_CONFIG_OVERLAY`, bukan formal exact-config                |
+| `pnpm run smoke-test`                              | Struktur repository, `verify-migrations`, lalu suite database                       | Bukan health-only check; menjalankan DB suite lagi bila dipakai bersama test-all                  |
+| `pnpm run package-plugin`                          | Validasi source dan pembuatan kandidat 13 file                                      | Mengganti kandidat output lama; tidak membuat ZIP/install                                         |
+| `pnpm exec tsx scripts/verify-plugin-candidate.ts` | Kesamaan daftar file, byte, dan hash kandidat/source                                | Kandidat/filelist sudah dibuat                                                                    |
+
+**Inventaris aktif:** database **41 file/182 kasus** pada manifest G4;
+angka **40 file** pada catatan baseline hanya historis. Bukti rilis formal
+setelah merge berasal dari Actions manual dengan committed exact config,
+source + dua shard database + aggregate PASS, bukan dari eksekusi
+`test-all` secara terpisah. Lokal `gate:full` PASS berlabel
+`DIAGNOSTIC_CONFIG_OVERLAY` hanya diagnostik ketika overlay mengganti
+`project_id`/port; perubahan security config, migration, fixture, atau
+suite wajib fail-closed. Ketiga run exact-SHA Actions PASS 9m41s,
+9m43s, dan 9m50s pada `a64a55e…`.
 
 `test:mcp` tidak mencakup `mcp-probe/handler_test.ts`. Jika probe diubah, pilih
 test-nya secara eksplisit dan tinjau workflow terkait. Test keberadaan runtime
@@ -68,15 +84,15 @@ dari input/docs, tanpa mengakses database.
 
 ## 3. Memilih pemeriksaan sesuai perubahan
 
-| Jenis perubahan                                                       | Pemeriksaan yang sesuai                                                                                 | Batas bukti                                                                   |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Markdown developer biasa                                              | Format file berubah, tautan/anchor, ketepatan isi, whitespace; light CI pada PR                         | Tidak perlu full backend gate hanya untuk dokumentasi                         |
-| Dokumen kontrak atau input audit dipindah/diubah                      | Pemeriksaan di atas + pembaca/test/packaging/audit yang terdampak                                       | Ekstensi `.md`/`.json` tidak otomatis berarti dampaknya ringan                |
-| TypeScript atau konfigurasi                                           | `pnpm run check` + test perilaku terkait                                                                | Pilih gate tambahan berdasarkan dampak, bukan hanya ekstensi                  |
-| Instruksi/metadata paket plugin                                       | Test paket terkait, packaging dan verifikasi kandidat; MCP/manual yang terdampak                        | Light CI; gunakan gate backend lama hanya bila syarat unchanged backend benar |
-| Transport MCP tanpa perubahan keputusan izin                          | `check` + focused protocol/security tests                                                               | Sesuai CR-044; bukan kategori untuk perubahan owner authorization             |
-| Migration, RLS, grant, identity/owner, write permission, business RPC | `check` dan focused tests selama pengembangan; satu full CR-020 gate pada kandidat final sebelum deploy | Full gate tidak dihapus oleh batas waktu CI                                   |
-| Frontend login/consent/routing                                        | Source checks, test Node terkait, pemeriksaan browser; nilai dampak auth dan gate tambahannya           | Build/unit test bukan bukti login production atau PKCE                        |
+| Jenis perubahan                                                       | Pemeriksaan yang sesuai                                                                                             | Batas bukti                                                                                                 |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Markdown developer biasa                                              | Format file berubah, tautan/anchor, ketepatan isi, whitespace; light CI pada PR                                     | Tidak perlu full backend gate hanya untuk dokumentasi                                                       |
+| Dokumen kontrak atau input audit dipindah/diubah                      | Pemeriksaan di atas + pembaca/test/packaging/audit yang terdampak                                                   | Ekstensi `.md`/`.json` tidak otomatis berarti dampaknya ringan                                              |
+| TypeScript atau konfigurasi                                           | `pnpm run check` + test perilaku terkait                                                                            | Pilih gate tambahan berdasarkan dampak, bukan hanya ekstensi                                                |
+| Instruksi/metadata paket plugin                                       | Test paket terkait, packaging dan verifikasi kandidat; MCP/manual yang terdampak                                    | Light CI; reuse hanya jika backend/security/dep identik menurut CR-044                                      |
+| Transport MCP tanpa perubahan keputusan izin                          | `check` + focused protocol/security tests                                                                           | Sesuai CR-044; bukan kategori untuk perubahan owner authorization                                           |
+| Migration, RLS, grant, identity/owner, write permission, business RPC | `check` dan focused tests; **satu full gate pada SHA final**: legacy sebelum merge, G4 Actions manual setelah merge | G4 mewajibkan source + kedua shard 41/182 + advisors terpisah + aggregate PASS; deployment tetap perlu izin |
+| Frontend login/consent/routing                                        | Source checks, test Node terkait, pemeriksaan browser; nilai dampak auth dan gate tambahannya                       | Build/unit test bukan bukti login production atau PKCE                                                      |
 
 Perubahan security config atau dependency runtime tidak boleh dianggap tidak
 berdampak hanya karena business handler tidak berubah. Jika klasifikasi risiko
@@ -124,42 +140,62 @@ digunakan suite plan lain, bukan menjalankan CLI Supabase untuk setiap query.
 Seluruh 18 kasus, termasuk pemeriksaan owner/JWT dan penolakan lintas owner,
 tetap dijalankan. Pada checkout lokal 26 Oktober 2026, durasi file ini turun
 dari sekitar 333 detik (Actions sebelumnya) menjadi 49 detik (test fokus);
-durasi full gate Actions sesudah perubahan belum diukur.
+angka ini tetap hasil test fokus historis, bukan durasi full gate G4.
 
-Urutan wajib CR-044 dalam full gate: setelah satu clean reset lokal, jalankan
-focused OAuth/owner dan authenticated Inspector **sebelum** suite database panjang
-dalam `test-all`. Pertahankan locked install, migration history, DB lint lokal,
-audit katalog/privilege/RLS dan kebersihan fixture, whitespace, serta bukti yang
-disanitasi. CR-044 juga mempertahankan audit sebelum/sesudah Inspector; periksa
-urutan job aktual, jangan menganggap nama workflow membuktikan seluruh urutannya
-sudah sesuai. Inspector dan audit akhir memastikan jalur dan state setelahnya.
-Jangan menambah `smoke-test` sebagai pengulangan DB suite yang sudah tercakup.
+**Sebelum merge PR #105 — full gate legacy CR-020/044:** satu stack lokal
+terisolasi dengan satu clean reset, focused OAuth/owner, audit awal,
+authenticated Inspector, audit sesudah Inspector, lalu `pnpm run test-all`
+termasuk suite database; lanjutkan migration history, DB lint, final catalog
+ACL/RLS/fixture audit, whitespace, cleanup dan evidence teredaksi. Urutan
+satu-reset/`test-all` ini tetap didokumentasikan untuk **rollback**, bukan
+syarat rilis yang berlaku setelah CR-052 efektif.
 
-Workflow backend yang sudah dikonsolidasikan memakai urutan tersebut: satu reset,
-focused OAuth/owner, audit awal, Inspector, audit sesudahnya, suite lengkap,
-history/lint, lalu audit akhir. Marker checkpoint lama sudah dipensiunkan;
-perubahan source/PR tidak otomatis memicu full gate.
+**Setelah merge — full gate rilis G4 CR-052:** dispatch
+[`backend-gate-candidate.yml`](../.github/workflows/backend-gate-candidate.yml)
+**manual di `main` pada exact final SHA**. Job source/frontend dan **dua
+Supabase stack terisolasi** berjalan dengan **satu clean reset per shard**;
+shard 1 melaksanakan MCP **15 file/82 kasus**, authenticated Inspector
+**33 valid/33 invalid + owner denial** tepat sekali; kedua shard mengeksekusi
+**19+22 = 41 file/182 kasus DB** tanpa skip dengan audit sebelum/sesudah/akhir,
+migration names/history, DB lint, **local security advisors terpisah**,
+fixture/whitespace/cleanup. Verifikasi ketiga report, identitas SHA/hash yang
+sama, status semua tahap, dan **aggregate PASS** sebelum menerima bukti formal.
+Actions memakai committed exact config; PC dengan `DIAGNOSTIC_CONFIG_OVERLAY`
+(`project_id`/port saja) adalah bukti reproduksibilitas diagnostik, bukan
+formal exact-config. Bila security config, migration, fixture atau suite berubah,
+**fail-closed**. Jangan menambah `smoke-test` untuk menggandakan DB suite.
+
+Belum ada required status context atau branch protection yang otomatis
+menjalankan/mewajibkan G4. Operator harus mengecek run manual dan aggregate
+pada exact SHA; check atau deployment tidak dianggap PASS dari nama workflow.
 
 ### Penggunaan ulang gate backend
 
-Boleh merujuk gate lama hanya jika source backend terpasang, migration,
-konfigurasi keamanan, dan dependency runtime terkait tetap identik. Simpan
+Boleh mereferensikan bukti backend historis hanya jika source backend terpasang,
+migration, konfigurasi keamanan, dan dependency runtime terkait tetap identik.
+Reuse ini tidak menggantikan full gate pada SHA final ketika diwajibkan
+untuk rilis backend berisiko menurut CR-052 setelah merge. Simpan
 backend SHA yang diuji/di-deploy terpisah dari SHA dokumentasi atau paket.
 Merge SHA berbeda bukan exact-SHA PASS otomatis. Tetap jalankan pemeriksaan
 fokus untuk paket/MCP dan manual card yang terdampak sesuai scope perubahan.
 
 ## 5. Workflow CI yang masih tersedia
 
-| Workflow                                                                      | Peran                                                                                                                             |
-| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| [ci.yml](../.github/workflows/ci.yml)                                         | PR/push ke main dan manual: format, check source/frontend, MCP/probe/paket sesuai dependency; tanpa database/reset/hosted request |
-| [backend-technical-gate.yml](../.github/workflows/backend-technical-gate.yml) | Full CR-020/044 manual pada main dengan exact candidate SHA, stack lokal terisolasi, serta bukti hasil yang disanitasi            |
-| [hosted-oauth-probe.yml](../.github/workflows/hosted-oauth-probe.yml)         | Probe hosted manual pada main: metadata publik dan challenge tanpa token; tanpa business tools/call                               |
+| Workflow                                                                      | Peran                                                                                                                                                   |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [ci.yml](../.github/workflows/ci.yml)                                         | PR/push ke main dan manual: format, check source/frontend, MCP/probe/paket sesuai dependency; tanpa database/reset/hosted request                       |
+| [backend-gate-candidate.yml](../.github/workflows/backend-gate-candidate.yml) | **G4 release gate manual exact-SHA setelah merge PR #105**: source + dua shard terisolasi + aggregate PASS, dengan committed config; **tidak otomatis** |
+| [backend-technical-gate.yml](../.github/workflows/backend-technical-gate.yml) | Full legacy CR-020/044 manual exact-SHA: gate aktif **sebelum merge**, tersedia sebagai **rollback setelah merge**; satu stack + `test-all`             |
+| [hosted-oauth-probe.yml](../.github/workflows/hosted-oauth-probe.yml)         | Probe hosted manual pada main: metadata publik dan challenge tanpa token; tanpa business tools/call                                                     |
 
 Task 6 memeriksa GitHub sebagai admin pada 25 Oktober 2026: branch protection
 `main` mengembalikan `Branch not protected`, daftar ruleset dan rules untuk branch
 kosong. Tidak ada required status checks yang terpasang pada pemeriksaan itu.
-Kebijakan dapat berubah; periksa ulang sebelum mengganti workflow di masa depan.
+Pemeriksaan G4 pada 31 Oktober 2026 juga menunjukkan `main` tanpa required
+status contexts/branch protection otomatis; detail protection tidak dapat
+dibaca oleh integrasi (403). Karena itu operator harus memeriksa manual
+exact-SHA Actions dan aggregate PASS; periksa ulang dengan admin sebelum
+mengubah required checks atau kebijakan branch.
 Konsolidasi source tidak menghapus riwayat run/workflow pada registry Actions.
 
 Classifier light CI kini menyertakan deletion dan memecah rename menjadi dua path
@@ -201,3 +237,54 @@ Pakai `PASS`, `FAIL`, `BLOCKED`, atau `NOT RUN` dengan batas bukti yang jelas.
 `FIXED` untuk masalah live memerlukan retest setelah runtime benar-benar berubah,
 bukan hanya PR merged atau CI passing. Keberhasilan fixture publikasi/metrics
 tidak membuktikan publikasi Facebook maupun pengamatan performa nyata.
+
+## 7. Gate rilis G4 manual exact-SHA dan batas bukti
+
+Workflow [`backend-gate-candidate.yml`](../.github/workflows/backend-gate-candidate.yml)
+menjadi **gate rilis manual exact-SHA setelah PR #105 di-merge**.
+Trigger tetap `workflow_dispatch` pada `main`; **tidak ada required status
+context maupun branch protection** yang mengeksekusi gate secara otomatis.
+Operator wajib memeriksa input `candidate_sha`, `github.sha`, checkout SHA,
+PASS job source, kedua database shard dan aggregate, SHA/hash manifest/lock/
+input/partisi dan artifact aman. Job aggregate bernama
+`G4 release evidence aggregate (manual exact SHA)`. Workflow
+[`backend-technical-gate.yml`](../.github/workflows/backend-technical-gate.yml)
+dan `pnpm run test-all` tetap tersedia sebagai rollback CR-020/044.
+Selama PR #105 belum merge, gate legacy tetap berlaku.
+
+Perbandingan same-SHA `aa0c38bd1d9df941128802a0c4848d507a8f6077`:
+[candidate #41058481162](https://github.com/milyarderpro/content-producer/actions/runs/41058481162)
+PASS 12m01s versus
+[legacy #41060272610](https://github.com/milyarderpro/content-producer/actions/runs/41060272610)
+PASS 15m26s, keduanya DB 41 file/182 kasus, MCP dan Inspector 33/33 + denial.
+**Legacy tidak memiliki bukti advisors lokal mandiri**; kandidat
+menjalankan `supabase db advisors --local --type security` sebagai tahap
+terpisah pada tiap shard, bukan DB lint atau audit katalog.
+
+Setelah rebalance **19+22**, pada SHA
+`a64a55ebb1e3c76112cd211724c2eb6bc256699a` tiga run Actions
+**PASS**: [#41072354433](https://github.com/milyarderpro/content-producer/actions/runs/41072354433)
+**9m41s**, [#41074001136](https://github.com/milyarderpro/content-producer/actions/runs/41074001136)
+**9m43s** dan
+[#41157962349](https://github.com/milyarderpro/content-producer/actions/runs/41157962349)
+**9m50s**. Run ketiga: source 12 file/91 tes, shard 1 19 file/97,
+shard 2 22 file/85; **41 file/182 kasus DB** dan aggregate PASS tanpa skip.
+MCP 15/82, Inspector 33/33 + owner denial, audit before/after/final,
+migration/history, DB lint, advisors terpisah dan cleanup PASS.
+Orchestrator menyetujui kesetaraan cakupan pada
+[review PR #105](https://github.com/milyarderpro/content-producer/pull/105#issuecomment-6537758736).
+
+Lokal `gate:full` pada SHA sama **PASS 18m50s** tetapi berlabel
+**`DIAGNOSTIC_CONFIG_OVERLAY`**, bukan PASS formal exact-config:
+overlay hanya `project_id`/port untuk isolasi PC.
+Jika security config, migration, fixture, suite atau SHA berubah,
+**fail-closed**. Bukti formal rilis harus Actions dengan **committed exact
+config** (`ACTIONS_EXACT_CONFIG`). CI fixture tidak membuktikan
+hosted OAuth, deployment atau live business Write. Rincian keputusan di
+[CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md).
+
+Untuk perubahan workflow/docs jalankan `pnpm exec vitest run tests/workflow-config.test.ts`,
+Prettier, `git diff --check` dan
+`pnpm run check` melalui light CI PR head. Tidak perlu dispatch ulang
+full backend gate pada draft #105; tiga Actions kandidat telah selesai.
+Required checks hanya dapat diaktifkan melalui keputusan terpisah.
