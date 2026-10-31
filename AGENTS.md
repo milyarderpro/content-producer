@@ -134,21 +134,28 @@ Commit, push, PR, merge, deployment, dan perubahan data adalah tindakan berbeda;
 ikuti izin masing-masing. Catat perubahan, verifikasi, batas bukti, dan handoff
 secukupnya. Untuk cleanup berurutan gunakan [audit cleanup](docs/cleanup-audit.md).
 
-## 7. Kandidat gate rilis G4 (draft, tidak efektif)
+## 7. Gate rilis G4 manual exact-SHA (efektif setelah merge PR #105)
 
-CR-052 masih **PROPOSED — NOT EFFECTIVE**. Issue #104 hanya menyiapkan
-dokumen, prosedur dan identitas workflow kandidat; gate wajib CR-020/044
-serta `.github/workflows/backend-technical-gate.yml` tetap berlaku.
-Jangan mengaktifkan cutover, required check, deploy, atau merge dari
-draft ini. Lihat [audit G4](docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
-dan [prosedur/rollback](docs/operations.md).
+Orchestrator menerima kesetaraan cakupan dan tiga run kandidat SHA
+`a64a55ebb1e3c76112cd211724c2eb6bc256699a`: **PASS 9m41s, 9m43s,
+9m50s**, termasuk source/frontend, 41 file/182 kasus DB, MCP 15/82,
+Inspector 33 valid/33 invalid + owner denial, migration/history, lint,
+**local security advisors terpisah**, audit RLS/grant/ACL/fixture dan cleanup.
+Review [CR-052](docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
+menetapkan **efektivitas hanya setelah PR #105 di-merge**. Selama draft,
+legacy CR-020/044 tetap gate yang berlaku; jangan merge/deploy sendiri.
 
-Dua kandidat exact-SHA `a64a55ebb1e3c76112cd211724c2eb6bc256699a`
-telah PASS; run ketiga dan bukti lokal tetap PENDING/NOT ACCEPTED
-sampai orchestrator memberi evidence serta keputusan. Hasil lokal
-`DIAGNOSTIC_CONFIG_OVERLAY` bukan PASS formal exact-config. Setelah
-persetujuan eksplisit, rilis kandidat memerlukan source/frontend,
-41 file/182 kasus DB, MCP, Inspector 33/33 + owner denial, audits
-RLS/grant/ACL/fixture, migration/history, lint, **local security
-advisors terpisah**, cleanup, dan aggregate PASS pada satu SHA.
-Pertahankan workflow lama dan `test-all` untuk rollback.
+**Bukti formal rilis:** Actions `backend-gate-candidate.yml` manual pada
+`main`, committed exact config, input dan checkout SHA sama, source, dua
+DB jobs dan aggregate PASS serta report/hash lengkap. **Lokal:** run
+`gate:full` pada SHA identik PASS 18m50s tetapi mode
+`DIAGNOSTIC_CONFIG_OVERLAY` bukan formal exact-config: hanya
+`project_id`/port boleh diganti untuk isolasi. Perubahan security
+config, migration, fixture, suite atau SHA **fail-closed**.
+
+Belum ada required status context atau branch protection yang secara
+otomatis menjalankan atau mewajibkan gate ini: operator harus mengecek
+run manual dan aggregate pada exact SHA. Pertahankan workflow legacy
+`backend-technical-gate.yml` dan `pnpm run test-all` untuk rollback;
+[prosedur](docs/operations.md) tidak memberi izin hosted OAuth, deployment
+atau business Write.

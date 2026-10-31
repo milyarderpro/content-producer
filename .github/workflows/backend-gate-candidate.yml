@@ -1,10 +1,10 @@
-name: Backend G4 release gate proposal (NOT EFFECTIVE; manual only)
+name: Backend G4 release gate - exact SHA (manual)
 
 on:
   workflow_dispatch:
     inputs:
       candidate_sha:
-        description: Exact main SHA for proposed G4 release evidence; cutover not active
+        description: Exact main SHA for manual release gate evidence
         required: true
         type: string
 
@@ -134,7 +134,7 @@ jobs:
           retention-days: 14
 
   aggregate:
-    name: Candidate evidence conjunction (not release check)
+    name: G4 release evidence aggregate (manual exact SHA)
     needs: [source, database]
     if: always()
     runs-on: ubuntu-24.04

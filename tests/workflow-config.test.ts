@@ -53,6 +53,8 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
   });
 
   it('candidate manual mengunci SHA dan agregasi bukti dua shard', () => {
+    expect(candidate).toContain('name: Backend G4 release gate - exact SHA (manual)');
+    expect(candidate).toContain('name: G4 release evidence aggregate (manual exact SHA)');
     expect(candidate).toMatch(/^on:\n {2}workflow_dispatch:/m);
     expect(candidate).not.toMatch(/^ {2}(push|pull_request|schedule|workflow_run):/m);
     expect(candidate).toMatch(/^permissions:\n {2}contents: read\n/m);

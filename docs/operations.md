@@ -259,50 +259,63 @@ memeriksa akses/proteksi GitHub dan riwayat CI; runtime live, backup capability,
 serta setting hosted tetap belum dibaca ulang pada cleanup ini dan perlu
 diperiksa dalam pekerjaan operasional yang benar-benar diotorisasi.
 
-## 9. Usulan cutover gate rilis G4 dan rollback (Issue #104)
+## 9. Release gate G4 manual dan rollback (Issue #104)
 
-**BELUM EFEKTIF:** CR-052 **PROPOSED — NOT EFFECTIVE**; tidak ada
-perubahan required checks, deployment, production data, ataupun
-business Write. Dua run kandidat pada
-`a64a55ebb1e3c76112cd211724c2eb6bc256699a` telah PASS:
+**Efektif hanya setelah merge PR #105 oleh orchestrator.** Pada draft,
+workflow legacy CR-020/044 tetap gate aktif. Keputusan
+[CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
+menerima bukti kandidat exact-SHA dan reproduksibilitas lokal yang
+terbatas; tidak memberi izin merge otomatis, deploy atau production Write.
+
+Bukti formal Actions pada `a64a55ebb1e3c76112cd211724c2eb6bc256699a`:
 [#41072354433](https://github.com/milyarderpro/content-producer/actions/runs/41072354433)
-(9m41s) dan
+**PASS 9m41s**,
 [#41074001136](https://github.com/milyarderpro/content-producer/actions/runs/41074001136)
-(9m43s). **Run ketiga dan bukti lokal PENDING**, bukan PASS;
-overlay lokal `DIAGNOSTIC_CONFIG_OVERLAY` bukan formal exact-config.
-Orchestrator wajib meninjau laporan, advisor lokal, kesetaraan
-source/backend, dan kriteria CR sebelum langkah berikutnya.
+**PASS 9m43s**, dan
+[#41157962349](https://github.com/milyarderpro/content-producer/actions/runs/41157962349)
+**PASS 9m50s**. Run ketiga mengesahkan source 12/91, DB shard 1
+19/97 dan shard 2 22/85, aggregate PASS: total 41 file/182 kasus DB,
+MCP 15 file/82, authenticated Inspector 33 valid/33 invalid +
+owner denial, migration/history, DB lint, advisors lokal terpisah,
+RLS/grant/ACL/fixture audit dan cleanup PASS.
+Lokal pada SHA sama **PASS 18m50s** seluruh tahap tetapi label
+**`DIAGNOSTIC_CONFIG_OVERLAY`**, **bukan** formal exact-config.
 
-**Prosedur sesudah keputusan tertulis (jangan jalankan sekarang):**
+**Prosedur pemeriksaan rilis setelah keputusan berlaku:**
 
-1. Catat SHA `main` final, klasifikasi diff, pin/manifest/lock/config,
-   serta bukti local + tiga run GitHub. Jika config overlay dipakai
-   lokal, tandai diagnostik dan minta keputusan kontrak eksplisit.
-2. Setelah izin cutover terpisah, dispatch manual
+1. Tetapkan exact SHA final `main`, diff, tool pin, config,
+   manifest/lock/input/partisi, lalu pilih runner Actions ephemeral
+   unlinked. Tidak boleh memakai production credential/stack.
+2. Dispatch **manual**
    [`backend-gate-candidate.yml`](../.github/workflows/backend-gate-candidate.yml)
-   dari `main` dengan `candidate_sha` 40 hex yang sama dengan
-   `github.sha` dan checkout. Runner harus ephemeral, unlinked,
-   config committed exact di Actions; jangan menjalankan mode ini
-   di PC lokal yang mempunyai stack Supabase aktif.
-3. Verifikasi PASS job source/frontend dan dua DB shard 19+22,
-   MCP 15 file/82 kasus, Inspector 33 valid/33 invalid plus owner
-   denial, total DB **41 file/182 kasus tanpa skip**, 72 migration
-   source/history, DB lint, **local security advisors terpisah**
-   pada dua shard, audit catalog RLS/grant/default ACL/fixture
-   pre/post/final, cleanup, hash identitas, dan aggregate PASS.
-   Simpan artifact aman `candidate-source-<sha>` dan
-   `candidate-db-shard-1/2-<sha>`; jangan unggah raw credentials.
-4. Review contexts aktual/branch protection dan minta izin
-   tersendiri sebelum required check/entrypoint diaktifkan.
-   Workflow saat ini hanya manual `workflow_dispatch`, jadi PASS
-   tidak otomatis menjadi required check pada PR.
+   dari `main` dengan `candidate_sha` 40 hex sama dengan
+   `github.sha` dan `git rev-parse HEAD`. Actions harus memakai
+   **committed exact config**, tanpa overlay.
+3. Terima release evidence hanya jika source/frontend, kedua
+   database shard 19+22 dan **aggregate PASS** di SHA tepat, report
+   lengkap dan hash cocok; total DB 41/182 tanpa skipped, MCP 15/82,
+   Inspector 33 valid/33 invalid + owner denial, migration/history,
+   DB lint **dan local security advisors terpisah**, audit katalog
+   RLS/grant/default ACL/fixture before/after/final serta cleanup
+   semuanya PASS. Simpan hanya laporan teredaksi/artifact aman.
+4. Lokal memakai overlay PC hanya untuk `project_id` dan port;
+   label `DIAGNOSTIC_CONFIG_OVERLAY` **diagnostik saja**, meskipun
+   PASS. Jika security config, migration, fixture, suite atau SHA
+   berbeda, **fail-closed** dan blok rilis; jangan menggantikan
+   formal Actions dengan PASS lokal.
+5. **Tidak ada required status context atau branch protection**
+   yang mengotomatiskan gate manual ini. Operator memeriksa URL,
+   SHA, job source, dua shard, aggregate dan artifact sendiri.
+   Perubahan required checks memerlukan keputusan/izin terpisah.
+   Bukti fixture tidak menyatakan deployment, hosted owner OAuth,
+   atau live business Write PASS.
 
-**Rollback CI:** pertahankan
+**Rollback:** workflow
 [`backend-technical-gate.yml`](../.github/workflows/backend-technical-gate.yml)
-dan `pnpm run test-all` tanpa perubahan. Jika kesetaraan gagal,
-**blok rilis** dan melalui keputusan/PR terpisah pulihkan required
-check/entrypoint legacy; dispatch full legacy pada exact SHA
-final yang disetujui, konfirmasi bukti PASS, dokumentasikan alasan
-dan perbaiki kandidat. Jangan mengubah migration/production
-sebagai rollback workflow. Rujuk [CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
-untuk audit same-SHA dan syarat penerimaan.
+dan `pnpm run test-all` tetap utuh. Bila kandidat gagal, salah
+SHA, stage/advisors/aggregate hilang atau beda security input,
+**blok deployment**, minta keputusan rollback, jalankan full gate
+legacy pada SHA final yang disetujui di stack ephemeral dan simpan
+bukti aman. Pulihkan entrypoint/required checks melalui prosedur
+terpisah bila nanti telah dikonfigurasi; jangan reset/migrasi
+database production untuk rollback workflow.

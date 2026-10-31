@@ -202,39 +202,53 @@ Pakai `PASS`, `FAIL`, `BLOCKED`, atau `NOT RUN` dengan batas bukti yang jelas.
 bukan hanya PR merged atau CI passing. Keberhasilan fixture publikasi/metrics
 tidak membuktikan publikasi Facebook maupun pengamatan performa nyata.
 
-## 7. Kandidat gate rilis G4 — rancangan, belum cutover
+## 7. Gate rilis G4 manual exact-SHA dan batas bukti
 
-[`backend-gate-candidate.yml`](../.github/workflows/backend-gate-candidate.yml)
-disiapkan dengan identitas **G4 release gate proposal**, tetapi
-tetap **manual-only** pada `main`; job, trigger, guard SHA, permission,
-dan agregasi belum diubah. Nama job tetap `Candidate source at exact SHA`,
-`Candidate DB shard 1/2 exact SHA`, dan
-`Candidate evidence conjunction (not release check)`; jangan
-menganggap nama workflow telah membuat required check rilis.
-Legacy [`backend-technical-gate.yml`](../.github/workflows/backend-technical-gate.yml)
-serta `pnpm run test-all` tetap menjadi fallback CR-020/044.
+Workflow [`backend-gate-candidate.yml`](../.github/workflows/backend-gate-candidate.yml)
+menjadi **gate rilis manual exact-SHA setelah PR #105 di-merge**.
+Trigger tetap `workflow_dispatch` pada `main`; **tidak ada required status
+context maupun branch protection** yang mengeksekusi gate secara otomatis.
+Operator wajib memeriksa input `candidate_sha`, `github.sha`, checkout SHA,
+PASS job source, kedua database shard dan aggregate, SHA/hash manifest/lock/
+input/partisi dan artifact aman. Job aggregate bernama
+`G4 release evidence aggregate (manual exact SHA)`. Workflow
+[`backend-technical-gate.yml`](../.github/workflows/backend-technical-gate.yml)
+dan `pnpm run test-all` tetap tersedia sebagai rollback CR-020/044.
+Selama PR #105 belum merge, gate legacy tetap berlaku.
 
-Perbandingan pada `aa0c38bd1d9df941128802a0c4848d507a8f6077`:
-[kandidat #41058481162](https://github.com/milyarderpro/content-producer/actions/runs/41058481162)
-PASS 12m01s dan
+Perbandingan same-SHA `aa0c38bd1d9df941128802a0c4848d507a8f6077`:
+[candidate #41058481162](https://github.com/milyarderpro/content-producer/actions/runs/41058481162)
+PASS 12m01s versus
 [legacy #41060272610](https://github.com/milyarderpro/content-producer/actions/runs/41060272610)
-PASS 15m26s. Keduanya memeriksa 41 file/182 kasus DB serta MCP/Inspector;
-legacy belum membuktikan local security advisors mandiri, sedangkan
-kandidat menjalankan `supabase db advisors --local --type security`
-terpisah dari DB lint dan audit. Pada SHA
-`a64a55ebb1e3c76112cd211724c2eb6bc256699a`, partisi DB menjadi
-**19+22**; regresi `tests/gate-runner.test.ts` melindungi kedua hotspot
-di shard 2. Run [#41072354433](https://github.com/milyarderpro/content-producer/actions/runs/41072354433)
-dan [#41074001136](https://github.com/milyarderpro/content-producer/actions/runs/41074001136)
-PASS 9m41s/9m43s. **Run ketiga dan pemeriksaan lokal PENDING**;
-target tiga run belum terpenuhi berdasarkan bukti yang diserahkan.
+PASS 15m26s, keduanya DB 41 file/182 kasus, MCP dan Inspector 33/33 + denial.
+**Legacy tidak memiliki bukti advisors lokal mandiri**; kandidat
+menjalankan `supabase db advisors --local --type security` sebagai tahap
+terpisah pada tiap shard, bukan DB lint atau audit katalog.
 
-Untuk review fokus PR #104 gunakan pemeriksaan config/workflow
-`pnpm exec vitest run tests/workflow-config.test.ts`, Prettier,
-`git diff --check`, serta `pnpm run check` melalui light CI.
-Full gate tidak boleh didispatch ulang oleh PR ini. Lokal dengan
-`DIAGNOSTIC_CONFIG_OVERLAY` adalah diagnostik, bukan bukti
-`ACTIONS_EXACT_CONFIG` formal; perubahan kriteria local+GitHub
-memerlukan persetujuan eksplisit CR-052 sebelum aktivasi.
-Lihat [rancangan keputusan](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
-dan [prosedur operasi](operations.md).
+Setelah rebalance **19+22**, pada SHA
+`a64a55ebb1e3c76112cd211724c2eb6bc256699a` tiga run Actions
+**PASS**: [#41072354433](https://github.com/milyarderpro/content-producer/actions/runs/41072354433)
+**9m41s**, [#41074001136](https://github.com/milyarderpro/content-producer/actions/runs/41074001136)
+**9m43s** dan
+[#41157962349](https://github.com/milyarderpro/content-producer/actions/runs/41157962349)
+**9m50s**. Run ketiga: source 12 file/91 tes, shard 1 19 file/97,
+shard 2 22 file/85; **41 file/182 kasus DB** dan aggregate PASS tanpa skip.
+MCP 15/82, Inspector 33/33 + owner denial, audit before/after/final,
+migration/history, DB lint, advisors terpisah dan cleanup PASS.
+Orchestrator menyetujui kesetaraan cakupan pada
+[review PR #105](https://github.com/milyarderpro/content-producer/pull/105#issuecomment-6537758736).
+
+Lokal `gate:full` pada SHA sama **PASS 18m50s** tetapi berlabel
+**`DIAGNOSTIC_CONFIG_OVERLAY`**, bukan PASS formal exact-config:
+overlay hanya `project_id`/port untuk isolasi PC.
+Jika security config, migration, fixture, suite atau SHA berubah,
+**fail-closed**. Bukti formal rilis harus Actions dengan **committed exact
+config** (`ACTIONS_EXACT_CONFIG`). CI fixture tidak membuktikan
+hosted OAuth, deployment atau live business Write. Rincian keputusan di
+[CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md).
+
+Untuk perubahan workflow/docs jalankan `pnpm exec vitest run tests/workflow-config.test.ts`,
+Prettier, `git diff --check` dan
+`pnpm run check` melalui light CI PR head. Tidak perlu dispatch ulang
+full backend gate pada draft #105; tiga Actions kandidat telah selesai.
+Required checks hanya dapat diaktifkan melalui keputusan terpisah.
