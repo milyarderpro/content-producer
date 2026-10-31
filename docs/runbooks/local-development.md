@@ -22,9 +22,15 @@ pernyataan bahwa MCP belum aktif; bukan keadaan source sekarang.
   mempertahankan data.
 - Validasi nama migration, pemeriksaan applied history, dan test database
   memiliki cakupan berbeda; lihat tabel command di panduan testing.
-- `test-all` sudah mencakup suite database. Jangan menambahkan `smoke-test`
-  sebagai duplikasi gate yang sama.
-- Estimasikan CI sebelum run; ikuti stop rule jika gate wajib lebih dari 10 menit.
+- `test-all` adalah **legacy/rollback**, sudah mencakup suite database;
+  jangan menambahkan `smoke-test` sebagai duplikasi.
+- Gate rilis aktif [CR-052](../decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md):
+  dispatch `backend-gate-candidate.yml` manual dari exact final SHA `main`;
+  source, dua shard 19+22 (41 file/182 kasus) dan aggregate wajib PASS.
+  CR-020/044 tetap kontrol keamanan; tidak ada required check otomatis.
+- Estimasikan CI sebelum run; jika gate yang diizinkan diperkirakan lebih
+  dari 10 menit, mulai/dispatch, catat SHA/URL/status sementara dan akhiri
+  pemantauan chat. Run berjalan bukan PASS; gate wajib tetap dijalankan.
 - Output CLI lokal dapat mengandung credential. Sanitasi sebelum mencatat bukti.
 
 Konfigurasi saat ini sudah memiliki entrypoint `mcp` enabled dan frontend auth.

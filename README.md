@@ -68,13 +68,28 @@ Selanjutnya pilih command sesuai pekerjaan, bukan menjalankan semuanya sekaligus
 | `pnpm run check`          | Format, lint, typecheck, root test, dan frontend checks/build |
 | `pnpm run test:mcp`       | Suite MCP terisolasi melalui Deno                             |
 | `pnpm run test:database`  | Suite database pada stack lokal yang sudah siap               |
-| `pnpm run test-all`       | Check, validasi nama migration, suite MCP dan database        |
+| `pnpm run test-all`       | **Legacy/rollback:** check, migration names, MCP dan database |
 | `pnpm run package-plugin` | Membuat kandidat paket lokal yang tervalidasi                 |
 
-**Estimasi durasi CI wajib dilakukan sebelum run atau trigger.** Jika check/gate
-wajib diperkirakan lebih dari 10 menit, berhenti sebelum memulainya dan ikuti
-[stop rule](AGENTS.md#3-estimasi-ci-wajib-dan-stop-rule). Detail prasyarat serta
-pemilihan pemeriksaan ada di [testing](docs/testing.md).
+**Gate rilis G4 aktif:** dispatch
+[`backend-gate-candidate.yml`](.github/workflows/backend-gate-candidate.yml)
+**manual pada exact final SHA `main`**; syarat formal adalah source,
+dua shard terisolasi **19+22 = 41 file/182 kasus database** dan aggregate
+PASS pada SHA/hash sama. Tidak ada trigger otomatis atau required branch
+protection check. `pnpm run gate:source`, `gate:backend`, `gate:full`
+adalah komponen G4; lokal `DIAGNOSTIC_CONFIG_OVERLAY` hanya diagnostik.
+`pnpm run test-all` dan
+[`backend-technical-gate.yml`](.github/workflows/backend-technical-gate.yml)
+adalah **legacy/rollback**, sesuai
+[CR-052](docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
+yang efektif sejak merge PR #105.
+
+**Estimasi CI wajib sebelum run/dispatch/push/PR.** Untuk gate wajib yang
+**sudah diizinkan** dan diperkirakan lebih dari 10 menit, **mulai/dispatch**,
+catat SHA, URL, estimasi dan status sementara, lalu **hentikan pemantauan
+chat tanpa menunggu hasil**. Run berjalan bukan PASS; gate wajib tidak boleh
+dilewati. Ikuti [aturan pemantauan](AGENTS.md#3-estimasi-ci-wajib-dan-batas-pemantauan)
+dan [testing](docs/testing.md).
 
 ## Batas produk dan perubahan
 

@@ -26,7 +26,8 @@ disebutkan lain.
 
 Periksa versi sebelum bekerja. Jangan mengubah pin atau memperbarui dependency
 hanya karena CLI menampilkan versi baru. `pnpm run check` tidak membutuhkan stack
-database; `pnpm run test-all` membutuhkan Deno dan database lokal yang siap.
+database; `pnpm run test-all` adalah **legacy/rollback** yang membutuhkan Deno
+dan database lokal siap.
 
 Git dan Bash juga harus tersedia untuk regresi workflow dalam `pnpm run check`.
 Test menggunakan tree Git sementara tanpa membuat commit; runner CI memakai
@@ -245,8 +246,9 @@ keputusan kontraknya sebelum mengedit.
    yang relevan. Periksa owner denial, opsi include_sources/checks, ukuran hasil,
    dan pelestarian nested `null`.
 4. Perubahan RPC dilakukan melalui migration baru dan mengikuti kategori business
-   RPC: check/test fokus selama pengembangan, lalu satu full CR-020/044 gate pada
-   kandidat final sebelum deploy. Estimasikan gate sebelum trigger; tidak perlu
+   RPC: check/test fokus selama pengembangan, lalu satu full CR-052 G4 gate
+   manual exact final SHA `main` sebelum deployment yang diotorisasi.
+   CR-020/044 tetap kontrol keamanan; estimasikan gate sebelum trigger; tidak perlu
    menguji write pada data production untuk memeriksa projection Read.
 
 ### B. Menambah format trivia
@@ -298,3 +300,16 @@ keputusan kontraknya sebelum mengedit.
 3. Paket-only memakai focused/light CI dan validasi host yang terdampak; full
    backend gate dapat dirujuk hanya jika backend/dependency terkait tetap identik.
    Update plugin dan persetujuan suatu post tetap tindakan terpisah.
+
+## Gate rilis backend aktif sejak cutover G4
+
+Sejak merge [PR #105](https://github.com/milyarderpro/content-producer/pull/105)
+(`ca5c43597af97c95ea9eaa87876237fd2d45e10c`), [CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
+wajib untuk perubahan migration, RLS/grant, owner/identity, permission Write,
+atau business RPC sebelum deployment yang diotorisasi. Dispatch
+[`backend-gate-candidate.yml`](../.github/workflows/backend-gate-candidate.yml)
+**manual pada exact final SHA `main`**; periksa source, dua shard 19+22
+(41 file/182 kasus DB), MCP/Inspector, advisors terpisah, audit,
+history/lint/cleanup dan aggregate PASS. Tidak ada required check otomatis.
+`test-all`/`backend-technical-gate.yml` kini legacy/rollback CR-020/044.
+Docs-only cukup format, tautan dan light CI tanpa full backend gate.

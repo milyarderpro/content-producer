@@ -44,7 +44,7 @@ metadata Read, format trivia, niche baru, dan penyajian hasil plugin.
 
 - [G1 baseline dan inventaris full gate](gate-optimization/baseline-and-inventory.md) — profil Actions, pemanggilan suite, dan durasi historis.
 - [Matriks invariant dan kasus gate](gate-optimization/invariant-matrix.md) — pemetaan cakupan 41 file dan bukti pengganti yang dibutuhkan.
-- [CR-052 rancangan kesetaraan gate](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md) — keputusan PROPOSED, belum efektif; CR-020/044 tetap berlaku.
+- [CR-052 — gate rilis G4 efektif](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md) — berlaku sejak [merge PR #105](https://github.com/milyarderpro/content-producer/pull/105) pada `ca5c43597af97c95ea9eaa87876237fd2d45e10c`; workflow manual exact-SHA, legacy untuk rollback.
 
 ## Referensi kontrak dan sejarah
 

@@ -146,16 +146,18 @@ Commit, push, PR, merge, deployment, dan perubahan data adalah tindakan berbeda;
 ikuti izin masing-masing. Catat perubahan, verifikasi, batas bukti, dan handoff
 secukupnya. Untuk cleanup berurutan gunakan [audit cleanup](docs/cleanup-audit.md).
 
-## 7. Gate rilis G4 manual exact-SHA (efektif setelah merge PR #105)
+## 7. Gate rilis G4 manual exact-SHA (efektif sejak merge PR #105)
 
 Orchestrator menerima kesetaraan cakupan dan tiga run kandidat SHA
 `a64a55ebb1e3c76112cd211724c2eb6bc256699a`: **PASS 9m41s, 9m43s,
 9m50s**, termasuk source/frontend, 41 file/182 kasus DB, MCP 15/82,
 Inspector 33 valid/33 invalid + owner denial, migration/history, lint,
 **local security advisors terpisah**, audit RLS/grant/ACL/fixture dan cleanup.
-Review [CR-052](docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
-menetapkan **efektivitas hanya setelah PR #105 di-merge**. Selama draft,
-legacy CR-020/044 tetap gate yang berlaku; jangan merge/deploy sendiri.
+[PR #105](https://github.com/milyarderpro/content-producer/pull/105) telah
+**di-merge** ke `main` pada `ca5c43597af97c95ea9eaa87876237fd2d45e10c` (31 Oktober 2026),
+sehingga [CR-052](docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
+**efektif sekarang**. Gate legacy CR-020/044 berlaku sebelum merge dan kini
+hanya rollback tanpa melemahkan kontrol keamanan.
 
 **Bukti formal rilis:** Actions `backend-gate-candidate.yml` manual pada
 `main`, committed exact config, input dan checkout SHA sama, source, dua
