@@ -136,8 +136,13 @@ dilemahkan.
   kandidat PASS/yang ter-deploy, docs-only atau package-only commit boleh mereferensikan backend
   **PASS historis yang berlabel backend SHA aslinya**. Catat docs/package/merge SHA terpisah dan
   jalankan light/focused/MCP/manual cards yang terdampak. Reuse **bukan** PASS exact-SHA gabungan
-  untuk dokumen atau kode baru, dan tidak boleh menyembunyikan perubahan security/dependency. Bila
-  fakta identitas tidak dapat dibuktikan, **fail closed dan rerun gate lama** sebelum deploy.
+  untuk dokumen atau kode baru, dan tidak boleh menyembunyikan perubahan security/dependency.
+  Bila identitas backend tidak dapat dibuktikan, **blokir rilis** dan jangan reuse bukti lama.
+  Wajib jalankan **gate G4 formal manual** melalui
+  `.github/workflows/backend-gate-candidate.yml` pada **exact final SHA `main`**;
+  verifikasi source, dua shard database, dan aggregate PASS pada SHA yang sama
+  sebelum deployment yang diotorisasi. Gate legacy **hanya digunakan setelah
+  keputusan rollback** sesuai [bagian Rollback](#rollback), bukan fallback otomatis.
 - **G4 comparison lebih ketat daripada reuse:** bandingkan gate lama dan baru pada **kandidat
   backend/source SHA yang sama**, test fixtures dan toolchain yang terkunci. Bandingkan
   assertion/invariant manifest, expected negative security cases, stage PASS, status skip, case

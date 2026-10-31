@@ -10,9 +10,12 @@ atau mengulang suite berat yang sama. Instruksi mengikat ada di
 (`ca5c43597af97c95ea9eaa87876237fd2d45e10c`). Gate legacy CR-020/044 berlaku sebelum merge;
 kini hanya rollback tanpa mengurangi kontrol keamanannya.
 
-**Dasar peninjauan:** baseline `d6e7fe83ea006931f85624c4d60486f92ab3438c` dan
-pembaruan script/workflow cleanup lokal, ditinjau 25 Oktober 2026. File workflow
-baru merupakan perubahan kandidat lokal, belum bagian dari commit baseline itu.
+**Catatan baseline historis (25 Oktober 2026):** baseline
+`d6e7fe83ea006931f85624c4d60486f92ab3438c` dan pembaruan
+script/workflow cleanup lokal ditinjau saat itu. Workflow baru masih kandidat
+lokal dan **belum bagian dari commit baseline tersebut**; ini bukan status kini.
+**Sejak merge PR #105** (`ca5c43597af97c95ea9eaa87876237fd2d45e10c`),
+workflow G4 **sudah efektif** sebagai gate rilis manual pada exact final SHA `main`.
 Daftar command di sini bukan catatan bahwa seluruh suite dijalankan pada cleanup.
 
 ## 1. Estimasi sebelum menjalankan pemeriksaan
@@ -285,8 +288,11 @@ config** (`ACTIONS_EXACT_CONFIG`). CI fixture tidak membuktikan
 hosted OAuth, deployment atau live business Write. Rincian keputusan di
 [CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md).
 
-Untuk perubahan workflow/docs jalankan `pnpm exec vitest run tests/workflow-config.test.ts`,
-Prettier, `git diff --check` dan
-`pnpm run check` melalui light CI PR head. Tidak perlu dispatch ulang
-full backend gate pada draft #105; tiga Actions kandidat telah selesai.
-Required checks hanya dapat diaktifkan melalui keputusan terpisah.
+Untuk **perubahan dokumentasi saja**, periksa format dokumen yang berubah,
+tautan/anchor lokal, dan `git diff --check`; verifikasi **light CI pada exact
+head SHA PR**. Jalankan `pnpm run check` atau
+`pnpm exec vitest run tests/workflow-config.test.ts` bila perubahan memang
+berdampak pada source/kontrak workflow; jangan menganggap tahap yang di-skip
+sebagai PASS. Tidak perlu full backend gate hanya untuk docs-only, tetapi
+perubahan backend berisiko tetap memerlukan **G4 formal manual exact-SHA PASS**
+sebelum rilis. Required checks hanya dapat diaktifkan lewat keputusan terpisah.
