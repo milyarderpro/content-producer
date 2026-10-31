@@ -201,3 +201,40 @@ Pakai `PASS`, `FAIL`, `BLOCKED`, atau `NOT RUN` dengan batas bukti yang jelas.
 `FIXED` untuk masalah live memerlukan retest setelah runtime benar-benar berubah,
 bukan hanya PR merged atau CI passing. Keberhasilan fixture publikasi/metrics
 tidak membuktikan publikasi Facebook maupun pengamatan performa nyata.
+
+## 7. Kandidat gate rilis G4 — rancangan, belum cutover
+
+[`backend-gate-candidate.yml`](../.github/workflows/backend-gate-candidate.yml)
+disiapkan dengan identitas **G4 release gate proposal**, tetapi
+tetap **manual-only** pada `main`; job, trigger, guard SHA, permission,
+dan agregasi belum diubah. Nama job tetap `Candidate source at exact SHA`,
+`Candidate DB shard 1/2 exact SHA`, dan
+`Candidate evidence conjunction (not release check)`; jangan
+menganggap nama workflow telah membuat required check rilis.
+Legacy [`backend-technical-gate.yml`](../.github/workflows/backend-technical-gate.yml)
+serta `pnpm run test-all` tetap menjadi fallback CR-020/044.
+
+Perbandingan pada `aa0c38bd1d9df941128802a0c4848d507a8f6077`:
+[kandidat #41058481162](https://github.com/milyarderpro/content-producer/actions/runs/41058481162)
+PASS 12m01s dan
+[legacy #41060272610](https://github.com/milyarderpro/content-producer/actions/runs/41060272610)
+PASS 15m26s. Keduanya memeriksa 41 file/182 kasus DB serta MCP/Inspector;
+legacy belum membuktikan local security advisors mandiri, sedangkan
+kandidat menjalankan `supabase db advisors --local --type security`
+terpisah dari DB lint dan audit. Pada SHA
+`a64a55ebb1e3c76112cd211724c2eb6bc256699a`, partisi DB menjadi
+**19+22**; regresi `tests/gate-runner.test.ts` melindungi kedua hotspot
+di shard 2. Run [#41072354433](https://github.com/milyarderpro/content-producer/actions/runs/41072354433)
+dan [#41074001136](https://github.com/milyarderpro/content-producer/actions/runs/41074001136)
+PASS 9m41s/9m43s. **Run ketiga dan pemeriksaan lokal PENDING**;
+target tiga run belum terpenuhi berdasarkan bukti yang diserahkan.
+
+Untuk review fokus PR #104 gunakan pemeriksaan config/workflow
+`pnpm exec vitest run tests/workflow-config.test.ts`, Prettier,
+`git diff --check`, serta `pnpm run check` melalui light CI.
+Full gate tidak boleh didispatch ulang oleh PR ini. Lokal dengan
+`DIAGNOSTIC_CONFIG_OVERLAY` adalah diagnostik, bukan bukti
+`ACTIONS_EXACT_CONFIG` formal; perubahan kriteria local+GitHub
+memerlukan persetujuan eksplisit CR-052 sebelum aktivasi.
+Lihat [rancangan keputusan](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
+dan [prosedur operasi](operations.md).

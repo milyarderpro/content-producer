@@ -1,10 +1,10 @@
-name: Backend candidate - G3 exact SHA (manual only)
+name: Backend G4 release gate proposal (NOT EFFECTIVE; manual only)
 
 on:
   workflow_dispatch:
     inputs:
       candidate_sha:
-        description: Exact main commit SHA to evaluate
+        description: Exact main SHA for proposed G4 release evidence; cutover not active
         required: true
         type: string
 

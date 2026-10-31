@@ -43,3 +43,44 @@ Run [#41058481162](https://github.com/milyarderpro/content-producer/actions/runs
 Dua file dipindah **dari shard 1 ke shard 2**: `api-trivia-public-gold.test.ts` dan `api-post-approval-quality.test.ts`. Profil serial **lokal diagnostik historis** Issue #95 memperkirakan masing-masing **65,080 s** dan **52,880 s**, total **117,960 s**; angka lokal ini **bukan** timing Actions pada run #41058481162. Proyeksi sederhana dengan asumsi transfer biaya serupa: shard 1 ~**553 s (9m13s)**, shard 2 ~**536 s (8m56s)**, di luar ketidakpastian perubahan hardware, overhead fixture, cross-run variance dan antrian aggregate. Jika perhitungan dari awal workflow mengikuti overhead run sebelumnya, wall clock dapat tetap lebih dari 10 menit. Proyeksi **NOT RUN / belum divalidasi**; target <=10 menit untuk tiga run identik tetap belum terbukti.
 
 Partisi baru **19+22 file**; 41 nama tepat sekali terhadap manifest, 182 kasus wajib PASS pada aggregate tanpa skipped. Shard 1 tetap memegang MCP/Inspector **tepat sekali**; kedua shard tetap menjalankan stack/start/reset/fixtures mandiri, database serial, audit pre/post/final, migration/history, lint, local security advisors, whitespace dan cleanup. Tidak ada perubahan runner, gate lama, workflow rilis atau CR-052 yang masih **PROPOSED — NOT EFFECTIVE**. Full candidate pada partisi baru dan G4 **NOT RUN**; orchestrator yang akan dispatch pada SHA integrasi final.
+
+## Issue #104 — preflight dan draft gate rilis G4 (2026-10-31)
+
+- Preflight sebelum perubahan: `main` =
+  `a64a55ebb1e3c76112cd211724c2eb6bc256699a`; branch
+  `codex/issue-104-g4-cutover`; cakupan hanya CR-052, AGENTS,
+  docs/testing, docs/operations, dokumen ini, dan nama/keterangan
+  workflow kandidat. Workflow legacy tidak disentuh.
+- Pemeriksaan fokus yang direncanakan:
+  `tests/workflow-config.test.ts`, Prettier, `git diff --check`,
+  dan `pnpm run check` via light CI pada PR head.
+  Riwayat [#41072234119](https://github.com/milyarderpro/content-producer/actions/runs/41072234119)
+  light CI pada base SHA PASS sekitar **40 detik**;
+  run sebelumnya sekitar 46–57 detik. Estimasi PR **~1 menit**
+  (termasuk variance setup dan classifier workflow), bukan
+  estimasi full backend. Jangan dispatch full gate dari draft ini.
+- Perbandingan G4: kandidat
+  [#41058481162](https://github.com/milyarderpro/content-producer/actions/runs/41058481162)
+  PASS 12m01s versus legacy
+  [#41060272610](https://github.com/milyarderpro/content-producer/actions/runs/41060272610)
+  PASS 15m26s pada SHA `aa0c38bd1d9df941128802a0c4848d507a8f6077`;
+  kedua jalur memiliki DB 41 file/182 kasus, MCP/Inspector 33/33
+  dan denial. Local security advisors terpisah ada pada kandidat,
+  tidak terbukti pada legacy; jangan samakan audit/lint legacy.
+- Delta ke `a64a55e…`: **19+22** DB, bukan 21+20;
+  dua file hotspot dipindah ke shard 2 dan satu tes regresi source
+  ditambah. Dua run kandidat PASS:
+  [#41072354433](https://github.com/milyarderpro/content-producer/actions/runs/41072354433)
+  **9m41s** serta
+  [#41074001136](https://github.com/milyarderpro/content-producer/actions/runs/41074001136)
+  **9m43s**; run ketiga, lokal dan signoff tetap PENDING/BLOCKED.
+- Mode lokal `DIAGNOSTIC_CONFIG_OVERLAY` bukan formal
+  `ACTIONS_EXACT_CONFIG`; G4-T3 menunggu keputusan tertulis tentang
+  kontrak local+GitHub tanpa perubahan kriteria diam-diam.
+  Branch `main` saat preflight `protected=false`, required
+  contexts kosong, rulesets `[]`; endpoint detail protection 403
+  pada konektor. Periksa ulang sebelum keputusan required checks.
+- Workflow `backend-gate-candidate.yml` hanya diberi identitas
+  usulan rilis; dispatch tetap manual di `main`, job names dan
+  aggregate/guard/permissions tetap sama. Legacy tersedia untuk
+  rollback. **CR-052 PROPOSED — NOT EFFECTIVE** dan merge BLOCKED.

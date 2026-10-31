@@ -221,3 +221,120 @@ Run [#41058481162](https://github.com/milyarderpro/content-producer/actions/runs
 Dua file dipindah **dari shard 1 ke shard 2**: `api-trivia-public-gold.test.ts` dan `api-post-approval-quality.test.ts`. Profil serial **lokal diagnostik historis** Issue #95 memperkirakan masing-masing **65,080 s** dan **52,880 s**, total **117,960 s**; angka lokal ini **bukan** timing Actions pada run #41058481162. Proyeksi sederhana dengan asumsi transfer biaya serupa: shard 1 ~**553 s (9m13s)**, shard 2 ~**536 s (8m56s)**, di luar ketidakpastian perubahan hardware, overhead fixture, cross-run variance dan antrian aggregate. Jika perhitungan dari awal workflow mengikuti overhead run sebelumnya, wall clock dapat tetap lebih dari 10 menit. Proyeksi **NOT RUN / belum divalidasi**; target <=10 menit untuk tiga run identik tetap belum terbukti.
 
 Partisi baru **19+22 file**; 41 nama tepat sekali terhadap manifest, 182 kasus wajib PASS pada aggregate tanpa skipped. Shard 1 tetap memegang MCP/Inspector **tepat sekali**; kedua shard tetap menjalankan stack/start/reset/fixtures mandiri, database serial, audit pre/post/final, migration/history, lint, local security advisors, whitespace dan cleanup. Tidak ada perubahan runner, gate lama, workflow rilis atau CR-052 yang masih **PROPOSED — NOT EFFECTIVE**. Full candidate pada partisi baru dan G4 **NOT RUN**; orchestrator yang akan dispatch pada SHA integrasi final.
+
+## G4-T3 — draft cutover Issue #104 (2026-10-31; NOT EFFECTIVE)
+
+**Status keputusan tetap PROPOSED — NOT EFFECTIVE.** Bagian ini adalah
+rancangan handoff untuk review orchestrator, bukan amendemen diam-diam atas
+CR-020/CR-044/CR-052, signoff, atau izin mengubah required checks.
+
+### Audit G4-T1: kandidat versus legacy pada SHA identik
+
+- SHA pembanding: `aa0c38bd1d9df941128802a0c4848d507a8f6077`.
+- [Candidate #41058481162](https://github.com/milyarderpro/content-producer/actions/runs/41058481162):
+  **PASS 12m01s**; source, shard 1, shard 2, dan aggregate PASS. Shard 1
+  21 file/108 kasus DB, shard 2 20 file/74 kasus; aggregate tepat **41 file unik
+  dan 182 kasus**, tanpa skip. MCP 15 file/82 kasus serta authenticated
+  Inspector 33 valid/33 invalid dan owner denial milik shard 1.
+- [Legacy #41060272610](https://github.com/milyarderpro/content-producer/actions/runs/41060272610):
+  **PASS 15m26s** pada SHA yang sama; satu stack/reset; MCP, audit
+  sebelum/sesudah Inspector, authenticated Inspector 33/33 dan cross-owner
+  denial, `test-all`, 41 file/182 tes DB, migration history, DB lint, audit
+  RLS/grant/ACL/fixture akhir, whitespace, dan artifact aman. Selisih wall
+  clock kandidat adalah **3m25s lebih singkat**, tetapi belum memenuhi
+  target 10 menit pada SHA pembanding.
+- **Perbedaan cakupan penting:** legacy tidak memiliki command/output
+  **local security advisors terpisah** yang terverifikasi; DB lint dan
+  catalog audit legacy bukan pengganti. Kandidat memiliki tahap
+  `security-advisors` mandiri pada **masing-masing shard**:
+  `pnpm exec supabase db advisors --local --type security --level info
+  --fail-on error --output-format json`, dengan validasi laporan.
+  Job serta aggregate kandidat PASS, namun kesetaraan kontrak dan signoff
+  G4 tetap menunggu review bukti advisors dan seluruh invariant.
+
+### Delta dari SHA pembanding ke SHA kandidat G4
+
+`a64a55ebb1e3c76112cd211724c2eb6bc256699a` berada **dua commit** di
+atas SHA pembanding. Compare GitHub menunjukkan **enam file** berubah:
+`scripts/gate-db-shards.json`, `tests/gate-runner.test.ts` dan empat
+dokumen profiling/kandidat/CR-052. Tidak ada perubahan source backend,
+migration, permission, CLI pin, lockfile, atau runtime workflow di delta ini.
+Partisi DB berpindah dari **21+20** menjadi **19+22** dengan memindahkan
+`api-trivia-public-gold.test.ts` dan `api-post-approval-quality.test.ts`
+dari shard 1 ke shard 2. Tambahan **satu regresi source** di
+`tests/gate-runner.test.ts` menegaskan 41 file disjoint dan kedua hotspot
+tepat di shard 2; ini bukan pengurangan kasus DB. Seluruh **41 file/182 kasus**
+tetap wajib pada agregasi, MCP/Inspector tetap tepat sekali di shard 1.
+Distribusi kasus per shard pada partisi baru tidak diasumsikan dari angka
+108+74 sebelum rebalance.
+
+### Bukti G4-T2 yang telah selesai dan yang masih menunggu
+
+- Pada `a64a55ebb1e3c76112cd211724c2eb6bc256699a`,
+  [candidate #41072354433](https://github.com/milyarderpro/content-producer/actions/runs/41072354433)
+  **PASS 9m41s** dan
+  [candidate #41074001136](https://github.com/milyarderpro/content-producer/actions/runs/41074001136)
+  **PASS 9m43s**. Source, dua DB jobs, dan aggregate selesai PASS pada
+  kedua run; ini **dua dari tiga**, bukan bukti target tiga run tercapai.
+- Run GitHub ketiga: **PENDING / NOT ACCEPTED** sampai orchestrator menyerahkan
+  bukti selesai, exact SHA, status setiap job, report dan aggregate.
+- Pemeriksaan lokal SHA yang sama: **PENDING / NOT ACCEPTED** sampai
+  orchestrator menyerahkan bukti. Mode lokal dengan overlay diberi label
+  **`DIAGNOSTIC_CONFIG_OVERLAY`**, bukan formal `ACTIONS_EXACT_CONFIG`
+  maupun formal exact-config PASS, sekalipun seluruh test lokal hijau.
+  CR-052 saat ini mensyaratkan local + Actions yang sepadan pada SHA
+  identik; usulan menerima overlay harus menjadi amendemen kontrak
+  **eksplisit, ditinjau dan disetujui sebelum cutover**, bukan interpretasi
+  implisit dari run diagnostik.
+- Uji kesetaraan lengkap, laporan advisors lokal terpisah, keputusan
+  CR-052, dan persetujuan required check: **BLOCKED** menunggu orchestrator.
+
+### Checklist wajib yang tidak boleh dikurangi
+
+Pada setiap kandidat final: source/frontend `pnpm run check` beserta
+format/lint/typecheck/root Vitest/frontend build/test; 72 migration names,
+applied/source history; dua start/reset Supabase ephemeral terisolasi;
+DB 19+22 tepat 41 file/182 kasus tanpa skip dengan serial per shard;
+MCP 15 file/82 kasus serta authenticated Inspector 33 valid/33 invalid,
+owner/non-owner dan cross-owner denial tepat sekali di shard 1;
+audit catalog RLS/grant/default ACL/privilege/fixture sebelum/sesudah
+Inspector dan final pada kedua shard; DB lint **dan local security
+advisors terpisah** pada kedua shard; whitespace, fixture cleanup,
+bukti report aman dengan SHA, hash manifest/lock/input/partisi dan
+aggregate fail-closed. Tiga report dan seluruh stage wajib PASS;
+hilang/gagal/skip/mismatch berarti FAIL/BLOCKED. CI fixture tidak
+membuktikan hosted OAuth atau production business Write.
+
+### Prosedur rilis usulan (belum boleh dijalankan sebagai cutover)
+
+1. Orchestrator menerima bukti final run ketiga dan lokal, mengaudit
+   same-SHA coverage, advisors, overlay versus exact-config, target tiga
+   run, serta mengesahkan atau mengamendemen CR-052 **secara eksplisit**.
+   Tanpa ini, gunakan legacy sebagai gate rilis yang berlaku.
+2. Setelah keputusan tertulis dan izin terpisah, operator memeriksa
+   `main` dan menetapkan **satu SHA 40 hex final**. Dispatch manual
+   `.github/workflows/backend-gate-candidate.yml` dari `main` dengan
+   input `candidate_sha` yang sama dengan `github.sha` dan checkout SHA.
+   Jangan dispatch pada PR head atau menggabungkan bukti SHA berbeda.
+3. Wajibkan PASS untuk job `source`, kedua matrix `database` (shard 1/2),
+   serta `aggregate` dan semua tahap pada tiga artifact sanitized.
+   Cocokkan exact SHA, hashes, 41/182, MCP/Inspector 33/33/denial,
+   advisors, migration/history/lint, audit RLS/ACL/fixture, dan cleanup.
+   Kegagalan atau evidence hilang memblokir deployment.
+4. **Hanya setelah signoff terpisah**, review branch protection dan
+   check contexts aktual sebelum mengonfigurasi required check rilis;
+   workflow ini masih `workflow_dispatch`/`main` saja, sehingga tidak
+   boleh mengklaim required check otomatis pada PR. Catat nama job
+   dan status check yang benar dari Actions API sebelum menetapkan aturan.
+   Aktivasi cutover/required checks **bukan** bagian draft PR #104.
+5. Simpan legacy `.github/workflows/backend-technical-gate.yml`
+   tidak berubah, bersama `pnpm run test-all`, sebagai jalur rollback.
+   Jika kandidat memberi false result, kehilangan kasus/advisor/audit,
+   salah SHA, atau berfluktuasi, **blok rilis**, kembalikan check/entrypoint
+   melalui keputusan dan PR operasional terpisah ke workflow legacy,
+   dispatch full gate lama pada SHA final yang disetujui, verifikasi
+   bukti PASS, lalu koreksi kandidat. Jangan reset/migrasi production
+   sebagai rollback CI.
+
+**Effective date: UNKNOWN.** Tidak ada deployment, production data,
+trivia, business Write, auto-merge, atau aktivasi cutover dari draft ini.

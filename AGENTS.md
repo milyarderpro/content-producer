@@ -133,3 +133,22 @@ rewrite migration, force-push, atau memakai Git destruktif tanpa instruksi ekspl
 Commit, push, PR, merge, deployment, dan perubahan data adalah tindakan berbeda;
 ikuti izin masing-masing. Catat perubahan, verifikasi, batas bukti, dan handoff
 secukupnya. Untuk cleanup berurutan gunakan [audit cleanup](docs/cleanup-audit.md).
+
+## 7. Kandidat gate rilis G4 (draft, tidak efektif)
+
+CR-052 masih **PROPOSED — NOT EFFECTIVE**. Issue #104 hanya menyiapkan
+dokumen, prosedur dan identitas workflow kandidat; gate wajib CR-020/044
+serta `.github/workflows/backend-technical-gate.yml` tetap berlaku.
+Jangan mengaktifkan cutover, required check, deploy, atau merge dari
+draft ini. Lihat [audit G4](docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
+dan [prosedur/rollback](docs/operations.md).
+
+Dua kandidat exact-SHA `a64a55ebb1e3c76112cd211724c2eb6bc256699a`
+telah PASS; run ketiga dan bukti lokal tetap PENDING/NOT ACCEPTED
+sampai orchestrator memberi evidence serta keputusan. Hasil lokal
+`DIAGNOSTIC_CONFIG_OVERLAY` bukan PASS formal exact-config. Setelah
+persetujuan eksplisit, rilis kandidat memerlukan source/frontend,
+41 file/182 kasus DB, MCP, Inspector 33/33 + owner denial, audits
+RLS/grant/ACL/fixture, migration/history, lint, **local security
+advisors terpisah**, cleanup, dan aggregate PASS pada satu SHA.
+Pertahankan workflow lama dan `test-all` untuk rollback.
