@@ -247,8 +247,8 @@ CR-020/CR-044/CR-052, signoff, atau izin mengubah required checks.
   **local security advisors terpisah** yang terverifikasi; DB lint dan
   catalog audit legacy bukan pengganti. Kandidat memiliki tahap
   `security-advisors` mandiri pada **masing-masing shard**:
-  `pnpm exec supabase db advisors --local --type security --level info
-  --fail-on error --output-format json`, dengan validasi laporan.
+  `pnpm exec supabase db advisors --local --type security --level info --fail-on error --output-format json`,
+  dengan validasi laporan.
   Job serta aggregate kandidat PASS, namun kesetaraan kontrak dan signoff
   G4 tetap menunggu review bukti advisors dan seluruh invariant.
 
