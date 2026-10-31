@@ -186,7 +186,7 @@ fokus untuk paket/MCP dan manual card yang terdampak sesuai scope perubahan.
 | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [ci.yml](../.github/workflows/ci.yml)                                         | PR/push ke main dan manual: format, check source/frontend, MCP/probe/paket sesuai dependency; tanpa database/reset/hosted request                       |
 | [backend-gate-candidate.yml](../.github/workflows/backend-gate-candidate.yml) | **G4 release gate manual exact-SHA setelah merge PR #105**: source + dua shard terisolasi + aggregate PASS, dengan committed config; **tidak otomatis** |
-| [backend-technical-gate.yml](../.github/workflows/backend-technical-gate.yml) | Full legacy CR-020/044 manual exact-SHA: **rollback sekarang**, gate historis sebelum merge; satu stack + `test-all`             |
+| [backend-technical-gate.yml](../.github/workflows/backend-technical-gate.yml) | Full legacy CR-020/044 manual exact-SHA: **rollback sekarang**, gate historis sebelum merge; satu stack + `test-all`                                    |
 | [hosted-oauth-probe.yml](../.github/workflows/hosted-oauth-probe.yml)         | Probe hosted manual pada main: metadata publik dan challenge tanpa token; tanpa business tools/call                                                     |
 
 Task 6 memeriksa GitHub sebagai admin pada 25 Oktober 2026: branch protection
