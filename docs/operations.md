@@ -80,8 +80,18 @@ perlu membuat plugin atau koneksi kedua.
 - Tetapkan candidate SHA dan scope, periksa Git diff, serta estimasikan seluruh
   CI sebelum push/PR/dispatch. Ikuti stop rule jika gate wajib lebih dari 10 menit.
 - Perubahan migration/RLS/grant/identity/owner/write permission/business RPC
-  memerlukan full CR-020 gate pada kandidat final sebelum deployment. Urutan
-  focused OAuth/owner dan Inspector mengikuti CR-044.
+  memerlukan **satu full gate PASS pada exact SHA kandidat final** sebelum
+  deployment yang diotorisasi. **Sebelum PR #105 merge**, gate yang berlaku
+  adalah legacy CR-020/044 (termasuk urutan focused OAuth/owner dan Inspector).
+  **Setelah merge**, gunakan **CR-052 G4 release gate manual exact-SHA** dari
+  `main` dengan committed exact config: source/frontend, dua stack terisolasi
+  (**satu reset per shard**), MCP/Inspector di shard 1, DB **41 file/182 kasus**,
+  audit, migration history/DB lint, **advisors terpisah**, cleanup, dan
+  **aggregate PASS** pada SHA final; cek URL serta report aman secara manual
+  sesuai [prosedur §9](#9-release-gate-g4-manual-dan-rollback-issue-104).
+  Workflow legacy dan `pnpm run test-all` tetap **rollback**, bukan gate rilis
+  utama setelah merge. Tidak ada required status context otomatis; PASS CI
+  atau dokumen ini **tidak memberi izin deployment**.
 - Dokumentasi dan paket-only memakai light/focused checks. Reuse gate backend
   hanya jika source terpasang, migration, konfigurasi security, dan dependency
   runtime yang relevan tetap identik; catat backend SHA dan SHA paket/dokumen
