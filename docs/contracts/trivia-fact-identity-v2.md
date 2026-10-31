@@ -1,22 +1,99 @@
 # Kontrak identitas fakta trivia lintas v1/v2 — P2-T1
 
-**Task:** OpenSpec `simplify-trivia-draft-workflow` checklist **2.1 / P2-T1 (Identitas)**; Issue [#108](https://github.com/milyarderpro/content-producer/issues/108). **Status:** desain/acceptance statis, **bukan** implementasi database atau hasil tes transaksi. **Source/base yang ditinjau:** `main` pada `b5bbf0de27454c6a1ca6981e98e2eaa59f8060fc` (sama dengan base koordinator saat pemeriksaan). **Kontrak P1:** [`trivia-draft-v2.md`](trivia-draft-v2.md) dan [`tool-errors-v2.md`](tool-errors-v2.md), keduanya `cr-053-p1-v1`; fixture `tests/fixtures/trivia-draft-v2-schema.ts`, `tests/fixtures/trivia-draft-v2.ts` dan `tests/fixtures/tool-errors-v2.ts`. Dasar keputusan: [CR-053](../decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md), [design](../../openspec/changes/simplify-trivia-draft-workflow/design.md), [spec TFL](../../openspec/changes/simplify-trivia-draft-workflow/specs/trivia-fact-library/spec.md), [spec TDW](../../openspec/changes/simplify-trivia-draft-workflow/specs/trivia-draft-workflow/spec.md), serta [PRD](../../plans/simplified-trivia-draft-workflow-prd.md).
+**Task:** OpenSpec `simplify-trivia-draft-workflow` checklist **2.1 / P2-T1
+(Identitas)**; Issue
+[#108](https://github.com/milyarderpro/content-producer/issues/108). **Status:**
+desain/acceptance statis, **bukan** implementasi database atau hasil tes
+transaksi. **Source/base yang ditinjau:** `main` pada
+`b5bbf0de27454c6a1ca6981e98e2eaa59f8060fc` (sama dengan base koordinator saat
+pemeriksaan). **Kontrak P1:** [`trivia-draft-v2.md`](trivia-draft-v2.md) dan
+[`tool-errors-v2.md`](tool-errors-v2.md), keduanya `cr-053-p1-v1`; fixture
+`tests/fixtures/trivia-draft-v2-schema.ts`, `tests/fixtures/trivia-draft-v2.ts`
+dan `tests/fixtures/tool-errors-v2.ts`. Dasar keputusan:
+[CR-053](../decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md),
+[design](../../openspec/changes/simplify-trivia-draft-workflow/design.md), [spec
+TFL](../../openspec/changes/simplify-trivia-draft-workflow/specs/trivia-fact-library/spec.md),
+[spec
+TDW](../../openspec/changes/simplify-trivia-draft-workflow/specs/trivia-draft-workflow/spec.md),
+serta [PRD](../../plans/simplified-trivia-draft-workflow-prd.md).
 
-**Batas bukti:** inspeksi source, migration berurutan, kontrak dan fixture pada SHA tersebut; tidak ada query production, migration/backfill, RPC v2, uji race DB, uji host/LIVE, atau validasi OpenSpec CLI pada artefak ini. Semua ID `F1`, `F2`, `PA` dan sebagainya di bawah adalah alias sintetis, **bukan** public ID valid yang dapat dipanggil. Rincian schema tambahan adalah usulan kontrak implementasi P3, belum DDL yang terpasang; jangan mengartikan opsi teknis sebagai perubahan keputusan produk.
+**Batas bukti:** inspeksi source, migration berurutan, kontrak dan fixture pada
+SHA tersebut; tidak ada query production, migration/backfill, RPC v2, uji race
+DB, uji host/LIVE, atau validasi OpenSpec CLI pada artefak ini. Semua ID `F1`,
+`F2`, `PA` dan sebagainya di bawah adalah alias sintetis, **bukan** public ID
+valid yang dapat dipanggil. Rincian schema tambahan adalah usulan kontrak
+implementasi P3, belum DDL yang terpasang; jangan mengartikan opsi teknis
+sebagai perubahan keputusan produk.
 
 ## 1. Satu identitas canonical dan binding versi
 
-1. **Akar authoritative** tetap `public.trivia_facts` yang sudah ada, bukan pustaka v2 paralel. Kunci internal adalah `trivia_facts.id` (`bigint`) ditambah `workspace_id` untuk FK/scope; ID eksternal stabil adalah `trivia_facts.public_id` (UUID). Public ID ini **persis** `fact_public_id` dalam Read/save/revise v2 P1, dan tetap public ID yang sama bagi v1. P3 dapat menambahkan proyeksi/kolom katalog pada registry ini, tetapi tidak boleh mengganti ID atau mengubah arti row v1. `public.trivia_post_facts.fact_id` menunjuk kunci internal yang sama; `public.trivia_post_facts.public_id` adalah ID **binding pemakaian**, bukan identitas fakta. Semua lookup mengikat `workspace_id` milik owner tervalidasi; UUID yang dikirim caller tidak memberi kewenangan lintas workspace.
-2. **Pemetaan v1 eksplisit:** untuk setiap row v1 `(workspace_id, id, public_id)`, identitas canonical `(workspace_id, id)` dan `fact_public_id = public_id` adalah pemetaan satu-ke-satu; tidak ada UUID kedua, remap lossy, atau penggantian FK. Apabila implementasi memilih materialisasi tabel mapping, kunci unik wajib `(workspace_id, legacy_fact_id)` dan `(workspace_id, canonical_fact_id)`, dengan `canonical_fact_id = legacy_fact_id` untuk setiap fakta v1; verifikasi `legacy_public_id = canonical_public_id` dan tolak benturan (fail-closed). Mapping sebenarnya dapat berupa **identity mapping in-place** tanpa tabel tersendiri; pilihan itu meminimalkan dual write dan menjaga FK yang sudah dipakai. Untuk fakta baru v2, sisipkan pada registry yang sama, bukan menulis salinan v1/v2.
-3. **Makna versus representasi:** `claim_text`, `normalized_claim`, `claim_hash`, `structured_key`, `structured_hash`, `subject_key`, `relation_key`, `object_key`, `numbers`, `qualifiers`, `normalization_version`, `ontology_version`, `dedup_review_snapshot` adalah data/aturan v1, bukan input wajib atau skema dedup yang diselundupkan ke v2. Binding v2 dapat menyimpan representasi `claim_text`, `source_url` dan versi kontrak (`content_schema_version = 2`) pada sisi draft/usage v2 tanpa menimpa snapshot v1. Bila membutuhkan tabel binding sumber tambahan di P3, FK-nya tetap `(workspace_id, fact_id)` ke akar tersebut, dan namespace/versi evidence berbeda (`v1` dengan tier/expiry versus `v2` URL minimum). URL/timestamp baru adalah referensi riset v2, bukan hasil migrasi metadata verification v1; timestamp simpan tidak boleh diklaim tanggal cek URL.
-4. **Resolusi same:** ChatGPT memutuskan `same`, `distinct` atau `uncertain` berdasarkan makna kandidat yang *ditemukan*; `same` terhadap fakta yang layak mengikat ke `public_id` lama. Tidak boleh mendaftarkan ID baru untuk menghindari usage/status existing. `distinct` harus mempunyai perbedaan proposisi yang material (relasi, angka, qualifier atau objek); subjek sama atau URL sama saja bukan bukti `same`. `uncertain`, kandidat wajib yang tak terlihat, hasil incomplete atau match `same` yang tidak layak: **ganti calon**, bukan mengarang distinct. Dua kandidat dalam satu set yang diketahui same tidak boleh lolos bersama. Ketiadaan match berarti hanya **tidak ada duplikasi terdeteksi dalam aturan retrieval yang berlaku**, bukan seluruh parafrasa sudah ditemukan atau seluruh data lama telah digabung semantik.
-5. **Lineage bukan identity merge:** `supersedes_fact_id` menyatakan hubungan koreksi/predecessor-successor, bukan izin menghapus atau mengubah identitas dan pemakaian predecessor. Successor berbeda makna mempunyai ID baru yang berlineage sah; parafrasa yang bermakna sama tetap mengacu pada identitas lama bila layak, tidak membuat successor palsu. `invalidated`, `superseded`, `rejected` tetap terindeks sebagai history hint walau tidak dapat direuse.
+1. **Akar authoritative** tetap `public.trivia_facts` yang sudah ada, bukan
+  pustaka v2 paralel. Kunci internal adalah `trivia_facts.id` (`bigint`)
+  ditambah `workspace_id` untuk FK/scope; ID eksternal stabil adalah
+  `trivia_facts.public_id` (UUID). Public ID ini **persis** `fact_public_id`
+  dalam Read/save/revise v2 P1, dan tetap public ID yang sama bagi v1. P3 dapat
+  menambahkan proyeksi/kolom katalog pada registry ini, tetapi tidak boleh
+  mengganti ID atau mengubah arti row v1. `public.trivia_post_facts.fact_id`
+  menunjuk kunci internal yang sama; `public.trivia_post_facts.public_id`
+  adalah ID **binding pemakaian**, bukan identitas fakta. Semua lookup mengikat
+  `workspace_id` milik owner tervalidasi; UUID yang dikirim caller tidak
+  memberi kewenangan lintas workspace.
+2. **Pemetaan v1 eksplisit:** untuk setiap row v1 `(workspace_id, id,
+  public_id)`, identitas canonical `(workspace_id, id)` dan `fact_public_id =
+  public_id` adalah pemetaan satu-ke-satu; tidak ada UUID kedua, remap lossy,
+  atau penggantian FK. Apabila implementasi memilih materialisasi tabel
+  mapping, kunci unik wajib `(workspace_id, legacy_fact_id)` dan
+  `(workspace_id, canonical_fact_id)`, dengan `canonical_fact_id =
+  legacy_fact_id` untuk setiap fakta v1; verifikasi `legacy_public_id =
+  canonical_public_id` dan tolak benturan (fail-closed). Mapping sebenarnya
+  dapat berupa **identity mapping in-place** tanpa tabel tersendiri; pilihan
+  itu meminimalkan dual write dan menjaga FK yang sudah dipakai. Untuk fakta
+  baru v2, sisipkan pada registry yang sama, bukan menulis salinan v1/v2.
+3. **Makna versus representasi:** `claim_text`, `normalized_claim`,
+  `claim_hash`, `structured_key`, `structured_hash`, `subject_key`,
+  `relation_key`, `object_key`, `numbers`, `qualifiers`,
+  `normalization_version`, `ontology_version`, `dedup_review_snapshot` adalah
+  data/aturan v1, bukan input wajib atau skema dedup yang diselundupkan ke v2.
+  Binding v2 dapat menyimpan representasi `claim_text`, `source_url` dan versi
+  kontrak (`content_schema_version = 2`) pada sisi draft/usage v2 tanpa menimpa
+  snapshot v1. Bila membutuhkan tabel binding sumber tambahan di P3, FK-nya
+  tetap `(workspace_id, fact_id)` ke akar tersebut, dan namespace/versi
+  evidence berbeda (`v1` dengan tier/expiry versus `v2` URL minimum).
+  URL/timestamp baru adalah referensi riset v2, bukan hasil migrasi metadata
+  verification v1; timestamp simpan tidak boleh diklaim tanggal cek URL.
+4. **Resolusi same:** ChatGPT memutuskan `same`, `distinct` atau `uncertain`
+  berdasarkan makna kandidat yang *ditemukan*; `same` terhadap fakta yang layak
+  mengikat ke `public_id` lama. Tidak boleh mendaftarkan ID baru untuk
+  menghindari usage/status existing. `distinct` harus mempunyai perbedaan
+  proposisi yang material (relasi, angka, qualifier atau objek); subjek sama
+  atau URL sama saja bukan bukti `same`. `uncertain`, kandidat wajib yang tak
+  terlihat, hasil incomplete atau match `same` yang tidak layak: **ganti
+  calon**, bukan mengarang distinct. Dua kandidat dalam satu set yang diketahui
+  same tidak boleh lolos bersama. Ketiadaan match berarti hanya **tidak ada
+  duplikasi terdeteksi dalam aturan retrieval yang berlaku**, bukan seluruh
+  parafrasa sudah ditemukan atau seluruh data lama telah digabung semantik.
+5. **Lineage bukan identity merge:** `supersedes_fact_id` menyatakan hubungan
+  koreksi/predecessor-successor, bukan izin menghapus atau mengubah identitas
+  dan pemakaian predecessor. Successor berbeda makna mempunyai ID baru yang
+  berlineage sah; parafrasa yang bermakna sama tetap mengacu pada identitas
+  lama bila layak, tidak membuat successor palsu. `invalidated`, `superseded`,
+  `rejected` tetap terindeks sebagai history hint walau tidak dapat direuse.
 
-Dasar source: `20261009043307_create_trivia_facts.sql`, `20261009060516_add_trivia_identity_source_freshness.sql`, `20261010072439_create_trivia_post_facts_and_usage_snapshots.sql`, `20261010084550_add_trivia_lineage_reverification_correction_primitives.sql`, `20261011151632_harden_phase_5_5_fact_resolution.sql`; bentuk retrieval terkini `20261012124852_materialize_trivia_candidate_input.sql` menggantikan asumsi implementasi retrieval pertama.
+Dasar source: `20261009043307_create_trivia_facts.sql`,
+`20261009060516_add_trivia_identity_source_freshness.sql`,
+`20261010072439_create_trivia_post_facts_and_usage_snapshots.sql`,
+`20261010084550_add_trivia_lineage_reverification_correction_primitives.sql`,
+`20261011151632_harden_phase_5_5_fact_resolution.sql`; bentuk retrieval terkini
+`20261012124852_materialize_trivia_candidate_input.sql` menggantikan asumsi
+implementasi retrieval pertama.
 
 ## 2. Matriks status, reservation, usage dan kelayakan v2
 
-Status disimpan/diturunkan pada dimensi **terpisah**; tidak menjadikan `expired` status `verification_status` yang keenam. `needs_review` tidak berarti verified, dan v2 tidak boleh memakai bukti v1 yang belum cukup sebagai bukti URL v2. `verified` v1 juga **bukan** bukti otomatis bahwa URL baru sudah diteliti ChatGPT.
+Status disimpan/diturunkan pada dimensi **terpisah**; tidak menjadikan `expired`
+status `verification_status` yang keenam. `needs_review` tidak berarti verified,
+dan v2 tidak boleh memakai bukti v1 yang belum cukup sebagai bukti URL v2.
+`verified` v1 juga **bukan** bukti otomatis bahwa URL baru sudah diteliti
+ChatGPT.
 
 | Dimensi | State/sumber authoritative | Makna dan keputusan v2 |
 | --- | --- | --- |
@@ -26,26 +103,121 @@ Status disimpan/diturunkan pada dimensi **terpisah**; tidak menjadikan `expired`
 | Alokasi dan riwayat | `trivia_post_facts`: `allocation_state` (`allocated`, `published`, `released`), `is_current`, `page_id`, `post_id` | `allocated` saat draft/ready adalah penggunaan aktif. `published` (termasuk post `archived`) adalah penggunaan permanen/riwayat yang memblok reuse sesuai scope. `released` tidak memblok alokasi baru tetapi **tetap** audit/history. `is_current = false` merekam binding lama yang dilepas saat revise; jangan menghapus row/snapshot. |
 | Eligibility v2 | Derived, **bukan** identitas/status persisten: `eligible`, `page_blocked`, `workspace_blocked`, `actively_reserved`, `not_eligible` | Tentukan dari Page tujuan, status, history pemakaian yang masih menahan scope, dan reservasi terkini di bawah lock; Read adalah pandangan informatif, Write tetap recheck. Tidak menghapus match historis dari Read karena tak layak. |
 
-Prioritas tampilan bila beberapa blocker bersamaan dapat diputuskan P2-T3 tanpa mengubah fakta bahwa Write menegakkan **seluruhnya**. Tidak boleh menafsirkan `needs_review` yang belum dipastikan sebagai izin save; jangan menetapkan transisi status baru yang melanggar constraint v1. Status v2 yang diperlukan oleh binding/evidence baru harus didefinisikan P3 tanpa memodifikasi `verification_status` historis secara diam-diam.
+Prioritas tampilan bila beberapa blocker bersamaan dapat diputuskan P2-T3 tanpa
+mengubah fakta bahwa Write menegakkan **seluruhnya**. Tidak boleh menafsirkan
+`needs_review` yang belum dipastikan sebagai izin save; jangan menetapkan
+transisi status baru yang melanggar constraint v1. Status v2 yang diperlukan
+oleh binding/evidence baru harus didefinisikan P3 tanpa memodifikasi
+`verification_status` historis secara diam-diam.
 
 ## 3. Scope Page dan riwayat non-retroaktif
 
-- Scope diterapkan pada **Page tujuan** dan konfigurasi `page_niche_configs.config.fact_reuse_scope` terkini: `workspace_unique` menolak alokasi baru bila ID canonical mempunyai penggunaan `allocated` atau `published` pada **Page mana pun** dalam workspace; `page_unique` menolak bila pemakaian tersebut ada pada **Page tujuan**. Dua Page berbeda dalam workspace yang sama dapat menggunakan ID sama di bawah `page_unique`, jika tidak ada penghalang lain (termasuk reservasi aktif). Pemakaian di workspace lain tidak ditampilkan/digabung secara lintas owner.
-- Contoh: Page `PA` `page_unique` lebih dahulu menerbitkan `F1`. Page `PB` `page_unique` boleh memakai `F1` untuk alokasi berikutnya, bila seluruh syarat lolos; Page `PC` `workspace_unique` **tidak** boleh membuat alokasi baru `F1` karena history `PA`. Jika `PB` kemudian mengubah konfigurasi menjadi `workspace_unique`, pemakaian `F1` lama yang saat dibuat sah **tidak dibatalkan**; hanya alokasi baru diuji ulang. Same-Page uniqueness tetap berlaku. Ini sesuai perbaikan terakhir `20261012124844_restore_nonretroactive_allocation_reuse.sql` (CR-016), bukan perilaku retroaktif dari definisi awal.
-- Draft maupun ready `allocated` menghitung penggunaan. Revise yang mengganti fakta melepas binding belum terbit: row lama `allocation_state = released`, `is_current = false`; fact baru mendapat binding/current sendiri dalam transaksi. Discard draft/ready melepas seluruh alokasi current belum terbit (`released`); bukan menghapus identitas, snapshots atau riwayat. Reorder yang tidak mengganti identitas tidak secara otomatis membuat identitas baru. Publication memutasi current `allocated -> published`, archive mempertahankan `published` beserta `published_at`; tidak pernah menyulap published menjadi released.
-- `source_snapshot`, `claim_hash_snapshot`, `verified_at_snapshot`, `rendered_text`, post `content_payload`, `generation_snapshot`, `approval_snapshot`, editorial/system checks dan `internal.post_write_history` mengikuti versi serta saat penulisannya. Perubahan verification/correction/source canonical setelah published tidak menulis ulang copy, approval, sumber maupun hash snapshot publikasi lama.
+- Scope diterapkan pada **Page tujuan** dan konfigurasi
+  `page_niche_configs.config.fact_reuse_scope` terkini: `workspace_unique`
+  menolak alokasi baru bila ID canonical mempunyai penggunaan `allocated` atau
+  `published` pada **Page mana pun** dalam workspace; `page_unique` menolak bila
+  pemakaian tersebut ada pada **Page tujuan**. Dua Page berbeda dalam workspace
+  yang sama dapat menggunakan ID sama di bawah `page_unique`, jika tidak ada
+  penghalang lain (termasuk reservasi aktif). Pemakaian di workspace lain tidak
+  ditampilkan/digabung secara lintas owner.
+- Contoh: Page `PA` `page_unique` lebih dahulu menerbitkan `F1`. Page `PB`
+  `page_unique` boleh memakai `F1` untuk alokasi berikutnya, bila seluruh syarat
+  lolos; Page `PC` `workspace_unique` **tidak** boleh membuat alokasi baru `F1`
+  karena history `PA`. Jika `PB` kemudian mengubah konfigurasi menjadi
+  `workspace_unique`, pemakaian `F1` lama yang saat dibuat sah **tidak
+  dibatalkan**; hanya alokasi baru diuji ulang. Same-Page uniqueness tetap
+  berlaku. Ini sesuai perbaikan terakhir
+  `20261012124844_restore_nonretroactive_allocation_reuse.sql` (CR-016), bukan
+  perilaku retroaktif dari definisi awal.
+- Draft maupun ready `allocated` menghitung penggunaan. Revise yang mengganti
+  fakta melepas binding belum terbit: row lama `allocation_state = released`,
+  `is_current = false`; fact baru mendapat binding/current sendiri dalam
+  transaksi. Discard draft/ready melepas seluruh alokasi current belum terbit
+  (`released`); bukan menghapus identitas, snapshots atau riwayat. Reorder yang
+  tidak mengganti identitas tidak secara otomatis membuat identitas baru.
+  Publication memutasi current `allocated -> published`, archive mempertahankan
+  `published` beserta `published_at`; tidak pernah menyulap published menjadi
+  released.
+- `source_snapshot`, `claim_hash_snapshot`, `verified_at_snapshot`,
+  `rendered_text`, post `content_payload`, `generation_snapshot`,
+  `approval_snapshot`, editorial/system checks dan `internal.post_write_history`
+  mengikuti versi serta saat penulisannya. Perubahan
+  verification/correction/source canonical setelah published tidak menulis ulang
+  copy, approval, sumber maupun hash snapshot publikasi lama.
 
-Rujukan: `20261010072439_create_trivia_post_facts_and_usage_snapshots.sql`, `20261011164412_phase_5_6_post_transaction_foundation.sql` (CR-013, `is_current`, immutable snapshot, `post_allocate_v1`), `20261012045018_phase_5_7_lifecycle_rpcs.sql` (CR-014), serta `20261012124844_restore_nonretroactive_allocation_reuse.sql`.
+Rujukan: `20261010072439_create_trivia_post_facts_and_usage_snapshots.sql`,
+`20261011164412_phase_5_6_post_transaction_foundation.sql` (CR-013,
+`is_current`, immutable snapshot, `post_allocate_v1`),
+`20261012045018_phase_5_7_lifecycle_rpcs.sql` (CR-014), serta
+`20261012124844_restore_nonretroactive_allocation_reuse.sql`.
 
 ## 4. Backfill idempoten dan write v1 sesudah backfill (kontrak P3)
 
-**Keputusan desain:** gunakan `trivia_facts` sebagai satu akar identity dan `trivia_post_facts` sebagai satu sumber penggunaan authoritative. Tidak membuat copy katalog identitas yang harus direkonsiliasi secara asinkron. Pada P3, materialisasi/proyeksi v2 hanya boleh menjadi indeks/metadata tambahan yang mengacu pada ID yang sama. Ledger/projection yang ditambahkan merupakan derivasi, bukan second source of truth.
+**Keputusan desain:** gunakan `trivia_facts` sebagai satu akar identity dan
+`trivia_post_facts` sebagai satu sumber penggunaan authoritative. Tidak membuat
+copy katalog identitas yang harus direkonsiliasi secara asinkron. Pada P3,
+materialisasi/proyeksi v2 hanya boleh menjadi indeks/metadata tambahan yang
+mengacu pada ID yang sama. Ledger/projection yang ditambahkan merupakan
+derivasi, bukan second source of truth.
 
-1. **Backfill additive yang bisa diulang:** dalam transaksi/migration P3 yang diotorisasi, baca semua `trivia_facts` per workspace dan `trivia_post_facts` termasuk released, non-current dan published. Simpan/derive mapping `(workspace_id, id, public_id)`, status/lineage, sumber evidence version dan usage per `trivia_post_facts.id`; key unik ID legacy membuat pengulangan `INSERT ... ON CONFLICT ... DO UPDATE` *hanya* pada kolom derivasi yang berubah, atau `DO NOTHING` untuk identitas tetap. Assert count, FK, workspace, duplicate/collision dan fingerprint historis sebelum/akhir; divergensi **BLOCKED**, jangan diam-diam overwrite old snapshot. Jangan meregenerasi `public_id`, `claim_hash_snapshot`, `source_snapshot`, approval, post body, timestamp v1 atau operation ledger. Proyeksi dapat dibangun ulang tanpa mengubah authoritative row. Status and reservation existing adalah state saat itu, bukan asumsi semuanya available.
-2. **No-gap handoff transaksi:** pasang mekanisme sinkronisasi pada **jalur write authoritative yang sama**, sebelum/bersama backfill/cutover pembacaan v2. Pilihan paling sederhana: Read/reuse v2 langsung membaca `trivia_facts`/`trivia_post_facts`/reservasi live di transaksi, sementara helper RPC v1 dan v2 memperbarui `catalog_version` workspace **dalam transaksi mutasi yang sama**, tanpa cache asynchronous. Bila P3 membutuhkan materialized usage/projection, jaga dengan trigger transaksional atau semua titik mutasi SQL v1/v2 yang terdaftar di tabel berikut; backfill dilakukan setelah hook dipasang, kemudian catch-up pada gate workspace dan audit konsistensi sebelum mengizinkan v2 Write. Catch-up bukan job manual berkala. Rollback pada mutation membatalkan projection dan kenaikan versi bersama. Tidak boleh ada interval saat write v1 committed tetapi Read/reuse v2 mengabaikannya.
-3. **Versi katalog baseline A:** bentuk persistent monotonic counter per workspace dapat ditambahkan oleh P3 dengan atomic increment di bawah workspace gate pada perubahan relevan identitas baru/identity projection, verification/correction/lineage, alokasi/release/publish dan perubahan reservation yang memengaruhi eligibility. Rekomendasi menaikkan versi pada reservation acquire/release/expiry yang *benar-benar termaterialisasi* juga menghindari kandidat stale; keputusan terperinci event-set ada pada P2-T3/P3. Read mengambil `catalog_version` dari satu snapshot konsisten; `expected_catalog_version` disalin persis (string desimal), dicek pada save di bawah workspace gate **sebelum** membuat post/fact/usage. Jika berubah, kembalikan `FACT_CATALOG_CONFLICT` dan rollback bisnis; Read ulang, tidak otomatis riset ulang URL yang tetap sah. Perubahan tidak terkait pun menolak Write stale sesuai **A**; jangan mengaktifkan alternatif B.
-4. **Lock dan replay CR-012:** validasi caller/owner/rate/input → klaim `internal.operation_ledger` dan replay otorisasi/key/payload identik **sebelum lock bisnis** → `internal.trivia_lock_workspace_v1` (workspace `FOR NO KEY UPDATE`) → Page/config ascending → slot schedule → plan/item → post ascending → advisory identity/lineage ascending → fact ascending → junction ascending → mutasi, history dan completion ledger. Lapisan yang tidak dipakai dilewati, **tidak dibalik** dan tidak mengambil lock sebelumnya sesudah lock berikutnya. Sesudah menunggu, rediscover Page/post/fact dan recheck config, token, expiry, status serta CAS. Jangan mengganti gate `FOR NO KEY UPDATE` menjadi `FOR UPDATE` karena risiko deadlock lock-upgrade ledger FK. Replay sukses operasi identik tidak mengulangi mutasi atau menaikkan versi; otorisasi dan validasi replay tetap berlaku. Race/correction harus diuji dua urutan commit, bukan hanya `Promise.all`.
-5. **Security:** implementasi harus mempertahankan owner OAuth, workspace isolation, RLS, minimal execute grants, tidak membuka akses langsung `anon`/`authenticated` ke business table/helper, dan tidak mengekspos `reservation_token`, `reservation_context`, internal IDs atau ledger dalam respons publik. `fact_public_id` hanya hasil lookup owner-scoped. P2-T1 tidak menetapkan DDL/grants, cutover atau waktu pensiun v1.
+1. **Backfill additive yang bisa diulang:** dalam transaksi/migration P3 yang
+  diotorisasi, baca semua `trivia_facts` per workspace dan `trivia_post_facts`
+  termasuk released, non-current dan published. Simpan/derive mapping
+  `(workspace_id, id, public_id)`, status/lineage, sumber evidence version dan
+  usage per `trivia_post_facts.id`; key unik ID legacy membuat pengulangan
+  `INSERT ... ON CONFLICT ... DO UPDATE` *hanya* pada kolom derivasi yang
+  berubah, atau `DO NOTHING` untuk identitas tetap. Assert count, FK,
+  workspace, duplicate/collision dan fingerprint historis sebelum/akhir;
+  divergensi **BLOCKED**, jangan diam-diam overwrite old snapshot. Jangan
+  meregenerasi `public_id`, `claim_hash_snapshot`, `source_snapshot`, approval,
+  post body, timestamp v1 atau operation ledger. Proyeksi dapat dibangun ulang
+  tanpa mengubah authoritative row. Status and reservation existing adalah
+  state saat itu, bukan asumsi semuanya available.
+2. **No-gap handoff transaksi:** pasang mekanisme sinkronisasi pada **jalur
+  write authoritative yang sama**, sebelum/bersama backfill/cutover pembacaan
+  v2. Pilihan paling sederhana: Read/reuse v2 langsung membaca
+  `trivia_facts`/`trivia_post_facts`/reservasi live di transaksi, sementara
+  helper RPC v1 dan v2 memperbarui `catalog_version` workspace **dalam
+  transaksi mutasi yang sama**, tanpa cache asynchronous. Bila P3 membutuhkan
+  materialized usage/projection, jaga dengan trigger transaksional atau semua
+  titik mutasi SQL v1/v2 yang terdaftar di tabel berikut; backfill dilakukan
+  setelah hook dipasang, kemudian catch-up pada gate workspace dan audit
+  konsistensi sebelum mengizinkan v2 Write. Catch-up bukan job manual berkala.
+  Rollback pada mutation membatalkan projection dan kenaikan versi bersama.
+  Tidak boleh ada interval saat write v1 committed tetapi Read/reuse v2
+  mengabaikannya.
+3. **Versi katalog baseline A:** bentuk persistent monotonic counter per
+  workspace dapat ditambahkan oleh P3 dengan atomic increment di bawah
+  workspace gate pada perubahan relevan identitas baru/identity projection,
+  verification/correction/lineage, alokasi/release/publish dan perubahan
+  reservation yang memengaruhi eligibility. Rekomendasi menaikkan versi pada
+  reservation acquire/release/expiry yang *benar-benar termaterialisasi* juga
+  menghindari kandidat stale; keputusan terperinci event-set ada pada P2-T3/P3.
+  Read mengambil `catalog_version` dari satu snapshot konsisten;
+  `expected_catalog_version` disalin persis (string desimal), dicek pada save
+  di bawah workspace gate **sebelum** membuat post/fact/usage. Jika berubah,
+  kembalikan `FACT_CATALOG_CONFLICT` dan rollback bisnis; Read ulang, tidak
+  otomatis riset ulang URL yang tetap sah. Perubahan tidak terkait pun menolak
+  Write stale sesuai **A**; jangan mengaktifkan alternatif B.
+4. **Lock dan replay CR-012:** validasi caller/owner/rate/input → klaim
+  `internal.operation_ledger` dan replay otorisasi/key/payload identik
+  **sebelum lock bisnis** → `internal.trivia_lock_workspace_v1` (workspace `FOR
+  NO KEY UPDATE`) → Page/config ascending → slot schedule → plan/item → post
+  ascending → advisory identity/lineage ascending → fact ascending → junction
+  ascending → mutasi, history dan completion ledger. Lapisan yang tidak dipakai
+  dilewati, **tidak dibalik** dan tidak mengambil lock sebelumnya sesudah lock
+  berikutnya. Sesudah menunggu, rediscover Page/post/fact dan recheck config,
+  token, expiry, status serta CAS. Jangan mengganti gate `FOR NO KEY UPDATE`
+  menjadi `FOR UPDATE` karena risiko deadlock lock-upgrade ledger FK. Replay
+  sukses operasi identik tidak mengulangi mutasi atau menaikkan versi;
+  otorisasi dan validasi replay tetap berlaku. Race/correction harus diuji dua
+  urutan commit, bukan hanya `Promise.all`.
+5. **Security:** implementasi harus mempertahankan owner OAuth, workspace
+  isolation, RLS, minimal execute grants, tidak membuka akses langsung
+  `anon`/`authenticated` ke business table/helper, dan tidak mengekspos
+  `reservation_token`, `reservation_context`, internal IDs atau ledger dalam
+  respons publik. `fact_public_id` hanya hasil lookup owner-scoped. P2-T1 tidak
+  menetapkan DDL/grants, cutover atau waktu pensiun v1.
 
 ### Peta titik mutasi v1 yang harus diadaptasi/audit P3
 
@@ -58,11 +230,21 @@ Rujukan: `20261010072439_create_trivia_post_facts_and_usage_snapshots.sql`, `202
 | `api.discard_post`, `api.mark_post_posted`, `api.archive_post`; `20261012045018_phase_5_7_lifecycle_rpcs.sql` | `allocated -> released`, `allocated -> published`, archive mempertahankan `published`; perubahan visibility usage | Current/history dan snapshot immutable; approval/old evidence untouched; archive tidak melepaskan reuse. `approve_post`/`revoke_post_approval` mengubah lifecycle/approval tetapi tidak membuat penggunaan baru. |
 | `api.get_post`, `api.trivia_find_similar_facts`, owner-scoped read projection; `20261011015742_phase_5_2_owner_scoped_read_projections.sql` dan patch `20261011164412_phase_5_6_post_transaction_foundation.sql` | Reader menampilkan identitas/usage snapshot pada scope benar, v2 Read dari canonical state terkini | `get_post` v1 tetap semantik v1, v2 menampilkan status/eligibility tanpa memalsukan source verification; P2-T3 menentukan retrieval/complete, bukan P2-T1. |
 
-Semua perubahan event dan mapping harus diperiksa lagi terhadap migration terakhir, termasuk `20261011153430_guard_phase_5_5_identity_and_replay_bindings.sql` dan `20261012124844_restore_nonretroactive_allocation_reuse.sql`, sebelum P3 menyusun SQL.
+Semua perubahan event dan mapping harus diperiksa lagi terhadap migration
+terakhir, termasuk
+`20261011153430_guard_phase_5_5_identity_and_replay_bindings.sql` dan
+`20261012124844_restore_nonretroactive_allocation_reuse.sql`, sebelum P3
+menyusun SQL.
 
 ## 5. Acceptance sintetis dan traceability
 
-Prakondisi bersama: satu owner/workspace `W`, Page `PA`/`PB`/`PC`, status dan konfigurasi ditetapkan per skenario **independen**; setiap Read dianggap lengkap pada versi yang sesuai kecuali disebut sebaliknya. `F1` dkk adalah alias untuk UUID publik canonical yang sudah ada, bukan nilai UUID. URL `https://example.org/a` hanya ilustrasi; tidak divalidasi sebagai bukti riset. Kolom outcome adalah hasil yang **harus dibuktikan pada P3**, **bukan hasil eksekusi**.
+Prakondisi bersama: satu owner/workspace `W`, Page `PA`/`PB`/`PC`, status dan
+konfigurasi ditetapkan per skenario **independen**; setiap Read dianggap lengkap
+pada versi yang sesuai kecuali disebut sebaliknya. `F1` dkk adalah alias untuk
+UUID publik canonical yang sudah ada, bukan nilai UUID. URL
+`https://example.org/a` hanya ilustrasi; tidak divalidasi sebagai bukti riset.
+Kolom outcome adalah hasil yang **harus dibuktikan pada P3**, **bukan hasil
+eksekusi**.
 
 | Kasus; pre-state | Keputusan | Referensi ID; scope Page tujuan | Outcome desain; state/snapshot yang tetap utuh | Requirement |
 | --- | --- | --- | --- | --- |
@@ -85,13 +267,46 @@ Prakondisi bersama: satu owner/workspace `W`, Page `PA`/`PB`/`PC`, status dan ko
 | S17: v1 `trivia_release_facts` atau expiry setelah backfill, dan F1 tidak punya usage | `same` pada Read baru | F1, `PB page_unique` | Reservation blocker lenyap transaksional; `internal.trivia_reservation_sets` immutable dan ledger replay tetap; ID F1 unchanged | TFL-09/10/12 |
 | S18: v2 memperbarui URL untuk F1 makna sama; correction owner invalidate F1 setelah publikasi | `same` saat update URL, kemudian `same` calon baru terhadap invalidated | F1 history; `PA` | URL evidence v2 terikat F1, correction menjadikannya not eligible; calon baru diganti; published v1/v2 tidak ditulis ulang | TFL-05/07/11/12 |
 
-**Keterlacakan TDW:** S01–S07 dan S16 mendukung keputusan dedup final untuk `TDW` save/revise; S08–S15 dan S17 menguji prasyarat alokasi/save atomik, CAS, conflict, rollback dan per-item draft isolation pada `TDW` save/revise, tanpa menjalankan save v2. S11/S12/S18 menyentuh lifecycle approval/publish hanya untuk **pelestarian history**, bukan implementasi Setujui. Lihat [spec TDW](../../openspec/changes/simplify-trivia-draft-workflow/specs/trivia-draft-workflow/spec.md) untuk nomor requirement normatif sebelum menulis focused tests. Fixture P1 `single.findResponse` mengandung history invalidated; penggantian status superseded/rejected dan negative-controls dievaluasi pada `tests/trivia-draft-v2-contracts.test.ts`. Test database v1 yang menjadi titik perluasan: `supabase/tests/database/trivia-identity-and-source.test.ts`, `trivia-lineage-and-reverification.test.ts`, `trivia-reservation-and-reuse.test.ts`, `trivia-post-facts.test.ts`, `api-trivia-facts.test.ts`, `api-trivia-correction.test.ts`, `api-trivia-concurrency.test.ts`; helper `supabase/tests/database/helpers/trivia-rpc.ts`. **Tidak satu pun skenario S01–S18 dinyatakan DB PASS**.
+**Keterlacakan TDW:** S01–S07 dan S16 mendukung keputusan dedup final untuk
+`TDW` save/revise; S08–S15 dan S17 menguji prasyarat alokasi/save atomik, CAS,
+conflict, rollback dan per-item draft isolation pada `TDW` save/revise, tanpa
+menjalankan save v2. S11/S12/S18 menyentuh lifecycle approval/publish hanya
+untuk **pelestarian history**, bukan implementasi Setujui. Lihat [spec
+TDW](../../openspec/changes/simplify-trivia-draft-workflow/specs/trivia-draft-workflow/spec.md)
+untuk nomor requirement normatif sebelum menulis focused tests. Fixture P1
+`single.findResponse` mengandung history invalidated; penggantian status
+superseded/rejected dan negative-controls dievaluasi pada
+`tests/trivia-draft-v2-contracts.test.ts`. Test database v1 yang menjadi titik
+perluasan: `supabase/tests/database/trivia-identity-and-source.test.ts`,
+`trivia-lineage-and-reverification.test.ts`,
+`trivia-reservation-and-reuse.test.ts`, `trivia-post-facts.test.ts`,
+`api-trivia-facts.test.ts`, `api-trivia-correction.test.ts`,
+`api-trivia-concurrency.test.ts`; helper
+`supabase/tests/database/helpers/trivia-rpc.ts`. **Tidak satu pun skenario
+S01–S18 dinyatakan DB PASS**.
 
 ## 6. Batas kerja dan handoff
 
-- **P2-T2**: susun dataset berlabel parafrasa/salah-gabung termasuk historic, invalidated/superseded/rejected dan proposisi mirip berbeda; tetapkan ambang **sebelum** evaluasi. P2-T1 tidak menetapkan retrieval recall atau threshold.
-- **P2-T3**: bekukan aturan kandidat wajib/limit/`complete`, `catalog_version` dan snapshot Read, event-set yang menaikkan versi (termasuk reservation/expiry), serta prioritas eligibility bila blocker bertumpuk. Pertahankan baseline **A**; protokol pembanding B bukan izin mengaktifkan B.
-- **P3-T1**: rancang additive DDL, FK/unique/index, mapping identity in-place, proyeksi evidence versi v2, serta backfill idempoten dan audit row-level; tandai ambiguity/collision/legacy source outlier sebagai blocker data, bukan silent merge. Jangan menerbitkan migration sebelum review desain P2.
-- **P3-T2**: adaptasi seluruh mutator v1 yang didaftar di §4 dengan hooks transaksional/no-gap, catalog version dan replay-safe update; buktikan cross-version races, old-v1 write after backfill, expiry/release, correction dan immutable snapshot pada fixture isolated. Save/revise v2 dan retrieval terperinci tetap task pemiliknya, bukan selesai melalui dokumen ini.
+- **P2-T2**: susun dataset berlabel parafrasa/salah-gabung termasuk historic,
+  invalidated/superseded/rejected dan proposisi mirip berbeda; tetapkan ambang
+  **sebelum** evaluasi. P2-T1 tidak menetapkan retrieval recall atau threshold.
+- **P2-T3**: bekukan aturan kandidat wajib/limit/`complete`, `catalog_version`
+  dan snapshot Read, event-set yang menaikkan versi (termasuk
+  reservation/expiry), serta prioritas eligibility bila blocker bertumpuk.
+  Pertahankan baseline **A**; protokol pembanding B bukan izin mengaktifkan B.
+- **P3-T1**: rancang additive DDL, FK/unique/index, mapping identity in-place,
+  proyeksi evidence versi v2, serta backfill idempoten dan audit row-level;
+  tandai ambiguity/collision/legacy source outlier sebagai blocker data, bukan
+  silent merge. Jangan menerbitkan migration sebelum review desain P2.
+- **P3-T2**: adaptasi seluruh mutator v1 yang didaftar di §4 dengan hooks
+  transaksional/no-gap, catalog version dan replay-safe update; buktikan
+  cross-version races, old-v1 write after backfill, expiry/release, correction
+  dan immutable snapshot pada fixture isolated. Save/revise v2 dan retrieval
+  terperinci tetap task pemiliknya, bukan selesai melalui dokumen ini.
 
-Tidak ditentukan di sini: dataset/threshold, cutover, observasi, rollback rilis, pensiun v1, rilis D1 sebelum D2 atau perubahan keputusan produk. Bila audit P3 menemukan bahwa pemetaan tidak dapat mempertahankan FK/public ID/snapshot atau urutan lock tanpa mengubah kontrak accepted, **hentikan perubahan terkait dan ajukan keputusan terpisah**, jangan mengedit CR-053/P1/spec/expected test untuk menyesuaikannya.
+Tidak ditentukan di sini: dataset/threshold, cutover, observasi, rollback rilis,
+pensiun v1, rilis D1 sebelum D2 atau perubahan keputusan produk. Bila audit P3
+menemukan bahwa pemetaan tidak dapat mempertahankan FK/public ID/snapshot atau
+urutan lock tanpa mengubah kontrak accepted, **hentikan perubahan terkait dan
+ajukan keputusan terpisah**, jangan mengedit CR-053/P1/spec/expected test untuk
+menyesuaikannya.
