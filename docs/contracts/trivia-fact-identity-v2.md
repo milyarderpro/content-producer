@@ -38,7 +38,7 @@ sebagai perubahan keputusan produk.
   adalah ID **binding pemakaian**, bukan identitas fakta. Semua lookup mengikat
   `workspace_id` milik owner tervalidasi; UUID yang dikirim caller tidak
   memberi kewenangan lintas workspace.
-2. **Pemetaan v1 eksplisit:** untuk setiap row v1 `(workspace_id, id,
+1. **Pemetaan v1 eksplisit:** untuk setiap row v1 `(workspace_id, id,
   public_id)`, identitas canonical `(workspace_id, id)` dan `fact_public_id =
   public_id` adalah pemetaan satu-ke-satu; tidak ada UUID kedua, remap lossy,
   atau penggantian FK. Apabila implementasi memilih materialisasi tabel
@@ -49,7 +49,7 @@ sebagai perubahan keputusan produk.
   dapat berupa **identity mapping in-place** tanpa tabel tersendiri; pilihan
   itu meminimalkan dual write dan menjaga FK yang sudah dipakai. Untuk fakta
   baru v2, sisipkan pada registry yang sama, bukan menulis salinan v1/v2.
-3. **Makna versus representasi:** `claim_text`, `normalized_claim`,
+1. **Makna versus representasi:** `claim_text`, `normalized_claim`,
   `claim_hash`, `structured_key`, `structured_hash`, `subject_key`,
   `relation_key`, `object_key`, `numbers`, `qualifiers`,
   `normalization_version`, `ontology_version`, `dedup_review_snapshot` adalah
@@ -61,7 +61,7 @@ sebagai perubahan keputusan produk.
   evidence berbeda (`v1` dengan tier/expiry versus `v2` URL minimum).
   URL/timestamp baru adalah referensi riset v2, bukan hasil migrasi metadata
   verification v1; timestamp simpan tidak boleh diklaim tanggal cek URL.
-4. **Resolusi same:** ChatGPT memutuskan `same`, `distinct` atau `uncertain`
+1. **Resolusi same:** ChatGPT memutuskan `same`, `distinct` atau `uncertain`
   berdasarkan makna kandidat yang *ditemukan*; `same` terhadap fakta yang layak
   mengikat ke `public_id` lama. Tidak boleh mendaftarkan ID baru untuk
   menghindari usage/status existing. `distinct` harus mempunyai perbedaan
@@ -72,7 +72,7 @@ sebagai perubahan keputusan produk.
   same tidak boleh lolos bersama. Ketiadaan match berarti hanya **tidak ada
   duplikasi terdeteksi dalam aturan retrieval yang berlaku**, bukan seluruh
   parafrasa sudah ditemukan atau seluruh data lama telah digabung semantik.
-5. **Lineage bukan identity merge:** `supersedes_fact_id` menyatakan hubungan
+1. **Lineage bukan identity merge:** `supersedes_fact_id` menyatakan hubungan
   koreksi/predecessor-successor, bukan izin menghapus atau mengubah identitas
   dan pemakaian predecessor. Successor berbeda makna mempunyai ID baru yang
   berlineage sah; parafrasa yang bermakna sama tetap mengacu pada identitas
@@ -173,7 +173,7 @@ derivasi, bukan second source of truth.
   post body, timestamp v1 atau operation ledger. Proyeksi dapat dibangun ulang
   tanpa mengubah authoritative row. Status and reservation existing adalah
   state saat itu, bukan asumsi semuanya available.
-2. **No-gap handoff transaksi:** pasang mekanisme sinkronisasi pada **jalur
+1. **No-gap handoff transaksi:** pasang mekanisme sinkronisasi pada **jalur
   write authoritative yang sama**, sebelum/bersama backfill/cutover pembacaan
   v2. Pilihan paling sederhana: Read/reuse v2 langsung membaca
   `trivia_facts`/`trivia_post_facts`/reservasi live di transaksi, sementara
@@ -186,7 +186,7 @@ derivasi, bukan second source of truth.
   Rollback pada mutation membatalkan projection dan kenaikan versi bersama.
   Tidak boleh ada interval saat write v1 committed tetapi Read/reuse v2
   mengabaikannya.
-3. **Versi katalog baseline A:** bentuk persistent monotonic counter per
+1. **Versi katalog baseline A:** bentuk persistent monotonic counter per
   workspace dapat ditambahkan oleh P3 dengan atomic increment di bawah
   workspace gate pada perubahan relevan identitas baru/identity projection,
   verification/correction/lineage, alokasi/release/publish dan perubahan
@@ -199,7 +199,7 @@ derivasi, bukan second source of truth.
   kembalikan `FACT_CATALOG_CONFLICT` dan rollback bisnis; Read ulang, tidak
   otomatis riset ulang URL yang tetap sah. Perubahan tidak terkait pun menolak
   Write stale sesuai **A**; jangan mengaktifkan alternatif B.
-4. **Lock dan replay CR-012:** validasi caller/owner/rate/input → klaim
+1. **Lock dan replay CR-012:** validasi caller/owner/rate/input → klaim
   `internal.operation_ledger` dan replay otorisasi/key/payload identik
   **sebelum lock bisnis** → `internal.trivia_lock_workspace_v1` (workspace `FOR
   NO KEY UPDATE`) → Page/config ascending → slot schedule → plan/item → post
@@ -212,7 +212,7 @@ derivasi, bukan second source of truth.
   sukses operasi identik tidak mengulangi mutasi atau menaikkan versi;
   otorisasi dan validasi replay tetap berlaku. Race/correction harus diuji dua
   urutan commit, bukan hanya `Promise.all`.
-5. **Security:** implementasi harus mempertahankan owner OAuth, workspace
+1. **Security:** implementasi harus mempertahankan owner OAuth, workspace
   isolation, RLS, minimal execute grants, tidak membuka akses langsung
   `anon`/`authenticated` ke business table/helper, dan tidak mengekspos
   `reservation_token`, `reservation_context`, internal IDs atau ledger dalam
