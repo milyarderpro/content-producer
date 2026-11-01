@@ -59,17 +59,12 @@ jobs:
           echo "HEAD $(git rev-parse HEAD); base $base; all_checks=$all_checks"
           git diff --check "$base" HEAD
           mapfile -d '' -t files < <(git diff --name-only --no-renames --diff-filter=ACMRD -z "$base" HEAD)
-          format=()
           need_check="$all_checks"
           mcp_changed="$all_checks"
           probe_changed="$all_checks"
           package_changed="$all_checks"
           backend_review="$all_checks"
           for file in "${files[@]}"; do
-            case "$file" in
-              *.md|*.json|*.yml|*.yaml|*.ts|*.tsx|*.js|*.mjs|*.cjs)
-                if [ -f "$file" ]; then format+=("$file"); fi ;;
-            esac
             case "$file" in
               *.ts|*.tsx|*.js|*.mjs|*.cjs|package.json|pnpm-lock.yaml|tsconfig.json|.nvmrc|.npmrc|.gitignore|.env.example|.deno-version|.prettierignore|.prettierrc.json|.github/workflows/*|.github/actions/*|auth-frontend/*|plans/tool-inventory.md|plans/trivia-content-dna.md|plans/use-case-inventory.md|plans/acceptance-traceability.md|docs/phase-8/*|docs/phase-5-*-catalog*|docs/phase-5-batch-b-remediation-final-catalog.json|supabase/tests/fixtures/*|dataset-reference/*|supabase/migrations/*|supabase/config.toml|supabase/functions/deno.json|supabase/functions/deno.lock)
                 need_check=true ;;
@@ -91,9 +86,6 @@ jobs:
                 backend_review=true ;;
             esac
           done
-          if [ "${#format[@]}" -gt 0 ]; then
-            printf '%s\0' "${format[@]}" > "$RUNNER_TEMP/ci-formatted-paths"
-          fi
           {
             echo "need_check=$need_check"
             echo "mcp_changed=$mcp_changed"
@@ -104,16 +96,6 @@ jobs:
 
       - name: Locked dependency installation
         run: pnpm install --frozen-lockfile
-
-      - name: Format changed files and documentation indexes
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -s "$RUNNER_TEMP/ci-formatted-paths" ]; then
-            mapfile -d '' -t paths < "$RUNNER_TEMP/ci-formatted-paths"
-            pnpm exec prettier --check "${paths[@]}"
-          fi
-          pnpm exec prettier --ignore-path /dev/null --check archive/README.md plans/README.md plans/implementation-plan.md
 
       - name: Project checks including frontend and root regressions
         if: steps.changes.outputs.need_check == 'true'

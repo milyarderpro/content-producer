@@ -80,7 +80,8 @@ chat**, bukan melarang pemicu gate yang sudah diizinkan.
 
 - Setelah perubahan TypeScript/configuration, jalankan `pnpm run check` serta
   test fokus yang relevan, dengan preflight durasi di atas.
-- Dokumen biasa memakai pemeriksaan format/referensi dan light CI. Paket-only
+- Dokumen biasa memakai review isi/referensi, `git diff --check`, dan light CI;
+  Prettier tersedia secara opsional, bukan gate wajib. Paket-only
   memakai focused package/MCP dan manual yang terdampak; bukan full gate baru
   hanya karena SHA dokumentasi/paket berubah.
 - Transport-only tanpa perubahan keputusan izin memakai focused protocol/security

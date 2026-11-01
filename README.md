@@ -65,11 +65,16 @@ Selanjutnya pilih command sesuai pekerjaan, bukan menjalankan semuanya sekaligus
 
 | Command                   | Fungsi singkat                                                |
 | ------------------------- | ------------------------------------------------------------- |
-| `pnpm run check`          | Format, lint, typecheck, root test, dan frontend checks/build |
+| `pnpm run check`          | Lint, typecheck, root test, dan frontend checks/build         |
 | `pnpm run test:mcp`       | Suite MCP terisolasi melalui Deno                             |
 | `pnpm run test:database`  | Suite database pada stack lokal yang sudah siap               |
 | `pnpm run test-all`       | **Legacy/rollback:** check, migration names, MCP dan database |
 | `pnpm run package-plugin` | Membuat kandidat paket lokal yang tervalidasi                 |
+
+`pnpm run format` dan `pnpm run format:check` tetap tersedia untuk penggunaan
+manual. Prettier bukan gate wajib; review isi/referensi, `git diff --check`,
+dan check non-style sesuai risiko tetap wajib. Keputusan aktif ada di
+[CR-055](docs/decisions/2026-11-01-cr-055-prettier-optional-gate.md).
 
 **Gate rilis G4 aktif:** dispatch
 [`backend-gate-candidate.yml`](.github/workflows/backend-gate-candidate.yml)

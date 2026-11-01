@@ -1,8 +1,10 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+
+const checkScript = readFileSync('scripts/check.ts', 'utf8');
 
 const readWorkflow = (name: string) => readFileSync(join('.github/workflows', name), 'utf8');
 const ci = readWorkflow('ci.yml');
@@ -32,6 +34,50 @@ const identity = identityBlock
   .join('\n');
 
 describe('Workflow aktif menjaga batas CI dan gate backend', () => {
+  it('Prettier opsional dan enam source check tetap wajib berurutan', () => {
+    expect(ci).not.toMatch(/(?:ci-formatted-paths|prettier --check|Format changed files)/);
+    expect(checkScript).not.toContain("['format:check']");
+    expect(ci).toContain('git diff --check "$base" HEAD');
+    expect(ci).toContain('pnpm install --frozen-lockfile');
+    expect(ci).toContain('run: pnpm run check');
+    const commands = [...checkScript.matchAll(/\['([^']+)'\]/g)].map((match) => match[1]);
+    expect(commands).toEqual([
+      'lint',
+      'typecheck',
+      'test',
+      'frontend:typecheck',
+      'frontend:build',
+      'frontend:test',
+    ]);
+    expect(checkScript).toContain("run('pnpm', ['run', ...command])");
+  });
+
+  it.each(['lint', 'test'])('entrypoint check berhenti gagal saat %s gagal', (failed) => {
+    const root = mkdtempSync(join(tmpdir(), 'check-fail-closed-'));
+    temporary.push(root);
+    const executable = join(root, 'pnpm');
+    const calls = join(root, 'calls');
+    writeFileSync(
+      executable,
+      '#!/bin/sh\nprintf "%s\\n" "$2" >> "$CHECK_CALLS"\nif [ "$2" = "$FAIL_SUBCHECK" ]; then exit 7; fi\n',
+    );
+    chmodSync(executable, 0o755);
+    const result = spawnSync(join(process.cwd(), 'node_modules/.bin/tsx'), ['scripts/check.ts'], {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        PATH: `${root}:${process.env.PATH ?? ''}`,
+        CHECK_CALLS: calls,
+        FAIL_SUBCHECK: failed,
+      },
+      encoding: 'utf8',
+    });
+    expect(result.status).not.toBe(0);
+    const invoked = readFileSync(calls, 'utf8').trim().split('\n');
+    expect(invoked.at(-1)).toBe(failed);
+    expect(invoked).not.toContain('frontend:test');
+  });
+
   it('menyisakan satu CI ringan dan tiga workflow manual yang terpisah', () => {
     expect(readdirSync('.github/workflows').sort()).toEqual([
       'backend-gate-candidate.yml',

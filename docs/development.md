@@ -29,6 +29,12 @@ hanya karena CLI menampilkan versi baru. `pnpm run check` tidak membutuhkan stac
 database; `pnpm run test-all` adalah **legacy/rollback** yang membutuhkan Deno
 dan database lokal siap.
 
+`pnpm run check` mewajibkan lint, typecheck, root test, frontend typecheck,
+build, dan test. `pnpm run format`/`format:check` tersedia secara manual;
+Prettier tidak menjadi gate wajib menurut
+[CR-055](decisions/2026-11-01-cr-055-prettier-optional-gate.md). Review isi,
+referensi, whitespace (`git diff --check`), dan check sesuai risiko tetap wajib.
+
 Git dan Bash juga harus tersedia untuk regresi workflow dalam `pnpm run check`.
 Test menggunakan tree Git sementara tanpa membuat commit; runner CI memakai
 Ubuntu 24.04. Untuk mengeksekusi tahap verifikasi ZIP dari shell CI, diperlukan
@@ -312,4 +318,5 @@ atau business RPC sebelum deployment yang diotorisasi. Dispatch
 (41 file/182 kasus DB), MCP/Inspector, advisors terpisah, audit,
 history/lint/cleanup dan aggregate PASS. Tidak ada required check otomatis.
 `test-all`/`backend-technical-gate.yml` kini legacy/rollback CR-020/044.
-Docs-only cukup format, tautan dan light CI tanpa full backend gate.
+Docs-only cukup review isi/tautan, `git diff --check`, dan light CI tanpa full
+backend gate; Prettier opsional.
