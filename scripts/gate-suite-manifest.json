@@ -47,6 +47,10 @@
           "status": "mandatory"
         },
         {
+          "path": "tests/trivia-dedup-v2.test.ts",
+          "status": "mandatory"
+        },
+        {
           "path": "tests/trivia-draft-v2-contracts.test.ts",
           "status": "mandatory"
         },
