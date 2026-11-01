@@ -10,6 +10,9 @@ error, serta acceptance yang diperiksa oleh fixture P1. **Backend/tool v2 belum
 diimplementasikan atau dipasang.** Pilihan retrieval, dataset/ambang dan schema
 database P2/P3 tidak diselesaikan oleh contoh ini. Baseline tetap **A: versi
 katalog workspace**; tidak ada receipt/lease dedup atau pengecualian katalog B.
+Aturan retrieval dan oracle `complete` yang menyusul contoh P1 ini ada pada
+[kontrak Read P2-T3](trivia-fact-read-v2.md); backend v2 tetap belum terbukti
+oleh kedua dokumen tersebut.
 
 ## 1. Artefak yang dapat diperiksa mesin
 
@@ -79,7 +82,7 @@ Success `data` berisi:
 Status mencakup needs_review, verified, invalidated, superseded, rejected.
 Eligibility membedakan eligible/page_blocked/workspace_blocked/actively_reserved/
 not_eligible. History tidak disembunyikan karena faktanya tidak layak. `complete`
-berarti kelengkapan menurut aturan retrieval yang akan dibekukan P2, bukan
+berarti kelengkapan menurut [aturan retrieval P2-T3](trivia-fact-read-v2.md), bukan
 jaminan semua parafrasa di dunia ditemukan.
 
 Fixture `single.findRequest` mempunyai enam calon untuk lima fakta final;

@@ -143,7 +143,7 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       comparable. Retrieval v2, database readback, oracle `complete`, G4, host
       dan LIVE tetap NOT RUN. Oracle `complete` dibekukan di P2-T3 sebelum
       truthfulness 100% dapat dinilai; tidak ada klaim retrieval PASS.
-- [ ] 2.3 **P2-T3 Kontrak Read:** bekukan aturan retrieval, kandidat wajib,
+- [x] 2.3 **P2-T3 Kontrak Read:** bekukan aturan retrieval, kandidat wajib,
       batas hasil, `complete`, versi katalog A, dan tindakan penggantian calon.
       Siapkan protokol pembanding A/B sesuai matriks design, tanpa memilih atau
       mengaktifkan B; eksperimen B hanya bila diotorisasi. **Verifikasi:** contoh
@@ -151,6 +151,13 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       kandidat baru, race lintas versi, penolakan tidak terkait, waktu tunggu, dan
       rollback masuk protokol. Hasil eksperimen yang belum ada tetap NOT RUN;
       setiap usulan mengganti A menunggu bukti dan keputusan pemilik.
+      **Bukti:** [kontrak Read P2-T3](../../../docs/contracts/trivia-fact-read-v2.md)
+      membekukan predicate exact/full-text/trigram, urutan dan cap 20,
+      `complete` relatif terhadap himpunan wajib, event katalog A, tindakan
+      penggantian, oracle O01–O16 dan protokol A/B. Review statis memeriksa
+      tautan/field terhadap fixture P1 dan TFL-06..10; whitespace lulus.
+      Retrieval/database/race, eksperimen B, G4, host dan LIVE tetap NOT RUN;
+      checklist ini tidak menyatakan implementasi P3 atau persetujuan B.
 
 ## 3. Data dan pencarian v2
 
