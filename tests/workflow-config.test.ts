@@ -85,6 +85,14 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
     }
   });
 
+  it('focused runtime checks are mandatory before the full source check when source is changed', () => {
+    const focused = '      - name: Focused Node Deno runtime and workflow selector regressions';
+    const full = '      - name: Project checks including frontend and root regressions';
+    expect(ci.indexOf(focused)).toBeGreaterThan(ci.indexOf('      - name: Locked dependency installation'));
+    expect(ci.indexOf(full)).toBeGreaterThan(ci.indexOf(focused));
+    expect(ci).toContain(`\${focused}\n        if: steps.changes.outputs.need_check == 'true'\n        run: pnpm exec vitest run tests/foundation.test.ts tests/gate-runner.test.ts tests/workflow-config.test.ts`);
+  });
+
   it('Prettier opsional dan enam source check tetap wajib berurutan', () => {
     expect(ci).not.toMatch(/(?:ci-formatted-paths|prettier --check|Format changed files)/);
     expect(checkScript).not.toContain("['format:check']");

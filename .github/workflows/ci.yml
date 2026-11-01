@@ -97,6 +97,10 @@ jobs:
       - name: Locked dependency installation
         run: pnpm install --frozen-lockfile
 
+      - name: Focused Node Deno runtime and workflow selector regressions
+        if: steps.changes.outputs.need_check == 'true'
+        run: pnpm exec vitest run tests/foundation.test.ts tests/gate-runner.test.ts tests/workflow-config.test.ts
+
       - name: Project checks including frontend and root regressions
         if: steps.changes.outputs.need_check == 'true'
         run: pnpm run check
