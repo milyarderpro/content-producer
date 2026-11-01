@@ -125,6 +125,7 @@ function assertCase(value: unknown, split: Split): asserts value is DedupV2Case 
   inSet(ref.usage, ['none', 'draft', 'published'], c.case_id + ': usage');
   ensure(typeof ref.evidence_expired_only === 'boolean', c.case_id + ': expired flag');
   ensure(!ref.evidence_expired_only || (ref.origin === 'legacy_v1' && ref.identity_status === 'verified'), c.case_id + ': expired-only must be verified legacy_v1');
+  ensure(ref.origin !== 'v2_native_synthetic' || ref.identity_status !== 'verified', c.case_id + ': native facts without valid v1 envelope cannot be verified');
   const provenance = record(c.provenance, c.case_id + ': provenance');
   exactKeys(provenance, ['kind', 'v1_case_id'], 'provenance');
   inSet(provenance.kind, ['synthetic', 'v1_adapted'], c.case_id + ': provenance.kind');
@@ -212,6 +213,33 @@ export function loadDedupV2(): DedupV2Case[] {
   });
 }
 
+/**
+ * The independent DB harness must read back every seeded fact and provide these
+ * bindings separately from retrieval outcomes. A caller-supplied "reference_identity_id"
+ * in a retrieval outcome is deliberately not accepted.
+ *
+ * This structural validator checks a readback against the frozen fixture but
+ * cannot authenticate the DB itself: production-quality evidence needs actual
+ * isolated-stack readback logs and cleanup review outside this unit test.
+ */
+export type IdentityReadback = {
+  case_id: string;
+  fixture_identity_id: string;
+  fact_public_id: string;
+  readback_claim_text: string;
+  readback_origin: Origin;
+  readback_identity_status: IdentityStatus;
+  readback_usage: Usage;
+  source: 'isolated_db_readback' | 'mock_unit_test';
+  readback_evidence_ref: string;
+};
+export type IdentityDecisionEvent = {
+  decision: 'same' | 'distinct' | 'uncertain' | 'none';
+  actor: 'chatgpt' | 'backend' | 'reviewer' | 'none';
+  stage: 'read_review' | 'save_resolution' | 'revise_resolution' | 'registration' | 'none';
+  target_fact_public_id: string | null;
+  evidence_ref: string | null;
+};
 export type RetrievalOutcome = {
   case_id: string;
   run_id: string;
@@ -219,34 +247,44 @@ export type RetrievalOutcome = {
   retrieval_version: string;
   limit_k: number;
   complete: boolean;
-  reference_identity_id: string;
-  visible_candidates: Array<{ identity_id: string; claim_text: string }>;
-  automatic_identity_decision: Label | null;
+  visible_candidates: Array<{ fact_public_id: string; claim_text: string }>;
+  decision_event: IdentityDecisionEvent | null;
 };
 export type EvaluatedRun = {
   status: 'evaluated';
+  evidence_kind: 'isolated_db' | 'mock';
   run_id: string;
   backend_sha: string;
   retrieval_version: string;
   limit_k: number;
-  automatic_decisions_available: boolean;
+  /** Missing bindings mean recall and false-merge are NOT RUN. */
+  identity_readbacks: IdentityReadback[] | null;
+  /** Complete means event capture (including explicit 'none') for every case. */
+  decision_capture: 'complete' | 'unavailable';
   outcomes: RetrievalOutcome[];
 };
 export type NotRun = { status: 'NOT RUN'; reason: string };
 export type Score = { numerator: number; denominator: number };
+export type MaybeScore = Score | { status: 'NOT RUN' };
 export type MetricGroup = {
   total: number;
   recall_at_k: Score;
-  false_merge: Score | { status: 'NOT RUN' };
+  /** Wrong same targets, plus same decisions on distinct/uncertain cases. */
+  false_merge: MaybeScore;
+  distinct_false_merge: MaybeScore;
+  wrong_target_merge: MaybeScore;
+  decision_cases: number;
   incomplete: number;
   uncertain: number;
   misses: string[];
   false_merge_cases: string[];
+  wrong_target_cases: string[];
   incomplete_cases: string[];
   distinct_candidates_visible: number;
 };
 export type EvaluationReport = {
   status: 'evaluated';
+  evidence_kind: 'isolated_db' | 'mock';
   run_id: string;
   backend_sha: string;
   retrieval_version: string;
@@ -258,44 +296,119 @@ export type EvaluationReport = {
   by_identity_status: Record<string, MetricGroup>;
 };
 
+function isPublicUuid(value: unknown): value is string {
+  return typeof value === 'string' &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function validateMappings(cases: DedupV2Case[], run: EvaluatedRun): Map<string, IdentityReadback> | null {
+  if (run.identity_readbacks === null) return null;
+  ensure(Array.isArray(run.identity_readbacks), 'identity_readbacks must be array or null');
+  ensure(run.identity_readbacks.length === cases.length, 'incomplete identity readback mapping');
+  const casesById = new Map(cases.map(c => [c.case_id, c]));
+  const bindings = new Map<string, IdentityReadback>();
+  for (const binding of run.identity_readbacks) {
+    const gold = casesById.get(binding.case_id);
+    ensure(gold, 'readback unknown case_id');
+    ensure(!bindings.has(binding.case_id), binding.case_id + ': duplicate readback mapping');
+    ensure(binding.fixture_identity_id === gold.reference.fixture_identity_id, binding.case_id + ': fixture identity mismatch');
+    ensure(isPublicUuid(binding.fact_public_id), binding.case_id + ': invalid fact_public_id');
+    ensure(binding.readback_claim_text === gold.reference.claim_text, binding.case_id + ': DB readback claim mismatch');
+    ensure(binding.readback_origin === gold.reference.origin, binding.case_id + ': DB readback origin mismatch');
+    ensure(binding.readback_identity_status === gold.reference.identity_status, binding.case_id + ': DB readback status mismatch');
+    ensure(binding.readback_usage === gold.reference.usage, binding.case_id + ': DB readback usage mismatch');
+    ensure(binding.source === (run.evidence_kind === 'mock' ? 'mock_unit_test' : 'isolated_db_readback'), binding.case_id + ': wrong mapping evidence source');
+    nonempty(binding.readback_evidence_ref, binding.case_id + ': missing DB readback evidence ref');
+    bindings.set(binding.case_id, binding);
+  }
+  return bindings;
+}
+
+function validateEvent(event: IdentityDecisionEvent | null, run: EvaluatedRun, caseId: string): void {
+  if (run.decision_capture === 'unavailable') {
+    ensure(event === null, caseId + ': decision must be null if capture unavailable');
+    return;
+  }
+  ensure(event && typeof event === 'object', caseId + ': missing captured decision event');
+  inSet(event.decision, ['same', 'distinct', 'uncertain', 'none'], caseId + ': decision');
+  if (event.decision === 'none') {
+    ensure(event.actor === 'none' && event.stage === 'none' &&
+      event.target_fact_public_id === null && event.evidence_ref === null,
+    caseId + ': no-decision must not carry target or actor');
+    return;
+  }
+  inSet(event.actor, ['chatgpt', 'backend', 'reviewer'], caseId + ': decision actor');
+  inSet(event.stage, ['read_review', 'save_resolution', 'revise_resolution', 'registration'], caseId + ': decision stage');
+  nonempty(event.evidence_ref, caseId + ': decision evidence ref');
+  if (event.decision === 'same') {
+    ensure(isPublicUuid(event.target_fact_public_id), caseId + ': same requires target fact_public_id');
+  } else {
+    ensure(event.target_fact_public_id === null, caseId + ': only same may have target fact_public_id');
+  }
+}
+
 function scoreGroup(
   rows: DedupV2Case[],
   byId: Map<string, RetrievalOutcome>,
+  mappings: Map<string, IdentityReadback>,
   k: number,
-  decisionsAvailable: boolean,
+  decisionCapture: EvaluatedRun['decision_capture'],
 ): MetricGroup {
-  const same = rows.filter(x => x.label === 'same'), distinct = rows.filter(x => x.label === 'distinct');
-  const visible = (x: DedupV2Case) => byId.get(x.case_id)!.visible_candidates.slice(0, k);
-  const hit = (x: DedupV2Case) =>
-    visible(x).some(y => y.identity_id === byId.get(x.case_id)!.reference_identity_id);
-  const misses = same.filter(x => !hit(x)).map(x => x.case_id);
-  const falseMerges = decisionsAvailable
-    ? distinct.filter(x => byId.get(x.case_id)!.automatic_identity_decision === 'same').map(x => x.case_id)
+  const same = rows.filter(x => x.label === 'same');
+  const distinct = rows.filter(x => x.label === 'distinct');
+  const candidateVisible = (c: DedupV2Case) =>
+    byId.get(c.case_id)!.visible_candidates.slice(0, k).some(
+      y => y.fact_public_id === mappings.get(c.case_id)!.fact_public_id,
+    );
+  const misses = same.filter(x => !candidateVisible(x)).map(x => x.case_id);
+  const reviewed = decisionCapture === 'complete'
+    ? rows.filter(x => byId.get(x.case_id)!.decision_event?.decision !== 'none')
     : [];
+  const sameDecisions = reviewed.filter(x => byId.get(x.case_id)!.decision_event!.decision === 'same');
+  const falseMerges = sameDecisions.filter(x =>
+    x.label !== 'same' ||
+    byId.get(x.case_id)!.decision_event!.target_fact_public_id !== mappings.get(x.case_id)!.fact_public_id,
+  ).map(x => x.case_id);
+  const wrongTarget = sameDecisions.filter(x =>
+    x.label === 'same' &&
+    byId.get(x.case_id)!.decision_event!.target_fact_public_id !== mappings.get(x.case_id)!.fact_public_id,
+  ).map(x => x.case_id);
+  const reviewedDistinct = reviewed.filter(x => x.label === 'distinct');
+  const distinctMerges = reviewedDistinct.filter(x => byId.get(x.case_id)!.decision_event!.decision === 'same');
   const incomplete = rows.filter(x => !byId.get(x.case_id)!.complete).map(x => x.case_id);
+  const ratio = (numerator: number, denominator: number): MaybeScore =>
+    denominator > 0 ? { numerator, denominator } : { status: 'NOT RUN' };
   return {
     total: rows.length,
     recall_at_k: { numerator: same.length - misses.length, denominator: same.length },
-    false_merge: decisionsAvailable
-      ? { numerator: falseMerges.length, denominator: distinct.length }
-      : { status: 'NOT RUN' },
+    false_merge: ratio(falseMerges.length, reviewed.length),
+    distinct_false_merge: ratio(distinctMerges.length, reviewedDistinct.length),
+    wrong_target_merge: ratio(wrongTarget.length, reviewed.filter(x => x.label === 'same').length),
+    decision_cases: reviewed.length,
     incomplete: incomplete.length,
     uncertain: rows.filter(x => x.label === 'uncertain').length,
     misses,
     false_merge_cases: falseMerges,
+    wrong_target_cases: wrongTarget,
     incomplete_cases: incomplete,
-    distinct_candidates_visible: distinct.filter(x => visible(x).some(y => y.identity_id === byId.get(x.case_id)!.reference_identity_id)).length,
+    distinct_candidates_visible: distinct.filter(candidateVisible).length,
   };
 }
-function groups(rows: DedupV2Case[], key: (x: DedupV2Case) => string, outcomes: Map<string, RetrievalOutcome>, run: EvaluatedRun): Record<string, MetricGroup> {
+function groups(
+  rows: DedupV2Case[],
+  key: (x: DedupV2Case) => string,
+  outcomes: Map<string, RetrievalOutcome>,
+  mappings: Map<string, IdentityReadback>,
+  run: EvaluatedRun,
+): Record<string, MetricGroup> {
   const grouped: Record<string, DedupV2Case[]> = {};
   for (const c of rows) (grouped[key(c)] ??= []).push(c);
   return Object.fromEntries(Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([label, group]) => [
-    label, scoreGroup(group, outcomes, run.limit_k, run.automatic_decisions_available),
+    label, scoreGroup(group, outcomes, mappings, run.limit_k, run.decision_capture),
   ]));
 }
 
-/** A real run must supply complete, independent outcomes. Mock tests do not assert retrieval quality. */
+/** No actual DB evidence exists in P2-T2. Tests use evidence_kind='mock' only. */
 export function evaluateRetrieval(cases: DedupV2Case[], run: EvaluatedRun | NotRun): EvaluationReport | NotRun {
   if (run.status === 'NOT RUN') {
     nonempty(run.reason, 'NOT RUN reason');
@@ -305,37 +418,37 @@ export function evaluateRetrieval(cases: DedupV2Case[], run: EvaluatedRun | NotR
   ensure(/^[a-f0-9]{40}$/.test(run.backend_sha), 'backend_sha must be 40 hex chars');
   nonempty(run.retrieval_version, 'retrieval_version');
   ensure(Number.isInteger(run.limit_k) && run.limit_k > 0, 'limit_k invalid');
-  ensure(typeof run.automatic_decisions_available === 'boolean', 'decision availability invalid');
+  inSet(run.evidence_kind, ['isolated_db', 'mock'], 'evidence_kind');
+  inSet(run.decision_capture, ['complete', 'unavailable'], 'decision_capture');
+  const mappings = validateMappings(cases, run);
+  if (!mappings) return { status: 'NOT RUN', reason: 'Identity mappings from independent fixture readback unavailable' };
   ensure(run.outcomes.length === cases.length, 'missing or extra outcomes for evaluated run');
   const knownIds = new Set(cases.map(c => c.case_id)), byId = new Map<string, RetrievalOutcome>();
   for (const outcome of run.outcomes) {
     ensure(knownIds.has(outcome.case_id), 'unknown outcome case_id');
     ensure(!byId.has(outcome.case_id), 'duplicate outcome case_id');
-    ensure(outcome.run_id === run.run_id && outcome.backend_sha === run.backend_sha && outcome.retrieval_version === run.retrieval_version && outcome.limit_k === run.limit_k, outcome.case_id + ': outcome/run metadata mismatch');
+    ensure(outcome.run_id === run.run_id && outcome.backend_sha === run.backend_sha &&
+      outcome.retrieval_version === run.retrieval_version && outcome.limit_k === run.limit_k,
+    outcome.case_id + ': outcome/run metadata mismatch');
     ensure(typeof outcome.complete === 'boolean', outcome.case_id + ': complete required');
-    nonempty(outcome.reference_identity_id, outcome.case_id + ': reference identity mapping required');
-    ensure(Array.isArray(outcome.visible_candidates), outcome.case_id + ': candidates array required');
-    const candidateIds = new Set<string>();
+    ensure(Array.isArray(outcome.visible_candidates), outcome.case_id + ': candidate array required');
+    const seen = new Set<string>();
     for (const candidate of outcome.visible_candidates) {
-      nonempty(candidate.identity_id, outcome.case_id + ': candidate identity ID');
+      ensure(isPublicUuid(candidate.fact_public_id), outcome.case_id + ': candidate fact_public_id invalid');
       nonempty(candidate.claim_text, outcome.case_id + ': candidate claim');
-      ensure(!candidateIds.has(candidate.identity_id), outcome.case_id + ': repeated candidate ID');
-      candidateIds.add(candidate.identity_id);
+      ensure(!seen.has(candidate.fact_public_id), outcome.case_id + ': repeated candidate fact_public_id');
+      seen.add(candidate.fact_public_id);
     }
-    if (run.automatic_decisions_available) {
-      ensure(['same', 'distinct', 'uncertain', null].includes(outcome.automatic_identity_decision), outcome.case_id + ': invalid decision');
-    } else {
-      ensure(outcome.automatic_identity_decision === null, outcome.case_id + ': auto decision not available');
-    }
+    validateEvent(outcome.decision_event, run, outcome.case_id);
     byId.set(outcome.case_id, outcome);
   }
   return {
-    status: 'evaluated', run_id: run.run_id, backend_sha: run.backend_sha,
-    retrieval_version: run.retrieval_version, limit_k: run.limit_k,
-    overall: scoreGroup(cases, byId, run.limit_k, run.automatic_decisions_available),
-    by_split: groups(cases, x => x.split, byId, run),
-    by_category: groups(cases, x => x.category, byId, run),
-    by_origin: groups(cases, x => x.reference.origin, byId, run),
-    by_identity_status: groups(cases, x => x.reference.identity_status, byId, run),
+    status: 'evaluated', evidence_kind: run.evidence_kind, run_id: run.run_id,
+    backend_sha: run.backend_sha, retrieval_version: run.retrieval_version, limit_k: run.limit_k,
+    overall: scoreGroup(cases, byId, mappings, run.limit_k, run.decision_capture),
+    by_split: groups(cases, x => x.split, byId, mappings, run),
+    by_category: groups(cases, x => x.category, byId, mappings, run),
+    by_origin: groups(cases, x => x.reference.origin, byId, mappings, run),
+    by_identity_status: groups(cases, x => x.reference.identity_status, byId, mappings, run),
   };
 }
