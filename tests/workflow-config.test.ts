@@ -90,7 +90,7 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
     const full = '      - name: Project checks including frontend and root regressions';
     expect(ci.indexOf(focused)).toBeGreaterThan(ci.indexOf('      - name: Locked dependency installation'));
     expect(ci.indexOf(full)).toBeGreaterThan(ci.indexOf(focused));
-    expect(ci).toContain(`\${focused}\n        if: steps.changes.outputs.need_check == 'true'\n        run: pnpm exec vitest run tests/foundation.test.ts tests/gate-runner.test.ts tests/workflow-config.test.ts`);
+    expect(ci).toContain(`${focused}\n        if: steps.changes.outputs.need_check == 'true'\n        run: pnpm exec vitest run tests/foundation.test.ts tests/gate-runner.test.ts tests/workflow-config.test.ts`);
   });
 
   it('Prettier opsional dan enam source check tetap wajib berurutan', () => {
