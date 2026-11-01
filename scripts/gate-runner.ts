@@ -15,6 +15,7 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveRuntimeEvidence, type RuntimeEvidence } from './runtime-range.js';
 
 type Mode = 'source' | 'backend' | 'full';
 type ShardId = '1' | '2';
@@ -29,6 +30,7 @@ type Identity = {
   inputsHash: string;
   counts: Record<string, number>;
   shardHash: string;
+  runtime: RuntimeEvidence;
 };
 export class GateError extends Error {
   constructor(
@@ -299,14 +301,24 @@ export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identit
     )
   )
     fail('LOCK_PIN_DRIFT');
-  const pinned = [read('.nvmrc').toString().trim(), read('.deno-version').toString().trim()];
-  if (
-    command('node', ['--version']).output.trim() !== `v${pinned[0]}` ||
-    command('pnpm', ['--version']).output.trim() !== '10.33.2' ||
-    !command('deno', ['--version']).output.startsWith(`deno ${pinned[1]} `) ||
-    command('pnpm', ['exec', 'supabase', '--version']).output.trim() !== '2.120.0'
-  )
+  let runtime!: RuntimeEvidence;
+  try {
+    runtime = resolveRuntimeEvidence(
+      {
+        nodeSelector: read('.nvmrc').toString().trim(),
+        nodeEngine: (pkg as typeof pkg & { engines?: { node?: string } }).engines?.node ?? '',
+        denoSelector: read('.deno-version').toString().trim(),
+      },
+      {
+        node: command('node', ['--version']).output,
+        deno: command('deno', ['--version']).output,
+        pnpm: command('pnpm', ['--version']).output,
+        supabase: command('pnpm', ['exec', 'supabase', '--version']).output,
+      },
+    );
+  } catch {
     fail('TOOL_VERSION_MISMATCH');
+  }
   const inputPaths = [
     ...files('supabase/migrations', '.sql'),
     ...files('supabase/tests/fixtures', ''),
@@ -323,6 +335,7 @@ export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identit
     inputsHash,
     counts,
     shardHash: hash(shardBytes),
+    runtime,
   };
 }
 
@@ -332,7 +345,8 @@ export function sameIdentity(a: Identity, b: Identity): void {
     a.manifestHash !== b.manifestHash ||
     a.lockHash !== b.lockHash ||
     a.inputsHash !== b.inputsHash ||
-    a.shardHash !== b.shardHash
+    a.shardHash !== b.shardHash ||
+    JSON.stringify(a.runtime) !== JSON.stringify(b.runtime)
   )
     fail('COMPONENT_IDENTITY_MISMATCH');
 }
@@ -865,6 +879,7 @@ export async function main(mode: Mode): Promise<void> {
         ? 'COMMITTED_SOURCE'
         : 'LOCAL_DIAGNOSTIC_OVERLAY',
     suites: identity?.counts ?? null,
+    runtime: identity?.runtime ?? null,
     toolPins: {
       node: read('.nvmrc').toString().trim(),
       pnpm: '10.33.2',

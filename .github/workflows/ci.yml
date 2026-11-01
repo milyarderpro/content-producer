@@ -34,7 +34,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version: '>=22 <25'
           cache: pnpm
 
       - name: Record SHA and classify changes
@@ -97,6 +97,14 @@ jobs:
       - name: Locked dependency installation
         run: pnpm install --frozen-lockfile
 
+      - name: Focused Node Deno runtime and workflow selector regressions
+        if: steps.changes.outputs.need_check == 'true'
+        run: pnpm exec vitest run tests/foundation.test.ts tests/gate-runner.test.ts tests/workflow-config.test.ts
+
+      - name: Focused trivia dedup v2 corpus and evaluator regressions
+        if: steps.changes.outputs.need_check == 'true'
+        run: pnpm exec vitest run tests/trivia-dedup-v2.test.ts
+
       - name: Project checks including frontend and root regressions
         if: steps.changes.outputs.need_check == 'true'
         run: pnpm run check
@@ -107,7 +115,7 @@ jobs:
       - uses: denoland/setup-deno@v2
         if: steps.changes.outputs.mcp_changed == 'true' || steps.changes.outputs.probe_changed == 'true'
         with:
-          deno-version-file: .deno-version
+          deno-version: '>=2.9.7 <3'
 
       - name: Focused MCP OAuth and protocol regressions
         if: steps.changes.outputs.mcp_changed == 'true'
