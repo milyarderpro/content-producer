@@ -5,7 +5,10 @@
 Menetapkan perilaku pembuatan draft trivia melalui instruksi biasa, dari riset
 hingga readback, termasuk kelanjutan beberapa draft dan persetujuan terpisah.
 Spesifikasi ini menjabarkan baseline PRD melalui [design](../../design.md), bukan
-memberlakukan override kontrak frozen sebelum change record diterima.
+mengganti change record. Override yang diterima mengikuti
+[CR-053](../../../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
+dan [CR-054](../../../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md);
+penerimaan kontrak bukan bukti implementasi atau izin cutover runtime.
 
 ## ADDED Requirements
 
@@ -308,14 +311,32 @@ archive, serta pengelolaan post lama SHALL tetap mengikuti kontrak versinya.
 ### Requirement: TDW-16 Tool v2 terpisah dan post v1 tetap kompatibel
 
 Sistem SHALL menyediakan `trivia_find_similar_facts_v2`, `save_post_v2`, dan
-`revise_post_v2` dengan kontrak versi jelas. Tool v1 MUST tetap kompatibel selama
-transisi. Read/lifecycle bersama MUST memahami versi konten; post v1 SHALL tetap
-terbaca dan dikelola dengan arti serta snapshot lama.
+`revise_post_v2` sebagai alur utama dengan kontrak versi jelas. Kontrak v1 yang
+masih sah MUST dipertahankan, dengan pengecualian Read terbatas CR-054.
+Read/lifecycle bersama MUST memahami versi konten; post v1 SHALL tetap terbaca
+dan dikelola dengan arti serta snapshot lama.
 
 #### Scenario: Plugin baru dan lama selama transisi
 
 - **WHEN** host memakai plugin baru atau plugin v1 yang masih didukung
 - **THEN** plugin baru memilih v2 dan plugin lama tidak dipaksa membaca schema baru sebagai schema v1
+
+#### Scenario: Read v1 menemukan kandidat wajib native tanpa ontologi v1 sah
+
+- **WHEN** kandidat yang wajib diperiksa berasal dari v2 dan belum mempunyai representasi ontologi v1 yang sah untuk success output Read v1
+- **THEN** Read v1 ditolak secara terarah dengan `FACT_REVIEW_REQUIRED` dalam envelope error v1; full native success projection v1 tidak diwajibkan
+- **AND** identitas serta penggunaan kandidat tetap diperhitungkan tanpa metadata rekaan, hasil bersih palsu, penyembunyian kandidat atau ID pengelak
+
+#### Scenario: Request v1 lain masih dapat diproses dengan benar
+
+- **WHEN** request v1 yang masih didukung dapat diproses sah, termasuk kandidat dengan representasi v1 sah
+- **THEN** sistem tetap melayani menurut kontrak v1 dan tidak memperluas pengecualian native menjadi penolakan massal tool atau request v1
+
+#### Scenario: Recovery Read v1 ketika ketersediaan v2 belum terbukti
+
+- **WHEN** Read v1 ditolak karena kandidat native dan runtime/tool/plugin v2 belum terverifikasi tersedia
+- **THEN** respons menjelaskan tahap serta calon terdampak bila diketahui secara aman, tanpa mengarahkan pemanggilan tool v2 seolah sudah tersedia
+- **AND** calon tidak dianggap lolos dedup; pengganti memerlukan riset/Read sah, sedangkan hasil Write sebelumnya yang belum pasti tetap direkonsiliasi sebelum operasi atau versi baru
 
 #### Scenario: Membaca post historis
 
@@ -324,10 +345,16 @@ terbaca dan dikelola dengan arti serta snapshot lama.
 
 ### Requirement: TDW-17 Pensiun pembuatan v1 menunggu bukti dan keputusan
 
-Pembuatan v1 MUST NOT dihentikan sebelum kriteria cutover terukur diterima
-pemilik dan terbukti. Bukti SHALL mencakup keberhasilan v2, kompatibilitas post
-lama, pemakaian plugin lama, dan rollback. Penghentian MUST membedakan pembuatan
-baru dari maintenance/replay historis serta mempertahankan keterbacaan data.
+Arah pensiun pembuatan v1 setelah v2 siap/terverifikasi telah diterima melalui
+CR-054. Pelaksanaannya MUST menunggu kriteria cutover terukur yang diterima,
+bukti kesiapan dan izin tindakan. Bukti SHALL mencakup keberhasilan v2,
+pengelolaan post lama, pemakaian plugin lama dan rollback. Penghentian MUST
+mempertahankan data/snapshot, maintenance/replay serta pekerjaan in-flight.
+
+#### Scenario: Arah pensiun diterima tetapi kesiapan belum terbukti
+
+- **WHEN** CR-054 sudah diterima tetapi implementasi/verifikasi v2, kriteria cutover atau izin pelaksanaan belum tersedia
+- **THEN** arah pensiun creation tidak diputuskan ulang, tetapi runtime v1 tidak dinonaktifkan hanya berdasarkan keputusan arah atau CI dokumentasi
 
 #### Scenario: Kriteria atau bukti belum tersedia
 
@@ -337,4 +364,4 @@ baru dari maintenance/replay historis serta mempertahankan keterbacaan data.
 #### Scenario: Meninjau penghentian pembuatan lama
 
 - **WHEN** bukti cutover dan latihan rollback diajukan kepada pemilik
-- **THEN** keputusan mempertimbangkan post v1/v2, plan in-flight, maintenance/replay, dan data historis tanpa menganggap CI PASS sebagai izin rilis/penghentian
+- **THEN** keputusan pelaksanaan mempertimbangkan post v1/v2, plan/claim/reservasi in-flight, maintenance/replay dan data historis tanpa menganggap CI PASS sebagai izin rilis/penghentian atau pensiun creation sebagai penghapusan semua tool v1
