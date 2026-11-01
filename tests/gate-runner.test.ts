@@ -6,6 +6,7 @@ import { test } from 'vitest';
 import {
   assertAdvisorsReport,
   assertSourceTestEvidence,
+  assertSourceSubchecks,
   assertDatabaseTestEvidence,
   countFromOutput,
   plainEvidence,
@@ -170,6 +171,37 @@ test('source Vitest ANSI and plain summaries', () => {
       code: 'SOURCE_TEST_EVIDENCE_MISSING',
     });
   }
+});
+
+test('source evidence accepts six mandatory subchecks without formatter and rejects each omission', () => {
+  const required = [
+    'lint',
+    'typecheck',
+    'test',
+    'frontend:typecheck',
+    'frontend:build',
+    'frontend:test',
+  ];
+  const output = required.map((name) => `> content-producer@0.1.0 ${name} ${process.cwd()}`).join('\n');
+  assert.doesNotThrow(() => assertSourceSubchecks(output));
+  for (const name of required) {
+    assert.throws(() => assertSourceSubchecks(output.replace(` ${name} ${process.cwd()}`, ' missing')), {
+      code: 'SOURCE_SUBCHECK_MISSING',
+      status: 'FAIL',
+    });
+  }
+  for (const outcome of ['1 failed', '1 skipped']) {
+    assert.throws(() => assertSourceSubchecks(`${output}\n${outcome}`), {
+      code: 'REQUIRED_CASE_SKIPPED',
+      status: 'FAIL',
+    });
+  }
+  assert.throws(() => assertSourceTestEvidence('Test Files 13 passed\nTests 90 passed, 1 failed', 13), {
+    code: 'SOURCE_TEST_EVIDENCE_MISSING',
+  });
+  assert.throws(() => assertSourceTestEvidence('Test Files 13 passed\nTests 90 passed, 1 skipped', 13), {
+    code: 'SOURCE_TEST_EVIDENCE_MISSING',
+  });
 });
 
 test('database Vitest ANSI and plain summaries', () => {

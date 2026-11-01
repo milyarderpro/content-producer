@@ -597,20 +597,24 @@ function requirePass(stages: Stage[]): void {
   if (stages.some((item) => item.status !== 'PASS')) fail('REQUIRED_STAGE_FAILED', 'FAIL');
 }
 
+export function assertSourceSubchecks(output: string): void {
+  assertNoSkipped(output);
+  for (const subcheck of [
+    'lint',
+    'typecheck',
+    'test',
+    'frontend:typecheck',
+    'frontend:build',
+    'frontend:test',
+  ]) {
+    if (!output.includes(` ${subcheck} ${root}`)) fail('SOURCE_SUBCHECK_MISSING', 'FAIL');
+  }
+}
+
 function sourceStages(sourceFiles: number, stages: Stage[]): void {
   const item = stage('source', () => {
     const run = command('pnpm', ['run', 'check']);
-    for (const subcheck of [
-      'format:check',
-      'lint',
-      'typecheck',
-      'test',
-      'frontend:typecheck',
-      'frontend:build',
-      'frontend:test',
-    ]) {
-      if (!run.output.includes(` ${subcheck} ${root}`)) fail('SOURCE_SUBCHECK_MISSING', 'FAIL');
-    }
+    assertSourceSubchecks(run.output);
     assertSourceTestEvidence(run.output, sourceFiles);
     return run;
   });

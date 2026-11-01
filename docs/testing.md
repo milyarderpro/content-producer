@@ -46,14 +46,14 @@ belum PASS. Gate wajib tetap dijalankan sebelum deployment yang memerlukannya.
 
 | Command dari root                                  | Cakupan                                                                             | Prasyarat / efek                                                                                  |
 | -------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `pnpm run format:check`                            | Format repository sesuai ignore/config Prettier                                     | Membaca source; cakupannya lebih luas dari file yang diubah                                       |
+| `pnpm run format:check`                            | Pemeriksaan gaya Prettier opsional secara manual                                    | Bukan gate wajib; membaca source lebih luas dari file yang diubah                                |
 | `pnpm run lint`                                    | ESLint                                                                              | Dependency root                                                                                   |
 | `pnpm run typecheck`                               | TypeScript Node tooling, root test, dan test database                               | Tidak menjalankan query database                                                                  |
 | `pnpm run test`                                    | Vitest untuk `tests/**/*.test.ts`                                                   | Bukan suite database atau Deno; mencakup input kontrak/dokumen dan paket                          |
 | `pnpm run frontend:typecheck`                      | `checkJs` source browser                                                            | Tidak membuktikan browser/hosting/OAuth live                                                      |
 | `pnpm run frontend:build`                          | Build statis frontend                                                               | Menulis `auth-frontend/dist/` dengan konfigurasi publik proses                                    |
 | `pnpm run frontend:test`                           | Tiga file test Node frontend                                                        | Menggunakan fixture/mocking; termasuk route/callback                                              |
-| `pnpm run check`                                   | Seluruh tujuh command di atas, berurutan                                            | Tidak menjalankan suite MCP atau database; membangun frontend                                     |
+| `pnpm run check`                                   | Enam command non-Prettier di atas, berurutan                                        | Kegagalan menggagalkan check; tidak menjalankan suite MCP atau database; membangun frontend       |
 | `pnpm run verify-migrations`                       | Pola nama file SQL migration                                                        | Tidak memeriksa SQL, applied history, atau drift                                                  |
 | `pnpm run test:mcp`                                | Deno check, lint MCP, dan 15 file test MCP yang disebut script                      | Deno; mock/fixture protokol, tanpa stack DB untuk suite ini                                       |
 | `pnpm run test:database`                           | Vitest database **41 file saat ini** (40 pada baseline historis)                    | Docker/Supabase lokal dengan migration sesuai; menulis fixture lokal                              |
@@ -90,7 +90,7 @@ dari input/docs, tanpa mengakses database.
 
 | Jenis perubahan                                                       | Pemeriksaan yang sesuai                                                                                             | Batas bukti                                                                                                 |
 | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Markdown developer biasa                                              | Format file berubah, tautan/anchor, ketepatan isi, whitespace; light CI pada PR                                     | Tidak perlu full backend gate hanya untuk dokumentasi                                                       |
+| Markdown developer biasa                                              | Review isi, tautan/anchor, `git diff --check`, dan light CI pada PR; Prettier opsional                               | Tidak perlu full backend gate hanya untuk dokumentasi                                                       |
 | Dokumen kontrak atau input audit dipindah/diubah                      | Pemeriksaan di atas + pembaca/test/packaging/audit yang terdampak                                                   | Ekstensi `.md`/`.json` tidak otomatis berarti dampaknya ringan                                              |
 | TypeScript atau konfigurasi                                           | `pnpm run check` + test perilaku terkait                                                                            | Pilih gate tambahan berdasarkan dampak, bukan hanya ekstensi                                                |
 | Instruksi/metadata paket plugin                                       | Test paket terkait, packaging dan verifikasi kandidat; MCP/manual yang terdampak                                    | Light CI; reuse hanya jika backend/security/dep identik menurut CR-044                                      |
@@ -187,7 +187,7 @@ fokus untuk paket/MCP dan manual card yang terdampak sesuai scope perubahan.
 
 | Workflow                                                                      | Peran                                                                                                                                                   |
 | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [ci.yml](../.github/workflows/ci.yml)                                         | PR/push ke main dan manual: format, check source/frontend, MCP/probe/paket sesuai dependency; tanpa database/reset/hosted request                       |
+| [ci.yml](../.github/workflows/ci.yml)                                         | PR/push ke main dan manual: whitespace, check source/frontend, MCP/probe/paket sesuai dependency; tanpa database/reset/hosted request                   |
 | [backend-gate-candidate.yml](../.github/workflows/backend-gate-candidate.yml) | **G4 release gate manual exact-SHA setelah merge PR #105**: source + dua shard terisolasi + aggregate PASS, dengan committed config; **tidak otomatis** |
 | [backend-technical-gate.yml](../.github/workflows/backend-technical-gate.yml) | Full legacy CR-020/044 manual exact-SHA: **rollback sekarang**, gate historis sebelum merge; satu stack + `test-all`                                    |
 | [hosted-oauth-probe.yml](../.github/workflows/hosted-oauth-probe.yml)         | Probe hosted manual pada main: metadata publik dan challenge tanpa token; tanpa business tools/call                                                     |
@@ -203,8 +203,8 @@ mengubah required checks atau kebijakan branch.
 Konsolidasi source tidak menghapus riwayat run/workflow pada registry Actions.
 
 Classifier light CI kini menyertakan deletion dan memecah rename menjadi dua path
-untuk memilih check. File yang hilang tidak dikirim ke formatter; daftar path
-memakai pemisah NUL agar spasi tidak memecah argumen. Regresi shell workflow diuji
+untuk memilih check. Path dengan spasi tetap diklasifikasikan sebagai satu file;
+tidak ada daftar path formatter. Regresi shell workflow diuji
 dengan tree Git lokal, tanpa commit atau koneksi GitHub.
 
 Pemetaan kini mencakup kontrak tool/DNA, coverage input, fixture/dataset, konfigurasi
@@ -288,8 +288,8 @@ config** (`ACTIONS_EXACT_CONFIG`). CI fixture tidak membuktikan
 hosted OAuth, deployment atau live business Write. Rincian keputusan di
 [CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md).
 
-Untuk **perubahan dokumentasi saja**, periksa format dokumen yang berubah,
-tautan/anchor lokal, dan `git diff --check`; verifikasi **light CI pada exact
+Untuk **perubahan dokumentasi saja**, review isi dan tautan/anchor lokal,
+jalankan `git diff --check`; Prettier opsional. Verifikasi **light CI pada exact
 head SHA PR**. Jalankan `pnpm run check` atau
 `pnpm exec vitest run tests/workflow-config.test.ts` bila perubahan memang
 berdampak pada source/kontrak workflow; jangan menganggap tahap yang di-skip

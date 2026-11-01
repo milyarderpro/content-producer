@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -74,7 +74,6 @@ function classify(before: Record<string, string>, after: Record<string, string>,
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
-  const paths = join(temporary, 'ci-formatted-paths');
   return {
     checks: Object.fromEntries(
       readFileSync(output, 'utf8')
@@ -82,40 +81,45 @@ function classify(before: Record<string, string>, after: Record<string, string>,
         .split('\n')
         .map((line) => line.split('=')),
     ),
-    format: existsSync(paths) ? readFileSync(paths, 'utf8').split('\0').filter(Boolean) : [],
   };
 }
 
 describe('Light CI memilih pemeriksaan dari kedua sisi perubahan', () => {
-  it('mengaktifkan project check untuk deletion TypeScript tanpa memformat file yang hilang', () => {
+  it('mengaktifkan project check untuk deletion TypeScript', () => {
     const result = classify({ 'scripts/old.ts': 'export const value = 1;\n' }, {});
     expect(result.checks.need_check).toBe('true');
-    expect(result.format).toEqual([]);
   });
 
   it('tetap memilih check TypeScript saat isi identik dipindah ke Markdown', () => {
     const content = 'export const value = 1;\n';
     const result = classify({ 'scripts/old.ts': content }, { 'docs/reference.md': content });
     expect(result.checks.need_check).toBe('true');
-    expect(result.format).toEqual(['docs/reference.md']);
   });
 
   it('mengaktifkan MCP check dari file handler yang dihapus', () => {
     const result = classify({ 'supabase/functions/mcp/old.ts': 'export const value = 1;\n' }, {});
     expect(result.checks.mcp_changed).toBe('true');
-    expect(result.format).toEqual([]);
   });
 
   it('tetap memilih package check ketika file plugin dipindah keluar paket', () => {
     const result = classify({ 'plugin/old.md': 'Fixture\n' }, { 'docs/reference.md': 'Fixture\n' });
     expect(result.checks.package_changed).toBe('true');
-    expect(result.format).toEqual(['docs/reference.md']);
   });
 
-  it('mempertahankan path dengan spasi sebagai satu argumen formatter', () => {
+  it('mempertahankan path dengan spasi dalam klasifikasi source', () => {
     const result = classify({}, { 'tests/with spaces.test.ts': 'export const value = 1;\n' });
     expect(result.checks.need_check).toBe('true');
-    expect(result.format).toEqual(['tests/with spaces.test.ts']);
+  });
+
+  it('menolak whitespace rusak pada path dengan spasi', () => {
+    expect(() => classify({}, { 'tests/with spaces.test.ts': 'export const value = 1;   \n' })).toThrow();
+  });
+
+  it('perubahan workflow memilih source, MCP, probe, dan package', () => {
+    const result = classify({}, { '.github/workflows/ci.yml': 'name: CI\n' });
+    for (const key of ['need_check', 'mcp_changed', 'probe_changed', 'package_changed']) {
+      expect(result.checks[key]).toBe('true');
+    }
   });
 
   it.each(['plans/tool-inventory.md', 'plans/trivia-content-dna.md'])(
@@ -137,6 +141,13 @@ describe('Light CI memilih pemeriksaan dari kedua sisi perubahan', () => {
       expect(result.checks.backend_review).toBe('true');
     },
   );
+
+  it('perubahan package dependency memilih source, MCP, probe, dan package', () => {
+    const result = classify({}, { 'pnpm-lock.yaml': 'lockfileVersion: 9.0\n' });
+    for (const key of ['need_check', 'mcp_changed', 'probe_changed', 'package_changed']) {
+      expect(result.checks[key]).toBe('true');
+    }
+  });
 
   it('memilih root checks untuk fixture yang dipindah keluar lokasi lama', () => {
     const result = classify(
