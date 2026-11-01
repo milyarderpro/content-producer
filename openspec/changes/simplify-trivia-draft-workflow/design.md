@@ -29,10 +29,15 @@ runtime production. Temuan yang memengaruhi desain:
   `http.ts` mempunyai log request tersanitasi, tetapi belum membuktikan
   pengukuran pemakaian versi plugin yang cukup untuk cutover.
 
-Pencatatan saat ini terbatas pada proposal/design dan metadata scaffold CLI.
-Tidak ada implementasi, perubahan PRD/plan/change record, delta spec, task file,
-deployment, atau business Write yang dilakukan. Semua test usulan di bawah
-berstatus **NOT RUN**; pembacaan test lama bukan bukti PASS baru.
+Pencatatan awal 31 Oktober 2026 terbatas pada proposal/design dan metadata
+scaffold CLI. Status berikutnya mengikuti [tasks](tasks.md), hasil P1 dan
+[kontrak identitas P2-T1](../../../docs/contracts/trivia-fact-identity-v2.md).
+Penyelarasan 1 November mengikuti
+[CR-053](../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
+dan [CR-054](../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md)
+yang diterima. Bukti kontrak/fixture P1 serta review statis P2-T1 tidak membuktikan
+implementasi backend/tool v2; test backend/race/host/LIVE usulan di bawah tetap
+**NOT RUN**. Tidak ada deployment atau business Write dalam penyelarasan ini.
 
 ## Goals / Non-Goals
 
@@ -128,8 +133,28 @@ FR-06, dengan izin koreksi terpisah dan snapshot terpublikasi tetap utuh.
 
 Selama v1 masih menulis, perubahan identitas, koreksi, reservasi, dan pemakaian
 v1 harus terlihat pada pemeriksaan lintas versi. Backfill sekali tanpa menjaga
-konsistensi write berikutnya tidak cukup. Bentuk schema/helper sinkronisasinya
-diputuskan pada P2/P3; tidak membuat registry identitas paralel.
+konsistensi write berikutnya tidak cukup. P2-T1 merinci akar `trivia_facts`
+in-place dengan ID stabil, envelope evidence v1 opsional, evidence URL v2
+dependent, serta shared usage dan dispatcher snapshot menurut versi. Rincian
+ada di [kontrak identitas](../../../docs/contracts/trivia-fact-identity-v2.md);
+DDL/constraint/trigger dan bukti sinkronisasi tetap P3. Tidak membuat registry
+identitas paralel atau metadata ontologi/tier/expiry rekaan untuk native v2.
+
+**Creation v2 utama; maintenance legacy tetap:** CR-054 menerima arah pensiun
+pembuatan v1 setelah v2 siap dan terverifikasi. Selama transisi, jika kandidat
+wajib v2-native belum mempunyai representasi ontologi v1 sah, Read v1 boleh
+ditolak dengan `FACT_REVIEW_REQUIRED` dalam envelope v1. Full native success
+projection v1 bukan kewajiban atau blocker P2-T1. Discovery tidak menyembunyikan
+identitas/usage kandidat, dan request v1 lain yang dapat diproses sah tetap
+dilayani. Readback/pengelolaan post lama, snapshot, replay serta pekerjaan
+in-flight tetap dilindungi; pengecualian creation bukan pensiun semua tool v1.
+
+Recovery menyebut tahap dan calon terdampak bila diketahui, tanpa menganggap
+hasil Read gagal sebagai dedup bersih atau membuat ID pengelak. Pilihan calon
+baru tetap melalui riset dan Read sah. Arahkan ke v2 hanya setelah ketersediaan
+runtime/tool/plugin terverifikasi; jika belum, jelaskan titik berhentinya.
+Respons Write yang belum pasti tetap direkonsiliasi sebelum berpindah operasi
+atau versi. Keputusan arah bukan izin cutover runtime atau deployment.
 
 Owner OAuth, scope workspace, RLS, grant default-closed, audit operasi,
 idempotency, serta urutan lock tetap berlaku. Pertahankan enam digit mikrodetik
@@ -274,9 +299,10 @@ panjang, atau data owner lain. Cakupan seluruh tool harus dapat diaudit.
 
 ### 7. Baseline pekerjaan tetap 8 fase / 23 task
 
-Tabel ini memetakan penjabaran ke task yang sudah ada, bukan task list eksekusi
-atau penggantian plan. Semua task belum dikerjakan pada langkah pencatatan ini.
-Tidak ada usulan penambahan/pengurangan task atau fase dalam dokumen ini.
+Tabel ini memetakan penjabaran ke task yang sudah ada, bukan penggantian plan.
+Status pelaksanaan/bukti terkini ada di [tasks](tasks.md); pernyataan semua task
+belum dikerjakan hanya berlaku pada pencatatan desain awal. Tidak ada perubahan
+jumlah task atau fase dalam penyelarasan ini.
 
 | Fase | Task baseline                 | Penjabaran pada task yang sama                                                                       |
 | ---- | ----------------------------- | ---------------------------------------------------------------------------------------------------- |
@@ -321,6 +347,10 @@ beserta alasan, perubahan dependensi, dan acceptance untuk keputusan pemilik.
   pemetaan/pemakaian, termasuk reservasi aktif dan status koreksi historis.
 - [Kompatibilitas menambah cabang lifecycle] -> Audit seluruh tool, pembacaan
   post lama, revisi, snapshot published, serta gate menurut versi konten.
+- [Read v1 berhenti saat menemui native tanpa ontologi sah] -> Batas creation
+  ini diterima CR-054; gunakan error/recovery terarah, bukan metadata rekaan atau
+  hasil bersih palsu. Uji request v1 lain yang sah dan maintenance/replay legacy
+  secara terpisah; jangan menyamakan pensiun creation dengan penghapusan data.
 - [Claim habis saat riset atau respons hilang] -> Reconcile plan/post dan replay
   operasi identik; uji expiry/reclaim serta larangan membuat ulang completed.
 - [Error umum menyamarkan commit yang sudah terjadi] -> Pisahkan kepastian hasil
@@ -360,14 +390,17 @@ tetap berlaku. Tidak ada gate yang dijalankan oleh pencatatan ini.
 
 1. Selesaikan baseline, change record yang diterima, kontrak contoh, dan keputusan
    identitas/retrieval sesuai P1/P2 sebelum coding kontrak baru.
-2. Terapkan schema additive/backfill dan backend kompatibel v1/v2; verifikasi
-   source, fixture/security dan host terkendali sesuai P3-P7.
+2. Terapkan schema additive/backfill dan backend lintas versi dengan batas Read
+   v1 CR-054 serta maintenance legacy yang tetap sah; verifikasi source,
+   fixture/security dan host terkendali sesuai P3-P7.
 3. Penuhi diagnostik seluruh tool menurut baseline penerimaan. Pemisahan rilis
    yang mendahulukan alur draft belum menjadi keputusan.
 4. Sesudah izin rilis, backend mendahului plugin v2. Catat versi runtime dan
    backend/plugin SHA terpisah; lakukan retest/readback pada objek yang diizinkan.
-5. Observasi dan tinjau kriteria cutover di bawah, lalu minta keputusan eksplisit
-   pemilik sebelum menghentikan jalur pembuatan v1.
+5. Arah pensiun creation v1 sudah diterima melalui CR-054. Observasi dan tinjau
+   kriteria cutover di bawah, buktikan kesiapan/rollback dan dapatkan izin
+   pelaksanaan sebelum menonaktifkan jalur runtime tersebut. Arah produk tidak
+   perlu diputuskan ulang; detail pelaksanaan belum dianggap diterima.
 
 ### Usulan kriteria cutover untuk ditinjau, belum diterima
 
@@ -394,7 +427,9 @@ Pensiun pembuatan v1 tidak otomatis menghapus seluruh tool lama. Audit khususnya
 dependensi register/reserve/release pada revisi post v1, pekerjaan in-flight,
 replay historis, serta plugin terpasang sebelum menentukan apa yang dinonaktifkan.
 Panggilan lama yang tidak didukung harus mendapat diagnostik jelas. Tidak ada
-tenggat atau daftar penghapusan tool yang ditetapkan sekarang.
+tenggat atau daftar penghapusan tool yang ditetapkan sekarang. CR-054 menerima
+arah pensiun creation dan pengecualian Read terbatas, bukan bukti bahwa kriteria
+di atas telah terpenuhi atau izin menonaktifkan runtime sekarang.
 
 ### Rancangan rollback untuk review
 
@@ -421,18 +456,24 @@ rollback belum diputuskan; rancangan ini bukan izin deploy atau mutasi.
 - Tidak mengembalikan tier/expiry/ontologi input v2, riset ulang URL saat Setujui,
   atau kewajiban tahun pada copy. Data/riwayat v1 tetap terbaca dengan arti lama;
   jalur pembuatan v1 hanya selama transisi.
+- CR-054: v2 alur utama; arah pensiun creation v1 setelah v2 siap/terverifikasi
+  diterima. Read v1 dapat menolak kandidat wajib native tanpa ontologi v1 sah
+  dengan `FACT_REVIEW_REQUIRED`, tanpa full native success projection wajib.
+  Request v1 lain yang sah, maintenance, snapshot, replay dan in-flight tetap
+  dilindungi. Kriteria/bukti/izin cutover belum terpenuhi oleh keputusan arah.
 - PRD adalah acuan kebutuhan dan plan 8 fase/23 task adalah baseline pekerjaan.
   **Aturan versi katalog tetap baseline**, bukan diganti oleh alternatif B.
-- Rujukan rilis mengikuti G4 CR-052 manual exact-SHA yang berlaku. Scope langkah
-  ini hanya proposal/design dan metadata scaffold, bukan implementasi atau
-  penerimaan override kontrak.
+- Rujukan rilis mengikuti G4 CR-052 manual exact-SHA yang berlaku. CR-053/054
+  menerima override kontrak dalam scope masing-masing; penerimaannya tidak
+  membuktikan implementasi, deployment, atau Write LIVE.
 
 ### Alternatif teknis yang masih terbuka
 
 - B: validasi kandidat relevan di dalam transaksi, bentuk referensi review dan
   kelengkapannya; belum mengganti A dan harus dibandingkan dengan race nyata.
-- Detail schema/pemetaan/sinkronisasi registry lintas versi dan pemeliharaan post
-  lama, mengikuti kebutuhan P2/P3 dan tanpa mengubah keputusan produk.
+- Detail DDL/validator/sinkronisasi registry lintas versi dan pemeliharaan post
+  lama mengikuti desain identitas P2-T1 serta kebutuhan P3, tanpa membuat
+  metadata v1 rekaan atau mengubah keputusan produk.
 - Metode pengukuran penggunaan lama, target/mekanisme rollback kompatibel, serta
   batas tepat tool v1 yang dapat dipensiunkan tanpa merusak maintenance/replay.
 - D1/D2 sebagai pemetaan internal boleh digunakan; rilis terpisah yang
@@ -446,8 +487,9 @@ rollback belum diputuskan; rancangan ini bukan izin deploy atau mutasi.
 2. Apa dataset/ambang retrieval, ambang manfaat A/B, serta paket skenario dan
    pengulangan host/LIVE yang disepakati sebelum evaluasi?
 3. Apa periode observasi aktif, ukuran penggunaan plugin lama, kriteria cutover,
-   target serta pemicu rollback, dan batas penghentian pembuatan v1 yang diterima?
-   Contoh 7 hari/3 chat belum menjadi persetujuan.
+   target serta pemicu rollback, dan scope pelaksanaan penghentian creation v1
+   yang diterima? Arah pensiunnya sudah diterima CR-054; contoh 7 hari/3 chat,
+   tanggal dan izin pelaksanaan belum menjadi persetujuan.
 4. Jika kelak diusulkan rilis alur draft sebelum D2 selesai, apakah urutan itu
    diterima dengan dampak dan kriteria penyelesaian seluruh tool yang eksplisit?
    Sampai ada keputusan, baseline seluruh tool tetap dipertahankan.

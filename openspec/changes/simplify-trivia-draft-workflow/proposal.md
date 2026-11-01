@@ -31,30 +31,36 @@ terbukti melalui readback, dengan keamanan serta riwayat tetap terjaga.
   tool**, termasuk kejelasan hasil Write yang belum pasti. D1/D2 hanya pembagian
   pekerjaan internal; urutan rilis terpisah belum disetujui.
 - Pertahankan satu identitas canonical lintas v1/v2 serta keterbacaan dan arti
-  riwayat lama. Jalur pembuatan v1 tersedia selama transisi; kriteria terukur untuk
-  cutover, pemakaian plugin lama, dan rollback diajukan untuk keputusan pemilik.
+  riwayat lama. Menurut
+  [CR-054](../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md),
+  v2 menjadi alur utama dan arah pensiun pembuatan v1 sudah diterima. Selama
+  transisi, Read v1 boleh menolak kandidat wajib v2-native tanpa representasi
+  ontologi v1 sah dengan `FACT_REVIEW_REQUIRED`; full native success projection
+  v1 tidak diwajibkan. Request v1 lain yang sah, maintenance post/data lama,
+  replay dan pekerjaan in-flight tetap dilindungi. Kriteria terukur, bukti dan
+  izin pelaksanaan cutover serta rollback belum ditetapkan oleh keputusan arah ini.
 - Pertahankan baseline [rencana implementasi](../../../plans/simplified-trivia-draft-workflow-implementation-plan.md):
   **8 fase dan 23 task**. Gunakan G4 CR-052 manual exact-SHA sebagai gate rilis
   backend sesuai aturan repository terbaru.
 - **BREAKING — perubahan kontrak yang direncanakan, belum diberlakukan:** alur v2
   mengganti kewajiban sumber, ontologi input, reservasi, dan editorial v1; kelak
-  penghentian pembuatan v1 juga memengaruhi plugin lama. Catat override dalam
-  change record yang diterima sebelum implementasi; schema tool v1 tidak diganti
-  mendadak selama transisi.
+  penghentian pembuatan v1 juga memengaruhi plugin lama. Override diterima melalui
+  [CR-053](../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
+  dan CR-054; implementasi serta verifikasi runtime tetap pekerjaan berikutnya.
+  Envelope/input/output v1 yang masih sah tidak diganti mendadak menjadi schema v2.
 
-Langkah ini hanya membuat `proposal.md` dan `design.md` beserta metadata scaffold
-CLI. Tidak mengubah PRD, plan, change record, source, konfigurasi workflow,
-deployment, atau data; tidak membuat delta spec maupun `tasks.md`. Persetujuan
-pencatatan bukan persetujuan kontrak baru atau izin implementasi.
+Proposal/design awal dicatat bersama metadata scaffold CLI pada 31 Oktober 2026;
+specs, tasks dan hasil P1/P2 ditambahkan pada langkah berikutnya. Penyelarasan
+1 November 2026 mengikuti keputusan CR-054, bukan perubahan runtime atau bukti
+deployment. Status pekerjaan dan batas verifikasi tetap ada di [tasks](tasks.md).
 
 ## Capabilities
 
 ### New Capabilities
 
-Inventaris `openspec list --specs --json` pada 31 Oktober 2026 kosong. Nama berikut
-adalah batas capability yang direncanakan untuk artefak specs pada langkah
-berikutnya yang diotorisasi, bukan klaim bahwa perilakunya belum ada sama sekali
-di source atau bahwa file spec sudah dibuat.
+Inventaris spec utama pada pencatatan awal 31 Oktober 2026 kosong. Tiga capability
+berikut sudah mempunyai delta spec dalam change ini; spec utama belum
+disinkronkan/diarsipkan. Keberadaan delta bukan bukti perilaku v2 sudah berjalan.
 
 - `trivia-draft-workflow`: pembuatan dan revisi draft sederhana, orkestrasi
   satu/beberapa draft melalui content plan, readback, pemeriksaan kualitas,
@@ -69,7 +75,7 @@ di source atau bahwa file spec sudah dibuat.
 ### Modified Capabilities
 
 Tidak ada capability OpenSpec terdaftar untuk dimodifikasi. Kontrak frozen di
-`plans/` dan keputusan yang berlaku tetap menjadi acuan sampai override diterima.
+`plans/` tetap menjadi baseline, dilengkapi override yang diterima di CR-053/054.
 
 ## Impact
 

@@ -11,9 +11,11 @@ kebutuhan adalah [PRD](../../../plans/simplified-trivia-draft-workflow-prd.md),
 
 Pernyataan scope proposal/design tentang pencatatan dua artefak merujuk langkah
 sebelumnya. Permintaan berikutnya mengizinkan penambahan specs dan checklist ini
-sebagai perencanaan; isi keputusan proposal/design dipertahankan. Progres apply
-dicatat per task beserta bukti. Verifikasi kontrak/mock P1 terpisah dari
-pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
+sebagai perencanaan. Penyelarasan 1 November 2026 mengikuti
+[CR-054](../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md)
+yang diterima setelah P1. Progres apply dicatat per task beserta bukti.
+Verifikasi kontrak/mock P1 dan review statis P2-T1 terpisah dari pengujian
+backend/host/LIVE v2 yang masih **NOT RUN**.
 
 ### Prasyarat dan batas keputusan
 
@@ -30,6 +32,12 @@ pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
 - Dataset/ambang retrieval dibekukan sebelum implementasi pencarian dievaluasi.
   Kriteria cutover, periode observasi, dan target/pemicu rollback diajukan untuk
   keputusan pemilik; contoh 7 hari/3 chat bukan gate yang diterima.
+- CR-054 menerima v2 utama, arah pensiun creation v1 setelah v2 siap/terverifikasi,
+  dan penolakan Read v1 `FACT_REVIEW_REQUIRED` untuk kandidat wajib native tanpa
+  ontologi v1 sah; full native success projection v1 tidak wajib. P3-T2/T3,
+  P4-T3/P5, P6 dan P7/P8 membuktikan batas ini serta request v1 lain yang sah,
+  maintenance/readback, snapshot, replay dan in-flight yang tetap dilindungi.
+  Detail kriteria/bukti/izin cutover bukan disetujui otomatis oleh keputusan arah.
 - D1/D2 hanya pembagian internal P6-T2. Diagnostik **seluruh tool** tetap wajib;
   tidak ada keputusan rilis alur draft lebih awal sebelum D2 selesai.
 - Setiap perubahan source memerlukan Issue/PR fokus dan Actions sesuai aturan
@@ -68,7 +76,9 @@ pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
       [CR-053](../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
       secara eksplisit pada 31 Oktober 2026 dengan baseline A. Pengecualian B,
       angka cutover, rilis D1 sebelum D2, pensiun v1, deployment, dan Write
-      production tetap tidak diterima; ketidakpastian P1-T1 tidak ditutup.
+      production tidak ikut diterima pada P1; ketidakpastian P1-T1 tidak ditutup.
+      Arah pensiun creation dan batas Read baru diterima kemudian melalui CR-054,
+      bukan ditambahkan retroaktif ke bukti P1.
 - [x] 1.3 **P1-T3 Kontrak contoh:** bekukan request/response sukses dan error
       untuk satu draft, lima draft bertema, hasil sebagian, Read incomplete,
       katalog/config stale, reuse, URL/budget, claim, lost response, dan CAS. Tetapkan
@@ -86,7 +96,7 @@ pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
 
 ## 2. Identitas dan tolok ukur duplikasi
 
-- [ ] 2.1 **P2-T1 Identitas:** rinci registry canonical dan pemetaan ID v1,
+- [x] 2.1 **P2-T1 Identitas:** rinci registry canonical dan pemetaan ID v1,
       status invalidated/superseded/rejected/expired, riwayat published, alokasi,
       reservasi v1 aktif, serta cara write v1 tetap terlihat selama transisi.
       **Verifikasi:** aturan dan contoh identity/reuse mencakup parafrasa sama,
@@ -96,6 +106,20 @@ pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
       diputuskan, tanpa jaminan seluruh parafrasa terdeteksi; calon `same` terhadap
       masing-masing status invalidated/superseded/rejected diganti, bukan dipakai
       atau diberi ID baru untuk melewati riwayatnya.
+      **Bukti/penerimaan koordinator:**
+      [kontrak identitas](../../../docs/contracts/trivia-fact-identity-v2.md) §1–6
+      dan S01–S22 (termasuk S11a/b), serta CR-054, direview mandiri pada
+      `a15f39483177bba3c99cf0066f3972f44963e591` di
+      [PR #109](https://github.com/milyarderpro/content-producer/pull/109),
+      [Issue #108](https://github.com/milyarderpro/content-producer/issues/108).
+      [Actions 41257834417](https://github.com/milyarderpro/content-producer/actions/runs/41257834417)
+      PASS docs-only exact SHA: format/indeks dan 72 nama migration; whitespace
+      PASS. R1–R4 memenuhi acceptance dokumentasi; sumber/binding v2-native,
+      shared usage, no-gap writes, TTL/cleanup serta traceability dirinci tanpa
+      metadata v1 rekaan. Ini penyelesaian desain/acceptance statis P2-T1, bukan
+      DB/race/security/G4/host/LIVE PASS. Implementasi/bukti tersebut tetap P3–P8;
+      SHA/check penyelarasan OpenSpec dan status integrasi dicatat di PR, bukan
+      dianggap lulus dari PASS kandidat dokumen sebelumnya.
 - [ ] 2.2 **P2-T2 Dataset dedup:** siapkan dataset berlabel parafrasa dan mirip
       kata tetapi beda makna, mencakup data historis serta status koreksi; pisahkan
       baseline/evaluasi sebelum optimasi. **Verifikasi:** manifest/label dan cara
@@ -124,7 +148,9 @@ pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
       konsistensi perubahan v1 berikutnya. **Verifikasi:** backfill berulang tidak
       menggandakan ID/pemakaian, digest snapshot/approval/isi lama tetap, dan test
       write v1 sesudah backfill langsung terlihat dari v2; catat prosedur dan hasil
-      audit migrasi pada fixture.
+      audit migrasi pada fixture. Native tanpa envelope v1 tetap ditemukan;
+      penolakan/first-attachment v1 mengikuti kontrak P2-T1 dan batas CR-054,
+      bukan insert identitas paralel atau kewajiban full native success v1.
 - [ ] 3.3 **P3-T3 Pencarian database:** implementasikan RPC Read v2 kalimat +
       Page dengan kandidat ringkas lintas versi, `complete`, dan versi katalog A.
       **Verifikasi:** test dataset P2, hasil kosong/lengkap/terpotong, batas output,
@@ -134,6 +160,8 @@ pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
       Fixture membedakan parafrasa yang ditemukan dari yang terlewat dan tidak
       mengklaim dedup sempurna; kasus `same` untuk setiap status invalidated,
       superseded, dan rejected memverifikasi petunjuk riwayat serta penggantian calon.
+      Verifikasi Read native v2 dan batas Read v1 CR-054 secara terpisah; request
+      v1 lain yang masih sah tidak ditolak massal atau disembunyikan kandidatnya.
 
 ## 4. Simpan, revisi, dan pemulihan
 
@@ -162,6 +190,8 @@ pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
       makna sama/berubah, pembaruan URL draft, stale revision/hash, ready ke draft,
       schedule-only sesuai kontrak, readback sumber/checks, serta pelepasan alokasi
       belum terbit; dokumentasi menjelaskan snapshot historis dan recovery.
+      Arah pensiun creation CR-054 tidak menghapus maintenance/readback post
+      lama, immutable usage/history, atau replay/in-flight yang masih diperlukan.
 - [ ] 4.4 **P4-T4 Beberapa draft:** hubungkan save v2 dengan content plan tanpa
       jadwal, satu item tiap giliran, jumlah/tema tepat, progres, lease/renew,
       failure/retry, serta resume tanpa membuat ulang completed. **Verifikasi:**
@@ -201,7 +231,8 @@ pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
       masih didukung serta mapping tipis ke RPC. **Verifikasi:** test MCP/registry,
       katalog host, error input/output, owner denial, dan kompatibilitas plugin lama
       lulus; inventaris, kontrak versi, serta manifest test/Inspector diperbarui
-      tanpa menutupi tool baru dengan hitungan baseline lama.
+      tanpa menutupi tool baru dengan hitungan baseline lama. Kompatibilitas
+      memakai pengecualian Read native CR-054, bukan full native success v1 wajib.
 - [ ] 6.2 **P6-T2 Diagnostik seluruh tool:** lengkapi mapping input/auth/domain/
       rate limit/transport/output/unknown untuk seluruh katalog menurut P1-T3;
       D1/D2 hanya kelompok internal dalam task ini. **Verifikasi:** matriks tool x
@@ -209,6 +240,9 @@ pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
       kepastian Write, waktu tunggu, recovery, kompatibilitas v1, serta redaction
       respons/log lulus; ID diagnostik cocok dengan log tersanitasi. Dokumentasi
       seluruh tool lengkap, tidak menyatakan task selesai setelah D1 saja.
+      Penolakan Read native CR-054 harus terarah dan recovery tidak menganggap
+      tool v2 tersedia sebelum runtime/plugin terverifikasi; Write unknown tetap
+      direkonsiliasi sebelum operasi atau perpindahan versi baru.
 - [ ] 6.3 **P6-T3 Instruksi plugin:** perbarui pemahaman jumlah/Page/tema,
       riset cadangan, dedup sebelum copy, penggantian calon, konteks sebelum Write,
       save/readback per item, plan/resume, retry aman, dan ringkasan error Indonesia.
@@ -246,12 +280,15 @@ pengujian backend/host/LIVE v2 yang masih **NOT RUN**.
       rollback terisolasi membuktikan readback/pengelolaan v1/v2 dan plan tetap utuh,
       target/pemicu/prosedur disetujui, bukti exact-SHA/migrasi/security tercatat,
       dan instalasi/plugin lama diinventarisasi tanpa menganggap 7 hari/3 chat
-      sebagai syarat diterima. Tanpa izin deployment/pemasangan, bagian itu BLOCKED.
+      sebagai syarat diterima. Pertahankan v1 dengan batas Read CR-054 serta
+      maintenance/replay/in-flight yang sah; arah pensiun bukan izin cutover.
+      Tanpa izin deployment/pemasangan, bagian itu BLOCKED.
 - [ ] 8.2 **P8-T2 Retest live:** pada runtime dan objek berizin, uji ulang alur
       ujung-ke-ujung dengan readback, pantau keberhasilan jumlah draft, error,
       duplikasi yang ditemukan, dan pemakaian pembuatan v1 versus maintenance.
-      Ajukan keputusan pensiun pembuatan v1 hanya sesudah kriteria yang diterima
-      terbukti. **Verifikasi:** laporan LIVE tersanitasi terpisah dari CI/FIXTURE,
+      Arah pensiun pembuatan v1 sudah diterima CR-054; ajukan pelaksanaannya
+      hanya sesudah kriteria yang diterima terbukti dan izin tindakan tersedia.
+      **Verifikasi:** laporan LIVE tersanitasi terpisah dari CI/FIXTURE,
       tidak memberi FIXED sebelum retest relevan, mempertahankan post/snapshot dan
       pekerjaan in-flight, serta mencatat keputusan pemilik; bukti penggunaan lama
       yang tidak tersedia tidak dihitung sebagai nol atau cutover PASS.
