@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import {
+  assertRuntimeSpecs, matchesRuntimeRange, resolveRuntimeEvidence,
+  assertEquivalentRuntimeEvidence,
+} from '../scripts/runtime-range.js';
 import { URL } from 'node:url';
 import { test } from 'vitest';
 import {
@@ -56,6 +60,57 @@ test('accepts the mandatory manifest including P1 contract tests and rejects ski
   });
 });
 
+test('range parser accepts numeric lower boundaries and rejects outside/malformed ranges', () => {
+  const specs = { nodeSelector: '>=22', nodeEngine: '>=22 <25', denoSelector: '>=2.9.7' };
+  assert.doesNotThrow(() => assertRuntimeSpecs(specs));
+  for (const [spec, accepted, rejected] of [
+    ['>=22 <25', '22.0.0', '25.0.0'],
+    ['>=22 <25', '24.99.9', '21.99.99'],
+    ['>=2.9.7', '2.9.7', '2.9.6'],
+  ]) {
+    assert.equal(matchesRuntimeRange(spec, accepted), true);
+    assert.equal(matchesRuntimeRange(spec, rejected), false);
+  }
+  for (const malformed of ['^22', '>=22 || <25', '>=22 <', '>=22.0.0-rc.1', '>=22*', '']) {
+    assert.throws(() => matchesRuntimeRange(malformed, '24.0.0'), /INVALID_RUNTIME_SPEC/);
+  }
+  for (const drift of [
+    { ...specs, nodeSelector: '>=24' }, { ...specs, nodeEngine: '>=22 <26' },
+    { ...specs, nodeSelector: '>=22 <24.100' },
+    { ...specs, denoSelector: '>=2.9.7 <2.11' },
+    { ...specs, denoSelector: '>=2.0.0' },
+  ]) assert.throws(() => assertRuntimeSpecs(drift), /UNSAFE_RUNTIME_RANGE/);
+});
+
+test('resolved Node/Deno versions, pins and G4 runtime reports are fail-closed', () => {
+  const specs = { nodeSelector: '>=22', nodeEngine: '>=22 <25', denoSelector: '>=2.9.7' };
+  const versions = { node: 'v22.0.0', deno: 'deno 2.9.7 (stable, release)', pnpm: '10.33.2', supabase: '2.120.0' };
+  const lower = resolveRuntimeEvidence(specs, versions);
+  assert.deepEqual(lower.declared, specs);
+  assert.equal(lower.resolved.node, '22.0.0');
+  assert.equal(lower.resolved.deno, '2.9.7');
+  assert.equal(lower.effective.deno, '>=2.9.7 <3.0.0');
+  for (const narrower of [
+    { ...specs, nodeSelector: '>=22 <24.100' },
+    { ...specs, denoSelector: '>=2.9.7 <2.11' },
+  ]) {
+    assert.throws(() => resolveRuntimeEvidence(narrower, versions), /UNSAFE_RUNTIME_RANGE/);
+  }
+  const later = resolveRuntimeEvidence(specs, { ...versions, node: 'v24.22.1', deno: 'deno 2.10.0 (stable)' });
+  assert.equal(later.resolved.node, '24.22.1');
+  assert.doesNotThrow(() => assertEquivalentRuntimeEvidence(later, later, later));
+  for (const bad of [
+    { ...versions, node: 'v21.99.1' }, { ...versions, node: 'v25.0.0' },
+    { ...versions, deno: 'deno 2.9.6 (stable)' }, { ...versions, deno: 'deno 3.0.0 (stable)' },
+    { ...versions, node: 'v24.22' }, { ...versions, node: 'Node version 24.22.1' },
+    { ...versions, deno: 'deno broken' }, { ...versions, pnpm: '10.33.1' },
+    { ...versions, supabase: '2.119.0' },
+  ]) assert.throws(() => resolveRuntimeEvidence(specs, bad));
+  assert.throws(() => assertEquivalentRuntimeEvidence(later, lower, later), /RUNTIME_EVIDENCE_MISMATCH/);
+  assert.throws(() => assertEquivalentRuntimeEvidence(later, undefined, later), /RUNTIME_EVIDENCE_MISSING/);
+  assert.throws(() => assertEquivalentRuntimeEvidence(later, { ...later, resolved: { ...later.resolved, node: '26.0.0' } }, later));
+});
+
 test('rejects unsafe and user stack targets', () => {
   assert.throws(() => validateTarget('content-producer', 54320, 'content-producer'), {
     code: 'UNSAFE_DISPOSABLE_TARGET',
@@ -89,8 +144,14 @@ test('rejects source/backend identity mismatch', () => {
     inputsHash: 'c',
     shardHash: 'd',
     counts: { source: 12, mcp: 15, database: 41 },
+    runtime: resolveRuntimeEvidence({ nodeSelector: '>=22', nodeEngine: '>=22 <25', denoSelector: '>=2.9.7' },
+      { node: 'v24.22.1', deno: 'deno 2.9.7 (stable)', pnpm: '10.33.2', supabase: '2.120.0' }),
   };
   assert.throws(() => sameIdentity(identity, { ...identity, manifestHash: 'drift' }), {
+    code: 'COMPONENT_IDENTITY_MISMATCH',
+  });
+  assert.throws(() => sameIdentity(identity, { ...identity, runtime: { ...identity.runtime,
+    resolved: { ...identity.runtime.resolved, node: '22.0.0' } } }), {
     code: 'COMPONENT_IDENTITY_MISMATCH',
   });
 });

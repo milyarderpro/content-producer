@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { assertEquivalentRuntimeEvidence } from './runtime-range.js';
 import {
   main,
   validateManifest,
@@ -24,6 +25,8 @@ function aggregate(args: string[]): void {
   const source = read(sourcePath);
   const one = read(onePath);
   const two = read(twoPath);
+  // Do not aggregate a different resolved toolchain even when SHA/hash match.
+  assertEquivalentRuntimeEvidence(source.runtime, one.runtime, two.runtime);
   const fields = ['manifestSha256', 'lockSha256', 'inputsSha256', 'shardSha256'] as const;
   const sourceStage = source.stages?.find((stage: SafeStage) => stage.name === 'source');
   if (
