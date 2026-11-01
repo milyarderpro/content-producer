@@ -1,6 +1,6 @@
 # CR-055 — Runtime range Node/Deno dan bukti G4 actual-version
 
-**Status:** Proposed for owner/coordinator review, implementation candidate in Issue #114.
+**Status:** Accepted by coordinator for CI/tooling on 1 November 2026; formal G4 exact-final-SHA on `main` remains NOT RUN and required before the next backend release.
 **Date:** 1 November 2026. **Base:** `main@0cd17c63d3b14569d2ebe00150f4e3dbf7171019`.
 **Scope:** CI/tooling saja. Tidak mengedit ADR-001 historis, backend RPC, migration, RLS, OAuth, atau konfigurasi versi pemilik.
 
