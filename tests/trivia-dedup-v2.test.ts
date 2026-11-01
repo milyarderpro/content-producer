@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   evaluateRetrieval, holdoutSha256, loadDedupV2, summarizeCases, validateDedupV2,
   type DedupV2Case, type EvaluatedRun, type FixtureInputs, type RetrievalOutcome,
+  type IdentityReadback, type IdentityDecisionEvent,
 } from './fixtures/trivia-dedup-v2.js';
 
 const root = new URL('../supabase/tests/fixtures/trivia/dedup-v2/', import.meta.url);
@@ -29,18 +30,38 @@ function changeHoldout(input: FixtureInputs, edit: (value: Record<string, unknow
 describe('P2-T2 dedup v2 corpus / integrity only, NOT retrieval', () => {
   it('validates every JSONL row, frozen SHA-256 bytes, labels and manifest dimensions', () => {
     const cases = loadDedupV2();
-    expect(cases).toHaveLength(36);
+    expect(cases).toHaveLength(93);
     expect(summarizeCases(cases)).toMatchObject({
-      total: 36, labels: { same: 18, distinct: 14, uncertain: 4 },
+      total: 93, labels: { same: 49, distinct: 40, uncertain: 4 },
     });
-    expect(cases.filter(c => c.split === 'development')).toHaveLength(24);
-    expect(cases.filter(c => c.split === 'holdout')).toHaveLength(12);
+    expect(cases.filter(c => c.split === 'development')).toHaveLength(60);
+    expect(cases.filter(c => c.split === 'holdout')).toHaveLength(33);
     expect(cases.filter(c => c.reference.origin === 'legacy_v1')).toHaveLength(6);
     expect(cases.some(c => c.reference.evidence_expired_only)).toBe(true);
     for (const status of ['invalidated', 'superseded', 'rejected'] as const) {
       expect(cases.some(c => c.label === 'same' && c.reference.identity_status === status)).toBe(true);
     }
+    expect(cases.filter(c => c.category === 'paraphrase')).toHaveLength(40);
+    expect(cases.filter(c => c.category === 'hard_negative')).toHaveLength(40);
+    const sameNegative = cases.filter(c => c.label === 'same' &&
+      ['invalidated', 'superseded', 'rejected'].includes(c.reference.identity_status));
+    expect(sameNegative).toHaveLength(18);
+    for (const status of ['invalidated', 'superseded', 'rejected']) {
+      expect(sameNegative.filter(c => c.reference.identity_status === status)).toHaveLength(6);
+    }
+    expect(cases.filter(c => c.reference.origin === 'v2_native_synthetic' &&
+      c.reference.identity_status === 'verified')).toHaveLength(0);
+    expect(cases.find(c => c.case_id === 'V2-036')?.label).toBe('uncertain');
     expect(holdoutSha256(fixture().holdoutBytes)).toBe(fixture().holdoutChecksum.trim());
+  });
+
+  it('rejects a v2-native verified row without legitimate v1 envelope', () => {
+    const input = fixture();
+    const changed = changeFirst(input, c => {
+      const ref = c.reference as Record<string, unknown>;
+      ref.identity_status = 'verified';
+    });
+    expect(() => validateDedupV2(changed)).toThrow(/native facts without valid v1 envelope/);
   });
 
   it('rejects byte-changed holdout even if the JSON would still parse', () => {
@@ -90,36 +111,65 @@ describe('P2-T2 dedup v2 corpus / integrity only, NOT retrieval', () => {
 });
 
 const corpus = loadDedupV2();
-const mockCases = ['V2-001', 'V2-002', 'V2-003', 'V2-004', 'V2-006'].map(id => corpus.find(x => x.case_id === id)!);
+const mockCases = ['V2-001', 'V2-002', 'V2-003', 'V2-004', 'V2-006']
+  .map(id => corpus.find(x => x.case_id === id)!);
 const sha = 'a'.repeat(40);
-function outcome(c: DedupV2Case, hit = false, complete = true, decision: 'same' | 'distinct' | 'uncertain' | null = null): RetrievalOutcome {
+const uuid = (i: number) => '00000000-0000-4000-8000-' + String(i).padStart(12, '0');
+function mockBindings(): IdentityReadback[] {
+  return mockCases.map((c, i) => ({
+    case_id: c.case_id,
+    fixture_identity_id: c.reference.fixture_identity_id,
+    fact_public_id: uuid(i + 1),
+    readback_claim_text: c.reference.claim_text,
+    readback_origin: c.reference.origin,
+    readback_identity_status: c.reference.identity_status,
+    readback_usage: c.reference.usage,
+    source: 'mock_unit_test',
+    readback_evidence_ref: 'MOCK-readback-' + c.case_id,
+  }));
+}
+const none: IdentityDecisionEvent = {
+  decision: 'none', actor: 'none', stage: 'none',
+  target_fact_public_id: null, evidence_ref: null,
+};
+const sameTo = (id: string, actor: 'chatgpt' | 'backend' | 'reviewer' = 'chatgpt'):
+  IdentityDecisionEvent => ({
+    decision: 'same', actor, stage: 'read_review',
+    target_fact_public_id: id, evidence_ref: 'MOCK-decision-trace',
+  });
+function outcome(c: DedupV2Case, hit = false, complete = true,
+  event: IdentityDecisionEvent = none): RetrievalOutcome {
+  const i = mockCases.findIndex(x => x.case_id === c.case_id);
   return {
     case_id: c.case_id, run_id: 'MOCK-ONLY', backend_sha: sha,
     retrieval_version: 'mock-v2-not-a-backend', limit_k: 2, complete,
-    reference_identity_id: 'db-' + c.reference.fixture_identity_id,
-    visible_candidates: hit ? [{ identity_id: 'db-' + c.reference.fixture_identity_id, claim_text: c.reference.claim_text }] : [],
-    automatic_identity_decision: decision,
+    visible_candidates: hit ? [{ fact_public_id: uuid(i + 1), claim_text: c.reference.claim_text }] : [],
+    decision_event: event,
   };
 }
 function mock(): EvaluatedRun {
   return {
-    status: 'evaluated', run_id: 'MOCK-ONLY', backend_sha: sha,
-    retrieval_version: 'mock-v2-not-a-backend', limit_k: 2,
-    automatic_decisions_available: true,
+    status: 'evaluated', evidence_kind: 'mock', run_id: 'MOCK-ONLY',
+    backend_sha: sha, retrieval_version: 'mock-v2-not-a-backend',
+    limit_k: 2, decision_capture: 'complete', identity_readbacks: mockBindings(),
     outcomes: [
       outcome(mockCases[0], true), outcome(mockCases[1], true),
-      outcome(mockCases[2], false, false), outcome(mockCases[3], true, true, 'same'),
+      outcome(mockCases[2], false, false),
+      outcome(mockCases[3], true, true, sameTo(uuid(4), 'backend')),
       outcome(mockCases[4], false),
     ],
   };
 }
-describe('P2-T2 evaluator unit tests (all outcomes MOCK; no DB)', () => {
-  it('reports recall 2/3, false merge 1/1, incomplete and case IDs, with group breakdowns', () => {
+describe('P2-T2 evaluator unit tests (MOCK ONLY, not DB or retrieval v2)', () => {
+  it('computes recall 2/3, distinct false merge 1/1, incomplete and group breakdowns', () => {
     const report = evaluateRetrieval(mockCases, mock());
     expect(report.status).toBe('evaluated');
     if (report.status !== 'evaluated') throw new Error('unexpected NOT RUN');
+    expect(report.evidence_kind).toBe('mock');
     expect(report.overall.recall_at_k).toEqual({ numerator: 2, denominator: 3 });
     expect(report.overall.false_merge).toEqual({ numerator: 1, denominator: 1 });
+    expect(report.overall.distinct_false_merge).toEqual({ numerator: 1, denominator: 1 });
+    expect(report.overall.wrong_target_merge).toEqual({ status: 'NOT RUN' });
     expect(report.overall.misses).toEqual(['V2-003']);
     expect(report.overall.false_merge_cases).toEqual(['V2-004']);
     expect(report.overall.incomplete_cases).toEqual(['V2-003']);
@@ -127,32 +177,81 @@ describe('P2-T2 evaluator unit tests (all outcomes MOCK; no DB)', () => {
     expect(report.overall.distinct_candidates_visible).toBe(1);
     expect(report.by_category.paraphrase.recall_at_k).toEqual({ numerator: 1, denominator: 1 });
     expect(report.by_origin).toHaveProperty('v2_native_synthetic');
-    expect(report.by_identity_status).toHaveProperty('verified');
+    expect(report.by_identity_status).toHaveProperty('needs_review');
     expect(report.by_split).toHaveProperty('development');
   });
-  it('is NOT RUN without actual outcomes and not zero false merges without automatic decisions', () => {
-    expect(evaluateRetrieval(mockCases, { status: 'NOT RUN', reason: 'RPC v2 not implemented' })).toEqual({
+
+  it('counts a same decision to the WRONG canonical target as false merge', () => {
+    const run = mock();
+    run.outcomes[0].decision_event = sameTo(uuid(99), 'reviewer');
+    const report = evaluateRetrieval(mockCases, run);
+    if (report.status !== 'evaluated') throw new Error('unexpected NOT RUN');
+    expect(report.overall.false_merge).toEqual({ numerator: 2, denominator: 2 });
+    expect(report.overall.wrong_target_merge).toEqual({ numerator: 1, denominator: 1 });
+    expect(report.overall.wrong_target_cases).toEqual(['V2-001']);
+    expect(report.overall.false_merge_cases).toEqual(['V2-001', 'V2-004']);
+  });
+
+  it('returns NOT RUN without genuine identity mapping or event capture', () => {
+    expect(evaluateRetrieval(mockCases, {
       status: 'NOT RUN', reason: 'RPC v2 not implemented',
-    });
-    const data = mock();
-    data.automatic_decisions_available = false;
-    for (const x of data.outcomes) x.automatic_identity_decision = null;
-    const report = evaluateRetrieval(mockCases, data);
+    })).toEqual({ status: 'NOT RUN', reason: 'RPC v2 not implemented' });
+    const noBindings = mock();
+    noBindings.identity_readbacks = null;
+    expect(evaluateRetrieval(mockCases, noBindings)).toMatchObject({ status: 'NOT RUN' });
+    const noDecision = mock();
+    noDecision.decision_capture = 'unavailable';
+    for (const x of noDecision.outcomes) x.decision_event = null;
+    const report = evaluateRetrieval(mockCases, noDecision);
     if (report.status !== 'evaluated') throw new Error('unexpected NOT RUN');
     expect(report.overall.false_merge).toEqual({ status: 'NOT RUN' });
+    expect(report.overall.recall_at_k).toEqual({ numerator: 2, denominator: 3 });
+    const noActualEvents = mock();
+    for (const x of noActualEvents.outcomes) x.decision_event = none;
+    const noActual = evaluateRetrieval(mockCases, noActualEvents);
+    if (noActual.status !== 'evaluated') throw new Error('unexpected NOT RUN');
+    expect(noActual.overall.false_merge).toEqual({ status: 'NOT RUN' });
   });
-  it('rejects missing outcomes, duplicate outcome IDs, metadata mismatch and inconsistent decision availability', () => {
+
+  it('rejects forged/cross-case identity mappings and incomplete readbacks', () => {
+    const invalid = mock();
+    invalid.identity_readbacks![0].fact_public_id = 'invented-reference-id';
+    expect(() => evaluateRetrieval(mockCases, invalid)).toThrow(/invalid fact_public_id/);
+    const wrong = mock();
+    wrong.identity_readbacks![0].fixture_identity_id = 'REF-V2-999';
+    expect(() => evaluateRetrieval(mockCases, wrong)).toThrow(/fixture identity mismatch/);
+    const forged = mock();
+    forged.identity_readbacks![0].readback_claim_text = 'This is not the gold fact.';
+    expect(() => evaluateRetrieval(mockCases, forged)).toThrow(/readback claim mismatch/);
+    const incomplete = mock();
+    incomplete.identity_readbacks!.pop();
+    expect(() => evaluateRetrieval(mockCases, incomplete)).toThrow(/incomplete identity readback/);
+    const badSource = mock();
+    badSource.evidence_kind = 'isolated_db';
+    expect(() => evaluateRetrieval(mockCases, badSource)).toThrow(/wrong mapping evidence source/);
+  });
+
+  it('rejects missing/duplicate outcomes, invalid same targets and missing trace', () => {
     const missing = mock();
     missing.outcomes.pop();
     expect(() => evaluateRetrieval(mockCases, missing)).toThrow(/missing or extra outcomes/);
     const duplicate = mock();
     duplicate.outcomes[1] = duplicate.outcomes[0];
     expect(() => evaluateRetrieval(mockCases, duplicate)).toThrow(/duplicate outcome/);
-    const mismatched = mock();
-    mismatched.outcomes[0].backend_sha = 'b'.repeat(40);
-    expect(() => evaluateRetrieval(mockCases, mismatched)).toThrow(/metadata mismatch/);
-    const noDecision = mock();
-    noDecision.automatic_decisions_available = false;
-    expect(() => evaluateRetrieval(mockCases, noDecision)).toThrow(/decision not available/);
+    const wrongSha = mock();
+    wrongSha.outcomes[0].backend_sha = 'b'.repeat(40);
+    expect(() => evaluateRetrieval(mockCases, wrongSha)).toThrow(/metadata mismatch/);
+    const invalidTarget = mock();
+    invalidTarget.outcomes[3].decision_event = sameTo('not-a-uuid');
+    expect(() => evaluateRetrieval(mockCases, invalidTarget)).toThrow(/same requires target/);
+    const badActor = mock();
+    badActor.outcomes[3].decision_event = { ...sameTo(uuid(4)), actor: 'none' };
+    expect(() => evaluateRetrieval(mockCases, badActor)).toThrow(/decision actor/);
+    const missingTrace = mock();
+    missingTrace.outcomes[3].decision_event = null;
+    expect(() => evaluateRetrieval(mockCases, missingTrace)).toThrow(/missing captured decision/);
+    const unavailable = mock();
+    unavailable.decision_capture = 'unavailable';
+    expect(() => evaluateRetrieval(mockCases, unavailable)).toThrow(/decision must be null/);
   });
 });
