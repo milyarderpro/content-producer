@@ -120,12 +120,29 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       DB/race/security/G4/host/LIVE PASS. Implementasi/bukti tersebut tetap P3–P8;
       SHA/check penyelarasan OpenSpec dan status integrasi dicatat di PR, bukan
       dianggap lulus dari PASS kandidat dokumen sebelumnya.
-- [ ] 2.2 **P2-T2 Dataset dedup:** siapkan dataset berlabel parafrasa dan mirip
+- [x] 2.2 **P2-T2 Dataset dedup:** siapkan dataset berlabel parafrasa dan mirip
       kata tetapi beda makna, mencakup data historis serta status koreksi; pisahkan
       baseline/evaluasi sebelum optimasi. **Verifikasi:** manifest/label dan cara
       menghitung recall/salah gabung dapat direproduksi, baseline dicatat, serta
       dataset dan ambang diterima sebelum hasil implementasi dinilai; tidak ada
       tuning expected sesudah hasil atau klaim 100%.
+      **Bukti/penerimaan koordinator:** [PR #115](https://github.com/milyarderpro/content-producer/pull/115)
+      dan [Issue #113](https://github.com/milyarderpro/content-producer/issues/113)
+      memuat corpus v2 93 kasus (60 development/33 holdout; 49 same/40 distinct/
+      4 uncertain), 40 parafrasa, 40 hard negatives, 18 same berstatus historis
+      negatif, validator manifest/checksum, serta evaluator recall/false merge
+      dengan readback dan decision trace terpisah. Holdout SHA-256
+      `6d6bbefec779ff33f9cb5fa1864eda936c861c30a5097e51a2fa17f1690609b3`.
+      [Actions #41286302122](https://github.com/milyarderpro/content-producer/actions/runs/41286302122)
+      PASS exact head `b8e2e5a47bd62078bd9a8e503a5ea9ebfb47da1a`: dedup
+      17/17, root 150/150, MCP 82/82. Koordinator menerima ambang
+      pra-evaluasi recall parafrasa@20 >=38/40, nol false identity merge dengan
+      trace lengkap, dan negative-history visibility 18/18 tanpa eligible reuse.
+      Baseline v1 150 kasus adalah HISTORICAL; current-v1 pada corpus ini
+      NOT RUN karena 0/6 legacy confirmed comparable; 87 native juga tidak
+      comparable. Retrieval v2, database readback, oracle `complete`, G4, host
+      dan LIVE tetap NOT RUN. Oracle `complete` dibekukan di P2-T3 sebelum
+      truthfulness 100% dapat dinilai; tidak ada klaim retrieval PASS.
 - [ ] 2.3 **P2-T3 Kontrak Read:** bekukan aturan retrieval, kandidat wajib,
       batas hasil, `complete`, versi katalog A, dan tindakan penggantian calon.
       Siapkan protokol pembanding A/B sesuai matriks design, tanpa memilih atau

@@ -1,0 +1,114 @@
+{
+  "fixture_version": 1,
+  "language": "en-US",
+  "files": {
+    "development": "development.v1.jsonl",
+    "holdout": "holdout.v1.jsonl",
+    "holdout_checksum": "holdout.sha256"
+  },
+  "hash_policy": "SHA-256 of exact UTF-8 holdout bytes including final LF; holdout.sha256 is lowercase hex plus LF",
+  "label_definitions": {
+    "same": "Proposition equivalent even if identity is ineligible",
+    "distinct": "Material difference required; not a synonym or subject-only change",
+    "uncertain": "Insufficient evidence of identity; replace candidate"
+  },
+  "split_policy": "Holdout sealed before v2 retrieval outcomes; coordinator-driven corrections here are before retrieval, never tuning.",
+  "splits": {
+    "development": {
+      "total": 60,
+      "labels": {
+        "distinct": 27,
+        "same": 31,
+        "uncertain": 2
+      },
+      "categories": {
+        "alias_unit": 4,
+        "exact": 2,
+        "hard_negative": 27,
+        "paraphrase": 25,
+        "uncertain": 2
+      },
+      "origins": {
+        "legacy_v1": 4,
+        "v2_native_synthetic": 56
+      },
+      "identity_statuses": {
+        "invalidated": 5,
+        "needs_review": 44,
+        "rejected": 3,
+        "superseded": 4,
+        "verified": 4
+      },
+      "usages": {
+        "draft": 45,
+        "none": 6,
+        "published": 9
+      },
+      "expired_only": 1
+    },
+    "holdout": {
+      "total": 33,
+      "labels": {
+        "distinct": 13,
+        "same": 18,
+        "uncertain": 2
+      },
+      "categories": {
+        "alias_unit": 2,
+        "exact": 1,
+        "hard_negative": 13,
+        "paraphrase": 15,
+        "uncertain": 2
+      },
+      "origins": {
+        "legacy_v1": 2,
+        "v2_native_synthetic": 31
+      },
+      "identity_statuses": {
+        "invalidated": 2,
+        "needs_review": 22,
+        "rejected": 4,
+        "superseded": 3,
+        "verified": 2
+      },
+      "usages": {
+        "draft": 3,
+        "none": 13,
+        "published": 17
+      },
+      "expired_only": 0
+    }
+  },
+  "totals": {
+    "total": 93,
+    "labels": {
+      "distinct": 40,
+      "same": 49,
+      "uncertain": 4
+    },
+    "categories": {
+      "alias_unit": 6,
+      "exact": 3,
+      "hard_negative": 40,
+      "paraphrase": 40,
+      "uncertain": 4
+    },
+    "origins": {
+      "legacy_v1": 6,
+      "v2_native_synthetic": 87
+    },
+    "identity_statuses": {
+      "invalidated": 7,
+      "needs_review": 66,
+      "rejected": 7,
+      "superseded": 7,
+      "verified": 6
+    },
+    "usages": {
+      "draft": 48,
+      "none": 19,
+      "published": 26
+    },
+    "expired_only": 1
+  }
+}
