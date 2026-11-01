@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
@@ -69,7 +68,7 @@ describe('P2-T2 dedup v2 corpus / integrity only, NOT retrieval', () => {
     const rows = input.developmentText.trimEnd().split('\n').map(x => JSON.parse(x) as DedupV2Case);
     rows[1].reference.claim_text = rows[0].query_claim_text;
     rows[1].query_claim_text = rows[0].reference.claim_text;
-    rows[1].category = 'paraphrase';
+    rows[1].category = 'exact';
     expect(() => validateDedupV2({ ...input, developmentText: rows.map(x => JSON.stringify(x)).join('\n') + '\n' })).toThrow(/duplicate unordered pair/);
   });
   it('rejects invalid label and distinct lacking a real difference', () => {
