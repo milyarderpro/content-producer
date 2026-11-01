@@ -17,14 +17,14 @@ disebutkan lain.
 
 | Alat              | Versi/acuan                                                   | Kapan diperlukan                                               |
 | ----------------- | ------------------------------------------------------------- | -------------------------------------------------------------- |
-| Node.js           | `24.15.0`, [.nvmrc](../.nvmrc); range package `>=24.15.0 <25` | Script, pemeriksaan, dan build frontend                        |
+| Node.js           | `>=22` pada [.nvmrc](../.nvmrc), engine `>=22 <25`; major Node 22–24 | Script, pemeriksaan, dan build frontend                        |
 | pnpm              | `10.33.2`, [package.json](../package.json)                    | Dependency dan command project                                 |
 | Supabase CLI      | `2.120.0`, dependency root yang dikunci                       | Stack lokal, migration, serta operasi Supabase                 |
-| Deno              | `2.9.7`, [.deno-version](../.deno-version)                    | `test:mcp`, harness HTTP, dan tooling Edge langsung            |
+| Deno              | `>=2.9.7` pada [.deno-version](../.deno-version), gate G4 dibatasi major 2                    | `test:mcp`, harness HTTP, dan tooling Edge langsung            |
 | Docker            | Runtime yang dapat diakses pengguna lokal                     | Stack Supabase, suite database, dan harness HTTP               |
 | GitHub CLI (`gh`) | Instalasi dan akun yang berhak atas repository                | Pemeriksaan Issue/PR/Actions dan alur perbaikan melalui GitHub |
 
-Periksa versi sebelum bekerja. Jangan mengubah pin atau memperbarui dependency
+Periksa versi aktual terhadap range sebelum bekerja. Jangan mengubah range atau memperbarui dependency
 hanya karena CLI menampilkan versi baru. `pnpm run check` tidak membutuhkan stack
 database; `pnpm run test-all` adalah **legacy/rollback** yang membutuhkan Deno
 dan database lokal siap.
@@ -320,3 +320,7 @@ history/lint/cleanup dan aggregate PASS. Tidak ada required check otomatis.
 `test-all`/`backend-technical-gate.yml` kini legacy/rollback CR-020/044.
 Docs-only cukup review isi/tautan, `git diff --check`, dan light CI tanpa full
 backend gate; Prettier opsional.
+
+## Runtime range dan bukti G4 terkini (Issue #114)
+
+Pilihan pemilik `.nvmrc >=22`, `package.json.engines.node >=22 <25`, `.deno-version >=2.9.7` tidak dikembalikan ke pin lama. Gate memakai irisan Node major **22/23/24**, Deno **2.x mulai 2.9.7** (major 3 belum tervalidasi meskipun selector pemilik bersifat terbuka), pnpm tepat **10.33.2**, dan Supabase CLI tepat **2.120.0**. Semua output runtime ditolak jika malformed, prerelease/alias tidak didukung, di bawah lower bound, atau di luar major yang disetujui. `scripts/runtime-range.ts` mengimplementasikan comparator numerik terbatas yang diaudit, bukan full npm semver. Report G4 merekam deklarasi dan versi aktual, dan aggregate hanya menerima versi aktual sama antar source dan dua shard di samping SHA/hash yang sama. Pilihan ini adalah kriteria tool preflight, bukan bukti test lintas semua versi Node/Deno; CI yang sudah teramati memakai Node 24.22.1.

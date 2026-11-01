@@ -50,9 +50,9 @@ acceptance historis menjadi PASS.
 
 ## Menyiapkan lingkungan
 
-- Node.js `24.15.0` dan pnpm `10.33.2` mengikuti pin repository.
+- Node.js mengikuti selector `.nvmrc >=22` dan engine `>=22 <25` (major 22–24); pnpm tetap pin `10.33.2`. G4 memeriksa versi aktual terhadap irisan range dan merekam keduanya dalam report.
 - Supabase CLI `2.120.0` tersedia melalui dependency project.
-- Deno `2.9.7` diperlukan untuk `test:mcp` dan harness HTTP.
+- Deno mengikuti selector `.deno-version >=2.9.7`; G4 fail-closed pada major 2.x yang disetujui (major 3 belum diuji), serta mencatat versi aktual. Deno diperlukan untuk `test:mcp` dan harness HTTP.
 - Docker diperlukan untuk stack Supabase dan suite database lokal.
 
 Instalasi dependency dari root:
