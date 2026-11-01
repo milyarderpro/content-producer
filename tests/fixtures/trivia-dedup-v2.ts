@@ -118,7 +118,8 @@ function assertCase(value: unknown, split: Split): asserts value is DedupV2Case 
   }
   const ref = record(c.reference, c.case_id + ': reference');
   exactKeys(ref, ['fixture_identity_id', 'claim_text', 'origin', 'identity_status', 'usage', 'evidence_expired_only'], 'reference');
-  ensure(ref.fixture_identity_id === 'REF-' + c.case_id, c.case_id + ': unstable fixture identity');
+  nonempty(ref.fixture_identity_id, c.case_id + ': missing fixture identity');
+  ensure(/^REF-V2-\d{3,}$/.test(ref.fixture_identity_id), c.case_id + ': invalid fixture identity format');
   nonempty(ref.claim_text, c.case_id + ': reference.claim_text');
   inSet(ref.origin, ['legacy_v1', 'v2_native_synthetic'], c.case_id + ': origin');
   inSet(ref.identity_status, ['needs_review', 'verified', 'invalidated', 'superseded', 'rejected'], c.case_id + ': identity_status');
@@ -187,11 +188,27 @@ export function validateDedupV2(input: FixtureInputs): DedupV2Case[] {
   const development = jsonl(input.developmentText, 'development');
   const holdout = jsonl(input.holdoutBytes.toString('utf8'), 'holdout');
   const ids = new Set<string>(), pairs = new Set<string>();
+  // One canonical fixture identity can be used by several editorial cases.
+  // Its reference snapshot and provenance must be identical in a single seed/run.
+  const referenceByIdentity = new Map<string, string>();
+  const identityByReference = new Map<string, string>();
+
   for (const [split, rows] of [['development', development], ['holdout', holdout]] as const) {
     for (const row of rows) {
       assertCase(row, split);
       ensure(!ids.has(row.case_id), row.case_id + ': duplicate case_id');
       ids.add(row.case_id);
+      const referenceKey = JSON.stringify([row.reference.claim_text, row.reference.origin,
+        row.reference.identity_status, row.reference.usage, row.reference.evidence_expired_only,
+        row.provenance.kind, row.provenance.v1_case_id]);
+      const existingReference = referenceByIdentity.get(row.reference.fixture_identity_id);
+      ensure(existingReference === undefined || existingReference === referenceKey,
+        row.case_id + ': shared fixture identity inconsistent reference/provenance');
+      const existingIdentity = identityByReference.get(referenceKey);
+      ensure(existingIdentity === undefined || existingIdentity === row.reference.fixture_identity_id,
+        row.case_id + ': repeated canonical reference split across identities');
+      referenceByIdentity.set(row.reference.fixture_identity_id, referenceKey);
+      identityByReference.set(referenceKey, row.reference.fixture_identity_id);
       const pair = pairKey(row.reference.claim_text, row.query_claim_text);
       ensure(!pairs.has(pair), row.case_id + ': duplicate unordered pair');
       pairs.add(pair);
@@ -307,12 +324,22 @@ function validateMappings(cases: DedupV2Case[], run: EvaluatedRun): Map<string, 
   ensure(run.identity_readbacks.length === cases.length, 'incomplete identity readback mapping');
   const casesById = new Map(cases.map(c => [c.case_id, c]));
   const bindings = new Map<string, IdentityReadback>();
+  const publicIdByFixture = new Map<string, string>();
+  const fixtureByPublicId = new Map<string, string>();
   for (const binding of run.identity_readbacks) {
     const gold = casesById.get(binding.case_id);
     ensure(gold, 'readback unknown case_id');
     ensure(!bindings.has(binding.case_id), binding.case_id + ': duplicate readback mapping');
     ensure(binding.fixture_identity_id === gold.reference.fixture_identity_id, binding.case_id + ': fixture identity mismatch');
     ensure(isPublicUuid(binding.fact_public_id), binding.case_id + ': invalid fact_public_id');
+    const existingPublicId = publicIdByFixture.get(binding.fixture_identity_id);
+    ensure(existingPublicId === undefined || existingPublicId === binding.fact_public_id,
+      binding.case_id + ': shared fixture identity mapped to two fact_public_id values');
+    const existingFixtureId = fixtureByPublicId.get(binding.fact_public_id);
+    ensure(existingFixtureId === undefined || existingFixtureId === binding.fixture_identity_id,
+      binding.case_id + ': fact_public_id mapped to two fixture identities');
+    publicIdByFixture.set(binding.fixture_identity_id, binding.fact_public_id);
+    fixtureByPublicId.set(binding.fact_public_id, binding.fixture_identity_id);
     ensure(binding.readback_claim_text === gold.reference.claim_text, binding.case_id + ': DB readback claim mismatch');
     ensure(binding.readback_origin === gold.reference.origin, binding.case_id + ': DB readback origin mismatch');
     ensure(binding.readback_identity_status === gold.reference.identity_status, binding.case_id + ': DB readback status mismatch');

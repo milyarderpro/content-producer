@@ -55,6 +55,39 @@ describe('P2-T2 dedup v2 corpus / integrity only, NOT retrieval', () => {
     expect(holdoutSha256(fixture().holdoutBytes)).toBe(fixture().holdoutChecksum.trim());
   });
 
+  it('shares one canonical fixture identity for V2-007 and V2-008 while retaining independent labels', () => {
+    const all = loadDedupV2();
+    const same = all.find(x => x.case_id === 'V2-007')!;
+    const distinct = all.find(x => x.case_id === 'V2-008')!;
+    expect(same.reference.fixture_identity_id).toBe('REF-V2-007');
+    expect(distinct.reference.fixture_identity_id).toBe(same.reference.fixture_identity_id);
+    expect(same.label).toBe('same');
+    expect(distinct.label).toBe('distinct');
+    expect(same.provenance).toEqual(distinct.provenance);
+    expect(same.reference).toEqual(distinct.reference);
+    expect(new Set(all.map(x => x.reference.fixture_identity_id)).size).toBe(92);
+  });
+
+  it('fails closed when a repeated reference has a different fixture identity or inconsistent status/provenance', () => {
+    const input = fixture();
+    const rows = input.developmentText.trimEnd().split('\n').map(x => JSON.parse(x) as DedupV2Case);
+    const second = rows.find(x => x.case_id === 'V2-008')!;
+    second.reference.fixture_identity_id = 'REF-V2-008';
+    expect(() => validateDedupV2({ ...input,
+      developmentText: rows.map(x => JSON.stringify(x)).join('\n') + '\n',
+    })).toThrow(/repeated canonical reference split across identities/);
+    second.reference.fixture_identity_id = 'REF-V2-007';
+    second.reference.usage = 'none';
+    expect(() => validateDedupV2({ ...input,
+      developmentText: rows.map(x => JSON.stringify(x)).join('\n') + '\n',
+    })).toThrow(/shared fixture identity inconsistent reference\/provenance/);
+    second.reference.usage = 'published';
+    second.provenance.v1_case_id = 'invented-v1-id';
+    expect(() => validateDedupV2({ ...input,
+      developmentText: rows.map(x => JSON.stringify(x)).join('\n') + '\n',
+    })).toThrow(/shared fixture identity inconsistent reference\/provenance/);
+  });
+
   it('rejects a v2-native verified row without legitimate v1 envelope', () => {
     const input = fixture();
     const changed = changeFirst(input, c => {
@@ -211,6 +244,41 @@ describe('P2-T2 evaluator unit tests (MOCK ONLY, not DB or retrieval v2)', () =>
     const noActual = evaluateRetrieval(mockCases, noActualEvents);
     if (noActual.status !== 'evaluated') throw new Error('unexpected NOT RUN');
     expect(noActual.overall.false_merge).toEqual({ status: 'NOT RUN' });
+  });
+
+  it('evaluates two cases referencing the same canonical ID with a single mapped public UUID', () => {
+    const pairs = corpus.filter(x => ['V2-007', 'V2-008'].includes(x.case_id));
+    const identity = uuid(71);
+    const bindings: IdentityReadback[] = pairs.map(x => ({
+      case_id: x.case_id, fixture_identity_id: x.reference.fixture_identity_id,
+      fact_public_id: identity, readback_claim_text: x.reference.claim_text,
+      readback_origin: x.reference.origin, readback_identity_status: x.reference.identity_status,
+      readback_usage: x.reference.usage, source: 'mock_unit_test',
+      readback_evidence_ref: 'MOCK-shared-fact-readback',
+    }));
+    const run: EvaluatedRun = {
+      status: 'evaluated', evidence_kind: 'mock', run_id: 'MOCK-ONLY',
+      backend_sha: sha, retrieval_version: 'mock-v2-not-a-backend', limit_k: 2,
+      identity_readbacks: bindings, decision_capture: 'complete',
+      outcomes: pairs.map(x => ({
+        case_id: x.case_id, run_id: 'MOCK-ONLY', backend_sha: sha,
+        retrieval_version: 'mock-v2-not-a-backend', limit_k: 2, complete: true,
+        visible_candidates: [{ fact_public_id: identity, claim_text: x.reference.claim_text }],
+        decision_event: none,
+      })),
+    };
+    const report = evaluateRetrieval(pairs, run);
+    if (report.status !== 'evaluated') throw new Error('unexpected NOT RUN');
+    expect(report.overall.recall_at_k).toEqual({ numerator: 1, denominator: 1 });
+    expect(report.overall.distinct_candidates_visible).toBe(1);
+    run.identity_readbacks![1].fact_public_id = uuid(72);
+    expect(() => evaluateRetrieval(pairs, run)).toThrow(/shared fixture identity mapped to two fact_public_id/);
+  });
+
+  it('rejects one fact_public_id assigned to different fixture identities', () => {
+    const run = mock();
+    run.identity_readbacks![1].fact_public_id = run.identity_readbacks![0].fact_public_id;
+    expect(() => evaluateRetrieval(mockCases, run)).toThrow(/fact_public_id mapped to two fixture identities/);
   });
 
   it('rejects forged/cross-case identity mappings and incomplete readbacks', () => {
