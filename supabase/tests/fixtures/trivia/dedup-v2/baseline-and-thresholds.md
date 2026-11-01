@@ -42,16 +42,18 @@ Corpus mengandung **40 parafrasa** (25 development / 15 holdout), **40 hard nega
 - **Distinct candidate visible** adalah indikator Read saja, tidak dianggap false merge. `uncertain` dan `incomplete` tetap breakdown terpisah per split/kategori/asal/status.
 - **HANYA MOCK TEST:** recall@2 **2/3**, satu distinct diputus `same` (false merge **1/1**), satu incomplete. Test tambahan mengarahkan positive `same` ke ID salah dan harus menghitungnya sebagai false merge. Ini unit rumus, bukan kualitas retrieval v2.
 
-## Ambang — PROPOSED, menunggu penerimaan pemilik (belum berlaku)
+## Ambang pra-evaluasi — ACCEPTED oleh koordinator (belum diuji)
 
-| Sinyal | Usulan pra-P3-T3 | Dasar/batas |
+| Sinyal | Ambang diterima pra-P3-T3 | Dasar/batas |
 | --- | --- | --- |
 | Recall@20 parafrasa | **>=95%** dari 40 cases (**>=38/40** total), laporkan 25 development / 15 holdout terpisah. Jangan tuning dengan holdout | 40 parafrasa (sebelumnya 9) sengaja ditambah sebelum outcome v2. Sampel kecil terhadap keragaman topik nyata; bukan jaminan semantik 100%. |
 | False identity merge | **0** keputusan salah terhadap semua event `same` yang direkam; nol hanya boleh diklaim bila trace lengkap + ada keputusan nyata. `distinct_false_merge` dan `wrong_target_merge` terpisah | 40 hard negatives (sebelumnya 14), termasuk perubahan angka, negasi, relasi, waktu, populasi, lokasi dan kondisi. Ada risiko blind spot di luar corpus, jadi diperlukan review kualitatif. |
 | Negative-history visibility dan eligibility | **18/18** `same` negatif terlihat dengan ID/status/usage pada Read lengkap; **0** eligible reuse, tidak membuat ID pengelak | Enam contoh per status negatif; ini kemampuan desain yang **NOT RUN** sampai registry/Read baru. |
 | `complete` truthfulness | **100% benar relatif terhadap oracle** (tidak ada false-clean); **tidak dapat diukur di P2-T2** | **BLOCKED pada kontrak Read P2-T3**: aturan kandidat wajib, limit response, versi katalog, truncated output/host-visible incomplete belum dibekukan. Setelah T2 diterima, siapkan >=10 skenario cap/truncation beserta oracle final pada T3 **sebelum** menguji P3-T3. Jangan mengarang oracle sekarang. |
 
-Angka 95%, 0 dan 100% masih **PROPOSED**, bukan target otomatis dari v1 atau acceptance yang sudah terjadi. Label gold dibekukan sebelum output v2; perubahan berikutnya butuh versi fixture dan review terpisah. Jika 40 contoh belum memenuhi ambang kepercayaan pemilik, tambahkan kasus dan hash baru **sebelum** outcome v2 diamati, bukan mengubah expected sesudahnya.
+**Keputusan P2-T2, 1 November 2026:** koordinator menerima corpus 93 kasus dan ambang pada tabel ini sebagai kriteria yang dibekukan **sebelum** hasil retrieval v2 dilihat, sesuai delegasi pemilik untuk keputusan teknis rutin. Recall parafrasa@20 harus >=38/40; false identity merge harus 0 hanya bila trace keputusan lengkap dan berisi keputusan nyata; 18/18 status historis negatif harus terlihat dan tidak boleh eligible reuse. Syarat truthfulness `complete` adalah 100% relatif terhadap oracle yang **baru akan dibekukan pada P2-T3**; metrik ini sekarang **NOT RUN**, bukan PASS. Penerimaan ambang tidak menerima implementasi retrieval, baseline database, atau hasil production. Keterbatasan baseline current-v1 **0/6 confirmed comparable / NOT RUN** diterima sebagai batas bukti P2-T2; laporan 150 kasus v1 tetap HISTORICAL dan tidak dijadikan pembanding angka yang setara.
+
+Label gold, split, dan ambang dibekukan sebelum output v2. Perubahan berikutnya memerlukan versi fixture, alasan review, dan hash baru **sebelum** outcome v2 diamati; expected tidak boleh dituning sesudahnya.
 
 ## Handoff Codex PC lokal — tidak dijalankan di PR ini
 
