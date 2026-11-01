@@ -301,7 +301,7 @@ export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identit
     )
   )
     fail('LOCK_PIN_DRIFT');
-  let runtime: RuntimeEvidence;
+  let runtime!: RuntimeEvidence;
   try {
     runtime = resolveRuntimeEvidence(
       {
