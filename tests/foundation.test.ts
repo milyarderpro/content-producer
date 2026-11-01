@@ -37,6 +37,8 @@ describe('Phase 1 repository foundation', () => {
     expect(() => assertRuntimeSpecs(specs)).not.toThrow();
     for (const drift of [
       { ...specs, nodeSelector: '>=24' },
+      { ...specs, nodeSelector: '>=22 <24.100' },
+      { ...specs, denoSelector: '>=2.9.7 <2.11' },
       { ...specs, nodeEngine: '>=22' },
       { ...specs, nodeEngine: '>=22 <26' },
       { ...specs, denoSelector: '>=2.0.0' },

@@ -34,7 +34,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version: '>=22 <25'
           cache: pnpm
 
       - name: Record SHA and classify changes
@@ -107,7 +107,7 @@ jobs:
       - uses: denoland/setup-deno@v2
         if: steps.changes.outputs.mcp_changed == 'true' || steps.changes.outputs.probe_changed == 'true'
         with:
-          deno-version-file: .deno-version
+          deno-version: '>=2.9.7 <3'
 
       - name: Focused MCP OAuth and protocol regressions
         if: steps.changes.outputs.mcp_changed == 'true'

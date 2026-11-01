@@ -3,6 +3,7 @@ import { chmodSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, w
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import { assertRuntimeSpecs } from '../scripts/runtime-range.js';
 
 const checkScript = readFileSync('scripts/check.ts', 'utf8');
 
@@ -34,6 +35,56 @@ const identity = identityBlock
   .join('\n');
 
 describe('Workflow aktif menjaga batas CI dan gate backend', () => {
+  it('semua setup Node/Deno memakai irisan bounded file/engine/gate yang direview', () => {
+    const declared = {
+      nodeSelector: readFileSync('.nvmrc', 'utf8').trim(),
+      nodeEngine: (JSON.parse(readFileSync('package.json', 'utf8')) as {
+        engines: { node: string };
+      }).engines.node,
+      denoSelector: readFileSync('.deno-version', 'utf8').trim(),
+    };
+    expect(declared).toEqual({
+      nodeSelector: '>=22', nodeEngine: '>=22 <25', denoSelector: '>=2.9.7',
+    });
+    expect(() => assertRuntimeSpecs(declared)).not.toThrow();
+
+    const assertSelectors = (source: string, requiredNode: number, requiredDeno: number) => {
+      const lines = source.split('\n');
+      const found = { node: 0, deno: 0 };
+      for (let i = 0; i < lines.length; i++) {
+        const action = /^ {6}- uses: (actions\/setup-node@v4|denoland\/setup-deno@v2)$/.exec(lines[i]!);
+        if (!action) continue;
+        const block: string[] = [];
+        for (let j = i + 1; j < lines.length && !/^ {6}- /.test(lines[j]!); j++) {
+          block.push(lines[j]!);
+        }
+        const selectors = block.filter(line =>
+          /^ {10}(?:node-version|node-version-file|deno-version|deno-version-file):/.test(line));
+        const isNode = action[1] === 'actions/setup-node@v4';
+        expect(block).toContain('        with:');
+        expect(selectors).toEqual([
+          isNode ? "          node-version: '>=22 <25'" : "          deno-version: '>=2.9.7 <3'",
+        ]);
+        found[isNode ? 'node' : 'deno']++;
+      }
+      expect(found).toEqual({ node: requiredNode, deno: requiredDeno });
+    };
+    const workflows = [
+      { value: ci, node: 1, deno: 1 },
+      { value: candidate, node: 3, deno: 2 },
+      { value: gate, node: 1, deno: 1 },
+    ];
+    for (const workflow of workflows) {
+      assertSelectors(workflow.value, workflow.node, workflow.deno);
+      for (const mutated of [
+        workflow.value.replace("node-version: '>=22 <25'", "node-version: '>=22'"),
+        workflow.value.replace("node-version: '>=22 <25'", 'node-version-file: .nvmrc'),
+        workflow.value.replace("deno-version: '>=2.9.7 <3'", "deno-version: '>=2.9.7'"),
+        workflow.value.replace("deno-version: '>=2.9.7 <3'", 'deno-version-file: .deno-version'),
+      ]) expect(() => assertSelectors(mutated, workflow.node, workflow.deno)).toThrow();
+    }
+  });
+
   it('Prettier opsional dan enam source check tetap wajib berurutan', () => {
     expect(ci).not.toMatch(/(?:ci-formatted-paths|prettier --check|Format changed files)/);
     expect(checkScript).not.toContain("['format:check']");

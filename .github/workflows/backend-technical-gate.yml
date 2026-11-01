@@ -51,11 +51,11 @@ jobs:
           run_install: false
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
+          node-version: '>=22 <25'
           cache: pnpm
       - uses: denoland/setup-deno@v2
         with:
-          deno-version-file: .deno-version
+          deno-version: '>=2.9.7 <3'
 
       - name: Locked install and CLI preflight
         id: install

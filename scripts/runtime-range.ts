@@ -51,8 +51,12 @@ export function matchesRuntimeRange(spec: string, actual: string): boolean {
   });
 }
 
-/** Owner baseline: Node majors 22-24; Deno major 2 from 2.9.7 until validated otherwise. */
+/** Owner baseline: reject unreviewed spec drift before claiming fixed effective ranges. */
 export function assertRuntimeSpecs(specs: RuntimeSpecs): void {
+  // The effective ranges reported below are exact only for this reviewed triple.
+  // Example-version probes alone can miss a restrictive upper bound.
+  if (specs.nodeSelector !== '>=22' || specs.nodeEngine !== '>=22 <25' ||
+      specs.denoSelector !== '>=2.9.7') throw new Error('UNSAFE_RUNTIME_RANGE');
   const node = (v: string) =>
     matchesRuntimeRange(specs.nodeSelector, v) && matchesRuntimeRange(specs.nodeEngine, v);
   const deno = (v: string) => matchesRuntimeRange(specs.denoSelector, v);

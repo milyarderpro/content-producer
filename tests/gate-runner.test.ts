@@ -76,6 +76,8 @@ test('range parser accepts numeric lower boundaries and rejects outside/malforme
   }
   for (const drift of [
     { ...specs, nodeSelector: '>=24' }, { ...specs, nodeEngine: '>=22 <26' },
+    { ...specs, nodeSelector: '>=22 <24.100' },
+    { ...specs, denoSelector: '>=2.9.7 <2.11' },
     { ...specs, denoSelector: '>=2.0.0' },
   ]) assert.throws(() => assertRuntimeSpecs(drift), /UNSAFE_RUNTIME_RANGE/);
 });
@@ -88,6 +90,12 @@ test('resolved Node/Deno versions, pins and G4 runtime reports are fail-closed',
   assert.equal(lower.resolved.node, '22.0.0');
   assert.equal(lower.resolved.deno, '2.9.7');
   assert.equal(lower.effective.deno, '>=2.9.7 <3.0.0');
+  for (const narrower of [
+    { ...specs, nodeSelector: '>=22 <24.100' },
+    { ...specs, denoSelector: '>=2.9.7 <2.11' },
+  ]) {
+    assert.throws(() => resolveRuntimeEvidence(narrower, versions), /UNSAFE_RUNTIME_RANGE/);
+  }
   const later = resolveRuntimeEvidence(specs, { ...versions, node: 'v24.22.1', deno: 'deno 2.10.0 (stable)' });
   assert.equal(later.resolved.node, '24.22.1');
   assert.doesNotThrow(() => assertEquivalentRuntimeEvidence(later, later, later));
