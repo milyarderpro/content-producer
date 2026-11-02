@@ -244,9 +244,10 @@ dan keberhasilan business Write production belum dibuktikan oleh run ini.
 
 ## P7-T2 — prasyarat host dan handoff
 
-**BLOCKED:** sesi implementasi ini tidak menyediakan koneksi tool bisnis
-`mcpku2`/host ChatGPT PRIVATE yang dapat dipanggil, dan belum ada bukti runtime
-host memasang backend v2 serta plugin 0.3.0 yang sesuai. Tidak ada ID Page/objek
+**BLOCKED:** pada handoff awal sesi implementasi tidak menyediakan koneksi tool
+bisnis `mcpku2`/host ChatGPT PRIVATE yang dapat dipanggil. Diagnosis read-only
+terbaru di bawah sudah dapat memanggil bootstrap Read, tetapi membuktikan target
+yang tersedia masih backend/plugin v1. Tidak ada ID Page/objek
 host terisolasi yang ditetapkan untuk skenario Write. Status source/kandidat,
 CI dan Inspector tidak membuktikan pemasangan host tersebut.
 
@@ -299,3 +300,33 @@ katalog yang terlihat host, lalu menetapkan runtime/objek uji terisolasi.
 Setelah target itu benar-benar siap, ulang preflight pada chat baru sebelum
 skenario Write. Perubahan/deployment yang diperlukan mengikuti prosedur rilis
 dan scope target; laporan preflight ini sendiri tidak memulai rollout P8.
+
+### Diagnosis read-only koneksi yang tersedia — 2 November 2026
+
+**Waktu pemeriksaan:** sekitar 14:53–14:55 UTC. **Tingkat bukti:** CONNECTED
+READ/SUPABASE MANAGEMENT, bukan skenario host H01–H06 atau retest LIVE v2.
+Pemeriksaan ini tidak menjalankan generation context, dedup, atau business Write.
+
+| Permukaan | Observasi langsung | Batas kesimpulan |
+| --- | --- | --- |
+| Owner OAuth `mcpku2` | `get_account_profile({})`, `get_workspace_context({})`, dan `list_pages` SUCCESS. Workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`; empat Page aktif, pagination selesai; dua Page berlabel testing cocok dengan preflight sebelumnya. | Identitas owner aktif dan data workspace konsisten; kedua Page belum ditetapkan sebagai fixture P7-T2. |
+| Supabase yang dapat diakses | Project aktif `content-producer-production`, ref `xjonnilnypchtxogtopb`, URL API `https://xjonnilnypchtxogtopb.supabase.co`; satu project lain `triviaku` berstatus INACTIVE. Query read-only pada project aktif menemukan workspace ID tersebut dan tepat empat Page aktif, termasuk dua ID testing yang sama. | Korelasi data mengidentifikasi target production yang melayani data owner ini. Metadata app yang tersedia tidak mengekspos URL endpoint internal `mcpku2`, sehingga binding URL langsung belum dibuktikan. |
+| Edge `mcp` pada target | ACTIVE version **35**, bundle SHA-256 `feafe5101a8edff1b55ef9a5552cc36f5c4d55fc0c70a3fa482b8be42f7a8009`. Isi bundle yang dikembalikan Supabase memuat registry/handler v1 tanpa ketiga nama v2. | Version/bundle adalah bukti deployment, tetapi tidak membuktikan Git source SHA yang membangunnya. |
+| Database pada target | Applied **72 migration**, terakhir `20261027075748_relax_trivia_visual_limit_and_dedup_diagnostics`; katalog `api` berisi **33 nama/33 signature**, tanpa `trivia_find_similar_facts_v2`, `save_post_v2`, atau `revise_post_v2`. Workspace ID owner ada tepat sekali. | Target belum kompatibel dengan backend v2 kandidat yang memiliki 84 migration serta 36 nama/38 signature. Dua belas migration v2 setelah migration terakhir belum applied di target ini. |
+| Plugin PRIVATE personal | Plugin `content-producer` terpasang **0.2.11**, current release `pluginrel_6ae1ea5e8e6c819184d3dab2cb947b3d`; `.app.json` release mengikat satu app `asdk_app_6ad6ebeab5fc8191a1d2cd54b87cd96f` (`mcpku2`). Kandidat repository **0.3.0** mengikat app ID yang sama. Metadata app `mcpku2` sendiri menunjukkan release `PluginRelease_3c4882c92d8c81918e06ffb79e718a76` versi 1.0.0. | Versi plugin yang terpasang terbukti masih v1; source 0.3.0 belum terpasang. App ID sama membuktikan deklarasi binding plugin, bukan URL endpoint koneksi atau kesiapan backend v2. |
+| Katalog tool sesi ini | Konektor `mcpku2` yang tersedia mengekspos tool v1; ketiga nama/schema v2 tidak ada. | Konsisten dengan preflight owner, bundle Edge, database, dan plugin lama. Tidak perlu menyalahkan cache sesi sebagai satu-satunya penyebab. |
+
+**Verdict:** P7-T2 tetap **BLOCKED** pada kesiapan runtime/plugin; H01–H06
+**NOT RUN**. Source G4 PASS `350a4c83f18e9bfb6017ef52e35913ec258ac661`
+terpisah dari deployment Edge v35 dan plugin 0.2.11. Tidak ada runtime v2
+terisolasi atau Page/objek fixture yang sudah ditetapkan untuk Write. Project
+aktif yang terlihat adalah production; diagnosis ini bukan izin deploy migration/
+Edge ke project tersebut, memasang plugin 0.3.0, membuat branch/fixture, atau
+menjalankan skenario Write pada Page yang kebetulan bernama testing.
+
+Prasyarat operasional berikutnya adalah target uji terisolasi yang jelas,
+kompatibel dengan 84 migration v2 dan Edge dari kandidat backend G4 tersebut,
+binding owner OAuth ke target itu, plugin PRIVATE 0.3.0 yang terpasang pada app
+yang benar, serta Page/objek fixture dan scope H01–H06 yang ditetapkan.
+Setelah itu ulang preflight pada chat baru untuk membuktikan tiga tool v2,
+baru baca generation context dan jalankan skenario sesuai izin target.

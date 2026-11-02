@@ -326,6 +326,11 @@ deployment/instalasi dan LIVE tetap P7/P8, NOT RUN pada sesi ini.
       objek host fixture belum terverifikasi/ditetapkan; generation context dan
       H01–H06 NOT RUN, tanpa business Write. [Handoff](phase-7-host-handoff.md)
       diperbarui; Inspector/G4 bukan pengganti bukti host yang masih kurang.
+      Diagnosis read-only berikutnya pada
+      [hasil P7](phase-7-results.md#diagnosis-read-only-koneksi-yang-tersedia--2-november-2026)
+      membuktikan target data owner yang tersedia masih 72 migration/33 RPC v1,
+      Edge `mcp` v35 tanpa tool v2, dan plugin terpasang 0.2.11. Runtime v2
+      terisolasi/fixture berizin belum tersedia; H01–H06 tetap NOT RUN.
 
 ## 8. Rilis dan pemantauan
 
