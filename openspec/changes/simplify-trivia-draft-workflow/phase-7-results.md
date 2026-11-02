@@ -156,3 +156,36 @@ SHA merge tersebut:
 Remediasi lanjutan tetap memerlukan PR/light CI dan satu G4 formal pada exact
 SHA main final yang baru. P7-T1/P7-T2 tetap belum dicentang; tidak ada deployment,
 pemasangan plugin atau business Write production pada pekerjaan ini.
+
+## Follow-up G4 setelah PR #120
+
+[PR #120](https://github.com/milyarderpro/content-producer/pull/120) di-merge
+sesudah review serta light CI exact head `6d9c07f` PASS
+([41452749708](https://github.com/milyarderpro/content-producer/actions/runs/41452749708),
+33 detik). Run G4
+[41452924375](https://github.com/milyarderpro/content-producer/actions/runs/41452924375)
+menguji exact SHA main `5b96e4fcfd5751e2a274b95d0e7e1ccdf582e759`.
+
+- Source PASS. **Shard 2 PASS lengkap:** 25 file/**101 kasus** DB, history,
+  lint, advisors security mandiri, audit before/after/final, whitespace dan
+  cleanup. Shard 1: migration names, MCP 127, Inspector 36/36 + denial,
+  audit before/after dan cleanup PASS; command suite DB FAIL. Aggregate FAIL.
+- Diagnosis lokal seluruh shard 1 (21 file) pada SHA itu mereproduksi **119
+  PASS/1 FAIL dari 120 kasus** dalam 469,15 detik. Satu kegagalan adalah
+  `trivia-post-facts.test.ts`: blok SQL legacy memeriksa
+  `information_schema.routines` masih **34**, bukan 38 signature CR-053/056.
+  Pemeriksaan statis lanjutan mencakup jalur `information_schema` dan katalog
+  `pg_proc`, bukan hanya assertion TypeScript yang diperbaiki PR #120.
+- Remediasi lanjutan mengubah **satu expected SQL census 34 → 38**, disertai
+  komentar dasar CR-053/056. Invariant snapshot immutable, reuse, scoped FK,
+  closed grants, validator, 12 tabel legacy yang dipilih eksplisit, serta semua
+  assertion negatif lain tetap dipertahankan. Tidak ada perubahan migration,
+  business code, pin audit, partition/manifest atau jumlah kasus gate.
+- Pengulangan file terakhir **1/1 PASS**; audit akhir PASS tanpa sisa fixture.
+  Source check final PASS **14 file/156 root + 19 frontend**, lint/typecheck/build.
+  Bukti 20 file/119 kasus PASS dari reproduksi dan 1/1 PASS setelah perbaikan
+  tetap dipisahkan, bukan ditulis sebagai satu run shard 1 final PASS.
+
+G4 formal baru pada exact main SHA setelah merge tetap diperlukan: shard 2
+passing pada SHA sebelumnya tidak menggantikan pasangan report exact-SHA baru.
+P7-T1 belum selesai, P7-T2 host nyata tetap NOT RUN.
