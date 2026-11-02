@@ -6,7 +6,7 @@ import {
   assertEquivalentRuntimeEvidence,
 } from '../scripts/runtime-range.js';
 import { URL } from 'node:url';
-import { test } from 'vitest';
+import { test, vi } from 'vitest';
 import { assertCatalogPin, catalogSections, type Catalog } from '../scripts/trivia-v2-catalog-audit.js';
 import {
   assertAdvisorsReport,
@@ -32,6 +32,10 @@ import {
   requiredReportStages,
   assertShardDatabaseEvidence,
 } from '../scripts/gate-runner.js';
+
+vi.mock('../supabase/tests/database/helpers/plan-lifecycle.js', () => {
+  throw new Error('SOURCE_PIN_VALIDATION_MUST_NOT_INITIALIZE_DATABASE');
+});
 
 const manifest = JSON.parse(
   readFileSync(new URL('../scripts/gate-suite-manifest.json', import.meta.url), 'utf8'),

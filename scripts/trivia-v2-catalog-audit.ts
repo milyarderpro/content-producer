@@ -1,7 +1,6 @@
 import { strict as assert } from 'node:assert';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { row, sql } from '../supabase/tests/database/helpers/plan-lifecycle.js';
 
 type CatalogFunction = { signature: string; owner: string; definer: boolean; settings: string[]; source_sha256: string; acl: string };
 type CatalogObject = { object: string; kind: string; owner: string; acl: string; rls: boolean; force_rls: boolean };
@@ -25,11 +24,15 @@ export function assertCatalogPin(catalog: Catalog, pin: CatalogPin, manifest = m
   assert.deepEqual(catalogSections(catalog), pin.sections, 'CATALOG_SCHEMA_SOURCE_OR_ACL_DRIFT');
 }
 
-export function collectCatalog(): Catalog {
+export async function collectCatalog(): Promise<Catalog> {
+  const { sql } = await import('../supabase/tests/database/helpers/plan-lifecycle.js');
   return JSON.parse(sql(`begin read only; ${readFileSync('scripts/trivia-v2-catalog.sql', 'utf8')} commit;`)) as Catalog;
 }
 
 export async function runCatalogAudit(): Promise<void> {
+  // Pure pin validation is also used by source CI, which has no Docker stack.
+  // Resolve the guarded local target only when the database audit is invoked.
+  const { row, sql } = await import('../supabase/tests/database/helpers/plan-lifecycle.js');
   const pin = JSON.parse(readFileSync('scripts/trivia-v2-catalog-pin.json', 'utf8')) as CatalogPin;
   const manifest = migrationManifest();
   const archived = JSON.parse(readFileSync('docs/phase-5-batch-b-remediation-final-catalog.json', 'utf8'));
@@ -37,7 +40,7 @@ export async function runCatalogAudit(): Promise<void> {
   assert.deepEqual(row<{ versions: string[] }>(
     'select array_agg(version order by version) versions from supabase_migrations.schema_migrations',
   ).versions, manifest.map(({ file }) => file.slice(0, 14)), 'APPLIED_MIGRATION_HISTORY_DRIFT');
-  const catalog = collectCatalog();
+  const catalog = await collectCatalog();
   assertCatalogPin(catalog, pin, manifest);
   // Source-only deltas to the archived baseline are explicitly bounded. The
   // pinned final catalog validates their exact bytes; every other old function

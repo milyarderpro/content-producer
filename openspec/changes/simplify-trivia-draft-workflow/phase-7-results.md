@@ -91,6 +91,14 @@ menjalankan full gate lokal duplikat atau menyebut overlay sebagai rilis formal.
 | `scripts/trivia-v2-catalog-controls.ts` | PASS lima negative control nyata yang di-rollback (grant anon, RLS off, helper baru, policy `true`, constraint hilang); audit akhir kembali PASS |
 | `git diff --check` dan validasi OpenSpec strict | PASS |
 
+Light CI PR [#119](https://github.com/milyarderpro/content-producer/pull/119)
+run [41448899109](https://github.com/milyarderpro/content-producer/actions/runs/41448899109)
+pada `6a80c8d` menemukan `LOCAL_DATABASE_TARGET_MISMATCH` saat import pure
+validator di source test: helper database diinisialisasi terlalu awal. Perbaikan
+membatasi dynamic import helper hanya pada eksekusi audit/collector, sehingga
+source tests tidak memerlukan stack Docker. Tidak mengubah keputusan izin DB
+atau melewati guard target ketika audit benar-benar dijalankan.
+
 Inspector menggunakan loopback, JWT sintetis dan PostgREST/database lokal nyata;
 URL/metadata publikasi fixture sintetis bukan peristiwa Facebook nyata. Ini
 LOCAL/INTEGRATION FIXTURE, bukan ChatGPT host, OAuth production atau LIVE.
