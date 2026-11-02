@@ -37,6 +37,8 @@
       "supabase/tests/database/api-trivia-populated-performance.test.ts",
       "supabase/tests/database/api-trivia-public-gold.test.ts",
       "supabase/tests/database/api-trivia-source-diagnostics.test.ts",
+      "supabase/tests/database/api-trivia-v2-corpus.test.ts",
+      "supabase/tests/database/api-trivia-v2-read.test.ts",
       "supabase/tests/database/content-plans-and-plan-items.test.ts",
       "supabase/tests/database/final-remediation.test.ts",
       "supabase/tests/database/operation-ledger-and-rate-limit-buckets.test.ts",

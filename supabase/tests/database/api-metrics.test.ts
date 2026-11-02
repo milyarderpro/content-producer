@@ -182,7 +182,7 @@ describe('5.8 RPC-METRIC public append and replay', () => {
         row(`select has_table_privilege('content_producer_api_owner','public.post_metrics','UPDATE,DELETE,TRUNCATE') mutable,
         (select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api') api`)
           .api,
-      ).toBe(33);
+      ).toBe(34);
     } finally {
       cleanup(f);
       cleanup(other);

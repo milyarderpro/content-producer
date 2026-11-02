@@ -49,7 +49,7 @@ describe('mandatory suite inventory (not a release gate)', () => {
     assertMandatory(manifest.suites.mcp, 'supabase/functions/mcp/');
     assertMandatory(manifest.suites.database, 'supabase/tests/database/');
     expect(manifest.suites.mcp.files).toHaveLength(15);
-    expect(manifest.suites.database.files).toHaveLength(41);
+    expect(manifest.suites.database.files).toHaveLength(43);
   });
 
   it('matches all source files discovered by the root Vitest include', () => {

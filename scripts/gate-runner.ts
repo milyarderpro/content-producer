@@ -126,7 +126,7 @@ export function validateManifest(
     )
       fail('MANIFEST_FILE_DRIFT');
   }
-  if (expected.mcp.length !== 15 || expected.database.length !== 41) fail('MANIFEST_COUNT_DRIFT');
+  if (expected.mcp.length !== 15 || expected.database.length !== 43) fail('MANIFEST_COUNT_DRIFT');
   const mcpCommand =
     (packageScripts['test:mcp'] ?? '')
       .split(/\s*&&\s*/)
@@ -170,8 +170,8 @@ export function validateShards(
   if (
     partition.shards['1'].length === 0 ||
     partition.shards['2'].length === 0 ||
-    all.length !== 41 ||
-    new Set(all).size !== 41 ||
+    all.length !== 43 ||
+    new Set(all).size !== 43 ||
     all.some(
       (path) =>
         typeof path !== 'string' ||
@@ -229,7 +229,7 @@ export function validateShardProofs(
   )
     fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
   const files = proofs.flatMap((p) => p.files);
-  if (files.length !== 41 || new Set(files).size !== 41) fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
+  if (files.length !== 43 || new Set(files).size !== 43) fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
   return proofs.reduce((sum, p) => sum + p.cases, 0);
 }
 
@@ -577,7 +577,7 @@ export function assertShardDatabaseEvidence(output: string, expectedFiles: numbe
 export function assertDatabaseTestEvidence(output: string): void {
   const plain = plainEvidence(output);
   assertNoSkipped(plain);
-  if (!/Test Files\s+41 passed[\s\S]*Tests\s+[1-9]\d* passed/.test(plain))
+  if (!/Test Files\s+43 passed[\s\S]*Tests\s+[1-9]\d* passed/.test(plain))
     fail('REQUIRED_EVIDENCE_MISSING', 'FAIL');
 }
 
@@ -703,7 +703,7 @@ async function backendStages(
     run('start', 'pnpm', ['run', 'supabase:start']);
     assertStartedTarget(projectId, base);
     run('reset', 'pnpm', ['run', 'supabase:reset']);
-    run('migration-names', 'pnpm', ['run', 'verify-migrations'], /Validated 72 migration filename/);
+    run('migration-names', 'pnpm', ['run', 'verify-migrations'], /Validated 75 migration filename/);
     if (!shard || shard === '1') run('mcp', 'pnpm', ['run', 'test:mcp'], /\b82 passed/);
     run(
       'audit-before',

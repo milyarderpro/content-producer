@@ -4,7 +4,7 @@ with expected as (
  'list_content_plans','get_content_plan','list_posts','get_post','get_post_performance','get_performance_insights',
  'create_page','update_page','create_content_plan','claim_content_plan_items','renew_content_plan_claim',
  'report_content_plan_item_failure','retry_content_plan_item','replace_discarded_plan_item','cancel_content_plan',
- 'trivia_find_similar_facts','trivia_register_and_reserve_facts','trivia_release_facts','trivia_reverify_fact','trivia_correct_fact',
+ 'trivia_find_similar_facts','trivia_find_similar_facts_v2','trivia_register_and_reserve_facts','trivia_release_facts','trivia_reverify_fact','trivia_correct_fact',
  'save_post','revise_post','reschedule_post','approve_post','revoke_post_approval','discard_post','mark_post_posted','archive_post','record_post_performance']) name
 ), api_functions as (
  select p.* from pg_catalog.pg_proc p join pg_catalog.pg_namespace n on n.oid=p.pronamespace where n.nspname='api'

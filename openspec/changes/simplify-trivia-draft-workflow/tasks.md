@@ -161,13 +161,13 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
 
 ## 3. Data dan pencarian v2
 
-- [ ] 3.1 **P3-T1 Schema additive:** tambahkan registry/pemetaan, sumber satu
+- [x] 3.1 **P3-T1 Schema additive:** tambahkan registry/pemetaan, sumber satu
       URL, binding v2, dan versi konten tanpa mengedit migration terpasang; sesuaikan
       constraint/trigger serta ACL/RLS/grant untuk jalur yang sah. **Verifikasi:**
       test schema dan owner/cross-owner menegakkan akses, migration history/names
       konsisten, audit katalog menunjukkan grant tetap tertutup, serta dokumentasi
       menjelaskan versi, invariant, dan rollback additive.
-- [ ] 3.2 **P3-T2 Backfill dan indeks:** petakan fakta/pemakaian v1 ke pandangan
+- [x] 3.2 **P3-T2 Backfill dan indeks:** petakan fakta/pemakaian v1 ke pandangan
       bersama secara idempoten, mencakup published dan status koreksi, serta jaga
       konsistensi perubahan v1 berikutnya. **Verifikasi:** backfill berulang tidak
       menggandakan ID/pemakaian, digest snapshot/approval/isi lama tetap, dan test
@@ -175,7 +175,7 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       audit migrasi pada fixture. Native tanpa envelope v1 tetap ditemukan;
       penolakan/first-attachment v1 mengikuti kontrak P2-T1 dan batas CR-054,
       bukan insert identitas paralel atau kewajiban full native success v1.
-- [ ] 3.3 **P3-T3 Pencarian database:** implementasikan RPC Read v2 kalimat +
+- [x] 3.3 **P3-T3 Pencarian database:** implementasikan RPC Read v2 kalimat +
       Page dengan kandidat ringkas lintas versi, `complete`, dan versi katalog A.
       **Verifikasi:** test dataset P2, hasil kosong/lengkap/terpotong, batas output,
       scope owner, status historis serta pemakaian lulus; URL/ontologi input tidak

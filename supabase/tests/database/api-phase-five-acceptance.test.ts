@@ -15,14 +15,14 @@ import {
 } from './helpers/metrics-rpc.js';
 
 describe('5.9 phase-wide public surface and scope acceptance', () => {
-  it('SEC-* exact 33 RPCs, owner policies/default ACL, historical replay security and Phase 6.1 bootstrap', () => {
+  it('SEC-* exact 34 RPCs, owner policies/default ACL, historical replay security and Phase 6.1 bootstrap', () => {
     const a = JSON.parse(sql(readFileSync('docs/phase-5-8-catalog-audit.sql', 'utf8'))) as Record<
       string,
       unknown
     >;
-    expect(a.api_function_count).toBe(33);
-    expect(a.authenticated_api_execute_count).toBe(33);
-    expect(a.rls_enabled_table_count).toBe(15);
+    expect(a.api_function_count).toBe(34);
+    expect(a.authenticated_api_execute_count).toBe(34);
+    expect(a.rls_enabled_table_count).toBe(17);
     for (const key of [
       'allowlist_difference_count',
       'overloaded_api_count',
@@ -67,6 +67,36 @@ describe('5.9 phase-wide public surface and scope acceptance', () => {
         owner: 'postgres',
         settings: ['search_path=""'],
       },
+      {
+        signature: 'internal.trivia_catalog_bump_v2(bigint)',
+        owner: 'postgres',
+        settings: ['search_path=""'],
+      },
+      {
+        signature: 'internal.trivia_catalog_config_hook_v2()',
+        owner: 'postgres',
+        settings: ['search_path=""'],
+      },
+      {
+        signature: 'internal.trivia_catalog_evidence_hook_v2()',
+        owner: 'postgres',
+        settings: ['search_path=""'],
+      },
+      {
+        signature: 'internal.trivia_catalog_fact_hook_v2()',
+        owner: 'postgres',
+        settings: ['search_path=""'],
+      },
+      {
+        signature: 'internal.trivia_catalog_usage_hook_v2()',
+        owner: 'postgres',
+        settings: ['search_path=""'],
+      },
+      {
+        signature: 'internal.trivia_require_native_evidence_v2()',
+        owner: 'postgres',
+        settings: ['search_path=""'],
+      },
     ]);
     expect(
       sql(
@@ -88,7 +118,7 @@ describe('5.9 phase-wide public surface and scope acceptance', () => {
     expect(frontendFiles).toContain('auth.js');
     expect(readdirSync('plugin/.codex-plugin').filter((x) => x !== '.gitkeep')).toEqual([]);
     expect(readFileSync('supabase/seed.sql', 'utf8')).not.toMatch(/\b(insert|update|delete)\b/i);
-    const allowed = new Set(phaseFiveOperationMap.map((x) => x.name));
+    const allowed = new Set([...phaseFiveOperationMap.map((x) => x.name), 'trivia_find_similar_facts_v2']);
     expect((a.api_inventory as { name: string }[]).every((x) => allowed.has(x.name))).toBe(true);
   });
   it('RPC-METRIC numeric normalization and immutable v8 preserve exact request/replay boundaries without new post revision', () => {
