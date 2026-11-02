@@ -66,6 +66,11 @@ jobs:
           backend_review="$all_checks"
           for file in "${files[@]}"; do
             case "$file" in
+              scripts/trivia-v2-catalog*|scripts/legacy-catalog-audit.ts|scripts/phase-6-catalog-audit.ts)
+                need_check=true
+                backend_review=true ;;
+            esac
+            case "$file" in
               *.ts|*.tsx|*.js|*.mjs|*.cjs|package.json|pnpm-lock.yaml|tsconfig.json|.nvmrc|.npmrc|.gitignore|.env.example|.deno-version|.prettierignore|.prettierrc.json|.github/workflows/*|.github/actions/*|auth-frontend/*|plans/tool-inventory.md|plans/trivia-content-dna.md|plans/use-case-inventory.md|plans/acceptance-traceability.md|docs/phase-8/*|docs/phase-5-*-catalog*|docs/phase-5-batch-b-remediation-final-catalog.json|supabase/tests/fixtures/*|dataset-reference/*|supabase/migrations/*|supabase/config.toml|supabase/functions/deno.json|supabase/functions/deno.lock)
                 need_check=true ;;
             esac

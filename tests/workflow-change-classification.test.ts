@@ -149,6 +149,14 @@ describe('Light CI memilih pemeriksaan dari kedua sisi perubahan', () => {
     }
   });
 
+  it.each(['scripts/trivia-v2-catalog.sql', 'scripts/trivia-v2-catalog-pin.json']) (
+    'memilih source dan review backend untuk input audit %s', (path) => {
+      const result = classify({}, { [path]: 'Fixture\n' });
+      expect(result.checks.need_check).toBe('true');
+      expect(result.checks.backend_review).toBe('true');
+    },
+  );
+
   it('memilih root checks untuk fixture yang dipindah keluar lokasi lama', () => {
     const result = classify(
       { 'supabase/tests/fixtures/old.json': '{}\n' },

@@ -7,6 +7,7 @@ import {
 } from '../scripts/runtime-range.js';
 import { URL } from 'node:url';
 import { test } from 'vitest';
+import { assertCatalogPin, catalogSections, type Catalog } from '../scripts/trivia-v2-catalog-audit.js';
 import {
   assertAdvisorsReport,
   assertSourceTestEvidence,
@@ -37,6 +38,22 @@ const manifest = JSON.parse(
 );
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 const sha = 'b'.repeat(40);
+
+test('catalog pins reject function, ACL, RLS, schema section and migration drift', () => {
+  const catalog = { functions: [], objects: [], policies: [{ using: 'owner_id = auth.uid()' }] } as Catalog;
+  const pin = { migrationCount: 0,
+    manifestSha256: '4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945',
+    sections: catalogSections(catalog) };
+  assert.doesNotThrow(() => assertCatalogPin(catalog, pin, []));
+  for (const changed of [
+    { ...catalog, functions: [{ signature: 'internal.unexpected()' }] },
+    { ...catalog, objects: [{ acl: '{anon=r/postgres}', rls: false }] },
+    { ...catalog, policies: [{ using: 'true' }] },
+    { ...catalog, constraints: [] },
+  ]) assert.throws(() => assertCatalogPin(changed as Catalog, pin, []), /CATALOG_SCHEMA_SOURCE_OR_ACL_DRIFT/);
+  assert.throws(() => assertCatalogPin(catalog, pin, [{ file: 'extra.sql', sha256: 'x' }]), /CATALOG_MIGRATION_COUNT_DRIFT/);
+  assert.throws(() => assertCatalogPin(catalog, { ...pin, manifestSha256: 'changed' }, []), /CATALOG_MIGRATION_SOURCE_DRIFT/);
+});
 
 test('rejects a mismatched candidate SHA before any stage', () => {
   assert.throws(() => assertSha('0'.repeat(40), sha), { code: 'SHA_MISMATCH' });
