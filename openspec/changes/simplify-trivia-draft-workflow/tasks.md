@@ -259,14 +259,14 @@ mengikuti izin terpisah. Inventaris G4 menjadi 46 file/221 kasus tanpa skip.
 
 ## 6. Tool dan plugin
 
-- [ ] 6.1 **P6-T1 Tool v2:** daftarkan tiga tool bernama v2 dengan schema
+- [x] 6.1 **P6-T1 Tool v2:** daftarkan tiga tool bernama v2 dengan schema
       request/response dan projection yang jelas; pertahankan input/output v1 yang
       masih didukung serta mapping tipis ke RPC. **Verifikasi:** test MCP/registry,
       katalog host, error input/output, owner denial, dan kompatibilitas plugin lama
       lulus; inventaris, kontrak versi, serta manifest test/Inspector diperbarui
       tanpa menutupi tool baru dengan hitungan baseline lama. Kompatibilitas
       memakai pengecualian Read native CR-054, bukan full native success v1 wajib.
-- [ ] 6.2 **P6-T2 Diagnostik seluruh tool:** lengkapi mapping input/auth/domain/
+- [x] 6.2 **P6-T2 Diagnostik seluruh tool:** lengkapi mapping input/auth/domain/
       rate limit/transport/output/unknown untuk seluruh katalog menurut P1-T3;
       D1/D2 hanya kelompok internal dalam task ini. **Verifikasi:** matriks tool x
       lapisan memiliki kasus dan hasil atau alasan tidak berlaku, test lokasi,
@@ -276,13 +276,23 @@ mengikuti izin terpisah. Inventaris G4 menjadi 46 file/221 kasus tanpa skip.
       Penolakan Read native CR-054 harus terarah dan recovery tidak menganggap
       tool v2 tersedia sebelum runtime/plugin terverifikasi; Write unknown tetap
       direkonsiliasi sebelum operasi atau perpindahan versi baru.
-- [ ] 6.3 **P6-T3 Instruksi plugin:** perbarui pemahaman jumlah/Page/tema,
+- [x] 6.3 **P6-T3 Instruksi plugin:** perbarui pemahaman jumlah/Page/tema,
       riset cadangan, dedup sebelum copy, penggantian calon, konteks sebelum Write,
       save/readback per item, plan/resume, retry aman, dan ringkasan error Indonesia.
       **Verifikasi:** test paket/instruksi dan skenario host fixture menunjukkan
       pilihan v2, sumber cukup satu URL, tanpa tier/ontologi/expiry/reservasi atau
       tahun wajib; contoh output memisahkan copy publik/sumber internal dan tidak
       menyamakan draft dengan Setujui atau HTTP 200 dengan tersimpan.
+
+**Bukti P6-T1/T2/T3:** [hasil P6](phase-6-results.md),
+[CR-057 Accepted](../../../docs/decisions/2026-11-02-cr-057-equivalent-mcp-catalog-schema.md),
+dan [matriks seluruh tool](../../../docs/contracts/tool-diagnostics-coverage.md).
+Source check final PASS 14 file/153 root + 19 frontend; MCP PASS 17 file/127
+kasus, termasuk enam kasus v2 dan 39 diagnostik seluruh 36 tool. Test paket/
+instruksi PASS 4 file/35; build/verifikasi kandidat 0.3.0 PASS 13 file. Katalog
+host terisolasi/kontrak dan scripted fixture bukan host ChatGPT/LIVE. Inspector
+36 valid/36 invalid diperluas pada source tetapi eksekusi nyata, G4 formal,
+deployment/instalasi dan LIVE tetap P7/P8, NOT RUN pada sesi ini.
 
 ## 7. Verifikasi integrasi
 

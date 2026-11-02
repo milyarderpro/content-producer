@@ -6,6 +6,7 @@ import { buildPilotRpcStatement } from './pilot_db.ts';
 import { canonicalMan02RpcArguments, isApprovedMan02CreatePage } from './pilot_write.ts';
 import { isApprovedPilot104Write } from './pilot_write_10_4.ts';
 import { createAuthenticatedTransport, fetchAnonymousDiscovery } from './transport.ts';
+import { closeUnionWrapper, expandCatalogSchema } from './catalog_schema.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
 import { createMcpServer } from './server.ts';
 
@@ -56,8 +57,8 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   );
   const listed = responseJson(catalogBody);
   const tools = (listed.result as { tools: Array<Record<string, unknown>> }).tools;
-  assert(MCP_TOOL_COUNT === 33 && tools.length === 33, 'exact 33 tools');
-  assert(new Set(tools.map((tool) => tool.name)).size === 33, 'duplicate tool names');
+  assert(MCP_TOOL_COUNT === 36 && tools.length === 36, 'exact 36 tools');
+  assert(new Set(tools.map((tool) => tool.name)).size === 36, 'duplicate tool names');
   assert(
     tools.some((tool) => tool.name === 'create_page'),
     'missing create_page',
@@ -92,7 +93,7 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   assert(rawResponse.status === 200, 'raw SDK catalog available');
   const original = responseJson(await rawResponse.text());
   const originalTools = (original.result as { tools: Array<Record<string, unknown>> }).tools;
-  assert(originalTools.length === 33, 'SDK original contains 33 tools');
+  assert(originalTools.length === 36, 'SDK original contains 36 tools');
   const rawPilotResponse = await createMcpHandler(() => createMcpServer(context)).fetch(
     request('tools/list'),
   );
@@ -100,7 +101,7 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   const pilotOriginal = responseJson(await rawPilotResponse.text());
   const pilotData = pilotOriginal.result as { tools: Array<Record<string, unknown>> };
   const pilotOriginalTools = pilotData.tools;
-  assert(pilotOriginalTools.length === 33, 'raw No-auth SDK still has 33 tools');
+  assert(pilotOriginalTools.length === 36, 'raw No-auth SDK has 36 tools');
 
   const oauthResponse = await createAuthenticatedTransport({
     ...context,
@@ -128,8 +129,8 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     request('tools/call', { name: 'get_account_profile', arguments: {} }),
   );
   assert(blockedCall.status === 403, 'anonymous OAuth tool calls must remain blocked');
-  assert(oauthTools.length === 33, 'OAuth catalog must expose exactly 33 tools');
-  assert(new Set(oauthTools.map((tool) => tool.name)).size === 33, 'OAuth duplicate tool name');
+  assert(oauthTools.length === 36, 'OAuth catalog must expose exactly 36 tools');
+  assert(new Set(oauthTools.map((tool) => tool.name)).size === 36, 'OAuth duplicate tool name');
   assert(
     oauthTools.some((tool) => tool.name === 'mark_post_posted'),
     'the historically rejected tool must remain available',
@@ -169,12 +170,12 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     delete pilotInput.$schema;
     const portablePilot = normalizeExpectedWirePatterns(pilotInput);
     assert(
-      JSON.stringify(compact.inputSchema) === JSON.stringify(portablePilot),
-      'No-auth input differs from its SDK source beyond CR-034 transforms',
+      JSON.stringify(expandCatalogSchema(compact.inputSchema)) === JSON.stringify(closeUnionWrapper(portablePilot)),
+      'No-auth input constraints differ after equivalent local-reference expansion',
     );
     assert(
-      JSON.stringify(auth.inputSchema) === JSON.stringify(portable),
-      'OAuth input differs from SDK beyond CR-034 transforms',
+      JSON.stringify(expandCatalogSchema(auth.inputSchema)) === JSON.stringify(closeUnionWrapper(portable)),
+      'OAuth input constraints differ after equivalent local-reference expansion',
     );
     assert(
       !('title' in auth) &&

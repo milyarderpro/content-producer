@@ -44,6 +44,12 @@ belum PASS. Gate wajib tetap dijalankan sebelum deployment yang memerlukannya.
 
 ## 2. Arti setiap command
 
+**P6, 2 November 2026:** manifest MCP kini **17 file/127 kasus** (15/82 historis
++ enam kasus tool/projection v2 + 39 kasus diagnostik). Katalog transisi **36
+tool: 12 Baca/24 Tulis**. Target authenticated Inspector diperluas menjadi
+**36 valid/36 invalid + owner denial**; pembaruan target bukan hasil eksekusi.
+DB tetap 46/221. Fixture source/plugin tidak membuktikan ChatGPT host atau LIVE.
+
 | Command dari root                                  | Cakupan                                                                             | Prasyarat / efek                                                                                  |
 | -------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | `pnpm run format:check`                            | Pemeriksaan gaya Prettier opsional secara manual                                    | Bukan gate wajib; membaca source lebih luas dari file yang diubah                                |
@@ -55,7 +61,7 @@ belum PASS. Gate wajib tetap dijalankan sebelum deployment yang memerlukannya.
 | `pnpm run frontend:test`                           | Tiga file test Node frontend                                                        | Menggunakan fixture/mocking; termasuk route/callback                                              |
 | `pnpm run check`                                   | Enam command non-Prettier di atas, berurutan                                        | Kegagalan menggagalkan check; tidak menjalankan suite MCP atau database; membangun frontend       |
 | `pnpm run verify-migrations`                       | Pola nama file SQL migration                                                        | Tidak memeriksa SQL, applied history, atau drift                                                  |
-| `pnpm run test:mcp`                                | Deno check, lint MCP, dan 15 file test MCP yang disebut script                      | Deno; mock/fixture protokol, tanpa stack DB untuk suite ini                                       |
+| `pnpm run test:mcp`                                | Deno check, lint MCP, dan 17 file/127 kasus test MCP yang disebut script             | Deno; mock/fixture protokol, tanpa stack DB untuk suite ini                                       |
 | `pnpm run test:database`                           | Vitest database **46 file saat ini** (40 pada baseline historis)                    | Docker/Supabase lokal dengan migration sesuai; menulis fixture lokal                              |
 | `pnpm run test-all`                                | **Legacy CR-020/044**: `check` → `verify-migrations` → `test:mcp` → `test:database` | Tidak start/reset stack; tetap dipertahankan untuk gate sebelum merge dan rollback, bukan gate G4 |
 | `pnpm run gate:source`                             | Source/frontend, versi/manifest, bukti source untuk G4                              | Komponen source kandidat; PASS saja bukan release evidence lengkap                                |

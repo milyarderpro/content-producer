@@ -18,8 +18,8 @@ import {
   content as postContent,
   editorial as postEditorial,
   request as postRequest,
-  cleanup as postCleanup,
 } from '../supabase/tests/database/helpers/post-rpc.js';
+import { cleanup as postCleanup } from '../supabase/tests/database/helpers/trivia-v2.js';
 import {
   candidate,
   factInput,
@@ -438,7 +438,7 @@ try {
     'INITIALIZE',
   );
   const tools = (await rpcHttp('tools/list')).body.result.tools;
-  check(tools.length === 33, 'EXACT_33_TOOLS');
+  check(tools.length === 36, 'EXACT_36_TOOLS');
   const defaultConfig = row<{ config: object }>(
     'select internal.default_trivia_config_v1() config',
   ).config;
@@ -490,7 +490,7 @@ try {
   const unauth = await fetch(resource, { method: 'POST', body: '{}' });
   check(unauth.status === 401, 'MISSING_TOKEN_DENIAL');
   console.info(
-    'Public HTTP auth, initialize, exact 33-tool census: PASS; original RS256 user JWT accepted by real local PostgREST.',
+    'Public HTTP auth, initialize, exact 36-tool census: PASS; original RS256 user JWT accepted by real local PostgREST.',
   );
 
   const createPageInput = {
@@ -1917,7 +1917,7 @@ try {
   if (!process.argv.includes('--preflight')) {
     await inspector('initialize');
     const listed = await inspector('tools/list');
-    check(listed.tools.length === 33, 'INSPECTOR_CENSUS');
+    check(listed.tools.length === 36, 'INSPECTOR_CENSUS');
     await inspector('tools/call', 'get_account_profile', {});
     await inspector('tools/call', 'get_workspace_context', common());
     await inspector('tools/call', 'list_pages', common());
@@ -2246,6 +2246,58 @@ try {
       'INSPECTOR_METRIC_INSIGHTS',
     );
 
+    // CR-053 P6: three new names have real authenticated positive calls too.
+    clearFixtureBuckets();
+    const v2Context = (await inspector('tools/call', 'get_page_generation_context', {
+      ...common(), page_public_id: newPage.page_public_id, niche_key: 'trivia',
+    })).structuredContent.data;
+    const v2Facts = Array.from({ length: 5 }, (_, i) => ({ position: i + 1,
+      candidate_key: `p6_${i}`, claim_text: randomUUID().replaceAll('-', ''),
+      source_url: 'https://example.org/fixture/inspector',
+      dedup: { complete: true, decision: 'distinct', fact_public_id: null,
+        reviews: [] as Array<{ fact_public_id: string; decision: string }> } }));
+    const v2ReadArgs = { request_schema_version: 2, workspace_public_id: f.workspace,
+      page_public_id: newPage.page_public_id,
+      candidates: v2Facts.map(({ candidate_key, claim_text }) => ({ candidate_key, claim_text })) };
+    const v2Read = (await inspector('tools/call', 'trivia_find_similar_facts_v2', v2ReadArgs)).structuredContent.data;
+    v2Read.candidates.forEach((candidate: { complete: boolean; matches: Array<{ fact_public_id: string }> }, i: number) => {
+      check(candidate.complete, 'INSPECTOR_V2_COMPLETE');
+      v2Facts[i]!.dedup.reviews = candidate.matches.map(match => ({ fact_public_id: match.fact_public_id, decision: 'distinct' }));
+    });
+    const v2Content = { schema_version: 2, hook: 'Inspector fixture',
+      body: { facts: v2Facts.map(({ position, claim_text }) => ({ position, text: claim_text })) },
+      cta: 'Fixture only.', canva_copy: '', caption: 'Synthetic fixture.', hashtags: ['#Fixture'],
+      render_style: 'plain_lines', text_metrics: {} };
+    v2Content.canva_copy = [v2Content.hook, ...v2Facts.map(fact => fact.claim_text), v2Content.cta].join('\n\n');
+    const v2SaveArgs = { request_schema_version: 2, workspace_public_id: f.workspace,
+      operation_key: randomUUID(), page_public_id: newPage.page_public_id, niche_key: 'trivia',
+      config_public_id: v2Context.config_public_id,
+      expected_config_updated_at: v2Context.context_version.config_updated_at,
+      expected_catalog_version: v2Read.catalog_version, content_schema_version: 2,
+      format_key: 'single_subject_fast', topic_key: 'animals', interaction_goal: 'share',
+      scheduled_at: null, plan_item: null, facts: v2Facts, content_payload: v2Content,
+      editorial_checks: { meaning_preserved: 'pass', caption_no_new_claim: 'pass', no_known_substantive_issue: 'pass' } };
+    const v2Saved = (await inspector('tools/call', 'save_post_v2', v2SaveArgs)).structuredContent.data.post;
+    const v2Post = (await inspector('tools/call', 'get_post', { ...common(),
+      post_public_id: v2Saved.post_public_id, include_sources: true, include_checks: true })).structuredContent.data.post;
+    check(v2Post.content_schema_version === 2 && v2Post.fact_bindings.length === 5, 'INSPECTOR_V2_READBACK');
+    const v2Again = (await inspector('tools/call', 'trivia_find_similar_facts_v2', v2ReadArgs)).structuredContent.data;
+    v2Again.candidates.forEach((candidate: { complete: boolean; matches: Array<{ fact_public_id: string; claim_text: string }> }, i: number) => {
+      check(candidate.complete, 'INSPECTOR_V2_REVISE_COMPLETE');
+      const selected = candidate.matches.find(match => match.claim_text === v2Facts[i]!.claim_text);
+      check(!!selected, 'INSPECTOR_V2_IDENTITY');
+      Object.assign(v2Facts[i]!.dedup, { decision: 'same', fact_public_id: selected.fact_public_id,
+        reviews: candidate.matches.map(match => ({ fact_public_id: match.fact_public_id,
+          decision: match.fact_public_id === selected.fact_public_id ? 'same' : 'distinct' })) });
+    });
+    const { page_public_id: _page, niche_key: _niche, scheduled_at: _schedule,
+      plan_item: _plan, ...v2Revision } = v2SaveArgs;
+    void [_page, _niche, _schedule, _plan];
+    const v2Revised = (await inspector('tools/call', 'revise_post_v2', { ...v2Revision,
+      operation_key: randomUUID(), post_public_id: v2Saved.post_public_id,
+      expected_revision: v2Saved.revision, expected_content_hash: v2Saved.content_hash,
+      expected_catalog_version: v2Again.catalog_version, revision_reason: 'Review synthetic fixture.' })).structuredContent.data.post;
+    check(v2Revised.revision === 2 && v2Revised.status === 'draft', 'INSPECTOR_V2_REVISED');
     clearFixtureBuckets();
     for (const tool of tools) {
       // OAuth profile and workspace bootstrap accept {}; retain one genuinely
@@ -2282,6 +2334,6 @@ try {
 
 if (process.exitCode !== 1) {
   console.info(
-    `Phase 6.13 ${process.argv.includes('--preflight') ? 'preflight: real HTTP recovery/race' : 'gate: Inspector initialize/list, 33/33 valid and 33/33 invalid tool calls'} PASS; HTTP log privacy PASS; typical local latency median ${Math.round(timings[Math.floor(timings.length / 2)])}ms, max ${Math.round(timings.at(-1)!)}ms (fixture scope).`,
+    `Phase 6.13 ${process.argv.includes('--preflight') ? 'preflight: real HTTP recovery/race' : 'gate: Inspector initialize/list, 36/36 valid and 36/36 invalid tool calls'} PASS; HTTP log privacy PASS; typical local latency median ${Math.round(timings[Math.floor(timings.length / 2)])}ms, max ${Math.round(timings.at(-1)!)}ms (fixture scope).`,
   );
 }

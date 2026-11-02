@@ -7,6 +7,7 @@ import { invoke } from './foundation.ts';
 import { metricAnomalyFlags } from './post_metrics.ts';
 import { planSummary } from './page_plan.ts';
 import { triviaConfig } from './schemas.ts';
+import { contentV2, editorialEvidenceV2, systemEvidenceV2, sourceUrlV2 } from './trivia_v2.ts';
 
 const uuid = z.string().uuid();
 const timestamp = z.string().datetime({ offset: true });
@@ -339,6 +340,7 @@ const saveInput = z
     }
   });
 const postSummary = z.strictObject({
+  content_schema_version: z.literal(2).optional(),
   post_public_id: uuid,
   page_public_id: uuid,
   niche_key: key,
@@ -388,7 +390,7 @@ const bindingOutput = bindingInput.extend({
   allocation_state: z.enum(['allocated', 'published', 'released']),
   source_snapshot: sourceSnapshot.optional(),
 });
-export const postPackage = z.strictObject({
+const legacyPostPackage = z.strictObject({
   post_public_id: uuid,
   page_public_id: uuid,
   niche_key: key,
@@ -408,6 +410,17 @@ export const postPackage = z.strictObject({
   created_at: timestamp,
   updated_at: timestamp,
 });
+export const postPackage = z.union([legacyPostPackage, legacyPostPackage.extend({
+  content_schema_version: z.literal(2),
+  content_payload: contentV2.extend({ text_metrics: textMetrics }),
+  system_checks: z.union([systemEvidenceV2, z.strictObject({}), z.null()]),
+  editorial_checks: z.union([editorialEvidenceV2, z.strictObject({}), z.null()]),
+  fact_bindings: z.array(bindingInput.extend({
+    allocation_state: z.enum(['allocated', 'published', 'released']),
+    source_snapshot: z.strictObject({ schema_version: z.literal(2),
+      canonical_claim: z.string().min(1).max(500), source_url: sourceUrlV2 }).optional(),
+  })).max(200),
+})]);
 const listOutput = envelope(
   z.strictObject({
     items: z.array(postSummary).max(50),

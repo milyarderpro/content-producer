@@ -1,5 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
+import { TRIVIA_V2_TOOL_NAMES, registerTriviaV2Tools } from './trivia_v2.ts';
+import { diagnosticInput } from './diagnostics.ts';
 import { POST_BASE_TOOL_NAMES, registerPostBaseTools } from './post_base.ts';
 import { POST_EDIT_TOOL_NAMES, registerPostEditTools } from './post_edit.ts';
 import { POST_APPROVAL_TOOL_NAMES, registerPostApprovalTools } from './post_approval.ts';
@@ -27,8 +29,15 @@ export const MCP_TOOL_COUNT =
   POST_EDIT_TOOL_NAMES.length +
   POST_APPROVAL_TOOL_NAMES.length +
   POST_PUBLICATION_TOOL_NAMES.length +
-  POST_METRICS_TOOL_NAMES.length;
+  POST_METRICS_TOOL_NAMES.length + TRIVIA_V2_TOOL_NAMES.length;
 export function registerTools(server: McpServer, context?: RequestContext): void {
+  const original = server.registerTool.bind(server);
+  server.registerTool = ((...args: Parameters<McpServer['registerTool']>) => {
+    const [name, config, callback] = args;
+    return original(name, {
+      ...config, inputSchema: diagnosticInput(config.inputSchema, name) as typeof config.inputSchema,
+    }, callback);
+  }) as typeof server.registerTool;
   registerFoundationTools(server, context);
   registerPagePlanTools(server, context);
   registerPlanClaimTools(server, context);
@@ -40,4 +49,6 @@ export function registerTools(server: McpServer, context?: RequestContext): void
   registerPostApprovalTools(server, context);
   registerPostPublicationTools(server, context);
   registerPostMetricsTools(server, context);
+  registerTriviaV2Tools(server, context);
+  server.registerTool = original;
 }

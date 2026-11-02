@@ -135,7 +135,7 @@ Deno.test(
   '6.13: precisely 33 tools; metrics schemas closed, OAuth and annotations explicit',
   async () => {
     const tools = (await mcp('tools/list')).result.tools;
-    check(MCP_TOOL_COUNT === 33 && tools.length === 33, 'EXACT_33');
+    check(MCP_TOOL_COUNT === 36 && tools.length === 36, 'EXACT_36');
     for (const name of POST_METRICS_TOOL_NAMES) {
       const tool = tools.find((entry: { name: string }) => entry.name === name);
       check(tool?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');

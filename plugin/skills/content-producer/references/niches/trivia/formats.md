@@ -1,5 +1,14 @@
 # Trivia formats, profiles and rendering
 
+**Current v2 precedence:** use current Page fact count, allowed choices and hard
+budgets. The five formats/two density preferences still guide composition, but
+do not import legacy source-tier/sensitive-topic quotas, expiry or approval
+waivers. Use the common sentence + one URL research path. If a factual qualifier
+cannot fit, replace the angle/fact; do not require a year on every line. V2
+save/revise rejects a hard violation, computes metrics, and requires three
+editorial pass results. The legacy waiver/readability discussion below describes
+v1 readiness only; never bypass a v2 count/budget failure with a legacy waiver.
+
 Frozen authority: `plans/trivia-content-dna.md` sections 7–9, 11–15, 24 and `plans/phase-0-decision-register.md` QUALITY-001/002. Use only the five named `format_key` values permitted by current Page config. `architecture` describes the collection (`single_subject`, `themed`, `mixed`); it does not replace `format_key`.
 
 ## Five format contracts

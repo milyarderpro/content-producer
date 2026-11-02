@@ -48,7 +48,7 @@ describe('mandatory suite inventory (not a release gate)', () => {
     assertMandatory(manifest.suites.source, 'tests/');
     assertMandatory(manifest.suites.mcp, 'supabase/functions/mcp/');
     assertMandatory(manifest.suites.database, 'supabase/tests/database/');
-    expect(manifest.suites.mcp.files).toHaveLength(15);
+    expect(manifest.suites.mcp.files).toHaveLength(17);
     expect(manifest.suites.database.files).toHaveLength(46);
   });
 

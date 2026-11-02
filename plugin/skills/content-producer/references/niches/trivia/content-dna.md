@@ -1,5 +1,13 @@
 # Trivia content DNA — editorial decisions
 
+**Current v2 precedence (CR-053/054):** Page/count/theme and the primary v2
+workflow control new drafts. Source packet/tier/expiry, reservation references
+and the old rubric attestation below are legacy-v1 only. Editorial interest
+preferences remain suggestions, not extra blocking checks beyond the three v2
+results. Follow configured fact count; replace weak candidates or report a
+shortfall, never silently reduce the requested number of drafts/facts. No year
+is mandatory on every line; accuracy and general safety remain required.
+
 This policy applies only when the selected, enabled niche is `trivia`. Read [formats](formats.md), [fact checking](fact-checking.md), [dedup ontology](dedup-ontology.md), and [quality rubric](quality-rubric.md) as needed. The generic [core workflow](../../core/workflow.md) owns Page selection, authorization boundaries, reservations and post lifecycle. Frozen authority: `plans/trivia-content-dna.md` sections 3–7, 10–14, 22–24; `plans/module-contract.md`.
 
 ## Editorial purpose

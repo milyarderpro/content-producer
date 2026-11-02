@@ -4,6 +4,7 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { invoke } from './foundation.ts';
 import { safeDetail } from './plan_claim.ts';
+import { systemEvidenceV2 } from './trivia_v2.ts';
 
 const uuid = z.string().uuid();
 const timestamp = z.string().datetime({ offset: true });
@@ -89,7 +90,7 @@ const approveOutput = envelope(
     status: z.literal('ready'),
     revision,
     approval: approvalSummary,
-    recomputed_checks: recomputedChecks,
+    recomputed_checks: z.union([recomputedChecks, systemEvidenceV2]),
     replayed: z.boolean(),
   }),
 );

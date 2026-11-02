@@ -69,6 +69,10 @@
       "entrypoint": "pnpm run test:mcp",
       "files": [
         {
+          "path": "supabase/functions/mcp/diagnostics_test.ts",
+          "status": "mandatory"
+        },
+        {
           "path": "supabase/functions/mcp/auth_test.ts",
           "status": "mandatory"
         },
@@ -126,6 +130,10 @@
         },
         {
           "path": "supabase/functions/mcp/trivia_fact_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/trivia_v2_test.ts",
           "status": "mandatory"
         }
       ]

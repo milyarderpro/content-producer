@@ -6,6 +6,7 @@ import type { RequestContext } from './auth.ts';
 import { invoke } from './foundation.ts';
 import { safeDetail } from './plan_claim.ts';
 import { candidate, source } from './trivia_fact.ts';
+import { factV2, catalogVersion, preciseTimestamp, sourceUrlV2 } from './trivia_v2.ts';
 
 const uuid = z
   .string()
@@ -110,6 +111,22 @@ const correctOutput = envelope(
     replayed: z.boolean(),
   }),
 );
+const commonV2 = { request_schema_version: z.literal(2), workspace_public_id: uuid,
+  operation_key: uuid, fact_public_id: uuid, expected_fact_updated_at: preciseTimestamp };
+const reverifyInputV2 = z.strictObject({ ...commonV2,
+  confirmed_claim_text: z.string().min(1).max(500), source_url: sourceUrlV2 });
+const correctInputV2 = z.strictObject({ ...commonV2,
+  action: z.enum(['invalidate', 'supersede']), correction_reason: safeDetail,
+  explicit_correction: z.literal(true), successor: factV2.nullable(),
+  expected_catalog_version: catalogVersion.nullable(),
+}).refine((v) => v.action === 'invalidate'
+  ? v.successor === null && v.expected_catalog_version === null
+  : v.successor !== null && v.expected_catalog_version !== null);
+const reverifyOutputV2 = z.strictObject({ response_schema_version: z.literal(2),
+  data: z.strictObject({ fact_public_id: uuid, verification_status: z.literal('verified'),
+    source_url: sourceUrlV2, fact_updated_at: preciseTimestamp,
+    affected_posts: affectedPosts, replayed: z.boolean() }) });
+const correctOutputV2 = correctOutput.extend({ response_schema_version: z.literal(2) });
 const securitySchemes = [{ type: 'oauth2', scopes: ['openid', 'email'] }];
 export const TRIVIA_CORRECTION_TOOL_NAMES = [
   'trivia_reverify_fact',
@@ -125,12 +142,13 @@ export function registerTriviaCorrectionTools(server: McpServer, context?: Reque
       title: 'Reverify a trivia fact',
       description:
         "Use this after fresh research confirms the same atomic proposition. It replaces current verification evidence and freshness metadata without changing the fact's meaning or identity.",
-      inputSchema: reverifyInput,
-      outputSchema: reverifyOutput,
+      inputSchema: z.union([reverifyInput, reverifyInputV2]),
+      outputSchema: z.union([reverifyOutput, reverifyOutputV2]),
       annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
       _meta: { securitySchemes },
     },
-    (args) =>
+    (args) => args.request_schema_version === 2 ? invoke('trivia_reverify_fact', scoped,
+      Object.fromEntries(Object.entries(args).map(([k, v]) => ['p_' + k, v])), reverifyOutputV2) :
       invoke(
         'trivia_reverify_fact',
         scoped,
@@ -157,12 +175,13 @@ export function registerTriviaCorrectionTools(server: McpServer, context?: Reque
       title: 'Correct or invalidate a trivia fact',
       description:
         'Use this after evidence shows a canonical fact is wrong or materially changed. It either invalidates the fact or creates one corrected successor, and may return affected ready posts to draft.',
-      inputSchema: correctInput,
-      outputSchema: correctOutput,
+      inputSchema: z.union([correctInput, correctInputV2]),
+      outputSchema: z.union([correctOutput, correctOutputV2]),
       annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
       _meta: { securitySchemes },
     },
-    (args) =>
+    (args) => args.request_schema_version === 2 ? invoke('trivia_correct_fact', scoped,
+      Object.fromEntries(Object.entries(args).map(([k, v]) => ['p_' + k, v])), correctOutputV2) :
       invoke(
         'trivia_correct_fact',
         scoped,

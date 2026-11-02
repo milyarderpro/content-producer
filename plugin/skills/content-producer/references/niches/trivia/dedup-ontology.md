@@ -1,5 +1,44 @@
 # Trivia canonical identity and dedup decisions
 
+## Current v2 decision path
+
+Use `trivia_find_similar_facts_v2` with Page and candidate sentences; no structured
+ontology input, source packet or review is required for Read. Copy its decimal
+string catalog version without rounding. Inspect `complete`, all match IDs,
+claims, status, reuse eligibility and usage. `fact_updated_at` is canonical CAS
+for version-2 maintenance; keep all six fractional digits.
+
+Compare atomic meaning as SAME/DISTINCT/UNCERTAIN, including quantities, negation,
+units, time, place, population and conditions without encoding a 17-key input.
+Same subject or URL is not sufficient to merge different propositions. SAME
+must use the existing canonical ID if eligible and unused within Page/workspace
+reuse scope. Draft allocations count as usage. SAME against invalidated,
+superseded or rejected identities must be replaced, never reused or assigned a
+new ID to bypass history. Legacy-only expiry need not disqualify v2 reuse after
+fresh URL research if status/usage permit; preserve the old ID and snapshots.
+
+Replace used, uncertain or `complete=false` candidates in the same workflow;
+host-clipped/missing match fields are incomplete too. Use reserves or research
+new candidates and search them. Do not force long reviews, lower result limits,
+invent DISTINCT or treat incomplete as no matches. Review every required match
+before save with one dedup entry per fact; `same` includes its matching ID/review,
+`distinct` has null identity and distinct reviews for all returned matches. The
+final set excludes known semantic duplicates. `complete=true` describes only
+the frozen retrieval predicates, not perfect recall of every paraphrase.
+
+Save allocates identities atomically; no separate reserve token. Katalog changes
+require fresh Read/review even for unrelated changes (baseline A), but do not
+force source research again when meaning and support remain valid. Unknown
+Write results must be reconciled before switching operations or versions.
+
+## Legacy v1 only — structured ontology and continuation gate
+
+The following ontology/Issue #56 rules preserve supported v1 maintenance,
+replay/in-flight and historical examples; do not apply them to new v2 creation.
+Native matches without valid v1 ontology may cause `FACT_REVIEW_REQUIRED`.
+Do not invent ontology, hide candidates or declare dedup clean; only suggest v2
+once runtime/tool/plugin availability has been verified.
+
 Frozen authority: `plans/trivia-content-dna.md` section 18, `plans/phase-0-decision-register.md` FACT-007 and `plans/database-design.md` section 11. Facts are reusable **atomic propositions**; hooks, CTA, caption wording, theme, and style are not canonical fact identity. No embeddings, vector search or automatic semantic certainty is permitted.
 
 ## Material identity

@@ -1,5 +1,10 @@
 # Taksonomi error seluruh tool — P1-T3
 
+**Implementasi source P6:** adapter bersama kini memakai taksonomi ini untuk
+seluruh katalog 36 tool. Lihat [matriks per tool/lapisan](tool-diagnostics-coverage.md)
+untuk kasus, recovery, pengecualian dan batas bukti LOCAL/CI FIXTURE.
+Deskripsi “belum diterapkan” di catatan P1 di bawah adalah keadaan historis P1.
+
 **Versi:** `cr-053-p1-v1`. Dasar: [CR-053](../decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md).
 [Data taksonomi](../../tests/fixtures/tool-errors-v2.ts) memetakan semua kode v1
 yang diizinkan adapter saat ini, delapan kode tambahan, dan semua **36 tool

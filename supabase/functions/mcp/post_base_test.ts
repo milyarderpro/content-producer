@@ -174,7 +174,7 @@ async function call(name: string, args: object) {
 }
 Deno.test('6.9: post schemas remain closed among 33 OAuth tools', async () => {
   const tools = (await mcp('tools/list')).result.tools;
-  check(MCP_TOOL_COUNT === 33 && tools.length === 33, 'EXACT_33');
+  check(MCP_TOOL_COUNT === 36 && tools.length === 36, 'EXACT_36');
   for (const name of POST_BASE_TOOL_NAMES) {
     const t = tools.find((x: { name: string }) => x.name === name);
     check(t?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');

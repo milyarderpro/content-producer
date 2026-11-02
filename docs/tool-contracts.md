@@ -1,5 +1,29 @@
 # Kontrak dan pemakaian tool MCP
 
+## Katalog transisi v2 — source P6 (2 November 2026)
+
+Source P6 memperluas baseline di bawah menjadi **36 tool: 12 Baca/24 Tulis**.
+Ini inventaris source, bukan bukti versi live. Tiga nama baru:
+
+| Tool | Jenis | Kontrak |
+| --- | --- | --- |
+| `trivia_find_similar_facts_v2` | Baca | Request/response 2, kalimat + Page; `complete`, katalog string, timestamp canonical CAS enam digit |
+| `save_post_v2` | Tulis | Request/response 2, satu draft atomik, satu URL/fakta, tanpa reservasi terpisah; summary lalu `get_post` |
+| `revise_post_v2` | Tulis | Request/response 2, revision/hash/config/catalog CAS; ready kembali draft; readback wajib |
+
+Schema runtime berada di `supabase/functions/mcp/trivia_v2.ts`; bentuk rinci di
+[kontrak draft v2](contracts/trivia-draft-v2.md). `get_post`/list tetap memakai
+request/response envelope 1 dengan projection konten 2 yang ditandai eksplisit;
+post v1 tetap memakai bentuk lamanya. Approval bersama menerima computed checks
+sesuai versi konten. `trivia_reverify_fact`/`trivia_correct_fact` menerima versi 2
+tanpa tier/expiry sesuai [CR-056](decisions/2026-11-02-cr-056-versioned-trivia-maintenance.md),
+serta mempertahankan versi 1. Native Read v1 mengikuti penolakan terbatas CR-054.
+
+Wire schema katalog memakai referensi lokal dan closure union ekuivalen menurut
+[CR-057](decisions/2026-11-02-cr-057-equivalent-mcp-catalog-schema.md); validator
+runtime tidak dilonggarkan. Inventaris Inspector adalah **36 valid/36 invalid +
+owner denial**. Passing fixture katalog tidak membuktikan host telah memasangnya.
+
 Panduan ini membantu memilih operasi dan menemukan definisi input/output yang
 tepat. Baca [domain](domain.md) untuk alasan aturan bisnis dan
 [arsitektur](architecture.md) untuk rantai implementasinya.

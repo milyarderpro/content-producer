@@ -126,7 +126,7 @@ export function validateManifest(
     )
       fail('MANIFEST_FILE_DRIFT');
   }
-  if (expected.mcp.length !== 15 || expected.database.length !== 46) fail('MANIFEST_COUNT_DRIFT');
+  if (expected.mcp.length !== 17 || expected.database.length !== 46) fail('MANIFEST_COUNT_DRIFT');
   const mcpCommand =
     (packageScripts['test:mcp'] ?? '')
       .split(/\s*&&\s*/)
@@ -137,7 +137,7 @@ export function validateManifest(
     .map((part) => `supabase/functions/${part}`);
   const last = invoked.sort();
   if (
-    invoked.length !== 15 ||
+    invoked.length !== 17 ||
     new Set(invoked).size !== invoked.length ||
     last.join('\0') !== expected.mcp.join('\0') ||
     packageScripts['test:database'] !== 'tsx scripts/supabase-local.ts test-database'
@@ -242,8 +242,8 @@ export function validateSingleMcpInspector(proofs: ShardProof[]): void {
     const item = owners[0].stages.find((stage) => stage.name === name);
     if (
       item?.status !== 'PASS' ||
-      (name === 'mcp' && item.count !== '82') ||
-      (name === 'inspector' && item.count !== '33 valid; 33 invalid; owner denial')
+      (name === 'mcp' && item.count !== '127') ||
+      (name === 'inspector' && item.count !== '36 valid; 36 invalid; owner denial')
     )
       fail('SHARD_SINGLE_OWNER_EVIDENCE_INVALID', 'FAIL');
   }
@@ -538,8 +538,8 @@ function stageCopy(projectId: string, base: number): { path: string; overlayHash
 export function countFromOutput(name: string, rawOutput: string): string | undefined {
   const output = plainEvidence(rawOutput);
   if (name === 'inspector')
-    return /33\/33 valid and 33\/33 invalid tool calls.*PASS/.test(output)
-      ? '33 valid; 33 invalid; owner denial'
+    return /36\/36 valid and 36\/36 invalid tool calls.*PASS/.test(output)
+      ? '36 valid; 36 invalid; owner denial'
       : undefined;
   if (name === 'database')
     return /Test Files\s+\d+ passed/.test(output) && /Tests\s+\d+ passed/.test(output)
@@ -704,7 +704,7 @@ async function backendStages(
     assertStartedTarget(projectId, base);
     run('reset', 'pnpm', ['run', 'supabase:reset']);
     run('migration-names', 'pnpm', ['run', 'verify-migrations'], /Validated 75 migration filename/);
-    if (!shard || shard === '1') run('mcp', 'pnpm', ['run', 'test:mcp'], /\b82 passed/);
+    if (!shard || shard === '1') run('mcp', 'pnpm', ['run', 'test:mcp'], /\b127 passed/);
     run(
       'audit-before',
       'pnpm',
@@ -716,7 +716,7 @@ async function backendStages(
         'inspector',
         'pnpm',
         ['exec', 'tsx', 'scripts/phase-6-13.ts'],
-        /33\/33 valid and 33\/33 invalid tool calls.*PASS/,
+        /36\/36 valid and 36\/36 invalid tool calls.*PASS/,
       );
     run(
       'audit-after',

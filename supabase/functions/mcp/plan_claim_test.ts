@@ -135,7 +135,7 @@ async function call(name: string, args: object) {
 Deno.test('6.5 claims retain OAuth and annotations after 6.11 expansion', async () => {
   const listed = await mcp('tools/list');
   const tools = listed.result?.tools ?? [];
-  assert(MCP_TOOL_COUNT === 33 && tools.length === 33, 'exact 30 registered tools');
+  assert(MCP_TOOL_COUNT === 36 && tools.length === 36, 'exact 36 registered tools');
   for (const name of PLAN_CLAIM_TOOL_NAMES) {
     const tool = tools.find((t) => t.name === name);
     assert(tool, 'missing claim tool ' + name);

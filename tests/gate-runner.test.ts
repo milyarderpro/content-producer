@@ -54,7 +54,7 @@ test('rejects manifest drift and missing required database file', () => {
 
 test('accepts the mandatory manifest including P1 contract tests and rejects skipped cases', () => {
   // P1-T3 and P2-T2 mandatory source files; runtime and all release coverage remain required.
-  assert.deepEqual(validateManifest(manifest, pkg.scripts), { source: 14, mcp: 15, database: 46 });
+  assert.deepEqual(validateManifest(manifest, pkg.scripts), { source: 14, mcp: 17, database: 46 });
   assert.throws(() => assertNoSkipped('Tests 179 passed, 1 skipped'), {
     code: 'REQUIRED_CASE_SKIPPED',
   });
@@ -143,7 +143,7 @@ test('rejects source/backend identity mismatch', () => {
     lockHash: 'b',
     inputsHash: 'c',
     shardHash: 'd',
-    counts: { source: 12, mcp: 15, database: 46 },
+    counts: { source: 12, mcp: 17, database: 46 },
     runtime: resolveRuntimeEvidence({ nodeSelector: '>=22', nodeEngine: '>=22 <25', denoSelector: '>=2.9.7' },
       { node: 'v24.22.1', deno: 'deno 2.9.7 (stable)', pnpm: '10.33.2', supabase: '2.120.0' }),
   };
@@ -383,14 +383,14 @@ test('backend candidate aggregate accepts exactly 221 database cases', () => {
   }
 });
 
-test('MCP 15 files/82 cases and authenticated Inspector belong to shard 1 exactly once', () => {
+test('MCP 17 files/127 cases and authenticated Inspector belong to shard 1 exactly once', () => {
   const stages: ShardProof['stages'] = [
-    { name: 'mcp', status: 'PASS' as const, durationMs: 1, count: '82' },
+    { name: 'mcp', status: 'PASS' as const, durationMs: 1, count: '127' },
     {
       name: 'inspector',
       status: 'PASS' as const,
       durationMs: 1,
-      count: '33 valid; 33 invalid; owner denial',
+      count: '36 valid; 36 invalid; owner denial',
     },
   ];
   const make = (shard: '1' | '2', items: typeof stages): ShardProof => ({
@@ -444,8 +444,8 @@ test('final two-shard reports satisfy both validators', () => {
       name,
       status: 'PASS',
       durationMs: 1,
-      ...(name === 'mcp' ? { count: '82' } : {}),
-      ...(name === 'inspector' ? { count: '33 valid; 33 invalid; owner denial' } : {}),
+      ...(name === 'mcp' ? { count: '127' } : {}),
+      ...(name === 'inspector' ? { count: '36 valid; 36 invalid; owner denial' } : {}),
       ...(name === 'database' ? { count: String(cases) } : {}),
     })),
   });

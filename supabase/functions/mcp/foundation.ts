@@ -7,6 +7,7 @@ import { triviaConfig, workspaceSettings } from './schemas.ts';
 import { executePilotRpc } from './pilot_db.ts';
 import { isApprovedMan02CreatePage } from './pilot_write.ts';
 import { isApprovedPilot104Write } from './pilot_write_10_4.ts';
+import { diagnosticFailure, normalizeDiagnosticCode } from './diagnostics.ts';
 
 const publicId = z
   .string()
@@ -476,36 +477,8 @@ function reviewFieldError(details: unknown): ReviewFieldError | null {
   };
 }
 
-function failure(code: SafeError, fieldError?: SourceFieldError | ReviewFieldError | null) {
-  const [message, retryable, recovery] = safeErrors[code];
-  return {
-    isError: true as const,
-    structuredContent: {
-      response_schema_version: 1,
-      error: {
-        code,
-        message,
-        retryable,
-        recovery,
-        ...(code === 'RATE_LIMITED' ? { retry_after_seconds: 60 } : {}),
-        ...((code === 'FACT_SOURCE_INSUFFICIENT' || code === 'FACT_REVIEW_REQUIRED') && fieldError
-          ? { field_errors: [fieldError] }
-          : {}),
-      },
-    },
-    content: [
-      {
-        type: 'text' as const,
-        text:
-          code +
-          ': ' +
-          message +
-          ((code === 'FACT_SOURCE_INSUFFICIENT' || code === 'FACT_REVIEW_REQUIRED') && fieldError
-            ? ` ${fieldError.path}: ${fieldError.message}`
-            : ''),
-      },
-    ],
-  };
+function failure(tool: string, code: string, stage: 'auth' | 'output') {
+  return diagnosticFailure(tool, 1, code, stage, safeErrors, { dispatched: stage === 'output' });
 }
 function isSafeError(text: unknown): text is SafeError {
   return typeof text === 'string' && Object.prototype.hasOwnProperty.call(safeErrors, text);
@@ -543,17 +516,22 @@ export async function invoke(
   params: Record<string, unknown>,
   schema: z.ZodType,
 ) {
+  const version = params.p_request_schema_version === 2 ? 2 : 1;
+  const fail = (code: string, stage: 'auth' | 'domain' | 'rate_limit' | 'rpc_transport' | 'output',
+    fieldErrors?: Array<{ path: string; code: string; message: string }>, retryAfter?: number,
+    dispatched = false) => diagnosticFailure(tool, version, code, stage, safeErrors,
+      { fieldErrors, retryAfter, dispatched });
   if (
     context.workspacePublicId !== null &&
     params.p_workspace_public_id !== undefined &&
     params.p_workspace_public_id !== context.workspacePublicId
   )
-    return failure('OWNER_ACCESS_REQUIRED');
+    return fail('OWNER_ACCESS_REQUIRED', 'auth');
   if (
     context.pilotMode &&
     !tool.startsWith('get_') &&
     !tool.startsWith('list_') &&
-    tool !== 'trivia_find_similar_facts'
+    tool !== 'trivia_find_similar_facts' && tool !== 'trivia_find_similar_facts_v2'
   ) {
     // Default closed. Never accept a grant from tool arguments or HTTP.
     // Only the Edge Function's server-side setting may authorize the exact
@@ -574,7 +552,7 @@ export async function invoke(
       }
     });
     if (!(await isApprovedMan02CreatePage(tool, params, grant)) && !phase104Approved) {
-      return failure('PILOT_WRITE_LOCKED');
+      return fail('PILOT_WRITE_LOCKED', 'auth');
     }
   }
   try {
@@ -584,7 +562,8 @@ export async function invoke(
         raw = await executePilotRpc(tool, params, context.actorUserId);
       } catch (error) {
         const safe = error instanceof Error ? error.message : '';
-        return failure(isSafeError(safe) ? safe : 'DATABASE_UNAVAILABLE');
+        return fail(isSafeError(safe) ? safe : 'DATABASE_UNAVAILABLE',
+          isSafeError(safe) ? 'domain' : 'rpc_transport', undefined, undefined, true);
       }
     } else {
       const rpc = await fetch(context.supabaseUrl + '/rest/v1/rpc/' + tool, {
@@ -602,33 +581,40 @@ export async function invoke(
       });
       const rawText = await rpc.text();
       if (new TextEncoder().encode(rawText).byteLength > 256 * 1024) {
-        return failure('DATABASE_UNAVAILABLE');
+        return fail('RPC_RESPONSE_TOO_LARGE', 'output', undefined, undefined, true);
       }
       try {
         raw = JSON.parse(rawText);
       } catch {
-        return failure('DATABASE_UNAVAILABLE');
+        return fail('RPC_RESPONSE_INVALID', 'output', undefined, undefined, true);
       }
       if (!rpc.ok) {
         const message =
           raw && typeof raw === 'object' && 'message' in raw
             ? (raw as { message: unknown }).message
             : null;
-        if (isSafeError(message)) {
+        const code = normalizeDiagnosticCode(message, safeErrors);
+        if (code) {
           const details =
             raw && typeof raw === 'object' && 'details' in raw
               ? (raw as { details: unknown }).details
               : null;
-          return failure(
-            message,
-            message === 'FACT_SOURCE_INSUFFICIENT'
-              ? sourceFieldError(details)
-              : message === 'FACT_REVIEW_REQUIRED'
-                ? reviewFieldError(details)
-                : null,
-          );
+          const knownField = code === 'FACT_SOURCE_INSUFFICIENT' ? sourceFieldError(details) :
+            code === 'FACT_REVIEW_REQUIRED' ? reviewFieldError(details) : null;
+          const position = typeof details === 'string' ? /^facts\[([1-9])\](\.(source_url|dedup|dedup\.reviews))?$/.exec(details) : null;
+          const path = position ? `facts[${Number(position[1]) - 1}]${position[2] ?? ''}` :
+            code === 'TEXT_BUDGET_EXCEEDED' || code === 'CONTENT_RENDER_MISMATCH' ? 'content_payload' : null;
+          const fields = knownField ? [knownField] : path ? [{ path, code,
+            message: 'Review the affected field and follow the recovery instruction.' }] : undefined;
+          const retryHeader = rpc.headers.get('Retry-After');
+          const retryDetail = typeof details === 'string' ? /^RETRY_AFTER_SECONDS:([1-9][0-9]{0,3})$/.exec(details)?.[1] : undefined;
+          const retryAfter = Number(retryHeader ?? retryDetail);
+          return fail(code, code === 'RATE_LIMITED' ? 'rate_limit' :
+            ['AUTH_REQUIRED', 'FORBIDDEN', 'OWNER_ACCESS_REQUIRED'].includes(code) ? 'auth' : 'domain',
+            fields, Number.isInteger(retryAfter) && retryAfter > 0 ? retryAfter : undefined, true);
         }
-        return failure(rpc.status === 401 ? 'AUTH_REQUIRED' : 'DATABASE_UNAVAILABLE');
+        return fail(rpc.status === 401 ? 'AUTH_REQUIRED' : rpc.status === 403 ? 'FORBIDDEN' : 'INTERNAL_ERROR',
+          rpc.status === 401 || rpc.status === 403 ? 'auth' : 'rpc_transport', undefined, undefined, true);
       }
     }
     const parsed = schema.safeParse(raw);
@@ -641,7 +627,7 @@ export async function invoke(
         tool === 'trivia_register_and_reserve_facts',
       )
     ) {
-      return failure('DATABASE_UNAVAILABLE');
+      return fail('RPC_RESPONSE_INVALID', 'output', undefined, undefined, true);
     }
     return {
       structuredContent: parsed.data as Record<string, unknown>,
@@ -652,9 +638,10 @@ export async function invoke(
         },
       ],
     };
-  } catch {
+  } catch (error) {
     // Do not reflect SQLSTATE, URL, token, response body, or raw exception.
-    return failure('DATABASE_UNAVAILABLE');
+    return fail(error instanceof Error && ['TimeoutError', 'AbortError'].includes(error.name)
+      ? 'RPC_TIMEOUT' : 'RPC_NETWORK_ERROR', 'rpc_transport', undefined, undefined, true);
   }
 }
 
@@ -690,14 +677,14 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
       );
       if ('isError' in result) return result;
       const rpc = rpcProfileOutput.safeParse(result.structuredContent);
-      if (!rpc.success) return failure('DATABASE_UNAVAILABLE');
+      if (!rpc.success) return failure('get_account_profile', 'RPC_RESPONSE_INVALID', 'output');
       const profile = profileOutput.safeParse({
         id: rpc.data.data.profile.id,
         name: rpc.data.data.profile.display_name,
         nickname: rpc.data.data.profile.workspace_name,
         ...(pilot ? { workspace_public_id: rpc.data.data.profile.workspace_public_id } : {}),
       });
-      if (!profile.success) return failure('DATABASE_UNAVAILABLE');
+      if (!profile.success) return failure('get_account_profile', 'RPC_RESPONSE_INVALID', 'output');
       return {
         structuredContent: profile.data,
         content: [{ type: 'text' as const, text: JSON.stringify(profile.data) }],
@@ -717,7 +704,7 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
     },
     (args: { request_schema_version?: 1; workspace_public_id?: string }) => {
       const workspaceId = args.workspace_public_id ?? scoped.workspacePublicId;
-      if (!workspaceId) return failure('OWNER_ACCESS_REQUIRED');
+      if (!workspaceId) return failure('get_workspace_context', 'OWNER_ACCESS_REQUIRED', 'auth');
       return invoke(
         'get_workspace_context',
         scoped,

@@ -193,13 +193,14 @@ export function validatePluginSource(
     (m) => m[1],
   );
   const sequence = read(pluginRoot, skillRoot + 'references/core/tool-sequences.md');
-  const listed = Array.from(sequence.matchAll(/^\|\s*\d+\s*\|\s*([a-z_]+)\s*\|/gm), (m) => m[1]);
-  if (names.length !== 33 || JSON.stringify(names) !== JSON.stringify(listed)) {
-    throw new Error('Frozen 33-tool inventory order differs from packaged skill.');
+  const listed = Array.from(sequence.matchAll(/^\|\s*\d+\s*\|\s*([a-z0-9_]+)\s*\|/gm), (m) => m[1]);
+  const transition = [...names, 'trivia_find_similar_facts_v2', 'save_post_v2', 'revise_post_v2'];
+  if (names.length !== 33 || listed.length !== 36 || JSON.stringify(transition) !== JSON.stringify(listed)) {
+    throw new Error('CR-053 transition inventory order differs: require 33 baseline tools plus 3 v2 names.');
   }
 
   const policy: Record<string, string[]> = {
-    'core/workflow.md': ['maximum 3', '30-minute', 'save_post'],
+    'core/workflow.md': ['maximum 3', '30-minute', 'save_post_v2', 'get_post', 'one item'],
     'core/lifecycle.md': [
       'explicit_approval=true',
       'OPERATION_KEY_REUSED',

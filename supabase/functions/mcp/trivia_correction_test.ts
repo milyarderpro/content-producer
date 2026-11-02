@@ -1,4 +1,5 @@
 import { createAuthenticatedTransport } from './transport.ts';
+import { expandCatalogSchema } from './catalog_schema.ts';
 import type { RequestContext } from './auth.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
 import { TRIVIA_RELATION_KEYS_V1 } from './trivia_fact.ts';
@@ -135,7 +136,7 @@ async function call(name: string, input: object) {
 }
 Deno.test('6.9 correction schemas remain closed among 33 authenticated tools', async () => {
   const tools = (await mcp('tools/list')).result.tools;
-  check(MCP_TOOL_COUNT === 33 && tools.length === 33, 'EXACT_33_TOOLS');
+  check(MCP_TOOL_COUNT === 36 && tools.length === 36, 'EXACT_36_TOOLS');
   for (const name of TRIVIA_CORRECTION_TOOL_NAMES) {
     const tool = tools.find((x: { name: string }) => x.name === name);
     check(tool && tool._meta.securitySchemes[0].type === 'oauth2', 'OAUTH_REQUIRED');
@@ -147,8 +148,9 @@ Deno.test('6.9 correction schemas remain closed among 33 authenticated tools', a
     check(!Object.hasOwn(tool, 'outputSchema'), 'OPTIONAL_OUTPUT_OMITTED');
     check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
     if (name === 'trivia_correct_fact') {
+      const schema = expandCatalogSchema(tool.inputSchema) as typeof tool.inputSchema;
       const relationEnum =
-        tool.inputSchema.properties.successor.properties.candidate.properties.relation_key.enum;
+        schema.anyOf[0].properties.successor.properties.candidate.properties.relation_key.enum;
       check(
         JSON.stringify(relationEnum) === JSON.stringify(TRIVIA_RELATION_KEYS_V1),
         'SUCCESSOR_SQL_RELATION_ENUM',

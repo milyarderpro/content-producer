@@ -1,5 +1,26 @@
 # Lifecycle, explicit intent and recovery
 
+## Versioned v2 lifecycle
+
+`save_post_v2` creates only draft; `revise_post_v2` edits draft/ready and returns
+draft with new revision/hash-bound checks. Both require `get_post` readback.
+They use request/response schema 2 with current config/catalog, one URL per
+fact and three editorial pass results; no reservation packet. Shared approval,
+reschedule/revoke/discard/publish/archive/metrics keep their existing envelope.
+For v2, Setujui checks current mechanical state and the stored three results,
+not URL research, tier/expiry or the old 18-criterion rubric. Owner approval
+still requires `explicit_approval=true` for the exact displayed revision/hash.
+Substantive edits invalidate approval; schedule-only rebinds evidence and keeps
+approval intent according to the server. Published snapshots remain immutable.
+
+`unknown` means reconcile state or replay the same operation_key and identical
+semantic payload before a new key, new facts or version switch. Claim expiry
+does not block replay of a successful save, but a new save needs a live claim.
+Config/catalog or revision/hash conflict requires fresh Read and review, never
+silent overwrite. Read-only failure is not evidence a prior Write rolled back.
+
+## Existing lifecycle and legacy v1 details
+
 See [tool sequences](tool-sequences.md) for exact schemas and [output contract](output-contract.md) for truthful status claims.
 
 | From          | Action               | To        | Guard                                                             |
@@ -19,7 +40,7 @@ Before approve_post show current get_post content, revision/hash, system and edi
 
 ## Idempotency and optimistic concurrency
 
-All writes require request_schema_version=1, workspace_public_id and UUID v4 operation_key. Retry **one logical operation** with the **same operation_key and semantic payload** after response loss or DATABASE_BUSY. Use a new key only for a new intent. OPERATION_KEY_REUSED with changed payload is a hard stop. Post mutations use expected_revision and, where required, expected_content_hash. Page/config uses expected_page_updated_at and expected_config_updated_at. Fact changes use expected_fact_updated_at. Never guess or silently refresh CAS values.
+All writes require workspace_public_id and UUID v4 operation_key; legacy/shared operations use request_schema_version=1, while new draft tools and version-2 maintenance use 2. Retry **one logical operation** with the **same operation_key and semantic payload** after response loss or DATABASE_BUSY. Use a new key only for a new intent after the prior outcome is reconciled. OPERATION_KEY_REUSED with changed payload is a hard stop. Post mutations use expected_revision and, where required, expected_content_hash. Page/config uses expected_page_updated_at and expected_config_updated_at. Fact changes use expected_fact_updated_at. Never guess or silently refresh CAS values.
 
 | Error / condition                          | Recovery                                                | Forbidden                  |
 | ------------------------------------------ | ------------------------------------------------------- | -------------------------- |

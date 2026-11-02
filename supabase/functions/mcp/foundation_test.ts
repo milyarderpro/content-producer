@@ -29,7 +29,10 @@ function assertClosedObjects(schema: unknown, path = 'schema'): void {
   }
   const value = schema as Record<string, unknown>;
   if (value.type === 'object') {
-    assert(value.additionalProperties === false, 'open object schema at ' + path);
+    const closedUnion = Array.isArray(value.anyOf) && value.anyOf.every((branch) =>
+      branch && typeof branch === 'object' && branch.type === 'object' &&
+      branch.additionalProperties === false);
+    assert(value.additionalProperties === false || closedUnion, 'open object schema at ' + path);
   }
   for (const [key, child] of Object.entries(value)) {
     assertClosedObjects(child, path + '.' + key);
@@ -229,10 +232,10 @@ Deno.test(
   async () => {
     const listed = await request('tools/list');
     for (const name of FOUNDATION_TOOL_NAMES) assert(listed.includes(name), 'missing ' + name);
-    assert((listed.match(/"readOnlyHint":true/g) || []).length === 11, 'eleven read-only tools');
-    assert((listed.match(/"openWorldHint":false/g) || []).length === 33, 'open world must be off');
+    assert((listed.match(/"readOnlyHint":true/g) || []).length === 12, 'twelve read-only tools');
+    assert((listed.match(/"openWorldHint":false/g) || []).length === 36, 'open world must be off');
     assert(listed.split('"openai/profile":true').length === 2, 'one profile metadata');
-    assert((listed.match(/"oauth2"/g) || []).length === 66, '33 OAuth schemes with mirrors');
+    assert((listed.match(/"oauth2"/g) || []).length === 72, '36 OAuth schemes with mirrors');
     assert(listed.includes('create_page'), '6.4 tool must be present');
   },
 );
@@ -243,8 +246,8 @@ Deno.test('All registered tool input/output object schemas are closed recursivel
   assert(frame, 'tools/list must return an MCP data frame');
   const parsed = JSON.parse(frame.slice(6));
   const tools = parsed.result?.tools ?? [];
-  assert(tools.length === MCP_TOOL_COUNT && tools.length === 33, 'exact 33 schemas');
-  assert(new Set(tools.map((tool: { name: string }) => tool.name)).size === 33, 'unique names');
+  assert(tools.length === MCP_TOOL_COUNT && tools.length === 36, 'exact 36 schemas');
+  assert(new Set(tools.map((tool: { name: string }) => tool.name)).size === 36, 'unique names');
   for (const tool of tools) {
     assertClosedObjects(tool.inputSchema, tool.name + '.input');
     if (tool.name === 'get_account_profile') {
@@ -269,7 +272,7 @@ Deno.test('All registered tool input/output object schemas are closed recursivel
   const sdkFrame = sdkBody.split('\n').find((line) => line.startsWith('data: '));
   assert(sdkFrame, 'SDK catalog must return a data frame');
   const sdkTools = JSON.parse(sdkFrame.slice(6)).result.tools;
-  assert(sdkTools.length === 33, 'raw SDK must still have 33 output schemas');
+  assert(sdkTools.length === 36, 'raw SDK must have 36 output schemas');
   for (const sdkTool of sdkTools) {
     assertClosedObjects(sdkTool.outputSchema, sdkTool.name + '.output');
   }

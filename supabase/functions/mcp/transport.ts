@@ -1,6 +1,7 @@
 import { createMcpHandler } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { createMcpServer } from './server.ts';
+import { compactCatalogSchema } from './catalog_schema.ts';
 
 // CR-034: The host schema validator can reject Unicode property regex
 // escapes. Unicode General Category Cc is exactly U+0000..001F and
@@ -77,7 +78,7 @@ function mirrorToolSchemes(value: unknown, pilot = false): unknown {
         ) {
           const input = { ...(published.inputSchema as Record<string, unknown>) };
           delete input.$schema;
-          published.inputSchema = portablePilotPatterns(input);
+          published.inputSchema = compactCatalogSchema(portablePilotPatterns(input));
         }
         return published;
       }),

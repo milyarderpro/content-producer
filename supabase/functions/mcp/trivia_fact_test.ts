@@ -193,7 +193,7 @@ Deno.test(
   '6.7 trivia tools among 33 OAuth tools, closed schemas and correct annotations',
   async () => {
     const listed = (await mcp('tools/list')).result.tools;
-    check(MCP_TOOL_COUNT === 33 && listed.length === 33, 'EXACT_33_TOOLS');
+    check(MCP_TOOL_COUNT === 36 && listed.length === 36, 'EXACT_36_TOOLS');
     for (const name of TRIVIA_FACT_TOOL_NAMES) {
       const tool = listed.find((value: { name: string }) => value.name === name);
       check(tool && tool._meta.securitySchemes[0].type === 'oauth2', 'OAUTH_REQUIRED');

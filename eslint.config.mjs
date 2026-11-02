@@ -10,6 +10,9 @@ export default tseslint.config(
       'node_modules/**',
       'supabase/.branches/**',
       'auth-frontend/dist/**',
+      '.agents/**',
+      '*.md',
+      'docs/**'
     ],
   },
   js.configs.recommended,

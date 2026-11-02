@@ -44,7 +44,7 @@ function ownerDenied(): Response {
         code: 'OWNER_ACCESS_REQUIRED',
         message: 'Only the connected workspace owner may access this resource.',
         retryable: false,
-        recovery: 'Use the authorized owner account.',
+        recovery: 'Stop this denied request; do not try another owner.',
       },
     },
     403,

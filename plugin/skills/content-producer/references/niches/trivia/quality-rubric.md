@@ -1,5 +1,27 @@
 # Trivia editorial rubric and safe outcomes
 
+## Current v2 — three required editorial results
+
+After research/dedup and final copy, submit exactly `meaning_preserved`,
+`caption_no_new_claim`, `no_known_substantive_issue`, each `pass` or
+`needs_revision`. All three must pass before save/revise; repair a
+`needs_revision` rather than attesting a false pass. The server binds results to
+the output revision/hash. Do not supply a v1 18-criterion packet, actor or timestamp.
+Style/novelty suggestions are nonblocking notes, not hidden extra approval gates.
+
+The server mechanically validates current Page/config, binding/URL/reuse,
+fact count/format/renderer and hard budgets. It does not verify URL-page content.
+Read back quality evidence via `get_post`. Explicit owner Setujui for that exact
+revision/hash is separate; it checks current state and stored three-pass evidence,
+without reopening every URL or demanding tier/expiry. A substantive ready edit
+returns draft and invalidates old approval; schedule-only uses its own operation.
+Canva/Facebook publication and observed metrics remain manual.
+
+## Legacy v1 only — rubric packet and examples
+
+The following criteria/source-freshness gates apply only to supported v1 content.
+They do not restore 18 required editorial results or source expiry on v2.
+
 Frozen authority: `plans/trivia-content-dna.md` sections 19–21 and `plans/phase-0-decision-register.md` QUALITY-003/004. Apply after [fact checking](fact-checking.md), [dedup review](dedup-ontology.md) and [format selection](formats.md), before attesting the current saved revision. The [core lifecycle](../../core/lifecycle.md) governs approval and state transitions.
 
 ## Three separate authorities
