@@ -15,17 +15,33 @@ import {
 } from './helpers/metrics-rpc.js';
 
 describe('5.9 phase-wide public surface and scope acceptance', () => {
-  it('SEC-* exact 34 RPCs, owner policies/default ACL, historical replay security and Phase 6.1 bootstrap', () => {
-    const a = JSON.parse(sql(readFileSync('docs/phase-5-8-catalog-audit.sql', 'utf8'))) as Record<
+  it('SEC-* exact 36 RPC names/38 signatures, owner policies/default ACL and historical replay security', () => {
+    // Preserve the archived query; extend its name allowlist only for the three
+    // accepted CR-053 tools. CR-056 adds signatures, not additional tool names.
+    const auditSql = readFileSync('docs/phase-5-8-catalog-audit.sql', 'utf8').replace(
+      "'trivia_find_similar_facts',",
+      "'trivia_find_similar_facts','trivia_find_similar_facts_v2','save_post_v2','revise_post_v2',",
+    );
+    const a = JSON.parse(sql(auditSql)) as Record<
       string,
       unknown
     >;
-    expect(a.api_function_count).toBe(34);
-    expect(a.authenticated_api_execute_count).toBe(34);
+    expect(a.api_function_count).toBe(38);
+    expect(a.authenticated_api_execute_count).toBe(38);
     expect(a.rls_enabled_table_count).toBe(17);
+    expect(a.overloaded_api_count).toBe(2);
+    const maintenance = row<{ signatures: string[] }>(`select array_agg(p.oid::regprocedure::text
+      order by p.oid::regprocedure::text) signatures from pg_proc p
+      join pg_namespace n on n.oid=p.pronamespace where n.nspname='api'
+      and p.proname in ('trivia_reverify_fact','trivia_correct_fact')`);
+    expect(maintenance.signatures).toEqual([
+      'api.trivia_correct_fact(integer,uuid,uuid,uuid,text,text,text,jsonb,boolean,text)',
+      'api.trivia_correct_fact(integer,uuid,uuid,uuid,timestamp with time zone,text,text,jsonb,boolean)',
+      'api.trivia_reverify_fact(integer,uuid,uuid,uuid,text,text,text)',
+      'api.trivia_reverify_fact(integer,uuid,uuid,uuid,timestamp with time zone,text,jsonb,text,date,timestamp with time zone,text,text)',
+    ]);
     for (const key of [
       'allowlist_difference_count',
-      'overloaded_api_count',
       'unsafe_api_count',
       'caller_table_privilege_count',
       'caller_column_privilege_count',
@@ -118,7 +134,10 @@ describe('5.9 phase-wide public surface and scope acceptance', () => {
     expect(frontendFiles).toContain('auth.js');
     expect(readdirSync('plugin/.codex-plugin').filter((x) => x !== '.gitkeep')).toEqual([]);
     expect(readFileSync('supabase/seed.sql', 'utf8')).not.toMatch(/\b(insert|update|delete)\b/i);
-    const allowed = new Set([...phaseFiveOperationMap.map((x) => x.name), 'trivia_find_similar_facts_v2']);
+    const allowed = new Set([...phaseFiveOperationMap.map((x) => x.name),
+      'trivia_find_similar_facts_v2', 'save_post_v2', 'revise_post_v2']);
+    expect(allowed.size).toBe(36);
+    expect(new Set((a.api_inventory as { name: string }[]).map((x) => x.name)).size).toBe(36);
     expect((a.api_inventory as { name: string }[]).every((x) => allowed.has(x.name))).toBe(true);
   });
   it('RPC-METRIC numeric normalization and immutable v8 preserve exact request/replay boundaries without new post revision', () => {
