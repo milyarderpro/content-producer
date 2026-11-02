@@ -6,6 +6,15 @@
 [run 41456400517](https://github.com/milyarderpro/content-producer/actions/runs/41456400517).
 **Plugin kandidat source:** 0.3.0, bukan bukti versi terpasang.
 
+**Diagnosis koneksi terbaru (2 November 2026):** [hasil read-only](phase-7-results.md#diagnosis-read-only-koneksi-yang-tersedia--2-november-2026)
+menemukan project production yang memuat workspace owner masih pada 72
+migration/33 RPC v1, Edge `mcp` aktif v35 tanpa tool v2, dan plugin PRIVATE
+terpasang 0.2.11 dengan binding app `mcpku2`. Kandidat v2 memiliki 84 migration,
+36 nama/38 signature dan plugin source 0.3.0. URL endpoint internal app tidak
+diekspos oleh metadata yang tersedia; korelasi workspace/Page dengan project
+production adalah bukti target data, bukan pembuktian URL koneksi langsung.
+H01–H06 tetap NOT RUN dan tidak ada business Write.
+
 **Hasil preflight pertama:** pemilik sudah menjalankan tiga bootstrap Read
 melalui `mcpku2`; semuanya SUCCESS. Tiga tool v2 tidak tersedia di katalog sesi,
 sehingga berhenti sebelum generation context. Bukti
@@ -20,8 +29,9 @@ atau jalur v1 untuk melewati blocker.
 
 - Chat ChatGPT baru dengan plugin PRIVATE dan koneksi owner OAuth `mcpku2`
   yang benar-benar menampilkan tiga tool v2/schema yang sesuai.
-- Identitas runtime/backend dan versi plugin terpasang dari bukti operator.
-  Host tidak boleh menebak source/deployment SHA dari nama tool atau health.
+- Runtime v2 terisolasi, deployment Edge dan migration 84 yang diverifikasi
+  pada target itu, serta plugin 0.3.0 yang terpasang. Source SHA dari G4 tidak
+  boleh diklaim sebagai SHA Edge v35 yang sekarang melayani production.
 - Page/objek khusus uji yang diizinkan pada runtime terisolasi kompatibel v2,
   beserta konfigurasi aktif dan scope jumlah draft. Data owner production tidak
   otomatis menjadi fixture dari izin remediasi repository.
@@ -29,7 +39,9 @@ atau jalur v1 untuk melewati blocker.
   bukan memutus koneksi production, memanipulasi DB production, atau mengarang
   error yang tidak benar-benar terjadi.
 
-Sesi coding tidak menyediakan tool bisnis `mcpku2`/akses chat host tersebut.
+Sesi coding sebelumnya tidak menyediakan tool bisnis `mcpku2`; sesi diagnosis
+terbaru dapat memanggil bootstrap Read melalui koneksi itu, tetapi tidak
+menyediakan runtime/schema v2 atau chat host baru yang membuktikan H01–H06.
 Inspector HTTP nyata yang sudah PASS adalah bukti integrasi fixture, bukan
 pengganti perilaku ChatGPT. Pengujian host tidak memulai rollout P8 secara
 diam-diam. Jika operator belum mempunyai runtime uji v2 yang sesuai, catat
