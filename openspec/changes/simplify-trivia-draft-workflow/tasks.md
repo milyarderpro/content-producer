@@ -296,7 +296,7 @@ deployment/instalasi dan LIVE tetap P7/P8, NOT RUN pada sesi ini.
 
 ## 7. Verifikasi integrasi
 
-- [ ] 7.1 **P7-T1 Lokal/CI:** gabungkan bukti dedup, transaksi/race, seluruh
+- [x] 7.1 **P7-T1 Lokal/CI:** gabungkan bukti dedup, transaksi/race, seluruh
       diagnostik, owner/cross-owner, ACL/RLS, migrasi, compatibility, serta test
       sumber/frontend/MCP yang sudah ditambahkan pada fase masing-masing. Jalankan
       satu gate rilis **G4 CR-052 Actions manual exact final SHA main** sesuai izin,
@@ -305,6 +305,13 @@ deployment/instalasi dan LIVE tetap P7/P8, NOT RUN pada sesi ini.
       advisors terpisah, audit/cleanup, serta inventaris suite/Inspector yang
       mencakup v2 diperiksa operator. Catat bukti/failure dan batas CI/FIXTURE;
       jangan mengganti gate ini dengan diagnostic overlay lokal atau legacy saja.
+      **Bukti:** [hasil P7](phase-7-results.md#p7-t1--bukti-formal-final-pass),
+      [G4 41456400517](https://github.com/milyarderpro/content-producer/actions/runs/41456400517)
+      PASS exact main SHA `350a4c83f18e9bfb6017ef52e35913ec258ac661`:
+      source, 21+25 file/120+101=221 kasus DB, MCP 17/127, Inspector 36/36 +
+      owner denial, history/lint/advisors, audit/cleanup dan aggregate PASS.
+      Ketiga report SHA/hash/runtime cocok; validator aggregate lokal mengonfirmasi
+      46 file disjoint/221 kasus. Ini bukti CI/FIXTURE, bukan host atau LIVE.
 - [ ] 7.2 **P7-T2 Host terkendali:** uji tool/schema yang benar-benar terlihat
       host dengan satu draft, lima draft bertema, penggantian calon, hard budget,
       readback tiap draft, hasil sebagian/resume, serta error dan lost response pada
@@ -313,6 +320,11 @@ deployment/instalasi dan LIVE tetap P7/P8, NOT RUN pada sesi ini.
       revision/hash, dan pesan Indonesia yang sesuai bukti; HTTP 200 dan CI PASS
       tidak menggantikan keberhasilan Write/readback. Paket pengulangan/ambang yang
       belum disetujui dibawa kepada pemilik sebelum dijadikan gate.
+      **Status:** BLOCKED; sesi coding tidak menyediakan koneksi bisnis host
+      `mcpku2`, bukti pemasangan runtime/plugin v2 serta objek host fixture belum
+      tersedia. [Handoff dan prompt preflight Read](phase-7-host-handoff.md)
+      disiapkan; seluruh skenario bisnis host NOT RUN. Inspector/G4 bukan
+      pengganti bukti ChatGPT host dan task ini belum selesai.
 
 ## 8. Rilis dan pemantauan
 

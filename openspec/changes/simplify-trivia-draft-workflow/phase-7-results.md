@@ -2,8 +2,11 @@
 
 **Tanggal:** 2 November 2026. **Change:** `simplify-trivia-draft-workflow`.
 **Issue:** [#118](https://github.com/milyarderpro/content-producer/issues/118).
-**Status:** P7-T1 belum selesai; P7-T2 NOT RUN pada host ChatGPT nyata.
-Checkbox tetap terbuka sampai kriteria task lengkap terbukti.
+**Status terkini:** P7-T1 **PASS/selesai** pada exact backend SHA
+`350a4c83f18e9bfb6017ef52e35913ec258ac661`; progres change **20/23**.
+P7-T2 **BLOCKED** pada host ChatGPT nyata; pengujian bisnis host NOT RUN.
+Pernyataan pending pada bagian kronologi di bawah dipertahankan sebagai sejarah
+sebelum run final, bukan status P7-T1 sekarang.
 
 ## Kandidat awal dan kegagalan formal
 
@@ -189,3 +192,67 @@ menguji exact SHA main `5b96e4fcfd5751e2a274b95d0e7e1ccdf582e759`.
 G4 formal baru pada exact main SHA setelah merge tetap diperlukan: shard 2
 passing pada SHA sebelumnya tidak menggantikan pasangan report exact-SHA baru.
 P7-T1 belum selesai, P7-T2 host nyata tetap NOT RUN.
+
+## P7-T1 — bukti formal final PASS
+
+**Backend SHA yang diuji:** `350a4c83f18e9bfb6017ef52e35913ec258ac661`,
+exact `main` hasil merge [PR #121](https://github.com/milyarderpro/content-producer/pull/121).
+**Run formal:** [41456400517](https://github.com/milyarderpro/content-producer/actions/runs/41456400517),
+manual `workflow_dispatch`, mulai 2 November 2026 13:50:04 UTC, selesai
+14:01:34 UTC (**11m30s**). Seluruh job source, kedua shard dan aggregate SUCCESS.
+Mode kedua backend report **ACTIONS_EXACT_CONFIG / ACTIONS_EXACT_COMMIT_CONFIG**;
+source report COMMITTED_SOURCE. Input/checkout/report memakai exact SHA yang sama.
+
+| Cakupan | Bukti formal |
+| --- | --- |
+| Source/frontend | PASS, root 14 file/156 kasus; frontend checks/build/test dalam source gate |
+| DB shard 1 | PASS **21 file/120 kasus** |
+| DB shard 2 | PASS **25 file/101 kasus** |
+| DB gabungan | **46 file/221 kasus**, semua wajib/disjoint, tidak ada skip |
+| MCP, hanya shard 1 | PASS **17 file/127 kasus** |
+| Authenticated Inspector, hanya shard 1 | PASS **36 valid/36 invalid + owner denial** |
+| Setiap shard | start, **satu reset**, 84 migration names/history, DB lint, security advisors lokal mandiri, audit before/after/final, whitespace, cleanup PASS |
+| Aggregate | PASS exact-SHA, SHA/hash/runtime sama, cakupan lengkap |
+
+Identitas berikut sama pada **ketiga** report yang diunduh dan ditinjau:
+
+| Field | SHA-256 |
+| --- | --- |
+| manifest | `80b928ff4f0c5c7ef5536ea51e2e5092328505408db6624e08edf6fdf5831dfa` |
+| lock | `511ec76647543b9cc6c16c336ad261bbe27b73d41b15dd80fba954e1c6bb1385` |
+| inputs | `8e8321f070d8ff2b5f9ad8e8cf3e144cb046257d83b9bf4b7aef5ca3f60397aa` |
+| partition | `b0258f1bda34560ab5faf15d3b8e83da8e5d62d1b10111acdc89b6d777e12a11` |
+
+Digest file artefak asli (bukan hash identitas bersama):
+
+- Source report: `fe0426f3531424bba66b0b08a7085d7edd8436d8d45fedb13717eb23596ff2c7`.
+- Shard 1 report: `76aecfacb29a7b69125534df5f5f1be1267375013bd972e1030a6d765365d280`.
+- Shard 2 report: `5a1f53a787922f5edb7b5a94759e8e69a10d03837c2d71eca4bd77630805918e`.
+
+Runtime ketiga report identik: Node **24.22.1**, Deno **2.9.8**, pnpm
+**10.33.2**, Supabase CLI **2.120.0**, dalam range yang diterima.
+Validator `scripts/gate-backend.ts --aggregate` dijalankan kembali terhadap
+ketiga report unduhan dan exact SHA tersebut: **PASS: 46 disjoint database
+files, 221 cases, identical exact-SHA identity**. Ini validasi bukti, bukan
+pengulangan suite/full gate.
+
+Review operator menerima P7-T1 dengan bukti **CI/FIXTURE**. SHA dokumen yang
+mencatat hasil dapat berbeda dan harus disebut terpisah; tidak ada klaim
+exact-SHA PASS untuk SHA dokumentasi berikutnya. Perubahan dokumen saja tidak
+memicu full gate backend duplikat. Deployment, runtime terpasang, host ChatGPT
+dan keberhasilan business Write production belum dibuktikan oleh run ini.
+
+## P7-T2 — prasyarat host dan handoff
+
+**BLOCKED:** sesi implementasi ini tidak menyediakan koneksi tool bisnis
+`mcpku2`/host ChatGPT PRIVATE yang dapat dipanggil, dan belum ada bukti runtime
+host memasang backend v2 serta plugin 0.3.0 yang sesuai. Tidak ada ID Page/objek
+host terisolasi yang ditetapkan untuk skenario Write. Status source/kandidat,
+CI dan Inspector tidak membuktikan pemasangan host tersebut.
+
+Ikuti [handoff host terkendali](phase-7-host-handoff.md). Preflight hanya Read
+dapat dilakukan pemilik di chat baru untuk mengembalikan bukti tool/schema dan
+runtime yang terlihat. Skenario Write menunggu target fixture nyata yang sesuai;
+tidak mengalihkan tes ke Page production atau melakukan rollout P8 sebagai efek
+samping. P7-T2 tetap tidak dicentang; skenario satu/lima draft, replacement,
+hard budget, partial/resume dan lost response pada host nyata **NOT RUN**.
