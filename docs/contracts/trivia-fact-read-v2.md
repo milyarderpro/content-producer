@@ -10,6 +10,14 @@ Angka dan oracle di bawah dibekukan **sebelum** hasil retrieval v2 dilihat.
 Perubahan aturan memerlukan versi kontrak/fixture baru dan review sebelum evaluasi;
 hasil P3 tidak boleh dipakai untuk menyesuaikan expected.
 
+**Pelengkap P5 Accepted:**
+[CR-056](../decisions/2026-11-02-cr-056-versioned-trivia-maintenance.md)
+menambah `fact_updated_at` pada setiap match sebagai CAS canonical maintenance,
+presisi enam digit dan berasal dari snapshot Read yang sama. Predicate, ranking,
+cap, `complete`, eligibility dan katalog A di dokumen ini tetap dibekukan;
+penambahan field bukan tuning retrieval. Bukti P5 terpisah dari status desain
+historis di atas dan tercatat pada [hasil P5](../../openspec/changes/simplify-trivia-draft-workflow/phase-5-results.md).
+
 ## 1. Input, scope, dan himpunan kandidat wajib
 
 `trivia_find_similar_facts_v2` menerima `request_schema_version: 2`, workspace,

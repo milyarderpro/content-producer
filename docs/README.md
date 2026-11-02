@@ -48,6 +48,10 @@ metadata Read, format trivia, niche baru, dan penyajian hasil plugin.
 
 ## Referensi kontrak dan sejarah
 
+- [Lifecycle trivia v2 — P5](contracts/trivia-v2-lifecycle.md) dan
+  [CR-056 maintenance versi 2](decisions/2026-11-02-cr-056-versioned-trivia-maintenance.md)
+  menjelaskan gate menurut versi konten, CAS publik untuk maintenance, serta
+  perbedaan URL canonical/draft dan snapshot historis.
 - [Kontrak frozen](../plans/README.md) menjelaskan peran dokumen `plans/` yang
   tetap menjadi acuan dan input test/packaging.
 - [Runbook pengembangan lokal](runbooks/local-development.md) menjadi pengarah

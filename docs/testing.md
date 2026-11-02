@@ -56,7 +56,7 @@ belum PASS. Gate wajib tetap dijalankan sebelum deployment yang memerlukannya.
 | `pnpm run check`                                   | Enam command non-Prettier di atas, berurutan                                        | Kegagalan menggagalkan check; tidak menjalankan suite MCP atau database; membangun frontend       |
 | `pnpm run verify-migrations`                       | Pola nama file SQL migration                                                        | Tidak memeriksa SQL, applied history, atau drift                                                  |
 | `pnpm run test:mcp`                                | Deno check, lint MCP, dan 15 file test MCP yang disebut script                      | Deno; mock/fixture protokol, tanpa stack DB untuk suite ini                                       |
-| `pnpm run test:database`                           | Vitest database **44 file saat ini** (40 pada baseline historis)                    | Docker/Supabase lokal dengan migration sesuai; menulis fixture lokal                              |
+| `pnpm run test:database`                           | Vitest database **46 file saat ini** (40 pada baseline historis)                    | Docker/Supabase lokal dengan migration sesuai; menulis fixture lokal                              |
 | `pnpm run test-all`                                | **Legacy CR-020/044**: `check` → `verify-migrations` → `test:mcp` → `test:database` | Tidak start/reset stack; tetap dipertahankan untuk gate sebelum merge dan rollback, bukan gate G4 |
 | `pnpm run gate:source`                             | Source/frontend, versi/manifest, bukti source untuk G4                              | Komponen source kandidat; PASS saja bukan release evidence lengkap                                |
 | `pnpm run gate:backend`                            | Isolated reset/audit, DB dan MCP/Inspector, history/lint/advisors                   | Mendukung shard 19+22 di Actions; masing-masing shard memiliki stack mandiri                      |
@@ -65,7 +65,8 @@ belum PASS. Gate wajib tetap dijalankan sebelum deployment yang memerlukannya.
 | `pnpm run package-plugin`                          | Validasi source dan pembuatan kandidat 13 file                                      | Mengganti kandidat output lama; tidak membuat ZIP/install                                         |
 | `pnpm exec tsx scripts/verify-plugin-candidate.ts` | Kesamaan daftar file, byte, dan hash kandidat/source                                | Kandidat/filelist sudah dibuat                                                                    |
 
-**Inventaris kandidat saat ini:** database **44 file/203 kasus** pada manifest G4;
+**Inventaris kandidat saat ini:** database **46 file/221 kasus** pada manifest G4
+(P5: tambahan 2 file/18 kasus dari baseline 44/203, partisi 21+25);
 angka **41 file/182 kasus** pada run rilis dan **40 file** pada catatan baseline
 adalah historis. Bukti rilis formal
 setelah merge berasal dari Actions manual dengan committed exact config,

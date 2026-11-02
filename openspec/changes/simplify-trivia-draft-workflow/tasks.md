@@ -229,24 +229,33 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
 
 ## 5. Setujui dan lifecycle
 
-- [ ] 5.1 **P5-T1 Gate Setujui v2:** gunakan pemeriksaan mekanis terkini dan
+- [x] 5.1 **P5-T1 Gate Setujui v2:** gunakan pemeriksaan mekanis terkini dan
       tiga hasil editorial P4 yang terikat revision/hash; pisahkan saran gaya.
       **Verifikasi:** test Page/binding/URL/reuse/jumlah/format/budget atau editorial
       stale/gagal memblokir Setujui, catatan nonblocking tidak menjadi gate sumber
       lama, dan dokumentasi quality/readback tidak mengklaim backend memverifikasi
       isi URL atau mengulangi 18 kriteria v1 pada v2.
-- [ ] 5.2 **P5-T2 Setujui/publikasi:** adaptasi `approve_post` dan
+- [x] 5.2 **P5-T2 Setujui/publikasi:** adaptasi `approve_post` dan
       `mark_post_posted` menurut versi konten, state terkini, serta perintah owner
       atas revision/hash yang ditinjau dan konfirmasi publikasi manual nyata.
       **Verifikasi:** test approval/publish dan race correction/approval/publish
       lintas versi, revoke/archive/reschedule/metrics terkait tetap benar, v2 tidak
       meminta tier/expiry atau membuka ulang URL, dan snapshot published utuh;
       dokumentasikan tindakan terpisah tanpa otomatisasi Canva/Facebook/metrik.
-- [ ] 5.3 **P5-T3 Koreksi fakta:** adaptasi reverify URL v2 untuk makna sama
+- [x] 5.3 **P5-T3 Koreksi fakta:** adaptasi reverify URL v2 untuk makna sama
       serta invalidasi/supersesi dengan izin owner terpisah, tanpa tier/expiry v2.
       **Verifikasi:** test CAS/race, status/lineage, dampak pada post mutable,
       penyegaran pandangan katalog, dan snapshot published yang tidak berubah;
       dokumentasi membedakan canonical URL, URL draft, serta riwayat post v1/v2.
+
+**Bukti P5-T1/T2/T3:** [hasil P5](phase-5-results.md),
+[kontrak lifecycle v2](../../../docs/contracts/trivia-v2-lifecycle.md),
+dan [CR-056 Accepted](../../../docs/decisions/2026-11-02-cr-056-versioned-trivia-maintenance.md)
+untuk maintenance versi 2 serta timestamp CAS pada Read. Fokus P5 PASS 18 kasus;
+Read/corpus/P5 PASS 4 file/22 kasus, regresi legacy/P4 PASS 6 file/53 kasus,
+source check PASS 150 root + 19 frontend. Ini bukti lokal/fixture, bukan G4
+formal, MCP/host P6, deployment atau LIVE. Issue #117; commit/push/PR/Actions
+mengikuti izin terpisah. Inventaris G4 menjadi 46 file/221 kasus tanpa skip.
 
 ## 6. Tool dan plugin
 

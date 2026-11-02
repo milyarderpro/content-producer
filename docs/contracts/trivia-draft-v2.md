@@ -79,6 +79,12 @@ Success `data` berisi:
 - setiap match: `fact_public_id`, `claim_text`, `status`, `reuse_eligibility`,
   `used_on_page`, `used_in_workspace` pada workspace owner yang sama.
 
+Pelengkap Accepted [CR-056](../decisions/2026-11-02-cr-056-versioned-trivia-maintenance.md)
+menambahkan `fact_updated_at` presisi enam digit pada setiap match untuk CAS
+maintenance. Schema/contoh terkini menyertakan field ini; bukti historis P1
+tetap mengacu versi sebelum perluasan. Timestamp berasal dari canonical pada
+snapshot Read yang sama, bukan timestamp sumber atau snapshot post.
+
 Status mencakup needs_review, verified, invalidated, superseded, rejected.
 Eligibility membedakan eligible/page_blocked/workspace_blocked/actively_reserved/
 not_eligible. History tidak disembunyikan karena faktanya tidak layak. `complete`

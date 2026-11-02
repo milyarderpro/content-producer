@@ -126,7 +126,7 @@ export function validateManifest(
     )
       fail('MANIFEST_FILE_DRIFT');
   }
-  if (expected.mcp.length !== 15 || expected.database.length !== 44) fail('MANIFEST_COUNT_DRIFT');
+  if (expected.mcp.length !== 15 || expected.database.length !== 46) fail('MANIFEST_COUNT_DRIFT');
   const mcpCommand =
     (packageScripts['test:mcp'] ?? '')
       .split(/\s*&&\s*/)
@@ -170,8 +170,8 @@ export function validateShards(
   if (
     partition.shards['1'].length === 0 ||
     partition.shards['2'].length === 0 ||
-    all.length !== 44 ||
-    new Set(all).size !== 44 ||
+    all.length !== 46 ||
+    new Set(all).size !== 46 ||
     all.some(
       (path) =>
         typeof path !== 'string' ||
@@ -229,7 +229,7 @@ export function validateShardProofs(
   )
     fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
   const files = proofs.flatMap((p) => p.files);
-  if (files.length !== 44 || new Set(files).size !== 44) fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
+  if (files.length !== 46 || new Set(files).size !== 46) fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
   return proofs.reduce((sum, p) => sum + p.cases, 0);
 }
 
@@ -577,7 +577,7 @@ export function assertShardDatabaseEvidence(output: string, expectedFiles: numbe
 export function assertDatabaseTestEvidence(output: string): void {
   const plain = plainEvidence(output);
   assertNoSkipped(plain);
-  if (!/Test Files\s+44 passed[\s\S]*Tests\s+[1-9]\d* passed/.test(plain))
+  if (!/Test Files\s+46 passed[\s\S]*Tests\s+[1-9]\d* passed/.test(plain))
     fail('REQUIRED_EVIDENCE_MISSING', 'FAIL');
 }
 

@@ -1,4 +1,5 @@
-// JSON Schema object for P1-T3 examples. No runtime/backend imports of this fixture.
+// P1-T3 examples with the accepted CR-056 maintenance-CAS Read extension.
+// No runtime/backend imports of this fixture.
 export const contractSchema = {
   $schema: 'http://json-schema.org/draft-07/schema#',
   title: 'CR-053 P1 contract examples v1, not a deployed tool validator',
@@ -62,6 +63,7 @@ export const contractSchema = {
         'fact_public_id',
         'claim_text',
         'status',
+        'fact_updated_at',
         'reuse_eligibility',
         'used_on_page',
         'used_in_workspace',
@@ -70,6 +72,7 @@ export const contractSchema = {
         fact_public_id: { $ref: '#/$defs/uuid' },
         claim_text: { $ref: '#/$defs/text' },
         status: { enum: ['needs_review', 'verified', 'rejected', 'invalidated', 'superseded'] },
+        fact_updated_at: { $ref: '#/$defs/configTimestamp' },
         reuse_eligibility: {
           enum: [
             'eligible',

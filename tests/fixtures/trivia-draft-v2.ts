@@ -147,6 +147,7 @@ export function draftExample(index = 0, inPlan = false) {
                   fact_public_id: id(i === 0 ? 500 + index * 10 : 999),
                   claim_text: c.claim_text,
                   status: i === 0 ? 'verified' : 'invalidated',
+                  fact_updated_at: configTime,
                   reuse_eligibility: i === 0 ? 'eligible' : 'not_eligible',
                   used_on_page: false,
                   used_in_workspace: false,

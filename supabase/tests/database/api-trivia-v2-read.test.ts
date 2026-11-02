@@ -14,6 +14,7 @@ import {
   row,
   rpc,
   sql,
+  time,
 } from './helpers/trivia-rpc.js';
 
 function insertNative(workspace: string, claim: string, status = 'needs_review'): string {
@@ -72,6 +73,7 @@ describe('P3 trivia v2 canonical Read and additive schema', () => {
               fact_public_id: id,
               claim_text: claim,
               status: 'needs_review',
+              fact_updated_at: time(id),
               reuse_eligibility: 'eligible',
               used_on_page: false,
               used_in_workspace: false,
