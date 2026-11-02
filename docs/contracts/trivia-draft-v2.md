@@ -183,6 +183,19 @@ Evidence tetap diikat server ke revision keluaran. Setelah revisi, readback dan
 Setujui versi tepat tetap terpisah. Konflik CAS membaca/review ulang, tidak
 mengganti expected revision/hash tanpa meninjau perubahan.
 
+Implementasi P4-T3 mempertahankan setiap baris binding lama sebagai snapshot
+historis `released`/`is_current=false`, termasuk URL dan wording yang pernah
+dipakai. Binding terkini dibuat ulang secara atomik, bahkan bila ID fakta sama;
+URL draft baru tersimpan pada snapshot binding baru tanpa menimpa canonical
+evidence atau riwayat lama. `get_post` menampilkan binding terkini beserta
+source/checks versi 2, sedangkan history tetap dapat diaudit dari usage dan
+write history. Revisi dari `ready` kembali ke `draft`, menghapus approval
+terkini; `discard_post` melepas alokasi yang belum diterbitkan tanpa menghapus
+riwayat. Perubahan jadwal saja tetap melalui `reschedule_post`, yang mengikat
+ulang revision evidence dan mempertahankan content hash. Bila respons revisi
+hilang, ulangi hanya operation key dan payload semantik identik; bila revision,
+hash, config, atau katalog berubah, baca ulang dan tinjau sebelum operasi baru.
+
 ## 6. Lima draft, hasil sebagian, dan replay
 
 - `planCreateRequest`: tool `create_content_plan`, request schema 1, lima slot
@@ -211,6 +224,23 @@ rekonsiliasi. Rate limit mengikuti waktu tunggu; perubahan fakta/copy adalah
 operasi baru sesudah state lama jelas. Draft sukses tetap ada walau langkah
 berikutnya gagal. Instruksi pembuatan tidak mengizinkan draft di luar jumlah,
 approval, correction, replacement, discard, atau pencatatan publikasi/metrik.
+
+P4-T4 memakai satu plan tanpa jadwal dan satu claim per giliran. Setelah tiap
+save, baca `get_post` dan `get_content_plan`; gunakan `progress.completed` dan
+`active_post_public_id` sebagai bukti jumlah serta identitas draft yang sudah
+selesai. Ringkasan hasil sebagian menyebut plan ID, ID draft yang terbukti,
+jumlah completed/failed/pending, dan langkah berikutnya. Bila readback gagal
+sementara, hentikan pembuatan item baru sampai state dapat dibaca; kegagalan
+Read tidak membatalkan save yang sudah commit. Bila respons create-plan atau
+save hilang, kirim ulang hanya operation key dan payload semantik yang sama,
+lalu cocokkan ID hasil replay dengan readback. Claim yang sudah dikonsumsi
+oleh save sukses tidak membuka ulang completed, walau waktu lease semula sudah
+lewat; key baru bukan replay. Claim yang benar-benar expired dan belum commit
+harus diambil ulang, sementara token lama ditolak. Dua chat pemilik mengikuti
+state plan yang sama, sehingga tidak mengklaim item completed untuk kedua kali.
+Cancel hanya menutup sisa item; draft completed tetap ada. Discard draft
+completed tidak otomatis membuat replacement: gunakan operasi replacement
+terpisah dengan keputusan eksplisit sesuai kontrak plan.
 
 ## 7. Daftar gate wajib Setujui
 

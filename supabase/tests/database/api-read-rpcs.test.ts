@@ -452,7 +452,7 @@ describe('Phase 5.2 owner-scoped read projections', () => {
         has_table_privilege('service_role', 'public.post_metrics', 'select') as service_role_metrics_select
     `);
 
-    expect(catalog.api_function_count).toBe(34);
+    expect(catalog.api_function_count).toBe(36);
     expect(String(catalog.api_function_names).replace(/[{}]/g, '').split(',')).toEqual([
       'approve_post',
       'archive_post',
@@ -479,8 +479,10 @@ describe('Phase 5.2 owner-scoped read projections', () => {
       'reschedule_post',
       'retry_content_plan_item',
       'revise_post',
+      'revise_post_v2',
       'revoke_post_approval',
       'save_post',
+      'save_post_v2',
       'trivia_correct_fact',
       'trivia_find_similar_facts',
       'trivia_find_similar_facts_v2',
@@ -489,7 +491,7 @@ describe('Phase 5.2 owner-scoped read projections', () => {
       'trivia_reverify_fact',
       'update_page',
     ]);
-    expect(catalog.authenticated_execute_count).toBe(34);
+    expect(catalog.authenticated_execute_count).toBe(36);
     expect(catalog.non_authenticated_execute_count).toBe(0);
     expect(catalog.caller_internal_helper_count).toBe(0);
     expect(catalog.api_owner_create).toBe(false);

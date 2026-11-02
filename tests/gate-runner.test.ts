@@ -54,7 +54,7 @@ test('rejects manifest drift and missing required database file', () => {
 
 test('accepts the mandatory manifest including P1 contract tests and rejects skipped cases', () => {
   // P1-T3 and P2-T2 mandatory source files; runtime and all release coverage remain required.
-  assert.deepEqual(validateManifest(manifest, pkg.scripts), { source: 14, mcp: 15, database: 43 });
+  assert.deepEqual(validateManifest(manifest, pkg.scripts), { source: 14, mcp: 15, database: 44 });
   assert.throws(() => assertNoSkipped('Tests 179 passed, 1 skipped'), {
     code: 'REQUIRED_CASE_SKIPPED',
   });
@@ -143,7 +143,7 @@ test('rejects source/backend identity mismatch', () => {
     lockHash: 'b',
     inputsHash: 'c',
     shardHash: 'd',
-    counts: { source: 12, mcp: 15, database: 43 },
+    counts: { source: 12, mcp: 15, database: 44 },
     runtime: resolveRuntimeEvidence({ nodeSelector: '>=22', nodeEngine: '>=22 <25', denoSelector: '>=2.9.7' },
       { node: 'v24.22.1', deno: 'deno 2.9.7 (stable)', pnpm: '10.33.2', supabase: '2.120.0' }),
   };
@@ -266,8 +266,8 @@ test('source evidence accepts six mandatory subchecks without formatter and reje
 });
 
 test('database Vitest ANSI and plain summaries', () => {
-  const plain = 'Test Files 43 passed\nTests 179 passed';
-  const ansi = 'Test Files \x1b[32m43 passed\x1b[0m\nTests \x1b[32m179 passed\x1b[0m';
+  const plain = 'Test Files 44 passed\nTests 179 passed';
+  const ansi = 'Test Files \x1b[32m44 passed\x1b[0m\nTests \x1b[32m179 passed\x1b[0m';
   for (const output of [plain, ansi]) {
     assert.doesNotThrow(() => assertDatabaseTestEvidence(output));
     assert.equal(countFromOutput('database', output), '179');
@@ -275,21 +275,21 @@ test('database Vitest ANSI and plain summaries', () => {
   assert.equal(plainEvidence(ansi), plain);
   for (const output of [
     'Test Files 40 passed\nTests 179 passed',
-    'Test Files 43 passed',
-    'Test Files 43 passed\nTests 178 passed, 1 skipped',
-    'Test Files 43 passed\nTests 178 passed, 1 failed',
-    'Test Files 43 passed\nTests 178 passed, 1 cancelled',
+    'Test Files 44 passed',
+    'Test Files 44 passed\nTests 178 passed, 1 skipped',
+    'Test Files 44 passed\nTests 178 passed, 1 failed',
+    'Test Files 44 passed\nTests 178 passed, 1 cancelled',
   ]) {
     assert.throws(() => assertDatabaseTestEvidence(output));
   }
 });
 
-test('partition covers all 43 mandatory files exactly once', () => {
+test('partition covers all 44 mandatory files exactly once', () => {
   const partition = JSON.parse(
     readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8'),
   );
   const shards = validateShards(partition, manifest);
-  assert.equal(shards['1'].length + shards['2'].length, 43);
+  assert.equal(shards['1'].length + shards['2'].length, 44);
   for (const broken of [
     { ...partition, shards: { ...partition.shards, '2': partition.shards['2'].slice(1) } },
     {
@@ -355,8 +355,8 @@ test('rebalanced shards preserve two hotspot files in shard 2 with no duplicates
     JSON.parse(readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8')),
     manifest,
   );
-  assert.equal(partition['1'].length + partition['2'].length, 43);
-  assert.equal(new Set([...partition['1'], ...partition['2']]).size, 43);
+  assert.equal(partition['1'].length + partition['2'].length, 44);
+  assert.equal(new Set([...partition['1'], ...partition['2']]).size, 44);
   for (const file of [
     'supabase/tests/database/api-trivia-public-gold.test.ts',
     'supabase/tests/database/api-post-approval-quality.test.ts',
@@ -366,10 +366,10 @@ test('rebalanced shards preserve two hotspot files in shard 2 with no duplicates
   }
 });
 
-test('backend candidate aggregate accepts exactly 186 database cases', () => {
+test('backend candidate aggregate accepts exactly 203 database cases', () => {
   for (const [count, expectedExit] of [
     [181, 1],
-    [186, 0],
+    [203, 0],
     [183, 1],
   ]) {
     const result = spawnSync(
@@ -448,9 +448,9 @@ test('final two-shard reports satisfy both validators', () => {
       ...(name === 'database' ? { count: String(cases) } : {}),
     })),
   });
-  const one = report('1', 92);
+  const one = report('1', 109);
   const two = report('2', 94);
-  assert.equal(validateShardProofs([one, two], sha, hashes, partition), 186);
+  assert.equal(validateShardProofs([one, two], sha, hashes, partition), 203);
   assert.doesNotThrow(() => validateSingleMcpInspector([one, two]));
   assert.deepEqual(
     two.stages.filter((item) => ['mcp', 'inspector'].includes(item.name)),

@@ -9,7 +9,7 @@ import {
 } from './gate-runner.js';
 
 export function assertExactDatabaseCaseCount(count: number): void {
-  if (count !== 186) throw new Error('SHARD_CASE_COUNT_MISMATCH');
+  if (count !== 203) throw new Error('SHARD_CASE_COUNT_MISMATCH');
 }
 
 function aggregate(args: string[]): void {
@@ -74,7 +74,7 @@ function aggregate(args: string[]): void {
     if (!Array.isArray(stages)) throw new Error('SHARD_STAGES_INVALID');
     const database = stages.find((stage) => stage.name === 'database');
     if (
-      proof.suites?.database !== 43 ||
+      proof.suites?.database !== 44 ||
       proof.mode !== 'backend' ||
       proof.evidence !== 'ACTIONS_EXACT_COMMIT_CONFIG' ||
       proof.configMode !== 'ACTIONS_EXACT_CONFIG' ||
@@ -89,7 +89,7 @@ function aggregate(args: string[]): void {
   assertExactDatabaseCaseCount(count);
 
   process.stdout.write(
-    'PASS: 43 disjoint database files, ' + count + ' cases, identical exact-SHA identity\n',
+    'PASS: 44 disjoint database files, ' + count + ' cases, identical exact-SHA identity\n',
   );
 }
 

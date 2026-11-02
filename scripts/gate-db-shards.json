@@ -12,6 +12,7 @@
       "supabase/tests/database/api-security-kernel.test.ts",
       "supabase/tests/database/api-trivia-concurrency.test.ts",
       "supabase/tests/database/api-trivia-facts.test.ts",
+      "supabase/tests/database/api-trivia-v2-save.test.ts",
       "supabase/tests/database/baseline.test.ts",
       "supabase/tests/database/core-primitives-and-validators.test.ts",
       "supabase/tests/database/oauth-resource-audience-hook.test.ts",

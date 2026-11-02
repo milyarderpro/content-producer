@@ -189,7 +189,7 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
 
 ## 4. Simpan, revisi, dan pemulihan
 
-- [ ] 4.1 **P4-T1 Simpan atomik:** implementasikan `save_post_v2` per draft
+- [x] 4.1 **P4-T1 Simpan atomik:** implementasikan `save_post_v2` per draft
       dengan registry/identitas, versi katalog A di bawah lock workspace, config
       presisi penuh, URL, reuse, renderer/jumlah/batas keras, tiga editorial, dan
       claim/item plan terkait; tanpa reservasi paket terpisah. **Verifikasi:** test
@@ -197,7 +197,7 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       stale, URL/budget/editorial gagal, serta alokasi dan completed atomik; hasil
       `pass` terikat revision/hash dan status selalu draft. Dokumentasikan transaksi
       dan error D1; MCP tidak memiliki business SQL baru.
-- [ ] 4.2 **P4-T2 Benturan dan replay:** tambahkan test sesi terpisah dengan
+- [x] 4.2 **P4-T2 Benturan dan replay:** tambahkan test sesi terpisah dengan
       overlap lock terbukti serta kedua urutan commit untuk same identity, set
       tumpang tindih, reuse lintas Page/workspace, koreksi/reservasi/write v1 vs v2,
       same-key replay, timeout, dan lost response. **Verifikasi:** satu penggunaan
@@ -208,7 +208,7 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       replay caller berwenang dengan key/payload identik mengembalikan hasil/ID
       semula tanpa post/alokasi atau perubahan item tambahan; save baru dengan
       key baru dan claim kedaluwarsa tetap ditolak tanpa mutasi bisnis baru.
-- [ ] 4.3 **P4-T3 Revisi dan baca:** implementasikan `revise_post_v2`, projection
+- [x] 4.3 **P4-T3 Revisi dan baca:** implementasikan `revise_post_v2`, projection
       `get_post`/list v1/v2, binding/URL atomik, CAS, editorial baru, pembatalan
       approval, dan discard tanpa menghapus riwayat. **Verifikasi:** test revisi
       makna sama/berubah, pembaruan URL draft, stale revision/hash, ready ke draft,
@@ -216,7 +216,7 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       belum terbit; dokumentasi menjelaskan snapshot historis dan recovery.
       Arah pensiun creation CR-054 tidak menghapus maintenance/readback post
       lama, immutable usage/history, atau replay/in-flight yang masih diperlukan.
-- [ ] 4.4 **P4-T4 Beberapa draft:** hubungkan save v2 dengan content plan tanpa
+- [x] 4.4 **P4-T4 Beberapa draft:** hubungkan save v2 dengan content plan tanpa
       jadwal, satu item tiap giliran, jumlah/tema tepat, progres, lease/renew,
       failure/retry, serta resume tanpa membuat ulang completed. **Verifikasi:**
       test satu draft tanpa plan, lima item, berhenti setelah tiga, create-plan/save

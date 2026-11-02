@@ -239,6 +239,10 @@
           "status": "mandatory"
         },
         {
+          "path": "supabase/tests/database/api-trivia-v2-save.test.ts",
+          "status": "mandatory"
+        },
+        {
           "path": "supabase/tests/database/baseline.test.ts",
           "status": "mandatory"
         },
