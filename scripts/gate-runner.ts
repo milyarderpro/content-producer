@@ -326,6 +326,8 @@ export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identit
     'supabase/config.toml',
     'supabase/functions/deno.lock',
     'pnpm-lock.yaml',
+    'scripts/trivia-v2-catalog.sql',
+    'scripts/trivia-v2-catalog-pin.json',
   ];
   const inputsHash = hash(inputPaths.map((path) => `${path}:${hash(read(path))}`).join('\n'));
   return {
@@ -703,7 +705,7 @@ async function backendStages(
     run('start', 'pnpm', ['run', 'supabase:start']);
     assertStartedTarget(projectId, base);
     run('reset', 'pnpm', ['run', 'supabase:reset']);
-    run('migration-names', 'pnpm', ['run', 'verify-migrations'], /Validated 75 migration filename/);
+    run('migration-names', 'pnpm', ['run', 'verify-migrations'], /Validated 84 migration filename/);
     if (!shard || shard === '1') run('mcp', 'pnpm', ['run', 'test:mcp'], /\b127 passed/);
     run(
       'audit-before',

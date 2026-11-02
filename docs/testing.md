@@ -50,6 +50,20 @@ tool: 12 Baca/24 Tulis**. Target authenticated Inspector diperluas menjadi
 **36 valid/36 invalid + owner denial**; pembaruan target bukan hasil eksekusi.
 DB tetap 46/221. Fixture source/plugin tidak membuktikan ChatGPT host atau LIVE.
 
+**Remediasi P7 ([Issue #118](https://github.com/milyarderpro/content-producer/issues/118)):**
+source memiliki **84 migration**, 36 nama RPC/**38 signature** (dua overload
+maintenance CR-056), serta **17/17 tabel RLS**. Audit aktif di
+`scripts/phase-6-catalog-audit.ts` memanggil comparator v2 dengan pin source,
+schema dan ACL `scripts/trivia-v2-catalog-pin.json`; comparator historis
+72-migration dipertahankan di `scripts/legacy-catalog-audit.ts`. Section pin
+dan manifest ikut hash input G4. Negative control lokal opsional
+`pnpm exec tsx scripts/trivia-v2-catalog-controls.ts` memerlukan database
+fixture-kosong, memeriksa drift grant/RLS/helper/policy/constraint dalam transaksi
+yang di-rollback, lalu mengaudit state akhir. Jangan jalankan pada production.
+Pin tidak diperbarui otomatis dari hasil gate. Bukti lokal dan run G4 awal yang
+gagal dicatat di [hasil P7](../openspec/changes/simplify-trivia-draft-workflow/phase-7-results.md);
+hasil lokal bukan formal G4 PASS atau host ChatGPT PASS.
+
 | Command dari root                                  | Cakupan                                                                             | Prasyarat / efek                                                                                  |
 | -------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | `pnpm run format:check`                            | Pemeriksaan gaya Prettier opsional secara manual                                    | Bukan gate wajib; membaca source lebih luas dari file yang diubah                                |

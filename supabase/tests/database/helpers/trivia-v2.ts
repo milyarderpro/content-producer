@@ -4,7 +4,8 @@ import type { TriviaFixture } from './trivia-rpc.js';
 import { time } from './trivia-rpc.js';
 
 export function cleanup(f: TriviaFixture): void {
-  sql(`delete from internal.post_write_history where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
+  sql(`delete from internal.content_plan_item_events where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
+    delete from internal.post_write_history where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
     delete from public.post_metrics where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
     delete from public.trivia_post_facts where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
     delete from public.posts where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
