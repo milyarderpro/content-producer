@@ -250,9 +250,52 @@ host memasang backend v2 serta plugin 0.3.0 yang sesuai. Tidak ada ID Page/objek
 host terisolasi yang ditetapkan untuk skenario Write. Status source/kandidat,
 CI dan Inspector tidak membuktikan pemasangan host tersebut.
 
-Ikuti [handoff host terkendali](phase-7-host-handoff.md). Preflight hanya Read
-dapat dilakukan pemilik di chat baru untuk mengembalikan bukti tool/schema dan
-runtime yang terlihat. Skenario Write menunggu target fixture nyata yang sesuai;
+Ikuti [handoff host terkendali](phase-7-host-handoff.md). Preflight Read sudah
+dilakukan pemilik dengan hasil di bawah; tool v2 serta runtime yang sesuai
+belum terbukti tersedia. Skenario Write menunggu target fixture nyata yang sesuai;
 tidak mengalihkan tes ke Page production atau melakukan rollout P8 sebagai efek
 samping. P7-T2 tetap tidak dicentang; skenario satu/lima draft, replacement,
 hard budget, partial/resume dan lost response pada host nyata **NOT RUN**.
+
+### Preflight owner di host — 2 November 2026
+
+**Bukti:** [trace tersanitasi Issue #118](https://github.com/milyarderpro/content-producer/issues/118#issuecomment-6579851010),
+dicatat 14:36:44 UTC, dan laporan pemilik pada sesi coding. Tingkat bukti
+**HOST / OWNER-REPORTED**, bukan pengujian host langsung oleh coding agent.
+**Verdict P7-T2 tetap BLOCKED** sebelum generation context.
+
+| Observasi aktual | Hasil / batas |
+| --- | --- |
+| `mcpku2.get_account_profile({})` | SUCCESS; profil owner terbaca, ID profil privat tidak dicatat |
+| `mcpku2.get_workspace_context({})` | SUCCESS; workspace `cad2885e-952e-41b3-9eae-d2d9d75d533d`, modul `trivia` aktif |
+| `mcpku2.list_pages` | SUCCESS; 4 Page aktif, `has_more=false`, `next_cursor=null` |
+| Tool/schema v2 | `trivia_find_similar_facts_v2`, `save_post_v2`, `revise_post_v2` tidak tersedia pada katalog sesi tersebut |
+| Tool v1 | Nama terlihat; tidak digunakan sebagai pengganti v2; dedup tidak dijalankan dan tidak dinyatakan bersih |
+| Backend/plugin terpasang | UNVERIFIED; source 0.3.0 dan G4 source SHA bukan bukti deployment |
+
+Dua Page berlabel testing yang ditemukan, **belum dipilih sebagai fixture**:
+
+- `Trivia Editorial Test (Internal)` — `f3984ee4-8ae7-4043-8c93-45765f82f46e`;
+  Page kampanye editorial historis.
+- `Content Producer QA Sandbox (Verified)` — `3c7dc8b2-43db-42b5-abd6-d334aac0ff83`;
+  Page QA yang sudah ada.
+
+Label testing tidak membuktikan isolasi runtime maupun penetapan objek P7-T2.
+Tidak ada Page dipilih/diubah. `get_page_generation_context` NOT RUN; config ID,
+timestamp config enam digit, bahasa, jumlah fakta, topik/format, reuse scope dan
+budget terkini tetap UNVERIFIED. Timestamp daftar Page tidak menggantikan CAS
+config. Dedup/save/revise/register/reserve/create-plan/approve/publish serta
+H01–H06 NOT RUN. Tidak ada business Write pada trace ini.
+
+Diagnosis dibatasi pada **ketidaktersediaan tool v2 di sesi host**. Belum ada
+bukti apakah target backend belum memasang v2, plugin/katalog sesi belum
+tersinkron, atau faktor lain; jangan menyebut root cause/deployment version yang
+belum diperiksa. Issue #118 tetap ditutup untuk remediasi gate yang sudah PASS;
+preflight ini bukan regresi gate atau bukti masalah live sudah FIXED.
+
+Langkah berikutnya adalah mencocokkan deployment Edge/source dan applied
+migration history pada target yang benar, versi/plugin/app binding serta
+katalog yang terlihat host, lalu menetapkan runtime/objek uji terisolasi.
+Setelah target itu benar-benar siap, ulang preflight pada chat baru sebelum
+skenario Write. Perubahan/deployment yang diperlukan mengikuti prosedur rilis
+dan scope target; laporan preflight ini sendiri tidak memulai rollout P8.

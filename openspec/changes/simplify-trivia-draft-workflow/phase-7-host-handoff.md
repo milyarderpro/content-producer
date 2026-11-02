@@ -6,6 +6,16 @@
 [run 41456400517](https://github.com/milyarderpro/content-producer/actions/runs/41456400517).
 **Plugin kandidat source:** 0.3.0, bukan bukti versi terpasang.
 
+**Hasil preflight pertama:** pemilik sudah menjalankan tiga bootstrap Read
+melalui `mcpku2`; semuanya SUCCESS. Tiga tool v2 tidak tersedia di katalog sesi,
+sehingga berhenti sebelum generation context. Bukti
+[Issue #118](https://github.com/milyarderpro/content-producer/issues/118#issuecomment-6579851010)
+dan [rincian hasil](phase-7-results.md#preflight-owner-di-host--2-november-2026)
+mencatat workspace dan dua kandidat Page testing yang belum ditetapkan sebagai
+fixture. H01–H06 tetap NOT RUN. Prompt di bawah dipakai ulang setelah kesiapan
+runtime/plugin dan target fixture terverifikasi, bukan diulang dengan Write
+atau jalur v1 untuk melewati blocker.
+
 ## 1. Prasyarat yang belum tersedia
 
 - Chat ChatGPT baru dengan plugin PRIVATE dan koneksi owner OAuth `mcpku2`
