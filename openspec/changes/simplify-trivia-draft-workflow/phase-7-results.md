@@ -116,3 +116,43 @@ LOCAL/INTEGRATION FIXTURE, bukan ChatGPT host, OAuth production atau LIVE.
   readback per draft, partial/resume, error/lost response. Bukti versi, ID,
   revision/hash serta jumlah diminta/terbukti/tersisa masih harus direkam.
   Scripted fixture P6 dan Inspector tidak menggantikan pengujian host tersebut.
+
+## Follow-up G4 setelah PR #119
+
+[PR #119](https://github.com/milyarderpro/content-producer/pull/119) di-merge ke
+`main` pada `7e69737f7fcd79a1e7ad0252d74aa6338738fa25` setelah review serta
+[light CI 41449141494](https://github.com/milyarderpro/content-producer/actions/runs/41449141494)
+PASS exact head `dc0bad6` (53 detik). G4 formal kemudian dijalankan pada exact
+SHA merge tersebut:
+[run 41449416985](https://github.com/milyarderpro/content-producer/actions/runs/41449416985).
+
+- Source, migration-names, audit-before/after **kedua shard**, MCP **127** serta
+  Inspector **36 valid/36 invalid + owner denial** PASS. Ini juga membuktikan
+  pin katalog baru cocok pada clean reset Actions masing-masing shard, bukan
+  hanya pada stack lokal pembuat pin.
+- Kedua command suite DB FAIL (`STAGE_COMMAND_FAILED`); cleanup PASS.
+  History/lint/advisors/final audit NOT RUN; aggregate FAIL. Run berlangsung
+  sekitar 11m17s; hasil tersebut bukan G4 PASS.
+- Tidak ada perubahan source backend/migration/pin dari remediasi lanjutan ini.
+  Diagnosis lokal mereproduksi **7 kegagalan dari 54 kasus** pada tujuh file
+  inventaris/keamanan lama (157,57 detik). Seluruh kegagalan awal berhenti pada
+  assertion jumlah signature 33/34/36, sementara state yang sah sudah 38.
+- Rekonsiliasi expected mengikuti CR-053/056: **36 nama/38 signature**, dua
+  overload maintenance dengan **empat signature lengkap yang diperiksa exact**,
+  dan tiga nama v2 pada allowlist transisi. Daftar nama Read serta Page/plan
+  memeriksa kedua duplikasi nama maintenance dan seluruh nama v2 secara tepat.
+  Phase 5 operation map tetap inventaris historis 33 nama; hanya allowlist
+  acceptance kini diperluas eksplisit. Tidak ada skip, penghapusan assertion
+  keamanan, perubahan migration atau pelebaran grant untuk membuat test lulus.
+- Pengulangan tujuh file: **6 file/50 kasus PASS**, satu file acceptance masih
+  menemukan allowlist operasi yang hanya diperluas sampai P3. Setelah menambah
+  tepat `save_post_v2`/`revise_post_v2` dan assertion 36 nama unik, file itu
+  diulang sendiri: **1 file/4 kasus PASS** (22,50 detik). Dengan demikian seluruh
+  54 kasus fokus memiliki bukti PASS pada source masing-masing yang tidak berubah
+  sesudah run relevan; bukan klaim satu run tujuh file final yang belum dilakukan.
+- `pnpm run check` final PASS **14 file/156 root + 19 frontend**;
+  audit katalog akhir PASS, tanpa sisa fixture dan pin tidak berubah.
+
+Remediasi lanjutan tetap memerlukan PR/light CI dan satu G4 formal pada exact
+SHA main final yang baru. P7-T1/P7-T2 tetap belum dicentang; tidak ada deployment,
+pemasangan plugin atau business Write production pada pekerjaan ini.
