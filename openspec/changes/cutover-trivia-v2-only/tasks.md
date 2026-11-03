@@ -16,9 +16,9 @@ bukan bukti cutover production. Rantai migration dan histori production dipertah
 
 ## 3. Reset konten dan pemulihan
 
-- [ ] 3.1 Buat prosedur backup lokal terbatas untuk schema, konten yang akan dihapus, identitas/Page/config pembanding, dan histori migration; dokumentasikan restore insiden serta verifikasi checksum dan keterbacaan tanpa commit/unggah konten atau credential.
-- [ ] 3.2 Buat skrip reset transaksional dari matriks 1.2, dengan scope owner, lock, pemeriksaan precondition, urutan FK, dan perbandingan data tetap. Verifikasi fixture v1/v2 menghasilkan nol konten, fixture scope berubah membatalkan semua, dan Page/config tetap identik.
-- [ ] 3.3 Tambahkan prosedur cleanup terarah untuk satu draft QA beserta turunannya setelah retest live; verifikasi pada fixture bahwa hanya ID QA yang dihapus dan hasil akhir nol tanpa mengubah Page/config.
+- [x] 3.1 Buat prosedur backup lokal terbatas untuk schema, konten yang akan dihapus, identitas/Page/config pembanding, dan histori migration; dokumentasikan restore insiden serta verifikasi checksum dan keterbacaan tanpa commit/unggah konten atau credential.
+- [x] 3.2 Buat skrip reset transaksional dari matriks 1.2, dengan scope owner, lock, pemeriksaan precondition, urutan FK, dan perbandingan data tetap. Verifikasi fixture v1/v2 menghasilkan nol konten, fixture scope berubah membatalkan semua, dan Page/config tetap identik.
+- [x] 3.3 Tambahkan prosedur cleanup terarah untuk satu draft QA beserta turunannya setelah retest live; verifikasi pada fixture bahwa hanya ID QA yang dihapus dan hasil akhir nol tanpa mengubah Page/config.
 
 ## 4. Plugin, dokumentasi, dan gate
 
