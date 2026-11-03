@@ -363,5 +363,10 @@ mempertahankan data/snapshot, maintenance/replay serta pekerjaan in-flight.
 
 #### Scenario: Meninjau penghentian pembuatan lama
 
-- **WHEN** bukti cutover dan latihan rollback diajukan kepada pemilik
+- **WHEN** bukti cutover dan pemeriksaan kompatibilitas Page QA production menurut CR-058 diajukan kepada pemilik
 - **THEN** keputusan pelaksanaan mempertimbangkan post v1/v2, plan/claim/reservasi in-flight, maintenance/replay dan data historis tanpa menganggap CI PASS sebagai izin rilis/penghentian atau pensiun creation sebagai penghapusan semua tool v1
+
+#### Scenario: Batas pemeriksaan production sebagai pengganti latihan terisolasi
+
+- **WHEN** post v1/v2 dan plan pada Page QA production terbaca utuh tetapi backend/plugin tidak benar-benar diganti
+- **THEN** hasil SHALL dicatat sebagai bukti kompatibilitas pada runtime aktif, bukan bukti rollback deployment atau restore; target dan izin rollback sungguhan tetap diputuskan terpisah

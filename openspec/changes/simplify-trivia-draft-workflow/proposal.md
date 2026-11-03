@@ -39,6 +39,9 @@ terbukti melalui readback, dengan keamanan serta riwayat tetap terjaga.
   v1 tidak diwajibkan. Request v1 lain yang sah, maintenance post/data lama,
   replay dan pekerjaan in-flight tetap dilindungi. Kriteria terukur, bukti dan
   izin pelaksanaan cutover serta rollback belum ditetapkan oleh keputusan arah ini.
+  [CR-058](../../../docs/decisions/2026-11-03-cr-058-p8-production-qa-rollback-verification.md)
+  menetapkan pemeriksaan kompatibilitas pada Page QA production sebagai bukti
+  P8-T1, dengan batas bahwa rollback backend/plugin sungguhan belum terbukti.
 - Pertahankan baseline [rencana implementasi](../../../plans/simplified-trivia-draft-workflow-implementation-plan.md):
   **8 fase dan 23 task**. Gunakan G4 CR-052 manual exact-SHA sebagai gate rilis
   backend sesuai aturan repository terbaru.

@@ -332,16 +332,24 @@ deployment/instalasi dan LIVE tetap P7/P8, NOT RUN pada sesi ini.
 
 ## 8. Rilis dan pemantauan
 
-- [ ] 8.1 **P8-T1 Rollout:** ajukan kriteria cutover terukur dan rancangan
+- [x] 8.1 **P8-T1 Rollout:** ajukan kriteria cutover terukur dan rancangan
       rollback kompatibel data campuran untuk keputusan pemilik; setelah gate dan
       izin tindakan tersedia, verifikasi runtime target, rilis backend sebelum
-      plugin v2, serta pertahankan v1 selama transisi. **Verifikasi:** latihan
-      rollback terisolasi membuktikan readback/pengelolaan v1/v2 dan plan tetap utuh,
+      plugin v2, serta pertahankan v1 selama transisi. **Verifikasi:** menurut
+      CR-058, pemeriksaan kompatibilitas pada Page QA production membuktikan
+      readback v1/v2 dan plan tetap utuh pada runtime aktif, dengan batas bahwa
+      rollback backend/plugin sungguhan belum diuji;
       target/pemicu/prosedur disetujui, bukti exact-SHA/migrasi/security tercatat,
       dan instalasi/plugin lama diinventarisasi tanpa menganggap 7 hari/3 chat
       sebagai syarat diterima. Pertahankan v1 dengan batas Read CR-054 serta
       maintenance/replay/in-flight yang sah; arah pensiun bukan izin cutover.
       Tanpa izin deployment/pemasangan, bagian itu BLOCKED.
+      **Bukti:** [CR-058](../../../docs/decisions/2026-11-03-cr-058-p8-production-qa-rollback-verification.md)
+      menerima pemeriksaan Page QA production dan persetujuan rencana pemilik;
+      [hasil P8-T1](phase-8-rollout-plan.md) mencatat runtime/gate P7, inventaris
+      plugin lama, data campuran, Read v1/v2 dan plan yang tidak berubah.
+      Rollback deployment NOT RUN, instalasi aktif lama UNVERIFIED, dan pensiun
+      pembuatan v1 menunggu P8-T2 serta izin tindakan tersendiri.
 - [ ] 8.2 **P8-T2 Retest live:** pada runtime dan objek berizin, uji ulang alur
       ujung-ke-ujung dengan readback, pantau keberhasilan jumlah draft, error,
       duplikasi yang ditemukan, dan pemakaian pembuatan v1 versus maintenance.

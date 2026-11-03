@@ -411,7 +411,7 @@ tetap berlaku. Tidak ada gate yang dijalankan oleh pencatatan ini.
 | Pemulihan             | Lost response, same-key replay, lease expired, config/revision conflict tanpa output ganda                                                             | Setujui cakupan latihan dan kriteria lolos                                   |
 | Post lama             | Fixture status draft/ready/posted/archived/discarded; readback dan lifecycle yang berlaku; snapshot/sumber/approval/metrik historis terjaga            | Setujui inventaris fixture dan cakupan sampel data lama yang diizinkan       |
 | Pemakaian plugin lama | Inventaris instalasi aktif, pengamatan panggilan pembuatan v1/v2, dan penjelasan untuk setiap pemakaian lama yang tersisa                              | Putuskan cara observasi, periode aktif dan ambang penggunaan sebelum pensiun |
-| Rollback              | Latihan pada data campuran, readback v2 dan progres plan tetap benar; hasilnya direkam                                                                 | Setujui target rilis kompatibel, pemicu rollback dan scope latihan           |
+| Rollback              | Sesuai CR-058, periksa data campuran dan progres plan pada Page QA production tanpa mengganti backend/plugin; rekam batas bahwa rollback sungguhan belum diuji | Rencana target/pemicu/prosedur P8-T1 diterima pemilik; izin tindakan insiden terpisah |
 | Backend/security      | Gate exact-SHA serta audit migrasi/security yang berlaku; runtime retest diketahui                                                                     | Verifikasi bukti pada kandidat final dan izin tindakan rilis secara terpisah |
 
 Angka **7 hari dan 3 chat baru** hanya contoh ambang observasi yang pernah
@@ -435,12 +435,18 @@ di atas telah terpenuhi atau izin menonaktifkan runtime sekarang.
 
 Usulkan target rollback yang sudah kompatibel dengan schema/data v2, bukan
 sembarang binary sebelum v2. Migration additive dan post v2 yang telah tersimpan
-tetap dipertahankan. Latihan harus membuktikan penghentian pembuatan baru bila
-diperlukan, keterbacaan/pengelolaan v1/v2, serta kelanjutan plan tanpa duplikasi.
-Mengaktifkan kembali pembuatan v1 hanya layak bila target itu telah diuji terhadap
-registry/pemakaian bersama. Jangan menganggap rollback plugin cukup jika backend
-tidak lagi mendukung inputnya. Target, mekanisme pengendali, pemicu, dan izin
-rollback belum diputuskan; rancangan ini bukan izin deploy atau mutasi.
+tetap dipertahankan. [CR-058](../../../docs/decisions/2026-11-03-cr-058-p8-production-qa-rollback-verification.md)
+mengganti syarat latihan runtime terisolasi P8-T1 dengan pemeriksaan
+kompatibilitas pada Page QA production: baca post v1/v2 dan plan pada runtime
+aktif, lalu pastikan ID, status, revision/hash serta progres tidak berubah.
+Pemeriksaan ini bukan bukti rollback deployment/plugin sungguhan; hal itu tetap
+memerlukan izin dan verifikasi tersendiri bila dilakukan. Mengaktifkan kembali
+pembuatan v1 hanya layak bila target itu telah diuji terhadap registry/pemakaian
+bersama. Jangan menganggap rollback plugin cukup jika backend tidak lagi
+mendukung inputnya. Target awal, pemicu dan prosedur P8-T1 disetujui pemilik
+melalui [rencana rollout](phase-8-rollout-plan.md); mekanisme penghentian
+pembuatan baru belum terbukti tersedia, dan izin tindakan rollback/cutover
+tetap terpisah. Rancangan ini bukan izin deploy atau mutasi.
 
 ## Ringkasan status keputusan
 
