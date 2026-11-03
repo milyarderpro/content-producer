@@ -102,7 +102,7 @@ Deno.test('P6 CR-056 maintenance versions map separately without tier/expiry on 
         return Promise.resolve(Response.json({ response_schema_version: 2, data: {
           fact_public_id: id(500), affected_posts: affected, replayed: false,
           ...(tool === 'trivia_reverify_fact'
-            ? { verification_status: 'verified', source_url: 'https://example.org/source', fact_updated_at: configTime }
+            ? { verification_status: 'needs_review', source_url: 'https://example.org/source', fact_updated_at: configTime }
             : { old_status: 'invalidated', successor_public_id: null }),
         } }));
       };

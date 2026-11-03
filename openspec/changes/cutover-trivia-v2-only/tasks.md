@@ -1,17 +1,18 @@
 # Tasks
 
-Semua kotak masih kosong: dokumen ini adalah rencana, bukan bukti cutover. Rantai migration dan histori production yang ada dipertahankan.
+Kotak tercentang menunjukkan implementasi dan verifikasi source/fixture yang selesai,
+bukan bukti cutover production. Rantai migration dan histori production dipertahankan.
 
 ## 1. Keputusan dan batas data
 
-- [ ] 1.1 Catat change record yang secara eksplisit mengganti kewajiban kompatibilitas v1 pada CR-053/054 dan TDW-16/17, menetapkan 31 tool aktif plus lima penolakan v1 tanpa melemahkan CR-052; verifikasi tautan keputusan, cakupan override, dan `git diff --check`.
-- [ ] 1.2 Inventaris ulang production secara read-only: owner/workspace/Page/config, semua tabel dan referensi konten v1/v2, FK, JSON snapshot, operation ledger, reservasi, job, dan histori migration; hasilkan matriks hapus/pertahankan dan verifikasi tidak ada data owner lain yang diam-diam masuk scope.
+- [x] 1.1 Catat change record yang secara eksplisit mengganti kewajiban kompatibilitas v1 pada CR-053/054 dan TDW-16/17, menetapkan 31 tool aktif plus lima penolakan v1 tanpa melemahkan CR-052; verifikasi tautan keputusan, cakupan override, dan `git diff --check`.
+- [x] 1.2 Inventaris ulang production secara read-only: owner/workspace/Page/config, semua tabel dan referensi konten v1/v2, FK, JSON snapshot, operation ledger, reservasi, job, dan histori migration; hasilkan matriks hapus/pertahankan dan verifikasi tidak ada data owner lain yang diam-diam masuk scope.
 
 ## 2. Penutupan alur konten v1
 
-- [ ] 2.1 Tambahkan migration maju yang menutup lima RPC khusus v1 dan overload v1 untuk dua tool pemeliharaan, termasuk replay/in-flight; pertahankan overload v2, helper bersama, dan tool umum. Verifikasi clean install dan upgrade fixture, direct-RPC v1 ditolak, v2 positif, serta audit grant/RLS/owner denial.
-- [ ] 2.2 Lepas lima nama v1 dari registry/handler Edge dan cabang input v1 pada dua tool pemeliharaan; audit jalur pilot, alias, dan PostgREST. Verifikasi katalog 31 nama, lima panggilan lama gagal tanpa perubahan data, `pnpm run check`, dan test MCP fokus.
-- [ ] 2.3 Pertahankan perilaku tool umum untuk post/fakta v2 melalui test fokus lifecycle, plan, metrik, dedup, save/revise, CAS, replay, dan readback; dokumentasikan batas kompatibilitas yang dipertahankan pada kontrak tool serta verifikasi test database/MCP terkait.
+- [x] 2.1 Tambahkan migration maju yang menutup lima RPC khusus v1 dan overload v1 untuk dua tool pemeliharaan, termasuk replay/in-flight; pertahankan overload v2, helper bersama, dan tool umum. Verifikasi clean install dan upgrade fixture, direct-RPC v1 ditolak, v2 positif, serta audit grant/RLS/owner denial.
+- [x] 2.2 Lepas lima nama v1 dari registry/handler Edge dan cabang input v1 pada dua tool pemeliharaan; audit jalur pilot, alias, dan PostgREST. Verifikasi katalog 31 nama, lima panggilan lama gagal tanpa perubahan data, `pnpm run check`, dan test MCP fokus.
+- [x] 2.3 Pertahankan perilaku tool umum untuk post/fakta v2 melalui test fokus lifecycle, plan, metrik, dedup, save/revise, CAS, replay, dan readback; dokumentasikan batas kompatibilitas yang dipertahankan pada kontrak tool serta verifikasi test database/MCP terkait.
 
 ## 3. Reset konten dan pemulihan
 

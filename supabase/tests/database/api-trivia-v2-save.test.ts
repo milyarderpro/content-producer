@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { cancel, claim, createPlan, expire, fail, renew, retry } from './helpers/plan-lifecycle.js';
 import { request as legacyPostRequest, save as legacyPostSave } from './helpers/post-rpc.js';
+import { approve as approveV2, publish as publishV2 } from './helpers/trivia-v2.js';
 import { callerStatement, cleanup as triviaCleanup, correct, factInput, fixture, json, quote,
   release, reserve, reserved, row, rpc, secondPage, session, setReuse, sql, time, waitForSession,
 } from './helpers/trivia-rpc.js';
@@ -24,6 +25,7 @@ type SaveInput = {
 
 function cleanup(f: Fixture): void {
   sql(`delete from internal.post_write_history where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
+    delete from public.post_metrics where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
     delete from public.trivia_post_facts where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
     delete from public.posts where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
     delete from public.trivia_fact_evidence_v2 where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');`);
@@ -461,6 +463,35 @@ describe('P4-T2 separate-session collisions and replay', () => {
 });
 
 describe('P4-T3 revise and version-aware readback', () => {
+  it('keeps shared lifecycle, metrics and readback available for a v2 post', () => {
+    const f = fixture();
+    try {
+      const created = rpc(f, save(f, input(f, 'shared')));
+      const id = (created.data.post as { post_public_id: string }).post_public_id;
+      rpc(f, approveV2(f, id));
+      rpc(f, publishV2(f, id));
+      const before = row<{ revision: number; content_hash: string }>(
+        `select revision,content_hash from public.posts where public_id='${id}'`);
+      const key = randomUUID();
+      const metric = `api.record_post_performance(1,'${f.workspace}','${key}','${id}',
+        '2026-11-03T00:00:00Z',${json({ views: 100, likes: 3 })},
+        ${json({ source_type: 'facebook_ui', metric_definition_version: 1 })})`;
+      const first = rpc(f, metric);
+      expect(first.data.replayed).toBe(false);
+      expect(rpc(f, metric).data.replayed).toBe(true);
+      const history = rpc(f, `api.get_post_performance(1,'${f.workspace}','${id}',
+        null,null,20,null)`);
+      expect((history.data.snapshots as unknown[])).toHaveLength(1);
+      const insights = rpc(f, `api.get_performance_insights(1,'${f.workspace}',
+        '${f.page}','trivia',null,null,array['format']::text[],'views',5,20)`);
+      expect(insights.response_schema_version).toBe(1);
+      const read = rpc(f, `api.get_post(1,'${f.workspace}','${id}',true,true,true)`);
+      expect((read.data.post as { content_schema_version: number }).content_schema_version).toBe(2);
+      expect(row<{ revision: number; content_hash: string }>(
+        `select revision,content_hash from public.posts where public_id='${id}'`)).toEqual(before);
+    } finally { cleanup(f); }
+  }, 30_000);
+
   it('revises a draft, preserves historical bindings, and reads current v2 evidence', () => {
     const f = fixture();
     try {

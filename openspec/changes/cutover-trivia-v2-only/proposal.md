@@ -21,7 +21,11 @@ Pemilik ingin memulai ulang konten dengan trivia v2 sebagai satu-satunya alur ya
 
 ### Modified Capabilities
 
-Tidak ada spec utama yang terdaftar. Keputusan ini menggantikan bagian transisi v1 yang masih aktif dalam kontrak terdahulu melalui change record saat implementasi.
+- `trivia-draft-workflow`: ganti kewajiban kompatibilitas post/operasi v1 dan kriteria pensiun creation bertahap pada TDW-16/17 dengan cutover v2 saja setelah gate, backup, dan reset.
+- `trivia-fact-library`: akhiri kewajiban pemetaan/backfill dan kompetisi write v1 setelah reset, sambil mempertahankan identitas canonical, dedup, reuse, dan keamanan v2.
+- `tool-diagnostics`: inventaris diagnostik mengikuti 31 tool aktif; nama v1 yang dipensiunkan ditolak, sedangkan diagnostik tool aktif tetap lengkap.
+
+[CR-059](../../../docs/decisions/2026-11-03-cr-059-trivia-v2-only-cutover.md) mencatat override terhadap CR-053/054 dan batas yang tetap berlaku dari CR-052. Spesifikasi dan keputusan historis tidak ditulis ulang.
 
 ## Impact
 

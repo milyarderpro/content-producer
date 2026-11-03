@@ -182,7 +182,7 @@ Deno.test('6.9: post schemas remain closed among 33 OAuth tools', async () => {
     check(t?._meta.securitySchemes[0].type === 'oauth2', 'OAUTH');
     check(t.annotations.openWorldHint === false, 'NO_OPEN_WORLD');
     check(t.annotations.destructiveHint === false, 'NON_DESTRUCTIVE');
-    check(t.annotations.readOnlyHint === (name !== 'save_post'), 'READ_ONLY');
+    check(t.annotations.readOnlyHint === true, 'READ_ONLY');
     check(!Object.hasOwn(t._meta, 'openai/profile'), 'NO_PROFILE');
   }
 });
