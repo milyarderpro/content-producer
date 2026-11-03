@@ -1,12 +1,18 @@
 # P7-T2 — handoff host ChatGPT terkendali
 
-**Status:** BLOCKED; seluruh skenario bisnis host di bawah NOT RUN.
+**Status terkini (3 November 2026):** P7-T2 **PASS/selesai** pada Page QA
+Sandbox production yang ditetapkan pemilik. Rincian aktual, ID/hash,
+versi runtime/plugin dan batas H06 ada pada
+[hasil host P7](phase-7-results.md#p7-t2--hasil-host-terkendali-3-november-2026).
+Handoff, prasyarat, prompt, dan tabel NOT RUN di bawah merekam kondisi sebelum
+deployment dan izin target; jangan membacanya sebagai status saat ini.
 **Prasyarat yang sudah selesai:** P7-T1 G4 formal PASS pada backend source
 `350a4c83f18e9bfb6017ef52e35913ec258ac661`,
 [run 41456400517](https://github.com/milyarderpro/content-producer/actions/runs/41456400517).
-**Plugin kandidat source:** 0.3.0, bukan bukti versi terpasang.
+**Pada handoff awal:** plugin source 0.3.0 belum membuktikan versi terpasang;
+versi terpasang sekarang dibuktikan pada hasil host terbaru.
 
-**Diagnosis koneksi terbaru (2 November 2026):** [hasil read-only](phase-7-results.md#diagnosis-read-only-koneksi-yang-tersedia--2-november-2026)
+**Diagnosis awal (2 November 2026):** [hasil read-only](phase-7-results.md#diagnosis-read-only-koneksi-yang-tersedia--2-november-2026)
 menemukan project production yang memuat workspace owner masih pada 72
 migration/33 RPC v1, Edge `mcp` aktif v35 tanpa tool v2, dan plugin PRIVATE
 terpasang 0.2.11 dengan binding app `mcpku2`. Kandidat v2 memiliki 84 migration,

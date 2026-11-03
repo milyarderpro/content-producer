@@ -312,7 +312,7 @@ deployment/instalasi dan LIVE tetap P7/P8, NOT RUN pada sesi ini.
       owner denial, history/lint/advisors, audit/cleanup dan aggregate PASS.
       Ketiga report SHA/hash/runtime cocok; validator aggregate lokal mengonfirmasi
       46 file disjoint/221 kasus. Ini bukti CI/FIXTURE, bukan host atau LIVE.
-- [ ] 7.2 **P7-T2 Host terkendali:** uji tool/schema yang benar-benar terlihat
+- [x] 7.2 **P7-T2 Host terkendali:** uji tool/schema yang benar-benar terlihat
       host dengan satu draft, lima draft bertema, penggantian calon, hard budget,
       readback tiap draft, hasil sebagian/resume, serta error dan lost response pada
       fixture/objek yang diizinkan. **Verifikasi:** laporan tersanitasi memuat
@@ -320,17 +320,15 @@ deployment/instalasi dan LIVE tetap P7/P8, NOT RUN pada sesi ini.
       revision/hash, dan pesan Indonesia yang sesuai bukti; HTTP 200 dan CI PASS
       tidak menggantikan keberhasilan Write/readback. Paket pengulangan/ambang yang
       belum disetujui dibawa kepada pemilik sebelum dijadikan gate.
-      **Status:** BLOCKED; [preflight pemilik](phase-7-results.md#preflight-owner-di-host--2-november-2026)
-      membuktikan tiga bootstrap Read SUCCESS pada host `mcpku2`, tetapi tiga
-      tool v2 tidak tersedia dalam katalog sesi. Runtime/plugin terpasang serta
-      objek host fixture belum terverifikasi/ditetapkan; generation context dan
-      H01–H06 NOT RUN, tanpa business Write. [Handoff](phase-7-host-handoff.md)
-      diperbarui; Inspector/G4 bukan pengganti bukti host yang masih kurang.
-      Diagnosis read-only berikutnya pada
-      [hasil P7](phase-7-results.md#diagnosis-read-only-koneksi-yang-tersedia--2-november-2026)
-      membuktikan target data owner yang tersedia masih 72 migration/33 RPC v1,
-      Edge `mcp` v35 tanpa tool v2, dan plugin terpasang 0.2.11. Runtime v2
-      terisolasi/fixture berizin belum tersedia; H01–H06 tetap NOT RUN.
+      **Bukti:** [hasil host 3 November](phase-7-results.md#p7-t2--hasil-host-terkendali-3-november-2026)
+      mencatat target production yang ditetapkan pemilik, 84 migration applied,
+      Edge `mcp` v36, plugin PRIVATE 0.3.0 dan tiga tool v2 terlihat. H01–H06
+      PASS dalam batas skenario: draft tanpa plan, lima draft food/home dengan
+      readback 5/5/0, calon used diganti, hard budget dan fact review ditolak
+      tanpa output parsial, resume pada chat ChatGPT baru, serta satu respons
+      save yang ditahan setelah dispatch dan direkonsiliasi/replay tanpa
+      duplikasi. Injeksi H06 berada pada batas respons host, bukan uji putus
+      jaringan. Semua post fixture tetap draft; P8 tidak dimulai.
 
 ## 8. Rilis dan pemantauan
 
