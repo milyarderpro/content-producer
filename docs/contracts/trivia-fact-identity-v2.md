@@ -13,10 +13,10 @@ dan `tests/fixtures/tool-errors-v2.ts`. Dasar keputusan:
 [CR-053](../decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md),
 [CR-054](../decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md)
 (v2 utama dan pengecualian kompatibilitas Read v1 terbatas, dicatat sesudah P1),
-[design](../../openspec/changes/simplify-trivia-draft-workflow/design.md), [spec
-TFL](../../openspec/changes/simplify-trivia-draft-workflow/specs/trivia-fact-library/spec.md),
+[design](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/design.md), [spec
+TFL](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/specs/trivia-fact-library/spec.md),
 [spec
-TDW](../../openspec/changes/simplify-trivia-draft-workflow/specs/trivia-draft-workflow/spec.md),
+TDW](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/specs/trivia-draft-workflow/spec.md),
 serta [PRD](../../plans/simplified-trivia-draft-workflow-prd.md).
 
 **Batas bukti:** inspeksi source, migration berurutan, kontrak dan fixture pada
@@ -546,7 +546,7 @@ mengaktifkan v2 atau mematikan creation v1 pada runtime sekarang.
   operasi). Jangan memindahkan seluruh pembuktian lifecycle/correction ke P3.
 
 Seluruh penjabaran di atas mengikuti
-[`tasks.md`](../../openspec/changes/simplify-trivia-draft-workflow/tasks.md);
+[`tasks.md`](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/tasks.md);
 baseline tetap **8 fase/23 task**. Ini handoff acceptance, bukan perubahan
 checklist atau izin melanjutkan P2-T2/P2-T3 maupun implementasi fase berikutnya.
 

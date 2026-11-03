@@ -5,7 +5,7 @@ eksperimen A/B, host, dan LIVE **NOT RUN**. **Baseline:** A (`complete` dan
 `catalog_version` per workspace) menurut CR-053. Dokumen ini melengkapi
 [kontrak contoh P1](trivia-draft-v2.md), [identitas P2-T1](trivia-fact-identity-v2.md),
 [corpus dan ambang P2-T2](../../supabase/tests/fixtures/trivia/dedup-v2/baseline-and-thresholds.md),
-TFL-06..10, serta [design](../../openspec/changes/simplify-trivia-draft-workflow/design.md).
+TFL-06..10, serta [design](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/design.md).
 Angka dan oracle di bawah dibekukan **sebelum** hasil retrieval v2 dilihat.
 Perubahan aturan memerlukan versi kontrak/fixture baru dan review sebelum evaluasi;
 hasil P3 tidak boleh dipakai untuk menyesuaikan expected.
@@ -16,7 +16,7 @@ menambah `fact_updated_at` pada setiap match sebagai CAS canonical maintenance,
 presisi enam digit dan berasal dari snapshot Read yang sama. Predicate, ranking,
 cap, `complete`, eligibility dan katalog A di dokumen ini tetap dibekukan;
 penambahan field bukan tuning retrieval. Bukti P5 terpisah dari status desain
-historis di atas dan tercatat pada [hasil P5](../../openspec/changes/simplify-trivia-draft-workflow/phase-5-results.md).
+historis di atas dan tercatat pada [hasil P5](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/phase-5-results.md).
 
 ## 1. Input, scope, dan himpunan kandidat wajib
 

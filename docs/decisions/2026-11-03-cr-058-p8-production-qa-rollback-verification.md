@@ -2,7 +2,7 @@
 
 **Status:** Accepted untuk **lokasi dan bentuk verifikasi P8-T1** serta
 rencana kriteria, target, pemicu dan prosedur pada
-[`phase-8-rollout-plan.md`](../../openspec/changes/simplify-trivia-draft-workflow/phase-8-rollout-plan.md);
+[`phase-8-rollout-plan.md`](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/phase-8-rollout-plan.md);
 tindakan cutover tetap memerlukan keputusan terpisah. **Tanggal:** 3 November 2026.
 **Change:** `simplify-trivia-draft-workflow`, P8-T1 / checklist 8.1.
 
@@ -48,4 +48,4 @@ readback dan G4 exact-SHA untuk perubahan backend. P8-T2 tetap menuntut retest
 LIVE yang relevan sebelum keputusan pensiun pembuatan v1.
 
 Rincian kriteria, inventaris dan prosedur yang diajukan dicatat pada
-[`phase-8-rollout-plan.md`](../../openspec/changes/simplify-trivia-draft-workflow/phase-8-rollout-plan.md).
+[`phase-8-rollout-plan.md`](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/phase-8-rollout-plan.md).

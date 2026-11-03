@@ -5,7 +5,7 @@
 Alur trivia saat ini membebankan struktur identitas, paket bukti sumber,
 reservasi, dan koordinasi payload yang rinci kepada ChatGPT sehingga permintaan
 draft dapat berhenti sebelum hasil tersimpan. Perubahan ini menjabarkan kebutuhan
-dalam [PRD alur draft sederhana](../../../plans/simplified-trivia-draft-workflow-prd.md)
+dalam [PRD alur draft sederhana](../../../../plans/simplified-trivia-draft-workflow-prd.md)
 agar instruksi biasa menghasilkan jumlah draft yang diminta, tersimpan utuh dan
 terbukti melalui readback, dengan keamanan serta riwayat tetap terjaga.
 
@@ -32,23 +32,23 @@ terbukti melalui readback, dengan keamanan serta riwayat tetap terjaga.
   pekerjaan internal; urutan rilis terpisah belum disetujui.
 - Pertahankan satu identitas canonical lintas v1/v2 serta keterbacaan dan arti
   riwayat lama. Menurut
-  [CR-054](../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md),
+  [CR-054](../../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md),
   v2 menjadi alur utama dan arah pensiun pembuatan v1 sudah diterima. Selama
   transisi, Read v1 boleh menolak kandidat wajib v2-native tanpa representasi
   ontologi v1 sah dengan `FACT_REVIEW_REQUIRED`; full native success projection
   v1 tidak diwajibkan. Request v1 lain yang sah, maintenance post/data lama,
   replay dan pekerjaan in-flight tetap dilindungi. Kriteria terukur, bukti dan
   izin pelaksanaan cutover serta rollback belum ditetapkan oleh keputusan arah ini.
-  [CR-058](../../../docs/decisions/2026-11-03-cr-058-p8-production-qa-rollback-verification.md)
+  [CR-058](../../../../docs/decisions/2026-11-03-cr-058-p8-production-qa-rollback-verification.md)
   menetapkan pemeriksaan kompatibilitas pada Page QA production sebagai bukti
   P8-T1, dengan batas bahwa rollback backend/plugin sungguhan belum terbukti.
-- Pertahankan baseline [rencana implementasi](../../../plans/simplified-trivia-draft-workflow-implementation-plan.md):
+- Pertahankan baseline [rencana implementasi](../../../../plans/simplified-trivia-draft-workflow-implementation-plan.md):
   **8 fase dan 23 task**. Gunakan G4 CR-052 manual exact-SHA sebagai gate rilis
   backend sesuai aturan repository terbaru.
 - **BREAKING — perubahan kontrak yang direncanakan, belum diberlakukan:** alur v2
   mengganti kewajiban sumber, ontologi input, reservasi, dan editorial v1; kelak
   penghentian pembuatan v1 juga memengaruhi plugin lama. Override diterima melalui
-  [CR-053](../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
+  [CR-053](../../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
   dan CR-054; implementasi serta verifikasi runtime tetap pekerjaan berikutnya.
   Envelope/input/output v1 yang masih sah tidak diganti mendadak menjadi schema v2.
 

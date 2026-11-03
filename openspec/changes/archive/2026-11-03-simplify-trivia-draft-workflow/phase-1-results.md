@@ -11,12 +11,12 @@ working-tree diff Phase 1. Ini bukan exact-SHA release evidence atau bukti live.
   ketidakpastian runtime, applied migration, data production, dan plugin aktif.
   Ketidakpastian itu tetap belum terverifikasi; tidak diubah menjadi PASS.
 - **P1-T2 selesai:** pemilik secara eksplisit menerima
-  [CR-053](../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
+  [CR-053](../../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
   dengan baseline A. Alternatif B, 7 hari/3 chat, rilis D1 sebelum D2, pensiun
   creation v1, deployment dan Write production tidak ikut disetujui.
 - **P1-T3 selesai pada lapisan kontrak/fixture:**
-  [kontrak contoh](../../../docs/contracts/trivia-draft-v2.md),
-  [taksonomi error](../../../docs/contracts/tool-errors-v2.md), tiga modul data
+  [kontrak contoh](../../../../docs/contracts/trivia-draft-v2.md),
+  [taksonomi error](../../../../docs/contracts/tool-errors-v2.md), tiga modul data
   schema/fixture/taksonomi, serta test kontrak tersedia dengan versi
   `cr-053-p1-v1`. Tidak ada implementasi handler/RPC/domain v2.
 

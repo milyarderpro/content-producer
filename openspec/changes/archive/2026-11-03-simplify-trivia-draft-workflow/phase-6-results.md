@@ -11,12 +11,12 @@ dan validasi change lulus. Bukti ini LOCAL/FIXTURE, bukan G4 atau LIVE.
 - Registry 36 tool (12 Read/24 Write), tiga adapter tipis v2, projection shared
   post/list/approval, serta maintenance request/response 2 CR-056. V1 sah tetap
   dilayani, termasuk batas native Read CR-054.
-- [CR-057](../../../docs/decisions/2026-11-02-cr-057-equivalent-mcp-catalog-schema.md)
+- [CR-057](../../../../docs/decisions/2026-11-02-cr-057-equivalent-mcp-catalog-schema.md)
   merekam persetujuan pemilik setelah pause awal: `$defs` lokal dan closure union
   ekuivalen. Batas katalog tidak dinaikkan; 15 kasus foundation/pilot PASS dengan
   OAuth 103896 byte, fixed-pilot di bawah 100000 byte. Test mengekspansi referensi
   dan membandingkan constraint dengan schema SDK.
-- Diagnostik seluruh tool: [matriks](../../../docs/contracts/tool-diagnostics-coverage.md),
+- Diagnostik seluruh tool: [matriks](../../../../docs/contracts/tool-diagnostics-coverage.md),
   input/access/domain/rate/network/timeout/oversize/schema/unknown, safe locations,
   legacy envelope/fallback, outcome Write dan ID yang cocok dengan log tersanitasi.
   Rate wait memakai metadata aktual bila ada; legacy tanpa metadata dinyatakan

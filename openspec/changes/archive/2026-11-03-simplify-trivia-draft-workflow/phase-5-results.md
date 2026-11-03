@@ -1,7 +1,7 @@
 # Hasil P5 — Setujui, lifecycle, dan maintenance fakta
 
 **Tanggal:** 2 November 2026. **Scope:** P5-T1/T2/T3, CR-053/054 dan
-[CR-056](../../../docs/decisions/2026-11-02-cr-056-versioned-trivia-maintenance.md).
+[CR-056](../../../../docs/decisions/2026-11-02-cr-056-versioned-trivia-maintenance.md).
 **Basis source:** `c6da942724dfb32f531581e372e6cb1e278c9820` + working diff P5,
 belum merupakan kandidat committed exact-SHA.
 **Issue:** [#117](https://github.com/milyarderpro/content-producer/issues/117).
@@ -22,7 +22,7 @@ belum merupakan kandidat committed exact-SHA.
   dari statement snapshot yang sama. Tests mengambilnya lewat Read publik lalu
   memakainya untuk CAS; tidak mengambil tanggal verifikasi dari snapshot post.
 - Tujuh migration additive baru; migration lama tidak ditulis ulang. Kontrak
-  rinci: [lifecycle v2](../../../docs/contracts/trivia-v2-lifecycle.md).
+  rinci: [lifecycle v2](../../../../docs/contracts/trivia-v2-lifecycle.md).
 
 ## Preflight dan hasil lokal
 

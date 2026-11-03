@@ -1,8 +1,8 @@
 # Tasks
 
-Checklist ini menjabarkan [plan baseline](../../../plans/simplified-trivia-draft-workflow-implementation-plan.md)
+Checklist ini menjabarkan [plan baseline](../../../../plans/simplified-trivia-draft-workflow-implementation-plan.md)
 menjadi **8 fase dan 23 task**, tanpa mengganti nomor atau pembagiannya. Acuan
-kebutuhan adalah [PRD](../../../plans/simplified-trivia-draft-workflow-prd.md),
+kebutuhan adalah [PRD](../../../../plans/simplified-trivia-draft-workflow-prd.md),
 [proposal](proposal.md), [design](design.md), dan tiga delta specs:
 
 - [Trivia draft workflow](specs/trivia-draft-workflow/spec.md): TDW-01..17.
@@ -12,7 +12,7 @@ kebutuhan adalah [PRD](../../../plans/simplified-trivia-draft-workflow-prd.md),
 Pernyataan scope proposal/design tentang pencatatan dua artefak merujuk langkah
 sebelumnya. Permintaan berikutnya mengizinkan penambahan specs dan checklist ini
 sebagai perencanaan. Penyelarasan 1 November 2026 mengikuti
-[CR-054](../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md)
+[CR-054](../../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md)
 yang diterima setelah P1. Progres apply dicatat per task beserta bukti.
 Verifikasi kontrak/mock P1 dan review statis P2-T1 terpisah dari pengujian
 backend/host/LIVE v2 yang masih **NOT RUN**.
@@ -73,7 +73,7 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       sebelum coding terkait, dan tidak memberi izin rilis/Write tersirat atau
       mengaktifkan B, ambang cutover, maupun rilis D1 saja.
       **Bukti:** pemilik menerima
-      [CR-053](../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
+      [CR-053](../../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
       secara eksplisit pada 31 Oktober 2026 dengan baseline A. Pengecualian B,
       angka cutover, rilis D1 sebelum D2, pensiun v1, deployment, dan Write
       production tidak ikut diterima pada P1; ketidakpastian P1-T1 tidak ditutup.
@@ -86,8 +86,8 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       ID diagnostik aman, tiga editorial, dan gate Setujui. **Verifikasi:** contoh
       ditinjau terhadap TDW/TFL/TDX, fixture kontrak/schema memeriksa bentuk dan
       kompatibilitas v1, serta dokumentasi menjelaskan izin scoped dan batas bukti.
-      **Bukti:** [kontrak contoh](../../../docs/contracts/trivia-draft-v2.md),
-      [taksonomi error](../../../docs/contracts/tool-errors-v2.md), serta
+      **Bukti:** [kontrak contoh](../../../../docs/contracts/trivia-draft-v2.md),
+      [taksonomi error](../../../../docs/contracts/tool-errors-v2.md), serta
       [hasil Phase 1](phase-1-results.md), versi `cr-053-p1-v1`.
       `pnpm run check` PASS (13 file/122 root cases, termasuk 31 kontrak baru,
       frontend 19), focused MCP v1 Deno 2.9.7 PASS (6 file/36 kasus).
@@ -107,7 +107,7 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       masing-masing status invalidated/superseded/rejected diganti, bukan dipakai
       atau diberi ID baru untuk melewati riwayatnya.
       **Bukti/penerimaan koordinator:**
-      [kontrak identitas](../../../docs/contracts/trivia-fact-identity-v2.md) §1–6
+      [kontrak identitas](../../../../docs/contracts/trivia-fact-identity-v2.md) §1–6
       dan S01–S22 (termasuk S11a/b), serta CR-054, direview mandiri pada
       `a15f39483177bba3c99cf0066f3972f44963e591` di
       [PR #109](https://github.com/milyarderpro/content-producer/pull/109),
@@ -151,7 +151,7 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       kandidat baru, race lintas versi, penolakan tidak terkait, waktu tunggu, dan
       rollback masuk protokol. Hasil eksperimen yang belum ada tetap NOT RUN;
       setiap usulan mengganti A menunggu bukti dan keputusan pemilik.
-      **Bukti:** [kontrak Read P2-T3](../../../docs/contracts/trivia-fact-read-v2.md)
+      **Bukti:** [kontrak Read P2-T3](../../../../docs/contracts/trivia-fact-read-v2.md)
       membekukan predicate exact/full-text/trigram, urutan dan cap 20,
       `complete` relatif terhadap himpunan wajib, event katalog A, tindakan
       penggantian, oracle O01–O16 dan protokol A/B. Review statis memeriksa
@@ -249,8 +249,8 @@ backend/host/LIVE v2 yang masih **NOT RUN**.
       dokumentasi membedakan canonical URL, URL draft, serta riwayat post v1/v2.
 
 **Bukti P5-T1/T2/T3:** [hasil P5](phase-5-results.md),
-[kontrak lifecycle v2](../../../docs/contracts/trivia-v2-lifecycle.md),
-dan [CR-056 Accepted](../../../docs/decisions/2026-11-02-cr-056-versioned-trivia-maintenance.md)
+[kontrak lifecycle v2](../../../../docs/contracts/trivia-v2-lifecycle.md),
+dan [CR-056 Accepted](../../../../docs/decisions/2026-11-02-cr-056-versioned-trivia-maintenance.md)
 untuk maintenance versi 2 serta timestamp CAS pada Read. Fokus P5 PASS 18 kasus;
 Read/corpus/P5 PASS 4 file/22 kasus, regresi legacy/P4 PASS 6 file/53 kasus,
 source check PASS 150 root + 19 frontend. Ini bukti lokal/fixture, bukan G4
@@ -285,8 +285,8 @@ mengikuti izin terpisah. Inventaris G4 menjadi 46 file/221 kasus tanpa skip.
       menyamakan draft dengan Setujui atau HTTP 200 dengan tersimpan.
 
 **Bukti P6-T1/T2/T3:** [hasil P6](phase-6-results.md),
-[CR-057 Accepted](../../../docs/decisions/2026-11-02-cr-057-equivalent-mcp-catalog-schema.md),
-dan [matriks seluruh tool](../../../docs/contracts/tool-diagnostics-coverage.md).
+[CR-057 Accepted](../../../../docs/decisions/2026-11-02-cr-057-equivalent-mcp-catalog-schema.md),
+dan [matriks seluruh tool](../../../../docs/contracts/tool-diagnostics-coverage.md).
 Source check final PASS 14 file/153 root + 19 frontend; MCP PASS 17 file/127
 kasus, termasuk enam kasus v2 dan 39 diagnostik seluruh 36 tool. Test paket/
 instruksi PASS 4 file/35; build/verifikasi kandidat 0.3.0 PASS 13 file. Katalog
@@ -344,7 +344,7 @@ deployment/instalasi dan LIVE tetap P7/P8, NOT RUN pada sesi ini.
       sebagai syarat diterima. Pertahankan v1 dengan batas Read CR-054 serta
       maintenance/replay/in-flight yang sah; arah pensiun bukan izin cutover.
       Tanpa izin deployment/pemasangan, bagian itu BLOCKED.
-      **Bukti:** [CR-058](../../../docs/decisions/2026-11-03-cr-058-p8-production-qa-rollback-verification.md)
+      **Bukti:** [CR-058](../../../../docs/decisions/2026-11-03-cr-058-p8-production-qa-rollback-verification.md)
       menerima pemeriksaan Page QA production dan persetujuan rencana pemilik;
       [hasil P8-T1](phase-8-rollout-plan.md) mencatat runtime/gate P7, inventaris
       plugin lama, data campuran, Read v1/v2 dan plan yang tidak berubah.

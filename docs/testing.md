@@ -61,7 +61,7 @@ dan manifest ikut hash input G4. Negative control lokal opsional
 fixture-kosong, memeriksa drift grant/RLS/helper/policy/constraint dalam transaksi
 yang di-rollback, lalu mengaudit state akhir. Jangan jalankan pada production.
 Pin tidak diperbarui otomatis dari hasil gate. Bukti lokal dan run G4 awal yang
-gagal dicatat di [hasil P7](../openspec/changes/simplify-trivia-draft-workflow/phase-7-results.md);
+gagal dicatat di [hasil P7](../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/phase-7-results.md);
 hasil lokal bukan formal G4 PASS atau host ChatGPT PASS.
 
 | Command dari root                                  | Cakupan                                                                             | Prasyarat / efek                                                                                  |
