@@ -350,7 +350,7 @@ deployment/instalasi dan LIVE tetap P7/P8, NOT RUN pada sesi ini.
       plugin lama, data campuran, Read v1/v2 dan plan yang tidak berubah.
       Rollback deployment NOT RUN, instalasi aktif lama UNVERIFIED, dan pensiun
       pembuatan v1 menunggu P8-T2 serta izin tindakan tersendiri.
-- [ ] 8.2 **P8-T2 Retest live:** pada runtime dan objek berizin, uji ulang alur
+- [x] 8.2 **P8-T2 Retest live:** pada runtime dan objek berizin, uji ulang alur
       ujung-ke-ujung dengan readback, pantau keberhasilan jumlah draft, error,
       duplikasi yang ditemukan, dan pemakaian pembuatan v1 versus maintenance.
       Arah pensiun pembuatan v1 sudah diterima CR-054; ajukan pelaksanaannya
@@ -359,6 +359,12 @@ deployment/instalasi dan LIVE tetap P7/P8, NOT RUN pada sesi ini.
       tidak memberi FIXED sebelum retest relevan, mempertahankan post/snapshot dan
       pekerjaan in-flight, serta mencatat keputusan pemilik; bukti penggunaan lama
       yang tidak tersedia tidak dihitung sebagai nol atau cutover PASS.
+      **Bukti:** [hasil P8-T2](phase-8-results.md) mencatat satu draft v2
+      barcode berizin tersimpan dan terbaca kembali melalui host production,
+      jumlah post v2 9→10 tanpa duplikat yang ditemukan pada scope uji,
+      sampel v1/v2 dan snapshot lama utuh, serta telemetri v1 yang terbatas.
+      Pensiun pembuatan v1 tetap BLOCKED oleh inventaris plugin lama dan
+      kriteria cutover lain yang belum terbukti; tidak ada tindakan cutover.
 
 ## Workflow follow-up
 
