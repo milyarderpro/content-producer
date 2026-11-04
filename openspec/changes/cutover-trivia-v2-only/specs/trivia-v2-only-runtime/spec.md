@@ -60,3 +60,7 @@ Rilis MUST diverifikasi dengan gate exact-SHA, penolakan v1, keamanan owner, dan
 #### Scenario: Retest sesudah rilis
 - **WHEN** backend dan plugin terbaru telah terpasang
 - **THEN** laporan memisahkan SHA source, versi terpasang, hasil database live, dan hasil host v2
+
+#### Scenario: Resolusi runtime berbeda antar runner
+- **WHEN** G4 memilih runtime untuk source, dua shard database, dan aggregate
+- **THEN** satu resolver memilih dan memvalidasi Node/Deno dalam range yang disetujui, semua job memakai versi exact hasil yang sama, dan output tidak sah atau drift versi aktual menggagalkan gate tanpa deployment atau reset

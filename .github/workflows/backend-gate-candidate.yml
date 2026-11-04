@@ -16,7 +16,53 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  runtime:
+    name: Resolve one validated toolchain for this run
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      node: ${{ steps.versions.outputs.node }}
+      deno: ${{ steps.versions.outputs.deno }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify exact dispatch identity before runtime resolution
+        env:
+          CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$GITHUB_EVENT_NAME" = workflow_dispatch
+          test "$GITHUB_REF" = refs/heads/main
+          test "$GITHUB_SHA" = "$CANDIDATE_SHA"
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_SHA"
+          test -z "$(git status --porcelain=v1 --untracked-files=all)"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '>=22 <25'
+          check-latest: true
+          cache: pnpm
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: '>=2.9.7 <3'
+      - name: Export validated exact runtime versions
+        id: versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile >/dev/null
+          pnpm exec tsx scripts/gate-runtime.ts
+
   source:
+    needs: runtime
     name: Candidate source at exact SHA
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
@@ -32,11 +78,11 @@ jobs:
           run_install: false
       - uses: actions/setup-node@v4
         with:
-          node-version: '>=22 <25'
+          node-version: ${{ needs.runtime.outputs.node }}
           cache: pnpm
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: '>=2.9.7 <3'
+          deno-version: ${{ needs.runtime.outputs.deno }}
       - name: Verify exact dispatch identity
         env:
           CANDIDATE_SHA: ${{ inputs.candidate_sha }}
@@ -68,6 +114,7 @@ jobs:
           retention-days: 14
 
   database:
+    needs: runtime
     name: Candidate DB shard ${{ matrix.shard }} exact SHA
     if: github.ref == 'refs/heads/main'
     strategy:
@@ -106,11 +153,11 @@ jobs:
           run_install: false
       - uses: actions/setup-node@v4
         with:
-          node-version: '>=22 <25'
+          node-version: ${{ needs.runtime.outputs.node }}
           cache: pnpm
       - uses: denoland/setup-deno@v2
         with:
-          deno-version: '>=2.9.7 <3'
+          deno-version: ${{ needs.runtime.outputs.deno }}
       - name: Run isolated Supabase stack, reset, fixtures and serial shard
         shell: bash
         env:
@@ -135,7 +182,7 @@ jobs:
 
   aggregate:
     name: G4 release evidence aggregate (manual exact SHA)
-    needs: [source, database]
+    needs: [runtime, source, database]
     if: always()
     runs-on: ubuntu-24.04
     steps:
@@ -149,16 +196,18 @@ jobs:
           run_install: false
       - uses: actions/setup-node@v4
         with:
-          node-version: '>=22 <25'
+          node-version: ${{ needs.runtime.outputs.node }}
           cache: pnpm
       - name: Verify both jobs succeeded before evidence
         shell: bash
         env:
           CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+          RUNTIME_JOB: ${{ needs.runtime.result }}
           SOURCE_JOB: ${{ needs.source.result }}
           DATABASE_JOB: ${{ needs.database.result }}
         run: |
           set -euo pipefail
+          test "$RUNTIME_JOB" = success
           test "$SOURCE_JOB" = success
           test "$DATABASE_JOB" = success
           [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
