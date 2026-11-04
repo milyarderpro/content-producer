@@ -47,7 +47,7 @@ export async function runCatalogAudit(): Promise<void> {
   // must still match the archive, including its body and least-privilege ACL.
   const allowedSourceChanges = new Set([
     'api.get_page_generation_context', 'api.get_post', 'api.list_posts', 'api.reschedule_post',
-    'api.trivia_find_similar_facts', 'internal.assert_write_operation_name_v1',
+    'internal.assert_write_operation_name_v1',
     'internal.canonical_request_hash_v1', 'internal.lifecycle_current_system_v1',
     'internal.lifecycle_effective_gate_v1', 'internal.lifecycle_evidence_history_valid_v1',
     'internal.lifecycle_evidence_v1', 'internal.lifecycle_raise_v1', 'internal.lifecycle_response_valid_v1',
@@ -57,8 +57,17 @@ export async function runCatalogAudit(): Promise<void> {
     'internal.trivia_response_valid_v5', 'internal.trivia_rpc_raise_v1', 'internal.validate_post_row',
   ]);
   const sourceDeltas: string[] = [];
+  const retiredApi = new Set(['api.trivia_find_similar_facts', 'api.trivia_register_and_reserve_facts',
+    'api.trivia_release_facts', 'api.save_post', 'api.revise_post']);
+  const retiredMaintenanceV1 = new Set(['api.trivia_reverify_fact', 'api.trivia_correct_fact']);
+  const retiredSignatures: string[] = [];
   for (const previous of archived.extra.functions as CatalogFunction[]) {
     const current = catalog.functions.find(({ signature }) => signature === previous.signature);
+    if (!current && (retiredApi.has(previous.signature.split('(')[0]!) ||
+      retiredMaintenanceV1.has(previous.signature.split('(')[0]!))) {
+      retiredSignatures.push(previous.signature);
+      continue;
+    }
     assert.ok(current, `ARCHIVED_FUNCTION_REMOVED:${previous.signature}`);
     assert.deepEqual({ ...current, source_sha256: previous.source_sha256 }, previous,
       `ARCHIVED_FUNCTION_METADATA_DRIFT:${previous.signature}`);
@@ -69,25 +78,27 @@ export async function runCatalogAudit(): Promise<void> {
     }
   }
   assert.equal(sourceDeltas.length, allowedSourceChanges.size);
+  assert.deepEqual([...new Set(retiredSignatures.map((signature) => signature.split('(')[0]))].sort(),
+    [...retiredApi, ...retiredMaintenanceV1].sort(), 'RETIRED_V1_API_INVENTORY_DRIFT');
 
   // Reuse every closed-grant/RLS/ledger/fixture invariant from the historical
   // SELECT-only query. Only its explicit API allowlist is extended for CR-053.
-  const auditSql = readFileSync('docs/phase-5-8-catalog-audit.sql', 'utf8').replace(
-    "'trivia_find_similar_facts',", "'trivia_find_similar_facts','trivia_find_similar_facts_v2','save_post_v2','revise_post_v2',",
-  );
+  let auditSql = readFileSync('docs/phase-5-8-catalog-audit.sql', 'utf8');
+  for (const name of retiredApi) auditSql = auditSql.replace(`'${name.slice(4)}',`, '');
+  auditSql = auditSql.replace("'trivia_reverify_fact',",
+    "'trivia_find_similar_facts_v2','save_post_v2','revise_post_v2','trivia_reverify_fact',");
   const audit = JSON.parse(sql(`begin read only; ${auditSql} commit;`));
-  assert.equal(audit.api_function_count, 38); // 36 names + two CR-056 maintenance overloads.
-  assert.equal(audit.authenticated_api_execute_count, 38);
+  assert.equal(audit.api_function_count, 31);
+  assert.equal(audit.authenticated_api_execute_count, 31);
   assert.equal(audit.business_table_count, 17);
   assert.equal(audit.rls_enabled_table_count, 17);
   // The legacy query counts overloads/names, not signature sets. Validate both
   // exactly here; all metadata/source/ACL is additionally covered by the pin.
   const api = catalog.functions.filter(({ signature }) => signature.startsWith('api.'));
   const names = api.map(({ signature }) => signature.slice(4, signature.indexOf('(')));
-  assert.equal(new Set(names).size, 36);
-  assert.deepEqual([...new Set(names.filter((name) => names.filter((n) => n === name).length > 1))].sort(),
-    ['trivia_correct_fact', 'trivia_reverify_fact']);
-  assert.equal(audit.overloaded_api_count, 2);
+  assert.equal(new Set(names).size, 31);
+  assert.deepEqual([...new Set(names.filter((name) => names.filter((n) => n === name).length > 1))].sort(), []);
+  assert.equal(audit.overloaded_api_count, 0);
   assert.equal(audit.allowlist_difference_count, 0);
   assert.equal(audit.metrics_immutable_trigger, 1);
   for (const [key, value] of Object.entries(audit)) {
@@ -135,5 +146,5 @@ export async function runCatalogAudit(): Promise<void> {
     migration_count: manifest.length, manifest, catalog, audit, legacy, extra,
     accepted_sections: pin.sections, archived_source_deltas: sourceDeltas, evidence: 'LOCAL_CATALOG_ONLY',
   }, null, 2));
-  console.info('P7 catalog: 84 source/applied migrations, 36 RPC names/38 signatures, 17/17 RLS, exact schema/source/ACL and zero fixtures/faults: PASS.');
+  console.info('CR-059 catalog: 85 source/applied migrations, 31 RPC names/signatures, five v1 names absent, 17/17 RLS, exact schema/source/ACL and zero fixtures/faults: PASS.');
 }

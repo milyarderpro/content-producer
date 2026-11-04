@@ -1,12 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import {
   fixture,
-  cleanup,
-  save,
-  request,
   rpc as postRpc,
-  ready,
-  posted,
+  get,
+  approve,
+  publish,
   type Fixture,
   type Post,
   json,
@@ -15,8 +13,12 @@ import {
   sql,
 } from './post-lifecycle.js';
 import { rpc } from './trivia-rpc.js';
+import { cleanup as v2Cleanup, draft as v2Draft } from './trivia-v2.js';
 export * from './post-lifecycle.js';
 export { rpc as metricRpc } from './trivia-rpc.js';
+export function cleanup(f: Fixture): void {
+  v2Cleanup(f);
+}
 export type Snapshot = {
   metric_snapshot_public_id: string;
   post_public_id: string;
@@ -38,7 +40,11 @@ export type History = {
   has_more: boolean;
 };
 export function published(f: Fixture): Post {
-  return posted(f, ready(f, postRpc(f, save(f, request(f))).data.post));
+  const draft = v2Draft(f, undefined, `Jar ${randomUUID().slice(0, 8)}`);
+  postRpc(f, approve(f, get(f, draft.post_public_id), randomUUID(), []));
+  const ready = get(f, draft.post_public_id);
+  postRpc(f, publish(f, ready));
+  return get(f, draft.post_public_id);
 }
 export function metricSource(source_type = 'facebook_ui'): Record<string, unknown> {
   return { source_type, metric_definition_version: 1 };

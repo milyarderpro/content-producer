@@ -2,12 +2,10 @@
 
 **Current v2 precedence:** use current Page fact count, allowed choices and hard
 budgets. The five formats/two density preferences still guide composition, but
-do not import legacy source-tier/sensitive-topic quotas, expiry or approval
-waivers. Use the common sentence + one URL research path. If a factual qualifier
+use the common sentence + one URL research path without extra source-tier or expiry gates. If a factual qualifier
 cannot fit, replace the angle/fact; do not require a year on every line. V2
 save/revise rejects a hard violation, computes metrics, and requires three
-editorial pass results. The legacy waiver/readability discussion below describes
-v1 readiness only; never bypass a v2 count/budget failure with a legacy waiver.
+editorial pass results. Never bypass a v2 count or budget failure.
 
 Frozen authority: `plans/trivia-content-dna.md` sections 7–9, 11–15, 24 and `plans/phase-0-decision-register.md` QUALITY-001/002. Use only the five named `format_key` values permitted by current Page config. `architecture` describes the collection (`single_subject`, `themed`, `mixed`); it does not replace `format_key`.
 
@@ -19,7 +17,7 @@ Default `fast_trivia`; prefer 7–8 facts, 8–11 words each, on **one familiar 
 
 ### `themed_utility`
 
-Default `practical_utility`; prefer 5–6 facts, 10–14 words each, with object + safe condition/action + outcome. One narrow practical theme with independently substantiated consequences. `themed` is default; narrow `single_subject` is allowed. A random science fact breaks collection fit. Food/pet/household safety requires [sensitive evidence](fact-checking.md), not clever home remedies.
+Default `practical_utility`; prefer 5–6 facts, 10–14 words each, with object + safe condition/action + outcome. One narrow practical theme with independently substantiated consequences. `themed` is default; narrow `single_subject` is allowed. A random science fact breaks collection fit. Food/pet/household safety needs credible support and cautious wording, not clever home remedies.
 
 ### `emotional_animal_collection`
 
@@ -31,16 +29,16 @@ Default `fast_trivia`, commonly 5–8 facts. Supports `single_subject`, `themed`
 
 ### `myth_vs_fact`
 
-Choose `fast_trivia` or `practical_utility` based on subject; prefer 5–7 corrections. The belief must actually be common or clearly framed as a misconception. Give the precise correction, with short reasoning when needed, without repeating a dangerous claim as fact. May be `single_subject`, `themed` or a device-consistent `mixed`. Medical claims require sensitive-topic evidence or rejection.
+Choose `fast_trivia` or `practical_utility` based on subject; prefer 5–7 corrections. The belief must actually be common or clearly framed as a misconception. Give the precise correction, with short reasoning when needed, without repeating a dangerous claim as fact. May be `single_subject`, `themed` or a device-consistent `mixed`. Avoid medical advice; replace unsupported or unsafe claims.
 
 ## Two preferred density profiles
 
 - `fast_trivia`: 7–8 facts, 8–11 words/fact, around 45–70 characters/fact, 65–85 words total Canva copy.
 - `practical_utility`: 5–6 facts, 10–14 words/fact, around 65–90 characters/fact, 65–85 words total.
 
-These are **preferences**, not hard gates. Page-config default counts are adaptive 5–9 (preferred 7); only explicit eligible `FACT_COUNT_BELOW_CONFIG_MIN` waiver can allow 1–4, never less than one, and cannot silently override a fixed count. The hard readiness limits are at most 18 words/fact, 12 in hook, 14 in CTA, 100 Canva words, 3 wrapped lines/fact, 2 wrapped lines for hook or CTA, `replay_ratio` 2.5, `estimated_loops` 3. Total estimated visual lines remain a server-reported metric, **not** a hard limit or approval warning under CR-051. Other hard failures cannot be waived.
+These are **preferences**, not hard gates. Page-config default counts are adaptive 5–9 (preferred 7); follow the configured count and do not silently reduce it. The hard readiness limits are at most 18 words/fact, 12 in hook, 14 in CTA, 100 Canva words, 3 wrapped lines/fact, 2 wrapped lines for hook or CTA, `replay_ratio` 2.5, `estimated_loops` 3. Total estimated visual lines remain a server-reported metric, **not** a hard limit or approval warning under CR-051. Hard failures cannot be waived.
 
-During composition, aim comfortably within the preferred word range: use a short, specific hook and CTA, remove redundant wording, and prefer facts that express their meaning compactly. Preserve material qualifiers and replace a fact that cannot fit honestly. Do not claim an exact line count before the server renders the copy, and never supply calculated `text_metrics`; send `{}` as the core workflow requires. A saved draft with another hard readability failure stays a draft requiring review, not a successful quality pass.
+During composition, aim comfortably within the preferred word range: use a short, specific hook and CTA, remove redundant wording, and prefer facts that express their meaning compactly. Preserve material qualifiers and replace a fact that cannot fit honestly. Do not claim an exact line count before the server renders the copy, and never supply calculated `text_metrics`; send `{}` as the core workflow requires. A hard readability failure requires repair before a successful save or approval.
 
 ## Canonical output
 

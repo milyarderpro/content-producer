@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { writeCr016Evidence } from '../../../scripts/evidence-output.js';
-import { fixture, cleanup, sql } from './helpers/trivia-rpc.js';
+import { fixture, sql } from './helpers/trivia-rpc.js';
+import { cleanup } from './helpers/trivia-v2.js';
 import { populateSearch } from './helpers/trivia-performance.js';
 
 describe('CR-016 public populated retrieval', () => {
-  it('P1-02 authenticated 5,001-fact public search p95 and normal-planner plans', async () => {
+  it('P1-02 authenticated 5,001-fact v2 search p95 and normal-planner plans', async () => {
     const f = fixture();
     try {
       const harness = populateSearch(f);

@@ -26,11 +26,10 @@ const domains: Record<string, string> = {
   get_content_plan: 'PLAN_NOT_FOUND', claim_content_plan_items: 'PLAN_STATUS_CONFLICT',
   renew_content_plan_claim: 'PLAN_CLAIM_RENEWAL_LIMIT', report_content_plan_item_failure: 'PLAN_ITEM_CLAIM_EXPIRED',
   retry_content_plan_item: 'PLAN_STATUS_CONFLICT', replace_discarded_plan_item: 'PLAN_ITEM_REPLACEMENT_BLOCKED',
-  cancel_content_plan: 'PLAN_STATUS_CONFLICT', trivia_find_similar_facts: 'FACT_REVIEW_REQUIRED',
-  trivia_register_and_reserve_facts: 'FACT_SOURCE_INSUFFICIENT', trivia_release_facts: 'FACT_RESERVATION_MISMATCH',
+  cancel_content_plan: 'PLAN_STATUS_CONFLICT',
   trivia_reverify_fact: 'FACT_CORRECTION_CONFLICT', trivia_correct_fact: 'FACT_CORRECTION_REQUIRED',
-  save_post: 'FACT_RESERVATION_EXPIRED', list_posts: 'PAGE_NOT_FOUND', get_post: 'POST_NOT_FOUND',
-  revise_post: 'REVISION_CONFLICT', reschedule_post: 'SCHEDULE_CONFLICT', approve_post: 'QUALITY_EVIDENCE_STALE',
+  list_posts: 'PAGE_NOT_FOUND', get_post: 'POST_NOT_FOUND',
+  reschedule_post: 'SCHEDULE_CONFLICT', approve_post: 'QUALITY_EVIDENCE_STALE',
   revoke_post_approval: 'CONTENT_HASH_CONFLICT', discard_post: 'INVALID_STATUS_TRANSITION',
   mark_post_posted: 'APPROVAL_REQUIRED', archive_post: 'INVALID_STATUS_TRANSITION',
   record_post_performance: 'METRIC_SNAPSHOT_CONFLICT', get_post_performance: 'POST_NOT_FOUND',
@@ -105,7 +104,7 @@ for (const tool of tools) {
 }
 Deno.test('P6 diagnostic inventory is exactly the actual 36-tool catalog, including D2', () => {
   const expected = errorTaxonomy.groups.flatMap(g => [...g.reads, ...g.writes]).sort();
-  check(tools.length === 36 && new Set(tools.map(t => t.name)).size === 36, 'catalog drift');
+  check(tools.length === 31 && new Set(tools.map(t => t.name)).size === 31, 'catalog drift');
   check(JSON.stringify(tools.map(t => t.name).sort()) === JSON.stringify(expected), 'diagnostic coverage drift');
   check(JSON.stringify(Object.keys(domains).sort()) === JSON.stringify(expected), 'per-tool domain inventory drift');
 });

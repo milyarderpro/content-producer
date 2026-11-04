@@ -25,8 +25,19 @@ production. Lihat [CR-059](decisions/2026-11-03-cr-059-trivia-v2-only-cutover.md
 Sesudah URL fakta v2 diperbarui, status `needs_review` tetap sah dalam respons
 `trivia_reverify_fact`; pembaruan URL sendiri tidak menyatakan fakta sudah diverifikasi ulang.
 
-Bagian inventaris 36/33 tool di bawah adalah kontrak historis sebelum cutover.
-Sinkronisasi panduan keseluruhan dijadwalkan pada task 4.2.
+## Katalog operasional source cutover: 31 tool
+
+Daftar aktif adalah 28 tool bersama dari inventaris 33 di bawah, ditambah
+`trivia_find_similar_facts_v2`, `save_post_v2`, dan `revise_post_v2`.
+Lima nama v1 yang tercantum pada bagian historis tidak ada dalam katalog baru.
+Ada 11 Read dan 20 Write. Schema v2 lengkap ada di
+[kontrak draft v2](contracts/trivia-draft-v2.md); source/fixture ini belum
+menyatakan versi production sudah berpindah. Jangan memakai contoh v1 di bawah
+sebagai prosedur baru.
+
+## Kontrak historis sebelum cutover
+
+Bagian inventaris 36/33 tool di bawah dipertahankan sebagai rekam kontrak lama.
 
 ## Katalog transisi v2 — source P6 (2 November 2026)
 

@@ -299,11 +299,13 @@ async function inspector(method: string, name?: string, input?: object, expected
     child.on('close', (code) => resolve({ code: code ?? 1, output }));
   });
   check(!result.output.includes(bearer), 'INSPECTOR_BEARER_LEAK');
+  const parsed = result.output.trim() ? JSON.parse(result.output) : {};
+  const rawCode = String(parsed?.result?.structuredContent?.error?.code ?? 'UNKNOWN');
+  const safeCode = /^[A-Z_]{1,60}$/.test(rawCode) ? rawCode : 'UNSAFE_ERROR';
   check(
     result.code === expectedExit,
-    `INSPECTOR_EXIT_${method.replaceAll('/', '_').toUpperCase()}_${(name ?? 'handshake').toUpperCase()}_${result.code}_EXPECTED_${expectedExit}`,
+    `INSPECTOR_EXIT_${method.replaceAll('/', '_').toUpperCase()}_${(name ?? 'handshake').toUpperCase()}_${result.code}_EXPECTED_${expectedExit}_${safeCode}`,
   );
-  const parsed = result.output.trim() ? JSON.parse(result.output) : {};
   console.info(`Inspector 2.5.0 ${method} ${name ?? ''}: exit ${result.code}`);
   return parsed.result;
 }
@@ -438,7 +440,175 @@ try {
     'INITIALIZE',
   );
   const tools = (await rpcHttp('tools/list')).body.result.tools;
-  check(tools.length === 36, 'EXACT_36_TOOLS');
+  const v2Inspector = process.argv.includes('--v2-inspector');
+  check(tools.length === (v2Inspector ? 31 : 36), 'EXACT_TOOL_COUNT');
+  if (v2Inspector) {
+    const names = tools.map((tool: { name: string }) => tool.name);
+    const retired = ['trivia_find_similar_facts', 'trivia_register_and_reserve_facts',
+      'trivia_release_facts', 'save_post', 'revise_post'];
+    check(new Set(names).size === 31 && retired.every(name => !names.includes(name)), 'V2_CATALOG_CENSUS');
+    await inspector('initialize');
+    const listed = await inspector('tools/list');
+    check(listed.tools.length === 31 && listed.tools.every((tool: { name: string }) => names.includes(tool.name)), 'INSPECTOR_V2_CENSUS');
+    const validNames = new Set<string>();
+    // Inspector JSON is dynamically typed; each response is checked before use.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const valid = async (name: string, input: object): Promise<any> => {
+      const result = await inspector('tools/call', name, input);
+      const data = name === 'get_account_profile' ? result?.structuredContent : result?.structuredContent?.data;
+      if (result?.isError === true || !data) {
+        const rawCode = String(result?.structuredContent?.error?.code ?? 'MISSING_DATA');
+        const code = /^[A-Z_]{1,60}$/.test(rawCode) ? rawCode : 'UNSAFE_ERROR';
+        throw new Error('INSPECTOR_V2_VALID_' + name.toUpperCase() + '_' + code);
+      }
+      check(!validNames.has(name), 'INSPECTOR_V2_DUPLICATE_VALID');
+      validNames.add(name);
+      return data;
+    };
+    await valid('get_account_profile', {});
+    await valid('get_workspace_context', common());
+    await valid('list_pages', common());
+    const context = await valid('get_page_generation_context', { ...common(), page_public_id: f.page, niche_key: 'trivia' });
+    const config = row<{ config: object }>('select internal.default_trivia_config_v1() config').config;
+    const page = (await valid('create_page', { ...write(), name: 'V2 Inspector Page', slug: f.prefix + '-v2-inspector',
+      timezone: 'UTC', target_markets: ['US'], niche_key: 'trivia', config_schema_version: 1, config })).page;
+    await valid('update_page', { ...write(), page_public_id: page.page_public_id,
+      expected_page_updated_at: page.updated_at, page_patch: { name: 'V2 Inspector Page updated' } });
+    await valid('list_content_plans', common());
+    const plan = await valid('create_content_plan', { ...write(), page_public_id: page.page_public_id,
+      niche_key: 'trivia', config_schema_version: 1, plan_intent: 'Local v2 Inspector fixture.',
+      items: [1, 2].map(position => ({ position, topic_key: 'animals', format_key: 'single_subject_fast',
+        interaction_goal: 'share', item_config: {}, scheduled_at: null })) });
+    await valid('get_content_plan', { ...common(), plan_public_id: plan.plan.plan_public_id });
+    const leased = (await valid('claim_content_plan_items', { ...write(), plan_public_id: plan.plan.plan_public_id,
+      lease_minutes: 30, limit: 1 })).claimed_items[0];
+    const lease = { plan_item_public_id: leased.item.plan_item_public_id, claim_token: leased.claim_token };
+    await valid('renew_content_plan_claim', { ...write(), ...lease });
+    await valid('report_content_plan_item_failure', { ...write(), ...lease, failure_code: 'FACT_SOURCE_INSUFFICIENT',
+      failure_detail: 'Synthetic source was insufficient.', retry_recommended: true });
+    await valid('retry_content_plan_item', itemArgs(leased.item.plan_item_public_id));
+    const replacementItem = plan.items[1].plan_item_public_id;
+    completeFixtureItem(replacementItem);
+    const replacementPost = insertPost(replacementItem);
+    await valid('replace_discarded_plan_item', { ...itemArgs(replacementItem),
+      discarded_post_public_id: replacementPost, explicit_replacement: true });
+    await valid('cancel_content_plan', { ...write(), plan_public_id: plan.plan.plan_public_id,
+      reason: 'Close local fixture.', explicit_cancellation: true });
+
+    const facts = Array.from({ length: 5 }, (_, i) => ({ position: i + 1, candidate_key: `v2_${i}`,
+      claim_text: randomUUID().replaceAll('-', ''), source_url: 'https://example.org/fixture/inspector',
+      dedup: { complete: true, decision: 'distinct', fact_public_id: null as string | null,
+        reviews: [] as Array<{ fact_public_id: string; decision: string }> } }));
+    const readArgs = { request_schema_version: 2, workspace_public_id: f.workspace, page_public_id: f.page,
+      candidates: facts.map(({ candidate_key, claim_text }) => ({ candidate_key, claim_text })) };
+    const similar = await valid('trivia_find_similar_facts_v2', readArgs);
+    similar.candidates.forEach((candidate: { complete: boolean; matches: Array<{ fact_public_id: string }> }, i: number) => {
+      check(candidate.complete, 'V2_INSPECTOR_DEDUP_INCOMPLETE');
+      facts[i]!.dedup.reviews = candidate.matches.map(match => ({ fact_public_id: match.fact_public_id, decision: 'distinct' }));
+    });
+    const content = { schema_version: 2, hook: 'Synthetic local fixture',
+      body: { facts: facts.map(({ position, claim_text }) => ({ position, text: claim_text })) },
+      cta: 'Fixture only.', canva_copy: '', caption: 'Synthetic local fixture.', hashtags: ['#Fixture'],
+      render_style: 'plain_lines', text_metrics: {} };
+    content.canva_copy = [content.hook, ...facts.map(fact => fact.claim_text), content.cta].join('\n\n');
+    const saveArgs = { request_schema_version: 2, workspace_public_id: f.workspace, operation_key: randomUUID(),
+      page_public_id: f.page, niche_key: 'trivia', config_public_id: context.config_public_id,
+      expected_config_updated_at: context.context_version.config_updated_at,
+      expected_catalog_version: similar.catalog_version, content_schema_version: 2,
+      format_key: 'single_subject_fast', topic_key: 'animals', interaction_goal: 'share', scheduled_at: null,
+      plan_item: null, facts, content_payload: content,
+      editorial_checks: { meaning_preserved: 'pass', caption_no_new_claim: 'pass', no_known_substantive_issue: 'pass' } };
+    const saved = (await valid('save_post_v2', saveArgs)).post;
+    const postId = saved.post_public_id;
+    const post = (await valid('get_post', { ...common(), post_public_id: postId,
+      include_sources: true, include_checks: true })).post;
+    check(post.content_schema_version === 2 && post.fact_bindings.length === 5, 'V2_INSPECTOR_READBACK');
+    const listedPosts = await valid('list_posts', { ...common(), page_public_id: f.page, statuses: ['draft'], limit: 10 });
+    check(listedPosts.items.some((item: { post_public_id: string }) => item.post_public_id === postId), 'V2_INSPECTOR_LIST');
+    const again = await call('trivia_find_similar_facts_v2', readArgs);
+    again.candidates.forEach((candidate: { complete: boolean; matches: Array<{ fact_public_id: string; claim_text: string }> }, i: number) => {
+      check(candidate.complete, 'V2_INSPECTOR_REVISE_DEDUP');
+      const selected = candidate.matches.find(match => match.claim_text === facts[i]!.claim_text);
+      check(selected, 'V2_INSPECTOR_FACT_IDENTITY');
+      facts[i]!.dedup.fact_public_id = selected.fact_public_id;
+      facts[i]!.dedup.decision = 'same';
+      facts[i]!.dedup.reviews = candidate.matches.map(match => ({ fact_public_id: match.fact_public_id,
+        decision: match.fact_public_id === selected.fact_public_id ? 'same' : 'distinct' }));
+    });
+    const { page_public_id: _page, niche_key: _niche, scheduled_at: _schedule, plan_item: _plan, ...revision } = saveArgs;
+    void [_page, _niche, _schedule, _plan];
+    const revised = (await valid('revise_post_v2', { ...revision, operation_key: randomUUID(), post_public_id: postId,
+      expected_revision: saved.revision, expected_content_hash: saved.content_hash,
+      expected_catalog_version: again.catalog_version, revision_reason: 'Synthetic review.' })).post;
+    const scheduled = await valid('reschedule_post', { ...write(), post_public_id: postId,
+      expected_revision: revised.revision, scheduled_at: null, reason: 'Local fixture.' });
+    const approval = await valid('approve_post', { ...write(), post_public_id: postId,
+      expected_revision: scheduled.revision, expected_content_hash: revised.content_hash,
+      explicit_approval: true, accepted_warning_ids: [] });
+    const revocation = await valid('revoke_post_approval', { ...write(), post_public_id: postId,
+      expected_revision: approval.revision, expected_content_hash: revised.content_hash,
+      reason: 'Withdraw synthetic approval.', explicit_revocation: true });
+    await valid('discard_post', { ...write(), post_public_id: postId,
+      expected_revision: revocation.revision, reason: 'Discard local fixture.', explicit_discard: true });
+    const factId = post.fact_bindings[0].fact_public_id;
+    const maintenance = () => ({ request_schema_version: 2, workspace_public_id: f.workspace, operation_key: randomUUID() });
+    const verified = await valid('trivia_reverify_fact', { ...maintenance(), fact_public_id: factId,
+      expected_fact_updated_at: time(factId), confirmed_claim_text: facts[0]!.claim_text,
+      source_url: facts[0]!.source_url });
+    await valid('trivia_correct_fact', { ...maintenance(), fact_public_id: factId,
+      expected_fact_updated_at: verified.fact_updated_at, action: 'invalidate',
+      correction_reason: 'Synthetic v2 correction.', explicit_correction: true,
+      successor: null, expected_catalog_version: null });
+    // Owner-approved temporary local publication and metric fixture. No Facebook
+    // request is made; postCleanup(f) removes every fixture row in finally.
+    const publicationFacts = facts.map((fact, i) => ({ ...fact, candidate_key: `publication_${i}`,
+      claim_text: randomUUID().replaceAll('-', ''), dedup: { complete: true, decision: 'distinct',
+        fact_public_id: null, reviews: [] as Array<{ fact_public_id: string; decision: string }> } }));
+    const publicationRead = await call('trivia_find_similar_facts_v2', { ...readArgs,
+      candidates: publicationFacts.map(({ candidate_key, claim_text }) => ({ candidate_key, claim_text })) });
+    publicationRead.candidates.forEach((candidate: { complete: boolean; matches: Array<{ fact_public_id: string }> }, i: number) => {
+      check(candidate.complete, 'V2_INSPECTOR_PUBLICATION_DEDUP');
+      publicationFacts[i]!.dedup.reviews = candidate.matches.map(match => ({ fact_public_id: match.fact_public_id, decision: 'distinct' }));
+    });
+    const publicationContent = { ...content,
+      body: { facts: publicationFacts.map(({ position, claim_text }) => ({ position, text: claim_text })) },
+      canva_copy: [content.hook, ...publicationFacts.map(fact => fact.claim_text), content.cta].join('\n\n') };
+    const publicationSaved = (await call('save_post_v2', { ...saveArgs, operation_key: randomUUID(),
+      expected_catalog_version: publicationRead.catalog_version, facts: publicationFacts,
+      content_payload: publicationContent })).post;
+    const publication = publicationSaved.post_public_id;
+    const publicationApproved = await call('approve_post', { ...write(), post_public_id: publication,
+      expected_revision: publicationSaved.revision, expected_content_hash: publicationSaved.content_hash,
+      explicit_approval: true, accepted_warning_ids: [] });
+    const posted = await valid('mark_post_posted', { ...write(), post_public_id: publication,
+      expected_revision: publicationApproved.revision, published_at: new Date().toISOString(),
+      expected_content_hash: publicationSaved.content_hash,
+      published_url: 'https://example.test/local-fixture-only', platform_post_id: null,
+      explicit_publication_confirmation: true });
+    await valid('archive_post', { ...write(), post_public_id: publication,
+      expected_revision: posted.revision, reason: 'Archive temporary local fixture.', explicit_archive: true });
+    await valid('record_post_performance', { ...write(), post_public_id: publication,
+      captured_at: new Date(Date.parse(posted.published_at) + 60_000).toISOString(),
+      metrics: { views: 0, reactions: 2, likes: 1 },
+      source: { source_type: 'facebook_ui', metric_definition_version: 1 } });
+    await valid('get_post_performance', { ...common(), post_public_id: publication, limit: 10 });
+    await valid('get_performance_insights', { ...common(), page_public_id: f.page,
+      niche_key: 'trivia', dimensions: ['format'], metric: 'views', minimum_sample_size: 5 });
+    const beforeNegative = stateDigest(f);
+    for (const name of names) {
+      const invalid = name === 'get_account_profile' || name === 'get_workspace_context'
+        ? { request_schema_version: 2 } : {};
+      await inspector('tools/call', name, invalid, 5);
+    }
+    for (const name of retired) await inspector('tools/call', name, {}, 5);
+    check(stateDigest(f) === beforeNegative, 'V2_INSPECTOR_NEGATIVE_MUTATION');
+    const foreign = await rpcHttp('tools/call', { name: 'list_posts', arguments: common() }, foreignBearer);
+    check(foreign.status === 403 && foreign.body.error?.code === 'OWNER_ACCESS_REQUIRED', 'V2_INSPECTOR_OWNER_DENIAL');
+    check(stateDigest(f) === beforeNegative, 'V2_INSPECTOR_OWNER_MUTATION');
+    check(!logs.includes(bearer) && !logs.includes(foreignBearer) && !/SQLSTATE|internal_id|private key/i.test(logs), 'HTTP_LOG_PRIVACY');
+    check(validNames.size === 31 && names.every((name: string) => validNames.has(name)), 'V2_INSPECTOR_VALID_COVERAGE_INCOMPLETE');
+    console.info('V2 Inspector gate: 31/31 valid and 31/31 invalid tool calls; five retired v1 rejected; owner denial PASS');
+  } else {
   const defaultConfig = row<{ config: object }>(
     'select internal.default_trivia_config_v1() config',
   ).config;
@@ -2316,6 +2486,7 @@ try {
       !/SQLSTATE|internal_id|private key/i.test(logs),
     'HTTP_LOG_PRIVACY',
   );
+  }
   timings.sort((a, b) => a - b);
 } catch (error) {
   // Print safe assertion labels only, never raw child stdout, SQL or payloads.
@@ -2334,6 +2505,6 @@ try {
 
 if (process.exitCode !== 1) {
   console.info(
-    `Phase 6.13 ${process.argv.includes('--preflight') ? 'preflight: real HTTP recovery/race' : 'gate: Inspector initialize/list, 36/36 valid and 36/36 invalid tool calls'} PASS; HTTP log privacy PASS; typical local latency median ${Math.round(timings[Math.floor(timings.length / 2)])}ms, max ${Math.round(timings.at(-1)!)}ms (fixture scope).`,
+    `Phase 6.13 ${process.argv.includes('--v2-inspector') ? 'v2 Inspector 31/31 valid and 31/31 invalid tool calls; five retired v1 rejected; owner denial' : process.argv.includes('--preflight') ? 'preflight: real HTTP recovery/race' : 'historical gate: Inspector initialize/list, 36/36 valid and 36/36 invalid tool calls'} PASS; HTTP log privacy PASS; typical local latency median ${Math.round(timings[Math.floor(timings.length / 2)])}ms, max ${Math.round(timings.at(-1)!)}ms (fixture scope).`,
   );
 }

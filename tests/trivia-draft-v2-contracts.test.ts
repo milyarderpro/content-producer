@@ -478,11 +478,10 @@ describe('P1 historical error taxonomy and current catalog', () => {
     ];
     expect(new Set(names).size).toBe(names.length);
     expect(registered).toHaveLength(31);
-    expect(new Set(names)).toEqual(
-      new Set([...registered, ...retired]),
-    );
-    expect(reads.size).toBe(12);
-    expect(writes.size).toBe(24);
+    expect(new Set(names)).toEqual(new Set(registered));
+    expect(retired.every((name) => !names.includes(name))).toBe(true);
+    expect(reads.size).toBe(11);
+    expect(writes.size).toBe(20);
     for (const group of taxonomy.groups) {
       expect(group.domain_codes.length).toBeGreaterThan(0);
       for (const code of [...taxonomy.global_codes, ...taxonomy.write_codes, ...group.domain_codes])

@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { fixture, json, quote, row, rpc, state, time } from './helpers/trivia-rpc.js';
 import { approve, cleanup, correct, draft, firstFact, overlap, post, publish, reverify } from './helpers/trivia-v2.js';
-import { approve as legacyApprove, get, request, save } from './helpers/post-lifecycle.js';
 
 function snapshots(id: string) {
   return row(`select p.content_hash,p.content_payload,p.system_checks,p.editorial_checks,
@@ -155,16 +154,15 @@ describe('P5-T3 URL maintenance, CAS and immutable history', () => {
   }, 30_000);
 });
 
-describe('P5-T2/T3 observable correction/approval/publication races across content versions', () => {
-  for (const version of [1, 2]) {
+describe('P5-T2/T3 observable correction/approval/publication races for v2 content', () => {
     for (const operation of ['approve', 'publish']) {
       for (const correctionFirst of [true, false]) {
-        it(`content v${version}: ${operation}, correction commits ${correctionFirst ? 'first' : 'second'}`, async () => {
+        it(`content v2: ${operation}, correction commits ${correctionFirst ? 'first' : 'second'}`, async () => {
           const f = fixture();
           try {
-            const p = version === 2 ? draft(f) : rpc(f, save(f, request(f))).data.post as ReturnType<typeof draft>;
+            const p = draft(f);
             const id = p.post_public_id;
-            const approveExpression = () => version === 2 ? approve(f, id) : legacyApprove(f, get(f, id));
+            const approveExpression = () => approve(f, id);
             if (operation === 'publish') rpc(f, approveExpression());
             const fact = firstFact(id);
             const mutation = operation === 'approve' ? approveExpression() : publish(f, id);
@@ -186,5 +184,4 @@ describe('P5-T2/T3 observable correction/approval/publication races across conte
         }, 30_000);
       }
     }
-  }
 });

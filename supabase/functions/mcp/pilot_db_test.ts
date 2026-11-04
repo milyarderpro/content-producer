@@ -46,7 +46,7 @@ function normalizeExpectedWirePatterns(value: unknown): unknown {
     ]),
   );
 }
-Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descriptors', async () => {
+Deno.test('10.1 noauth pilot advertises exactly 31 tools without OAuth descriptors', async () => {
   const response = await createAuthenticatedTransport(context).fetch(request('tools/list'));
   assert(response.status === 200, 'catalog must succeed');
   const catalogBody = await response.text();
@@ -57,8 +57,8 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   );
   const listed = responseJson(catalogBody);
   const tools = (listed.result as { tools: Array<Record<string, unknown>> }).tools;
-  assert(MCP_TOOL_COUNT === 36 && tools.length === 36, 'exact 36 tools');
-  assert(new Set(tools.map((tool) => tool.name)).size === 36, 'duplicate tool names');
+  assert(MCP_TOOL_COUNT === 31 && tools.length === 31, 'exact 31 tools');
+  assert(new Set(tools.map((tool) => tool.name)).size === 31, 'duplicate tool names');
   assert(
     tools.some((tool) => tool.name === 'create_page'),
     'missing create_page',
@@ -93,7 +93,7 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   assert(rawResponse.status === 200, 'raw SDK catalog available');
   const original = responseJson(await rawResponse.text());
   const originalTools = (original.result as { tools: Array<Record<string, unknown>> }).tools;
-  assert(originalTools.length === 36, 'SDK original contains 36 tools');
+  assert(originalTools.length === 31, 'SDK original contains 31 tools');
   const rawPilotResponse = await createMcpHandler(() => createMcpServer(context)).fetch(
     request('tools/list'),
   );
@@ -101,7 +101,7 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
   const pilotOriginal = responseJson(await rawPilotResponse.text());
   const pilotData = pilotOriginal.result as { tools: Array<Record<string, unknown>> };
   const pilotOriginalTools = pilotData.tools;
-  assert(pilotOriginalTools.length === 36, 'raw No-auth SDK has 36 tools');
+  assert(pilotOriginalTools.length === 31, 'raw No-auth SDK has 31 tools');
 
   const oauthResponse = await createAuthenticatedTransport({
     ...context,
@@ -129,8 +129,8 @@ Deno.test('10.1 noauth pilot advertises exactly 33 tools without OAuth descripto
     request('tools/call', { name: 'get_account_profile', arguments: {} }),
   );
   assert(blockedCall.status === 403, 'anonymous OAuth tool calls must remain blocked');
-  assert(oauthTools.length === 36, 'OAuth catalog must expose exactly 36 tools');
-  assert(new Set(oauthTools.map((tool) => tool.name)).size === 36, 'OAuth duplicate tool name');
+  assert(oauthTools.length === 31, 'OAuth catalog must expose exactly 31 tools');
+  assert(new Set(oauthTools.map((tool) => tool.name)).size === 31, 'OAuth duplicate tool name');
   assert(
     oauthTools.some((tool) => tool.name === 'mark_post_posted'),
     'the historically rejected tool must remain available',
@@ -382,10 +382,10 @@ Deno.test('10.1 SQL statement builder allows only named parameters, never free S
     'MAN-02 JSON text must be explicitly parsed into a jsonb object by PostgreSQL',
   );
   assert(
-    buildPilotRpcStatement('trivia_find_similar_facts', {
+    buildPilotRpcStatement('trivia_find_similar_facts_v2', {
       p_candidates: [{ candidate_key: 'moon_1' }],
-    }) === 'select api."trivia_find_similar_facts"("p_candidates" => $1::text::jsonb) as result',
-    'MAN-03 dedup candidates must be encoded as JSONB, not a PostgreSQL array',
+    }) === 'select api."trivia_find_similar_facts_v2"("p_candidates" => $1::text::jsonb) as result',
+    'v2 dedup candidates must be encoded as JSONB, not a PostgreSQL array',
   );
   assert(
     buildPilotRpcStatement('update_page', { p_config: { example: true } }) ===
@@ -591,15 +591,16 @@ Deno.test('10.4 draft saving cannot schedule, switch topic, approve or waive qua
     !(await isApprovedPilot104Write('approve_post', args, read, now)),
     'approval always separately locked',
   );
-  const sqlReserve = buildPilotRpcStatement('trivia_register_and_reserve_facts', { p_facts: [{}] });
-  assert(sqlReserve.includes('"p_facts" => $1::text::jsonb'), 'fact list must be JSONB');
-  const sqlSave = buildPilotRpcStatement('save_post', {
+  let retiredRejected = false;
+  try { buildPilotRpcStatement('trivia_register_and_reserve_facts', { p_facts: [{}] }); }
+  catch { retiredRejected = true; }
+  assert(retiredRejected, 'retired reserve cannot be built');
+  const sqlSave = buildPilotRpcStatement('save_post_v2', {
     p_content_payload: {},
-    p_generation_snapshot: {},
-    p_fact_bindings: [{}],
+    p_facts: [{}],
     p_editorial_checks: {},
   });
-  assert(sqlSave.includes('"p_fact_bindings" => $3::text::jsonb'), 'allocations must be JSONB');
+  assert(sqlSave.includes('"p_facts" => $2::text::jsonb'), 'v2 facts must be JSONB');
 });
 
 Deno.test('10.4 MAN-04 CAS revision permit does not imply editorial approval', async () => {

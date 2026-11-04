@@ -2,8 +2,8 @@
 
 Direktori ini berisi manifest dan instruksi yang digunakan ChatGPT untuk alur
 Content Producer. [plugin.json](plugin.json) menyatakan kandidat source versi
-`0.3.0`; [.app.json](.app.json) memetakan satu app owner OAuth `mcpku2` yang sudah
-ada. Rilis terpasang terakhir yang dikonfirmasi sebelum kandidat ini adalah `0.2.10`;
+`0.4.0`; [.app.json](.app.json) memetakan satu app owner OAuth `mcpku2` yang sudah
+ada. Versi source ini belum membuktikan versi plugin terpasang;
 perubahan source sesudahnya tidak boleh diberi ulang nomor rilis tersebut. Source paket, archive
 kandidat, dan release yang terpasang adalah bukti berbeda; ringkasan bertanggal
 ada di [operations](../docs/operations.md).
@@ -39,16 +39,16 @@ Git. Packaging mengganti kandidat lama pada lokasi itu, memvalidasi source, dan
 menyalin hanya file allowlist; bukan pembuatan ZIP atau instalasi plugin.
 
 Validator/test memeriksa manifest, schema generator, link/path/symlink, larangan
-credential, aturan editorial, dan urutan 36 tool transisi (33 baseline frozen +
-tiga nama v2 menurut CR-053). Karena
+credential, aturan editorial, dan urutan 31 tool aktif setelah lima nama v1
+dipensiunkan menurut CR-059. Karena
 itu `plans/tool-inventory.md`, DNA trivia, serta schema legacy tertentu masih
 merupakan dependensi yang harus direkonsiliasi sebelum dipindah/dihapus.
 
 ## Update dan pembuktian hasil
 
-Kandidat v0.3.0 memilih alur draft v2 setelah katalog runtime terverifikasi.
-Sumber cukup kalimat + satu URL/fakta; instruksi v1 dipertahankan untuk
-maintenance/replay/in-flight dengan batas CR-054. Backend harus dirilis dan
+Kandidat v0.4.0 memakai alur trivia v2 saja setelah katalog runtime terverifikasi.
+Sumber cukup kalimat + satu URL/fakta; post lama yang telah direset dinyatakan
+tidak tersedia dan tidak dibuat ulang otomatis. Backend harus dirilis dan
 diverifikasi sebelum pemasangan plugin v2 sesuai P7/P8 dan izin tersendiri;
 build kandidat lokal tidak membuktikan runtime/plugin terpasang atau cutover.
 

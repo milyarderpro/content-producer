@@ -22,9 +22,9 @@ bukan bukti cutover production. Rantai migration dan histori production dipertah
 
 ## 4. Plugin, dokumentasi, dan gate
 
-- [ ] 4.1 Perbarui source plugin Content Producer melalui Plugin Creator dan Content Producer agar memakai v2 saja tanpa fallback v1; verifikasi paket/skill, owner OAuth, kasus draft baru, dan respons saat post lama diminta.
-- [ ] 4.2 Selaraskan README, arsitektur, domain, kontrak tool, development, testing, operations, AGENTS.md, serta matriks/panduan live dengan 31 tool aktif dan v2 saja. Tandai kontrak/hasil v1 historis tanpa menghapusnya; verifikasi referensi, tautan, dan `git diff --check`.
-- [ ] 4.3 Perbarui manifest, pin katalog, Inspector, gate runner, dan test menjadi 31 valid/31 invalid plus lima nama v1 absen/ditolak serta owner denial. Verifikasi suite gate fokus, audit migration/history/RLS/grant/security advisors tetap wajib, dan tidak ada skip keamanan yang disembunyikan.
+- [x] 4.1 Perbarui source plugin Content Producer melalui Plugin Creator dan Content Producer agar memakai v2 saja tanpa fallback v1; verifikasi paket/skill, owner OAuth, kasus draft baru, dan respons saat post lama diminta.
+- [x] 4.2 Selaraskan README, arsitektur, domain, kontrak tool, development, testing, operations, AGENTS.md, serta matriks/panduan live dengan 31 tool aktif dan v2 saja. Tandai kontrak/hasil v1 historis tanpa menghapusnya; verifikasi referensi, tautan, dan `git diff --check`.
+- [x] 4.3 Perbarui manifest, pin katalog, Inspector, gate runner, dan test menjadi 31 valid/31 invalid plus lima nama v1 absen/ditolak serta owner denial. Verifikasi suite gate fokus, audit migration/history/RLS/grant/security advisors tetap wajib, dan tidak ada skip keamanan yang disembunyikan.
 
 ## 5. Integrasi dan rilis production
 

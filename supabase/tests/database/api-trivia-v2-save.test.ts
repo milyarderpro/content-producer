@@ -1,10 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { cancel, claim, createPlan, expire, fail, renew, retry } from './helpers/plan-lifecycle.js';
-import { request as legacyPostRequest, save as legacyPostSave } from './helpers/post-rpc.js';
 import { approve as approveV2, publish as publishV2 } from './helpers/trivia-v2.js';
-import { callerStatement, cleanup as triviaCleanup, correct, factInput, fixture, json, quote,
-  release, reserve, reserved, row, rpc, secondPage, session, setReuse, sql, time, waitForSession,
+import { callerStatement, cleanup as triviaCleanup, factInput, fixture, json, quote,
+  release, reserve, row, rpc, secondPage, session, setReuse, sql, waitForSession,
 } from './helpers/trivia-rpc.js';
 import type { ClaimedItem, SessionResult } from './helpers/plan-lifecycle.js';
 
@@ -328,37 +327,19 @@ describe('P4-T2 separate-session collisions and replay', () => {
     } finally { cleanup(base); }
   }, 25_000);
 
-  it('serializes v1 reservation and correction against v2 without partial posts', async () => {
+  it('rejects retired v1 reservation and release without affecting v2 save', () => {
     const f = fixture();
     try {
-      const v = input(f, 'legacy');
-      const legacy = factInput();
-      const claim = (legacy.candidate as { claim_text: string }).claim_text;
-      replaceClaim(v, 1, claim);
-      reviewCurrent(f, v);
-      const [v2First, v1Second] = await overlap(f, save(f, v), reserve(f, [legacy]));
-      expect(v2First.code).toBe(0);
-      expect(v1Second.error).toBe('FACT_REUSE_BLOCKED');
-      expect(counts(f).posts).toBe(1);
-
-      const legacy2 = factInput();
-      const registered = rpc(f, reserve(f, [legacy2]));
-      const factId = reserved(registered)[0]!.fact_public_id;
-      const conflicting = input(f, 'reserved', true);
-      replaceClaim(conflicting, 2, (legacy2.candidate as { claim_text: string }).claim_text);
-      reviewCurrent(f, conflicting, [2]);
-      expect(() => rpc(f, save(f, conflicting))).toThrow('FACT_NOT_ELIGIBLE');
-      const token = registered.data.reservation_token as string;
-      rpc(f, release(f, token));
-      reviewCurrent(f, conflicting, [2]);
-      const [correctFirst, saveSecond] = await overlap(f,
-        correct(f, factId, null, time(factId)), save(f, conflicting));
-      expect(correctFirst.code).toBe(0);
-      expect(['FACT_CATALOG_CONFLICT', 'FACT_NOT_ELIGIBLE']).toContain(saveSecond.error);
-      expect(counts(f).posts).toBe(1);
-      expect(counts(f).usage).toBe(5);
+      const before = counts(f);
+      expect(() => rpc(f, reserve(f, [factInput()]))).toThrow('LOCAL_TEST_QUERY_FAILED');
+      expect(() => rpc(f, release(f, randomUUID()))).toThrow('LOCAL_TEST_QUERY_FAILED');
+      expect(counts(f)).toEqual(before);
+      expect(rpc(f, save(f, input(f, 'v2-only'))).data.post).toEqual(
+        expect.objectContaining({ status: 'draft' }),
+      );
+      expect(counts(f)).toEqual({ posts: 1, facts: 5, usage: 5, evidence: 5, completed: 0 });
     } finally { cleanup(f); }
-  }, 40_000);
+  }, 25_000);
 
   it('keeps lost-response save certain on replay after claim is consumed; expired new claim rejects', async () => {
     const f = fixture();
@@ -423,43 +404,20 @@ describe('P4-T2 separate-session collisions and replay', () => {
     } finally { cleanup(f); }
   }, 30_000);
 
-  it('orders v1 post write before v2 and v2 save before a later correction', async () => {
+  it('rejects retired v1 post writes without affecting v2 draft creation', () => {
     const f = fixture();
     try {
-      const deadlocks = row<{ n: number }>('select deadlocks n from pg_stat_database where datname=current_database()').n;
-      const old = legacyPostRequest(f);
-      const factId = old.bindings[0]!.fact_public_id;
-      const claimText = row<{ claim: string }>(`select claim_text claim from public.trivia_facts where public_id='${factId}'`).claim;
-      const v = input(f, 'post_v1', true);
-      replaceClaim(v, 1, claimText);
-      reviewCurrent(f, v, [1]);
-      const [legacy, newer] = await overlap(f, legacyPostSave(f, old), save(f, v));
-      expect(legacy.code).toBe(0);
-      expect(['FACT_CATALOG_CONFLICT', 'FACT_REUSE_BLOCKED', 'FACT_NOT_ELIGIBLE']).toContain(newer.error);
+      const legacyNames = row<{ n: number }>(`select count(*)::integer n from pg_proc p
+        join pg_namespace ns on ns.oid=p.pronamespace where ns.nspname='api'
+        and p.proname in ('save_post','revise_post')`).n;
+      expect(legacyNames).toBe(0);
+      expect(() => rpc(f, `api.save_post(1,'${f.workspace}')`)).toThrow('LOCAL_TEST_QUERY_FAILED');
+      expect(() => rpc(f, `api.revise_post(1,'${f.workspace}')`)).toThrow('LOCAL_TEST_QUERY_FAILED');
+      expect(counts(f).posts).toBe(0);
+      expect((rpc(f, save(f, input(f, 'post_v2'))).data.post as { status: string }).status).toBe('draft');
       expect(counts(f).posts).toBe(1);
-
-      const registered = rpc(f, reserve(f, [factInput()]));
-      const availableId = reserved(registered)[0]!.fact_public_id;
-      const token = registered.data.reservation_token as string;
-      rpc(f, release(f, token));
-      const availableClaim = row<{ claim: string }>(`select claim_text claim from public.trivia_facts
-        where public_id='${availableId}'`).claim;
-      const v2 = input(f, 'correct_after', true);
-      replaceClaim(v2, 2, availableClaim);
-      reviewCurrent(f, v2, [2]);
-      const [saved, corrected] = await overlap(f, save(f, v2),
-        correct(f, availableId, null, time(availableId)));
-      expect(saved.code).toBe(0);
-      expect(corrected.code).toBe(0);
-      expect(counts(f).posts).toBe(2);
-      expect(counts(f).usage).toBe(10);
-      expect(row<{ quality: string; status: string }>(`select quality_status quality,status
-        from public.posts where public_id='${(sessionResponse(saved)!.data.post as { post_public_id: string }).post_public_id}'`))
-        .toEqual({ quality: 'failed', status: 'draft' });
-      expect(row<{ n: number }>('select deadlocks n from pg_stat_database where datname=current_database()').n)
-        .toBe(deadlocks);
     } finally { cleanup(f); }
-  }, 40_000);
+  }, 25_000);
 });
 
 describe('P4-T3 revise and version-aware readback', () => {

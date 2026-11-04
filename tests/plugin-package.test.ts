@@ -88,14 +88,14 @@ describe('Phase 7.4 generated package and source safety', () => {
   it('rejects tool drift, loss of critical quality guidance and symlink escapes', () => {
     const dir = setup();
     const seq = join(dir, 'plugin/skills/content-producer/references/core/tool-sequences.md');
-    change(seq, '|   1 | get_account_profile', '|   1 | list_pages        ');
-    expect(() => validatePluginSource(dir)).toThrow(/inventory order/);
+    change(seq, '|    1 | get_account_profile', '|    1 | list_pages        ');
+    expect(() => validatePluginSource(dir)).toThrow(/active inventory differs/);
     cpSync(join(root, 'plugin/skills/content-producer/references/core/tool-sequences.md'), seq);
     const rubric = join(
       dir,
       'plugin/skills/content-producer/references/niches/trivia/quality-rubric.md',
     );
-    change(rubric, 'trivia.source_supported', 'trivia.source_ignored');
+    change(rubric, 'meaning_preserved', 'meaning_ignored');
     expect(() => validatePluginSource(dir)).toThrow(/frozen policy/);
     cpSync(
       join(root, 'plugin/skills/content-producer/references/niches/trivia/quality-rubric.md'),

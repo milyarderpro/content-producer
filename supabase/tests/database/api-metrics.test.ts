@@ -20,13 +20,11 @@ import {
   replayDigest,
   fixture,
   published,
-  save,
-  request,
-  rpc,
-  ready,
+  approve,
   discard,
   rpcClaims,
 } from './helpers/metrics-rpc.js';
+import { draft as v2Draft } from './helpers/trivia-v2.js';
 
 describe('5.8 RPC-METRIC public append and replay', () => {
   it('QUALITY-006 preserves null/zero, subset, UTC/source, unchanged post and immutable historical replay', () => {
@@ -166,9 +164,10 @@ describe('5.8 RPC-METRIC public append and replay', () => {
         /^OAUTH_CLIENT_REQUIRED$/,
       );
       expect(() => metricRpc(f, record(f, published(other)))).toThrow(/^POST_NOT_FOUND$/);
-      let draft = rpc(f, save(f, request(f))).data.post;
+      let draft = get(f, v2Draft(f, undefined, `Jar ${randomUUID().slice(0, 8)}`).post_public_id);
       expect(() => metricRpc(f, record(f, draft))).toThrow(/^POST_NOT_PUBLISHED$/);
-      draft = ready(f, draft);
+      lifecycleRpc(f, approve(f, draft, randomUUID(), []));
+      draft = get(f, draft.post_public_id);
       expect(() => metricRpc(f, record(f, draft))).toThrow(/^POST_NOT_PUBLISHED$/);
       lifecycleRpc(f, discard(f, draft));
       expect(() => metricRpc(f, record(f, draft))).toThrow(/^POST_NOT_PUBLISHED$/);
@@ -182,7 +181,7 @@ describe('5.8 RPC-METRIC public append and replay', () => {
         row(`select has_table_privilege('content_producer_api_owner','public.post_metrics','UPDATE,DELETE,TRUNCATE') mutable,
         (select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api') api`)
           .api,
-      ).toBe(38); // 36 RPC names + two versioned maintenance overloads (CR-056).
+      ).toBe(31); // Active cutover catalog; retired trivia v1 operations are absent.
     } finally {
       cleanup(f);
       cleanup(other);

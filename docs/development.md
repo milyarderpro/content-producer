@@ -7,7 +7,10 @@ Pemilihan pemeriksaan ada di [testing](testing.md); tindakan pada hosted environ
 ada di [operations](operations.md).
 
 **Dasar panduan:** baseline `d6e7fe83ea006931f85624c4d60486f92ab3438c` beserta
-perubahan cleanup lokal yang dicatat pada audit, ditinjau 25 Oktober 2026.
+perubahan cleanup lokal yang dicatat pada audit (25 Oktober 2026), serta source
+cutover v2 CR-059 (3 November 2026). Katalog kandidat memuat 31 tool aktif;
+pengembangan draft baru mengikuti `trivia_find_similar_facts_v2` →
+`save_post_v2` → `get_post`, revisi melalui `revise_post_v2`.
 Command berasal dari script repository serta bantuan CLI
 Supabase 2.120.0 yang diperiksa; penulisan panduan tidak menjalankan database atau
 deployment. Semua command di bawah dijalankan dari root repository, kecuali jika
@@ -314,8 +317,8 @@ Sejak merge [PR #105](https://github.com/milyarderpro/content-producer/pull/105)
 wajib untuk perubahan migration, RLS/grant, owner/identity, permission Write,
 atau business RPC sebelum deployment yang diotorisasi. Dispatch
 [`backend-gate-candidate.yml`](../.github/workflows/backend-gate-candidate.yml)
-**manual pada exact final SHA `main`**; periksa source, dua shard 19+22
-(41 file/182 kasus DB), MCP/Inspector, advisors terpisah, audit,
+**manual pada exact final SHA `main`**; periksa source, dua shard 15+18
+(33 file/132 kasus DB untuk kandidat cutover), MCP/Inspector, advisors terpisah, audit,
 history/lint/cleanup dan aggregate PASS. Tidak ada required check otomatis.
 `test-all`/`backend-technical-gate.yml` kini legacy/rollback CR-020/044.
 Docs-only cukup review isi/tautan, `git diff --check`, dan light CI tanpa full

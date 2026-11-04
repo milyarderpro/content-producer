@@ -22,7 +22,7 @@ describe('Phase 7.2 core skill source contract', () => {
     expect(frontmatter).toMatch(/^description: .{70,}$/m);
     expect(skill).toContain('Activate for user goals');
     expect(skill).toContain('Do not activate');
-    expect(skill).toContain('Phase 10');
+    expect(skill).toContain('source package');
   });
 
   it('links five real core references without escaping the skill root', () => {
@@ -42,7 +42,7 @@ describe('Phase 7.2 core skill source contract', () => {
     }
   });
 
-  it('preserves the frozen 33 names in order and adds exactly the three CR-053 v2 tools', () => {
+  it('lists 31 active names and excludes five retired trivia v1 tools', () => {
     const inventory = readFileSync(join(process.cwd(), 'plans', 'tool-inventory.md'), 'utf8');
     const frozen = Array.from(
       inventory.matchAll(/^\|\s*\d+\s*\|\s*\x60([a-z_]+)\x60\s*\|/gm),
@@ -53,7 +53,11 @@ describe('Phase 7.2 core skill source contract', () => {
       (match) => match[1],
     );
     expect(frozen).toHaveLength(33);
-    expect(listed).toEqual([...frozen, 'trivia_find_similar_facts_v2', 'save_post_v2', 'revise_post_v2']);
+    const retired = new Set(['trivia_find_similar_facts', 'trivia_register_and_reserve_facts',
+      'trivia_release_facts', 'save_post', 'revise_post']);
+    expect(listed).toEqual([...frozen.filter((name) => !retired.has(name)),
+      'trivia_find_similar_facts_v2', 'save_post_v2', 'revise_post_v2']);
+    expect(listed).toHaveLength(31);
   });
 
   it('covers clarification, retry, stale state and manual boundaries', () => {
@@ -81,28 +85,20 @@ describe('Phase 7.2 core skill source contract', () => {
     expect(lifecycle).toContain('same operation_key');
   });
 
-  it('enforces server-authoritative metrics for post writes', () => {
-    const docs = [read('SKILL.md'), read('references/core/workflow.md')];
-    const rule = [
-      'For `save_post` and `revise_post`,',
-      'always send `content_payload.text_metrics: {}`.',
-    ].join(' ');
-    for (const content of docs) {
-      expect(content).toContain(rule);
-      expect(content).toContain(
-        'Never calculate, guess, reuse, or fabricate pre-submit `text_metrics`',
-      );
-      expect(content).toContain('server-returned `text_metrics`');
-      // Negative guard: fabricated client metrics must not match the rule.
-      const invalid = content.replaceAll(
-        'content_payload.text_metrics: {}',
-        'content_payload.text_metrics: {"word_count":79}',
-      );
-      expect(invalid).not.toContain(rule);
-    }
+  it('requires server metrics and rejects retired trivia instructions', () => {
+    const skill = read('SKILL.md');
+    const workflow = read('references/core/workflow.md');
     const output = read('references/core/output-contract.md');
+    expect(skill).toContain('content_payload.text_metrics: {}');
+    expect(workflow).toContain('text_metrics: {}');
     expect(output).toContain('server-returned `text_metrics`');
-    expect(output).toContain('never display pre-submit client estimates as authoritative');
+    const packaged = [skill, ...names.map((name) => read('references/core/' + name)),
+      ...['content-dna', 'formats', 'fact-checking', 'dedup-ontology', 'quality-rubric']
+        .map((name) => read('references/niches/trivia/' + name + '.md'))].join('\\n');
+    for (const retired of ['trivia_find_similar_facts', 'trivia_register_and_reserve_facts',
+      'trivia_release_facts', 'save_post', 'revise_post']) {
+      expect(packaged).not.toMatch(new RegExp('\\b' + retired + '\\b'));
+    }
   });
 
   it('preserves explicit saves, batch limits and separate copy sections', () => {
@@ -119,15 +115,15 @@ describe('Phase 7.2 core skill source contract', () => {
     expect(output).toContain('INFORMASI INTERNAL');
     expect(output).toContain('unsaved');
     expect(output).toContain('manual');
-    expect(sources).toContain('independence_group');
-    expect(sources).toContain('required_per_item');
+    expect(sources).toContain('source_url');
+    expect(sources).toContain('untrusted data');
   });
 });
 
 describe('CR-053 P6 primary v2 instructions and scripted host fixtures (not live AI)', () => {
   it('makes v2 primary with scoped counts, URL research, replacement and mandatory readback', () => {
-    const skill = read('SKILL.md').split('## Legacy v1 only')[0];
-    const workflow = read('references/core/workflow.md').split('## Legacy v1 single post')[0];
+    const skill = read('SKILL.md');
+    const workflow = read('references/core/workflow.md');
     for (const term of ['save_post_v2', 'revise_post_v2', 'trivia_find_similar_facts_v2',
       'source_url', 'three', 'get_post', 'get_content_plan', 'same', 'before', 'one']) {
       expect((skill + workflow).toLowerCase()).toContain(term.toLowerCase());
@@ -140,12 +136,12 @@ describe('CR-053 P6 primary v2 instructions and scripted host fixtures (not live
       expect(skill.toLowerCase()).toContain(term.toLowerCase());
     }
     expect(skill.indexOf('trivia_find_similar_facts_v2')).toBeLessThan(skill.indexOf('save_post_v2'));
-    const quality = read('references/niches/trivia/quality-rubric.md').split('## Legacy v1 only')[0];
+    const quality = read('references/niches/trivia/quality-rubric.md');
     for (const criterion of ['meaning_preserved', 'caption_no_new_claim', 'no_known_substantive_issue']) {
       expect(quality).toContain(criterion);
     }
     expect(quality).toContain('Style/novelty suggestions are nonblocking');
-    const source = read('references/niches/trivia/fact-checking.md').split('## Legacy v1 only')[0];
+    const source = read('references/niches/trivia/fact-checking.md');
     expect(source).toContain('one `source_url` is sufficient');
     expect(source).toContain('topic category alone does not impose a two-source quota');
   });
@@ -206,7 +202,7 @@ describe('CR-053 P6 primary v2 instructions and scripted host fixtures (not live
     expect(fields).not.toContain(single.request.facts[0].source_url);
     expect(fields).not.toContain(single.response.data.post.post_public_id);
     const sequence = read('references/core/tool-sequences.md');
-    expect(sequence).toContain('36 tools, 12 Read/24 Write');
+    expect(sequence).toContain('31 active tools, 11 Read/20 Write');
     expect(sequence).toContain('Shared reads/plan/lifecycle');
     expect(sequence).toContain('not deployment evidence');
   });

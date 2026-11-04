@@ -1,6 +1,6 @@
 # Live Test & Fix — workflow aktif Content Producer
 
-**Berlaku mulai:** 21 Oktober 2026 · **Cakupan:** pengujian langsung plugin PRIVATE Content Producer **v0.2.3** melalui owner OAuth `mcpku2` (terverifikasi di [Issue #29](https://github.com/milyarderpro/content-producer/issues/29); v0.2.2 adalah baseline awal historis), remediasi, dan retest. **Kampanye:** [Issue #25](https://github.com/milyarderpro/content-producer/issues/25). **Masalah awal:** [Issue #26](https://github.com/milyarderpro/content-producer/issues/26).
+**Berlaku mulai:** 21 Oktober 2026 · **Cakupan:** pengujian langsung plugin PRIVATE Content Producer melalui owner OAuth `mcpku2`, remediasi, dan retest. Versi `0.2.3` dan hasil [Issue #29](https://github.com/milyarderpro/content-producer/issues/29) adalah bukti historis, bukan versi live saat ini. Kandidat source cutover v2 memakai 31 tool; bukti deployment dipisahkan di [operations](../operations.md). **Kampanye historis:** [Issue #25](https://github.com/milyarderpro/content-producer/issues/25). **Masalah awal:** [Issue #26](https://github.com/milyarderpro/content-producer/issues/26).
 
 ## Keputusan sederhana
 
@@ -9,7 +9,7 @@
 - **Phase 10 tetap historis selesai / Pilot-ready.** Bukti dan dokumen Phase 0–10 **tidak dihapus atau dinyatakan gagal**.
 - Pemilik **tidak melanjutkan Phase 11 atau menutup AC-001..AC-014 melalui workflow ini**. Status historis `PENDING` tetap jujur, bukan otomatis `PASS`/dihapus. Workflow baru bukan sertifikasi `MVP Complete`.
 - `plans/PRD.md`, `plans/tool-inventory.md`, migration, core/niche constraints dan keamanan tetap kontrak teknis. Proses uji boleh disederhanakan, **bukan** aturan auth/data/security.
-- **Satu sumber operasional:** dokumen ini + [matriks 33 tool](test-matrix.md) + [log hasil](results.md). GitHub Issue adalah sumber bukti/triage, PR adalah sumber perubahan kode dan Actions adalah bukti regresi/CI. Jangan membuat laporan fase terpisah.
+- **Satu sumber operasional:** dokumen ini + [matriks historis dan cakupan v2](test-matrix.md) + [log hasil](results.md). GitHub Issue adalah sumber bukti/triage, PR adalah sumber perubahan kode dan Actions adalah bukti regresi/CI. Jangan membuat laporan fase terpisah.
 
 ## Satu putaran tes: lima langkah
 
@@ -61,12 +61,19 @@ mencukupi.
 
 ## Definisi selesai untuk kampanye ini
 
-1. Semua **33 tool telah dipetakan** dengan hasil dan batas bukti yang eksplisit; bukan harus mengeksekusi seluruh mutasi destruktif di production.
+1. Semua **31 tool aktif** dipetakan dengan hasil dan batas bukti yang eksplisit setelah cutover; 33 baris kampanye lama tetap rekam historis, bukan daftar kerja baru. Mutasi destruktif tidak harus dieksekusi di production.
 2. **Core E2E draft baru** melalui ChatGPT berhasil disimpan **sekali**, terbaca kembali dengan `get_post`, dan checks/status benar, atau tetap BLOCKED dengan alasan konkret.
 3. Setiap kegagalan yang tereproduksi memiliki Issue, PR/fix atau keputusan defer yang disetujui owner, regresi, serta hasil retest.
 4. Tidak ada P0/P1 tak ditangani pada **alur pengguna yang dipilih untuk digunakan**. Kesiapan ini adalah keputusan operasional pemilik; **bukan** persetujuan Phase 11, `MVP Complete`, atau klaim seluruh AC PASS.
 
 Laporan tetap ringkas: kirim satu prompt, terima hasil, catat verdict, lanjut. Tidak memaksakan deadline tujuh hari jika bukti/fix belum tersedia.
+
+## Catatan kampanye historis v1 (bukan instruksi untuk cutover v2)
+
+Rangkaian LT-E2E-01 dan paket sumber di bawah mencatat kegagalan lama. Untuk
+draft baru, gunakan `trivia_find_similar_facts_v2` → `save_post_v2` →
+`get_post` pada Page dan scope yang disetujui. Jangan mengulang reservasi atau
+`save_post` v1 dari prompt lama.
 
 ## Titik awal
 

@@ -15,30 +15,27 @@ import {
 } from './helpers/metrics-rpc.js';
 
 describe('5.9 phase-wide public surface and scope acceptance', () => {
-  it('SEC-* exact 36 RPC names/38 signatures, owner policies/default ACL and historical replay security', () => {
-    // Preserve the archived query; extend its name allowlist only for the three
-    // accepted CR-053 tools. CR-056 adds signatures, not additional tool names.
-    const auditSql = readFileSync('docs/phase-5-8-catalog-audit.sql', 'utf8').replace(
-      "'trivia_find_similar_facts',",
-      "'trivia_find_similar_facts','trivia_find_similar_facts_v2','save_post_v2','revise_post_v2',",
-    );
+  it('SEC-* exact 31 v2 RPC signatures, owner policies/default ACL and historical replay security', () => {
+    // Keep the archived query immutable and project its allowlist onto CR-059.
+    const auditSql = readFileSync('docs/phase-5-8-catalog-audit.sql', 'utf8')
+      .replace("'trivia_find_similar_facts','trivia_register_and_reserve_facts','trivia_release_facts',",
+        "'trivia_find_similar_facts_v2',")
+      .replace("'save_post','revise_post',", "'save_post_v2','revise_post_v2',");
     const a = JSON.parse(sql(auditSql)) as Record<
       string,
       unknown
     >;
-    expect(a.api_function_count).toBe(38);
-    expect(a.authenticated_api_execute_count).toBe(38);
+    expect(a.api_function_count).toBe(31);
+    expect(a.authenticated_api_execute_count).toBe(31);
     expect(a.rls_enabled_table_count).toBe(17);
-    expect(a.overloaded_api_count).toBe(2);
+    expect(a.overloaded_api_count).toBe(0);
     const maintenance = row<{ signatures: string[] }>(`select array_agg(p.oid::regprocedure::text
       order by p.oid::regprocedure::text) signatures from pg_proc p
       join pg_namespace n on n.oid=p.pronamespace where n.nspname='api'
       and p.proname in ('trivia_reverify_fact','trivia_correct_fact')`);
     expect(maintenance.signatures).toEqual([
       'api.trivia_correct_fact(integer,uuid,uuid,uuid,text,text,text,jsonb,boolean,text)',
-      'api.trivia_correct_fact(integer,uuid,uuid,uuid,timestamp with time zone,text,text,jsonb,boolean)',
       'api.trivia_reverify_fact(integer,uuid,uuid,uuid,text,text,text)',
-      'api.trivia_reverify_fact(integer,uuid,uuid,uuid,timestamp with time zone,text,jsonb,text,date,timestamp with time zone,text,text)',
     ]);
     for (const key of [
       'allowlist_difference_count',
@@ -134,10 +131,12 @@ describe('5.9 phase-wide public surface and scope acceptance', () => {
     expect(frontendFiles).toContain('auth.js');
     expect(readdirSync('plugin/.codex-plugin').filter((x) => x !== '.gitkeep')).toEqual([]);
     expect(readFileSync('supabase/seed.sql', 'utf8')).not.toMatch(/\b(insert|update|delete)\b/i);
-    const allowed = new Set([...phaseFiveOperationMap.map((x) => x.name),
-      'trivia_find_similar_facts_v2', 'save_post_v2', 'revise_post_v2']);
-    expect(allowed.size).toBe(36);
-    expect(new Set((a.api_inventory as { name: string }[]).map((x) => x.name)).size).toBe(36);
+    const retired = new Set(['trivia_find_similar_facts', 'trivia_register_and_reserve_facts',
+      'trivia_release_facts', 'save_post', 'revise_post']);
+    const allowed = new Set(phaseFiveOperationMap.map((x) => x.name));
+    expect(allowed.size).toBe(31);
+    expect([...allowed].every((name) => !retired.has(name))).toBe(true);
+    expect(new Set((a.api_inventory as { name: string }[]).map((x) => x.name)).size).toBe(31);
     expect((a.api_inventory as { name: string }[]).every((x) => allowed.has(x.name))).toBe(true);
   });
   it('RPC-METRIC numeric normalization and immutable v8 preserve exact request/replay boundaries without new post revision', () => {
@@ -190,7 +189,7 @@ describe('5.9 phase-wide public surface and scope acceptance', () => {
         '{"source_type":"facebook_ui","metric_definition_version":1,"source_reported_at":null,"timezone":null,"note":null}'::jsonb
         from public.posts p cross join generate_series(1,40) g where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
         analyze public.posts;analyze public.post_metrics;`);
-      expect(row(`select count(*) n from public.post_metrics`).n).toBe(10040);
+      expect(row(`select count(*) n from public.post_metrics where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`).n).toBe(10040);
       const expressions = {
         get_post: `api.get_post(1,'${f.workspace}','${p.post_public_id}',false,false,true)`,
         list_posts: `api.list_posts(1,'${f.workspace}','${f.page}')`,

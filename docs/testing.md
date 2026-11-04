@@ -44,11 +44,14 @@ belum PASS. Gate wajib tetap dijalankan sebelum deployment yang memerlukannya.
 
 ## 2. Arti setiap command
 
-**P6, 2 November 2026:** manifest MCP kini **17 file/127 kasus** (15/82 historis
-+ enam kasus tool/projection v2 + 39 kasus diagnostik). Katalog transisi **36
-tool: 12 Baca/24 Tulis**. Target authenticated Inspector diperluas menjadi
-**36 valid/36 invalid + owner denial**; pembaruan target bukan hasil eksekusi.
-DB tetap 46/221. Fixture source/plugin tidak membuktikan ChatGPT host atau LIVE.
+**P6, 2 November 2026 (historis):** manifest MCP **17 file/127 kasus**,
+katalog transisi **36 tool**, Inspector **36 valid/36 invalid**, dan DB
+**46 file/221 kasus** sebelum pensiun v1. Kandidat cutover CR-059 memakai
+**17 file/114 kasus MCP**, **31 tool**, Inspector **31 valid/31 invalid**
+ditambah lima penolakan v1 dan owner denial, serta DB **33 file/132 kasus**.
+Pemetaan suite v1 yang diarsipkan ke pemeriksaan v2 ada di
+[task 4.3](../openspec/changes/cutover-trivia-v2-only/task-4.3-test-mapping.md).
+Fixture source/plugin tidak membuktikan ChatGPT host atau LIVE.
 
 **Remediasi P7 ([Issue #118](https://github.com/milyarderpro/content-producer/issues/118)):**
 source memiliki **84 migration**, 36 nama RPC/**38 signature** (dua overload
@@ -75,20 +78,20 @@ hasil lokal bukan formal G4 PASS atau host ChatGPT PASS.
 | `pnpm run frontend:test`                           | Tiga file test Node frontend                                                        | Menggunakan fixture/mocking; termasuk route/callback                                              |
 | `pnpm run check`                                   | Enam command non-Prettier di atas, berurutan                                        | Kegagalan menggagalkan check; tidak menjalankan suite MCP atau database; membangun frontend       |
 | `pnpm run verify-migrations`                       | Pola nama file SQL migration                                                        | Tidak memeriksa SQL, applied history, atau drift                                                  |
-| `pnpm run test:mcp`                                | Deno check, lint MCP, dan 17 file/127 kasus test MCP yang disebut script             | Deno; mock/fixture protokol, tanpa stack DB untuk suite ini                                       |
-| `pnpm run test:database`                           | Vitest database **46 file saat ini** (40 pada baseline historis)                    | Docker/Supabase lokal dengan migration sesuai; menulis fixture lokal                              |
+| `pnpm run test:mcp`                                | Deno check, lint MCP, dan 17 file/114 kasus test MCP yang disebut script             | Deno; mock/fixture protokol, tanpa stack DB untuk suite ini                                       |
+| `pnpm run test:database`                           | Vitest database **33 file aktif** (46 sebelum cutover v1)                          | Docker/Supabase lokal dengan migration sesuai; menulis fixture lokal                              |
 | `pnpm run test-all`                                | **Legacy CR-020/044**: `check` → `verify-migrations` → `test:mcp` → `test:database` | Tidak start/reset stack; tetap dipertahankan untuk gate sebelum merge dan rollback, bukan gate G4 |
 | `pnpm run gate:source`                             | Source/frontend, versi/manifest, bukti source untuk G4                              | Komponen source kandidat; PASS saja bukan release evidence lengkap                                |
-| `pnpm run gate:backend`                            | Isolated reset/audit, DB dan MCP/Inspector, history/lint/advisors                   | Mendukung shard 19+22 di Actions; masing-masing shard memiliki stack mandiri                      |
+| `pnpm run gate:backend`                            | Isolated reset/audit, DB dan MCP/Inspector, history/lint/advisors                   | Mendukung shard 15+18 pada kandidat cutover; masing-masing shard memiliki stack mandiri            |
 | `pnpm run gate:full`                               | Konjungsi source dan backend suite kandidat G4                                      | Lokal dengan overlay adalah `DIAGNOSTIC_CONFIG_OVERLAY`, bukan formal exact-config                |
 | `pnpm run smoke-test`                              | Struktur repository, `verify-migrations`, lalu suite database                       | Bukan health-only check; menjalankan DB suite lagi bila dipakai bersama test-all                  |
 | `pnpm run package-plugin`                          | Validasi source dan pembuatan kandidat 13 file                                      | Mengganti kandidat output lama; tidak membuat ZIP/install                                         |
 | `pnpm exec tsx scripts/verify-plugin-candidate.ts` | Kesamaan daftar file, byte, dan hash kandidat/source                                | Kandidat/filelist sudah dibuat                                                                    |
 
-**Inventaris kandidat saat ini:** database **46 file/221 kasus** pada manifest G4
-(P5: tambahan 2 file/18 kasus dari baseline 44/203, partisi 21+25);
-angka **41 file/182 kasus** pada run rilis dan **40 file** pada catatan baseline
-adalah historis. Bukti rilis formal
+**Inventaris kandidat cutover:** database **33 file/132 kasus** pada manifest G4,
+partisi **15+18**. Angka **46 file/221 kasus** sebelum pensiun v1,
+**41 file/182 kasus** pada run rilis terdahulu, dan **40 file** pada catatan
+baseline adalah historis. Bukti rilis formal
 setelah merge berasal dari Actions manual dengan committed exact config,
 source + dua shard database + aggregate PASS, bukan dari eksekusi
 `test-all` secara terpisah. Lokal `gate:full` PASS berlabel
@@ -117,7 +120,7 @@ dari input/docs, tanpa mengakses database.
 | TypeScript atau konfigurasi                                           | `pnpm run check` + test perilaku terkait                                                                            | Pilih gate tambahan berdasarkan dampak, bukan hanya ekstensi                                                |
 | Instruksi/metadata paket plugin                                       | Test paket terkait, packaging dan verifikasi kandidat; MCP/manual yang terdampak                                    | Light CI; reuse hanya jika backend/security/dep identik menurut CR-044                                      |
 | Transport MCP tanpa perubahan keputusan izin                          | `check` + focused protocol/security tests                                                                           | Sesuai CR-044; bukan kategori untuk perubahan owner authorization                                           |
-| Migration, RLS, grant, identity/owner, write permission, business RPC | `check` dan focused tests; **satu full gate pada SHA final**: legacy sebelum merge, G4 Actions manual setelah merge | G4 mewajibkan source + kedua shard 41/182 + advisors terpisah + aggregate PASS; deployment tetap perlu izin |
+| Migration, RLS, grant, identity/owner, write permission, business RPC | `check` dan focused tests; **satu full gate pada SHA final**: legacy sebelum merge, G4 Actions manual setelah merge | G4 mewajibkan source + kedua shard 33/132 + advisors terpisah + aggregate PASS; deployment tetap perlu izin |
 | Frontend login/consent/routing                                        | Source checks, test Node terkait, pemeriksaan browser; nilai dampak auth dan gate tambahannya                       | Build/unit test bukan bukti login production atau PKCE                                                      |
 
 Perubahan security config atau dependency runtime tidak boleh dianggap tidak
@@ -180,9 +183,10 @@ syarat rilis yang berlaku setelah CR-052 efektif.
 [`backend-gate-candidate.yml`](../.github/workflows/backend-gate-candidate.yml)
 **manual di `main` pada exact final SHA**. Job source/frontend dan **dua
 Supabase stack terisolasi** berjalan dengan **satu clean reset per shard**;
-shard 1 melaksanakan MCP **15 file/82 kasus**, authenticated Inspector
-**33 valid/33 invalid + owner denial** tepat sekali; kedua shard mengeksekusi
-**19+22 = 41 file/182 kasus DB** tanpa skip dengan audit sebelum/sesudah/akhir,
+shard 1 melaksanakan MCP **17 file/114 kasus**, authenticated Inspector
+**31 valid/31 invalid + lima nama v1 absen/ditolak + owner denial** tepat sekali
+untuk kandidat cutover CR-059; kedua shard mengeksekusi
+**15+18 = 33 file/132 kasus DB** tanpa skip dengan audit sebelum/sesudah/akhir,
 migration names/history, DB lint, **local security advisors terpisah**,
 fixture/whitespace/cleanup. Verifikasi ketiga report, identitas SHA/hash yang
 sama, status semua tahap, dan **aggregate PASS** sebelum menerima bukti formal.

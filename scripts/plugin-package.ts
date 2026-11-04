@@ -194,9 +194,20 @@ export function validatePluginSource(
   );
   const sequence = read(pluginRoot, skillRoot + 'references/core/tool-sequences.md');
   const listed = Array.from(sequence.matchAll(/^\|\s*\d+\s*\|\s*([a-z0-9_]+)\s*\|/gm), (m) => m[1]);
-  const transition = [...names, 'trivia_find_similar_facts_v2', 'save_post_v2', 'revise_post_v2'];
-  if (names.length !== 33 || listed.length !== 36 || JSON.stringify(transition) !== JSON.stringify(listed)) {
-    throw new Error('CR-053 transition inventory order differs: require 33 baseline tools plus 3 v2 names.');
+  const retired = new Set(['trivia_find_similar_facts', 'trivia_register_and_reserve_facts',
+    'trivia_release_facts', 'save_post', 'revise_post']);
+  const active = [...names.filter((name) => !retired.has(name)),
+    'trivia_find_similar_facts_v2', 'save_post_v2', 'revise_post_v2'];
+  if (names.length !== 33 || retired.size !== 5 || listed.length !== 31 ||
+      JSON.stringify(active) !== JSON.stringify(listed)) {
+    throw new Error('CR-059 active inventory differs: require 31 tools and five retired v1 names absent.');
+  }
+  const packagedMarkdown = CANDIDATE_FILES.filter((path) => path.endsWith('.md'))
+    .map((path) => read(pluginRoot, path)).join('\n');
+  for (const name of retired) {
+    if (new RegExp('\\b' + name + '\\b').test(packagedMarkdown)) {
+      throw new Error('Retired v1 tool remains in plugin instruction: ' + name);
+    }
   }
 
   const policy: Record<string, string[]> = {
@@ -206,7 +217,7 @@ export function validatePluginSource(
       'OPERATION_KEY_REUSED',
       'expected_content_hash',
     ],
-    'core/source-policy.md': ['independence_group', 'untrusted data'],
+    'core/source-policy.md': ['source_url', 'untrusted data'],
     'core/output-contract.md': ['CANVA COPY', 'FACEBOOK CAPTION', 'HASHTAGS', 'INFORMASI INTERNAL'],
     'niches/trivia/content-dna.md': ['en-US', 'approval', 'topic_key'],
     'niches/trivia/formats.md': [
@@ -218,28 +229,18 @@ export function validatePluginSource(
       'fast_trivia',
       'practical_utility',
     ],
-    'niches/trivia/fact-checking.md': [
-      'Tier D',
-      '24 months',
-      '12 months',
-      '30 days',
-      '90 days',
-      '180 days',
-    ],
+    'niches/trivia/fact-checking.md': ['one `source_url` is sufficient', 'real page', 'atomic claim'],
     'niches/trivia/dedup-ontology.md': [
       'SAME',
       'DISTINCT',
       'UNCERTAIN',
-      'trivia_find_similar_facts',
+      'trivia_find_similar_facts_v2',
     ],
     'niches/trivia/quality-rubric.md': [
-      'trivia.meaning_preserved',
-      'trivia.source_supported',
-      'trivia.time_context_valid',
-      'trivia.safety_appropriate',
-      'trivia.caption_no_new_claim',
-      'trivia.substantial_copying_absent',
-      'express owner approval',
+      'meaning_preserved',
+      'caption_no_new_claim',
+      'no_known_substantive_issue',
+      'owner Setujui',
     ],
   };
   for (const [name, terms] of Object.entries(policy)) {

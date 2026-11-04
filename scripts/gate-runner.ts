@@ -22,7 +22,20 @@ type ShardId = '1' | '2';
 type Status = 'PASS' | 'FAIL' | 'BLOCKED' | 'NOT RUN';
 type Stage = { name: string; status: Status; durationMs: number; count?: string; reason?: string };
 type Suite = { status: string; entrypoint: string; files: { path: string; status: string }[] };
-type Manifest = { schemaVersion: number; suites: Record<'source' | 'mcp' | 'database', Suite> };
+type Manifest = {
+  schemaVersion: number;
+  cutoverEvidence: {
+    apiNames: number;
+    mcpCases: number;
+    inspectorValid: number;
+    inspectorInvalid: number;
+    retiredV1NamesRejected: number;
+    ownerDenialRequired: boolean;
+    databaseFiles: number;
+    databaseCases: number;
+  };
+  suites: Record<'source' | 'mcp' | 'database', Suite>;
+};
 type Identity = {
   sha: string;
   manifestHash: string;
@@ -99,6 +112,16 @@ export function validateManifest(
 ): Record<string, number> {
   if (
     manifest.schemaVersion !== 1 ||
+    JSON.stringify(manifest.cutoverEvidence) !== JSON.stringify({
+      apiNames: 31,
+      mcpCases: 114,
+      inspectorValid: 31,
+      inspectorInvalid: 31,
+      retiredV1NamesRejected: 5,
+      ownerDenialRequired: true,
+      databaseFiles: 33,
+      databaseCases: 132,
+    }) ||
     Object.keys(manifest.suites).sort().join(',') !== 'database,mcp,source'
   )
     fail('MANIFEST_SCHEMA_DRIFT');
@@ -126,7 +149,7 @@ export function validateManifest(
     )
       fail('MANIFEST_FILE_DRIFT');
   }
-  if (expected.mcp.length !== 17 || expected.database.length !== 46) fail('MANIFEST_COUNT_DRIFT');
+  if (expected.mcp.length !== 17 || expected.database.length !== 33) fail('MANIFEST_COUNT_DRIFT');
   const mcpCommand =
     (packageScripts['test:mcp'] ?? '')
       .split(/\s*&&\s*/)
@@ -170,8 +193,8 @@ export function validateShards(
   if (
     partition.shards['1'].length === 0 ||
     partition.shards['2'].length === 0 ||
-    all.length !== 46 ||
-    new Set(all).size !== 46 ||
+    all.length !== 33 ||
+    new Set(all).size !== 33 ||
     all.some(
       (path) =>
         typeof path !== 'string' ||
@@ -229,7 +252,7 @@ export function validateShardProofs(
   )
     fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
   const files = proofs.flatMap((p) => p.files);
-  if (files.length !== 46 || new Set(files).size !== 46) fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
+  if (files.length !== 33 || new Set(files).size !== 33) fail('SHARD_EVIDENCE_MISMATCH', 'FAIL');
   return proofs.reduce((sum, p) => sum + p.cases, 0);
 }
 
@@ -242,8 +265,8 @@ export function validateSingleMcpInspector(proofs: ShardProof[]): void {
     const item = owners[0].stages.find((stage) => stage.name === name);
     if (
       item?.status !== 'PASS' ||
-      (name === 'mcp' && item.count !== '127') ||
-      (name === 'inspector' && item.count !== '36 valid; 36 invalid; owner denial')
+      (name === 'mcp' && item.count !== '114') ||
+      (name === 'inspector' && item.count !== '31 valid; 31 invalid; five retired v1 rejected; owner denial')
     )
       fail('SHARD_SINGLE_OWNER_EVIDENCE_INVALID', 'FAIL');
   }
@@ -540,8 +563,8 @@ function stageCopy(projectId: string, base: number): { path: string; overlayHash
 export function countFromOutput(name: string, rawOutput: string): string | undefined {
   const output = plainEvidence(rawOutput);
   if (name === 'inspector')
-    return /36\/36 valid and 36\/36 invalid tool calls.*PASS/.test(output)
-      ? '36 valid; 36 invalid; owner denial'
+    return /31\/31 valid and 31\/31 invalid tool calls; five retired v1 rejected; owner denial.*PASS/.test(output)
+      ? '31 valid; 31 invalid; five retired v1 rejected; owner denial'
       : undefined;
   if (name === 'database')
     return /Test Files\s+\d+ passed/.test(output) && /Tests\s+\d+ passed/.test(output)
@@ -579,7 +602,7 @@ export function assertShardDatabaseEvidence(output: string, expectedFiles: numbe
 export function assertDatabaseTestEvidence(output: string): void {
   const plain = plainEvidence(output);
   assertNoSkipped(plain);
-  if (!/Test Files\s+46 passed[\s\S]*Tests\s+[1-9]\d* passed/.test(plain))
+  if (!/Test Files\s+33 passed[\s\S]*Tests\s+[1-9]\d* passed/.test(plain))
     fail('REQUIRED_EVIDENCE_MISSING', 'FAIL');
 }
 
@@ -705,8 +728,8 @@ async function backendStages(
     run('start', 'pnpm', ['run', 'supabase:start']);
     assertStartedTarget(projectId, base);
     run('reset', 'pnpm', ['run', 'supabase:reset']);
-    run('migration-names', 'pnpm', ['run', 'verify-migrations'], /Validated 84 migration filename/);
-    if (!shard || shard === '1') run('mcp', 'pnpm', ['run', 'test:mcp'], /\b127 passed/);
+    run('migration-names', 'pnpm', ['run', 'verify-migrations'], /Validated 85 migration filename/);
+    if (!shard || shard === '1') run('mcp', 'pnpm', ['run', 'test:mcp'], /\b114 passed/);
     run(
       'audit-before',
       'pnpm',
@@ -717,8 +740,8 @@ async function backendStages(
       run(
         'inspector',
         'pnpm',
-        ['exec', 'tsx', 'scripts/phase-6-13.ts'],
-        /36\/36 valid and 36\/36 invalid tool calls.*PASS/,
+        ['exec', 'tsx', 'scripts/phase-6-13.ts', '--v2-inspector'],
+        /31\/31 valid and 31\/31 invalid tool calls; five retired v1 rejected; owner denial.*PASS/,
       );
     run(
       'audit-after',

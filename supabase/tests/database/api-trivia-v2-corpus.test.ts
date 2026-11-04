@@ -3,27 +3,21 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import {
-  candidate,
-  cleanup,
-  factInput,
   fixture,
   json,
-  postFixture,
   quote,
-  release,
-  reserve,
-  reserved,
   row,
   rpc,
   sql,
 } from './helpers/trivia-rpc.js';
+import { cleanup } from './helpers/trivia-v2.js';
 
 type CorpusCase = {
   case_id: string;
   reference: {
     fixture_identity_id: string;
     claim_text: string;
-    origin: 'v1_legacy_adapted' | 'v2_native_synthetic';
+    origin: 'legacy_v1' | 'v2_native_synthetic';
     identity_status: string;
     usage: 'none' | 'draft' | 'published';
   };
@@ -72,6 +66,26 @@ function insertNativeBatch(workspace: string, identities: CorpusCase[]): void {
     select workspace_id,id,'https://example.org/fixture/corpus' from inserted;`);
 }
 
+function insertHistoricalBatch(workspace: string, identities: CorpusCase[]): void {
+  const input = identities.map((item) => ({ claim_text: item.reference.claim_text }));
+  sql(`insert into public.trivia_facts (
+    workspace_id,claim_text,normalized_claim,claim_hash,subject_key,relation_key,
+    object_key,numbers,qualifiers,structured_key,structured_hash,topic_key,
+    dedup_review_snapshot,source_data,verification_status,freshness_class,
+    verified_at,expires_at
+  ) select w.id,x.claim_text,'',repeat('0',64),
+    internal.trivia_normalize_claim_v1(x.claim_text),'has_count','1','[{"value":"1","unit":"count","role":"count"}]'::jsonb,
+    '{"negated":false,"comparison_direction":"none"}'::jsonb,'',repeat('0',64),
+    'general_trivia',
+    '{"schema_version":1,"identity_schema_version":1,"reviewed_at":"2026-10-09T00:00:00Z","evaluator":"chatgpt","decisions":[]}'::jsonb,
+    '[{"schema_version":1,"url":"https://example.org/fixture/corpus","canonical_url":"https://example.org/fixture/corpus","title":"Historical corpus fixture","publisher":"Fixture","tier":"A","source_type":"official","accessed_at":"2026-10-09T00:00:00Z","published_at":null,"updated_at":null,"as_of":null,"language":"en","supports":"Local corpus fixture only.","independence_group":"fixture"}]'::jsonb,
+    'verified','stable',now()-interval '1 day',now()+interval '30 days'
+    from public.workspaces w
+    cross join jsonb_to_recordset(${quote(JSON.stringify(input))}::jsonb)
+      as x(claim_text text)
+    where w.public_id='${workspace}';`);
+}
+
 describe('P3 frozen dedup-v2 corpus on the canonical database', () => {
   it('preserves 92 IDs, finds 40/40 paraphrases and 18/18 negative history, and reports complete truthfully', () => {
     const f = fixture();
@@ -80,27 +94,15 @@ describe('P3 frozen dedup-v2 corpus on the canonical database', () => {
       expect(corpus).toHaveLength(93);
       expect(identities).toHaveLength(92);
       const legacy = identities.filter((item) => item.reference.origin !== 'v2_native_synthetic');
-      const native = identities.filter((item) => item.reference.origin === 'v2_native_synthetic');
-      for (const [index, item] of legacy.entries()) {
+      for (const item of legacy) {
         const gold = legacyGold.get(item.provenance.v1_case_id!);
         expect(gold).toBeDefined();
-        const input: Record<string, unknown> = {
-          ...candidate(),
-          ...gold,
-          candidate_key: `legacy_${index}`,
-          qualifiers: { negated: false, ...(gold!.qualifiers as object) },
-          normalization_version: 1,
-          ontology_version: 1,
-        };
-        expect(input.claim_text).toBe(item.reference.claim_text);
-        const result = rpc(f, reserve(f, [factInput(input)]));
-        const id = reserved(result)[0]!.fact_public_id;
-        rpc(f, release(f, result.data.reservation_token as string));
-        if (item.reference.usage !== 'none') {
-          postFixture(f, id, item.reference.usage === 'published' ? 'posted' : 'draft');
-        }
+        expect(gold!.claim_text).toBe(item.reference.claim_text);
       }
-      insertNativeBatch(f.workspace, native);
+      // The archived test retains v1 registration. These five historical
+      // envelopes are seeded directly to verify v2 reads across the cutover.
+      insertHistoricalBatch(f.workspace, legacy);
+      insertNativeBatch(f.workspace, identities.filter((item) => item.reference.origin === 'v2_native_synthetic'));
       const readback = row<{ identities: Array<{ claim_text: string; public_id: string; status: string; v1: boolean }> }>(
         `select jsonb_agg(jsonb_build_object('claim_text',f.claim_text,'public_id',f.public_id,
           'status',f.verification_status,'v1',f.has_v1_envelope) order by f.public_id) identities
@@ -143,6 +145,7 @@ describe('P3 frozen dedup-v2 corpus on the canonical database', () => {
           f,
           `api.trivia_find_similar_facts_v2(2,'${f.workspace}','${f.page}',${json(batch.map((item) => ({ candidate_key: item.case_id, claim_text: item.query_claim_text })))})`,
         );
+        expect(JSON.stringify(response.data)).not.toMatch(/"source(?:_url|_data)?"|https?:\/\//);
         versions.add(response.data.catalog_version as string);
         for (const item of response.data.candidates as Array<{ candidate_key: string; complete: boolean; matches: Array<{ fact_public_id: string; status: string; reuse_eligibility: string }> }>) {
           found.set(item.candidate_key, item);
@@ -168,10 +171,9 @@ describe('P3 frozen dedup-v2 corpus on the canonical database', () => {
           negativeHistoryFound += 1;
         }
       }
-      expect(paraphraseFound).toBeGreaterThanOrEqual(38);
+      expect(paraphraseFound).toBe(40);
       expect(negativeHistoryFound).toBe(18);
     } finally {
-      sql(`delete from public.trivia_fact_evidence_v2 where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');`);
       cleanup(f);
     }
   }, 60_000);

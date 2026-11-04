@@ -66,6 +66,20 @@ Deno.test('P6 v2 bad input and foreign workspace never dispatch business RPC', a
     }
     const denied = await call('save_post_v2', { ...single.request, workspace_public_id: id(999) });
     check(denied.result?.isError, 'foreign workspace accepted');
+    for (const args of [
+      { ...reviseRequest, expected_revision: 0 },
+      { ...reviseRequest, expected_content_hash: 'bad' },
+      { ...reviseRequest, reservation_token: id(2) },
+      { ...reviseRequest, owner_user_id: context.actorUserId },
+      { ...reviseRequest, system_checks: {} },
+    ]) {
+      const rejected = await call('revise_post_v2', args);
+      check(rejected.error || rejected.result?.isError, 'invalid v2 revision accepted');
+    }
+    const foreignRevision = await call('revise_post_v2', {
+      ...reviseRequest, workspace_public_id: id(999),
+    });
+    check(foreignRevision.result?.isError, 'foreign revision accepted');
     check(calls === 0, 'unauthorized RPC dispatched');
   } finally { globalThis.fetch = original; }
 });

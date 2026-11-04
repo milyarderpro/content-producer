@@ -6,7 +6,18 @@
 
 Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan concurrency. Untuk Write, `PASS LIVE` memerlukan izin spesifik, respons sukses yang sah dan verifikasi owner-scoped readback; untuk tool destruktif, keberhasilan fixture diberi label `PASS CI/FIXTURE`, tidak diberi label sukses LIVE.
 
-## Master inventory
+## Cakupan aktif kandidat cutover v2
+
+Kandidat source CR-059 memiliki **31 tool aktif: 11 Read dan 20 Write**.
+Gunakan 28 nama bersama di tabel historis di bawah, kecuali LT-016, LT-017,
+LT-018, LT-023, LT-024. Tambahkan tiga skenario baru: dedup
+`trivia_find_similar_facts_v2` (Read), draft `save_post_v2` (Write), dan
+revisi `revise_post_v2` (Write). Kelima nama lama harus absen dari discovery
+dan ditolak bila dipanggil. Status seluruh skenario cutover baru adalah
+**NOT RUN LIVE** sampai ada bukti host sesudah rilis. Status PASS pada tabel
+di bawah tetap hasil kampanye 21 Oktober, bukan PASS v2.
+
+## Master inventory historis v1 — 33 tool
 
 | ID     | Kelompok  | Tool                              | Akses | Metode uji                 | Hasil yang diharapkan                          | Status  |
 | ------ | --------- | --------------------------------- | ----- | -------------------------- | ---------------------------------------------- | ------- |

@@ -2,14 +2,13 @@ import { createAuthenticatedTransport } from './transport.ts';
 import { expandCatalogSchema } from './catalog_schema.ts';
 import type { RequestContext } from './auth.ts';
 import { MCP_TOOL_COUNT } from './registry.ts';
-import { TRIVIA_RELATION_KEYS_V1 } from './trivia_fact.ts';
 import { TRIVIA_CORRECTION_TOOL_NAMES } from './trivia_correction.ts';
 
 const workspace = '44444444-4444-4444-8444-444444444444';
 const factId = '77777777-7777-4777-8777-777777777777';
 const successorId = '88888888-8888-4888-8888-888888888888';
 const operationKey = '99999999-9999-4999-8999-999999999999';
-const stamp = '2026-10-14T12:00:00Z';
+const stamp = '2026-10-14T12:00:00.123456Z';
 const context: RequestContext = {
   requestId: '6.8-local',
   actorUserId: '11111111-1111-4111-8111-111111111111',
@@ -19,36 +18,15 @@ const context: RequestContext = {
   supabaseUrl: 'http://127.0.0.1:54321',
   publishableKey: 'local-public-key',
 };
-const source = {
-  schema_version: 1,
-  url: 'https://example.test/reverify',
-  canonical_url: 'https://example.test/reverify',
-  title: 'Research',
-  publisher: 'Authority',
-  tier: 'A',
-  source_type: 'official',
-  accessed_at: stamp,
-  published_at: null,
-  updated_at: null,
-  as_of: null,
-  language: 'en',
-  supports: 'Supports the tested proposition.',
-  independence_group: 'authority',
-};
 const candidate = {
+  position: 1,
   candidate_key: 'corrected',
   claim_text: 'Corrected proposition.',
-  subject_key: 'test_subject',
-  relation_key: 'has_count',
-  object_key: '4',
-  numbers: [{ value: '4', unit: 'count', role: 'count' }],
-  qualifiers: { negated: false, comparison_direction: 'none' },
-  topic_key: 'animals',
-  normalization_version: 1,
-  ontology_version: 1,
+  source_url: 'https://example.org/corrected',
+  dedup: { complete: true, decision: 'distinct', fact_public_id: null, reviews: [] },
 };
 const common = {
-  request_schema_version: 1,
+  request_schema_version: 2,
   workspace_public_id: workspace,
   operation_key: operationKey,
   fact_public_id: factId,
@@ -57,28 +35,15 @@ const common = {
 const reverify = {
   ...common,
   confirmed_claim_text: 'A tested proposition.',
-  sources: [source],
-  freshness_class: 'stable',
-  as_of_date: null,
-  requested_expires_at: '2027-01-11T00:00:00Z',
-  risk_class: 'standard',
-  review_note: 'Confirmed unchanged proposition.',
+  source_url: 'https://example.org/reverify',
 };
-const successor = {
-  candidate,
-  dedup_reviews: [],
-  sources: [source],
-  freshness_class: 'stable',
-  as_of_date: null,
-  requested_expires_at: '2027-01-11T00:00:00Z',
-  risk_class: 'standard',
-  verification_note: 'New evidence supports successor.',
-};
+const successor = candidate;
 const correct = {
   ...common,
   action: 'supersede',
   correction_reason: 'Materially changed.',
   successor,
+  expected_catalog_version: '1',
   explicit_correction: true,
 };
 const affectedPosts = {
@@ -98,8 +63,7 @@ const outputs: Record<string, object> = {
   trivia_reverify_fact: {
     fact_public_id: factId,
     verification_status: 'verified',
-    verified_at: stamp,
-    expires_at: '2027-01-11T00:00:00Z',
+    source_url: 'https://example.org/reverify',
     fact_updated_at: stamp,
     affected_posts: affectedPosts,
     replayed: false,
@@ -134,9 +98,9 @@ async function mcp(method: string, params?: object) {
 async function call(name: string, input: object) {
   return (await mcp('tools/call', { name, arguments: input })).result;
 }
-Deno.test('6.9 correction schemas remain closed among 33 authenticated tools', async () => {
+Deno.test('6.9 correction schemas remain closed among 31 authenticated tools', async () => {
   const tools = (await mcp('tools/list')).result.tools;
-  check(MCP_TOOL_COUNT === 36 && tools.length === 36, 'EXACT_36_TOOLS');
+  check(MCP_TOOL_COUNT === 31 && tools.length === 31, 'EXACT_36_TOOLS');
   for (const name of TRIVIA_CORRECTION_TOOL_NAMES) {
     const tool = tools.find((x: { name: string }) => x.name === name);
     check(tool && tool._meta.securitySchemes[0].type === 'oauth2', 'OAUTH_REQUIRED');
@@ -149,12 +113,7 @@ Deno.test('6.9 correction schemas remain closed among 33 authenticated tools', a
     check(!Object.hasOwn(tool._meta, 'openai/profile'), 'NO_PROFILE_METADATA');
     if (name === 'trivia_correct_fact') {
       const schema = expandCatalogSchema(tool.inputSchema) as typeof tool.inputSchema;
-      const relationEnum =
-        schema.anyOf[0].properties.successor.properties.candidate.properties.relation_key.enum;
-      check(
-        JSON.stringify(relationEnum) === JSON.stringify(TRIVIA_RELATION_KEYS_V1),
-        'SUCCESSOR_SQL_RELATION_ENUM',
-      );
+      check(!JSON.stringify(schema).includes('relation_key'), 'V1_ONTOLOGY_RETIRED');
     }
   }
 });
@@ -170,7 +129,7 @@ Deno.test(
       check(headers.get('Content-Profile') === 'api', 'PUBLIC_SCHEMA');
       check(headers.get('apikey') === context.publishableKey, 'PUBLIC_API_KEY');
       seen.push({ name, args: JSON.parse(String(init?.body)) });
-      return Promise.resolve(Response.json({ response_schema_version: 1, data: outputs[name] }));
+      return Promise.resolve(Response.json({ response_schema_version: 2, data: outputs[name] }));
     }) as typeof fetch;
     try {
       for (const [name, args] of [
@@ -198,7 +157,7 @@ Deno.test(
         seen.every((x) => x.args.p_workspace_public_id === workspace),
         'OWNER_SCOPE',
       );
-      check(seen[0].args.p_sources !== undefined, 'SOURCE_EVIDENCE');
+      check(seen[0].args.p_source_url === reverify.source_url, 'SOURCE_URL');
       check(seen[1].args.p_successor !== undefined, 'SUCCESSOR_EVIDENCE');
       check(seen[1].args.p_explicit_correction === true, 'EXPLICIT_INTENT');
       check(
@@ -212,33 +171,26 @@ Deno.test(
     }
   },
 );
-Deno.test('FIX-37 correction successor preserves an official behavioral relation', async () => {
+Deno.test('CR-059 correction successor preserves v2 claim and source', async () => {
   const original = globalThis.fetch;
   const forwarded: Record<string, unknown>[] = [];
   globalThis.fetch = ((_: Request | URL | string, init?: RequestInit) => {
     forwarded.push(JSON.parse(String(init?.body)));
     return Promise.resolve(
-      Response.json({ response_schema_version: 1, data: outputs.trivia_correct_fact }),
+      Response.json({ response_schema_version: 2, data: outputs.trivia_correct_fact }),
     );
   }) as typeof fetch;
   try {
-    const behavioral = {
-      ...candidate,
-      claim_text: 'Test subjects communicate using signals.',
-      relation_key: 'communicates_by',
-      object_key: 'signals',
-      numbers: [],
-      qualifiers: { negated: false, comparison_direction: 'none' },
-    };
+    const behavioral = { ...candidate, claim_text: 'Test subjects communicate using signals.' };
     const result = await call('trivia_correct_fact', {
       ...correct,
-      successor: { ...successor, candidate: behavioral },
+      successor: behavioral,
     });
     check(result?.isError !== true, 'OFFICIAL_SUCCESSOR_ACCEPTED');
     check(forwarded.length === 1, 'ONE_CORRECTION_CALL');
-    const sent = (forwarded[0].p_successor as { candidate: typeof behavioral }).candidate;
-    check(sent.relation_key === 'communicates_by', 'SUCCESSOR_RELATION_UNCHANGED');
-    check(sent.qualifiers.comparison_direction === 'none', 'SUCCESSOR_DIRECTION_UNCHANGED');
+    const sent = forwarded[0].p_successor as typeof behavioral;
+    check(sent.claim_text === behavioral.claim_text, 'SUCCESSOR_CLAIM_UNCHANGED');
+    check(sent.source_url === behavioral.source_url, 'SUCCESSOR_SOURCE_UNCHANGED');
   } finally {
     globalThis.fetch = original;
   }
@@ -255,39 +207,33 @@ Deno.test(
     try {
       const badInputs: Array<[string, object]> = [
         ['trivia_reverify_fact', { ...reverify, expected_fact_updated_at: 'invalid' }],
-        ['trivia_reverify_fact', { ...reverify, sources: [] }],
+        ['trivia_reverify_fact', { ...reverify, source_url: '' }],
         ['trivia_reverify_fact', { ...reverify, confirmed_claim_text: '' }],
         ['trivia_reverify_fact', { ...reverify, actor_user_id: context.actorUserId }],
         ['trivia_reverify_fact', { ...reverify, workspace_public_id: successorId }],
         ['trivia_correct_fact', { ...correct, explicit_correction: false }],
-        ['trivia_correct_fact', { ...correct, action: 'invalidate' }],
+        ['trivia_correct_fact', { ...correct, action: 'invalidate', successor: null, expected_catalog_version: '1' }],
         ['trivia_correct_fact', { ...correct, action: 'supersede', successor: undefined }],
         [
           'trivia_correct_fact',
           {
             ...correct,
-            successor: {
-              ...successor,
-              candidate: { ...candidate, relation_key: 'greets_via_trunk_touch' },
-            },
+            successor: { ...successor, relation_key: 'greets_via_trunk_touch' },
           },
         ],
         [
           'trivia_correct_fact',
           {
             ...correct,
-            successor: { ...successor, candidate: { ...candidate, ontology_version: 2 } },
+            successor: { ...successor, ontology_version: 2 },
           },
         ],
-        // Successor facts share the same CR-005 candidate contract as dedup and reserve.
+        // Successor facts use the closed v2 shape and a complete dedup decision.
         [
           'trivia_correct_fact',
           {
             ...correct,
-            successor: {
-              ...successor,
-              candidate: { ...candidate, qualifiers: { negated: false } },
-            },
+            successor: { ...successor, dedup: { ...successor.dedup, complete: false } },
           },
         ],
         ['trivia_correct_fact', { ...correct, correction_reason: '' }],
@@ -318,7 +264,7 @@ Deno.test('6.8 keeps safe RPC errors and rejects unexpected correction projectio
     globalThis.fetch = (() =>
       Promise.resolve(
         Response.json({
-          response_schema_version: 1,
+          response_schema_version: 2,
           data: { ...outputs.trivia_correct_fact, internal_id: 12345 },
         }),
       )) as typeof fetch;
