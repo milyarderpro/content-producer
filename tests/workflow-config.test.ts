@@ -48,10 +48,13 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
     });
     expect(() => assertRuntimeSpecs(declared)).not.toThrow();
 
-    const assertSelectors = (source: string, requiredNode: number, requiredDeno: number) => {
+    const assertSelectors = (source: string, requiredNode: number, requiredDeno: number, sharedRuntime = false) => {
       const lines = source.split('\n');
       const found = { node: 0, deno: 0 };
+      let job = '';
       for (let i = 0; i < lines.length; i++) {
+        const jobMatch = /^ {2}([a-z]+):$/.exec(lines[i]!);
+        if (jobMatch) job = jobMatch[1]!;
         const action = /^ {6}- uses: (actions\/setup-node@v4|denoland\/setup-deno@v2)$/.exec(lines[i]!);
         if (!action) continue;
         const block: string[] = [];
@@ -62,27 +65,69 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
           /^ {10}(?:node-version|node-version-file|deno-version|deno-version-file):/.test(line));
         const isNode = action[1] === 'actions/setup-node@v4';
         expect(block).toContain('        with:');
-        expect(selectors).toEqual([
-          isNode ? "          node-version: '>=22 <25'" : "          deno-version: '>=2.9.7 <3'",
-        ]);
+        const expected = sharedRuntime && job !== 'runtime'
+          ? (isNode ? '          node-version: ${{ needs.runtime.outputs.node }}'
+            : '          deno-version: ${{ needs.runtime.outputs.deno }}')
+          : (isNode ? "          node-version: '>=22 <25'" : "          deno-version: '>=2.9.7 <3'");
+        expect(selectors).toEqual([expected]);
         found[isNode ? 'node' : 'deno']++;
       }
       expect(found).toEqual({ node: requiredNode, deno: requiredDeno });
     };
     const workflows = [
       { value: ci, node: 1, deno: 1 },
-      { value: candidate, node: 3, deno: 2 },
+      { value: candidate, node: 4, deno: 3 },
       { value: gate, node: 1, deno: 1 },
     ];
     for (const workflow of workflows) {
-      assertSelectors(workflow.value, workflow.node, workflow.deno);
+      assertSelectors(workflow.value, workflow.node, workflow.deno, workflow.value === candidate);
       for (const mutated of [
         workflow.value.replace("node-version: '>=22 <25'", "node-version: '>=22'"),
         workflow.value.replace("node-version: '>=22 <25'", 'node-version-file: .nvmrc'),
         workflow.value.replace("deno-version: '>=2.9.7 <3'", "deno-version: '>=2.9.7'"),
         workflow.value.replace("deno-version: '>=2.9.7 <3'", 'deno-version-file: .deno-version'),
-      ]) expect(() => assertSelectors(mutated, workflow.node, workflow.deno)).toThrow();
+      ]) expect(() => assertSelectors(mutated, workflow.node, workflow.deno, workflow.value === candidate)).toThrow();
     }
+  });
+
+  it('G4 resolves one validated toolchain and wires exact outputs to every consumer', () => {
+    const validate = (source: string) => {
+      const job = (name: string) => {
+        const body = source.split(`  ${name}:\n`)[1]?.split(/\n {2}[a-z]+:\n/)[0];
+        expect(body).toBeDefined();
+        return body!;
+      };
+      const resolver = job('runtime');
+      expect(resolver).toContain('node: ${{ steps.versions.outputs.node }}');
+      expect(resolver).toContain('deno: ${{ steps.versions.outputs.deno }}');
+      expect(resolver).toContain("node-version: '>=22 <25'");
+      expect(resolver).toContain("deno-version: '>=2.9.7 <3'");
+      expect(resolver).toContain('check-latest: true');
+      expect(resolver).toContain('id: versions');
+      expect(resolver).toContain('pnpm exec tsx scripts/gate-runtime.ts');
+      expect(resolver).toContain('test "$GITHUB_SHA" = "$CANDIDATE_SHA"');
+      for (const name of ['source', 'database', 'aggregate']) {
+        const body = job(name);
+        expect(body).toContain(name === 'aggregate'
+          ? 'needs: [runtime, source, database]' : 'needs: runtime');
+        expect(body).toContain('node-version: ${{ needs.runtime.outputs.node }}');
+        if (name !== 'aggregate')
+          expect(body).toContain('deno-version: ${{ needs.runtime.outputs.deno }}');
+        expect(body).not.toMatch(/(?:node|deno)-version: ['"]?>=/);
+      }
+      expect(job('aggregate')).toContain('RUNTIME_JOB: ${{ needs.runtime.result }}');
+      expect(job('aggregate')).toContain('test "$RUNTIME_JOB" = success');
+    };
+    validate(candidate);
+    for (const mutated of [
+      candidate.replace('    needs: runtime', ''),
+      candidate.replace('needs: [runtime, source, database]', 'needs: [source, database]'),
+      candidate.replace('node-version: ${{ needs.runtime.outputs.node }}', "node-version: '>=22 <25'"),
+      candidate.replace('deno-version: ${{ needs.runtime.outputs.deno }}', "deno-version: '>=2.9.7 <3'"),
+      candidate.replace('node: ${{ steps.versions.outputs.node }}', 'node: 24.22.0'),
+      candidate.replace('pnpm exec tsx scripts/gate-runtime.ts', 'node --version'),
+      candidate.replace('test "$RUNTIME_JOB" = success', 'true'),
+    ]) expect(() => validate(mutated)).toThrow();
   });
 
   it('focused runtime checks are mandatory before the full source check when source is changed', () => {
@@ -185,7 +230,7 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
     expect(databaseJob).toContain('ref: ${{ github.sha }}');
     expect(candidate).toContain('scripts/gate-backend.ts --aggregate');
     expect(candidate).toContain('GATE_DB_SHARD: ${{ matrix.shard }}');
-    expect(candidate).toContain('needs: [source, database]');
+    expect(candidate).toContain('needs: [runtime, source, database]');
     expect(candidate).toContain('if: always()');
     expect(candidate).toContain('test "$SOURCE_JOB" = success');
     expect(candidate).toContain('test "$DATABASE_JOB" = success');

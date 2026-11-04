@@ -10,6 +10,7 @@ Pemilik ingin memulai ulang konten dengan trivia v2 sebagai satu-satunya alur ya
 - **BREAKING:** Pensiunkan seluruh operasi konten trivia v1 pada katalog MCP dan akses RPC langsung. Panggilan dari plugin lama, termasuk replay atau permintaan yang tertunda, harus ditolak tanpa membuat konten baru. Tool umum tetap tersedia untuk konten v2 dengan kontrak yang sekarang.
 - Arahkan plugin Content Producer dan dokumentasi operasional aktif hanya ke alur v2. Catat risiko bahwa instalasi plugin lama dapat gagal setelah cutover; pemilik telah menerimanya.
 - Sediakan backup, preflight scope, pengosongan transaksional, pemeriksaan identitas/Page sebelum dan sesudah, gate G4 exact-SHA, dan uji live v2 yang membedakan source dari runtime terpasang.
+- Remediasi G4 yang disetujui pemilik pada 4 November 2026: resolve Node/Deno sekali per run dalam range yang berlaku, lalu gunakan versi exact yang sama untuk source, kedua shard, dan aggregate. Pemeriksaan runtime aktual tetap fail-closed; rincian di CR-060.
 - Pertahankan rantai migration dan histori production yang ada. Tambahkan migration maju untuk menutup v1; simpan helper internal bersama meskipun sebagian namanya berakhiran `_v1` selama v2 masih memerlukannya. Pembersihan nama dan baseline schema baru menjadi change terpisah.
 
 ## Capabilities

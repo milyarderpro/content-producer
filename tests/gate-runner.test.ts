@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { runtimeJobOutputs } from '../scripts/gate-runtime.js';
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import {
@@ -130,6 +131,26 @@ test('resolved Node/Deno versions, pins and G4 runtime reports are fail-closed',
   assert.throws(() => assertEquivalentRuntimeEvidence(later, lower, later), /RUNTIME_EVIDENCE_MISMATCH/);
   assert.throws(() => assertEquivalentRuntimeEvidence(later, undefined, later), /RUNTIME_EVIDENCE_MISSING/);
   assert.throws(() => assertEquivalentRuntimeEvidence(later, { ...later, resolved: { ...later.resolved, node: '26.0.0' } }, later));
+});
+
+test('runtime resolver exports exact validated versions and rejects invalid output injection', () => {
+  const declared = { nodeSelector: '>=22', nodeEngine: '>=22 <25', denoSelector: '>=2.9.7' };
+  const actual = { node: 'v24.22.2', deno: 'deno 2.9.8 (stable)', pnpm: '10.33.2', supabase: '2.120.0' };
+  assert.equal(runtimeJobOutputs(declared, actual), 'node=24.22.2\ndeno=2.9.8\n');
+  for (const node of ['', 'v24.22.2\nnode=25.0.0', 'v25.0.0', 'v24.22.2-rc.1']) {
+    assert.throws(() => runtimeJobOutputs(declared, { ...actual, node }));
+  }
+  for (const deno of ['', 'deno 3.0.0', 'deno 2.9.6', 'deno 2.9.8\nnode=25.0.0']) {
+    if (deno.includes('\n')) {
+      // Multiline deno --version is expected; only the validated first line is exported.
+      assert.equal(runtimeJobOutputs(declared, { ...actual, deno }), 'node=24.22.2\ndeno=2.9.8\n');
+    } else assert.throws(() => runtimeJobOutputs(declared, { ...actual, deno }));
+  }
+  const report = resolveRuntimeEvidence(declared, actual);
+  for (const node of ['24.22.1', '24.22.0']) {
+    const different = { ...report, resolved: { ...report.resolved, node } };
+    assert.throws(() => assertEquivalentRuntimeEvidence(report, different, report), /RUNTIME_EVIDENCE_MISMATCH/);
+  }
 });
 
 test('rejects unsafe and user stack targets', () => {

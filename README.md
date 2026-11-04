@@ -54,7 +54,7 @@ acceptance historis menjadi PASS.
 - Node.js mengikuti selector `.nvmrc >=22` dan engine `>=22 <25` (major 22–24); pnpm tetap pin `10.33.2`. G4 memeriksa versi aktual terhadap irisan range dan merekam keduanya dalam report.
 - Supabase CLI `2.120.0` tersedia melalui dependency project.
 - Deno mengikuti selector `.deno-version >=2.9.7`; G4 fail-closed pada major 2.x yang disetujui (major 3 belum diuji), serta mencatat versi aktual. Deno diperlukan untuk `test:mcp` dan harness HTTP.
-- Workflow light CI, G4 manual, dan legacy backend gate memakai input Actions **Node `>=22 <25`** serta **Deno `>=2.9.7 <3`** agar resolver runtime memilih irisan aman. File deklarasi pemilik tidak diubah; gate menolak drift tiga string deklarasi yang belum di-review sebelum membuat laporan `effective`.
+- Workflow light CI, G4 manual, dan legacy backend gate memakai input Actions **Node `>=22 <25`** serta **Deno `>=2.9.7 <3`** agar resolver runtime memilih irisan aman. G4 memilih sekali per run lalu membagikan versi exact ke seluruh job ([CR-060](docs/decisions/2026-11-04-cr-060-g4-single-runtime-resolution.md)). File deklarasi pemilik tidak diubah; gate menolak drift tiga string deklarasi yang belum di-review sebelum membuat laporan `effective`.
 - Docker diperlukan untuk stack Supabase dan suite database lokal.
 
 Instalasi dependency dari root:

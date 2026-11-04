@@ -335,3 +335,13 @@ legacy pada SHA final yang disetujui di stack ephemeral dan simpan
 bukti aman. Pulihkan entrypoint/required checks melalui prosedur
 terpisah bila nanti telah dikonfigurasi; jangan reset/migrasi
 database production untuk rollback workflow.
+
+### Remediasi resolusi runtime G4 — CR-060
+
+Run [41839544747](https://github.com/milyarderpro/content-producer/actions/runs/41839544747)
+pada `916f3cd76c43a85a2f350357ce900abcc885a081` **FAIL aggregate** karena
+Node source/shard memakai 24.22.2/24.22.1/24.22.0. Komponen PASS tidak memberi
+izin rilis. [CR-060](decisions/2026-11-04-cr-060-g4-single-runtime-resolution.md)
+menetapkan satu resolver bounded per run dan output exact untuk seluruh job;
+actual-version equality, hash, dua shard, advisors serta seluruh kontrol
+tetap wajib. Rilis menunggu G4 baru pada final main SHA dengan aggregate PASS.
