@@ -2,7 +2,7 @@
 
 Content Producer membantu pemilik menyiapkan konten trivia Facebook melalui
 plugin PRIVATE ChatGPT dan layanan MCP berbasis Supabase. Alurnya mencakup riset,
-pemeriksaan duplikasi, reservasi fakta, draft, review, persetujuan, rencana konten,
+pemeriksaan duplikasi, draft v2, review, persetujuan, rencana konten,
 serta pencatatan publikasi dan performa secara manual.
 
 Niche yang diimplementasikan saat ini adalah `trivia`; core dirancang agar niche
@@ -15,7 +15,7 @@ baru dapat memiliki aturan dan modelnya sendiri. Bahasa konten trivia tetap
 | ------------------------------------- | -------------------------------------- |
 | Tujuan produk dan peta implementasi   | [Arsitektur](docs/architecture.md)     |
 | Arti data dan aturan bisnis           | [Domain](docs/domain.md)               |
-| Input/output dan pilihan 33 tool      | [Kontrak tool](docs/tool-contracts.md) |
+| Input/output dan pilihan 31 tool aktif | [Kontrak tool](docs/tool-contracts.md) |
 | Setup lokal dan pengembangan fitur    | [Development](docs/development.md)     |
 | Memilih test dan gate CI              | [Testing](docs/testing.md)             |
 | Versi terpasang, rilis, dan pemulihan | [Operations](docs/operations.md)       |
@@ -27,7 +27,8 @@ Indeks lengkap ada di [docs/README.md](docs/README.md). Kontrak frozen dalam
 ## Status dan alur kerja aktif
 
 Project sudah digunakan di production menurut pemilik. Source menggunakan default
-owner OAuth dengan app `mcpku2` dan 33 tool, yaitu 11 Baca dan 22 Tulis. Ringkasan
+owner OAuth dengan app `mcpku2`. Kandidat cutover menyediakan 31 tool aktif,
+yaitu 11 Baca dan 20 Tulis; lima tool khusus trivia v1 pensiun. Ringkasan
 versi source dan bukti deployment yang tercatat dipusatkan di
 [operations](docs/operations.md#1-satu-ringkasan-versi-dengan-sumber-bukti-yang-jelas);
 HEAD lokal bukan bukti versi live terbaru.
@@ -35,7 +36,7 @@ HEAD lokal bukan bukti versi live terbaru.
 Pengujian langsung dan remediasi mengikuti [Live Test & Fix](docs/live-test/README.md):
 satu prompt → chat baru oleh pemilik → bukti disanitasi → verdict → Issue → PR
 fokus dan Actions → retest pada runtime yang terverifikasi. Lihat
-[matriks 33 tool](docs/live-test/test-matrix.md), [log hasil](docs/live-test/results.md),
+[matriks live historis dan cakupan v2](docs/live-test/test-matrix.md), [log hasil](docs/live-test/results.md),
 dan [Issue kampanye #25](https://github.com/milyarderpro/content-producer/issues/25).
 
 [Issue #26](https://github.com/milyarderpro/content-producer/issues/26) merekam
@@ -80,7 +81,7 @@ dan check non-style sesuai risiko tetap wajib. Keputusan aktif ada di
 **Gate rilis G4 aktif:** dispatch
 [`backend-gate-candidate.yml`](.github/workflows/backend-gate-candidate.yml)
 **manual pada exact final SHA `main`**; syarat formal adalah source,
-dua shard terisolasi **19+22 = 41 file/182 kasus database** dan aggregate
+dua shard terisolasi **15+18 = 33 file/132 kasus database** dan aggregate
 PASS pada SHA/hash sama. Tidak ada trigger otomatis atau required branch
 protection check. `pnpm run gate:source`, `gate:backend`, `gate:full`
 adalah komponen G4; lokal `DIAGNOSTIC_CONFIG_OVERLAY` hanya diagnostik.

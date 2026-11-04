@@ -1,5 +1,10 @@
 # Evaluasi editorial trivia — Page uji dan draft tersimpan
 
+**ARSIP prosedur v1.** Kampanye dan prompt di direktori ini mencatat cara kerja
+sebelum CR-059. Jangan menjalankan reservasi/`save_post` dari dokumen lama.
+Uji baru setelah cutover memakai alur v2 pada [panduan live aktif](../README.md)
+dan hanya setelah versi host serta scope Write diverifikasi.
+
 Kampanye ini melengkapi [Live Test & Fix](../README.md) untuk menguji **kualitas naskah dan keberhasilan workflow penyimpanan draft secara terpisah**, bukan mengganti [matriks 33 tool](../test-matrix.md), menguji video 13 detik, atau mengklaim publikasi end-to-end. [Rencana enam task](../../../plans/trivia-editorial-evaluation-plan.md), [spesifikasi Page uji](page-setup.md), dan [protokol](protocol.md) menjelaskan dasar kampanye; audit tiga referensi berada di [sintesis](references/synthesis.md). [Issue payung #47](https://github.com/milyarderpro/content-producer/issues/47) melacak progres, bukan bukti bahwa suatu kasus telah dijalankan.
 
 **Status 28 Oktober 2026:** [Page uji](preflight.md) telah dibuat sekali dengan readback `MATCH`. Kelima format pilot mempunyai sekurangnya satu draft tersimpan melalui baseline atau retest, tetapi kualitas editorialnya berbeda-beda dan tidak ada draft yang otomatis `ready`. Uji terfokus [SSF v0.2.9](runs/DNA-SSF-02-v029-01.md) dan [TUT v0.2.9](runs/DNA-TUT-02-v029-01.md) dicatat terpisah. Kampanye utama kini **dibuka, tetapi masih 0/30 kasus dijalankan**; [prosedur direct-save v1](main-direct-save-v1.md) adalah instruksi aktif untuk kasus baru. [Matriks dan prompt GO lama](cases.md) serta [mini-test terdahulu](mini-test-v1.md) hanya historis. Lihat [ringkasan](summary.md) untuk batas bukti tiap kohort.

@@ -219,14 +219,14 @@ const payloads: Record<string, object> = {
 
 Deno.test('6.4 Page/plan metadata survives the 6.11 expansion; no anonymous tools', async () => {
   const text = await request('tools/list');
-  assert(MCP_TOOL_COUNT === 36, 'cumulative registry count must be 36');
+  assert(MCP_TOOL_COUNT === 31, 'cumulative registry count must be 36');
   for (const tool of PAGE_PLAN_TOOL_NAMES) assert(text.includes(tool), 'missing ' + tool);
-  assert((text.match(/"oauth2"/g) || []).length === 72, 'every tool has OAuth and mirror');
-  assert((text.match(/"openWorldHint":false/g) || []).length === 36, 'open world hint');
-  assert((text.match(/"readOnlyHint":true/g) || []).length === 12, 'twelve read tools');
-  assert((text.match(/"readOnlyHint":false/g) || []).length === 24, 'twenty-four writes');
+  assert((text.match(/"oauth2"/g) || []).length === 62, 'every tool has OAuth and mirror');
+  assert((text.match(/"openWorldHint":false/g) || []).length === 31, 'open world hint');
+  assert((text.match(/"readOnlyHint":true/g) || []).length === 11, 'eleven read tools');
+  assert((text.match(/"readOnlyHint":false/g) || []).length === 20, 'twenty writes');
   assert(
-    (text.match(/"destructiveHint":true/g) || []).length === 9,
+    (text.match(/"destructiveHint":true/g) || []).length === 8,
     'update_page, cancel, two trivia correction, two post edit, discard and two published-history tools are destructive',
   );
   assert(text.split('"openai/profile":true').length === 2, 'profile only');

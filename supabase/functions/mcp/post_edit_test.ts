@@ -216,10 +216,10 @@ response.reschedule_post = {
 };
 
 Deno.test(
-  '6.10: post-edit schemas remain closed among 33 OAuth tools with destructive annotations',
+  '6.10: post-edit schemas remain closed among 31 OAuth tools with destructive annotations',
   async () => {
     const tools = (await mcp('tools/list')).result.tools;
-    check(MCP_TOOL_COUNT === 36 && tools.length === 36, 'EXACT_36');
+    check(MCP_TOOL_COUNT === 31 && tools.length === 31, 'EXACT_36');
     for (const name of POST_EDIT_TOOL_NAMES) {
       const tool = tools.find((x: { name: string }) => x.name === name);
       check(tool?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
@@ -249,26 +249,23 @@ Deno.test(
       return Promise.resolve(Response.json({ response_schema_version: 1, data: response[name] }));
     }) as typeof fetch;
     try {
-      const revised = await call('revise_post', reviseArgs);
-      check(!revised.isError && revised.structuredContent.data.post.revision === 2, 'REVISE_OK');
+      const retired = await mcp('tools/call', { name: 'revise_post', arguments: reviseArgs });
+      check(!!retired.error || retired.result?.isError === true, 'V1_REVISE_RETIRED');
       const moved = await call('reschedule_post', scheduleArgs);
       check(!moved.isError && moved.structuredContent.data.content_hash_unchanged, 'SCHEDULE_OK');
       const cleared = await call('reschedule_post', { ...scheduleArgs, scheduled_at: null });
       check(!cleared.isError, 'NULL_SCHEDULE_ACCEPTED');
       check(
-        calls.map((c) => c.name).join(',') === 'revise_post,reschedule_post,reschedule_post',
+        calls.map((c) => c.name).join(',') === 'reschedule_post,reschedule_post',
         'EXACT_RPCS',
       );
       check(
-        calls[0].params.p_expected_revision === 1 &&
-          calls[0].params.p_expected_content_hash === 'a'.repeat(64),
-        'CAS_FORWARDED',
+        calls[0].params.p_expected_revision === scheduleArgs.expected_revision,
+        'REVISION_CAS_FORWARDED',
       );
-      check(calls[0].params.p_reservation_token === null, 'NULL_RESERVATION');
-      check(calls[0].params.p_revision_reason === 'Improve the caption.', 'SAFE_REASON');
       check(
-        calls[1].params.p_scheduled_at === scheduleArgs.scheduled_at &&
-          calls[2].params.p_scheduled_at === null,
+        calls[0].params.p_scheduled_at === scheduleArgs.scheduled_at &&
+          calls[1].params.p_scheduled_at === null,
         'SCHEDULE_EXPLICIT_NULL',
       );
       check(
@@ -277,7 +274,7 @@ Deno.test(
         ),
         'NO_IDENTITY_OVERRIDES',
       );
-      check(!JSON.stringify(revised.content).includes(context.accessToken), 'NO_TOKEN_LEAK');
+      check(!JSON.stringify(moved.content).includes(context.accessToken), 'NO_TOKEN_LEAK');
     } finally {
       globalThis.fetch = oldFetch;
     }
@@ -315,8 +312,8 @@ Deno.test(
         ['reschedule_post', { ...scheduleArgs, access_token: context.accessToken }],
         ['reschedule_post', { ...scheduleArgs, workspace_public_id: postId }],
       ] as const) {
-        const result = await call(name, args);
-        check(result.isError === true, 'REJECT_' + name);
+        const packet = await mcp('tools/call', { name, arguments: args });
+        check(!!packet.error || packet.result?.isError === true, 'REJECT_' + name);
       }
       check(hits === 0, 'INVALID_DID_NOT_REACH_RPC');
     } finally {
@@ -332,11 +329,11 @@ Deno.test(
       Promise.resolve(
         Response.json({
           response_schema_version: 1,
-          data: { ...response.revise_post, owner_user_id: context.actorUserId },
+          data: { ...response.reschedule_post, owner_user_id: context.actorUserId },
         }),
       )) as typeof fetch;
     try {
-      const result = await call('revise_post', reviseArgs);
+      const result = await call('reschedule_post', scheduleArgs);
       check(
         result.isError && result.structuredContent.error.code === 'DATABASE_UNAVAILABLE',
         'BACKEND_RESPONSE_REJECTED',

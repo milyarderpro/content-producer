@@ -6,8 +6,8 @@ Menetapkan perilaku pembuatan draft trivia melalui instruksi biasa, dari riset
 hingga readback, termasuk kelanjutan beberapa draft dan persetujuan terpisah.
 Spesifikasi ini menjabarkan baseline PRD melalui [design](../../design.md), bukan
 mengganti change record. Override yang diterima mengikuti
-[CR-053](../../../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
-dan [CR-054](../../../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md);
+[CR-053](../../../../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
+dan [CR-054](../../../../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md);
 penerimaan kontrak bukan bukti implementasi atau izin cutover runtime.
 
 ## ADDED Requirements

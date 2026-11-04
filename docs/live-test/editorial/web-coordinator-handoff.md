@@ -1,5 +1,8 @@
 # Serah-terima koordinator evaluasi ke ChatGPT Work web
 
+**ARSIP prosedur v1.** Handoff dan prompt ini tidak berlaku untuk cutover v2;
+ikuti [panduan live aktif](../README.md) sebelum menyusun uji baru.
+
 **Status awal, 28 Oktober 2026:** kampanye utama `MAIN` belum dijalankan (`0/30`). Lima pilot format dan uji terfokus sesudahnya adalah bukti historis/diagnostik, **bukan** bagian dari 30 kasus utama. Dokumen ini menjelaskan serah-terima peran, bukan izin menjalankan 30 Write sekaligus.
 
 ## Peran dan akses

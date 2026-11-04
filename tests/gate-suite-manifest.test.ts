@@ -10,6 +10,16 @@ type Suite = { status: string; entrypoint: string; files: Entry[] };
 const manifest = JSON.parse(read('scripts/gate-suite-manifest.json')) as {
   schemaVersion: number;
   baseSha: string;
+  cutoverEvidence: {
+    apiNames: number;
+    mcpCases: number;
+    inspectorValid: number;
+    inspectorInvalid: number;
+    retiredV1NamesRejected: number;
+    ownerDenialRequired: boolean;
+    databaseFiles: number;
+    databaseCases: number;
+  };
   suites: { source: Suite; mcp: Suite; database: Suite };
 };
 
@@ -44,12 +54,17 @@ describe('mandatory suite inventory (not a release gate)', () => {
   it('has distinct mandatory source, MCP, and database groups', () => {
     expect(manifest.schemaVersion).toBe(1);
     expect(manifest.baseSha).toMatch(/^[0-9a-f]{40}$/);
+    expect(manifest.cutoverEvidence).toEqual({
+      apiNames: 31, mcpCases: 114, inspectorValid: 31, inspectorInvalid: 31,
+      retiredV1NamesRejected: 5, ownerDenialRequired: true,
+      databaseFiles: 33, databaseCases: 132,
+    });
     expect(Object.keys(manifest.suites).sort()).toEqual(['database', 'mcp', 'source']);
     assertMandatory(manifest.suites.source, 'tests/');
     assertMandatory(manifest.suites.mcp, 'supabase/functions/mcp/');
     assertMandatory(manifest.suites.database, 'supabase/tests/database/');
     expect(manifest.suites.mcp.files).toHaveLength(17);
-    expect(manifest.suites.database.files).toHaveLength(46);
+    expect(manifest.suites.database.files).toHaveLength(33);
   });
 
   it('matches all source files discovered by the root Vitest include', () => {

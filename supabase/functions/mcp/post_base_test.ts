@@ -172,9 +172,9 @@ async function mcp(method: string, params?: object) {
 async function call(name: string, args: object) {
   return (await mcp('tools/call', { name, arguments: args })).result;
 }
-Deno.test('6.9: post schemas remain closed among 33 OAuth tools', async () => {
+Deno.test('6.9: post schemas remain closed among 31 OAuth tools', async () => {
   const tools = (await mcp('tools/list')).result.tools;
-  check(MCP_TOOL_COUNT === 36 && tools.length === 36, 'EXACT_36');
+  check(MCP_TOOL_COUNT === 31 && tools.length === 31, 'EXACT_36');
   for (const name of POST_BASE_TOOL_NAMES) {
     const t = tools.find((x: { name: string }) => x.name === name);
     check(t?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');
@@ -182,7 +182,7 @@ Deno.test('6.9: post schemas remain closed among 33 OAuth tools', async () => {
     check(t?._meta.securitySchemes[0].type === 'oauth2', 'OAUTH');
     check(t.annotations.openWorldHint === false, 'NO_OPEN_WORLD');
     check(t.annotations.destructiveHint === false, 'NON_DESTRUCTIVE');
-    check(t.annotations.readOnlyHint === (name !== 'save_post'), 'READ_ONLY');
+    check(t.annotations.readOnlyHint === true, 'READ_ONLY');
     check(!Object.hasOwn(t._meta, 'openai/profile'), 'NO_PROFILE');
   }
 });
@@ -201,9 +201,8 @@ Deno.test(
       return Promise.resolve(Response.json({ response_schema_version: 1, data: response[name] }));
     }) as typeof fetch;
     try {
-      const s = await call('save_post', save);
-      check(!s.isError && s.structuredContent.data.post.status === 'draft', 'SAVE_DRAFT');
-      check(!JSON.stringify(s.content).includes(token), 'NO_TOKEN_TEXT');
+      const retired = await mcp('tools/call', { name: 'save_post', arguments: save });
+      check(!!retired.error || retired.result?.isError === true, 'V1_SAVE_RETIRED');
       check(!(await call('list_posts', { ...base, limit: 1 })).isError, 'LIST_OK');
       check(
         !(await call('get_post', { ...base, post_public_id: postId, include_sources: false }))
@@ -211,13 +210,11 @@ Deno.test(
         'GET_OK',
       );
       check(calls.map((c) => c.name).join(',') === POST_BASE_TOOL_NAMES.join(','), 'EXPECTED_RPCS');
-      check(calls[0].params.p_reservation_token === token, 'RESERVATION_FORWARDED');
-      check(calls[0].params.p_plan_item === null, 'NO_PLAN');
-      check(calls[1].params.p_limit === 1, 'LIST_LIMIT');
+      check(calls[0].params.p_limit === 1, 'LIST_LIMIT');
       check(
-        calls[2].params.p_include_sources === false &&
-          calls[2].params.p_include_checks === true &&
-          calls[2].params.p_include_latest_metrics === false,
+        calls[1].params.p_include_sources === false &&
+          calls[1].params.p_include_checks === true &&
+          calls[1].params.p_include_latest_metrics === false,
         'READ_DEFAULTS',
       );
       check(
@@ -265,8 +262,8 @@ Deno.test(
         ['get_post', { ...base, post_public_id: postId, include_sources: 'yes' }],
         ['get_post', { ...base, post_public_id: postId, access_token: 'bad' }],
       ] as const) {
-        const result = await call(name, args);
-        check(result.isError === true, 'REJECT_' + name);
+        const packet = await mcp('tools/call', { name, arguments: args });
+        check(!!packet.error || packet.result?.isError === true, 'REJECT_' + name);
       }
       check(hits === 0, 'NO_RPC_ON_INVALID_INPUT');
     } finally {
@@ -283,14 +280,13 @@ Deno.test(
         Response.json({
           response_schema_version: 1,
           data: {
+            ...response.get_post,
             post: { ...post, owner_user_id: context.actorUserId },
-            plan: null,
-            replayed: false,
           },
         }),
       )) as typeof fetch;
     try {
-      const r = await call('save_post', save);
+      const r = await call('get_post', { ...base, post_public_id: postId });
       check(
         r.isError === true && r.structuredContent?.error?.code === 'DATABASE_UNAVAILABLE',
         'MALICIOUS_RESPONSE_DENIED',

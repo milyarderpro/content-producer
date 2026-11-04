@@ -1,11 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import {
   candidate,
-  factInput,
-  reserve,
-  release,
   rpc,
   json,
+  quote,
   row,
   sql,
   callerStatement,
@@ -14,23 +12,29 @@ import {
 
 export function populateSearch(f: TriviaFixture) {
   const c = candidate();
-  const first = rpc(f, reserve(f, [factInput(c)]));
-  rpc(f, release(f, first.data.reservation_token as string));
-  const id = (first.data.facts as { fact_public_id: string }[])[0]!.fact_public_id;
-  // Administrative volume only; target registration/release and all measurements use api.
-  sql(`insert into public.trivia_facts(workspace_id,claim_text,normalized_claim,claim_hash,
-    subject_key,relation_key,object_key,numbers,qualifiers,structured_key,structured_hash,
-    topic_key,dedup_review_snapshot,source_data)
-    select workspace_id,'Synthetic audit corpus entity '||g,'',repeat('0',64),'audit_entity_'||g,
-      relation_key,object_key,numbers,qualifiers,'',repeat('0',64),topic_key,dedup_review_snapshot,source_data
-    from public.trivia_facts cross join generate_series(1,5000) g where public_id='${id}';
+  // Administrative native-v2 volume; all public measurements use the v2 Read RPC.
+  sql(`with inserted as (
+    insert into public.trivia_facts(workspace_id,claim_text,normalized_claim,claim_hash,
+      has_v1_envelope,subject_key,relation_key,object_key,numbers,qualifiers,
+      ontology_version,structured_key,structured_hash,topic_key,
+      dedup_review_snapshot,source_data,freshness_class,risk_class,verification_status)
+    select w.id,case when g=0 then ${quote(c.claim_text as string)}
+      else 'Synthetic audit corpus entity '||g end,'',repeat('0',64),false,
+      null,null,null,null,null,null,null,null,null,null,null,null,null,'needs_review'
+    from public.workspaces w cross join generate_series(0,5000) g
+    where w.public_id='${f.workspace}' returning workspace_id,id
+  ) insert into public.trivia_fact_evidence_v2(workspace_id,fact_id,source_url)
+    select workspace_id,id,'https://example.org/fixture/performance' from inserted;
     analyze public.trivia_facts;`);
   const scope = `(select id from public.workspaces where public_id='${f.workspace}')`;
   const fixtureDigest = () =>
     row<{ n: number; digest: string }>(`select count(*) n,
       md5(jsonb_agg(to_jsonb(f) order by id)::text) digest from public.trivia_facts f where workspace_id=${scope}`);
   const expression = (inputs: unknown[] = [c]) =>
-    `api.trivia_find_similar_facts(1,'${f.workspace}','${f.page}',${json(inputs)},20)`;
+    `api.trivia_find_similar_facts_v2(2,'${f.workspace}','${f.page}',${json(inputs.map((input) => {
+      const item = input as { candidate_key: string; claim_text: string };
+      return { candidate_key: item.candidate_key, claim_text: item.claim_text };
+    }))})`;
   const results = () =>
     [
       c,

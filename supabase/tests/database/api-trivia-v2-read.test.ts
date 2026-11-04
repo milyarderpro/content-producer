@@ -1,21 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  candidate,
-  cleanup,
-  factInput,
-  fixture,
-  json,
-  postFixture,
-  quote,
-  release,
-  reserve,
-  reserved,
-  row,
-  rpc,
-  sql,
-  time,
-} from './helpers/trivia-rpc.js';
+import { fixture, json, quote, row, rpc, sql, time } from './helpers/trivia-rpc.js';
+import { approve, cleanup, draft, firstFact, publish } from './helpers/trivia-v2.js';
 
 function insertNative(workspace: string, claim: string, status = 'needs_review'): string {
   const url = 'https://example.org/fixture/source';
@@ -46,7 +32,7 @@ function readV2(f: ReturnType<typeof fixture>, candidates: Array<{ candidate_key
 }
 
 describe('P3 trivia v2 canonical Read and additive schema', () => {
-  it('uses the original fact ID, requires one URL, and isolates owner and v1 projection', () => {
+  it('uses the original fact ID, requires one URL, isolates owner, and rejects retired v1 Read', () => {
     const f = fixture();
     const claim = 'Fixture blue marker rests on a clean shelf.';
     try {
@@ -82,8 +68,8 @@ describe('P3 trivia v2 canonical Read and additive schema', () => {
         },
       ]);
       expect(() =>
-        rpc(f, `api.trivia_find_similar_facts(1,'${f.workspace}','${f.page}',${json([{ ...candidate(), claim_text: claim }])},20)`),
-      ).toThrow('FACT_REVIEW_REQUIRED');
+        rpc(f, `api.trivia_find_similar_facts(1,'${f.workspace}','${f.page}',${json([{ candidate_key: 'a', claim_text: claim }])},20)`),
+      ).toThrow('LOCAL_TEST_QUERY_FAILED');
       expect(() => readV2(f, [{ candidate_key: 'a', claim_text: claim }])).not.toThrow();
       expect(() =>
         rpc(f, `api.trivia_find_similar_facts_v2(2,'${f.workspace}','${f.page}',${json([{ candidate_key: 'a', claim_text: claim }])})`, f.other),
@@ -91,32 +77,21 @@ describe('P3 trivia v2 canonical Read and additive schema', () => {
       expect(() =>
         readV2(f, [{ candidate_key: 'a', claim_text: claim, extra: true } as never]),
       ).toThrow('VALIDATION_FAILED');
-      const attached = rpc(f, reserve(f, [factInput({ ...candidate(), claim_text: claim })]));
-      expect(reserved(attached)[0]).toEqual(
-        expect.objectContaining({ fact_public_id: id, canonical_action: 'refreshed_existing' }),
-      );
       expect(row<{ has_v1_envelope: boolean }>(
         `select has_v1_envelope from public.trivia_facts where public_id='${id}'`,
-      ).has_v1_envelope).toBe(true);
-      const legacyAfterAttachment = rpc(
-        f,
-        `api.trivia_find_similar_facts(1,'${f.workspace}','${f.page}',${json([{ ...candidate(), claim_text: claim }])},20)`,
-      );
-      expect(JSON.stringify(legacyAfterAttachment)).toContain(id);
-      expect(readV2(f, [{ candidate_key: 'a', claim_text: claim }]).data.catalog_version).not.toBe('1');
+      ).has_v1_envelope).toBe(false);
     } finally {
-      sql(`delete from public.trivia_fact_evidence_v2 where fact_id in (select id from public.trivia_facts where workspace_id=(select id from public.workspaces where public_id='${f.workspace}'));`);
       cleanup(f);
     }
   });
 
-  it('keeps the in-place v1 mapping idempotent and protects native evidence', () => {
+  it('keeps the in-place v2 mapping idempotent and protects native evidence', () => {
     const f = fixture();
     try {
-      const v1 = rpc(f, reserve(f, [factInput(candidate())]));
-      const originalId = reserved(v1)[0]!.fact_public_id;
-      rpc(f, release(f, v1.data.reservation_token as string));
-      postFixture(f, originalId, 'posted');
+      const p = draft(f);
+      const originalId = firstFact(p.post_public_id).id;
+      rpc(f, approve(f, p.post_public_id));
+      rpc(f, publish(f, p.post_public_id));
       const before = row<{ digest: string; facts: number; usage: number }>(`
         select
           (select encode(extensions.digest(string_agg(j.source_snapshot::text,',' order by j.id),'sha256'),'hex')
@@ -139,12 +114,12 @@ describe('P3 trivia v2 canonical Read and additive schema', () => {
           (select count(*)::integer from internal.trivia_fact_usage_v2 u where u.workspace_id=w.id) usage
         from public.workspaces w where w.public_id='${f.workspace}'`);
       expect(after).toEqual(before);
-      expect(after).toEqual({ digest: before.digest, facts: 1, usage: 1 });
-      expect(readV2(f, [{ candidate_key: 'legacy', claim_text: row<{ claim: string }>(`select claim_text claim from public.trivia_facts where public_id='${originalId}'`).claim }]).data.candidates)
-        .toEqual([expect.objectContaining({ matches: [expect.objectContaining({ fact_public_id: originalId,
-          used_in_workspace: true, reuse_eligibility: 'workspace_blocked' })] })]);
+      expect(after).toEqual({ digest: before.digest, facts: 5, usage: 5 });
+      expect(readV2(f, [{ candidate_key: 'current', claim_text: row<{ claim: string }>(`select claim_text claim from public.trivia_facts where public_id='${originalId}'`).claim }]).data.candidates)
+        .toEqual([expect.objectContaining({ matches: expect.arrayContaining([expect.objectContaining({ fact_public_id: originalId,
+          used_in_workspace: true, reuse_eligibility: 'workspace_blocked' })]) })]);
       expect(row<{ count: number }>(`select count(*)::integer count from public.trivia_facts
-        where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`).count).toBe(1);
+        where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`).count).toBe(5);
       expect(row<{ valid: boolean }>(`select internal.trivia_web_source_url_v2('http://127.0.0.1/private') valid`).valid).toBe(false);
       expect(row<{ valid: boolean }>(`select internal.trivia_web_source_url_v2('https://example.org/fact') valid`).valid).toBe(true);
       expect(() => sql(`insert into public.trivia_facts(workspace_id,claim_text,normalized_claim,claim_hash,
@@ -155,25 +130,23 @@ describe('P3 trivia v2 canonical Read and additive schema', () => {
           null,null,null,null,null,null,null,null,null,null,null,null,null,'needs_review'
         from public.workspaces where public_id='${f.workspace}'`)).toThrow();
       expect(row<{ count: number }>(`select count(*)::integer count from public.trivia_facts
-        where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`).count).toBe(1);
+        where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`).count).toBe(5);
     } finally {
       cleanup(f);
     }
   });
 
-  it('sees v1 usage, negative history, and an incomplete 21st match without rewriting old snapshots', () => {
+  it('sees v2 usage, negative history, and an incomplete 21st match without rewriting snapshots', () => {
     const f = fixture();
     try {
-      const legacy = rpc(f, reserve(f, [factInput(candidate())]));
-      const fact = reserved(legacy)[0]!.fact_public_id;
-      rpc(f, release(f, legacy.data.reservation_token as string));
-      postFixture(f, fact);
+      const p = draft(f);
+      const fact = firstFact(p.post_public_id).id;
       const snapshotBefore = row<{ hash: string }>(
         `select encode(extensions.digest(string_agg(source_snapshot::text,',' order by id),'sha256'),'hex') hash
          from public.trivia_post_facts where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`,
       ).hash;
-      const v1Claim = row<{ claim: string }>(`select claim_text claim from public.trivia_facts where public_id='${fact}'`).claim;
-      const used = readV2(f, [{ candidate_key: 'legacy', claim_text: v1Claim }]);
+      const claim = row<{ claim: string }>(`select claim_text claim from public.trivia_facts where public_id='${fact}'`).claim;
+      const used = readV2(f, [{ candidate_key: 'current', claim_text: claim }]);
       const legacyMatch = (used.data.candidates as Array<{ matches: Array<Record<string, unknown>> }>)[0]!.matches[0]!;
       expect(legacyMatch.fact_public_id).toBe(fact);
       expect(legacyMatch.used_on_page).toBe(true);
@@ -208,7 +181,6 @@ describe('P3 trivia v2 canonical Read and additive schema', () => {
          from public.trivia_post_facts where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`,
       ).hash).toBe(snapshotBefore);
     } finally {
-      sql(`delete from public.trivia_fact_evidence_v2 where fact_id in (select id from public.trivia_facts where workspace_id=(select id from public.workspaces where public_id='${f.workspace}'));`);
       cleanup(f);
     }
   }, 20_000);

@@ -2,7 +2,8 @@
 
 **Kampanye:** [Issue #25](https://github.com/milyarderpro/content-producer/issues/25) · **Matriks:** [test-matrix.md](test-matrix.md) · **Workflow:** [README.md](README.md).
 
-Dokumen ini adalah **log ringkas hasil kampanye baru**, bukan duplikasi seluruh trace chat. Simpan bukti yang telah disanitasi, tool input/output yang relevan dan tautan diskusi di GitHub Issue; jangan menyimpan akses token, OAuth client secret, reservation token atau kredensial.
+Dokumen ini adalah **log ringkas hasil kampanye historis v1**, bukan bukti
+bahwa 31 tool kandidat v2 sudah diuji live atau terpasang. Simpan bukti yang telah disanitasi, tool input/output yang relevan dan tautan diskusi di GitHub Issue; jangan menyimpan akses token, OAuth client secret, reservation token atau kredensial.
 
 ## Hasil yang telah dinilai
 

@@ -14,20 +14,20 @@ Substantive edits invalidate approval; schedule-only rebinds evidence and keeps
 approval intent according to the server. Published snapshots remain immutable.
 
 `unknown` means reconcile state or replay the same operation_key and identical
-semantic payload before a new key, new facts or version switch. Claim expiry
+semantic payload before a new key or changed facts. Claim expiry
 does not block replay of a successful save, but a new save needs a live claim.
 Config/catalog or revision/hash conflict requires fresh Read and review, never
 silent overwrite. Read-only failure is not evidence a prior Write rolled back.
 
-## Existing lifecycle and legacy v1 details
+## Shared lifecycle for v2 posts
 
 See [tool sequences](tool-sequences.md) for exact schemas and [output contract](output-contract.md) for truthful status claims.
 
 | From          | Action               | To        | Guard                                                             |
 | ------------- | -------------------- | --------- | ----------------------------------------------------------------- |
-| new           | save_post            | draft     | Reservation/evidence if niche requires; never automatically ready |
-| draft         | revise_post          | draft     | CAS current revision/hash                                         |
-| ready         | revise_post          | draft     | Invalidates previous approval                                     |
+| new           | save_post_v2         | draft     | One source URL per fact; never automatically ready               |
+| draft         | revise_post_v2       | draft     | CAS current revision/hash                                         |
+| ready         | revise_post_v2       | draft     | Invalidates previous approval                                     |
 | draft         | approve_post         | ready     | Explicit approval, latest reviewed hash, blocking gates pass      |
 | ready         | revoke_post_approval | draft     | Explicit revocation                                               |
 | draft / ready | discard_post         | discarded | Explicit discard; releases unpublished allocations                |
@@ -40,7 +40,7 @@ Before approve_post show current get_post content, revision/hash, system and edi
 
 ## Idempotency and optimistic concurrency
 
-All writes require workspace_public_id and UUID v4 operation_key; legacy/shared operations use request_schema_version=1, while new draft tools and version-2 maintenance use 2. Retry **one logical operation** with the **same operation_key and semantic payload** after response loss or DATABASE_BUSY. Use a new key only for a new intent after the prior outcome is reconciled. OPERATION_KEY_REUSED with changed payload is a hard stop. Post mutations use expected_revision and, where required, expected_content_hash. Page/config uses expected_page_updated_at and expected_config_updated_at. Fact changes use expected_fact_updated_at. Never guess or silently refresh CAS values.
+All writes require workspace_public_id and UUID v4 operation_key; shared operations retain request_schema_version=1, while trivia v2 draft tools and version-2 fact maintenance use 2. Retry **one logical operation** with the **same operation_key and semantic payload** after response loss or DATABASE_BUSY. Use a new key only for a new intent after the prior outcome is reconciled. OPERATION_KEY_REUSED with changed payload is a hard stop. Post mutations use expected_revision and, where required, expected_content_hash. Page/config uses expected_page_updated_at and expected_config_updated_at. Fact changes use expected_fact_updated_at. Never guess or silently refresh CAS values.
 
 | Error / condition                          | Recovery                                                | Forbidden                  |
 | ------------------------------------------ | ------------------------------------------------------- | -------------------------- |

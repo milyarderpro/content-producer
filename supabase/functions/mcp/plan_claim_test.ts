@@ -135,7 +135,7 @@ async function call(name: string, args: object) {
 Deno.test('6.5 claims retain OAuth and annotations after 6.11 expansion', async () => {
   const listed = await mcp('tools/list');
   const tools = listed.result?.tools ?? [];
-  assert(MCP_TOOL_COUNT === 36 && tools.length === 36, 'exact 36 registered tools');
+  assert(MCP_TOOL_COUNT === 31 && tools.length === 31, 'exact 31 registered tools');
   for (const name of PLAN_CLAIM_TOOL_NAMES) {
     const tool = tools.find((t) => t.name === name);
     assert(tool, 'missing claim tool ' + name);
@@ -156,8 +156,8 @@ Deno.test('6.5 claims retain OAuth and annotations after 6.11 expansion', async 
     assert(!Object.hasOwn(tool, 'outputSchema'), 'optional output schema omitted from catalog');
   }
   assert(
-    tools.some((t) => t.name === 'trivia_find_similar_facts'),
-    '6.7 tool registered',
+    tools.some((t) => t.name === 'trivia_find_similar_facts_v2'),
+    'v2 dedup tool registered',
   );
 });
 

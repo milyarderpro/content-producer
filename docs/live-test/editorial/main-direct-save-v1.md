@@ -1,5 +1,9 @@
 # Uji utama 30 kasus — direct-save v1
 
+**ARSIP — tidak untuk pelaksanaan baru setelah cutover CR-059.** Tool reservasi
+dan `save_post` v1 pensiun. Gunakan [panduan live v2](../README.md) untuk
+skenario baru; jangan menempel prompt di bawah ke plugin baru.
+
 **Status 28 Oktober 2026:** prosedur aktif disiapkan; **0/30 kasus utama telah dijalankan**. Pilot lima format dan retest terfokus tetap di luar denominator. Prompt panjang ber-checkpoint GO di [cases.md](cases.md) adalah arsip v7, bukan teks yang dikirim pada kampanye ini. Page target hanya `Trivia Editorial Test (Internal)` (`f3984ee4-8ae7-4043-8c93-45765f82f46e`), bukan Page Facebook yang akan dipublikasi.
 
 ## Operasi dan peran

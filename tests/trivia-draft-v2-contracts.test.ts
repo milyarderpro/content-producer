@@ -456,11 +456,12 @@ describe('CR-053 P1 schema/fixture contracts — no tool or database calls', () 
   });
 });
 
-describe('P1 error taxonomy and legacy compatibility', () => {
-  it('covers the registered catalog plus three planned v2 tools without duplicate or missing names', () => {
+describe('P1 historical error taxonomy and current catalog', () => {
+  it('keeps historical v1 error coverage while the active catalog has 31 tools', () => {
     const directory = join(root, 'supabase/functions/mcp');
     const registered = readdirSync(directory)
-      .filter((name) => name.endsWith('.ts') && !name.endsWith('_test.ts'))
+      .filter((name) => name.endsWith('.ts') && !name.endsWith('_test.ts') &&
+        name !== 'trivia_fact.ts')
       .flatMap((name) => {
         const source = readFileSync(join(directory, name), 'utf8');
         const arrays = [
@@ -471,12 +472,16 @@ describe('P1 error taxonomy and legacy compatibility', () => {
         );
       });
     const names = taxonomy.groups.flatMap((g) => [...g.reads, ...g.writes]);
+    const retired = [
+      'trivia_find_similar_facts', 'trivia_register_and_reserve_facts',
+      'trivia_release_facts', 'save_post', 'revise_post',
+    ];
     expect(new Set(names).size).toBe(names.length);
-    expect(new Set(names)).toEqual(
-      new Set([...registered, 'trivia_find_similar_facts_v2', 'save_post_v2', 'revise_post_v2']),
-    );
-    expect(reads.size).toBe(12);
-    expect(writes.size).toBe(24);
+    expect(registered).toHaveLength(31);
+    expect(new Set(names)).toEqual(new Set(registered));
+    expect(retired.every((name) => !names.includes(name))).toBe(true);
+    expect(reads.size).toBe(11);
+    expect(writes.size).toBe(20);
     for (const group of taxonomy.groups) {
       expect(group.domain_codes.length).toBeGreaterThan(0);
       for (const code of [...taxonomy.global_codes, ...taxonomy.write_codes, ...group.domain_codes])

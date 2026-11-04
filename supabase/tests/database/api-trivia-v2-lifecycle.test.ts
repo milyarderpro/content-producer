@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
-import { callerStatement, factInput, fixture, json, release, reserve, reserved, row, rpc, secondPage, sql } from './helpers/trivia-rpc.js';
+import { callerStatement, fixture, json, row, rpc, secondPage, sql } from './helpers/trivia-rpc.js';
 import { approve, cleanup, draft, post, publish } from './helpers/trivia-v2.js';
 
 describe('P5-T1 current mechanical and editorial v2 gate', () => {
@@ -86,15 +86,13 @@ describe('P5-T1 current mechanical and editorial v2 gate', () => {
 });
 
 describe('P5-T2 explicit version-aware lifecycle', () => {
-  it('approves/publishes v2 using expired-only legacy identities without v1 expiry gates', () => {
+  it('approves/publishes v2 facts with native evidence and no legacy expiry fields', () => {
     const f = fixture();
     try {
-      const token = randomUUID();
-      const identities = reserved(rpc(f, reserve(f, Array.from({ length: 5 }, (_, i) => factInput(undefined, i + 1)), randomUUID(), token)));
-      rpc(f, release(f, token));
-      sql(`update public.trivia_facts set verified_at=now()-interval '2 days',expires_at=now()-interval '1 day'
-        where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`);
-      const p = draft(f, identities);
+      const p = draft(f);
+      expect(row<{ n: number }>(`select count(*)::integer n from public.trivia_facts
+        where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')
+          and not has_v1_envelope and verified_at is null and expires_at is null`).n).toBe(5);
       rpc(f, approve(f, p.post_public_id));
       rpc(f, publish(f, p.post_public_id));
       expect(post(p.post_public_id).status).toBe('posted');

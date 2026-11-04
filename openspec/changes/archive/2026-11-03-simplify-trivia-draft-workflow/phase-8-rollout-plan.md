@@ -2,11 +2,11 @@
 
 **Status:** Rencana diterima pemilik; P8-T1 **PASS pada kriteria CR-058**.
 **Tanggal pemeriksaan:**
-3 November 2026. [CR-058](../../../docs/decisions/2026-11-03-cr-058-p8-production-qa-rollback-verification.md)
+3 November 2026. [CR-058](../../../../docs/decisions/2026-11-03-cr-058-p8-production-qa-rollback-verification.md)
 menerima pemeriksaan kompatibilitas pada Page QA production sebagai pengganti
 latihan runtime terisolasi. Dokumen ini tidak mengizinkan penghentian pembuatan v1,
 perubahan plugin, deployment, atau perubahan data production. Arah produk v2
-utama dan batas Read v1 mengikuti [CR-054](../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md).
+utama dan batas Read v1 mengikuti [CR-054](../../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md).
 
 ## Baseline yang sudah terbukti
 

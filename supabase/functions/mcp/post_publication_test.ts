@@ -80,10 +80,10 @@ const archiveInput = {
 };
 
 Deno.test(
-  '6.12: exactly 33 OAuth tools with closed publication schemas and destructive hints',
+  '6.12: exactly 31 OAuth tools with closed publication schemas and destructive hints',
   async () => {
     const tools = (await mcp('tools/list')).result.tools;
-    check(MCP_TOOL_COUNT === 36 && tools.length === 36, 'EXACT_36');
+    check(MCP_TOOL_COUNT === 31 && tools.length === 31, 'EXACT_36');
     for (const name of POST_PUBLICATION_TOOL_NAMES) {
       const tool = tools.find((entry: { name: string }) => entry.name === name);
       check(tool?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');

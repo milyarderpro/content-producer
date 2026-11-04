@@ -6,7 +6,8 @@ memulihkan layanan, dan menelusuri masalah. Untuk pekerjaan lokal baca
 [testing](testing.md). Izin deployment dan perubahan data tetap mengikuti
 [AGENTS.md](../AGENTS.md) serta keputusan pemilik untuk tindakan yang tepat.
 
-**Tanggal peninjauan:** 27 Oktober 2026. Task dokumentasi ini tidak mengakses atau
+**Tanggal peninjauan:** baseline 27 Oktober 2026; panduan source cutover CR-059
+diperbarui 3 November 2026. Task dokumentasi ini tidak mengakses atau
 mengubah production. Command di bawah adalah prosedur bersyarat, bukan bukti bahwa
 command sudah dijalankan atau otorisasi untuk langsung mengeksekusinya.
 
@@ -18,7 +19,7 @@ yang tersedia perlu dibedakan dari pemeriksaan live terbaru:
 | Komponen             | Yang dapat dirujuk sekarang                                                                                                                                      | Batas bukti                                                                                        |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | Source yang ditinjau | Backend `main` SHA `be7ce5455863d3c51f4cfdd9ec6c9263e837ede3` setelah PR #52                                                                                     | Bukan exact SHA deployment yang baru diperiksa                                                     |
-| Paket plugin         | Manifest kandidat source `0.2.7` setelah perubahan editorial/CR-051; pemilik sebelumnya mengonfirmasi plugin terpasang `0.2.6`. LT-016 v0.2.3 adalah riwayat.    | Kandidat belum diunggah/terpasang; release ID dan versi aktif saat ini belum diverifikasi langsung |
+| Paket plugin         | Kandidat source CR-059 `0.4.0` tervalidasi lokal; Plugin Creator menunjukkan PRIVATE terpasang `0.3.0` sebelum cutover. Versi lebih awal adalah riwayat. | Kandidat belum diunggah; versi live harus diperiksa lagi saat rilis |
 | Edge `mcp`           | CR-049 mencatat Edge tetap v33 saat rollout SQL 22 Oktober; v31/v32 adalah record lebih awal                                                                     | Versi aktif serta exact source/bundle SHA sekarang belum diverifikasi                              |
 | Database             | Ada 71 migration source pada backend SHA di atas; CR-049 terakhir mencatat 70 migration production setelah rollout                                               | Applied production history dan drift sekarang belum diperiksa                                      |
 | Gate historis CR-049 | Kandidat `1a4e755a48f3c77eb557b931fd6bd99d5e1b24fd`, [run 39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314)                | Record pada CR-049; jangan menempelkan exact-SHA PASS tersebut ke HEAD yang berbeda                |
@@ -87,7 +88,8 @@ perlu membuat plugin atau koneksi kedua.
   adalah legacy CR-020/044 (termasuk urutan focused OAuth/owner dan Inspector).
   **Setelah merge**, gunakan **CR-052 G4 release gate manual exact-SHA** dari
   `main` dengan committed exact config: source/frontend, dua stack terisolasi
-  (**satu reset per shard**), MCP/Inspector di shard 1, DB **41 file/182 kasus**,
+  (**satu reset per shard**), MCP/Inspector 31 valid/31 invalid serta lima nama
+  v1 absen/ditolak dan owner denial di shard 1, DB **33 file/132 kasus**,
   audit, migration history/DB lint, **advisors terpisah**, cleanup, dan
   **aggregate PASS** pada SHA final; cek URL serta report aman secara manual
   sesuai [prosedur §9](#9-release-gate-g4-manual-dan-rollback-issue-104).
@@ -305,9 +307,10 @@ Lokal pada SHA sama **PASS 18m50s** seluruh tahap tetapi label
    `github.sha` dan `git rev-parse HEAD`. Actions harus memakai
    **committed exact config**, tanpa overlay.
 3. Terima release evidence hanya jika source/frontend, kedua
-   database shard 19+22 dan **aggregate PASS** di SHA tepat, report
-   lengkap dan hash cocok; total DB 41/182 tanpa skipped, MCP 15/82,
-   Inspector 33 valid/33 invalid + owner denial, migration/history,
+   database shard 15+18 dan **aggregate PASS** di SHA tepat, report
+   lengkap dan hash cocok; total DB 33/132 tanpa skipped, MCP 17/114,
+   Inspector 31 valid/31 invalid + lima nama v1 absen/ditolak + owner denial
+   untuk kandidat cutover, migration/history,
    DB lint **dan local security advisors terpisah**, audit katalog
    RLS/grant/default ACL/fixture before/after/final serta cleanup
    semuanya PASS. Simpan hanya laporan teredaksi/artifact aman.

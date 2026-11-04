@@ -44,16 +44,6 @@ Catalog conflict calls for fresh dedup Read/review, not unnecessary source
 research when meaning/support remain valid. Revision/hash conflict requires
 get_post and review, not a silent CAS refresh.
 
-## Legacy v1 single post — supported maintenance/replay/in-flight only
-
-1. get_page_generation_context loads current Page+niche config, reuse scope, format, topics, timing and relevant performance.
-2. ChatGPT independently researches credible candidates and uses the installed niche source and safety policy; reference viral examples are style only.
-3. For trivia, trivia_find_similar_facts → semantic same/distinct/uncertain decision → trivia_register_and_reserve_facts of the exact verified ordered set. Do not force uncertain identity into a new fact. Reservations are atomic.
-4. Compose original copy and editorial attestation. For `save_post` and `revise_post`, always send `content_payload.text_metrics: {}`. Never calculate, guess, reuse, or fabricate pre-submit `text_metrics` (including copied metrics from an earlier revision). `save_post` uses current config, exact reservation token, fact bindings and optional plan claim. Server computes authoritative text metrics and checks. Save creates draft, never ready.
-5. On confirmed save/revise success, use the server-returned `text_metrics` as authoritative; display persisted ID, revision, checks and public copy sections. Do not alter otherwise stable user-authored copy solely to game metrics. On failure label copy unsaved. Release an abandoned reservation through trivia_release_facts; do not wait for TTL by default.
-
-For revision: get_post → optional research/find/reserve if fact replacement → revise_post using expected revision/hash. Editing ready returns it to draft. Approval/discard/publication require [lifecycle](lifecycle.md). Record performance manually with record_post_performance; review with get_post_performance / get_performance_insights, with sample-size caveats.
-
 ## Batch and calendar
 
 create_content_plan stores ordered intent and up to 100 slots before generation. get_content_plan or list_content_plans discovers persisted progress. claim_content_plan_items immediately before active work: 1 item by default, maximum 3, 30-minute lease. Run the single-post flow per item and save with plan_item_public_id and claim_token; save successful items immediately. On failure report_content_plan_item_failure with a safe reason; do not erase completed output. renew_content_plan_claim only once on a live claim, capped at 60 minutes from first claim.

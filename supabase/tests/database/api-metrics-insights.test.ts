@@ -152,10 +152,11 @@ describe('5.8 RPC-METRIC-002 / RPC-INSIGHT-001', () => {
       expect(g.metric_summary!.min).toBe(0);
       expect(g.age_distribution.min_days).toBeGreaterThanOrEqual(0);
       expect(g.dimension_values).toMatchObject({
-        profile: 'fast_trivia',
+        format: 'themed_utility',
+        profile: 'practical_utility',
         fact_count: 5,
-        hook_pattern: 'did_you_know',
-        cta_pattern: 'share',
+        hook_pattern: 'statement',
+        cta_pattern: 'other',
       });
       i = insights(f, 'views', 3);
       expect((i.groups as Group[])[0]!.evidence_strength).toBe('exploratory');

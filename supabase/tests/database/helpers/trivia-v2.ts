@@ -13,11 +13,14 @@ export function cleanup(f: TriviaFixture): void {
   legacyCleanup(f);
 }
 
-export function draft(f: TriviaFixture, identities?: Array<{ fact_public_id: string; canonical_claim: string }>) {
+export function draft(f: TriviaFixture, identities?: Array<{ fact_public_id: string; canonical_claim: string }>,
+  fixtureLabel = 'Fixture jar') {
   const content = {
     schema_version: 2, hook: 'Fixture jars',
     body: { facts: Array.from({ length: 5 }, (_, i) => ({ position: i + 1,
-      text: identities?.[i]?.canonical_claim ?? `Fixture jar ${i + 1} has a blue lid.` })) },
+      text: identities?.[i]?.canonical_claim ?? (fixtureLabel === 'Fixture jar'
+        ? `${fixtureLabel} ${i + 1} has a blue lid.`
+        : `${Array.from({ length: 7 }, () => randomUUID().slice(0, 8)).join(' ')}.`) })) },
     cta: 'Which jar stands out?', canva_copy: '', caption: 'Fixture only.',
     hashtags: ['#Fixture'], render_style: 'plain_lines', text_metrics: {},
   };
@@ -38,6 +41,11 @@ export function draft(f: TriviaFixture, identities?: Array<{ fact_public_id: str
     (read.data.candidates as Array<{ matches: Array<{ fact_public_id: string }> }>).forEach((c, i) => {
       facts[i]!.dedup.reviews = c.matches.map(x => ({ fact_public_id: x.fact_public_id,
         decision: x.fact_public_id === identities[i]!.fact_public_id ? 'same' : 'distinct' }));
+    });
+  } else {
+    (read.data.candidates as Array<{ matches: Array<{ fact_public_id: string }> }>).forEach((c, i) => {
+      facts[i]!.dedup.reviews = c.matches.map(x => ({ fact_public_id: x.fact_public_id,
+        decision: 'distinct' }));
     });
   }
   const r = rpc(f, `api.save_post_v2(2,'${f.workspace}','${randomUUID()}','${f.page}',

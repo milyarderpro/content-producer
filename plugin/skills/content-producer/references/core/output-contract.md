@@ -1,6 +1,6 @@
 # Output contract
 
-For v2, a successful save_post_v2 summary followed by matching get_post readback proves a saved **draft**; after revise_post_v2, read back that same post. Match Page/facts/URLs/copy/status/revision/hash/checks. A locally composed preview is **unsaved**; a lost tool response is **unconfirmed** until reconciliation/replay and readback. HTTP 200 or host approval is not proof of persistence. Legacy save_post results follow their versioned contract. A separate successful approve_post for the exact reviewed revision/hash establishes ready.
+For v2, a successful save_post_v2 summary followed by matching get_post readback proves a saved **draft**; after revise_post_v2, read back that same post. Match Page/facts/URLs/copy/status/revision/hash/checks. A locally composed preview is **unsaved**; a lost tool response is **unconfirmed** until reconciliation/replay and readback. HTTP 200 or host approval is not proof of persistence. A separate successful approve_post for the exact reviewed revision/hash establishes ready.
 
 ## CANVA COPY
 
@@ -8,7 +8,7 @@ Show the persisted module-rendered hook, fact lines and CTA, preserving exact ni
 
 ## FACEBOOK CAPTION
 
-Display the persisted caption separately. Do not introduce unsourced claims, regenerate missing legacy fields, or claim the caption was uploaded.
+Display the persisted caption separately. Do not introduce unsourced claims, claim the caption was uploaded.
 
 ## HASHTAGS
 
@@ -16,13 +16,12 @@ Show stored relevant hashtags separately from the caption and copy.
 
 ## INFORMASI INTERNAL / INTERNAL INFO
 
-Show public post ID, Page/niche, topic/format, interaction goal, current status and revision, scheduled_at and Page timezone when known, source links and concise system/editorial quality checks. Internal information is not pasted into Canva/Facebook. Use the server-returned `text_metrics` from a successful `save_post` / `revise_post` or authoritative `get_post` readback; never display pre-submit client estimates as authoritative. Include current plan progress, warnings and recovery needs.
+Show public post ID, Page/niche, topic/format, interaction goal, current status and revision, scheduled_at and Page timezone when known, source links and concise system/editorial quality checks. Internal information is not pasted into Canva/Facebook. Use the server-returned `text_metrics` from a successful `save_post_v2` / `revise_post_v2` or authoritative `get_post` readback; never display pre-submit client estimates as authoritative. Include current plan progress, warnings and recovery needs.
 
 Three independent authorities govern readiness: server system checks, ChatGPT versioned editorial attestation of exact content and explicit owner approval. Critical fails/needs_review block ready; only allowlisted noncritical warnings can be accepted with an explicit reason. On failures or stale content, report the uncertainty rather than claiming approval.
 
 For v2, display its three revision/hash-bound editorial results and mechanical
-checks; style suggestions are separate nonblocking notes, not v1 warnings or
-source-tier/expiry gates. Keep source URLs in internal information only.
+checks; style suggestions are separate nonblocking notes, not extra approval gates. Keep source URLs in internal information only.
 Read sources/checks with `include_sources: true` and `include_checks: true`.
 
 ## Ringkasan Indonesia berbasis bukti

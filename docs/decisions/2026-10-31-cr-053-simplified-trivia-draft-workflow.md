@@ -18,13 +18,13 @@ implementasi backend/tool; izin tindakan lain tetap terpisah.
 - [PRD alur draft sederhana](../../plans/simplified-trivia-draft-workflow-prd.md)
   adalah acuan hasil dan batas produk; [plan](../../plans/simplified-trivia-draft-workflow-implementation-plan.md)
   tetap baseline **8 fase/23 task**.
-- [Proposal](../../openspec/changes/simplify-trivia-draft-workflow/proposal.md),
-  [design](../../openspec/changes/simplify-trivia-draft-workflow/design.md), serta
+- [Proposal](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/proposal.md),
+  [design](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/design.md), serta
   delta specs pada change memisahkan kebutuhan produk dari alternatif yang belum
   diputuskan. Klarifikasi terakhir membatasi kewajiban ID sama pada kesamaan yang
   ditemukan/diputuskan, mengganti calon `same` dengan fakta tidak layak, dan
   membedakan replay sukses dari save baru dengan claim kedaluwarsa.
-- [Baseline P1-T1](../../openspec/changes/simplify-trivia-draft-workflow/phase-1-baseline.md)
+- [Baseline P1-T1](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/phase-1-baseline.md)
   ditinjau pada source `3b385a679770e20c5ba193b470874a35c08b786a`:
   33 tool baseline, 72 migration source, kandidat plugin 0.2.11. Source SHA dan
   nomor versi tersebut bukan bukti deployment/instalasi live sekarang.
@@ -213,7 +213,7 @@ in-flight harus tetap dapat dipulihkan pada target kompatibel yang disetujui.
 - **P1-T3 selesai pada lapisan kontrak/fixture** dengan versi `cr-053-p1-v1`:
   [kontrak contoh](../contracts/trivia-draft-v2.md),
   [taksonomi seluruh tool](../contracts/tool-errors-v2.md), schema/fixture dan
-  test lokal. [Hasil Phase 1](../../openspec/changes/simplify-trivia-draft-workflow/phase-1-results.md)
+  test lokal. [Hasil Phase 1](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/phase-1-results.md)
   membedakan bukti source/fixture dari backend dan LIVE. Pembekuan contoh ini
   tidak menyelesaikan keputusan retrieval/schema database P2/P3.
 - Setelah implementasi yang diotorisasi, syarat bukti mencakup test fokus pada

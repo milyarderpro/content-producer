@@ -26,8 +26,8 @@ percobaan tersebut, dan tidak dicoba bypass menggunakan credential lain.
 ### Source yang teramati
 
 - HEAD lokal: `3b385a679770e20c5ba193b470874a35c08b786a`.
-- Manifest [plugin](../../../plugin/plugin.json): **0.2.11**. Ini kandidat source.
-- [Server MCP](../../../supabase/functions/mcp/server.ts) mendeklarasikan
+- Manifest [plugin](../../../../plugin/plugin.json): **0.2.11**. Ini kandidat source.
+- [Server MCP](../../../../supabase/functions/mcp/server.ts) mendeklarasikan
   `content-producer-mcp` versi **0.1.0**. Versi service ini berbeda dari nomor
   deployment Edge dan versi plugin.
 - Ada **72 migration source tracked**, dihitung dengan
@@ -39,16 +39,16 @@ percobaan tersebut, dan tidak dicoba bypass menggunakan credential lain.
   dedup READ recovery. Commit terakhir pada path `supabase/` adalah
   `ca4a1483542490f177492252232c0ebac236acb5`, 30 Oktober 2026, untuk query test
   lokal. Keduanya provenance path, **bukan exact SHA deployment**.
-- [Registry](../../../supabase/functions/mcp/registry.ts) memasang 11 kelompok
-  handler. [Inventaris kontrak](../../../docs/tool-contracts.md#3-daftar-33-tool)
+- [Registry](../../../../supabase/functions/mcp/registry.ts) memasang 11 kelompok
+  handler. [Inventaris kontrak](../../../../docs/tool-contracts.md#3-daftar-33-tool)
   memetakan **33 tool: 11 Read dan 22 Write**. Belum ada tiga tool v2 pada
   konstanta registry kelompok yang diinventarisasi.
 
 ### Rekonsiliasi record yang berbeda
 
-- [Operations §1](../../../docs/operations.md#1-satu-ringkasan-versi-dengan-sumber-bukti-yang-jelas)
+- [Operations §1](../../../../docs/operations.md#1-satu-ringkasan-versi-dengan-sumber-bukti-yang-jelas)
   masih merangkum kandidat plugin 0.2.7 dan konfirmasi pemasangan 0.2.6.
-  [README plugin](../../../plugin/README.md) menyebut kandidat 0.2.11 dan
+  [README plugin](../../../../plugin/README.md) menyebut kandidat 0.2.11 dan
   pemasangan terakhir yang dikonfirmasi sebelum kandidat itu 0.2.10. Record lebih
   baru tersebut dicatat sebagai konfirmasi historis, bukan bukti release ID/hash
   atau plugin aktif yang dibaca langsung pada sesi ini. Ringkasan lama tidak
@@ -57,11 +57,11 @@ percobaan tersebut, dan tidak dicoba bypass menggunakan credential lain.
   71 migration source pada baseline CR-050. Source sekarang mempunyai 72 file.
   Ini perbedaan baseline bukti, **bukan bukti drift production**. Versi Edge,
   bundle SHA, applied history, dan drift saat ini **NOT RUN**.
-- [Uji hummingbirds 28 Oktober](../../../docs/live-test/editorial/runs/DNA-SSF-02-v029-01.md)
+- [Uji hummingbirds 28 Oktober](../../../../docs/live-test/editorial/runs/DNA-SSF-02-v029-01.md)
   melaporkan satu reservasi, satu `save_post`, dan readback draft v1 berhasil;
   versi runtime sesi tersebut tetap `UNVERIFIED`. Ini bukti kasus historis, bukan
   uji v2 atau pembuktian semua kegagalan draft telah diperbaiki.
-- [Log kampanye lama](../../../docs/live-test/results.md) tetap menyatakan
+- [Log kampanye lama](../../../../docs/live-test/results.md) tetap menyatakan
   LT-E2E-01/#26 berhenti di dedup Read, reserve/save tidak terpanggil, dan retest
   draft pada record itu BLOCKED. Bukti editorial kemudian tidak menulis ulang
   verdict kasus lama maupun membuktikan akar sebabnya identik.
@@ -74,7 +74,7 @@ statistik penggunaan versi plugin masih belum terverifikasi langsung.
 
 ## 3. Inventaris data v1 dan kebutuhan pemetaan
 
-Inventaris model mengikuti [domain](../../../docs/domain.md) dan migration;
+Inventaris model mengikuti [domain](../../../../docs/domain.md) dan migration;
 tidak menyatakan jumlah record production sekarang.
 
 - Core: `workspaces`, `niches`, `pages`, `page_niche_configs`, `content_plans`,
@@ -94,7 +94,7 @@ tidak menyatakan jumlah record production sekarang.
   post menurut status, dan plan/claim in-flight production: **NOT RUN**. Belum ada
   statistik kelengkapan pemetaan yang sah untuk dijadikan rencana backfill.
 
-[Preflight editorial 26 Oktober](../../../docs/live-test/editorial/preflight.md)
+[Preflight editorial 26 Oktober](../../../../docs/live-test/editorial/preflight.md)
 mencatat empat Page setelah pembuatan satu Page internal dengan config/readback
 cocok. Log 21 Oktober mencatat plan tiga item pending dan post Moon ready.
 Contoh-contoh itu adalah inventaris objek historis yang diketahui, **bukan total
@@ -184,7 +184,7 @@ produksi satu post serta batch/beberapa chat. Keputusan CR-005/012/013/014/046/0
 
 ## 6. Gate dan handoff Phase 1
 
-[G4 CR-052](../../../docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
+[G4 CR-052](../../../../docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
 adalah gate rilis manual exact final SHA `main` dengan committed config dan
 source, dua shard, serta aggregate PASS. Bukti lama exact-SHA tidak dipindahkan
 ke HEAD ini. Inventaris baseline 41 file/182 DB, MCP 15/82, Inspector 33 valid/

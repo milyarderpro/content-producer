@@ -5,7 +5,6 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { invoke } from './foundation.ts';
 import { metricAnomalyFlags } from './post_metrics.ts';
-import { planSummary } from './page_plan.ts';
 import { triviaConfig } from './schemas.ts';
 import { contentV2, editorialEvidenceV2, systemEvidenceV2, sourceUrlV2 } from './trivia_v2.ts';
 
@@ -15,31 +14,10 @@ const key = z.string().regex(/^[a-z][a-z0-9_]{1,79}$/);
 const version = z.literal(1);
 const status = z.enum(['draft', 'ready', 'posted', 'discarded', 'archived']);
 const quality = z.enum(['pending', 'failed', 'passed']);
-const format = z.enum([
-  'single_subject_fast',
-  'themed_utility',
-  'emotional_animal_collection',
-  'comparison',
-  'myth_vs_fact',
-]);
-const topic = z.enum([
-  'animals',
-  'pet_safety',
-  'food_science',
-  'food_storage_home',
-  'practical_utility',
-  'human_body',
-  'nature_science',
-  'geography',
-  'history_origins',
-  'inventions_everyday',
-  'general_trivia',
-]);
 const goal = z.enum(['share', 'save', 'comment', 'follow']);
 const cursor = z.string().min(1).max(512);
 const common = { request_schema_version: version, workspace_public_id: uuid };
 const readAnnotations = { readOnlyHint: true, destructiveHint: false, openWorldHint: false };
-const writeAnnotations = { readOnlyHint: false, destructiveHint: false, openWorldHint: false };
 const securitySchemes = [{ type: 'oauth2', scopes: ['openid', 'email'] }];
 const envelope = <T extends z.ZodType>(data: T) =>
   z.strictObject({ response_schema_version: version, data });
@@ -296,49 +274,6 @@ export const editorialInput = z.strictObject({
     )
     .max(20),
 });
-const saveInput = z
-  .strictObject({
-    ...common,
-    operation_key: uuid,
-    page_public_id: uuid,
-    niche_key: z.literal('trivia'),
-    reservation_token: uuid,
-    expected_config_updated_at: timestamp,
-    plan_item: z
-      .strictObject({
-        plan_item_public_id: uuid,
-        claim_token: uuid,
-      })
-      .nullable()
-      .optional(),
-    scheduled_at: timestamp.nullable(),
-    content_schema_version: version,
-    format_key: format,
-    topic_key: topic,
-    interaction_goal: goal,
-    content_payload: contentPayload,
-    generation_snapshot: generationSnapshot,
-    fact_bindings: z.array(bindingInput).min(1).max(9),
-    editorial_checks: editorialInput,
-  })
-  .superRefine((value, ctx) => {
-    const facts = value.content_payload.body.facts;
-    if (
-      facts.length !== value.fact_bindings.length ||
-      facts.some(
-        (f, i) =>
-          f.position !== i + 1 ||
-          value.fact_bindings[i]?.position !== i + 1 ||
-          f.text !== value.fact_bindings[i]?.rendered_text,
-      ) ||
-      new Set(value.fact_bindings.map((b) => b.fact_public_id)).size !== value.fact_bindings.length
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Ordered fact bindings must match the rendered body',
-      });
-    }
-  });
 const postSummary = z.strictObject({
   content_schema_version: z.literal(2).optional(),
   post_public_id: uuid,
@@ -455,55 +390,11 @@ const getOutput = envelope(
     latest_metrics: metricSnapshot.nullable(),
   }),
 );
-const saveOutput = envelope(
-  z.strictObject({
-    post: postPackage,
-    plan: planSummary.nullable(),
-    replayed: z.boolean(),
-  }),
-);
-export const POST_BASE_TOOL_NAMES = ['save_post', 'list_posts', 'get_post'] as const;
+export const POST_BASE_TOOL_NAMES = ['list_posts', 'get_post'] as const;
 
 export function registerPostBaseTools(server: McpServer, context?: RequestContext): void {
   if (!context) return;
   const scoped = context;
-  server.registerTool(
-    'save_post',
-    {
-      title: 'Save a content draft',
-      description:
-        'Use after facts are reserved and content has been reviewed. Atomically converts reservations to fact allocations, optionally completes a currently claimed plan item, and creates only a draft (never auto-approved).',
-      inputSchema: saveInput,
-      outputSchema: saveOutput,
-      annotations: writeAnnotations,
-      _meta: { securitySchemes },
-    },
-    (args) =>
-      invoke(
-        'save_post',
-        scoped,
-        {
-          p_request_schema_version: args.request_schema_version,
-          p_workspace_public_id: args.workspace_public_id,
-          p_operation_key: args.operation_key,
-          p_page_public_id: args.page_public_id,
-          p_niche_key: args.niche_key,
-          p_reservation_token: args.reservation_token,
-          p_expected_config_updated_at: args.expected_config_updated_at,
-          p_plan_item: args.plan_item ?? null,
-          p_scheduled_at: args.scheduled_at,
-          p_content_schema_version: args.content_schema_version,
-          p_format_key: args.format_key,
-          p_topic_key: args.topic_key,
-          p_interaction_goal: args.interaction_goal,
-          p_content_payload: args.content_payload,
-          p_generation_snapshot: args.generation_snapshot,
-          p_fact_bindings: args.fact_bindings,
-          p_editorial_checks: args.editorial_checks,
-        },
-        saveOutput,
-      ),
-  );
   server.registerTool(
     'list_posts',
     {

@@ -4,8 +4,8 @@ Panduan ini menjelaskan susunan project dan tempat mencari implementasinya.
 Baca berikutnya: [domain dan aturan bisnis](domain.md), lalu
 [kontrak tool](tool-contracts.md).
 
-**Acuan peninjauan:** source pada `d6e7fe83ea006931f85624c4d60486f92ab3438c`,
-25 Oktober 2026. Dokumen ini menjelaskan kode yang tersedia, bukan pemeriksaan
+**Acuan peninjauan:** baseline `d6e7fe83ea006931f85624c4d60486f92ab3438c`
+(25 Oktober 2026) dan perubahan source CR-059 (3 November 2026). Dokumen ini menjelaskan kode yang tersedia, bukan pemeriksaan
 deployment langsung. Versi terpasang dan batas bukti dicatat di
 [audit cleanup](cleanup-audit.md#2-baseline-yang-dapat-direproduksi).
 Kontrak frozen dan keputusan yang diterima tetap berlaku; panduan ini membantu
@@ -23,7 +23,7 @@ Pembagian pekerjaannya:
 
 - **ChatGPT** memahami permintaan, meneliti sumber melalui kemampuan host,
   menilai kesamaan makna fakta, menulis copy, dan memberikan penilaian editorial.
-- **Backend** menjaga identitas, kepemilikan data, kontrak, transaksi, reservasi,
+- **Backend** menjaga identitas, kepemilikan data, kontrak, transaksi,
   aturan penggunaan ulang fakta, revision, serta bukti pemeriksaan.
 - **Pemilik** memilih sasaran dan menyetujui tindakan yang memerlukannya,
   termasuk persetujuan atas konten tertentu.
@@ -162,7 +162,7 @@ Komponen historis berikut masih mempunyai referensi source dan perlu dikenali:
 - `auth-frontend/api/phase-9-5/` beserta route UI terkait adalah client uji
   OAuth/pilot dengan flag server-side tersendiri; bukan dashboard produk.
 - `supabase/functions/mcp-probe/` adalah probe terpisah; jangan memasukkannya
-  ke hitungan 33 tool bisnis.
+  ke hitungan 31 tool bisnis aktif setelah cutover.
 - `MCP_AUTH_MODE=fixed-pilot` adalah pilihan rollback server-side eksplisit,
   bukan jalur default. `pilot_db.ts` dan helper write-nya masih diimpor.
 - `supabase/functions/batch_a_server.ts` adalah host pengujian lokal yang dipakai
@@ -230,7 +230,7 @@ pada `ca5c43597af97c95ea9eaa87876237fd2d45e10c`,
 [CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
 menetapkan `.github/workflows/backend-gate-candidate.yml` sebagai gate rilis
 **manual exact final SHA `main`**: source, dua shard database terisolasi
-19+22 (41 file/182 kasus) dan aggregate PASS. CR-020/044 tetap mengikat
+21+25 (46 file/221 kasus) dan aggregate PASS. CR-020/044 tetap mengikat
 kontrol keamanan. Gate tidak otomatis diwajibkan branch protection;
 `backend-technical-gate.yml`/`pnpm run test-all` adalah legacy/rollback.
 Lihat [testing](testing.md) dan [operations](operations.md).

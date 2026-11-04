@@ -3,8 +3,8 @@
 ## Context
 
 Motivasi dan cakupan capability ada pada [proposal](proposal.md). Acuan kebutuhan
-produk adalah [PRD](../../../plans/simplified-trivia-draft-workflow-prd.md);
-[rencana implementasi](../../../plans/simplified-trivia-draft-workflow-implementation-plan.md)
+produk adalah [PRD](../../../../plans/simplified-trivia-draft-workflow-prd.md);
+[rencana implementasi](../../../../plans/simplified-trivia-draft-workflow-implementation-plan.md)
 menjadi baseline **8 fase dan 23 task**. Dokumen ini menjabarkan keduanya, bukan
 mengubah kontrak frozen atau menggantikan change record yang harus diterima
 sebelum implementasi.
@@ -17,7 +17,7 @@ runtime production. Temuan yang memengaruhi desain:
   paket sumber, freshness, expiry, dan reservasi untuk registrasi v1.
 - `supabase/functions/mcp/post_base.ts` menghubungkan copy, fact binding,
   generation snapshot, dan pemeriksaan editorial v1.
-- [CR-012](../../../docs/decisions/2026-10-11-phase-5-5-trivia-rpc-reconciliation.md)
+- [CR-012](../../../../docs/decisions/2026-10-11-phase-5-5-trivia-rpc-reconciliation.md)
   dan migration foundation/resolver trivia menetapkan lock workspace, urutan
   lock, serta retrieval ulang dalam transaksi. Ini fondasi yang perlu dijaga,
   bukan bukti bahwa desain v2 telah diuji.
@@ -31,10 +31,10 @@ runtime production. Temuan yang memengaruhi desain:
 
 Pencatatan awal 31 Oktober 2026 terbatas pada proposal/design dan metadata
 scaffold CLI. Status berikutnya mengikuti [tasks](tasks.md), hasil P1 dan
-[kontrak identitas P2-T1](../../../docs/contracts/trivia-fact-identity-v2.md).
+[kontrak identitas P2-T1](../../../../docs/contracts/trivia-fact-identity-v2.md).
 Penyelarasan 1 November mengikuti
-[CR-053](../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
-dan [CR-054](../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md)
+[CR-053](../../../../docs/decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md)
+dan [CR-054](../../../../docs/decisions/2026-11-01-cr-054-v2-primary-and-v1-creation-retirement.md)
 yang diterima. Bukti kontrak/fixture P1 serta review statis P2-T1 tidak membuktikan
 implementasi backend/tool v2; test backend/race/host/LIVE usulan di bawah tetap
 **NOT RUN**. Tidak ada deployment atau business Write dalam penyelarasan ini.
@@ -136,7 +136,7 @@ v1 harus terlihat pada pemeriksaan lintas versi. Backfill sekali tanpa menjaga
 konsistensi write berikutnya tidak cukup. P2-T1 merinci akar `trivia_facts`
 in-place dengan ID stabil, envelope evidence v1 opsional, evidence URL v2
 dependent, serta shared usage dan dispatcher snapshot menurut versi. Rincian
-ada di [kontrak identitas](../../../docs/contracts/trivia-fact-identity-v2.md);
+ada di [kontrak identitas](../../../../docs/contracts/trivia-fact-identity-v2.md);
 DDL/constraint/trigger dan bukti sinkronisasi tetap P3. Tidak membuat registry
 identitas paralel atau metadata ontologi/tier/expiry rekaan untuk native v2.
 
@@ -364,9 +364,9 @@ beserta alasan, perubahan dependensi, dan acceptance untuk keputusan pemilik.
 
 ### Gate rilis yang berlaku
 
-Rujukan gate mengikuti [testing](../../../docs/testing.md),
-[operations](../../../docs/operations.md), dan
-[CR-052](../../../docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md):
+Rujukan gate mengikuti [testing](../../../../docs/testing.md),
+[operations](../../../../docs/operations.md), dan
+[CR-052](../../../../docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md):
 G4 Actions `backend-gate-candidate.yml` manual pada exact final SHA `main`,
 committed config, input/checkout SHA sama, source, dua stack/shard terisolasi,
 serta aggregate PASS dengan report/hash yang cocok. Kedua shard memerlukan
@@ -435,7 +435,7 @@ di atas telah terpenuhi atau izin menonaktifkan runtime sekarang.
 
 Usulkan target rollback yang sudah kompatibel dengan schema/data v2, bukan
 sembarang binary sebelum v2. Migration additive dan post v2 yang telah tersimpan
-tetap dipertahankan. [CR-058](../../../docs/decisions/2026-11-03-cr-058-p8-production-qa-rollback-verification.md)
+tetap dipertahankan. [CR-058](../../../../docs/decisions/2026-11-03-cr-058-p8-production-qa-rollback-verification.md)
 mengganti syarat latihan runtime terisolasi P8-T1 dengan pemeriksaan
 kompatibilitas pada Page QA production: baca post v1/v2 dan plan pada runtime
 aktif, lalu pastikan ID, status, revision/hash serta progres tidak berubah.

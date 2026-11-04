@@ -3,7 +3,7 @@
 **Versi kontrak contoh:** `cr-053-p1-v1`, 31 Oktober 2026.
 **Dasar:** [CR-053 Accepted](../decisions/2026-10-31-cr-053-simplified-trivia-draft-workflow.md),
 [PRD](../../plans/simplified-trivia-draft-workflow-prd.md), dan
-[change](../../openspec/changes/simplify-trivia-draft-workflow/).
+[change](../../openspec/changes/archive/2026-11-03-simplify-trivia-draft-workflow/).
 
 Dokumen ini membekukan bentuk contoh request, respons tiga tool baru, taksonomi
 error, serta acceptance yang diperiksa oleh fixture P1. **Backend/tool v2 belum

@@ -31,7 +31,7 @@ tercatat dipisahkan dalam [operations](docs/operations.md); jangan menyatakan ve
 live terkini hanya dari manifest atau HEAD lokal.
 
 Untuk pengujian langsung/remediasi gunakan [Live Test & Fix](docs/live-test/README.md),
-[matriks 33 tool](docs/live-test/test-matrix.md), dan [hasil](docs/live-test/results.md):
+[matriks live historis/cakupan v2](docs/live-test/test-matrix.md), dan [hasil](docs/live-test/results.md):
 prompt → pemilik menguji di chat baru dengan plugin PRIVATE/owner OAuth `mcpku2`
 → hasil disanitasi → verdict → Issue per defect → PR fokus + Actions → retest
 pada runtime yang terverifikasi. Perbaikan tetap membutuhkan Issue/PR/Actions.
@@ -92,9 +92,11 @@ chat**, bukan melarang pemicu gate yang sudah diizinkan.
   [CR-052](docs/decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
   **Actions manual exact-SHA** dengan committed config dan aggregate PASS.
 - **Full gate G4 setelah merge:** dua Supabase stack terisolasi dengan **satu clean
-  reset per shard**, source/frontend PASS, **19+22 = 41 file/182 kasus database**
-  tanpa skip; MCP 15 file/82 kasus dan authenticated Inspector **33 valid/33
-  invalid + owner denial** tepat sekali pada shard 1. Kedua shard wajib PASS
+  reset per shard**, source/frontend PASS, **15+18 = 33 file/132 kasus database**
+  tanpa skip; MCP **17 file/114 kasus** dan authenticated Inspector **31 valid/31 invalid, lima nama
+  v1 absen/ditolak + owner denial** untuk kandidat CR-059 tepat sekali pada shard 1.
+  Angka 15 file/82 kasus MCP dan 33 valid/33 invalid adalah bukti run historis
+  sebelum cutover, bukan target yang boleh dipaksakan ke katalog baru. Kedua shard wajib PASS
   migration names/history, DB lint, **local security advisors terpisah**, audit
   katalog/grant/ACL/RLS/fixture sebelum/sesudah/akhir, dan cleanup; periksa
   kesamaan SHA/hash/report serta **aggregate PASS**. Tidak ada required status

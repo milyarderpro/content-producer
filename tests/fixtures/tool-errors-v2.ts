@@ -202,8 +202,8 @@ export const errorTaxonomy = {
     },
     {
       name: 'trivia_fact',
-      reads: ['trivia_find_similar_facts'],
-      writes: ['trivia_register_and_reserve_facts', 'trivia_release_facts'],
+      reads: [],
+      writes: [],
       domain_codes: [
         'PAGE_NOT_FOUND',
         'MODULE_DISABLED',
@@ -239,7 +239,7 @@ export const errorTaxonomy = {
     {
       name: 'post_base',
       reads: ['list_posts', 'get_post'],
-      writes: ['save_post'],
+      writes: [],
       domain_codes: [
         'POST_NOT_FOUND',
         'PAGE_NOT_FOUND',
@@ -261,7 +261,7 @@ export const errorTaxonomy = {
     {
       name: 'post_edit',
       reads: [],
-      writes: ['revise_post', 'reschedule_post'],
+      writes: ['reschedule_post'],
       domain_codes: [
         'POST_NOT_FOUND',
         'REVISION_CONFLICT',

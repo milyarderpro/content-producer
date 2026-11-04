@@ -7,24 +7,26 @@ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-
 const identifier = /^[a-z][a-z0-9_]{0,79}$/;
 const paramIdentifier = /^p_[a-z][a-z0-9_]{0,79}$/;
 const fixedClientId = 'phase-10-1-noauth-fixed-pilot';
+const retiredTriviaV1 = new Set([
+  'trivia_find_similar_facts', 'trivia_register_and_reserve_facts',
+  'trivia_release_facts', 'save_post', 'revise_post',
+]);
 
 const PILOT_JSONB_PARAMS: Record<string, readonly string[]> = {
   create_page: ['p_config'],
-  trivia_find_similar_facts: ['p_candidates'],
-  trivia_register_and_reserve_facts: ['p_facts'],
-  save_post: [
+  trivia_find_similar_facts_v2: ['p_candidates'],
+  save_post_v2: [
     'p_plan_item',
+    'p_facts',
     'p_content_payload',
-    'p_generation_snapshot',
-    'p_fact_bindings',
     'p_editorial_checks',
   ],
-  revise_post: [
+  revise_post_v2: [
+    'p_facts',
     'p_content_payload',
-    'p_generation_snapshot',
-    'p_fact_bindings',
     'p_editorial_checks',
   ],
+  trivia_correct_fact: ['p_successor'],
 };
 
 function isPilotJsonbArgument(tool: string, key: string): boolean {
@@ -33,6 +35,7 @@ function isPilotJsonbArgument(tool: string, key: string): boolean {
 
 export function buildPilotRpcStatement(tool: string, params: Record<string, unknown>): string {
   if (!identifier.test(tool)) throw new Error('Invalid RPC name');
+  if (retiredTriviaV1.has(tool)) throw new Error('Retired trivia v1 RPC');
   const keys = Object.keys(params);
   if (keys.length > 40 || keys.some((key) => !paramIdentifier.test(key))) {
     throw new Error('Invalid RPC arguments');

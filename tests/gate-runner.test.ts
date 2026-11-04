@@ -75,7 +75,7 @@ test('rejects manifest drift and missing required database file', () => {
 
 test('accepts the mandatory manifest including P1 contract tests and rejects skipped cases', () => {
   // P1-T3 and P2-T2 mandatory source files; runtime and all release coverage remain required.
-  assert.deepEqual(validateManifest(manifest, pkg.scripts), { source: 14, mcp: 17, database: 46 });
+  assert.deepEqual(validateManifest(manifest, pkg.scripts), { source: 14, mcp: 17, database: 33 });
   assert.throws(() => assertNoSkipped('Tests 179 passed, 1 skipped'), {
     code: 'REQUIRED_CASE_SKIPPED',
   });
@@ -164,7 +164,7 @@ test('rejects source/backend identity mismatch', () => {
     lockHash: 'b',
     inputsHash: 'c',
     shardHash: 'd',
-    counts: { source: 12, mcp: 17, database: 46 },
+    counts: { source: 12, mcp: 17, database: 33 },
     runtime: resolveRuntimeEvidence({ nodeSelector: '>=22', nodeEngine: '>=22 <25', denoSelector: '>=2.9.7' },
       { node: 'v24.22.1', deno: 'deno 2.9.7 (stable)', pnpm: '10.33.2', supabase: '2.120.0' }),
   };
@@ -185,9 +185,18 @@ test('fails closed when a required stage throws or lacks evidence', () => {
     'FAIL',
   );
   assert.equal(
-    stage('inspector', () => ({ output: '33 calls skipped' }), /33 valid and 33 invalid/).status,
+    stage('inspector', () => ({ output: '31 calls skipped' }), /31 valid and 31 invalid/).status,
     'FAIL',
   );
+});
+
+test('Inspector evidence requires all v2 calls, retired names, and owner denial', () => {
+  const evidence = 'V2 Inspector gate: 31/31 valid and 31/31 invalid tool calls; five retired v1 rejected; owner denial PASS';
+  assert.equal(countFromOutput('inspector', evidence),
+    '31 valid; 31 invalid; five retired v1 rejected; owner denial');
+  for (const missing of ['five retired v1 rejected; ', 'owner denial ', '31/31 invalid ']) {
+    assert.equal(countFromOutput('inspector', evidence.replace(missing, '')), undefined);
+  }
 });
 
 test('accepts the pinned CLI advisor report and rejects missing or malformed results', () => {
@@ -287,30 +296,30 @@ test('source evidence accepts six mandatory subchecks without formatter and reje
 });
 
 test('database Vitest ANSI and plain summaries', () => {
-  const plain = 'Test Files 46 passed\nTests 179 passed';
-  const ansi = 'Test Files \x1b[32m46 passed\x1b[0m\nTests \x1b[32m179 passed\x1b[0m';
+  const plain = 'Test Files 33 passed\nTests 132 passed';
+  const ansi = 'Test Files \x1b[32m33 passed\x1b[0m\nTests \x1b[32m132 passed\x1b[0m';
   for (const output of [plain, ansi]) {
     assert.doesNotThrow(() => assertDatabaseTestEvidence(output));
-    assert.equal(countFromOutput('database', output), '179');
+    assert.equal(countFromOutput('database', output), '132');
   }
   assert.equal(plainEvidence(ansi), plain);
   for (const output of [
     'Test Files 40 passed\nTests 179 passed',
-    'Test Files 46 passed',
-    'Test Files 46 passed\nTests 178 passed, 1 skipped',
-    'Test Files 46 passed\nTests 178 passed, 1 failed',
-    'Test Files 46 passed\nTests 178 passed, 1 cancelled',
+    'Test Files 33 passed',
+    'Test Files 33 passed\nTests 132 passed, 1 skipped',
+    'Test Files 33 passed\nTests 132 passed, 1 failed',
+    'Test Files 33 passed\nTests 132 passed, 1 cancelled',
   ]) {
     assert.throws(() => assertDatabaseTestEvidence(output));
   }
 });
 
-test('partition covers all 46 mandatory files exactly once', () => {
+test('partition covers all 33 mandatory files exactly once', () => {
   const partition = JSON.parse(
     readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8'),
   );
   const shards = validateShards(partition, manifest);
-  assert.equal(shards['1'].length + shards['2'].length, 46);
+  assert.equal(shards['1'].length + shards['2'].length, 33);
   for (const broken of [
     { ...partition, shards: { ...partition.shards, '2': partition.shards['2'].slice(1) } },
     {
@@ -362,37 +371,37 @@ test('shard proof rejects missing, duplicate, skipped and wrong SHA', () => {
     assert.throws(() => validateShardProofs(bad, sha, hashes, part), {
       code: 'SHARD_EVIDENCE_MISMATCH',
     });
-  assert.equal(assertShardDatabaseEvidence('Test Files 21 passed\nTests 90 passed', 21), 90);
+  assert.equal(assertShardDatabaseEvidence('Test Files 15 passed\nTests 90 passed', 15), 90);
   for (const output of [
     'Test Files 20 passed\nTests 90 passed',
-    'Test Files 21 passed\nTests 89 passed, 1 skipped',
+    'Test Files 15 passed\nTests 89 passed, 1 skipped',
   ]) {
-    assert.throws(() => assertShardDatabaseEvidence(output, 21));
+    assert.throws(() => assertShardDatabaseEvidence(output, 15));
   }
 });
 
-test('rebalanced shards preserve two hotspot files in shard 2 with no duplicates', () => {
+test('v2 shards retain distinct hotspot files in shard 2 with no duplicates', () => {
   const partition = validateShards(
     JSON.parse(readFileSync(new URL('../scripts/gate-db-shards.json', import.meta.url), 'utf8')),
     manifest,
   );
-  assert.equal(partition['1'].length + partition['2'].length, 46);
-  assert.equal(new Set([...partition['1'], ...partition['2']]).size, 46);
+  assert.equal(partition['1'].length + partition['2'].length, 33);
+  assert.equal(new Set([...partition['1'], ...partition['2']]).size, 33);
   for (const file of [
     'supabase/tests/database/api-trivia-public-gold.test.ts',
-    'supabase/tests/database/api-post-approval-quality.test.ts',
+    'supabase/tests/database/api-trivia-v2-maintenance.test.ts',
   ]) {
     assert.equal(partition['1'].includes(file), false);
     assert.equal(partition['2'].includes(file), true);
   }
 });
 
-test('backend candidate aggregate accepts exactly 221 database cases', () => {
+test('backend candidate aggregate accepts exactly 132 database cases', () => {
   for (const [count, expectedExit] of [
-    [181, 1],
-    [203, 1],
-    [221, 0],
-    [183, 1],
+    [131, 1],
+    [221, 1],
+    [132, 0],
+    [133, 1],
   ]) {
     const result = spawnSync(
       'pnpm',
@@ -404,14 +413,14 @@ test('backend candidate aggregate accepts exactly 221 database cases', () => {
   }
 });
 
-test('MCP 17 files/127 cases and authenticated Inspector belong to shard 1 exactly once', () => {
+test('MCP 17 files/114 cases and authenticated v2 Inspector belong to shard 1 exactly once', () => {
   const stages: ShardProof['stages'] = [
-    { name: 'mcp', status: 'PASS' as const, durationMs: 1, count: '127' },
+    { name: 'mcp', status: 'PASS' as const, durationMs: 1, count: '114' },
     {
       name: 'inspector',
       status: 'PASS' as const,
       durationMs: 1,
-      count: '36 valid; 36 invalid; owner denial',
+      count: '31 valid; 31 invalid; five retired v1 rejected; owner denial',
     },
   ];
   const make = (shard: '1' | '2', items: typeof stages): ShardProof => ({
@@ -465,14 +474,14 @@ test('final two-shard reports satisfy both validators', () => {
       name,
       status: 'PASS',
       durationMs: 1,
-      ...(name === 'mcp' ? { count: '127' } : {}),
-      ...(name === 'inspector' ? { count: '36 valid; 36 invalid; owner denial' } : {}),
+      ...(name === 'mcp' ? { count: '114' } : {}),
+      ...(name === 'inspector' ? { count: '31 valid; 31 invalid; five retired v1 rejected; owner denial' } : {}),
       ...(name === 'database' ? { count: String(cases) } : {}),
     })),
   });
-  const one = report('1', 115);
-  const two = report('2', 106);
-  assert.equal(validateShardProofs([one, two], sha, hashes, partition), 221);
+  const one = report('1', 69);
+  const two = report('2', 63);
+  assert.equal(validateShardProofs([one, two], sha, hashes, partition), 132);
   assert.doesNotThrow(() => validateSingleMcpInspector([one, two]));
   assert.deepEqual(
     two.stages.filter((item) => ['mcp', 'inspector'].includes(item.name)),

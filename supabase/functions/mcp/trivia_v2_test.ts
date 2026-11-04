@@ -66,6 +66,20 @@ Deno.test('P6 v2 bad input and foreign workspace never dispatch business RPC', a
     }
     const denied = await call('save_post_v2', { ...single.request, workspace_public_id: id(999) });
     check(denied.result?.isError, 'foreign workspace accepted');
+    for (const args of [
+      { ...reviseRequest, expected_revision: 0 },
+      { ...reviseRequest, expected_content_hash: 'bad' },
+      { ...reviseRequest, reservation_token: id(2) },
+      { ...reviseRequest, owner_user_id: context.actorUserId },
+      { ...reviseRequest, system_checks: {} },
+    ]) {
+      const rejected = await call('revise_post_v2', args);
+      check(rejected.error || rejected.result?.isError, 'invalid v2 revision accepted');
+    }
+    const foreignRevision = await call('revise_post_v2', {
+      ...reviseRequest, workspace_public_id: id(999),
+    });
+    check(foreignRevision.result?.isError, 'foreign revision accepted');
     check(calls === 0, 'unauthorized RPC dispatched');
   } finally { globalThis.fetch = original; }
 });
@@ -102,7 +116,7 @@ Deno.test('P6 CR-056 maintenance versions map separately without tier/expiry on 
         return Promise.resolve(Response.json({ response_schema_version: 2, data: {
           fact_public_id: id(500), affected_posts: affected, replayed: false,
           ...(tool === 'trivia_reverify_fact'
-            ? { verification_status: 'verified', source_url: 'https://example.org/source', fact_updated_at: configTime }
+            ? { verification_status: 'needs_review', source_url: 'https://example.org/source', fact_updated_at: configTime }
             : { old_status: 'invalidated', successor_public_id: null }),
         } }));
       };

@@ -135,28 +135,12 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     testOwner: 'api-plan-lifecycle.test.ts',
   },
   {
-    name: 'trivia_find_similar_facts',
-    functionName: 'api.trivia_find_similar_facts',
+    name: 'trivia_find_similar_facts_v2',
+    functionName: 'api.trivia_find_similar_facts_v2',
     rateGroup: 'expensive_read',
     write: false,
     requiredGuards: [],
-    testOwner: 'api-trivia-facts.test.ts',
-  },
-  {
-    name: 'trivia_register_and_reserve_facts',
-    functionName: 'api.trivia_register_and_reserve_facts',
-    rateGroup: 'contention_write',
-    write: true,
-    requiredGuards: ['operation_key', 'expected_config_updated_at'],
-    testOwner: 'api-trivia-facts.test.ts',
-  },
-  {
-    name: 'trivia_release_facts',
-    functionName: 'api.trivia_release_facts',
-    rateGroup: 'contention_write',
-    write: true,
-    requiredGuards: ['operation_key', 'reservation_token'],
-    testOwner: 'api-trivia-facts.test.ts',
+    testOwner: 'api-trivia-v2-read.test.ts',
   },
   {
     name: 'trivia_reverify_fact',
@@ -164,7 +148,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'write',
     write: true,
     requiredGuards: ['operation_key', 'expected_fact_updated_at'],
-    testOwner: 'api-trivia-correction.test.ts',
+    testOwner: 'api-trivia-v2-maintenance.test.ts',
   },
   {
     name: 'trivia_correct_fact',
@@ -172,7 +156,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'contention_write',
     write: true,
     requiredGuards: ['operation_key', 'expected_fact_updated_at', 'explicit_correction'],
-    testOwner: 'api-trivia-correction.test.ts',
+    testOwner: 'api-trivia-v2-maintenance.test.ts',
   },
   {
     name: 'list_posts',
@@ -191,25 +175,25 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     testOwner: 'api-read-rpcs.test.ts',
   },
   {
-    name: 'save_post',
-    functionName: 'api.save_post',
+    name: 'save_post_v2',
+    functionName: 'api.save_post_v2',
     rateGroup: 'contention_write',
     write: true,
     requiredGuards: [
       'operation_key',
-      'reservation_token',
       'expected_config_updated_at',
+      'catalog_version',
       'claim_token when plan-bound',
     ],
-    testOwner: 'api-post-save-revise.test.ts',
+    testOwner: 'api-trivia-v2-save.test.ts',
   },
   {
-    name: 'revise_post',
-    functionName: 'api.revise_post',
+    name: 'revise_post_v2',
+    functionName: 'api.revise_post_v2',
     rateGroup: 'contention_write',
     write: true,
     requiredGuards: ['operation_key', 'expected_revision', 'expected_content_hash'],
-    testOwner: 'api-post-save-revise.test.ts',
+    testOwner: 'api-trivia-v2-save.test.ts',
   },
   {
     name: 'reschedule_post',
@@ -217,7 +201,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'write',
     write: true,
     requiredGuards: ['operation_key', 'expected_revision'],
-    testOwner: 'api-post-reschedule.test.ts',
+    testOwner: 'api-trivia-v2-lifecycle.test.ts',
   },
   {
     name: 'approve_post',
@@ -230,7 +214,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
       'expected_content_hash',
       'explicit_approval',
     ],
-    testOwner: 'api-post-approval-quality.test.ts',
+    testOwner: 'api-trivia-v2-lifecycle.test.ts',
   },
   {
     name: 'revoke_post_approval',
@@ -243,7 +227,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
       'expected_content_hash',
       'explicit_revocation',
     ],
-    testOwner: 'api-post-lifecycle.test.ts',
+    testOwner: 'api-trivia-v2-lifecycle.test.ts',
   },
   {
     name: 'discard_post',
@@ -251,7 +235,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'contention_write',
     write: true,
     requiredGuards: ['operation_key', 'expected_revision', 'explicit_discard'],
-    testOwner: 'api-post-lifecycle.test.ts',
+    testOwner: 'api-trivia-v2-save.test.ts',
   },
   {
     name: 'mark_post_posted',
@@ -264,7 +248,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
       'expected_content_hash',
       'explicit_publication_confirmation',
     ],
-    testOwner: 'api-post-lifecycle.test.ts',
+    testOwner: 'api-trivia-v2-lifecycle.test.ts',
   },
   {
     name: 'archive_post',
@@ -272,7 +256,7 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     rateGroup: 'write',
     write: true,
     requiredGuards: ['operation_key', 'expected_revision', 'explicit_archive'],
-    testOwner: 'api-post-lifecycle.test.ts',
+    testOwner: 'api-trivia-v2-lifecycle.test.ts',
   },
   {
     name: 'record_post_performance',
@@ -301,11 +285,11 @@ export const phaseFiveOperationMap: readonly Operation[] = [
 ];
 
 describe('Phase 5 operation map', () => {
-  it('keeps the frozen 33-operation inventory machine-readable', () => {
-    expect(phaseFiveOperationMap).toHaveLength(33);
-    expect(new Set(phaseFiveOperationMap.map((operation) => operation.name)).size).toBe(33);
-    expect(new Set(phaseFiveOperationMap.map((operation) => operation.functionName)).size).toBe(33);
-    expect(phaseFiveOperationMap.filter((operation) => operation.write)).toHaveLength(22);
+  it('keeps the active 31-operation inventory machine-readable', () => {
+    expect(phaseFiveOperationMap).toHaveLength(31);
+    expect(new Set(phaseFiveOperationMap.map((operation) => operation.name)).size).toBe(31);
+    expect(new Set(phaseFiveOperationMap.map((operation) => operation.functionName)).size).toBe(31);
+    expect(phaseFiveOperationMap.filter((operation) => operation.write)).toHaveLength(20);
     expect(phaseFiveOperationMap.filter((operation) => !operation.write)).toHaveLength(11);
     expect(
       phaseFiveOperationMap
@@ -318,7 +302,7 @@ describe('Phase 5 operation map', () => {
       'get_page_generation_context',
       'list_content_plans',
       'get_content_plan',
-      'trivia_find_similar_facts',
+      'trivia_find_similar_facts_v2',
       'list_posts',
       'get_post',
       'get_post_performance',

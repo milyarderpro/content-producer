@@ -1,5 +1,44 @@
 # Kontrak dan pemakaian tool MCP
 
+## Batas kompatibilitas source cutover v2 — CR-059 (3 November 2026)
+
+Source pada change `cutover-trivia-v2-only` memasang **31 tool**. Lima nama
+`trivia_find_similar_facts`, `trivia_register_and_reserve_facts`,
+`trivia_release_facts`, `save_post`, dan `revise_post` tidak lagi masuk katalog
+atau dapat dipanggil. Dua tool pemeliharaan bernama tetap,
+`trivia_reverify_fact` dan `trivia_correct_fact`, hanya menerima
+`request_schema_version: 2`. Jalur draft baru memakai
+`trivia_find_similar_facts_v2` → `save_post_v2` → `get_post`; revisi memakai
+`revise_post_v2` dengan revision/hash serta config/catalog terkini.
+
+Tool umum untuk akun, Page, plan, lifecycle post, dan metrik tetap memakai
+`request_schema_version: 1`. Angka itu adalah versi **kontrak tool umum**,
+bukan versi konten: `list_posts`, `get_post`, `approve_post`,
+`reschedule_post`, `mark_post_posted`, `archive_post`, dan tool metrik tetap
+dapat menangani post dengan `content_schema_version: 2`. `get_post`
+mengembalikan envelope 1 dengan projection post versi 2, termasuk sumber,
+checks, dan metrik sesuai opsi. CAS, replay operation key/payload yang identik,
+owner OAuth, RLS, dan grant tetap berlaku. Post v1 yang sudah ada tetap bisa
+dibaca selama tahap upgrade, sebelum reset konten terpisah; operasi khusus v1
+tidak tersedia lagi. Ini bukti kontrak **source/fixture**, belum klaim deployment
+production. Lihat [CR-059](decisions/2026-11-03-cr-059-trivia-v2-only-cutover.md).
+Sesudah URL fakta v2 diperbarui, status `needs_review` tetap sah dalam respons
+`trivia_reverify_fact`; pembaruan URL sendiri tidak menyatakan fakta sudah diverifikasi ulang.
+
+## Katalog operasional source cutover: 31 tool
+
+Daftar aktif adalah 28 tool bersama dari inventaris 33 di bawah, ditambah
+`trivia_find_similar_facts_v2`, `save_post_v2`, dan `revise_post_v2`.
+Lima nama v1 yang tercantum pada bagian historis tidak ada dalam katalog baru.
+Ada 11 Read dan 20 Write. Schema v2 lengkap ada di
+[kontrak draft v2](contracts/trivia-draft-v2.md); source/fixture ini belum
+menyatakan versi production sudah berpindah. Jangan memakai contoh v1 di bawah
+sebagai prosedur baru.
+
+## Kontrak historis sebelum cutover
+
+Bagian inventaris 36/33 tool di bawah dipertahankan sebagai rekam kontrak lama.
+
 ## Katalog transisi v2 — source P6 (2 November 2026)
 
 Source P6 memperluas baseline di bawah menjadi **36 tool: 12 Baca/24 Tulis**.
