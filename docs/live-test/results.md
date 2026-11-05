@@ -2,10 +2,42 @@
 
 **Kampanye:** [Issue #25](https://github.com/milyarderpro/content-producer/issues/25) · **Matriks:** [test-matrix.md](test-matrix.md) · **Workflow:** [README.md](README.md).
 
-Dokumen ini adalah **log ringkas hasil kampanye historis v1**, bukan bukti
-bahwa 31 tool kandidat v2 sudah diuji live atau terpasang. Simpan bukti yang telah disanitasi, tool input/output yang relevan dan tautan diskusi di GitHub Issue; jangan menyimpan akses token, OAuth client secret, reservation token atau kredensial.
+Dokumen ini menyimpan **hasil kampanye historis v1** dan bukti LIVE v2 terbaru
+secara terpisah. Satu E2E v2 PASS tidak membuktikan seluruh 31 tool diuji LIVE. Simpan bukti yang telah disanitasi, tool input/output yang relevan dan tautan diskusi di GitHub Issue; jangan menyimpan akses token, OAuth client secret, reservation token atau kredensial.
 
 ## Hasil yang telah dinilai
+
+### CUT-V2-HOST-01 — 4 November 2026 — PASS LIVE (Chrome + readback independen)
+
+Plugin PRIVATE Content Producer **0.4.0**, release
+`pluginrel_6aeb5dffa8688191831a1f71f107d8fd`, diuji pada
+[chat ChatGPT baru](https://chatgpt.com/c/6aeb5f61-1de4-83ec-80e1-a9ff95fe4635)
+dengan parent-plugin Content Producer saja dan dependency owner OAuth `mcpku2`.
+Pemilik mengizinkan QA melalui Chrome. Setelah preview payload ditinjau, tepat
+satu draft v2 disimpan pada Page QA `3c7dc8b2-43db-42b5-abd6-d334aac0ff83`.
+
+Host: profile/workspace/Page/context → riset URL nyata → dedup v2 → preview →
+persetujuan satu payload → dedup/context terbaru → `save_post_v2` →
+`get_post` dengan sources/checks. Post `ff10ff32-788a-45c2-80d6-3b4f6fd64b4b`,
+schema 2/draft/revision 1, tujuh fakta/URL, quality passed, 5 mechanical passed,
+3 editorial pass. Read OAuth independen mengonfirmasi konten dan hash
+`dbaaa6d1b4a7e36b7a1066d076773504ec7f7e71a1395129e71b8e0c46d06847`.
+Bukti UI/respons host bukan raw invocation trace lengkap; dibantu readback
+owner dan state database independen.
+
+Cleanup transaksional satu ID dan turunannya PASS; seluruh konten kembali nol,
+owner get_post **POST_NOT_FOUND** dan list_posts workspace kosong.
+Comparator akun/workspace/Page/config/niche identik dengan backup/pre-QA.
+Katalog connector aktif 31 nama dan lima nama v1 absen; RPC v1 final 0.
+Tidak ada approval ready, publikasi, metrik, draft kedua atau fallback v1.
+Bukan PASS seluruh 31 tool LIVE atau relabel kampanye v1/AC historis.
+
+Bukti rinci: [task 5.4](../../openspec/changes/archive/2026-11-05-cutover-trivia-v2-only/task-5.4-host-qa-results.md)
+dan [laporan akhir](../../openspec/changes/archive/2026-11-05-cutover-trivia-v2-only/final-report.md).
+Backend formal G4 `37fbbbeb0a0c628d9c5e628b21b5f804a4df9501`,
+[run 41854239512](https://github.com/milyarderpro/content-producer/actions/runs/41854239512)
+PASS CI/FIXTURE; Edge v37/85 migration terpasang berdasarkan report rilis.
+Status E2E historis Issue #26 tetap dipertahankan sebagai bukti kejadian lama.
 
 ### LT-READ-A — 21 Oktober 2026 — 5 PASS LIVE (owner-reported)
 

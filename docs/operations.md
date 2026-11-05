@@ -14,18 +14,20 @@ command sudah dijalankan atau otorisasi untuk langsung mengeksekusinya.
 ## 1. Satu ringkasan versi, dengan sumber bukti yang jelas
 
 Pemilik menyatakan project sudah digunakan di production. Source dan bukti lokal
-yang tersedia perlu dibedakan dari pemeriksaan live terbaru:
+yang tersedia perlu dibedakan dari pemeriksaan live terbaru. Pembaruan runtime
+4 November 2026 dirangkum dalam [laporan cutover](../openspec/changes/archive/2026-11-05-cutover-trivia-v2-only/final-report.md)
+dan [bukti host/cleanup QA](../openspec/changes/archive/2026-11-05-cutover-trivia-v2-only/task-5.4-host-qa-results.md):
 
 | Komponen             | Yang dapat dirujuk sekarang                                                                                                                                      | Batas bukti                                                                                        |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Source yang ditinjau | Backend `main` SHA `be7ce5455863d3c51f4cfdd9ec6c9263e837ede3` setelah PR #52                                                                                     | Bukan exact SHA deployment yang baru diperiksa                                                     |
-| Paket plugin         | Kandidat source CR-059 `0.4.0` tervalidasi lokal; Plugin Creator menunjukkan PRIVATE terpasang `0.3.0` sebelum cutover. Versi lebih awal adalah riwayat. | Kandidat belum diunggah; versi live harus diperiksa lagi saat rilis |
-| Edge `mcp`           | CR-049 mencatat Edge tetap v33 saat rollout SQL 22 Oktober; v31/v32 adalah record lebih awal                                                                     | Versi aktif serta exact source/bundle SHA sekarang belum diverifikasi                              |
-| Database             | Ada 71 migration source pada backend SHA di atas; CR-049 terakhir mencatat 70 migration production setelah rollout                                               | Applied production history dan drift sekarang belum diperiksa                                      |
+| Source yang ditinjau | Backend exact G4 `37fbbbeb0a0c628d9c5e628b21b5f804a4df9501`; source paket/QA `352347c420fa389212718010b4c9d835064f0ff9` | Selisih keduanya hanya laporan/checklist; bukti pada laporan cutover 4 November 2026 |
+| Paket plugin | PRIVATE Content Producer **0.4.0**, release `pluginrel_6aeb5dffa8688191831a1f71f107d8fd`; readback 13 file + overlay kompatibilitas sesuai | LIVE Plugin Creator dan satu QA host v2 PASS, 4 November 2026; bukan seluruh tool LIVE |
+| Edge `mcp` | **v37**, verify_jwt=false; 24/24 file bundle provider identik kandidat backend pada rilis 4 November 2026 | Bukti task 5.2; tidak redeploy pada sesi QA task 5.4 |
+| Database | **85 migration**, latest `20261103072943`; seluruh konten owner final nol setelah reset dan cleanup QA | LIVE 4 November 2026; akun/workspace/4 Page/config dan 5 ledger Page tetap |
 | Gate historis CR-049 | Kandidat `1a4e755a48f3c77eb557b931fd6bd99d5e1b24fd`, [run 39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314)                | Record pada CR-049; jangan menempelkan exact-SHA PASS tersebut ke HEAD yang berbeda                |
 | Gate CR-050          | Backend SHA `be7ce5455863d3c51f4cfdd9ec6c9263e837ede3`, [run 40364895835](https://github.com/milyarderpro/content-producer/actions/runs/40364895835) **SUCCESS** | Gate lokal terisolasi; bukan bukti deployment atau retest live                                     |
 | Frontend             | Tracker merekam hosting production; source memakai `auth-frontend/`, build `dist/`, Git auto-deployment dimatikan                                                | Deployment aktif, environment, dan flag hosted sekarang belum diperiksa                            |
-| Kampanye live        | Log lokal merekam 11 Read PASS; LT-E2E-01 masih BLOCKED pada record tersebut                                                                                     | Status Issue atau hasil setelah log itu belum diperiksa                                            |
+| Kampanye live | CUT-V2-HOST-01 PASS LIVE: satu draft v2 melalui ChatGPT + get_post, cleanup terarah dan readback nol | Hasil v1/Issue #26 tetap historis; belum semua 31 tool LIVE |
 
 Sumber: [log live](live-test/results.md),
 [CR-049](decisions/2026-10-22-cr-049-get-post-source-evidence-null-preservation.md),
@@ -344,4 +346,8 @@ Node source/shard memakai 24.22.2/24.22.1/24.22.0. Komponen PASS tidak memberi
 izin rilis. [CR-060](decisions/2026-11-04-cr-060-g4-single-runtime-resolution.md)
 menetapkan satu resolver bounded per run dan output exact untuk seluruh job;
 actual-version equality, hash, dua shard, advisors serta seluruh kontrol
-tetap wajib. Rilis menunggu G4 baru pada final main SHA dengan aggregate PASS.
+tetap wajib. G4 pengganti [41854239512](https://github.com/milyarderpro/content-producer/actions/runs/41854239512)
+pada final main `37fbbbeb0a0c628d9c5e628b21b5f804a4df9501` **aggregate PASS 8m51s**.
+Rilis/reset dan QA host berikutnya dibuktikan terpisah pada [laporan akhir
+cutover](../openspec/changes/archive/2026-11-05-cutover-trivia-v2-only/final-report.md); run gagal lama
+tetap FAIL.

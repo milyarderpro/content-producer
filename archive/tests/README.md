@@ -8,7 +8,7 @@ syarat gate aktif. Data gold dan corpus asli tetap di
 
 Tiga belas suite database yang membutuhkan keberhasilan operasi v1 dipindahkan
 utuh ke direktori ini. Alasan dan test v2 yang menggantikannya dicatat dalam
-[pemetaan task 4.3](../../openspec/changes/cutover-trivia-v2-only/task-4.3-test-mapping.md).
+[pemetaan task 4.3](../../openspec/changes/archive/2026-11-05-cutover-trivia-v2-only/task-4.3-test-mapping.md).
 Suite arsip tidak dijalankan sebagai gate rilis v2; namanya tetap dapat
 ditelusuri melalui Git dan file di direktori ini.
 

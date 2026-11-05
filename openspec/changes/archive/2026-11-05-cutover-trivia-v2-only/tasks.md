@@ -1,7 +1,9 @@
 # Tasks
 
-Kotak tercentang menunjukkan implementasi dan verifikasi source/fixture yang selesai,
-bukan bukti cutover production. Rantai migration dan histori production dipertahankan.
+Kotak tercentang merujuk cakupan bukti tiap task: source/fixture pada task 1–4,
+gate CI pada 5.1, serta LIVE pada 5.2–5.4. Lihat [laporan akhir](final-report.md)
+untuk batas bukti; bukan klaim semua tool LIVE. Rantai migration dan histori
+production dipertahankan.
 
 ## 1. Keputusan dan batas data
 
@@ -31,8 +33,8 @@ bukan bukti cutover production. Rantai migration dan histori production dipertah
 - [x] 5.1 Implementasikan remediasi runtime Issue #130/CR-060 yang disetujui pemilik: satu resolver bounded, output exact untuk seluruh job G4, regresi wiring dan penolakan drift tanpa melonggarkan equality. Review perubahan terintegrasi, jalankan check/test fokus dan Issue/PR/Actions sesuai aturan proyek, estimasikan durasi, lalu dispatch satu G4 manual exact-SHA kandidat backend. Verifikasi URL, SHA, config/hash, status, dan aggregate PASS sebelum rilis; jika >10 menit, laporkan run dimulai lalu tunggu `lanjutkan` untuk memeriksa hasil.
 - [x] 5.2 Setelah G4 PASS, ambil backup dan preflight production terbaru, tutup RPC v1 melalui migration maju, lalu deploy Edge katalog v2. Verifikasi versi terpasang, v1 direct/MCP ditolak, v2 dan owner OAuth tetap berfungsi, serta perbedaan scope menghentikan tindakan.
 - [x] 5.3 Dalam jendela write yang dibatasi, jalankan reset konten production sesuai matriks; verifikasi hitungan konten nol, operasi lama tidak replay, dan ID/hash akun/workspace/Page/config sebelum-sesudah identik. Jika ada mismatch, catat `BLOCKED` tanpa penghapusan sebagian.
-- [ ] 5.4 Perbarui plugin PRIVATE, uji host pada Page QA yang disetujui dengan satu draft v2 dan readback, lalu cleanup ID QA secara terarah. Verifikasi v1 absen/ditolak, hasil akhir konten nol, Page/config tetap, dan jangan beri PASS pada uji yang belum berjalan.
-- [ ] 5.5 Catat laporan akhir yang memisahkan LIVE, CI/FIXTURE, source SHA, versi backend/plugin terpasang, backup, hitungan sebelum/sesudah, serta risiko plugin lama; verifikasi setiap status task sesuai bukti dan tidak menyebut rollback data yang belum diuji sebagai berhasil.
+- [x] 5.4 Perbarui plugin PRIVATE, uji host pada Page QA yang disetujui dengan satu draft v2 dan readback, lalu cleanup ID QA secara terarah. Verifikasi v1 absen/ditolak, hasil akhir konten nol, Page/config tetap, dan jangan beri PASS pada uji yang belum berjalan.
+- [x] 5.5 Catat laporan akhir yang memisahkan LIVE, CI/FIXTURE, source SHA, versi backend/plugin terpasang, backup, hitungan sebelum/sesudah, serta risiko plugin lama; verifikasi setiap status task sesuai bukti dan tidak menyebut rollback data yang belum diuji sebagai berhasil.
 
 ## Workflow follow-up
 
