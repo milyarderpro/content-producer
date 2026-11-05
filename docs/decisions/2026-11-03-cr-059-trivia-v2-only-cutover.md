@@ -2,7 +2,7 @@
 
 **Tanggal:** 3 November 2026.
 **Status:** diterima sebagai keputusan pemilik untuk change
-[`cutover-trivia-v2-only`](../../openspec/changes/cutover-trivia-v2-only/proposal.md);
+[`cutover-trivia-v2-only`](../../openspec/changes/archive/2026-11-05-cutover-trivia-v2-only/proposal.md);
 implementasi dan rilis belum dibuktikan oleh record ini.
 
 ## Keputusan pemilik dan cakupan
@@ -15,7 +15,7 @@ helper internal bersama, termasuk nama `_v1` yang masih dipakai v2, tetap ada;
 nomor versi tool umum tidak diganti. Akun/OAuth, workspace, Page, niche, dan
 pengaturan Page tetap utuh. Semua post/fakta v1 **dan v2**, plan, metrik, dan
 turunan konten milik pemilik termasuk reset, setelah backup dan preflight yang
-ditetapkan dalam [design](../../openspec/changes/cutover-trivia-v2-only/design.md).
+ditetapkan dalam [design](../../openspec/changes/archive/2026-11-05-cutover-trivia-v2-only/design.md).
 
 ## Override kontrak sebelumnya
 
@@ -60,5 +60,5 @@ tetap bukti historis; gate aktif perlu memetakan setiap test yang tidak lagi
 berlaku ke penolakan v1 atau pemeriksaan v2 yang setara. Tidak ada skip diam-diam.
 
 Urutan rilis, backup, reset transaksional, dan uji host berada pada
-[tasks](../../openspec/changes/cutover-trivia-v2-only/tasks.md). Record ini
+[tasks](../../openspec/changes/archive/2026-11-05-cutover-trivia-v2-only/tasks.md). Record ini
 tidak sendiri membuktikan G4 PASS, deployment, penghapusan data, atau uji LIVE.

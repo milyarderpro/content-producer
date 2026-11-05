@@ -6,16 +6,19 @@
 
 Setiap LT dapat memiliki subkasus valid, invalid/expected-denial, retry dan concurrency. Untuk Write, `PASS LIVE` memerlukan izin spesifik, respons sukses yang sah dan verifikasi owner-scoped readback; untuk tool destruktif, keberhasilan fixture diberi label `PASS CI/FIXTURE`, tidak diberi label sukses LIVE.
 
-## Cakupan aktif kandidat cutover v2
+## Cakupan aktif cutover v2
 
-Kandidat source CR-059 memiliki **31 tool aktif: 11 Read dan 20 Write**.
+Runtime cutover CR-059 memiliki **31 tool aktif: 11 Read dan 20 Write**.
 Gunakan 28 nama bersama di tabel historis di bawah, kecuali LT-016, LT-017,
 LT-018, LT-023, LT-024. Tambahkan tiga skenario baru: dedup
 `trivia_find_similar_facts_v2` (Read), draft `save_post_v2` (Write), dan
 revisi `revise_post_v2` (Write). Kelima nama lama harus absen dari discovery
-dan ditolak bila dipanggil. Status seluruh skenario cutover baru adalah
-**NOT RUN LIVE** sampai ada bukti host sesudah rilis. Status PASS pada tabel
-di bawah tetap hasil kampanye 21 Oktober, bukan PASS v2.
+dan ditolak bila dipanggil. Pada 4 November 2026, **CUT-V2-HOST-01 PASS LIVE** untuk dedup v2 → satu
+save_post_v2 → get_post sources/checks di host ChatGPT dengan plugin 0.4.0,
+diikuti cleanup terarah dan verifikasi konten nol. Revisi v2 dan skenario lain
+yang belum diuji tetap **NOT RUN LIVE**; G4/Inspector adalah CI/FIXTURE.
+Lihat [hasil QA](results.md).
+Status PASS pada tabel di bawah tetap hasil kampanye 21 Oktober, bukan PASS v2.
 
 ## Master inventory historis v1 — 33 tool
 

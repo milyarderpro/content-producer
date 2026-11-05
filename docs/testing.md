@@ -50,7 +50,7 @@ katalog transisi **36 tool**, Inspector **36 valid/36 invalid**, dan DB
 **17 file/114 kasus MCP**, **31 tool**, Inspector **31 valid/31 invalid**
 ditambah lima penolakan v1 dan owner denial, serta DB **33 file/132 kasus**.
 Pemetaan suite v1 yang diarsipkan ke pemeriksaan v2 ada di
-[task 4.3](../openspec/changes/cutover-trivia-v2-only/task-4.3-test-mapping.md).
+[task 4.3](../openspec/changes/archive/2026-11-05-cutover-trivia-v2-only/task-4.3-test-mapping.md).
 Fixture source/plugin tidak membuktikan ChatGPT host atau LIVE.
 
 **Remediasi P7 ([Issue #118](https://github.com/milyarderpro/content-producer/issues/118)):**

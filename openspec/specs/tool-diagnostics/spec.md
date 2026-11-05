@@ -10,20 +10,17 @@ ini berlaku lintas versi dan tidak dibatasi pada tiga tool draft v2.
 
 ### Requirement: TDX-01 Seluruh tool tercakup oleh diagnostik
 
-Setiap tool Read/Write yang tersedia SHALL memiliki diagnostik untuk lapisan
-input, akses, domain, rate limit, transport, dan output yang berlaku. Inventaris
-SHALL mengikuti katalog aktual, termasuk v1 selama transisi. Penyelesaian proyek
-MUST mencakup seluruh tool, bukan hanya kelompok internal D1.
+Setiap tool Read/Write yang tersedia SHALL memiliki diagnostik untuk lapisan input, akses, domain, rate limit, transport, dan output yang berlaku. Inventaris SHALL mengikuti katalog aktif setelah cutover; nama v1 yang dipensiunkan MUST ditolak dan tidak dihitung sebagai tool aktif. Penyelesaian proyek MUST mencakup seluruh tool aktif, bukan hanya kelompok draft.
 
 #### Scenario: Tool baru ditambahkan selama transisi
 
-- **WHEN** tiga tool v2 ditambahkan ke katalog yang masih mendukung v1
-- **THEN** inventaris cakupan error mencakup semua tool aktual dan tidak berhenti pada baseline 33
+- **WHEN** katalog setelah cutover berisi 31 tool aktif
+- **THEN** cakupan diagnostik meliputi semua 31 tool dan lima nama v1 absen atau ditolak
 
 #### Scenario: Hanya diagnostik jalur draft selesai
 
-- **WHEN** D1 selesai tetapi tool lain pada D2 belum tercakup
-- **THEN** diagnostik seluruh tool dan proyek belum dinyatakan selesai, serta label D1/D2 tidak dianggap persetujuan rilis lebih awal
+- **WHEN** diagnostik jalur draft selesai tetapi tool umum lain belum tercakup
+- **THEN** diagnostik seluruh tool dan proyek belum dinyatakan selesai
 
 ### Requirement: TDX-02 Kegagalan menyediakan konteks dan tindakan aman
 
@@ -122,15 +119,17 @@ menjadikannya credential atau saluran pembocoran data.
 
 ### Requirement: TDX-07 Kompatibilitas error lintas versi dipertahankan
 
-Error v1 yang masih didukung SHALL tetap kompatibel dengan plugin lama.
-Taksonomi dan contoh request/response error MUST ditetapkan sebelum coding;
-schema tertutup MUST NOT diberi field baru sembarangan. Respons v2 SHALL memakai
-kontrak versi yang jelas tanpa membuat plugin v1 salah menafsirkan hasil.
+Error tool yang tetap aktif SHALL mengikuti envelope dan versi kontrak masing-masing; schema tertutup MUST NOT diberi field baru sembarangan. Nama tool v1 yang dipensiunkan MUST ditolak tanpa menjalankan operasi bisnis atau menjanjikan kompatibilitas envelope v1. Respons v2 SHALL memakai kontrak versi yang jelas.
 
 #### Scenario: Plugin lama menerima kegagalan
 
-- **WHEN** tool v1 gagal selama masa transisi
-- **THEN** plugin lama tetap dapat memahami kontrak respons yang didukung dan tidak dipaksa membaca envelope v2
+- **WHEN** plugin lama memanggil tool v1 yang telah dipensiunkan
+- **THEN** panggilan ditolak sebelum operasi bisnis tanpa mengharuskan plugin lama memahami envelope v2
+
+#### Scenario: Tool umum gagal saat mengelola v2
+
+- **WHEN** tool umum aktif gagal pada input konten v2
+- **THEN** respons mengikuti kontrak tool umum saat ini dan diagnostik aman yang berlaku
 
 #### Scenario: Taksonomi belum dibekukan
 
