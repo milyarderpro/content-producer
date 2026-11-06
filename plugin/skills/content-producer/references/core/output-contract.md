@@ -6,6 +6,14 @@ For v2, a successful save_post_v2 summary followed by matching get_post readback
 
 Show the persisted module-rendered hook, fact lines and CTA, preserving exact niche rules, order and text budget. Public copy must not include source URLs, markdown bullets, internal IDs, diagnostics or credentials. Canva editing and video export are manual.
 
+For trivia, finish nonacademic DNA editing before save/revise on the exact
+payload. Display the same copy returned by readback, without silent polishing.
+A good preview with a different payload/readback is not persisted DNA success.
+Report the mismatch internally and reconcile the same post under CAS and
+authorization; do not create a replacement draft. An unsaved preview remains
+unsaved. Source/fixture checks, semantic preview review and LIVE saved-copy
+evidence must be labeled separately.
+
 ## FACEBOOK CAPTION
 
 Display the persisted caption separately. Do not introduce unsourced claims, claim the caption was uploaded.
@@ -21,7 +29,12 @@ Show public post ID, Page/niche, topic/format, interaction goal, current status 
 Three independent authorities govern readiness: server system checks, ChatGPT versioned editorial attestation of exact content and explicit owner approval. Critical fails/needs_review block ready; only allowlisted noncritical warnings can be accepted with an explicit reason. On failures or stale content, report the uncertainty rather than claiming approval.
 
 For v2, display its three revision/hash-bound editorial results and mechanical
-checks; style suggestions are separate nonblocking notes, not extra approval gates. Keep source URLs in internal information only.
+checks. The three results are `meaning_preserved`, `caption_no_new_claim`,
+`no_known_substantive_issue`; the last is not a DNA/style or virality score.
+`quality_status: passed` does not prove reference fit. Core DNA defects require
+repair before Write; minor style suggestions after that review are separate
+nonblocking notes, not extra approval gates. No new DNA field or routine
+preview/GO checkpoint is introduced. Keep source URLs in internal information only.
 Read sources/checks with `include_sources: true` and `include_checks: true`.
 
 ## Ringkasan Indonesia berbasis bukti

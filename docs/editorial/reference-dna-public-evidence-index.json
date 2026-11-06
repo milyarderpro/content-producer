@@ -1,0 +1,356 @@
+{
+  "schema_version": 1,
+  "local_evidence_commit": "fa00f6cee008a6e254864fa8e73ddd8b29350951",
+  "public_parent_commit": "8069bb1bfd03316700e0dca9cfb4c6c8e880229a",
+  "scope": "Published source/docs snapshot; private ancestor history and alias lookup remain local. Original fixture digests are provenance, not hashes of redacted downloads.",
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "original_local_sha256": "27f7eb5a422755e8b5572861cee503614625e9620565ed323cd03b5627702975",
+      "public_sha256": "27f7eb5a422755e8b5572861cee503614625e9620565ed323cd03b5627702975",
+      "sanitized": false
+    },
+    {
+      "path": "docs/decisions/2026-11-05-cr-061-plugin-reference-content-dna.md",
+      "original_local_sha256": "b1e457995ff6e93c453f9a2223745dd8cdf0a7bce672402732643e24598e438c",
+      "public_sha256": "5267548eba7294f77685e9ae4061e67ec328c47a62737926f4322583fff6d85a",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-baseline.md",
+      "original_local_sha256": "584a32d7b927bcb202678f284334701f05225960ad9e9952b7aedfaa69a83235",
+      "public_sha256": "c496c265b1556937e62fef7a1d5f6299bcc94d6097989979641eb0b3da253df3",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-batch-2026-11-06.md",
+      "original_local_sha256": "2059b42fab99e2de77a28f96e95f7716476d41683c193949ed924e2b919fcd66",
+      "public_sha256": "6e30d2caf6c2a03c2e577cad58d74970d32f4e8c4fdda3d4f3896fc3c48355ec",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-d6-retest-0.5.7-2026-11-06.md",
+      "original_local_sha256": "b2e92fa79ad00b3419b2ecc0a758b49237919592a25e92fc32fe7f5a09bb937f",
+      "public_sha256": "b35f3bc43ee1c3e0a38a3ab9c5bf9a9742cdc143c82a3487e18a6857bf8d438f",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-d6-saved-review-2026-11-06.md",
+      "original_local_sha256": "2510f68fc2ce9bef12a2e34e3cfcfb13f48b6d776daf83f903d22bc4fcebd405",
+      "public_sha256": "927654b79374d0049a0d06079c56ee407c77d9a3e674a1b63bd5fe15fbf147a2",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-evaluation.md",
+      "original_local_sha256": "a990e2371988f4862719493f9cc363d60fa6a5a3c4f0568489fb4f5195378263",
+      "public_sha256": "a990e2371988f4862719493f9cc363d60fa6a5a3c4f0568489fb4f5195378263",
+      "sanitized": false
+    },
+    {
+      "path": "docs/editorial/reference-dna-installed-host-verification.md",
+      "original_local_sha256": "64065aa10a80b1c5ed81fbdb8f85f3541e09e249b582c677792dd2a22b7e27d7",
+      "public_sha256": "899b91daaa180dcc41a73a86bab2ae1607353ac7f5f95b253f259eefadf1c5e0",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-owner-review.md",
+      "original_local_sha256": "01aabf0b15cf0c8a2f14ef0234284b76a1e6feefe8ce419f0ecdd3e629aa440d",
+      "public_sha256": "01aabf0b15cf0c8a2f14ef0234284b76a1e6feefe8ce419f0ecdd3e629aa440d",
+      "sanitized": false
+    },
+    {
+      "path": "docs/editorial/reference-dna-owner-revision-r1.md",
+      "original_local_sha256": "0d00bb91b6925168246240ce25e864c90cbb876c4ccd75eadae3993ee0d53d3a",
+      "public_sha256": "0d00bb91b6925168246240ce25e864c90cbb876c4ccd75eadae3993ee0d53d3a",
+      "sanitized": false
+    },
+    {
+      "path": "docs/editorial/reference-dna-owner-revision-r2.md",
+      "original_local_sha256": "95d5889e1e52de5c9eaadfe120d9ac3740528266f106a284714cda986bf5002d",
+      "public_sha256": "95d5889e1e52de5c9eaadfe120d9ac3740528266f106a284714cda986bf5002d",
+      "sanitized": false
+    },
+    {
+      "path": "docs/editorial/reference-dna-package-verification.md",
+      "original_local_sha256": "d7cceaaa49d6bb758c4d96d9af46baa19cefa22749b6693001b07a768d1838b6",
+      "public_sha256": "d7cceaaa49d6bb758c4d96d9af46baa19cefa22749b6693001b07a768d1838b6",
+      "sanitized": false
+    },
+    {
+      "path": "docs/editorial/reference-dna-plugin-release-2026-11-05.md",
+      "original_local_sha256": "1afaa1c8e5cf4ae3479d681c75407e29fd692f3ca33411258132031c6e3a2f07",
+      "public_sha256": "c05bb00e86a3adaf4a8b64f90599f3897daa12761998fe8c3233f41ffadaa77b",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-preview-baseline-2026-11-05.md",
+      "original_local_sha256": "ae3e991eecf0a132f3c59af7deece9ab97acb03c38fa759a90e768457f95ada6",
+      "public_sha256": "23d823dda1e5c5201d45a00eabc07ac819ae4d27dda86c1075c80d6371ec2dc6",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-preview-candidate-0.5.0.md",
+      "original_local_sha256": "2955a2201d87162434ecc3995cecb0836bb5844ce90417d5691a98896da2e283",
+      "public_sha256": "0eea5cc2e50e9935f53187b3283a3da98f083eff2526f5efd1550dca15bc037a",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-preview-candidate-0.5.1.md",
+      "original_local_sha256": "3453050859ca0b62fc77ac2ecd787752e171e49ad3346968710e945e9bb96242",
+      "public_sha256": "7ccdf179febc7e7790333a110aa4b3bd1d83c4299cd418fcb522f45e7b3e15bf",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-preview-candidate-0.5.2.md",
+      "original_local_sha256": "a0af466100e2eb816861f134d769a37cab4fd09092afc02b0b8359371c5adb0f",
+      "public_sha256": "1f32ee8d82b62e7267f303c2e2839e572252ca225a26c0589db1fb32dee690e1",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-preview-candidate-0.5.3.md",
+      "original_local_sha256": "d4c5f6320c87a272cdca59aa80feec63d57598b0cae180518a30d76436ace194",
+      "public_sha256": "9e06440f74e60a31852cf27152fa32df3afb2aa75a159f100f9b17fd6d64fa3d",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-preview-candidate-0.5.5.md",
+      "original_local_sha256": "6a09dc41f9d9485ff1bd8456c7a0d7e2d845629376b8c9148ad49251ce1eccab",
+      "public_sha256": "59ce15adc48ed4f0b40a1cd373137e8e094f58cd9ffd3db9f7a8ee67b26ac6eb",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-preview-candidate-0.5.6.md",
+      "original_local_sha256": "ac37e1665df9577f7cc7f135eb2704c4ada7f06de367879b91efc717439a921c",
+      "public_sha256": "22d7d5ba91e018f9a32b6aea1abd24132e8f0da57f87ef8b7e4b3e9c44721775",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-release-handoff.md",
+      "original_local_sha256": "a3d3ee0e139145b125f4c4840d414c549683ed174bb274387e3a6219439a1c6f",
+      "public_sha256": "480a9f3ff15436d7237e64bc58a5a06336f15f7d3b282f91fee2e08434125209",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-remediation-issue.md",
+      "original_local_sha256": "9fc97bdba0d56780cfd855ac28eda1d632a76434fac0d1dee296e4f11ea091e5",
+      "public_sha256": "964dc3b53adfe56c3a6afc15d020cda2b10a2fdaa51f7009049932e517f2baa9",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-review-2026-11-06.md",
+      "original_local_sha256": "1dd2a5efdf3b06734df90757bc540ef39d831392e19a88844033222c04db6f17",
+      "public_sha256": "1dd2a5efdf3b06734df90757bc540ef39d831392e19a88844033222c04db6f17",
+      "sanitized": false
+    },
+    {
+      "path": "docs/editorial/reference-dna-saved-copy-2026-11-06.md",
+      "original_local_sha256": "e51d3909e0e6c6da7fee712def2e364c3ad9b3bc535db1a9c295701a7194f3c9",
+      "public_sha256": "1a19e2108a8b90f1344a4df16b01ce3d0754b17ca9baeda19516cbcf6e5e0284",
+      "sanitized": true
+    },
+    {
+      "path": "docs/editorial/reference-dna-semantic-review.md",
+      "original_local_sha256": "8233827f1f35a45d50b5e10be0a282c7556bbe315f54cba7aff823701b5788c5",
+      "public_sha256": "8233827f1f35a45d50b5e10be0a282c7556bbe315f54cba7aff823701b5788c5",
+      "sanitized": false
+    },
+    {
+      "path": "docs/editorial/reference-dna-writing-verification.md",
+      "original_local_sha256": "dd31884a92eef125fbca6d549d7a8b8363f827a4909068bcce10eb23a6976830",
+      "public_sha256": "dd31884a92eef125fbca6d549d7a8b8363f827a4909068bcce10eb23a6976830",
+      "sanitized": false
+    },
+    {
+      "path": "docs/editorial/reference-example-sources.md",
+      "original_local_sha256": "db0c8a14cf0c872cee65313d787b75595e89867743c6203321b12a5d6756b196",
+      "public_sha256": "db0c8a14cf0c872cee65313d787b75595e89867743c6203321b12a5d6756b196",
+      "sanitized": false
+    },
+    {
+      "path": "docs/live-test/fixtures/reference-dna-batch-2026-11-06.json",
+      "original_local_sha256": "70215025709d6878c0e5f99b411c45d0cfb76fcc023bd54a2ef82377d924bbac",
+      "public_sha256": "516e48dcef8b533f71969d466de9c7a8097ee883fbda525a6c253eabf5e4f38b",
+      "sanitized": true
+    },
+    {
+      "path": "docs/live-test/fixtures/reference-dna-d6-retest-0.5.7-2026-11-06.json",
+      "original_local_sha256": "93e3074d188a3d3b40d5cc7227ff516bc1f1b49648c993fb11a46148a714eea2",
+      "public_sha256": "be45e11cd11755c0d47bb8f240b4a8680f7dcd3a59d2e42fea20d63fa6e3fbfd",
+      "sanitized": true
+    },
+    {
+      "path": "docs/live-test/fixtures/reference-dna-d6-review-2026-11-06.json",
+      "original_local_sha256": "67ce79adc7f87a93ddec61e6aed113ad26fc4ca4cfa387521651f619fc7ee184",
+      "public_sha256": "6275d2e7b61f203308d1c0064c9441c973f4b2652fb4c43e0672aa78011c0e83",
+      "sanitized": true
+    },
+    {
+      "path": "docs/live-test/fixtures/reference-dna-saved-copy-2026-11-06.json",
+      "original_local_sha256": "74927e4fa86554f2eeb2a028801ccb2f561bf90fa02d48dd85076c6404b6e48d",
+      "public_sha256": "745fe27f0e5450264b165430659ca8723b023b3c5e389cd1e8d4d9a57d72dbfc",
+      "sanitized": true
+    },
+    {
+      "path": "docs/live-test/results.md",
+      "original_local_sha256": "438e7fee8f5de75fc1fda0949cf66114a0ae3fa367f725de09d4cd300269f243",
+      "public_sha256": "a77bdfa16d540d709307d1a49bc90a6c93e6b58ba6f21a232bbe7f922d9be70c",
+      "sanitized": true
+    },
+    {
+      "path": "docs/live-test/test-matrix.md",
+      "original_local_sha256": "6a3391ae350cf72dc614a9a2e3ce91b971343138e21c8a28ce0dc335cf3da1a9",
+      "public_sha256": "91ad7f69a6aa63d1608122746a9c58f1d0d52e841c530b7cf9f1fcd611fe9b87",
+      "sanitized": true
+    },
+    {
+      "path": "docs/operations.md",
+      "original_local_sha256": "d95646e542e2b6db943a513f6656ac9b444d8209d9d78b7999ff6e1d8c616931",
+      "public_sha256": "0ea593f8c6b4406b31315ef0c854fc5f7364e7744f5109e4a3d97a64b43d7644",
+      "sanitized": true
+    },
+    {
+      "path": "docs/testing.md",
+      "original_local_sha256": "8e87abf1a0d574ff140d53a7a478b23463bbf819a1d9770b671e64228db3ee45",
+      "public_sha256": "8e87abf1a0d574ff140d53a7a478b23463bbf819a1d9770b671e64228db3ee45",
+      "sanitized": false
+    },
+    {
+      "path": "openspec/changes/align-plugin-reference-content-dna/.openspec.yaml",
+      "original_local_sha256": "3e16994612e657a7bbaefe38b70ef46f3e8e9f382f092dcaceb60ebabe7a5da0",
+      "public_sha256": "3e16994612e657a7bbaefe38b70ef46f3e8e9f382f092dcaceb60ebabe7a5da0",
+      "sanitized": false
+    },
+    {
+      "path": "openspec/changes/align-plugin-reference-content-dna/design.md",
+      "original_local_sha256": "ea4ce16c6507f99a885a2a710bf66e6ee1611f7b823d9db67cb2e1b77777afaf",
+      "public_sha256": "ea4ce16c6507f99a885a2a710bf66e6ee1611f7b823d9db67cb2e1b77777afaf",
+      "sanitized": false
+    },
+    {
+      "path": "openspec/changes/align-plugin-reference-content-dna/proposal.md",
+      "original_local_sha256": "618ec4ef169742f30923d6551ffe48401e04ad7e26f75b2840f8995ea7960787",
+      "public_sha256": "618ec4ef169742f30923d6551ffe48401e04ad7e26f75b2840f8995ea7960787",
+      "sanitized": false
+    },
+    {
+      "path": "openspec/changes/align-plugin-reference-content-dna/specs/trivia-draft-workflow/spec.md",
+      "original_local_sha256": "b8dca838571e0cbe2573dc017ea0681541f2a78e15dc8cc37cad703840440966",
+      "public_sha256": "b8dca838571e0cbe2573dc017ea0681541f2a78e15dc8cc37cad703840440966",
+      "sanitized": false
+    },
+    {
+      "path": "openspec/changes/align-plugin-reference-content-dna/specs/trivia-reference-editorial/spec.md",
+      "original_local_sha256": "11bc2dcd3643cf49d2f30b115ebf0dbe0816021ec99bc50196f9241566ac80bb",
+      "public_sha256": "11bc2dcd3643cf49d2f30b115ebf0dbe0816021ec99bc50196f9241566ac80bb",
+      "sanitized": false
+    },
+    {
+      "path": "openspec/changes/align-plugin-reference-content-dna/tasks.md",
+      "original_local_sha256": "e7bf308688273756b86d014cc1c760ea4dab1577c7b449ca0a2a7435d108427b",
+      "public_sha256": "e7bf308688273756b86d014cc1c760ea4dab1577c7b449ca0a2a7435d108427b",
+      "sanitized": false
+    },
+    {
+      "path": "plugin/CHANGELOG.md",
+      "original_local_sha256": "b837562ab799f9686192fbec028c753d145601c1723a70242199e7be25f98fc7",
+      "public_sha256": "b837562ab799f9686192fbec028c753d145601c1723a70242199e7be25f98fc7",
+      "sanitized": false
+    },
+    {
+      "path": "plugin/README.md",
+      "original_local_sha256": "caaff646aad7343a701e848b982b4f75abf40ed2f36cfd449a76f1af07581759",
+      "public_sha256": "25c4aed2240f603b6ad744c973dfd049fc40ab8df9d27be68d4ffce46e3e443b",
+      "sanitized": true
+    },
+    {
+      "path": "plugin/plugin.json",
+      "original_local_sha256": "ac4a9d3933c4fd88bf2310666470e67c76c0c8b9d78906939ce729a971afca67",
+      "public_sha256": "ac4a9d3933c4fd88bf2310666470e67c76c0c8b9d78906939ce729a971afca67",
+      "sanitized": false
+    },
+    {
+      "path": "plugin/skills/content-producer/SKILL.md",
+      "original_local_sha256": "7f5d039d50c8eb345a04a7c9ecad12417992185c69e0ca369ebc701db5f8c263",
+      "public_sha256": "7f5d039d50c8eb345a04a7c9ecad12417992185c69e0ca369ebc701db5f8c263",
+      "sanitized": false
+    },
+    {
+      "path": "plugin/skills/content-producer/references/core/output-contract.md",
+      "original_local_sha256": "5422d41d0205358b787c8d2e70d1caaadfe8e2626ac1f02eb912d753a6612ede",
+      "public_sha256": "5422d41d0205358b787c8d2e70d1caaadfe8e2626ac1f02eb912d753a6612ede",
+      "sanitized": false
+    },
+    {
+      "path": "plugin/skills/content-producer/references/core/workflow.md",
+      "original_local_sha256": "945464f5786378066c4a45bbc92d64be345814fe50f09dad2acc1df43944aa5e",
+      "public_sha256": "945464f5786378066c4a45bbc92d64be345814fe50f09dad2acc1df43944aa5e",
+      "sanitized": false
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/content-dna.md",
+      "original_local_sha256": "b6603d9c32454fb3faef02346db6c923c1682f38deb5be6788977f72c7372a86",
+      "public_sha256": "b6603d9c32454fb3faef02346db6c923c1682f38deb5be6788977f72c7372a86",
+      "sanitized": false
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/formats.md",
+      "original_local_sha256": "65e4fda50006097a5c981334ef8ea25209001c1f3a7898e63d7de30e7b060bcc",
+      "public_sha256": "65e4fda50006097a5c981334ef8ea25209001c1f3a7898e63d7de30e7b060bcc",
+      "sanitized": false
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/quality-rubric.md",
+      "original_local_sha256": "44199002d327258b329caf81f893402f12686af5238f9c87b0fd0f62999b7c69",
+      "public_sha256": "44199002d327258b329caf81f893402f12686af5238f9c87b0fd0f62999b7c69",
+      "sanitized": false
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/reference-patterns.md",
+      "original_local_sha256": "722753208b536e542af0d4fc98fe5ee388427bf9d7da5e9a084e278180a0430d",
+      "public_sha256": "722753208b536e542af0d4fc98fe5ee388427bf9d7da5e9a084e278180a0430d",
+      "sanitized": false
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/writing-playbook.md",
+      "original_local_sha256": "d382d69e798bcd5dd9beb75815b0ab40cebe7b5a2f5f5e20d655753dc15dfa91",
+      "public_sha256": "d382d69e798bcd5dd9beb75815b0ab40cebe7b5a2f5f5e20d655753dc15dfa91",
+      "sanitized": false
+    },
+    {
+      "path": "scripts/plugin-package.ts",
+      "original_local_sha256": "e607020abf5dd297827bc1902acf829d037d351570aaa684f050b1d842194582",
+      "public_sha256": "e607020abf5dd297827bc1902acf829d037d351570aaa684f050b1d842194582",
+      "sanitized": false
+    },
+    {
+      "path": "tests/plugin-package.test.ts",
+      "original_local_sha256": "bc1a47fca849cfaa61ae4cc37d11c7a3eddc966a5fc1a1ed0d944f25bb7bc20a",
+      "public_sha256": "bc1a47fca849cfaa61ae4cc37d11c7a3eddc966a5fc1a1ed0d944f25bb7bc20a",
+      "sanitized": false
+    },
+    {
+      "path": "tests/plugin-skill.test.ts",
+      "original_local_sha256": "8daa0cf15e97475b7024a59e6955073fccab1923b5b11a663b5e571b35283423",
+      "public_sha256": "8daa0cf15e97475b7024a59e6955073fccab1923b5b11a663b5e571b35283423",
+      "sanitized": false
+    },
+    {
+      "path": "tests/plugin-trivia.test.ts",
+      "original_local_sha256": "e3e15942c6bc5f305db5a513a7dde23ad76fc00d41955acd0285b5155c6182d0",
+      "public_sha256": "e3e15942c6bc5f305db5a513a7dde23ad76fc00d41955acd0285b5155c6182d0",
+      "sanitized": false
+    },
+    {
+      "path": "tests/workflow-change-classification.test.ts",
+      "original_local_sha256": "5f0b28a57f3b7e31573ae43dea659fc074685b128cbf1f816cf0e0e07937db86",
+      "public_sha256": "5f0b28a57f3b7e31573ae43dea659fc074685b128cbf1f816cf0e0e07937db86",
+      "sanitized": false
+    },
+    {
+      "path": "tests/workflow-config.test.ts",
+      "original_local_sha256": "01634ad000b7cd7012da5a7d667caeced6e47e21c6ad495a68ff262e884f3080",
+      "public_sha256": "01634ad000b7cd7012da5a7d667caeced6e47e21c6ad495a68ff262e884f3080",
+      "sanitized": false
+    }
+  ]
+}

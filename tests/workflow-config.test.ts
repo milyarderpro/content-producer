@@ -1,9 +1,10 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { assertRuntimeSpecs } from '../scripts/runtime-range.js';
+import { CANDIDATE_FILES, createCandidate, saveCandidateIndex, verifyCandidate } from '../scripts/plugin-package.js';
 
 const checkScript = readFileSync('scripts/check.ts', 'utf8');
 
@@ -33,6 +34,38 @@ const identity = identityBlock
   .split('\n')
   .map((line) => line.replace(/^ {10}/, ''))
   .join('\n');
+
+const archiveStart = ci.indexOf('      - name: Archive and verify package entries and hashes');
+const archiveEnd = ci.indexOf('      - name: Upload verified package', archiveStart);
+if (archiveStart < 0 || archiveEnd < archiveStart) throw new Error('Tahap ZIP tidak ditemukan.');
+const archiveBlock = ci.slice(archiveStart, archiveEnd);
+const archiveRun = archiveBlock.indexOf(marker);
+if (archiveRun < 0) throw new Error('Shell ZIP tidak ditemukan.');
+const archiveScript = archiveBlock.slice(archiveRun + marker.length)
+  .split('\n').map(line => line.replace(/^ {10}/, '')).join('\n');
+
+// Execute the real workflow shell against isolated files; no Actions dispatch,
+// hosted calls, commits or credentials. Only git rev-parse reads the real HEAD.
+function packageZip(mutate?: (root: string) => void) {
+  const root = mkdtempSync(join(tmpdir(), 'workflow-package-'));
+  temporary.push(root);
+  cpSync('plugin', join(root, 'plugin'), { recursive: true });
+  mkdirSync(join(root, 'plans'));
+  cpSync('plans/tool-inventory.md', join(root, 'plans/tool-inventory.md'));
+  const index = createCandidate(root, join(root, 'artifacts/plugin-candidate'));
+  saveCandidateIndex(join(root, 'artifacts/plugin-candidate-filelist.json'), index);
+  mutate?.(root);
+  const version = (JSON.parse(readFileSync(join(root, 'plugin/plugin.json'), 'utf8')) as { version: string }).version;
+  const archiveName = 'content-producer-private-v' + version + '.zip';
+  const result = spawnSync('bash', ['-c', archiveScript], {
+    cwd: root,
+    env: { ...process.env, ARCHIVE_NAME: archiveName, PLUGIN_VERSION: version,
+      RUNNER_TEMP: root, GITHUB_STEP_SUMMARY: join(root, 'summary'),
+      GIT_DIR: join(process.cwd(), '.git'), GIT_WORK_TREE: root },
+    encoding: 'utf8',
+  });
+  return { root, index, result, archive: join(root, 'artifacts', archiveName) };
+}
 
 describe('Workflow aktif menjaga batas CI dan gate backend', () => {
   it('semua setup Node/Deno memakai irisan bounded file/engine/gate yang direview', () => {
@@ -290,7 +323,7 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
     expect(probe).not.toMatch(/"method"\s*:\s*"tools\/call"/);
   });
 
-  it.each(['0.2.3', '0.2.4'])('nama ZIP/artefak mengikuti versi manifest %s', (version) => {
+  it.each(['0.2.3', '0.2.4', '0.5.0'])('nama ZIP/artefak mengikuti versi manifest %s', (version) => {
     const root = mkdtempSync(join(tmpdir(), 'package-identity-'));
     temporary.push(root);
     mkdirSync(join(root, 'plugin'));
@@ -328,4 +361,39 @@ describe('Workflow aktif menjaga batas CI dan gate backend', () => {
     });
     expect(result.status).not.toBe(0);
   });
+
+  it('ZIP nyata memuat 15 file, dua referensi baru dan hash yang identik, tanpa corpus QA', () => {
+    const fixture = packageZip();
+    expect(fixture.result.status, fixture.result.stderr).toBe(0);
+    expect(ci).toContain('test "$(find artifacts/plugin-candidate -type f | wc -l)" -eq 15');
+    const entries = execFileSync('unzip', ['-Z1', fixture.archive], { encoding: 'utf8' }).trim().split('\n');
+    expect(entries.sort()).toEqual(CANDIDATE_FILES);
+    for (const name of ['reference-patterns.md', 'writing-playbook.md']) {
+      expect(entries).toContain('skills/content-producer/references/niches/trivia/' + name);
+    }
+    expect(entries.some(path => /docs\/|dataset-reference\/|CHANGELOG|README/.test(path))).toBe(false);
+    const extracted = join(fixture.root, 'extracted');
+    execFileSync('unzip', ['-q', fixture.archive, '-d', extracted]);
+    expect(verifyCandidate(fixture.root, extracted)).toEqual(fixture.index);
+    expect(readFileSync(join(fixture.root, 'summary'), 'utf8')).toContain('15 file dan hash');
+  });
+
+  it.each(['missing-reference', 'tampered-reference', 'qa-leak'])(
+    'shell ZIP menolak %s tanpa mengurangi pemeriksaan hash/filelist', (mode) => {
+      const fixture = packageZip(root => {
+        const candidate = join(root, 'artifacts/plugin-candidate');
+        const atlas = join(candidate, 'skills/content-producer/references/niches/trivia/reference-patterns.md');
+        if (mode === 'tampered-reference') writeFileSync(atlas, readFileSync(atlas, 'utf8') + '\nTamper.\n');
+        else {
+          rmSync(atlas);
+          if (mode === 'qa-leak') {
+            mkdirSync(join(candidate, 'docs'));
+            // Keep the count at 15 so the exact filelist, not count alone, rejects it.
+            writeFileSync(join(candidate, 'docs/evaluation.md'), 'Synthetic QA corpus.\n');
+          }
+        }
+      });
+      expect(fixture.result.status).not.toBe(0);
+    },
+  );
 });

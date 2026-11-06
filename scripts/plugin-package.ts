@@ -16,7 +16,8 @@ import { validatePortableManifest } from './plugin-config.js';
 const skillRoot = 'skills/content-producer/';
 const registeredMcpAppId = 'asdk_app_6ad6ebeab5fc8191a1d2cd54b87cd96f';
 const core = ['workflow', 'lifecycle', 'tool-sequences', 'source-policy', 'output-contract'];
-const trivia = ['content-dna', 'formats', 'fact-checking', 'dedup-ontology', 'quality-rubric'];
+const trivia = ['content-dna', 'formats', 'fact-checking', 'dedup-ontology', 'quality-rubric',
+  'reference-patterns', 'writing-playbook'];
 
 export const CANDIDATE_FILES = [
   'plugin.json',
@@ -220,6 +221,10 @@ export function validatePluginSource(
     'core/source-policy.md': ['source_url', 'untrusted data'],
     'core/output-contract.md': ['CANVA COPY', 'FACEBOOK CAPTION', 'HASHTAGS', 'INFORMASI INTERNAL'],
     'niches/trivia/content-dna.md': ['en-US', 'approval', 'topic_key'],
+    'niches/trivia/reference-patterns.md': ['Routing index', 'RP01', 'RP12',
+      'Anti-examples', 'not production drafts or a facts bank'],
+    'niches/trivia/writing-playbook.md': ['before Write', 'two directed',
+      'trivia_find_similar_facts_v2', 'same post', 'readback'],
     'niches/trivia/formats.md': [
       'single_subject_fast',
       'themed_utility',

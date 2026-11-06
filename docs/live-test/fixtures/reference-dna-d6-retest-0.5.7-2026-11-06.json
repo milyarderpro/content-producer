@@ -1,0 +1,3930 @@
+{
+  "schema_version": 1,
+  "test_id": "DNA-D6-057-R2",
+  "date": "2026-11-06",
+  "evidence_level": "LIVE saved-copy readback + semantic D6 review",
+  "plugin": {
+    "version": "0.5.7",
+    "release_id": "QA-RELEASE-10c52114aae7",
+    "plugin_id": "QA-PLUGIN-58151d60d6a8",
+    "source_sha": "8069bb1bfd03316700e0dca9cfb4c6c8e880229a",
+    "filelist_sha256": "ed5efd75511671e4dc185913c08f1b510fda03f49e591d653d9bd232c1d367d6",
+    "update_zip_sha256": "20ce9fd9fdfe2a51b942c475174967e485f3e2e4869e3954d7243f502e915de3",
+    "portable_files_readback_equal": 15,
+    "overlay_preserved": true
+  },
+  "ci": {
+    "pr": "https://github.com/milyarderpro/content-producer/pull/137",
+    "run": "https://github.com/milyarderpro/content-producer/actions/runs/42176824421",
+    "sha": "8069bb1bfd03316700e0dca9cfb4c6c8e880229a",
+    "conclusion": "PASS",
+    "local_source_tests": 184,
+    "local_frontend_tests": 19,
+    "duration_seconds": 53,
+    "backend_gate": "NOT RUN — plugin-only; no backend change",
+    "pr_merged": false
+  },
+  "rubric": {
+    "minimum": 13,
+    "no_zero": true,
+    "naturalness": 2,
+    "accuracy_qualifier_config_budget_issues_allowed": false
+  },
+  "historical_attempt": {
+    "test_id": "DNA-D6-056-01",
+    "file": "docs/live-test/fixtures/reference-dna-d6-review-2026-11-06.json",
+    "pass": 6,
+    "fail": 4,
+    "preserved": true
+  },
+  "scope": {
+    "page_public_id": "QA-ID-7b6e770529b4",
+    "workspace_public_id": "QA-ID-e45fbfa3970f",
+    "revision_targets": [
+      "B1",
+      "B2",
+      "B3",
+      "B5"
+    ],
+    "new_posts": 0,
+    "new_plans": 0,
+    "approval": 0,
+    "publication": 0,
+    "completed_plan_edits": 0,
+    "canonical_claim_edits": 0,
+    "source_url_edits": 0,
+    "production_page_writes": 0
+  },
+  "host": {
+    "B1": {
+      "url": "PRIVATE-REFERENCE-9c95430aadaa",
+      "exact_copy_in_host": true,
+      "pending": false,
+      "model_visible": "Thinking effort Medium; exact model ID unavailable"
+    },
+    "B2": {
+      "url": "PRIVATE-REFERENCE-c3c57d527471",
+      "exact_copy_in_host": true,
+      "pending": false,
+      "model_visible": "Thinking effort Medium; exact model ID unavailable"
+    },
+    "B3": {
+      "url": "PRIVATE-REFERENCE-0ddeb8e65048",
+      "exact_copy_in_host": true,
+      "pending": false,
+      "model_visible": "Thinking effort Medium; exact model ID unavailable"
+    },
+    "B5": {
+      "url": "PRIVATE-REFERENCE-be49cd7837a4",
+      "exact_copy_in_host": true,
+      "pending": false,
+      "model_visible": "Thinking effort Medium; exact model ID unavailable"
+    }
+  },
+  "final_page_context": {
+    "response_schema_version": 1,
+    "data": {
+      "page": {
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "name": "Content Producer QA Sandbox (Verified)",
+        "slug": "cp-qa-sandbox-20261021",
+        "timezone": "Asia/Jakarta",
+        "target_markets": [
+          "US"
+        ],
+        "is_active": true,
+        "enabled_niches": [
+          {
+            "niche_key": "trivia",
+            "is_enabled": true,
+            "is_default": false,
+            "config_schema_version": 1,
+            "updated_at": "2026-10-21T16:08:12.627461Z"
+          }
+        ],
+        "updated_at": "2026-10-22T02:09:46.387531Z",
+        "created_at": "2026-10-21T16:08:12.627461Z"
+      },
+      "module": {
+        "niche_key": "trivia",
+        "display_name": "Trivia Facts",
+        "module_version": 1,
+        "status": "active",
+        "config_schema_version": 1,
+        "content_schema_versions": [
+          1
+        ],
+        "capabilities": [
+          "project_generation_context",
+          "validate_content_payload",
+          "render_content",
+          "find_similar_items",
+          "register_and_reserve_items",
+          "release_items",
+          "reverify_sources",
+          "correct_items",
+          "project_performance_dimensions"
+        ]
+      },
+      "config_public_id": "QA-ID-70dc81dc5199",
+      "config": {
+        "allowed_formats": [
+          "single_subject_fast",
+          "themed_utility",
+          "emotional_animal_collection",
+          "comparison",
+          "myth_vs_fact"
+        ],
+        "format_weights": {
+          "single_subject_fast": 35,
+          "themed_utility": 20,
+          "emotional_animal_collection": 20,
+          "comparison": 15,
+          "myth_vs_fact": 10
+        },
+        "allowed_topics": [
+          "animals",
+          "pet_safety",
+          "food_science",
+          "food_storage_home",
+          "practical_utility",
+          "human_body",
+          "nature_science",
+          "geography",
+          "history_origins",
+          "inventions_everyday",
+          "general_trivia"
+        ],
+        "topic_group_weights": {
+          "animals_pet_safety": 30,
+          "human_body_food_myth": 20,
+          "practical_utility": 15,
+          "places_geography": 15,
+          "nature_space": 10,
+          "history_inventions_people": 10
+        },
+        "fact_count": {
+          "mode": "adaptive",
+          "min": 5,
+          "preferred": 7,
+          "max": 9
+        },
+        "profiles": {
+          "fast_trivia": {
+            "fact_count_min": 7,
+            "fact_count_max": 8,
+            "words_per_fact_min": 8,
+            "words_per_fact_max": 11,
+            "total_words_min": 65,
+            "total_words_max": 85
+          },
+          "practical_utility": {
+            "fact_count_min": 5,
+            "fact_count_max": 6,
+            "words_per_fact_min": 10,
+            "words_per_fact_max": 14,
+            "total_words_min": 65,
+            "total_words_max": 85
+          }
+        },
+        "fact_reuse_scope": "workspace_unique",
+        "render_style": "plain_lines",
+        "allowed_interaction_goals": [
+          "share",
+          "save",
+          "comment",
+          "follow"
+        ],
+        "text_budget": {
+          "hook_max_chars": 45,
+          "fact_max_chars": 90,
+          "facts_total_max_chars": 500,
+          "cta_max_chars": 50,
+          "canva_total_max_chars": 600
+        },
+        "caption": {
+          "max_chars": 500
+        },
+        "hashtags": {
+          "default_count": 3,
+          "min_count": 0,
+          "max_count": 5
+        },
+        "style": {
+          "english_variant": "en-US",
+          "tone": "conversational_credible",
+          "emoji_allowed": false,
+          "regional_slang_allowed": false
+        }
+      },
+      "generation_rules": {
+        "allowed_topics": [
+          "animals",
+          "pet_safety",
+          "food_science",
+          "food_storage_home",
+          "practical_utility",
+          "human_body",
+          "nature_science",
+          "geography",
+          "history_origins",
+          "inventions_everyday",
+          "general_trivia"
+        ],
+        "allowed_formats": [
+          "single_subject_fast",
+          "themed_utility",
+          "emotional_animal_collection",
+          "comparison",
+          "myth_vs_fact"
+        ],
+        "allowed_profiles": [
+          "fast_trivia",
+          "practical_utility"
+        ],
+        "allowed_interaction_goals": [
+          "share",
+          "save",
+          "comment",
+          "follow"
+        ],
+        "fact_count": {
+          "mode": "adaptive",
+          "min": 5,
+          "preferred": 7,
+          "max": 9
+        },
+        "profiles": {
+          "fast_trivia": {
+            "fact_count_min": 7,
+            "fact_count_max": 8,
+            "words_per_fact_min": 8,
+            "words_per_fact_max": 11,
+            "total_words_min": 65,
+            "total_words_max": 85
+          },
+          "practical_utility": {
+            "fact_count_min": 5,
+            "fact_count_max": 6,
+            "words_per_fact_min": 10,
+            "words_per_fact_max": 14,
+            "total_words_min": 65,
+            "total_words_max": 85
+          }
+        },
+        "text_budget": {
+          "hook_max_chars": 45,
+          "fact_max_chars": 90,
+          "facts_total_max_chars": 500,
+          "cta_max_chars": 50,
+          "canva_total_max_chars": 600
+        },
+        "locale": "en-US",
+        "english_variant": "en-US",
+        "render_style": "plain_lines"
+      },
+      "reuse_policy": {
+        "scope": "workspace_unique",
+        "reservation_ttl_minutes": 30,
+        "requires_verified_facts": true,
+        "eligible_fact_count": 0
+      },
+      "recent_variety": [
+        {
+          "post_public_id": "QA-ID-5ac933583f9f",
+          "status": "draft",
+          "topic_key": "geography",
+          "format_key": "single_subject_fast",
+          "interaction_goal": "follow",
+          "hook": "Did you know?",
+          "cta": "Follow for more unexpected places.",
+          "updated_at": "2026-11-06T06:58:30.530948Z"
+        }
+      ],
+      "performance_signals": [],
+      "context_version": {
+        "page_updated_at": "2026-10-22T02:09:46.387531Z",
+        "config_updated_at": "2026-10-21T16:08:12.627461Z"
+      }
+    }
+  },
+  "final_inventory": {
+    "response_schema_version": 1,
+    "data": {
+      "items": [
+        {
+          "content_schema_version": 2,
+          "post_public_id": "QA-ID-5ac933583f9f",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 3,
+          "format_key": "single_subject_fast",
+          "topic_key": "geography",
+          "interaction_goal": "follow",
+          "scheduled_at": null,
+          "published_at": null,
+          "quality_status": "passed",
+          "hook_preview": "Did you know?",
+          "updated_at": "2026-11-06T06:58:30.530948Z"
+        },
+        {
+          "content_schema_version": 2,
+          "post_public_id": "QA-ID-069385c57142",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 2,
+          "format_key": "single_subject_fast",
+          "topic_key": "geography",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "quality_status": "passed",
+          "hook_preview": "Did you know?",
+          "updated_at": "2026-11-06T06:56:06.675729Z"
+        },
+        {
+          "content_schema_version": 2,
+          "post_public_id": "QA-ID-6821aa81b974",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 2,
+          "format_key": "single_subject_fast",
+          "topic_key": "inventions_everyday",
+          "interaction_goal": "follow",
+          "scheduled_at": null,
+          "published_at": null,
+          "quality_status": "passed",
+          "hook_preview": "Did you know?",
+          "updated_at": "2026-11-06T06:54:40.307253Z"
+        },
+        {
+          "content_schema_version": 2,
+          "post_public_id": "QA-ID-6343ba3a3224",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 2,
+          "format_key": "comparison",
+          "topic_key": "nature_science",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "quality_status": "passed",
+          "hook_preview": "Did you know?",
+          "updated_at": "2026-11-06T06:53:36.748861Z"
+        },
+        {
+          "content_schema_version": 2,
+          "post_public_id": "QA-ID-1b061bd35c5e",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "format_key": "single_subject_fast",
+          "topic_key": "nature_science",
+          "interaction_goal": "share",
+          "scheduled_at": null,
+          "published_at": null,
+          "quality_status": "passed",
+          "hook_preview": "Did you know?",
+          "updated_at": "2026-11-06T05:43:58.940226Z"
+        },
+        {
+          "content_schema_version": 2,
+          "post_public_id": "QA-ID-2f4994901bb3",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "format_key": "emotional_animal_collection",
+          "topic_key": "animals",
+          "interaction_goal": "share",
+          "scheduled_at": null,
+          "published_at": null,
+          "quality_status": "passed",
+          "hook_preview": "Did you know?",
+          "updated_at": "2026-11-06T02:19:39.715132Z"
+        },
+        {
+          "content_schema_version": 2,
+          "post_public_id": "QA-ID-9b0689b5acf3",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "format_key": "myth_vs_fact",
+          "topic_key": "animals",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "quality_status": "passed",
+          "hook_preview": "Did you know?",
+          "updated_at": "2026-11-06T02:17:59.851498Z"
+        },
+        {
+          "content_schema_version": 2,
+          "post_public_id": "QA-ID-2efa1c2e80c0",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "format_key": "comparison",
+          "topic_key": "animals",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "quality_status": "passed",
+          "hook_preview": "Did you know?",
+          "updated_at": "2026-11-06T02:15:40.670600Z"
+        },
+        {
+          "content_schema_version": 2,
+          "post_public_id": "QA-ID-834222c2456a",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "format_key": "single_subject_fast",
+          "topic_key": "animals",
+          "interaction_goal": "share",
+          "scheduled_at": null,
+          "published_at": null,
+          "quality_status": "passed",
+          "hook_preview": "Did you know?",
+          "updated_at": "2026-11-06T02:13:34.401739Z"
+        },
+        {
+          "content_schema_version": 2,
+          "post_public_id": "QA-ID-1112e26848ac",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "format_key": "themed_utility",
+          "topic_key": "food_storage_home",
+          "interaction_goal": "save",
+          "scheduled_at": null,
+          "published_at": null,
+          "quality_status": "passed",
+          "hook_preview": "Did you know?",
+          "updated_at": "2026-11-06T02:11:50.787293Z"
+        }
+      ],
+      "next_cursor": null,
+      "has_more": false
+    }
+  },
+  "final_plan": {
+    "response_schema_version": 1,
+    "data": {
+      "plan": {
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "name": "QA DNA batch 2026-11-06 T64",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "completed",
+        "requested_count": 5,
+        "progress": {
+          "pending": 0,
+          "in_progress": 0,
+          "completed": 5,
+          "failed": 0,
+          "cancelled": 0
+        },
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T05:46:17.221870Z"
+      },
+      "items": [
+        {
+          "plan_item_public_id": "QA-ID-a8e492fb5347",
+          "plan_public_id": "QA-ID-6efb71a0e89b",
+          "position": 1,
+          "status": "completed",
+          "scheduled_at": null,
+          "topic_key": "nature_science",
+          "format_key": "comparison",
+          "interaction_goal": "comment",
+          "item_config": {
+            "profile_key": "fast_trivia"
+          },
+          "attempt_count": 1,
+          "claim_expires_at": null,
+          "active_post_public_id": "QA-ID-6343ba3a3224",
+          "last_error": null,
+          "created_at": "2026-11-06T03:04:57.622973Z",
+          "updated_at": "2026-11-06T03:05:59.762163Z"
+        },
+        {
+          "plan_item_public_id": "QA-ID-02b4a58bcf76",
+          "plan_public_id": "QA-ID-6efb71a0e89b",
+          "position": 2,
+          "status": "completed",
+          "scheduled_at": null,
+          "topic_key": "geography",
+          "format_key": "single_subject_fast",
+          "interaction_goal": "follow",
+          "item_config": {
+            "profile_key": "fast_trivia"
+          },
+          "attempt_count": 1,
+          "claim_expires_at": null,
+          "active_post_public_id": "QA-ID-5ac933583f9f",
+          "last_error": null,
+          "created_at": "2026-11-06T03:04:57.622973Z",
+          "updated_at": "2026-11-06T05:39:00.340403Z"
+        },
+        {
+          "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+          "plan_public_id": "QA-ID-6efb71a0e89b",
+          "position": 3,
+          "status": "completed",
+          "scheduled_at": null,
+          "topic_key": "inventions_everyday",
+          "format_key": "single_subject_fast",
+          "interaction_goal": "follow",
+          "item_config": {
+            "profile_key": "fast_trivia"
+          },
+          "attempt_count": 1,
+          "claim_expires_at": null,
+          "active_post_public_id": "QA-ID-6821aa81b974",
+          "last_error": null,
+          "created_at": "2026-11-06T03:04:57.622973Z",
+          "updated_at": "2026-11-06T05:41:40.679307Z"
+        },
+        {
+          "plan_item_public_id": "QA-ID-fa3adbcc9368",
+          "plan_public_id": "QA-ID-6efb71a0e89b",
+          "position": 4,
+          "status": "completed",
+          "scheduled_at": null,
+          "topic_key": "nature_science",
+          "format_key": "single_subject_fast",
+          "interaction_goal": "share",
+          "item_config": {
+            "profile_key": "fast_trivia"
+          },
+          "attempt_count": 1,
+          "claim_expires_at": null,
+          "active_post_public_id": "QA-ID-1b061bd35c5e",
+          "last_error": null,
+          "created_at": "2026-11-06T03:04:57.622973Z",
+          "updated_at": "2026-11-06T05:43:58.940226Z"
+        },
+        {
+          "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+          "plan_public_id": "QA-ID-6efb71a0e89b",
+          "position": 5,
+          "status": "completed",
+          "scheduled_at": null,
+          "topic_key": "geography",
+          "format_key": "comparison",
+          "interaction_goal": "comment",
+          "item_config": {
+            "profile_key": "fast_trivia"
+          },
+          "attempt_count": 1,
+          "claim_expires_at": null,
+          "active_post_public_id": "QA-ID-069385c57142",
+          "last_error": null,
+          "created_at": "2026-11-06T03:04:57.622973Z",
+          "updated_at": "2026-11-06T05:46:17.221870Z"
+        }
+      ],
+      "next_cursor": null,
+      "has_more": false
+    }
+  },
+  "live_readback": {
+    "E01": {
+      "response_schema_version": 1,
+      "data": {
+        "post": {
+          "post_public_id": "QA-ID-834222c2456a",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+          "format_key": "single_subject_fast",
+          "topic_key": "animals",
+          "interaction_goal": "share",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "red pandas",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Red pandas got the name \"panda\" before giant pandas did."
+                },
+                {
+                  "position": 2,
+                  "text": "Thick fur even covers the bottoms of red pandas' feet."
+                },
+                {
+                  "position": 3,
+                  "text": "Reddish coats help them blend into moss-covered branches."
+                },
+                {
+                  "position": 4,
+                  "text": "Young red pandas can whistle when they're distressed."
+                },
+                {
+                  "position": 5,
+                  "text": "Red pandas use their tongues to inspect scent marks."
+                },
+                {
+                  "position": 6,
+                  "text": "Red pandas have their own animal family, separate from bears."
+                },
+                {
+                  "position": 7,
+                  "text": "When threatened, red pandas may stand upright and swipe with sharp claws."
+                }
+              ]
+            },
+            "cta": "Share this with a red panda fan.",
+            "canva_copy": "Did you know?\n\nRed pandas got the name \"panda\" before giant pandas did.\n\nThick fur even covers the bottoms of red pandas' feet.\n\nReddish coats help them blend into moss-covered branches.\n\nYoung red pandas can whistle when they're distressed.\n\nRed pandas use their tongues to inspect scent marks.\n\nRed pandas have their own animal family, separate from bears.\n\nWhen threatened, red pandas may stand upright and swipe with sharp claws.\n\nShare this with a red panda fan.",
+            "caption": "Red pandas have more surprises than you might expect. Which fact would you share with a friend?",
+            "hashtags": [
+              "#RedPanda",
+              "#AnimalFacts",
+              "#WildlifeTrivia"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                56,
+                54,
+                57,
+                53,
+                52,
+                61,
+                73
+              ],
+              "facts_total_chars": 418,
+              "cta_chars": 32,
+              "canva_total_chars": 467,
+              "word_count": 77,
+              "fact_word_counts": [
+                10,
+                10,
+                8,
+                8,
+                9,
+                10,
+                12
+              ],
+              "line_count": 25,
+              "fact_line_counts": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                3
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 7,
+              "hook_line_count": 1,
+              "cta_line_count": 1,
+              "estimated_read_seconds": 26.3,
+              "replay_ratio": 2.023077,
+              "estimated_loops": 3
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-49b5affd0aa9",
+              "fact_role": "general",
+              "rendered_text": "Red pandas got the name \"panda\" before giant pandas did.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Red pandas were called pandas before giant pandas were.",
+                "source_url": "https://nationalzoo.si.edu/animals/news/red-panda-bear-and-more-red-panda-facts"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-b22bfd02efa2",
+              "fact_role": "general",
+              "rendered_text": "Thick fur even covers the bottoms of red pandas' feet.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Red pandas have thick fur on the bottoms of their feet.",
+                "source_url": "https://animals.sandiegozoo.org/animals/red-panda"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-9f94fe614593",
+              "fact_role": "general",
+              "rendered_text": "Reddish coats help them blend into moss-covered branches.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Red pandas' reddish coats blend into moss-covered tree branches.",
+                "source_url": "https://nationalzoo.si.edu/animals/red-panda"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-40ea949c7875",
+              "fact_role": "general",
+              "rendered_text": "Young red pandas can whistle when they're distressed.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Young red pandas whistle when distressed.",
+                "source_url": "https://nationalzoo.si.edu/animals/red-panda"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-a481576307b1",
+              "fact_role": "general",
+              "rendered_text": "Red pandas use their tongues to inspect scent marks.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Red pandas use their tongues to investigate scent marks.",
+                "source_url": "https://animals.sandiegozoo.org/animals/red-panda"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-c53820e1332c",
+              "fact_role": "general",
+              "rendered_text": "Red pandas have their own animal family, separate from bears.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Red pandas belong to their own animal family, not the bear family.",
+                "source_url": "https://nationalzoo.si.edu/animals/news/red-panda-bear-and-more-red-panda-facts"
+              }
+            },
+            {
+              "position": 7,
+              "fact_public_id": "QA-ID-50e69ba5decd",
+              "fact_role": "general",
+              "rendered_text": "When threatened, red pandas may stand upright and swipe with sharp claws.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Threatened red pandas may stand upright and swipe with sharp claws.",
+                "source_url": "https://animals.sandiegozoo.org/animals/red-panda"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T02:13:34.401739Z",
+          "updated_at": "2026-11-06T02:13:34.401739Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": null,
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    "E08": {
+      "response_schema_version": 1,
+      "data": {
+        "post": {
+          "post_public_id": "QA-ID-1112e26848ac",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+          "format_key": "themed_utility",
+          "topic_key": "food_storage_home",
+          "interaction_goal": "save",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Berries and leafy greens",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Keep berries unwashed in the fridge; rinse them only before eating."
+                },
+                {
+                  "position": 2,
+                  "text": "Leave strawberry tops attached until you're ready to prepare them."
+                },
+                {
+                  "position": 3,
+                  "text": "Keep loose spinach in an open bag in your refrigerator's crisper."
+                },
+                {
+                  "position": 4,
+                  "text": "Keep raspberries in shallow containers to prevent crushing."
+                },
+                {
+                  "position": 5,
+                  "text": "Keep greens away from apples; their ripening gas can cause yellowing."
+                },
+                {
+                  "position": 6,
+                  "text": "Prewashed, ready-to-eat salad needs refrigeration, but no extra rinse."
+                }
+              ]
+            },
+            "cta": "Save this for your next grocery trip.",
+            "canva_copy": "Did you know?\n\nKeep berries unwashed in the fridge; rinse them only before eating.\n\nLeave strawberry tops attached until you're ready to prepare them.\n\nKeep loose spinach in an open bag in your refrigerator's crisper.\n\nKeep raspberries in shallow containers to prevent crushing.\n\nKeep greens away from apples; their ripening gas can cause yellowing.\n\nPrewashed, ready-to-eat salad needs refrigeration, but no extra rinse.\n\nSave this for your next grocery trip.",
+            "caption": "Small storage habits worth remembering for berries and leafy greens. Save this guide for your next grocery trip.",
+            "hashtags": [
+              "#FoodStorage",
+              "#KitchenTips",
+              "#FreshProduce"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                67,
+                66,
+                65,
+                59,
+                69,
+                70
+              ],
+              "facts_total_chars": 406,
+              "cta_chars": 37,
+              "canva_total_chars": 460,
+              "word_count": 70,
+              "fact_word_counts": [
+                11,
+                10,
+                11,
+                8,
+                11,
+                9
+              ],
+              "line_count": 26,
+              "fact_line_counts": [
+                3,
+                3,
+                2,
+                2,
+                3,
+                3
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 7,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 23.8,
+              "replay_ratio": 1.830769,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-6502e38f65b2",
+              "fact_role": "general",
+              "rendered_text": "Keep berries unwashed in the fridge; rinse them only before eating.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Store berries unwashed in the refrigerator and rinse them just before eating.",
+                "source_url": "https://communityhealth.ucsd.edu/work/eat-ca/berries"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-cde23ba7d05a",
+              "fact_role": "general",
+              "rendered_text": "Leave strawberry tops attached until you're ready to prepare them.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Leave strawberry tops attached until you're ready to prepare them.",
+                "source_url": "https://foodsafety.uconn.edu/storing-fresh-garden-produce/"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-442c299abeb0",
+              "fact_role": "general",
+              "rendered_text": "Keep loose spinach in an open bag in your refrigerator's crisper.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Keep loose spinach in an open bag in the refrigerator crisper.",
+                "source_url": "https://extension.colostate.edu/resource/how-to-use-lettuce-and-other-greens/"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-b717cc2aab76",
+              "fact_role": "general",
+              "rendered_text": "Keep raspberries in shallow containers to prevent crushing.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Store raspberries in shallow containers to prevent crushing.",
+                "source_url": "https://extension.sdstate.edu/raspberries-harvest-and-storage"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-a1b321897fe5",
+              "fact_role": "general",
+              "rendered_text": "Keep greens away from apples; their ripening gas can cause yellowing.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Store leafy greens away from apples; ethylene released by apples can accelerate yellowing.",
+                "source_url": "https://extension.colostate.edu/resource/how-to-use-lettuce-and-other-greens/"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-be7a61400ff8",
+              "fact_role": "general",
+              "rendered_text": "Prewashed, ready-to-eat salad needs refrigeration, but no extra rinse.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Keep prewashed, ready-to-eat salad refrigerated; it does not need an extra rinse.",
+                "source_url": "https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T02:11:50.787293Z",
+          "updated_at": "2026-11-06T02:11:50.787293Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": null,
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    "E02": {
+      "response_schema_version": 1,
+      "data": {
+        "post": {
+          "post_public_id": "QA-ID-2f4994901bb3",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+          "format_key": "emotional_animal_collection",
+          "topic_key": "animals",
+          "interaction_goal": "share",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Meerkats",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Adult meerkats teach pups using scorpions with the stingers removed."
+                },
+                {
+                  "position": 2,
+                  "text": "Meerkats can shut their ears to keep sand out while digging."
+                },
+                {
+                  "position": 3,
+                  "text": "Their burrows have separate rooms for sleeping and using the toilet."
+                },
+                {
+                  "position": 4,
+                  "text": "Together, meerkats can overwhelm even venomous snakes."
+                },
+                {
+                  "position": 5,
+                  "text": "Meerkats press their bellies against cooler rocks to cool off."
+                },
+                {
+                  "position": 6,
+                  "text": "At night, meerkats curl up and snuggle together."
+                }
+              ]
+            },
+            "cta": "Share this with someone who loves meerkats.",
+            "canva_copy": "Did you know?\n\nAdult meerkats teach pups using scorpions with the stingers removed.\n\nMeerkats can shut their ears to keep sand out while digging.\n\nTheir burrows have separate rooms for sleeping and using the toilet.\n\nTogether, meerkats can overwhelm even venomous snakes.\n\nMeerkats press their bellies against cooler rocks to cool off.\n\nAt night, meerkats curl up and snuggle together.\n\nShare this with someone who loves meerkats.",
+            "caption": "From scorpion lessons to nighttime snuggles, meerkats have some remarkable habits. Which one surprised you most?",
+            "hashtags": [
+              "#Meerkats",
+              "#AnimalFacts",
+              "#Wildlife"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                68,
+                60,
+                68,
+                54,
+                62,
+                48
+              ],
+              "facts_total_chars": 370,
+              "cta_chars": 43,
+              "canva_total_chars": 430,
+              "word_count": 67,
+              "fact_word_counts": [
+                10,
+                11,
+                11,
+                7,
+                10,
+                8
+              ],
+              "line_count": 23,
+              "fact_line_counts": [
+                3,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 7,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 22.9,
+              "replay_ratio": 1.761538,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-da28c15bc102",
+              "fact_role": "general",
+              "rendered_text": "Adult meerkats teach pups using scorpions with the stingers removed.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Adult meerkats teach pups to handle scorpions after removing the scorpions' stingers.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-e76e0a8355c0",
+              "fact_role": "general",
+              "rendered_text": "Meerkats can shut their ears to keep sand out while digging.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Meerkats can close their ears to keep sand out while digging.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-09a51542a49c",
+              "fact_role": "general",
+              "rendered_text": "Their burrows have separate rooms for sleeping and using the toilet.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Meerkat burrows have separate chambers for sleeping and toileting.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-91787b848a67",
+              "fact_role": "general",
+              "rendered_text": "Together, meerkats can overwhelm even venomous snakes.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Meerkats work together to mob or overwhelm venomous snakes.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-d9ba00473317",
+              "fact_role": "general",
+              "rendered_text": "Meerkats press their bellies against cooler rocks to cool off.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Meerkats cool their bellies against cooler rocks.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-9ee78dab7a5d",
+              "fact_role": "general",
+              "rendered_text": "At night, meerkats curl up and snuggle together.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Meerkats huddle or snuggle together at night.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T02:19:39.715132Z",
+          "updated_at": "2026-11-06T02:19:39.715132Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": null,
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    "E03": {
+      "response_schema_version": 1,
+      "data": {
+        "post": {
+          "post_public_id": "QA-ID-2efa1c2e80c0",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+          "format_key": "comparison",
+          "topic_key": "animals",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "African vs. Asian elephants",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "African elephants have two trunk \"fingers\"; Asian elephants have one."
+                },
+                {
+                  "position": 2,
+                  "text": "African elephants have larger ears than Asian elephants."
+                },
+                {
+                  "position": 3,
+                  "text": "Asian elephants have twin head domes; African elephants have rounder heads."
+                },
+                {
+                  "position": 4,
+                  "text": "African savanna elephants generally outweigh Asian elephants."
+                },
+                {
+                  "position": 5,
+                  "text": "Africa has two living elephant species; Asia has just one."
+                },
+                {
+                  "position": 6,
+                  "text": "African savanna elephants' backs dip; Asian elephants' backs usually arch."
+                },
+                {
+                  "position": 7,
+                  "text": "Female African elephants often have tusks; Asian females rarely have visible ones."
+                }
+              ]
+            },
+            "cta": "Which difference surprised you most?",
+            "canva_copy": "Did you know?\n\nAfrican elephants have two trunk \"fingers\"; Asian elephants have one.\n\nAfrican elephants have larger ears than Asian elephants.\n\nAsian elephants have twin head domes; African elephants have rounder heads.\n\nAfrican savanna elephants generally outweigh Asian elephants.\n\nAfrica has two living elephant species; Asia has just one.\n\nAfrican savanna elephants' backs dip; Asian elephants' backs usually arch.\n\nFemale African elephants often have tusks; Asian females rarely have visible ones.\n\nWhich difference surprised you most?",
+            "caption": "African vs. Asian elephants: which difference caught your attention? Tell us in the comments!",
+            "hashtags": [
+              "#ElephantFacts",
+              "#WildlifeTrivia",
+              "#AnimalFacts"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                69,
+                56,
+                75,
+                61,
+                58,
+                74,
+                82
+              ],
+              "facts_total_chars": 487,
+              "cta_chars": 36,
+              "canva_total_chars": 540,
+              "word_count": 76,
+              "fact_word_counts": [
+                10,
+                8,
+                11,
+                7,
+                10,
+                10,
+                12
+              ],
+              "line_count": 30,
+              "fact_line_counts": [
+                3,
+                2,
+                3,
+                3,
+                2,
+                3,
+                3
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 5,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 26,
+              "replay_ratio": 2,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-eed358a505ac",
+              "fact_role": "general",
+              "rendered_text": "African elephants have two trunk \"fingers\"; Asian elephants have one.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African elephants have two fingerlike tips on their trunks, while Asian elephants have one.",
+                "source_url": "https://www.wcs.org/get-involved/updates/how-to-tell-an-african-elephant-from-an-asian-elephant"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-f5474824a57f",
+              "fact_role": "general",
+              "rendered_text": "African elephants have larger ears than Asian elephants.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African elephants have larger ears than Asian elephants.",
+                "source_url": "https://www.wcs.org/get-involved/updates/how-to-tell-an-african-elephant-from-an-asian-elephant"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-d549e62d0558",
+              "fact_role": "general",
+              "rendered_text": "Asian elephants have twin head domes; African elephants have rounder heads.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African elephants have rounded heads, while Asian elephants have twin domes.",
+                "source_url": "https://elephantconservation.org/faq-items/how-can-you-tell-the-difference-between-an-african-and-an-asian-elephant/"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-9e28dba9f1c0",
+              "fact_role": "general",
+              "rendered_text": "African savanna elephants generally outweigh Asian elephants.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African savanna elephants generally weigh more than Asian elephants.",
+                "source_url": "https://www.worldwildlife.org/species/elephant/"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-2a2e5c94cb96",
+              "fact_role": "general",
+              "rendered_text": "Africa has two living elephant species; Asia has just one.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Africa has two living elephant species, while Asia has one.",
+                "source_url": "https://www.worldwildlife.org/species/elephant/"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-c38e7633f95e",
+              "fact_role": "general",
+              "rendered_text": "African savanna elephants' backs dip; Asian elephants' backs usually arch.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African savanna elephants have backs that dip, while Asian elephants' backs usually arch upward.",
+                "source_url": "https://elephantconservation.org/faq-items/how-can-you-tell-the-difference-between-an-african-and-an-asian-elephant/"
+              }
+            },
+            {
+              "position": 7,
+              "fact_public_id": "QA-ID-1d7ef147598b",
+              "fact_role": "general",
+              "rendered_text": "Female African elephants often have tusks; Asian females rarely have visible ones.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African female elephants often have tusks, while Asian females rarely have visible tusks.",
+                "source_url": "https://www.wcs.org/get-involved/updates/how-to-tell-an-african-elephant-from-an-asian-elephant"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T02:15:40.670600Z",
+          "updated_at": "2026-11-06T02:15:40.670600Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": null,
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    "E04": {
+      "response_schema_version": 1,
+      "data": {
+        "post": {
+          "post_public_id": "QA-ID-9b0689b5acf3",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+          "format_key": "myth_vs_fact",
+          "topic_key": "animals",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "common bat myths",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Flying fox bats use sight and smell, not echolocation."
+                },
+                {
+                  "position": 2,
+                  "text": "Some bats roost in trees, not just caves."
+                },
+                {
+                  "position": 3,
+                  "text": "Bats groom themselves regularly; they're not naturally filthy."
+                },
+                {
+                  "position": 4,
+                  "text": "Some bats migrate for winter instead of hibernating."
+                },
+                {
+                  "position": 5,
+                  "text": "Bats don't gnaw through wood or wires like mice."
+                },
+                {
+                  "position": 6,
+                  "text": "Some bats eat fruit or drink nectar, not just insects."
+                }
+              ]
+            },
+            "cta": "Which bat myth surprised you the most?",
+            "canva_copy": "Did you know?\n\nFlying fox bats use sight and smell, not echolocation.\n\nSome bats roost in trees, not just caves.\n\nBats groom themselves regularly; they're not naturally filthy.\n\nSome bats migrate for winter instead of hibernating.\n\nBats don't gnaw through wood or wires like mice.\n\nSome bats eat fruit or drink nectar, not just insects.\n\nWhich bat myth surprised you the most?",
+            "caption": "Bats have a reputation built on some pretty persistent myths. Which one did you grow up believing?",
+            "hashtags": [
+              "#BatFacts",
+              "#AnimalMyths",
+              "#WildlifeTrivia"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                54,
+                41,
+                62,
+                52,
+                48,
+                54
+              ],
+              "facts_total_chars": 321,
+              "cta_chars": 38,
+              "canva_total_chars": 376,
+              "word_count": 62,
+              "fact_word_counts": [
+                9,
+                8,
+                8,
+                8,
+                9,
+                10
+              ],
+              "line_count": 22,
+              "fact_line_counts": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 7,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 21.4,
+              "replay_ratio": 1.646154,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-c74bbebf7d5a",
+              "fact_role": "general",
+              "rendered_text": "Flying fox bats use sight and smell, not echolocation.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Not all bats echolocate; flying foxes rely on sight and smell.",
+                "source_url": "https://www.batcon.org/five-false-myths-about-batsand-one-thats-actually-true/"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-12c69f6d9065",
+              "fact_role": "general",
+              "rendered_text": "Some bats roost in trees, not just caves.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Not all bats live in caves; some roost in trees.",
+                "source_url": "https://home.nps.gov/subjects/bats/myth-busters.htm"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-e7aedae07590",
+              "fact_role": "general",
+              "rendered_text": "Bats groom themselves regularly; they're not naturally filthy.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Bats groom themselves and are not naturally filthy.",
+                "source_url": "https://home.nps.gov/subjects/bats/myth-busters.htm"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-fbe3e9f57c82",
+              "fact_role": "general",
+              "rendered_text": "Some bats migrate for winter instead of hibernating.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Some bats migrate for winter instead of hibernating.",
+                "source_url": "https://wdfw.wa.gov/species-habitats/living/species-facts/bats"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-839232d4fdf4",
+              "fact_role": "general",
+              "rendered_text": "Bats don't gnaw through wood or wires like mice.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Bats do not gnaw wood or wires like mice.",
+                "source_url": "https://wdfw.wa.gov/species-habitats/living/species-facts/bats"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-b5d136967154",
+              "fact_role": "general",
+              "rendered_text": "Some bats eat fruit or drink nectar, not just insects.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Some bats eat fruit or nectar rather than only insects.",
+                "source_url": "https://www.batcon.org/five-false-myths-about-batsand-one-thats-actually-true/"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T02:17:59.851498Z",
+          "updated_at": "2026-11-06T02:17:59.851498Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": null,
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    "B1": {
+      "response_schema_version": 1,
+      "data": {
+        "post": {
+          "post_public_id": "QA-ID-6343ba3a3224",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 2,
+          "content_hash": "2a11fb8a7ab2753d377b41c05ec53b4c88b386d0e2a604845eb85036501c533a",
+          "format_key": "comparison",
+          "topic_key": "nature_science",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Unexpected moons of the solar system",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Phobos races around Mars roughly three times every day."
+                },
+                {
+                  "position": 2,
+                  "text": "Ganymede is wider than Mercury, despite being a moon."
+                },
+                {
+                  "position": 3,
+                  "text": "Triton circles Neptune backward relative to the planet's spin."
+                },
+                {
+                  "position": 4,
+                  "text": "Titan's atmosphere is thicker than Earth's; our Moon barely has one."
+                },
+                {
+                  "position": 5,
+                  "text": "Io is the solar system's most volcanically active world."
+                },
+                {
+                  "position": 6,
+                  "text": "Enceladus shines brightly; parts of Iapetus are dark as asphalt."
+                },
+                {
+                  "position": 7,
+                  "text": "Charon is about half Pluto's width; our Moon is about a quarter of Earth's."
+                }
+              ]
+            },
+            "cta": "Which moon surprised you the most?",
+            "canva_copy": "Did you know?\n\nPhobos races around Mars roughly three times every day.\n\nGanymede is wider than Mercury, despite being a moon.\n\nTriton circles Neptune backward relative to the planet's spin.\n\nTitan's atmosphere is thicker than Earth's; our Moon barely has one.\n\nIo is the solar system's most volcanically active world.\n\nEnceladus shines brightly; parts of Iapetus are dark as asphalt.\n\nCharon is about half Pluto's width; our Moon is about a quarter of Earth's.\n\nWhich moon surprised you the most?",
+            "caption": "From wild orbits to strange surfaces, the moons of our solar system have surprises of their own. Which one caught your attention?",
+            "hashtags": [
+              "#MoonFacts",
+              "#SpaceTrivia",
+              "#DidYouKnow"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                55,
+                53,
+                62,
+                68,
+                56,
+                64,
+                75
+              ],
+              "facts_total_chars": 445,
+              "cta_chars": 34,
+              "canva_total_chars": 496,
+              "word_count": 80,
+              "fact_word_counts": [
+                9,
+                9,
+                9,
+                11,
+                9,
+                10,
+                14
+              ],
+              "line_count": 25,
+              "fact_line_counts": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                3
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 6,
+              "hook_line_count": 1,
+              "cta_line_count": 1,
+              "estimated_read_seconds": 27.2,
+              "replay_ratio": 2.092308,
+              "estimated_loops": 3
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 2,
+            "content_hash": "2a11fb8a7ab2753d377b41c05ec53b4c88b386d0e2a604845eb85036501c533a",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 2,
+            "content_hash": "2a11fb8a7ab2753d377b41c05ec53b4c88b386d0e2a604845eb85036501c533a",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-44519c7bd90a",
+              "fact_role": "general",
+              "rendered_text": "Phobos races around Mars roughly three times every day.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Phobos circles Mars about three times per day.",
+                "source_url": "https://science.nasa.gov/mars/moons/phobos/"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-acd670f2ca98",
+              "fact_role": "general",
+              "rendered_text": "Ganymede is wider than Mercury, despite being a moon.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Ganymede is wider than Mercury, even though Ganymede is a moon.",
+                "source_url": "https://science.nasa.gov/solar-system/moons/10-things-about-our-solar-systems-most-marvelous-moons/"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-515473a4a75d",
+              "fact_role": "general",
+              "rendered_text": "Triton circles Neptune backward relative to the planet's spin.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Triton orbits Neptune opposite the planet's spin.",
+                "source_url": "https://science.nasa.gov/solar-system/moons/10-things-about-our-solar-systems-most-marvelous-moons/"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-552967d72ab1",
+              "fact_role": "general",
+              "rendered_text": "Titan's atmosphere is thicker than Earth's; our Moon barely has one.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Titan has a thicker atmosphere than Earth, while our Moon has almost none.",
+                "source_url": "https://science.nasa.gov/solar-system/moons/10-things-about-our-solar-systems-most-marvelous-moons/"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-521b521ec912",
+              "fact_role": "general",
+              "rendered_text": "Io is the solar system's most volcanically active world.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Io is the solar system's most volcanically active world.",
+                "source_url": "https://science.nasa.gov/solar-system/moons/10-things-about-our-solar-systems-most-marvelous-moons/"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-a43fd7da7fae",
+              "fact_role": "general",
+              "rendered_text": "Enceladus shines brightly; parts of Iapetus are dark as asphalt.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Enceladus reflects bright light, while parts of Iapetus are dark as asphalt.",
+                "source_url": "https://science.nasa.gov/solar-system/moons/10-things-about-our-solar-systems-most-marvelous-moons/"
+              }
+            },
+            {
+              "position": 7,
+              "fact_public_id": "QA-ID-992016d9324d",
+              "fact_role": "general",
+              "rendered_text": "Charon is about half Pluto's width; our Moon is about a quarter of Earth's.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Charon is about half Pluto's width; our Moon is about one-quarter Earth's width.",
+                "source_url": "https://science.nasa.gov/asset/hubble/pluto-and-its-moon-charon/"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T03:05:59.762163Z",
+          "updated_at": "2026-11-06T06:53:36.748861Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": "QA-ID-a8e492fb5347",
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    "B2": {
+      "response_schema_version": 1,
+      "data": {
+        "post": {
+          "post_public_id": "QA-ID-5ac933583f9f",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 3,
+          "content_hash": "7261a7aee4b6a4778447af8f10fceade3fc9527ff15aa02aeba2b2467e8ea16b",
+          "format_key": "single_subject_fast",
+          "topic_key": "geography",
+          "interaction_goal": "follow",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Unexpected places across Canada",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Near Victoria, Butchart Gardens' five-acre Sunken Garden sits in an old limestone quarry."
+                },
+                {
+                  "position": 2,
+                  "text": "Toronto's PATH stretches over 30 km, mostly beneath downtown."
+                },
+                {
+                  "position": 3,
+                  "text": "Historic Quebec City still preserves its complete colonial city walls."
+                },
+                {
+                  "position": 4,
+                  "text": "In Calgary, Plus 15 skywalks take pedestrians over streets inside enclosed bridges."
+                },
+                {
+                  "position": 5,
+                  "text": "When winter conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink."
+                }
+              ]
+            },
+            "cta": "Follow for more unexpected places.",
+            "canva_copy": "Did you know?\n\nNear Victoria, Butchart Gardens' five-acre Sunken Garden sits in an old limestone quarry.\n\nToronto's PATH stretches over 30 km, mostly beneath downtown.\n\nHistoric Quebec City still preserves its complete colonial city walls.\n\nIn Calgary, Plus 15 skywalks take pedestrians over streets inside enclosed bridges.\n\nWhen winter conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink.\n\nFollow for more unexpected places.",
+            "caption": "A garden inside an old quarry, city walks above and below the streets, historic walls, and a canal that can become a winter skating route.",
+            "hashtags": [
+              "#CanadaTrivia",
+              "#GeographyFacts",
+              "#DidYouKnow"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                89,
+                61,
+                70,
+                83,
+                82
+              ],
+              "facts_total_chars": 393,
+              "cta_chars": 34,
+              "canva_total_chars": 444,
+              "word_count": 65,
+              "fact_word_counts": [
+                13,
+                9,
+                10,
+                12,
+                13
+              ],
+              "line_count": 22,
+              "fact_line_counts": [
+                3,
+                2,
+                3,
+                3,
+                3
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 5,
+              "hook_line_count": 1,
+              "cta_line_count": 1,
+              "estimated_read_seconds": 22,
+              "replay_ratio": 1.692308,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 3,
+            "content_hash": "7261a7aee4b6a4778447af8f10fceade3fc9527ff15aa02aeba2b2467e8ea16b",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 3,
+            "content_hash": "7261a7aee4b6a4778447af8f10fceade3fc9527ff15aa02aeba2b2467e8ea16b",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-884a965b32fc",
+              "fact_role": "general",
+              "rendered_text": "Near Victoria, Butchart Gardens' five-acre Sunken Garden sits in an old limestone quarry.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Near Victoria, Butchart Gardens' five-acre Sunken Garden occupies a former limestone quarry.",
+                "source_url": "https://butchartgardens.com/garden/sunken-garden/"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-5706f9460788",
+              "fact_role": "general",
+              "rendered_text": "Toronto's PATH stretches over 30 km, mostly beneath downtown.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Toronto's PATH walkway network stretches more than 30 kilometers, mostly under downtown.",
+                "source_url": "https://www.toronto.ca/explore-enjoy/visitor-toronto/path-torontos-downtown-pedestrian-walkway/"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-9b5dc66f3012",
+              "fact_role": "general",
+              "rendered_text": "Historic Quebec City still preserves its complete colonial city walls.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Quebec City's historic district preserves North America's only surviving complete colonial city walls.",
+                "source_url": "https://www.pc.gc.ca/apps/dfhd/page_nhs_eng.aspx?id=680"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-1268acfb018c",
+              "fact_role": "general",
+              "rendered_text": "In Calgary, Plus 15 skywalks take pedestrians over streets inside enclosed bridges.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Calgary's Plus 15 network lets pedestrians cross streets on enclosed elevated skywalks.",
+                "source_url": "https://www.calgary.ca/bike-walk-roll/plus-15-network.html"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-e5a5eb556206",
+              "fact_role": "general",
+              "rendered_text": "When winter conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Ottawa's Rideau Canal can become a 7.8-kilometer skating rink when winter conditions allow.",
+                "source_url": "https://ncc-ccn.gc.ca/places/rideau-canal-skateway"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T05:39:00.340403Z",
+          "updated_at": "2026-11-06T06:58:30.530948Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": "QA-ID-02b4a58bcf76",
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    "B3": {
+      "response_schema_version": 1,
+      "data": {
+        "post": {
+          "post_public_id": "QA-ID-6821aa81b974",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 2,
+          "content_hash": "0dc1d2c33fa3963a4f727d94cfe486115ba7cc19256f25397e69130bc6c7f47d",
+          "format_key": "single_subject_fast",
+          "topic_key": "inventions_everyday",
+          "interaction_goal": "follow",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Unexpected zipper stories",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "An Apollo spacesuit used a special zipper to seal in air."
+                },
+                {
+                  "position": 2,
+                  "text": "Early zipper-like fasteners could jam or spring open unexpectedly."
+                },
+                {
+                  "position": 3,
+                  "text": "The word zipper echoed the sound of fastening rubber boots."
+                },
+                {
+                  "position": 4,
+                  "text": "Some 1930s dresses showed off zippers as decorative details."
+                },
+                {
+                  "position": 5,
+                  "text": "A Van Cleef & Arpels Zip necklace can turn into a bracelet."
+                }
+              ]
+            },
+            "cta": "Follow for more unexpected invention stories.",
+            "canva_copy": "Did you know?\n\nAn Apollo spacesuit used a special zipper to seal in air.\n\nEarly zipper-like fasteners could jam or spring open unexpectedly.\n\nThe word zipper echoed the sound of fastening rubber boots.\n\nSome 1930s dresses showed off zippers as decorative details.\n\nA Van Cleef & Arpels Zip necklace can turn into a bracelet.\n\nFollow for more unexpected invention stories.",
+            "caption": "Zippers have turned up in some surprising places, from fashion to space gear. Which detail caught you off guard?",
+            "hashtags": [
+              "#ZipperFacts",
+              "#InventionTrivia",
+              "#DidYouKnow"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                57,
+                66,
+                59,
+                60,
+                59
+              ],
+              "facts_total_chars": 309,
+              "cta_chars": 45,
+              "canva_total_chars": 371,
+              "word_count": 59,
+              "fact_word_counts": [
+                11,
+                9,
+                10,
+                9,
+                11
+              ],
+              "line_count": 19,
+              "fact_line_counts": [
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 6,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 20.2,
+              "replay_ratio": 1.553846,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 2,
+            "content_hash": "0dc1d2c33fa3963a4f727d94cfe486115ba7cc19256f25397e69130bc6c7f47d",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 2,
+            "content_hash": "0dc1d2c33fa3963a4f727d94cfe486115ba7cc19256f25397e69130bc6c7f47d",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-421d6e2a8f47",
+              "fact_role": "general",
+              "rendered_text": "An Apollo spacesuit used a special zipper to seal in air.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "An Apollo spacesuit used a special pressure-sealing zipper to retain air.",
+                "source_url": "https://www.si.edu/object/pressure-suit-a7-lb-irwin-apollo-15-flown%3Anasm_A19740132000"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-ada6b6281ff1",
+              "fact_role": "general",
+              "rendered_text": "Early zipper-like fasteners could jam or spring open unexpectedly.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Early zipper-like fasteners could jam or spring open unexpectedly.",
+                "source_url": "https://ykkamericas.com/history-of-the-zipper/"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-370bf30a91a6",
+              "fact_role": "general",
+              "rendered_text": "The word zipper echoed the sound of fastening rubber boots.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "The name zipper imitated the fastening sound of rubber boots.",
+                "source_url": "https://lemelson.mit.edu/resources/whitcomb-judson"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-9e438aeb7270",
+              "fact_role": "general",
+              "rendered_text": "Some 1930s dresses showed off zippers as decorative details.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "In the 1930s, some dresses displayed zippers as decorative details.",
+                "source_url": "https://www.vam.ac.uk/info/schiaparelli-fashion-becomes-art-exhibition-large-print-guide"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-9de1c5fc2d50",
+              "fact_role": "general",
+              "rendered_text": "A Van Cleef & Arpels Zip necklace can turn into a bracelet.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "A Van Cleef & Arpels Zip necklace can transform into a bracelet.",
+                "source_url": "https://www.vancleefarpels.com/en/the-maison/the-heritage-gallery/zip.html"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T05:41:40.679307Z",
+          "updated_at": "2026-11-06T06:54:40.307253Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    "B4": {
+      "response_schema_version": 1,
+      "data": {
+        "post": {
+          "post_public_id": "QA-ID-1b061bd35c5e",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+          "format_key": "single_subject_fast",
+          "topic_key": "nature_science",
+          "interaction_goal": "share",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Surprising ways trees survive",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Some mangroves push excess salt out through tiny leaf glands."
+                },
+                {
+                  "position": 2,
+                  "text": "Neighboring trees of the same species can join their roots naturally."
+                },
+                {
+                  "position": 3,
+                  "text": "Some pond pine cones release their seeds after a fire."
+                },
+                {
+                  "position": 4,
+                  "text": "Silver birch branches can droop overnight as their water balance shifts."
+                },
+                {
+                  "position": 5,
+                  "text": "Trees can wall off damaged wood to slow spreading decay."
+                },
+                {
+                  "position": 6,
+                  "text": "Some oaks release airborne chemicals that ready nearby trees' defenses."
+                }
+              ]
+            },
+            "cta": "Share these surprising tree facts.",
+            "canva_copy": "Did you know?\n\nSome mangroves push excess salt out through tiny leaf glands.\n\nNeighboring trees of the same species can join their roots naturally.\n\nSome pond pine cones release their seeds after a fire.\n\nSilver birch branches can droop overnight as their water balance shifts.\n\nTrees can wall off damaged wood to slow spreading decay.\n\nSome oaks release airborne chemicals that ready nearby trees' defenses.\n\nShare these surprising tree facts.",
+            "caption": "Trees have some remarkable ways of surviving and responding to their surroundings. Which fact would you share with a nature lover?",
+            "hashtags": [
+              "#TreeFacts",
+              "#NatureScience",
+              "#DidYouKnow"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                61,
+                69,
+                54,
+                72,
+                56,
+                71
+              ],
+              "facts_total_chars": 393,
+              "cta_chars": 34,
+              "canva_total_chars": 444,
+              "word_count": 70,
+              "fact_word_counts": [
+                10,
+                11,
+                10,
+                11,
+                10,
+                10
+              ],
+              "line_count": 24,
+              "fact_line_counts": [
+                2,
+                3,
+                2,
+                3,
+                2,
+                3
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 5,
+              "hook_line_count": 1,
+              "cta_line_count": 1,
+              "estimated_read_seconds": 23.8,
+              "replay_ratio": 1.830769,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-358729064ded",
+              "fact_role": "general",
+              "rendered_text": "Some mangroves push excess salt out through tiny leaf glands.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Some mangroves expel excess salt through glands in their leaves.",
+                "source_url": "https://oceanservice.noaa.gov/education/tutorial_estuaries/est07_adaptations.html"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-901aad84dad3",
+              "fact_role": "general",
+              "rendered_text": "Neighboring trees of the same species can join their roots naturally.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Neighboring trees of the same species can naturally graft their roots together.",
+                "source_url": "https://naturalresources.extension.iastate.edu/forestry/tree_biology/101.html"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-e9e1dac1feb2",
+              "fact_role": "general",
+              "rendered_text": "Some pond pine cones release their seeds after a fire.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Pond pine cones can release seeds after exposure to fire.",
+                "source_url": "https://research.fs.usda.gov/feis/species-reviews/pinser"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-89417f661bce",
+              "fact_role": "general",
+              "rendered_text": "Silver birch branches can droop overnight as their water balance shifts.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Silver birch branches can droop overnight as changes in water balance occur.",
+                "source_url": "https://www.uef.fi/en/article/water-makes-tree-branches-droop-at-night"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-a257ee6f1ec3",
+              "fact_role": "general",
+              "rendered_text": "Trees can wall off damaged wood to slow spreading decay.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Trees can isolate damaged wood to slow the spread of decay.",
+                "source_url": "https://extension.colostate.edu/resource/tree-growth-and-decay/"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-1d21fc031133",
+              "fact_role": "general",
+              "rendered_text": "Some oaks release airborne chemicals that ready nearby trees' defenses.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Some oaks release airborne chemicals that prime defenses in nearby trees.",
+                "source_url": "https://www.nps.gov/articles/species-spotlight-tree-and-plant-communication.htm"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T05:43:58.940226Z",
+          "updated_at": "2026-11-06T05:43:58.940226Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": "QA-ID-fa3adbcc9368",
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    "B5": {
+      "response_schema_version": 1,
+      "data": {
+        "post": {
+          "post_public_id": "QA-ID-069385c57142",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 2,
+          "content_hash": "7a4f3e3211095a4d8dc43977181d810900c09efc221fa638dae891f143610027",
+          "format_key": "single_subject_fast",
+          "topic_key": "geography",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Unexpected everyday Australia",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "In Australian cities, white ibises scavenge, earning the nickname “bin chickens.”"
+                },
+                {
+                  "position": 2,
+                  "text": "Some Australian magpies swoop at people during nesting season."
+                },
+                {
+                  "position": 3,
+                  "text": "Australian polymer banknotes have transparent windows for security."
+                },
+                {
+                  "position": 4,
+                  "text": "Australia’s Hills Hoist is a rotary clothesline and a backyard icon."
+                },
+                {
+                  "position": 5,
+                  "text": "In Australia, election-day sausage stalls are nicknamed “democracy sausages.”"
+                }
+              ]
+            },
+            "cta": "Which Australian fact surprised you most?",
+            "canva_copy": "Did you know?\n\nIn Australian cities, white ibises scavenge, earning the nickname “bin chickens.”\n\nSome Australian magpies swoop at people during nesting season.\n\nAustralian polymer banknotes have transparent windows for security.\n\nAustralia’s Hills Hoist is a rotary clothesline and a backyard icon.\n\nIn Australia, election-day sausage stalls are nicknamed “democracy sausages.”\n\nWhich Australian fact surprised you most?",
+            "caption": "From city birds and backyard clotheslines to money and election-day traditions, Australia has some memorable everyday details. Which surprised you?",
+            "hashtags": [
+              "#AustraliaTrivia",
+              "#GeographyFacts",
+              "#DidYouKnow"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                81,
+                62,
+                67,
+                68,
+                77
+              ],
+              "facts_total_chars": 363,
+              "cta_chars": 41,
+              "canva_total_chars": 421,
+              "word_count": 57,
+              "fact_word_counts": [
+                11,
+                9,
+                8,
+                11,
+                9
+              ],
+              "line_count": 22,
+              "fact_line_counts": [
+                3,
+                2,
+                2,
+                3,
+                3
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 6,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 19.6,
+              "replay_ratio": 1.507692,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 2,
+            "content_hash": "7a4f3e3211095a4d8dc43977181d810900c09efc221fa638dae891f143610027",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 2,
+            "content_hash": "7a4f3e3211095a4d8dc43977181d810900c09efc221fa638dae891f143610027",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-7e59908819b2",
+              "fact_role": "general",
+              "rendered_text": "In Australian cities, white ibises scavenge, earning the nickname “bin chickens.”",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "City-dwelling Australian white ibises are nicknamed bin chickens because they scavenge.",
+                "source_url": "https://birdlife.org.au/bird-profiles/australian-white-ibis/"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-a46b3f2bd8e5",
+              "fact_role": "general",
+              "rendered_text": "Some Australian magpies swoop at people during nesting season.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Some Australian magpies swoop at nearby people during nesting season.",
+                "source_url": "https://australian.museum/learn/species-identification/ask-an-expert/why-do-magpies-swoop/"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-25fade47a41a",
+              "fact_role": "general",
+              "rendered_text": "Australian polymer banknotes have transparent windows for security.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Australian polymer banknotes include transparent windows as security features.",
+                "source_url": "https://www.rba.gov.au/publications/bulletin/2016/sep/1.html"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-80ea0c40a2a9",
+              "fact_role": "general",
+              "rendered_text": "Australia’s Hills Hoist is a rotary clothesline and a backyard icon.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Australia's rotary Hills Hoist clothesline became an icon of the backyard.",
+                "source_url": "https://www.abc.net.au/news/2017-01-04/hills-hoist-australian-backyard-icon-ownership-change/8161430"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-38424f4bca37",
+              "fact_role": "general",
+              "rendered_text": "In Australia, election-day sausage stalls are nicknamed “democracy sausages.”",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Election-day sausage stalls in Australia are nicknamed democracy sausages.",
+                "source_url": "https://www.abc.net.au/btn/classroom/election-lingo-democracy-sausage/13878386"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T05:46:17.221870Z",
+          "updated_at": "2026-11-06T06:56:06.675729Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    }
+  },
+  "reviewer": "Codex — reviewer also participated in remediation; not blind/owner acceptance",
+  "reviews": [
+    {
+      "id": "E01",
+      "post_public_id": "QA-ID-834222c2456a",
+      "revision": 1,
+      "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+      "format_key": "single_subject_fast",
+      "patterns": [
+        "RP01",
+        "RP03"
+      ],
+      "total": 16,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Red pandas got the name \"panda\" before giant pandas did."
+          ],
+          "reason": "Subjek langsung bernama; asal sebutan panda menjadi angle familiar dengan kebalikan yang jelas."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Red pandas use their tongues to inspect scent marks."
+          ],
+          "reason": "Penggunaan lidah untuk memeriksa scent marks merupakan kemampuan spesifik yang mudah diceritakan ulang."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Thick fur even covers the bottoms of red pandas' feet.",
+            "Reddish coats help them blend into moss-covered branches.",
+            "Young red pandas can whistle when they're distressed.",
+            "Red pandas have their own animal family, separate from bears."
+          ],
+          "reason": "Insulasi kaki, kamuflase, suara dan identitas keluarga memberi empat pengalaman berbeda; tidak mengulang diet atau gerak memanjat."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 2,
+          "quotes": [
+            "When threatened, red pandas may stand upright and swipe with sharp claws."
+          ],
+          "reason": "Penutup berdiri dan mengayun cakar memberi adegan visual baru setelah nama dan indra."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Young red pandas can whistle when they're distressed."
+          ],
+          "reason": "Contraction they're dan kata whistle/distressed terasa percakapan; tidak diawali taksonomi ilmiah."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Hook literal dan perpindahan nama–fisik–indra–pertahanan mengikuti kartu hewan tanpa menyalin fakta contoh."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Red pandas got the name \"panda\" before giant pandas did."
+          ],
+          "reason": "Tujuh baris mandiri dengan satu gagasan utama; exact rendering dan budget revision ini lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Share this with a red panda fan."
+          ],
+          "reason": "Share diarahkan kepada red panda fan, satu aksi dan penerima yang relevan."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nRed pandas got the name \"panda\" before giant pandas did.\n\nThick fur even covers the bottoms of red pandas' feet.\n\nReddish coats help them blend into moss-covered branches.\n\nYoung red pandas can whistle when they're distressed.\n\nRed pandas use their tongues to inspect scent marks.\n\nRed pandas have their own animal family, separate from bears.\n\nWhen threatened, red pandas may stand upright and swipe with sharp claws.\n\nShare this with a red panda fan.",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia."
+    },
+    {
+      "id": "E08",
+      "post_public_id": "QA-ID-1112e26848ac",
+      "revision": 1,
+      "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+      "format_key": "themed_utility",
+      "patterns": [
+        "RP06",
+        "RP05"
+      ],
+      "total": 15,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Keep berries unwashed in the fridge; rinse them only before eating."
+          ],
+          "reason": "Berries/greens dan kebiasaan sebelum makan langsung dikenali sebagai kebutuhan rumah tangga."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Keep greens away from apples; their ripening gas can cause yellowing."
+          ],
+          "reason": "Apel yang mempercepat yellowing memberi akibat konkret; bukan janji umur simpan pasti."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Leave strawberry tops attached until you're ready to prepare them.",
+            "Keep loose spinach in an open bag in your refrigerator's crisper.",
+            "Keep raspberries in shallow containers to prevent crushing."
+          ],
+          "reason": "Persiapan strawberry, kemasan spinach dan wadah raspberry masing-masing menawarkan tindakan berbeda."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 1,
+          "quotes": [
+            "Prewashed, ready-to-eat salad needs refrigeration, but no extra rinse."
+          ],
+          "reason": "Penutup ready-to-eat/no extra rinse berguna, tetapi kembali ke tema pencucian pembuka; variasi ending lebih ringan daripada baris gas."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Keep greens away from apples; their ripening gas can cause yellowing."
+          ],
+          "reason": "Ripening gas menjelaskan istilah tanpa kuliah ethylene; qualifier can tetap terdengar natural."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Plain hook, rotasi objek/tindakan dan saveable ending selaras pola utility Daily Facts."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Prewashed, ready-to-eat salad needs refrigeration, but no extra rinse."
+          ],
+          "reason": "Enam baris dengan kondisi unwashed/ready-to-eat yang terbaca; batas keras dan source bindings lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Save this for your next grocery trip."
+          ],
+          "reason": "Save untuk grocery trip mempunyai alasan pakai yang jelas dan satu aksi."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nKeep berries unwashed in the fridge; rinse them only before eating.\n\nLeave strawberry tops attached until you're ready to prepare them.\n\nKeep loose spinach in an open bag in your refrigerator's crisper.\n\nKeep raspberries in shallow containers to prevent crushing.\n\nKeep greens away from apples; their ripening gas can cause yellowing.\n\nPrewashed, ready-to-eat salad needs refrigeration, but no extra rinse.\n\nSave this for your next grocery trip.",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia."
+    },
+    {
+      "id": "E02",
+      "post_public_id": "QA-ID-2f4994901bb3",
+      "revision": 1,
+      "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+      "format_key": "emotional_animal_collection",
+      "patterns": [
+        "RP03",
+        "RP01"
+      ],
+      "total": 16,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Adult meerkats teach pups using scorpions with the stingers removed."
+          ],
+          "reason": "Adult meerkats menyebut spesies sesudah hook generik dan membuka dengan praktik mengajar yang spesifik."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Adult meerkats teach pups using scorpions with the stingers removed."
+          ],
+          "reason": "Scorpion dengan stinger dilepas memberi detail mengejutkan; bukan kalimat umum hewan saling membantu."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Meerkats can shut their ears to keep sand out while digging.",
+            "Their burrows have separate rooms for sleeping and using the toilet.",
+            "Together, meerkats can overwhelm even venomous snakes.",
+            "Meerkats press their bellies against cooler rocks to cool off."
+          ],
+          "reason": "Telinga, chamber toilet, pertahanan ular dan pendinginan tubuh memberi nilai berbeda tanpa cluster caregiving atau warning calls."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 2,
+          "quotes": [
+            "At night, meerkats curl up and snuggle together."
+          ],
+          "reason": "Awal hunting practice dan akhir snuggling memberi perubahan rasa penasaran ke adegan hangat."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Their burrows have separate rooms for sleeping and using the toilet."
+          ],
+          "reason": "Using the toilet dan cool off merupakan kata sehari-hari, tanpa jargon anatomi."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "At night, meerkats curl up and snuggle together."
+          ],
+          "reason": "Snuggle adalah perilaku terlihat, dekat pola DYK, tanpa mengarang motif cinta manusia."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Adult meerkats teach pups using scorpions with the stingers removed."
+          ],
+          "reason": "Enam fakta utuh dalam adaptive; tidak ada pengisi demi tujuh dan render/budget lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Share this with someone who loves meerkats."
+          ],
+          "reason": "Satu ajakan share kepada orang yang menyukai meerkat sesuai isi."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nAdult meerkats teach pups using scorpions with the stingers removed.\n\nMeerkats can shut their ears to keep sand out while digging.\n\nTheir burrows have separate rooms for sleeping and using the toilet.\n\nTogether, meerkats can overwhelm even venomous snakes.\n\nMeerkats press their bellies against cooler rocks to cool off.\n\nAt night, meerkats curl up and snuggle together.\n\nShare this with someone who loves meerkats.",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia."
+    },
+    {
+      "id": "E03",
+      "post_public_id": "QA-ID-2efa1c2e80c0",
+      "revision": 1,
+      "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+      "format_key": "comparison",
+      "patterns": [
+        "RP11",
+        "RP01"
+      ],
+      "total": 15,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "African elephants have two trunk \"fingers\"; Asian elephants have one."
+          ],
+          "reason": "Pasangan African/Asian elephants langsung jelas bagi pembaca umum."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "African elephants have two trunk \"fingers\"; Asian elephants have one."
+          ],
+          "reason": "Dua trunk fingers versus satu memberi perbedaan fisik yang mudah dibayangkan."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Asian elephants have twin head domes; African elephants have rounder heads.",
+            "African savanna elephants generally outweigh Asian elephants.",
+            "Africa has two living elephant species; Asia has just one.",
+            "African savanna elephants' backs dip; Asian elephants' backs usually arch."
+          ],
+          "reason": "Bentuk kepala, berat, spesies dan punggung merupakan dimensi berbeda; bukan deret satu ukuran."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 1,
+          "quotes": [
+            "Female African elephants often have tusks; Asian females rarely have visible ones."
+          ],
+          "reason": "Awal kuat dan akhir tusks sah, tetapi telinga/kepala di tengah masih berasa identifikasi; ini kekurangan ritme minor."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Female African elephants often have tusks; Asian females rarely have visible ones."
+          ],
+          "reason": "Have/usually/visible dan fingers dalam tanda kutip mudah dipahami; tidak memakai istilah teknis yang menutupi reveal."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Like-for-like per pasangan mengikuti RP11 dengan variasi dimensi yang sah."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "African savanna elephants' backs dip; Asian elephants' backs usually arch."
+          ],
+          "reason": "Setiap baris membandingkan dimensi sama; generally/savanna/usually/often/rarely/visible dipertahankan dan budget lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Which difference surprised you most?"
+          ],
+          "reason": "Which difference menanyakan perbandingan yang benar-benar ada dengan satu aksi comment."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nAfrican elephants have two trunk \"fingers\"; Asian elephants have one.\n\nAfrican elephants have larger ears than Asian elephants.\n\nAsian elephants have twin head domes; African elephants have rounder heads.\n\nAfrican savanna elephants generally outweigh Asian elephants.\n\nAfrica has two living elephant species; Asia has just one.\n\nAfrican savanna elephants' backs dip; Asian elephants' backs usually arch.\n\nFemale African elephants often have tusks; Asian females rarely have visible ones.\n\nWhich difference surprised you most?",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia."
+    },
+    {
+      "id": "E04",
+      "post_public_id": "QA-ID-9b0689b5acf3",
+      "revision": 1,
+      "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+      "format_key": "myth_vs_fact",
+      "patterns": [
+        "RP05",
+        "RP03"
+      ],
+      "total": 15,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Flying fox bats use sight and smell, not echolocation."
+          ],
+          "reason": "Flying fox bats memberi nama subjek dan langsung membantah anggapan semua bat berekolokasi."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Flying fox bats use sight and smell, not echolocation."
+          ],
+          "reason": "Sight/smell memberi alternatif kemampuan yang konkret, bukan hanya negasi."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Some bats roost in trees, not just caves.",
+            "Bats groom themselves regularly; they're not naturally filthy.",
+            "Some bats migrate for winter instead of hibernating.",
+            "Bats don't gnaw through wood or wires like mice."
+          ],
+          "reason": "Roost, grooming, migrasi dan kebiasaan menggerogoti membawa empat angle yang berbeda."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 1,
+          "quotes": [
+            "Some bats eat fruit or drink nectar, not just insects."
+          ],
+          "reason": "Ending buah/nectar benar menambah sudut, tetapi kejutan lebih ringan daripada navigasi pembuka; tidak perlu mengulang label myth."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Bats groom themselves regularly; they're not naturally filthy."
+          ],
+          "reason": "They're not naturally filthy terasa bahasa pembaca umum, tanpa klaim bebas penyakit atau saran handling."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Koreksi langsung mengikuti pola RP05; tidak ada parade Myth/Fact mekanis."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Some bats migrate for winter instead of hibernating."
+          ],
+          "reason": "Enam koreksi singkat, some tetap ada, format myth_vs_fact sesuai isi dan budget lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Which bat myth surprised you the most?"
+          ],
+          "reason": "Pertanyaan tentang bat myth relevan dengan koreksi yang baru dibaca."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nFlying fox bats use sight and smell, not echolocation.\n\nSome bats roost in trees, not just caves.\n\nBats groom themselves regularly; they're not naturally filthy.\n\nSome bats migrate for winter instead of hibernating.\n\nBats don't gnaw through wood or wires like mice.\n\nSome bats eat fruit or drink nectar, not just insects.\n\nWhich bat myth surprised you the most?",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia."
+    },
+    {
+      "id": "B1",
+      "post_public_id": "QA-ID-6343ba3a3224",
+      "revision": 2,
+      "content_hash": "2a11fb8a7ab2753d377b41c05ec53b4c88b386d0e2a604845eb85036501c533a",
+      "format_key": "comparison",
+      "patterns": [
+        "RP12"
+      ],
+      "total": 15,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Ganymede is wider than Mercury, despite being a moon."
+          ],
+          "reason": "Bulan dibanding planet yang familiar membuka skala yang mudah dibayangkan."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Io is the solar system's most volcanically active world."
+          ],
+          "reason": "Aktivitas gunung api memberi kejutan berbeda; cakupan solar system kini eksplisit."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Phobos races around Mars roughly three times every day.",
+            "Titan's atmosphere is thicker than Earth's; our Moon barely has one.",
+            "Enceladus shines brightly; parts of Iapetus are dark as asphalt.",
+            "Charon is about half Pluto's width; our Moon is about a quarter of Earth's."
+          ],
+          "reason": "Gerak, ukuran, atmosfer, vulkanisme, kecerahan dan rasio memberi dimensi berbeda."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 1,
+          "quotes": [
+            "Triton circles Neptune backward relative to the planet's spin."
+          ],
+          "reason": "Beberapa fakta orbit di awal masih berdekatan; minor, tidak memerlukan seleksi ulang."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Phobos races around Mars roughly three times every day."
+          ],
+          "reason": "Races, barely dan kata sehari-hari mengalir tanpa gaya paper."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Ragam kontras visual mengikuti pola nature surprises; bukan tabel diameter."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Charon is about half Pluto's width; our Moon is about a quarter of Earth's."
+          ],
+          "reason": "Kalimat mandiri, dua about pada rasio tetap terbaca; exact rendering dan budget lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Which moon surprised you the most?"
+          ],
+          "reason": "Satu pertanyaan spesifik tentang moon, sesuai goal comment."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nPhobos races around Mars roughly three times every day.\n\nGanymede is wider than Mercury, despite being a moon.\n\nTriton circles Neptune backward relative to the planet's spin.\n\nTitan's atmosphere is thicker than Earth's; our Moon barely has one.\n\nIo is the solar system's most volcanically active world.\n\nEnceladus shines brightly; parts of Iapetus are dark as asphalt.\n\nCharon is about half Pluto's width; our Moon is about a quarter of Earth's.\n\nWhich moon surprised you the most?",
+      "mechanical_status": "passed",
+      "research_basis": "Snapshot canonical/sumber QA lama; URL tidak dibuka atau diverifikasi ulang. Review editorial dan pelestarian makna, bukan sertifikasi faktual baru."
+    },
+    {
+      "id": "B2",
+      "post_public_id": "QA-ID-5ac933583f9f",
+      "revision": 3,
+      "content_hash": "7261a7aee4b6a4778447af8f10fceade3fc9527ff15aa02aeba2b2467e8ea16b",
+      "format_key": "single_subject_fast",
+      "patterns": [
+        "RP07",
+        "RP08"
+      ],
+      "total": 15,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Near Victoria, Butchart Gardens' five-acre Sunken Garden sits in an old limestone quarry."
+          ],
+          "reason": "Taman bekas quarry menjadi tempat konkret yang segera dapat dibayangkan; nama Butchart Gardens jelas."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "When winter conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink."
+          ],
+          "reason": "Kanal menjadi arena skating saat kondisi musim dingin memungkinkan memberi perubahan yang mudah diceritakan."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 1,
+          "quotes": [
+            "Toronto's PATH stretches over 30 km, mostly beneath downtown.",
+            "In Calgary, Plus 15 skywalks take pedestrians over streets inside enclosed bridges."
+          ],
+          "reason": "Dua rute pejalan kaki masih berdekatan tema, tetapi kini memberi kontras bawah/atas; minor, bukan tiga jaringan setara ditambah luas taman."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 2,
+          "quotes": [
+            "Near Victoria, Butchart Gardens' five-acre Sunken Garden sits in an old limestone quarry.",
+            "When winter conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink."
+          ],
+          "reason": "Quarry membuka, infrastruktur dan sejarah berselang, skating menutup; tidak lagi park-area ending."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Historic Quebec City still preserves its complete colonial city walls."
+          ],
+          "reason": "Sits in, still preserves dan becomes memakai bahasa umum; superlatif geografis luas dibuang tanpa menambah klaim."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?",
+            "When winter conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink."
+          ],
+          "reason": "Perjalanan antarjenis tempat dan ending visual dekat Daily Facts; tidak berupa tabel spesifikasi kota."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Near Victoria, Butchart Gardens' five-acre Sunken Garden sits in an old limestone quarry."
+          ],
+          "reason": "Lima fakta dalam adaptive, satu gagasan/baris, maksimum tiga baris visual dan hard budget lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Follow for more unexpected places."
+          ],
+          "reason": "Satu ajakan follow relevan untuk tempat tak terduga."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nNear Victoria, Butchart Gardens' five-acre Sunken Garden sits in an old limestone quarry.\n\nToronto's PATH stretches over 30 km, mostly beneath downtown.\n\nHistoric Quebec City still preserves its complete colonial city walls.\n\nIn Calgary, Plus 15 skywalks take pedestrians over streets inside enclosed bridges.\n\nWhen winter conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink.\n\nFollow for more unexpected places.",
+      "mechanical_status": "passed",
+      "research_basis": "Snapshot canonical/sumber QA lama; tanpa membuka ulang URL. Copy menyempitkan klaim tembok tanpa keunikan North America. Bukan sertifikasi faktual baru."
+    },
+    {
+      "id": "B3",
+      "post_public_id": "QA-ID-6821aa81b974",
+      "revision": 2,
+      "content_hash": "0dc1d2c33fa3963a4f727d94cfe486115ba7cc19256f25397e69130bc6c7f47d",
+      "format_key": "single_subject_fast",
+      "patterns": [
+        "RP09",
+        "RP10"
+      ],
+      "total": 16,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "An Apollo spacesuit used a special zipper to seal in air."
+          ],
+          "reason": "Zipper benda familiar dibuka lewat pemakaian antariksa yang tidak biasa."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "A Van Cleef & Arpels Zip necklace can turn into a bracelet."
+          ],
+          "reason": "Kalung berubah gelang memberi payoff konkret yang mudah diceritakan ulang."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "An Apollo spacesuit used a special zipper to seal in air.",
+            "Early zipper-like fasteners could jam or spring open unexpectedly.",
+            "The word zipper echoed the sound of fastening rubber boots.",
+            "Some 1930s dresses showed off zippers as decorative details.",
+            "A Van Cleef & Arpels Zip necklace can turn into a bracelet."
+          ],
+          "reason": "Space seal, kegagalan mekanis, bunyi nama, dekorasi fashion dan perhiasan berbeda; hanya satu fakta asal/nama dipertahankan."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 2,
+          "quotes": [
+            "An Apollo spacesuit used a special zipper to seal in air.",
+            "A Van Cleef & Arpels Zip necklace can turn into a bracelet."
+          ],
+          "reason": "Dari space ke kegagalan, nama, fashion dan perhiasan; tidak lagi tiga langkah asal-usul berulang."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Early zipper-like fasteners could jam or spring open unexpectedly."
+          ],
+          "reason": "Jam, spring open dan turn into adalah kata sehari-hari dengan can/could/some tetap."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?",
+            "The word zipper echoed the sound of fastening rubber boots."
+          ],
+          "reason": "Kartu benda familiar berisi reveal lintas penggunaan, dekat pola RP10 tanpa menyalin faktanya."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Some 1930s dresses showed off zippers as decorative details."
+          ],
+          "reason": "Lima baris terkurasi sah adaptive; pendek, exact render, semua batas lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Follow for more unexpected invention stories."
+          ],
+          "reason": "Satu ajakan follow untuk cerita penemuan yang sesuai isi."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nAn Apollo spacesuit used a special zipper to seal in air.\n\nEarly zipper-like fasteners could jam or spring open unexpectedly.\n\nThe word zipper echoed the sound of fastening rubber boots.\n\nSome 1930s dresses showed off zippers as decorative details.\n\nA Van Cleef & Arpels Zip necklace can turn into a bracelet.\n\nFollow for more unexpected invention stories.",
+      "mechanical_status": "passed",
+      "research_basis": "Snapshot canonical/sumber QA lama; URL tidak dibuka atau diverifikasi ulang. Review editorial dan pelestarian makna, bukan sertifikasi faktual baru."
+    },
+    {
+      "id": "B4",
+      "post_public_id": "QA-ID-1b061bd35c5e",
+      "revision": 1,
+      "content_hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+      "format_key": "single_subject_fast",
+      "patterns": [
+        "RP12",
+        "RP01"
+      ],
+      "total": 16,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Some mangroves push excess salt out through tiny leaf glands."
+          ],
+          "reason": "Mangrove dan salt lewat daun mengubah pohon familiar menjadi kemampuan yang konkret."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Some mangroves push excess salt out through tiny leaf glands."
+          ],
+          "reason": "Push excess salt out memberi mekanisme dan hasil singkat yang bisa diceritakan ulang."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Neighboring trees of the same species can join their roots naturally.",
+            "Some pond pine cones release their seeds after a fire.",
+            "Silver birch branches can droop overnight as their water balance shifts.",
+            "Trees can wall off damaged wood to slow spreading decay."
+          ],
+          "reason": "Root graft, fire-triggered seed release, gerak malam dan pembatasan decay masing-masing memberi pengalaman berbeda."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 2,
+          "quotes": [
+            "Some oaks release airborne chemicals that ready nearby trees' defenses."
+          ],
+          "reason": "Awal membuang garam dan akhir chemical defense berbeda skala/fungsi; tengah tidak mengikuti bab struktur pohon."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Trees can wall off damaged wood to slow spreading decay."
+          ],
+          "reason": "Wall off damaged wood menjelaskan proses tanpa istilah akademis; tidak memberi pohon niat atau pikiran manusia."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Perpindahan kemampuan konkret mengikuti pola nature surprises RP12 dengan fakta sendiri."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Silver birch branches can droop overnight as their water balance shifts."
+          ],
+          "reason": "Enam fakta cukup dalam adaptive; some/can/same species tetap dipertahankan, semua budget lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Share these surprising tree facts."
+          ],
+          "reason": "Share tree facts singkat, satu aksi dan relevan untuk pembaca pecinta alam."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nSome mangroves push excess salt out through tiny leaf glands.\n\nNeighboring trees of the same species can join their roots naturally.\n\nSome pond pine cones release their seeds after a fire.\n\nSilver birch branches can droop overnight as their water balance shifts.\n\nTrees can wall off damaged wood to slow spreading decay.\n\nSome oaks release airborne chemicals that ready nearby trees' defenses.\n\nShare these surprising tree facts.",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia."
+    },
+    {
+      "id": "B5",
+      "post_public_id": "QA-ID-069385c57142",
+      "revision": 2,
+      "content_hash": "7a4f3e3211095a4d8dc43977181d810900c09efc221fa638dae891f143610027",
+      "format_key": "single_subject_fast",
+      "patterns": [
+        "RP07",
+        "RP08"
+      ],
+      "total": 14,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "In Australian cities, white ibises scavenge, earning the nickname “bin chickens.”"
+          ],
+          "reason": "Lokasi Australia dan nickname bin chickens langsung terlihat pada opening."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 1,
+          "quotes": [
+            "Australian polymer banknotes have transparent windows for security."
+          ],
+          "reason": "Nama dan kebiasaan menarik; fitur jendela uang serta ikon jemuran masih lebih ringan daripada reveal terkuat."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "In Australian cities, white ibises scavenge, earning the nickname “bin chickens.”",
+            "Some Australian magpies swoop at people during nesting season.",
+            "Australian polymer banknotes have transparent windows for security.",
+            "Australia’s Hills Hoist is a rotary clothesline and a backyard icon.",
+            "In Australia, election-day sausage stalls are nicknamed “democracy sausages.”"
+          ],
+          "reason": "Scavenging, perilaku nesting, uang, backyard dan pemilu memberi fungsi berbeda; BBQ paling ringan dibuang."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 2,
+          "quotes": [
+            "In Australia, election-day sausage stalls are nicknamed “democracy sausages.”"
+          ],
+          "reason": "Penutup democracy sausages lebih kuat daripada fitur uang dan menghubungkan kehidupan sehari-hari dengan pemilu."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Australia’s Hills Hoist is a rotary clothesline and a backyard icon."
+          ],
+          "reason": "Hills Hoist kini dijelaskan sebagai clothesline sehingga pembaca tidak perlu mengenal merek."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 1,
+          "quotes": [
+            "Did you know?",
+            "Australian polymer banknotes have transparent windows for security."
+          ],
+          "reason": "Country trivia sudah terbentuk, walau tengahnya masih memiliki dua detail budaya ringan; minor."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "In Australian cities, white ibises scavenge, earning the nickname “bin chickens.”"
+          ],
+          "reason": "Format single_subject_fast sesuai daftar satu negara, tidak lagi menjanjikan comparison; baris/budget lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Which Australian fact surprised you most?"
+          ],
+          "reason": "Fact mengganti contrast; satu pertanyaan relevan untuk comment."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nIn Australian cities, white ibises scavenge, earning the nickname “bin chickens.”\n\nSome Australian magpies swoop at people during nesting season.\n\nAustralian polymer banknotes have transparent windows for security.\n\nAustralia’s Hills Hoist is a rotary clothesline and a backyard icon.\n\nIn Australia, election-day sausage stalls are nicknamed “democracy sausages.”\n\nWhich Australian fact surprised you most?",
+      "mechanical_status": "passed",
+      "research_basis": "Snapshot canonical/sumber QA lama; URL tidak dibuka atau diverifikasi ulang. Review editorial dan pelestarian makna, bukan sertifikasi faktual baru."
+    }
+  ],
+  "summary": {
+    "pass": 10,
+    "fail": 0,
+    "formats_pass": 5,
+    "batch_pass": 5,
+    "batch_completed": 5,
+    "batch_requested": 5
+  },
+  "repair_attempts": {
+    "B1": {
+      "from_revision": 1,
+      "to_revision": 2,
+      "rounds": 1
+    },
+    "B2": {
+      "from_revision": 1,
+      "to_revision": 3,
+      "rounds": 2,
+      "intermediate_readback": {
+        "response_schema_version": 1,
+        "data": {
+          "post": {
+            "post_public_id": "QA-ID-5ac933583f9f",
+            "page_public_id": "QA-ID-7b6e770529b4",
+            "niche_key": "trivia",
+            "status": "draft",
+            "revision": 2,
+            "content_hash": "d223f83b2d1b0a8b3a9a0dce2a9ceedf27a6bc5b4ee16d1415ed698c6c92d101",
+            "format_key": "single_subject_fast",
+            "topic_key": "geography",
+            "interaction_goal": "follow",
+            "scheduled_at": null,
+            "published_at": null,
+            "content_payload": {
+              "schema_version": 2,
+              "hook": "Did you know?",
+              "body": {
+                "subject": "Unexpected places across Canada",
+                "facts": [
+                  {
+                    "position": 1,
+                    "text": "Near Victoria, Butchart Gardens' five-acre Sunken Garden sits in an old limestone quarry."
+                  },
+                  {
+                    "position": 2,
+                    "text": "When winter conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink."
+                  },
+                  {
+                    "position": 3,
+                    "text": "In Calgary, Plus 15 skywalks take pedestrians over streets inside enclosed bridges."
+                  },
+                  {
+                    "position": 4,
+                    "text": "Toronto's PATH stretches over 30 km, mostly beneath downtown."
+                  },
+                  {
+                    "position": 5,
+                    "text": "Historic Quebec City has North America's only surviving complete colonial city walls."
+                  }
+                ]
+              },
+              "cta": "Follow for more unexpected places.",
+              "canva_copy": "Did you know?\n\nNear Victoria, Butchart Gardens' five-acre Sunken Garden sits in an old limestone quarry.\n\nWhen winter conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink.\n\nIn Calgary, Plus 15 skywalks take pedestrians over streets inside enclosed bridges.\n\nToronto's PATH stretches over 30 km, mostly beneath downtown.\n\nHistoric Quebec City has North America's only surviving complete colonial city walls.\n\nFollow for more unexpected places.",
+              "caption": "A quarry turned garden, a winter skating canal, walks above and below city streets, and historic city walls: Canada's places have surprises.",
+              "hashtags": [
+                "#CanadaTrivia",
+                "#GeographyFacts",
+                "#DidYouKnow"
+              ],
+              "render_style": "plain_lines",
+              "text_metrics": {
+                "hook_chars": 13,
+                "fact_chars": [
+                  89,
+                  82,
+                  83,
+                  61,
+                  85
+                ],
+                "facts_total_chars": 408,
+                "cta_chars": 34,
+                "canva_total_chars": 459,
+                "word_count": 67,
+                "fact_word_counts": [
+                  13,
+                  13,
+                  12,
+                  9,
+                  12
+                ],
+                "line_count": 22,
+                "fact_line_counts": [
+                  3,
+                  3,
+                  3,
+                  2,
+                  3
+                ],
+                "hook_word_count": 3,
+                "cta_word_count": 5,
+                "hook_line_count": 1,
+                "cta_line_count": 1,
+                "estimated_read_seconds": 22.6,
+                "replay_ratio": 1.738462,
+                "estimated_loops": 2
+              }
+            },
+            "system_checks": {
+              "schema_version": 2,
+              "post_revision": 2,
+              "content_hash": "d223f83b2d1b0a8b3a9a0dce2a9ceedf27a6bc5b4ee16d1415ed698c6c92d101",
+              "overall_status": "passed",
+              "checks": [
+                {
+                  "id": "trivia.facts.count_valid",
+                  "status": "passed"
+                },
+                {
+                  "id": "trivia.render.exact_match",
+                  "status": "passed"
+                },
+                {
+                  "id": "trivia.render.hard_budget",
+                  "status": "passed"
+                },
+                {
+                  "id": "trivia.sources.url_valid",
+                  "status": "passed"
+                },
+                {
+                  "id": "trivia.reuse.allowed",
+                  "status": "passed"
+                }
+              ]
+            },
+            "editorial_checks": {
+              "schema_version": 2,
+              "post_revision": 2,
+              "content_hash": "d223f83b2d1b0a8b3a9a0dce2a9ceedf27a6bc5b4ee16d1415ed698c6c92d101",
+              "overall_status": "passed",
+              "checks": {
+                "meaning_preserved": "pass",
+                "caption_no_new_claim": "pass",
+                "no_known_substantive_issue": "pass"
+              }
+            },
+            "quality_status": "passed",
+            "fact_bindings": [
+              {
+                "position": 1,
+                "fact_public_id": "QA-ID-884a965b32fc",
+                "fact_role": "general",
+                "rendered_text": "Near Victoria, Butchart Gardens' five-acre Sunken Garden sits in an old limestone quarry.",
+                "allocation_state": "allocated",
+                "source_snapshot": {
+                  "schema_version": 2,
+                  "canonical_claim": "Near Victoria, Butchart Gardens' five-acre Sunken Garden occupies a former limestone quarry.",
+                  "source_url": "https://butchartgardens.com/garden/sunken-garden/"
+                }
+              },
+              {
+                "position": 2,
+                "fact_public_id": "QA-ID-e5a5eb556206",
+                "fact_role": "general",
+                "rendered_text": "When winter conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink.",
+                "allocation_state": "allocated",
+                "source_snapshot": {
+                  "schema_version": 2,
+                  "canonical_claim": "Ottawa's Rideau Canal can become a 7.8-kilometer skating rink when winter conditions allow.",
+                  "source_url": "https://ncc-ccn.gc.ca/places/rideau-canal-skateway"
+                }
+              },
+              {
+                "position": 3,
+                "fact_public_id": "QA-ID-1268acfb018c",
+                "fact_role": "general",
+                "rendered_text": "In Calgary, Plus 15 skywalks take pedestrians over streets inside enclosed bridges.",
+                "allocation_state": "allocated",
+                "source_snapshot": {
+                  "schema_version": 2,
+                  "canonical_claim": "Calgary's Plus 15 network lets pedestrians cross streets on enclosed elevated skywalks.",
+                  "source_url": "https://www.calgary.ca/bike-walk-roll/plus-15-network.html"
+                }
+              },
+              {
+                "position": 4,
+                "fact_public_id": "QA-ID-5706f9460788",
+                "fact_role": "general",
+                "rendered_text": "Toronto's PATH stretches over 30 km, mostly beneath downtown.",
+                "allocation_state": "allocated",
+                "source_snapshot": {
+                  "schema_version": 2,
+                  "canonical_claim": "Toronto's PATH walkway network stretches more than 30 kilometers, mostly under downtown.",
+                  "source_url": "https://www.toronto.ca/explore-enjoy/visitor-toronto/path-torontos-downtown-pedestrian-walkway/"
+                }
+              },
+              {
+                "position": 5,
+                "fact_public_id": "QA-ID-9b5dc66f3012",
+                "fact_role": "general",
+                "rendered_text": "Historic Quebec City has North America's only surviving complete colonial city walls.",
+                "allocation_state": "allocated",
+                "source_snapshot": {
+                  "schema_version": 2,
+                  "canonical_claim": "Quebec City's historic district preserves North America's only surviving complete colonial city walls.",
+                  "source_url": "https://www.pc.gc.ca/apps/dfhd/page_nhs_eng.aspx?id=680"
+                }
+              }
+            ],
+            "created_at": "2026-11-06T05:39:00.340403Z",
+            "updated_at": "2026-11-06T06:55:30.363718Z",
+            "content_schema_version": 2
+          },
+          "approval": null,
+          "plan_item_public_id": "QA-ID-02b4a58bcf76",
+          "current_fact_warnings": [],
+          "latest_metrics": null
+        }
+      },
+      "intermediate_verdict": "Needs revision — unnecessary broad geographic uniqueness assertion; not final accepted copy",
+      "reason": "Conservative wording without broad uniqueness assertion; Ottawa skating ending. No new source verification."
+    },
+    "B3": {
+      "from_revision": 1,
+      "to_revision": 2,
+      "rounds": 1
+    },
+    "B5": {
+      "from_revision": 1,
+      "to_revision": 2,
+      "rounds": 1,
+      "plan_item_format_remains": "comparison",
+      "current_post_format": "single_subject_fast",
+      "compatibility": "revise_post_v2 validates Page config and does not rewrite completed plan item"
+    }
+  },
+  "technical_events": {
+    "B2": [
+      "Host-reported local text-length validation failures before Write; no state change",
+      "FACT_CATALOG_CONFLICT rolled_back, fresh context/dedup, subsequent revision readback"
+    ],
+    "B5": [
+      "FACT_CATALOG_CONFLICT rolled_back, fresh dedup/context, subsequent revision readback"
+    ],
+    "coordinator": [
+      "Read list_posts limit 100 rejected (maximum 50); corrected to 50, inventory complete. No business write."
+    ]
+  },
+  "research_limit": "No fact-source URLs opened/reverified. Canonical snapshots and existing QA source pool only. Semantic/qualifier review and conservative public copy; not fresh factual certification.",
+  "regression_limit": "Six passing saved posts unchanged byte-for-byte on fresh readback; not six new generation attempts on 0.5.7. Four failed cases repaired through fresh ChatGPT host chats with targeted feedback, not first-pass performance.",
+  "egress": "Private chat URLs and object/release identifiers remain local; public PR/Issues contain sanitized source/CI and aggregated outcomes only.",
+  "issues": [
+    134,
+    135,
+    136
+  ],
+  "public_snapshot": {
+    "redacted": true,
+    "notice": "Stable QA-ID aliases and private-reference placeholders replace object/release identifiers and private ChatGPT URLs. This is documentation evidence, not an executable production payload. Raw evidence and original hashes remain in local commits.",
+    "original_sha256": "93e3074d188a3d3b40d5cc7227ff516bc1f1b49648c993fb11a46148a714eea2"
+  }
+}

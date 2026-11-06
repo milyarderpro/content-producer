@@ -1,0 +1,1895 @@
+{
+  "schema_version": 1,
+  "test_id": "DNA-SAVED-056-01",
+  "date": "2026-11-06",
+  "scope": "Task 6.3; five singular QA drafts, not a batch; no D6/FIXED claim",
+  "source_sha": "82f698b0c7f873fc5906919ae64f34242cb49e61",
+  "plugin_version": "0.5.6",
+  "plugin_release_id": "QA-RELEASE-cb7b33da5f8d",
+  "page_public_id": "QA-ID-7b6e770529b4",
+  "config_updated_at": "2026-10-21T16:08:12.627461Z",
+  "reuse_scope": "workspace_unique",
+  "baseline_post_count": 0,
+  "cases": {
+    "E01": {
+      "host_chat": "PRIVATE-REFERENCE-0eccd08038bd",
+      "research_basis": "previous QA research pool; no source URL reverification",
+      "expected": {
+        "format_key": "single_subject_fast",
+        "topic_key": "animals",
+        "interaction_goal": "share",
+        "caption": "Red pandas have more surprises than you might expect. Which fact would you share with a friend?",
+        "hashtags": [
+          "#RedPanda",
+          "#AnimalFacts",
+          "#WildlifeTrivia"
+        ],
+        "facts": [
+          "Red pandas got the name \"panda\" before giant pandas did.",
+          "Thick fur even covers the bottoms of red pandas' feet.",
+          "Reddish coats help them blend into moss-covered branches.",
+          "Young red pandas can whistle when they're distressed.",
+          "Red pandas use their tongues to inspect scent marks.",
+          "Red pandas have their own animal family, separate from bears.",
+          "When threatened, red pandas may stand upright and swipe with sharp claws."
+        ],
+        "cta": "Share this with a red panda fan.",
+        "sources": [
+          "https://nationalzoo.si.edu/animals/news/red-panda-bear-and-more-red-panda-facts",
+          "https://animals.sandiegozoo.org/animals/red-panda",
+          "https://nationalzoo.si.edu/animals/red-panda",
+          "https://nationalzoo.si.edu/animals/red-panda",
+          "https://animals.sandiegozoo.org/animals/red-panda",
+          "https://nationalzoo.si.edu/animals/news/red-panda-bear-and-more-red-panda-facts",
+          "https://animals.sandiegozoo.org/animals/red-panda"
+        ],
+        "canva_copy": "Did you know?\n\nRed pandas got the name \"panda\" before giant pandas did.\n\nThick fur even covers the bottoms of red pandas' feet.\n\nReddish coats help them blend into moss-covered branches.\n\nYoung red pandas can whistle when they're distressed.\n\nRed pandas use their tongues to inspect scent marks.\n\nRed pandas have their own animal family, separate from bears.\n\nWhen threatened, red pandas may stand upright and swipe with sharp claws.\n\nShare this with a red panda fan.",
+        "claims": [
+          "Red pandas were called pandas before giant pandas were.",
+          "Red pandas have thick fur on the bottoms of their feet.",
+          "Red pandas' reddish coats blend into moss-covered tree branches.",
+          "Young red pandas whistle when distressed.",
+          "Red pandas use their tongues to investigate scent marks.",
+          "Red pandas belong to their own animal family, not the bear family.",
+          "Threatened red pandas may stand upright and swipe with sharp claws."
+        ]
+      },
+      "readback": {
+        "post": {
+          "post_public_id": "QA-ID-834222c2456a",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+          "format_key": "single_subject_fast",
+          "topic_key": "animals",
+          "interaction_goal": "share",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "red pandas",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Red pandas got the name \"panda\" before giant pandas did."
+                },
+                {
+                  "position": 2,
+                  "text": "Thick fur even covers the bottoms of red pandas' feet."
+                },
+                {
+                  "position": 3,
+                  "text": "Reddish coats help them blend into moss-covered branches."
+                },
+                {
+                  "position": 4,
+                  "text": "Young red pandas can whistle when they're distressed."
+                },
+                {
+                  "position": 5,
+                  "text": "Red pandas use their tongues to inspect scent marks."
+                },
+                {
+                  "position": 6,
+                  "text": "Red pandas have their own animal family, separate from bears."
+                },
+                {
+                  "position": 7,
+                  "text": "When threatened, red pandas may stand upright and swipe with sharp claws."
+                }
+              ]
+            },
+            "cta": "Share this with a red panda fan.",
+            "canva_copy": "Did you know?\n\nRed pandas got the name \"panda\" before giant pandas did.\n\nThick fur even covers the bottoms of red pandas' feet.\n\nReddish coats help them blend into moss-covered branches.\n\nYoung red pandas can whistle when they're distressed.\n\nRed pandas use their tongues to inspect scent marks.\n\nRed pandas have their own animal family, separate from bears.\n\nWhen threatened, red pandas may stand upright and swipe with sharp claws.\n\nShare this with a red panda fan.",
+            "caption": "Red pandas have more surprises than you might expect. Which fact would you share with a friend?",
+            "hashtags": [
+              "#RedPanda",
+              "#AnimalFacts",
+              "#WildlifeTrivia"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                56,
+                54,
+                57,
+                53,
+                52,
+                61,
+                73
+              ],
+              "facts_total_chars": 418,
+              "cta_chars": 32,
+              "canva_total_chars": 467,
+              "word_count": 77,
+              "fact_word_counts": [
+                10,
+                10,
+                8,
+                8,
+                9,
+                10,
+                12
+              ],
+              "line_count": 25,
+              "fact_line_counts": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                3
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 7,
+              "hook_line_count": 1,
+              "cta_line_count": 1,
+              "estimated_read_seconds": 26.3,
+              "replay_ratio": 2.023077,
+              "estimated_loops": 3
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-49b5affd0aa9",
+              "fact_role": "general",
+              "rendered_text": "Red pandas got the name \"panda\" before giant pandas did.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Red pandas were called pandas before giant pandas were.",
+                "source_url": "https://nationalzoo.si.edu/animals/news/red-panda-bear-and-more-red-panda-facts"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-b22bfd02efa2",
+              "fact_role": "general",
+              "rendered_text": "Thick fur even covers the bottoms of red pandas' feet.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Red pandas have thick fur on the bottoms of their feet.",
+                "source_url": "https://animals.sandiegozoo.org/animals/red-panda"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-9f94fe614593",
+              "fact_role": "general",
+              "rendered_text": "Reddish coats help them blend into moss-covered branches.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Red pandas' reddish coats blend into moss-covered tree branches.",
+                "source_url": "https://nationalzoo.si.edu/animals/red-panda"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-40ea949c7875",
+              "fact_role": "general",
+              "rendered_text": "Young red pandas can whistle when they're distressed.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Young red pandas whistle when distressed.",
+                "source_url": "https://nationalzoo.si.edu/animals/red-panda"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-a481576307b1",
+              "fact_role": "general",
+              "rendered_text": "Red pandas use their tongues to inspect scent marks.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Red pandas use their tongues to investigate scent marks.",
+                "source_url": "https://animals.sandiegozoo.org/animals/red-panda"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-c53820e1332c",
+              "fact_role": "general",
+              "rendered_text": "Red pandas have their own animal family, separate from bears.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Red pandas belong to their own animal family, not the bear family.",
+                "source_url": "https://nationalzoo.si.edu/animals/news/red-panda-bear-and-more-red-panda-facts"
+              }
+            },
+            {
+              "position": 7,
+              "fact_public_id": "QA-ID-50e69ba5decd",
+              "fact_role": "general",
+              "rendered_text": "When threatened, red pandas may stand upright and swipe with sharp claws.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Threatened red pandas may stand upright and swipe with sharp claws.",
+                "source_url": "https://animals.sandiegozoo.org/animals/red-panda"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T02:13:34.401739Z",
+          "updated_at": "2026-11-06T02:13:34.401739Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": null,
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      },
+      "comparison": {
+        "id": "E01",
+        "post_public_id": "QA-ID-834222c2456a",
+        "copy_exact": true,
+        "body_order_exact": true,
+        "source_order_exact": true,
+        "caption_exact": true,
+        "hashtags_exact": true,
+        "page": "QA-ID-7b6e770529b4",
+        "status": "draft",
+        "revision": 1,
+        "format_exact": true,
+        "quality_status": "passed",
+        "system_checks": {
+          "schema_version": 2,
+          "post_revision": 1,
+          "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+          "overall_status": "passed",
+          "checks": [
+            {
+              "id": "trivia.facts.count_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.exact_match",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.hard_budget",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.sources.url_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.reuse.allowed",
+              "status": "passed"
+            }
+          ]
+        },
+        "editorial_checks": {
+          "schema_version": 2,
+          "post_revision": 1,
+          "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+          "overall_status": "passed",
+          "checks": {
+            "meaning_preserved": "pass",
+            "caption_no_new_claim": "pass",
+            "no_known_substantive_issue": "pass"
+          }
+        },
+        "approval": null,
+        "plan_item": null,
+        "scheduled_at": null,
+        "warnings": [],
+        "claims_exact": true,
+        "topic_exact": true,
+        "goal_exact": true,
+        "check_revision_hash_exact": true
+      },
+      "outcome": "PASS LIVE saved-copy; guided pre-save editorial review"
+    },
+    "E08": {
+      "host_chat": "PRIVATE-REFERENCE-479968246778",
+      "research_basis": "previous QA research pool; no source URL reverification",
+      "expected": {
+        "format_key": "themed_utility",
+        "topic_key": "food_storage_home",
+        "interaction_goal": "save",
+        "caption": "Small storage habits worth remembering for berries and leafy greens. Save this guide for your next grocery trip.",
+        "hashtags": [
+          "#FoodStorage",
+          "#KitchenTips",
+          "#FreshProduce"
+        ],
+        "facts": [
+          "Keep berries unwashed in the fridge; rinse them only before eating.",
+          "Leave strawberry tops attached until you're ready to prepare them.",
+          "Keep loose spinach in an open bag in your refrigerator's crisper.",
+          "Keep raspberries in shallow containers to prevent crushing.",
+          "Keep greens away from apples; their ripening gas can cause yellowing.",
+          "Prewashed, ready-to-eat salad needs refrigeration, but no extra rinse."
+        ],
+        "cta": "Save this for your next grocery trip.",
+        "sources": [
+          "https://communityhealth.ucsd.edu/work/eat-ca/berries",
+          "https://foodsafety.uconn.edu/storing-fresh-garden-produce/",
+          "https://extension.colostate.edu/resource/how-to-use-lettuce-and-other-greens/",
+          "https://extension.sdstate.edu/raspberries-harvest-and-storage",
+          "https://extension.colostate.edu/resource/how-to-use-lettuce-and-other-greens/",
+          "https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely"
+        ],
+        "canva_copy": "Did you know?\n\nKeep berries unwashed in the fridge; rinse them only before eating.\n\nLeave strawberry tops attached until you're ready to prepare them.\n\nKeep loose spinach in an open bag in your refrigerator's crisper.\n\nKeep raspberries in shallow containers to prevent crushing.\n\nKeep greens away from apples; their ripening gas can cause yellowing.\n\nPrewashed, ready-to-eat salad needs refrigeration, but no extra rinse.\n\nSave this for your next grocery trip.",
+        "claims": [
+          "Store berries unwashed in the refrigerator and rinse them just before eating.",
+          "Leave strawberry tops attached until you're ready to prepare them.",
+          "Keep loose spinach in an open bag in the refrigerator crisper.",
+          "Store raspberries in shallow containers to prevent crushing.",
+          "Store leafy greens away from apples; ethylene released by apples can accelerate yellowing.",
+          "Keep prewashed, ready-to-eat salad refrigerated; it does not need an extra rinse."
+        ]
+      },
+      "readback": {
+        "post": {
+          "post_public_id": "QA-ID-1112e26848ac",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+          "format_key": "themed_utility",
+          "topic_key": "food_storage_home",
+          "interaction_goal": "save",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Berries and leafy greens",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Keep berries unwashed in the fridge; rinse them only before eating."
+                },
+                {
+                  "position": 2,
+                  "text": "Leave strawberry tops attached until you're ready to prepare them."
+                },
+                {
+                  "position": 3,
+                  "text": "Keep loose spinach in an open bag in your refrigerator's crisper."
+                },
+                {
+                  "position": 4,
+                  "text": "Keep raspberries in shallow containers to prevent crushing."
+                },
+                {
+                  "position": 5,
+                  "text": "Keep greens away from apples; their ripening gas can cause yellowing."
+                },
+                {
+                  "position": 6,
+                  "text": "Prewashed, ready-to-eat salad needs refrigeration, but no extra rinse."
+                }
+              ]
+            },
+            "cta": "Save this for your next grocery trip.",
+            "canva_copy": "Did you know?\n\nKeep berries unwashed in the fridge; rinse them only before eating.\n\nLeave strawberry tops attached until you're ready to prepare them.\n\nKeep loose spinach in an open bag in your refrigerator's crisper.\n\nKeep raspberries in shallow containers to prevent crushing.\n\nKeep greens away from apples; their ripening gas can cause yellowing.\n\nPrewashed, ready-to-eat salad needs refrigeration, but no extra rinse.\n\nSave this for your next grocery trip.",
+            "caption": "Small storage habits worth remembering for berries and leafy greens. Save this guide for your next grocery trip.",
+            "hashtags": [
+              "#FoodStorage",
+              "#KitchenTips",
+              "#FreshProduce"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                67,
+                66,
+                65,
+                59,
+                69,
+                70
+              ],
+              "facts_total_chars": 406,
+              "cta_chars": 37,
+              "canva_total_chars": 460,
+              "word_count": 70,
+              "fact_word_counts": [
+                11,
+                10,
+                11,
+                8,
+                11,
+                9
+              ],
+              "line_count": 26,
+              "fact_line_counts": [
+                3,
+                3,
+                2,
+                2,
+                3,
+                3
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 7,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 23.8,
+              "replay_ratio": 1.830769,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-6502e38f65b2",
+              "fact_role": "general",
+              "rendered_text": "Keep berries unwashed in the fridge; rinse them only before eating.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Store berries unwashed in the refrigerator and rinse them just before eating.",
+                "source_url": "https://communityhealth.ucsd.edu/work/eat-ca/berries"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-cde23ba7d05a",
+              "fact_role": "general",
+              "rendered_text": "Leave strawberry tops attached until you're ready to prepare them.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Leave strawberry tops attached until you're ready to prepare them.",
+                "source_url": "https://foodsafety.uconn.edu/storing-fresh-garden-produce/"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-442c299abeb0",
+              "fact_role": "general",
+              "rendered_text": "Keep loose spinach in an open bag in your refrigerator's crisper.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Keep loose spinach in an open bag in the refrigerator crisper.",
+                "source_url": "https://extension.colostate.edu/resource/how-to-use-lettuce-and-other-greens/"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-b717cc2aab76",
+              "fact_role": "general",
+              "rendered_text": "Keep raspberries in shallow containers to prevent crushing.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Store raspberries in shallow containers to prevent crushing.",
+                "source_url": "https://extension.sdstate.edu/raspberries-harvest-and-storage"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-a1b321897fe5",
+              "fact_role": "general",
+              "rendered_text": "Keep greens away from apples; their ripening gas can cause yellowing.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Store leafy greens away from apples; ethylene released by apples can accelerate yellowing.",
+                "source_url": "https://extension.colostate.edu/resource/how-to-use-lettuce-and-other-greens/"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-be7a61400ff8",
+              "fact_role": "general",
+              "rendered_text": "Prewashed, ready-to-eat salad needs refrigeration, but no extra rinse.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Keep prewashed, ready-to-eat salad refrigerated; it does not need an extra rinse.",
+                "source_url": "https://www.fda.gov/food/buy-store-serve-safe-food/selecting-and-serving-produce-safely"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T02:11:50.787293Z",
+          "updated_at": "2026-11-06T02:11:50.787293Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": null,
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      },
+      "comparison": {
+        "id": "E08",
+        "post_public_id": "QA-ID-1112e26848ac",
+        "copy_exact": true,
+        "body_order_exact": true,
+        "source_order_exact": true,
+        "caption_exact": true,
+        "hashtags_exact": true,
+        "page": "QA-ID-7b6e770529b4",
+        "status": "draft",
+        "revision": 1,
+        "format_exact": true,
+        "quality_status": "passed",
+        "system_checks": {
+          "schema_version": 2,
+          "post_revision": 1,
+          "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+          "overall_status": "passed",
+          "checks": [
+            {
+              "id": "trivia.facts.count_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.exact_match",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.hard_budget",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.sources.url_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.reuse.allowed",
+              "status": "passed"
+            }
+          ]
+        },
+        "editorial_checks": {
+          "schema_version": 2,
+          "post_revision": 1,
+          "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+          "overall_status": "passed",
+          "checks": {
+            "meaning_preserved": "pass",
+            "caption_no_new_claim": "pass",
+            "no_known_substantive_issue": "pass"
+          }
+        },
+        "approval": null,
+        "plan_item": null,
+        "scheduled_at": null,
+        "warnings": [],
+        "claims_exact": true,
+        "topic_exact": true,
+        "goal_exact": true,
+        "check_revision_hash_exact": true
+      },
+      "outcome": "PASS LIVE saved-copy; guided pre-save editorial review"
+    },
+    "E02": {
+      "host_chat": "PRIVATE-REFERENCE-5dee84859d1e",
+      "research_basis": "previous QA research pool; no source URL reverification",
+      "expected": {
+        "format_key": "emotional_animal_collection",
+        "topic_key": "animals",
+        "interaction_goal": "share",
+        "caption": "From scorpion lessons to nighttime snuggles, meerkats have some remarkable habits. Which one surprised you most?",
+        "hashtags": [
+          "#Meerkats",
+          "#AnimalFacts",
+          "#Wildlife"
+        ],
+        "facts": [
+          "Adult meerkats teach pups using scorpions with the stingers removed.",
+          "Meerkats can shut their ears to keep sand out while digging.",
+          "Their burrows have separate rooms for sleeping and using the toilet.",
+          "Together, meerkats can overwhelm even venomous snakes.",
+          "Meerkats press their bellies against cooler rocks to cool off.",
+          "At night, meerkats curl up and snuggle together."
+        ],
+        "cta": "Share this with someone who loves meerkats.",
+        "sources": [
+          "https://animals.sandiegozoo.org/animals/meerkat",
+          "https://animals.sandiegozoo.org/animals/meerkat",
+          "https://animals.sandiegozoo.org/animals/meerkat",
+          "https://animals.sandiegozoo.org/animals/meerkat",
+          "https://animals.sandiegozoo.org/animals/meerkat",
+          "https://animals.sandiegozoo.org/animals/meerkat"
+        ],
+        "canva_copy": "Did you know?\n\nAdult meerkats teach pups using scorpions with the stingers removed.\n\nMeerkats can shut their ears to keep sand out while digging.\n\nTheir burrows have separate rooms for sleeping and using the toilet.\n\nTogether, meerkats can overwhelm even venomous snakes.\n\nMeerkats press their bellies against cooler rocks to cool off.\n\nAt night, meerkats curl up and snuggle together.\n\nShare this with someone who loves meerkats.",
+        "claims": [
+          "Adult meerkats teach pups to handle scorpions after removing the scorpions' stingers.",
+          "Meerkats can close their ears to keep sand out while digging.",
+          "Meerkat burrows have separate chambers for sleeping and toileting.",
+          "Meerkats work together to mob or overwhelm venomous snakes.",
+          "Meerkats cool their bellies against cooler rocks.",
+          "Meerkats huddle or snuggle together at night."
+        ]
+      },
+      "readback": {
+        "post": {
+          "post_public_id": "QA-ID-2f4994901bb3",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+          "format_key": "emotional_animal_collection",
+          "topic_key": "animals",
+          "interaction_goal": "share",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Meerkats",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Adult meerkats teach pups using scorpions with the stingers removed."
+                },
+                {
+                  "position": 2,
+                  "text": "Meerkats can shut their ears to keep sand out while digging."
+                },
+                {
+                  "position": 3,
+                  "text": "Their burrows have separate rooms for sleeping and using the toilet."
+                },
+                {
+                  "position": 4,
+                  "text": "Together, meerkats can overwhelm even venomous snakes."
+                },
+                {
+                  "position": 5,
+                  "text": "Meerkats press their bellies against cooler rocks to cool off."
+                },
+                {
+                  "position": 6,
+                  "text": "At night, meerkats curl up and snuggle together."
+                }
+              ]
+            },
+            "cta": "Share this with someone who loves meerkats.",
+            "canva_copy": "Did you know?\n\nAdult meerkats teach pups using scorpions with the stingers removed.\n\nMeerkats can shut their ears to keep sand out while digging.\n\nTheir burrows have separate rooms for sleeping and using the toilet.\n\nTogether, meerkats can overwhelm even venomous snakes.\n\nMeerkats press their bellies against cooler rocks to cool off.\n\nAt night, meerkats curl up and snuggle together.\n\nShare this with someone who loves meerkats.",
+            "caption": "From scorpion lessons to nighttime snuggles, meerkats have some remarkable habits. Which one surprised you most?",
+            "hashtags": [
+              "#Meerkats",
+              "#AnimalFacts",
+              "#Wildlife"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                68,
+                60,
+                68,
+                54,
+                62,
+                48
+              ],
+              "facts_total_chars": 370,
+              "cta_chars": 43,
+              "canva_total_chars": 430,
+              "word_count": 67,
+              "fact_word_counts": [
+                10,
+                11,
+                11,
+                7,
+                10,
+                8
+              ],
+              "line_count": 23,
+              "fact_line_counts": [
+                3,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 7,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 22.9,
+              "replay_ratio": 1.761538,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-da28c15bc102",
+              "fact_role": "general",
+              "rendered_text": "Adult meerkats teach pups using scorpions with the stingers removed.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Adult meerkats teach pups to handle scorpions after removing the scorpions' stingers.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-e76e0a8355c0",
+              "fact_role": "general",
+              "rendered_text": "Meerkats can shut their ears to keep sand out while digging.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Meerkats can close their ears to keep sand out while digging.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-09a51542a49c",
+              "fact_role": "general",
+              "rendered_text": "Their burrows have separate rooms for sleeping and using the toilet.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Meerkat burrows have separate chambers for sleeping and toileting.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-91787b848a67",
+              "fact_role": "general",
+              "rendered_text": "Together, meerkats can overwhelm even venomous snakes.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Meerkats work together to mob or overwhelm venomous snakes.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-d9ba00473317",
+              "fact_role": "general",
+              "rendered_text": "Meerkats press their bellies against cooler rocks to cool off.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Meerkats cool their bellies against cooler rocks.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-9ee78dab7a5d",
+              "fact_role": "general",
+              "rendered_text": "At night, meerkats curl up and snuggle together.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Meerkats huddle or snuggle together at night.",
+                "source_url": "https://animals.sandiegozoo.org/animals/meerkat"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T02:19:39.715132Z",
+          "updated_at": "2026-11-06T02:19:39.715132Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": null,
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      },
+      "comparison": {
+        "id": "E02",
+        "post_public_id": "QA-ID-2f4994901bb3",
+        "copy_exact": true,
+        "body_order_exact": true,
+        "source_order_exact": true,
+        "caption_exact": true,
+        "hashtags_exact": true,
+        "page": "QA-ID-7b6e770529b4",
+        "status": "draft",
+        "revision": 1,
+        "format_exact": true,
+        "quality_status": "passed",
+        "system_checks": {
+          "schema_version": 2,
+          "post_revision": 1,
+          "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+          "overall_status": "passed",
+          "checks": [
+            {
+              "id": "trivia.facts.count_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.exact_match",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.hard_budget",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.sources.url_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.reuse.allowed",
+              "status": "passed"
+            }
+          ]
+        },
+        "editorial_checks": {
+          "schema_version": 2,
+          "post_revision": 1,
+          "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+          "overall_status": "passed",
+          "checks": {
+            "meaning_preserved": "pass",
+            "caption_no_new_claim": "pass",
+            "no_known_substantive_issue": "pass"
+          }
+        },
+        "approval": null,
+        "plan_item": null,
+        "scheduled_at": null,
+        "warnings": [],
+        "claims_exact": true,
+        "topic_exact": true,
+        "goal_exact": true,
+        "check_revision_hash_exact": true
+      },
+      "outcome": "PASS LIVE saved-copy; guided pre-save editorial review"
+    },
+    "E03": {
+      "host_chat": "PRIVATE-REFERENCE-eafa608b55c3",
+      "research_basis": "previous QA research pool; no source URL reverification",
+      "expected": {
+        "format_key": "comparison",
+        "topic_key": "animals",
+        "interaction_goal": "comment",
+        "caption": "African vs. Asian elephants: which difference caught your attention? Tell us in the comments!",
+        "hashtags": [
+          "#ElephantFacts",
+          "#WildlifeTrivia",
+          "#AnimalFacts"
+        ],
+        "facts": [
+          "African elephants have two trunk \"fingers\"; Asian elephants have one.",
+          "African elephants have larger ears than Asian elephants.",
+          "Asian elephants have twin head domes; African elephants have rounder heads.",
+          "African savanna elephants generally outweigh Asian elephants.",
+          "Africa has two living elephant species; Asia has just one.",
+          "African savanna elephants' backs dip; Asian elephants' backs usually arch.",
+          "Female African elephants often have tusks; Asian females rarely have visible ones."
+        ],
+        "cta": "Which difference surprised you most?",
+        "sources": [
+          "https://www.wcs.org/get-involved/updates/how-to-tell-an-african-elephant-from-an-asian-elephant",
+          "https://www.wcs.org/get-involved/updates/how-to-tell-an-african-elephant-from-an-asian-elephant",
+          "https://elephantconservation.org/faq-items/how-can-you-tell-the-difference-between-an-african-and-an-asian-elephant/",
+          "https://www.worldwildlife.org/species/elephant/",
+          "https://www.worldwildlife.org/species/elephant/",
+          "https://elephantconservation.org/faq-items/how-can-you-tell-the-difference-between-an-african-and-an-asian-elephant/",
+          "https://www.wcs.org/get-involved/updates/how-to-tell-an-african-elephant-from-an-asian-elephant"
+        ],
+        "canva_copy": "Did you know?\n\nAfrican elephants have two trunk \"fingers\"; Asian elephants have one.\n\nAfrican elephants have larger ears than Asian elephants.\n\nAsian elephants have twin head domes; African elephants have rounder heads.\n\nAfrican savanna elephants generally outweigh Asian elephants.\n\nAfrica has two living elephant species; Asia has just one.\n\nAfrican savanna elephants' backs dip; Asian elephants' backs usually arch.\n\nFemale African elephants often have tusks; Asian females rarely have visible ones.\n\nWhich difference surprised you most?",
+        "claims": [
+          "African elephants have two fingerlike tips on their trunks, while Asian elephants have one.",
+          "African elephants have larger ears than Asian elephants.",
+          "African elephants have rounded heads, while Asian elephants have twin domes.",
+          "African savanna elephants generally weigh more than Asian elephants.",
+          "Africa has two living elephant species, while Asia has one.",
+          "African savanna elephants have backs that dip, while Asian elephants' backs usually arch upward.",
+          "African female elephants often have tusks, while Asian females rarely have visible tusks."
+        ]
+      },
+      "readback": {
+        "post": {
+          "post_public_id": "QA-ID-2efa1c2e80c0",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+          "format_key": "comparison",
+          "topic_key": "animals",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "African vs. Asian elephants",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "African elephants have two trunk \"fingers\"; Asian elephants have one."
+                },
+                {
+                  "position": 2,
+                  "text": "African elephants have larger ears than Asian elephants."
+                },
+                {
+                  "position": 3,
+                  "text": "Asian elephants have twin head domes; African elephants have rounder heads."
+                },
+                {
+                  "position": 4,
+                  "text": "African savanna elephants generally outweigh Asian elephants."
+                },
+                {
+                  "position": 5,
+                  "text": "Africa has two living elephant species; Asia has just one."
+                },
+                {
+                  "position": 6,
+                  "text": "African savanna elephants' backs dip; Asian elephants' backs usually arch."
+                },
+                {
+                  "position": 7,
+                  "text": "Female African elephants often have tusks; Asian females rarely have visible ones."
+                }
+              ]
+            },
+            "cta": "Which difference surprised you most?",
+            "canva_copy": "Did you know?\n\nAfrican elephants have two trunk \"fingers\"; Asian elephants have one.\n\nAfrican elephants have larger ears than Asian elephants.\n\nAsian elephants have twin head domes; African elephants have rounder heads.\n\nAfrican savanna elephants generally outweigh Asian elephants.\n\nAfrica has two living elephant species; Asia has just one.\n\nAfrican savanna elephants' backs dip; Asian elephants' backs usually arch.\n\nFemale African elephants often have tusks; Asian females rarely have visible ones.\n\nWhich difference surprised you most?",
+            "caption": "African vs. Asian elephants: which difference caught your attention? Tell us in the comments!",
+            "hashtags": [
+              "#ElephantFacts",
+              "#WildlifeTrivia",
+              "#AnimalFacts"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                69,
+                56,
+                75,
+                61,
+                58,
+                74,
+                82
+              ],
+              "facts_total_chars": 487,
+              "cta_chars": 36,
+              "canva_total_chars": 540,
+              "word_count": 76,
+              "fact_word_counts": [
+                10,
+                8,
+                11,
+                7,
+                10,
+                10,
+                12
+              ],
+              "line_count": 30,
+              "fact_line_counts": [
+                3,
+                2,
+                3,
+                3,
+                2,
+                3,
+                3
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 5,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 26,
+              "replay_ratio": 2,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-eed358a505ac",
+              "fact_role": "general",
+              "rendered_text": "African elephants have two trunk \"fingers\"; Asian elephants have one.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African elephants have two fingerlike tips on their trunks, while Asian elephants have one.",
+                "source_url": "https://www.wcs.org/get-involved/updates/how-to-tell-an-african-elephant-from-an-asian-elephant"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-f5474824a57f",
+              "fact_role": "general",
+              "rendered_text": "African elephants have larger ears than Asian elephants.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African elephants have larger ears than Asian elephants.",
+                "source_url": "https://www.wcs.org/get-involved/updates/how-to-tell-an-african-elephant-from-an-asian-elephant"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-d549e62d0558",
+              "fact_role": "general",
+              "rendered_text": "Asian elephants have twin head domes; African elephants have rounder heads.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African elephants have rounded heads, while Asian elephants have twin domes.",
+                "source_url": "https://elephantconservation.org/faq-items/how-can-you-tell-the-difference-between-an-african-and-an-asian-elephant/"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-9e28dba9f1c0",
+              "fact_role": "general",
+              "rendered_text": "African savanna elephants generally outweigh Asian elephants.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African savanna elephants generally weigh more than Asian elephants.",
+                "source_url": "https://www.worldwildlife.org/species/elephant/"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-2a2e5c94cb96",
+              "fact_role": "general",
+              "rendered_text": "Africa has two living elephant species; Asia has just one.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Africa has two living elephant species, while Asia has one.",
+                "source_url": "https://www.worldwildlife.org/species/elephant/"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-c38e7633f95e",
+              "fact_role": "general",
+              "rendered_text": "African savanna elephants' backs dip; Asian elephants' backs usually arch.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African savanna elephants have backs that dip, while Asian elephants' backs usually arch upward.",
+                "source_url": "https://elephantconservation.org/faq-items/how-can-you-tell-the-difference-between-an-african-and-an-asian-elephant/"
+              }
+            },
+            {
+              "position": 7,
+              "fact_public_id": "QA-ID-1d7ef147598b",
+              "fact_role": "general",
+              "rendered_text": "Female African elephants often have tusks; Asian females rarely have visible ones.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "African female elephants often have tusks, while Asian females rarely have visible tusks.",
+                "source_url": "https://www.wcs.org/get-involved/updates/how-to-tell-an-african-elephant-from-an-asian-elephant"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T02:15:40.670600Z",
+          "updated_at": "2026-11-06T02:15:40.670600Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": null,
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      },
+      "comparison": {
+        "id": "E03",
+        "post_public_id": "QA-ID-2efa1c2e80c0",
+        "copy_exact": true,
+        "body_order_exact": true,
+        "source_order_exact": true,
+        "caption_exact": true,
+        "hashtags_exact": true,
+        "page": "QA-ID-7b6e770529b4",
+        "status": "draft",
+        "revision": 1,
+        "format_exact": true,
+        "quality_status": "passed",
+        "system_checks": {
+          "schema_version": 2,
+          "post_revision": 1,
+          "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+          "overall_status": "passed",
+          "checks": [
+            {
+              "id": "trivia.facts.count_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.exact_match",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.hard_budget",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.sources.url_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.reuse.allowed",
+              "status": "passed"
+            }
+          ]
+        },
+        "editorial_checks": {
+          "schema_version": 2,
+          "post_revision": 1,
+          "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+          "overall_status": "passed",
+          "checks": {
+            "meaning_preserved": "pass",
+            "caption_no_new_claim": "pass",
+            "no_known_substantive_issue": "pass"
+          }
+        },
+        "approval": null,
+        "plan_item": null,
+        "scheduled_at": null,
+        "warnings": [],
+        "claims_exact": true,
+        "topic_exact": true,
+        "goal_exact": true,
+        "check_revision_hash_exact": true
+      },
+      "outcome": "PASS LIVE saved-copy; guided pre-save editorial review"
+    },
+    "E04": {
+      "host_chat": "PRIVATE-REFERENCE-ce9889ad2a2a",
+      "research_basis": "previous QA research pool; no source URL reverification",
+      "expected": {
+        "format_key": "myth_vs_fact",
+        "topic_key": "animals",
+        "interaction_goal": "comment",
+        "caption": "Bats have a reputation built on some pretty persistent myths. Which one did you grow up believing?",
+        "hashtags": [
+          "#BatFacts",
+          "#AnimalMyths",
+          "#WildlifeTrivia"
+        ],
+        "facts": [
+          "Flying fox bats use sight and smell, not echolocation.",
+          "Some bats roost in trees, not just caves.",
+          "Bats groom themselves regularly; they're not naturally filthy.",
+          "Some bats migrate for winter instead of hibernating.",
+          "Bats don't gnaw through wood or wires like mice.",
+          "Some bats eat fruit or drink nectar, not just insects."
+        ],
+        "cta": "Which bat myth surprised you the most?",
+        "sources": [
+          "https://www.batcon.org/five-false-myths-about-batsand-one-thats-actually-true/",
+          "https://home.nps.gov/subjects/bats/myth-busters.htm",
+          "https://home.nps.gov/subjects/bats/myth-busters.htm",
+          "https://wdfw.wa.gov/species-habitats/living/species-facts/bats",
+          "https://wdfw.wa.gov/species-habitats/living/species-facts/bats",
+          "https://www.batcon.org/five-false-myths-about-batsand-one-thats-actually-true/"
+        ],
+        "canva_copy": "Did you know?\n\nFlying fox bats use sight and smell, not echolocation.\n\nSome bats roost in trees, not just caves.\n\nBats groom themselves regularly; they're not naturally filthy.\n\nSome bats migrate for winter instead of hibernating.\n\nBats don't gnaw through wood or wires like mice.\n\nSome bats eat fruit or drink nectar, not just insects.\n\nWhich bat myth surprised you the most?",
+        "claims": [
+          "Not all bats echolocate; flying foxes rely on sight and smell.",
+          "Not all bats live in caves; some roost in trees.",
+          "Bats groom themselves and are not naturally filthy.",
+          "Some bats migrate for winter instead of hibernating.",
+          "Bats do not gnaw wood or wires like mice.",
+          "Some bats eat fruit or nectar rather than only insects."
+        ]
+      },
+      "readback": {
+        "post": {
+          "post_public_id": "QA-ID-9b0689b5acf3",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+          "format_key": "myth_vs_fact",
+          "topic_key": "animals",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "common bat myths",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Flying fox bats use sight and smell, not echolocation."
+                },
+                {
+                  "position": 2,
+                  "text": "Some bats roost in trees, not just caves."
+                },
+                {
+                  "position": 3,
+                  "text": "Bats groom themselves regularly; they're not naturally filthy."
+                },
+                {
+                  "position": 4,
+                  "text": "Some bats migrate for winter instead of hibernating."
+                },
+                {
+                  "position": 5,
+                  "text": "Bats don't gnaw through wood or wires like mice."
+                },
+                {
+                  "position": 6,
+                  "text": "Some bats eat fruit or drink nectar, not just insects."
+                }
+              ]
+            },
+            "cta": "Which bat myth surprised you the most?",
+            "canva_copy": "Did you know?\n\nFlying fox bats use sight and smell, not echolocation.\n\nSome bats roost in trees, not just caves.\n\nBats groom themselves regularly; they're not naturally filthy.\n\nSome bats migrate for winter instead of hibernating.\n\nBats don't gnaw through wood or wires like mice.\n\nSome bats eat fruit or drink nectar, not just insects.\n\nWhich bat myth surprised you the most?",
+            "caption": "Bats have a reputation built on some pretty persistent myths. Which one did you grow up believing?",
+            "hashtags": [
+              "#BatFacts",
+              "#AnimalMyths",
+              "#WildlifeTrivia"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                54,
+                41,
+                62,
+                52,
+                48,
+                54
+              ],
+              "facts_total_chars": 321,
+              "cta_chars": 38,
+              "canva_total_chars": 376,
+              "word_count": 62,
+              "fact_word_counts": [
+                9,
+                8,
+                8,
+                8,
+                9,
+                10
+              ],
+              "line_count": 22,
+              "fact_line_counts": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 7,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 21.4,
+              "replay_ratio": 1.646154,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-c74bbebf7d5a",
+              "fact_role": "general",
+              "rendered_text": "Flying fox bats use sight and smell, not echolocation.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Not all bats echolocate; flying foxes rely on sight and smell.",
+                "source_url": "https://www.batcon.org/five-false-myths-about-batsand-one-thats-actually-true/"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-12c69f6d9065",
+              "fact_role": "general",
+              "rendered_text": "Some bats roost in trees, not just caves.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Not all bats live in caves; some roost in trees.",
+                "source_url": "https://home.nps.gov/subjects/bats/myth-busters.htm"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-e7aedae07590",
+              "fact_role": "general",
+              "rendered_text": "Bats groom themselves regularly; they're not naturally filthy.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Bats groom themselves and are not naturally filthy.",
+                "source_url": "https://home.nps.gov/subjects/bats/myth-busters.htm"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-fbe3e9f57c82",
+              "fact_role": "general",
+              "rendered_text": "Some bats migrate for winter instead of hibernating.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Some bats migrate for winter instead of hibernating.",
+                "source_url": "https://wdfw.wa.gov/species-habitats/living/species-facts/bats"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-839232d4fdf4",
+              "fact_role": "general",
+              "rendered_text": "Bats don't gnaw through wood or wires like mice.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Bats do not gnaw wood or wires like mice.",
+                "source_url": "https://wdfw.wa.gov/species-habitats/living/species-facts/bats"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-b5d136967154",
+              "fact_role": "general",
+              "rendered_text": "Some bats eat fruit or drink nectar, not just insects.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Some bats eat fruit or nectar rather than only insects.",
+                "source_url": "https://www.batcon.org/five-false-myths-about-batsand-one-thats-actually-true/"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T02:17:59.851498Z",
+          "updated_at": "2026-11-06T02:17:59.851498Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": null,
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      },
+      "comparison": {
+        "id": "E04",
+        "post_public_id": "QA-ID-9b0689b5acf3",
+        "copy_exact": true,
+        "body_order_exact": true,
+        "source_order_exact": true,
+        "caption_exact": true,
+        "hashtags_exact": true,
+        "page": "QA-ID-7b6e770529b4",
+        "status": "draft",
+        "revision": 1,
+        "format_exact": true,
+        "quality_status": "passed",
+        "system_checks": {
+          "schema_version": 2,
+          "post_revision": 1,
+          "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+          "overall_status": "passed",
+          "checks": [
+            {
+              "id": "trivia.facts.count_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.exact_match",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.hard_budget",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.sources.url_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.reuse.allowed",
+              "status": "passed"
+            }
+          ]
+        },
+        "editorial_checks": {
+          "schema_version": 2,
+          "post_revision": 1,
+          "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+          "overall_status": "passed",
+          "checks": {
+            "meaning_preserved": "pass",
+            "caption_no_new_claim": "pass",
+            "no_known_substantive_issue": "pass"
+          }
+        },
+        "approval": null,
+        "plan_item": null,
+        "scheduled_at": null,
+        "warnings": [],
+        "claims_exact": true,
+        "topic_exact": true,
+        "goal_exact": true,
+        "check_revision_hash_exact": true
+      },
+      "outcome": "PASS LIVE saved-copy; guided pre-save editorial review"
+    }
+  },
+  "after_posts": {
+    "items": [
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-2f4994901bb3",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "emotional_animal_collection",
+        "topic_key": "animals",
+        "interaction_goal": "share",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T02:19:39.715132Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-9b0689b5acf3",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "myth_vs_fact",
+        "topic_key": "animals",
+        "interaction_goal": "comment",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T02:17:59.851498Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-2efa1c2e80c0",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "comparison",
+        "topic_key": "animals",
+        "interaction_goal": "comment",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T02:15:40.670600Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-834222c2456a",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "single_subject_fast",
+        "topic_key": "animals",
+        "interaction_goal": "share",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T02:13:34.401739Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-1112e26848ac",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "themed_utility",
+        "topic_key": "food_storage_home",
+        "interaction_goal": "save",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T02:11:50.787293Z"
+      }
+    ],
+    "next_cursor": null,
+    "has_more": false
+  },
+  "before_posts": {
+    "items": [],
+    "next_cursor": null,
+    "has_more": false
+  },
+  "host_reported_catalog_versions": {
+    "E08": "18",
+    "E01": "19",
+    "E03": "20",
+    "E04": "21",
+    "E02": null
+  },
+  "dedup_independent_read": {
+    "E02": {
+      "catalog_version": "18",
+      "candidates": [
+        {
+          "candidate_key": "MEER_TEACH",
+          "complete": true,
+          "matches": [
+            {
+              "fact_public_id": "QA-ID-8963bd2702a4",
+              "claim_text": "Meerkats take turns acting as sentinels to watch for predators.",
+              "status": "needs_review",
+              "fact_updated_at": "2026-11-05T06:25:38.509164Z",
+              "reuse_eligibility": "workspace_blocked",
+              "used_on_page": false,
+              "used_in_workspace": true
+            },
+            {
+              "fact_public_id": "QA-ID-05e3bec7a56b",
+              "claim_text": "Scrubbing hands with soap for at least 20 seconds helps remove germs.",
+              "status": "needs_review",
+              "fact_updated_at": "2026-11-05T06:17:56.908436Z",
+              "reuse_eligibility": "workspace_blocked",
+              "used_on_page": false,
+              "used_in_workspace": true
+            },
+            {
+              "fact_public_id": "QA-ID-8f1e2cd2eee9",
+              "claim_text": "Nonbreeding meerkats also help care for young pups.",
+              "status": "needs_review",
+              "fact_updated_at": "2026-11-05T06:25:38.509164Z",
+              "reuse_eligibility": "workspace_blocked",
+              "used_on_page": false,
+              "used_in_workspace": true
+            }
+          ]
+        },
+        {
+          "candidate_key": "MEER_EARS",
+          "complete": true,
+          "matches": []
+        },
+        {
+          "candidate_key": "MEER_GUARD",
+          "complete": true,
+          "matches": []
+        },
+        {
+          "candidate_key": "MEER_BURROW",
+          "complete": true,
+          "matches": [
+            {
+              "fact_public_id": "QA-ID-3abf03f8a134",
+              "claim_text": "Meerkats live in social groups called mobs that may have up to 30 members.",
+              "status": "needs_review",
+              "fact_updated_at": "2026-11-05T06:25:38.509164Z",
+              "reuse_eligibility": "workspace_blocked",
+              "used_on_page": false,
+              "used_in_workspace": true
+            }
+          ]
+        },
+        {
+          "candidate_key": "MEER_SNAKES",
+          "complete": true,
+          "matches": []
+        },
+        {
+          "candidate_key": "MEER_COOL",
+          "complete": true,
+          "matches": []
+        },
+        {
+          "candidate_key": "MEER_SLEEP",
+          "complete": true,
+          "matches": [
+            {
+              "fact_public_id": "QA-ID-3abf03f8a134",
+              "claim_text": "Meerkats live in social groups called mobs that may have up to 30 members.",
+              "status": "needs_review",
+              "fact_updated_at": "2026-11-05T06:25:38.509164Z",
+              "reuse_eligibility": "workspace_blocked",
+              "used_on_page": false,
+              "used_in_workspace": true
+            }
+          ]
+        },
+        {
+          "candidate_key": "MEER_DIG",
+          "complete": true,
+          "matches": []
+        },
+        {
+          "candidate_key": "MEER_GROOM",
+          "complete": true,
+          "matches": [
+            {
+              "fact_public_id": "QA-ID-c7d0eac717d3",
+              "claim_text": "Fathers help guard young meerkats in a social group.",
+              "status": "needs_review",
+              "fact_updated_at": "2026-11-05T06:25:38.509164Z",
+              "reuse_eligibility": "workspace_blocked",
+              "used_on_page": false,
+              "used_in_workspace": true
+            },
+            {
+              "fact_public_id": "QA-ID-3abf03f8a134",
+              "claim_text": "Meerkats live in social groups called mobs that may have up to 30 members.",
+              "status": "needs_review",
+              "fact_updated_at": "2026-11-05T06:25:38.509164Z",
+              "reuse_eligibility": "workspace_blocked",
+              "used_on_page": false,
+              "used_in_workspace": true
+            },
+            {
+              "fact_public_id": "QA-ID-8f1e2cd2eee9",
+              "claim_text": "Nonbreeding meerkats also help care for young pups.",
+              "status": "needs_review",
+              "fact_updated_at": "2026-11-05T06:25:38.509164Z",
+              "reuse_eligibility": "workspace_blocked",
+              "used_on_page": false,
+              "used_in_workspace": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "evidence_limits": [
+    "Host UI responses, not full raw invocation trace. E02 final catalog version was not captured; do not infer it from save order.",
+    "Research reused previous QA pool; source URLs not reopened or reverified.",
+    "Five singular guided drafts; batch and saved-copy D6 verdict NOT RUN."
+  ],
+  "public_snapshot": {
+    "redacted": true,
+    "notice": "Stable QA-ID aliases and private-reference placeholders replace object/release identifiers and private ChatGPT URLs. This is documentation evidence, not an executable production payload. Raw evidence and original hashes remain in local commits.",
+    "original_sha256": "74927e4fa86554f2eeb2a028801ccb2f561bf90fa02d48dd85076c6404b6e48d"
+  }
+}
