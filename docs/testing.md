@@ -85,7 +85,7 @@ hasil lokal bukan formal G4 PASS atau host ChatGPT PASS.
 | `pnpm run gate:backend`                            | Isolated reset/audit, DB dan MCP/Inspector, history/lint/advisors                   | Mendukung shard 15+18 pada kandidat cutover; masing-masing shard memiliki stack mandiri            |
 | `pnpm run gate:full`                               | Konjungsi source dan backend suite kandidat G4                                      | Lokal dengan overlay adalah `DIAGNOSTIC_CONFIG_OVERLAY`, bukan formal exact-config                |
 | `pnpm run smoke-test`                              | Struktur repository, `verify-migrations`, lalu suite database                       | Bukan health-only check; menjalankan DB suite lagi bila dipakai bersama test-all                  |
-| `pnpm run package-plugin`                          | Validasi source dan pembuatan kandidat 13 file                                      | Mengganti kandidat output lama; tidak membuat ZIP/install                                         |
+| `pnpm run package-plugin`                          | Validasi source dan pembuatan kandidat 15 file (CR-061)                              | Mengganti kandidat output lama; tidak membuat ZIP/install                                         |
 | `pnpm exec tsx scripts/verify-plugin-candidate.ts` | Kesamaan daftar file, byte, dan hash kandidat/source                                | Kandidat/filelist sudah dibuat                                                                    |
 
 **Inventaris kandidat cutover:** database **33 file/132 kasus** pada manifest G4,
@@ -240,8 +240,12 @@ ringan. Review risiko backend ditandai terpisah, bukan otomatis menjalankan full
 gate. Dependency baru tetap harus ditambahkan ke pemetaan dan regresinya.
 
 Nama ZIP dan artefak diambil dari versi manifest plugin; kandidat source v0.2.7
-menghasilkan nama v0.2.7, bukan label checkpoint yang ditulis permanen. Kandidat 13 file,
+menghasilkan nama v0.2.7, bukan label checkpoint yang ditulis permanen. Kandidat CR-061 0.5.0 memiliki 15 file,
 allowlist, hash ekstraksi, dan larangan credential/bundled MCP tetap diperiksa.
+Tujuh referensi trivia termasuk atlas/playbook; corpus QA dan companion sumber
+tetap di luar ZIP. Companion `docs/editorial/reference-example-sources.md` adalah
+dependency test corpus sehingga addition/deletion memilih root checks, tanpa
+menjadikannya isi paket. Jumlah 13 file adalah baseline 0.4.0 yang tercatat.
 
 Basis durasi yang tersedia: job light run 39915940238 berlangsung 29 detik,
 run 39800520559 40 detik, sementara full gate 39768822314 berlangsung 23 menit

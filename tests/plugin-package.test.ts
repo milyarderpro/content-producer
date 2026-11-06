@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import {
   cpSync,
   mkdtempSync,
@@ -39,17 +40,29 @@ afterEach(() => {
 describe('Phase 7.4 generated package and source safety', () => {
   it('validates manifest, generator schema, skill, references, policy and exact tool order', () => {
     expect(() => validatePluginSource(root)).not.toThrow();
-    expect(CANDIDATE_FILES).toHaveLength(13);
+    expect(CANDIDATE_FILES).toHaveLength(15);
     expect(CANDIDATE_FILES).toContain('.app.json');
     expect(CANDIDATE_FILES).not.toContain('mcp.json');
   });
 
-  it('builds thirteen allowlisted files and verifies actual candidate hashes', () => {
+  it('builds fifteen allowlisted files and verifies actual candidate hashes', () => {
     const dir = setup();
     const out = join(dir, 'artifacts/plugin-candidate');
     const index = createCandidate(dir, out);
-    expect(index.file_count).toBe(13);
+    expect(index.file_count).toBe(15);
     expect(index.files.every((entry) => entry.sha256.length === 64 && entry.bytes > 0)).toBe(true);
+    expect(index.files.map(entry => entry.path)).toEqual(CANDIDATE_FILES);
+    for (const entry of index.files) {
+      const source = readFileSync(join(dir, 'plugin', entry.path));
+      const candidate = readFileSync(join(out, entry.path));
+      expect(candidate).toEqual(source);
+      expect(entry.bytes).toBe(source.byteLength);
+      expect(entry.sha256).toBe(createHash('sha256').update(source).digest('hex'));
+    }
+    expect(index.files.map(entry => entry.path).filter(path => path.includes('/niches/trivia/')))
+      .toHaveLength(7);
+    expect(index.files.map(entry => entry.path).some(path =>
+      /docs\/|dataset-reference\/|evaluation|example-sources|baseline|remediation/.test(path))).toBe(false);
     expect(verifyCandidate(dir, out)).toEqual(index);
     expect(readFileSync(join(out, 'plugin.json'), 'utf8')).toBe(
       readFileSync(join(dir, 'plugin/plugin.json'), 'utf8'),
@@ -134,4 +147,36 @@ describe('Phase 7.4 generated package and source safety', () => {
     );
     expect(() => validatePluginSource(dir)).toThrow(/endpoint/);
   });
+
+  it.each(['reference-patterns.md', 'writing-playbook.md'])(
+    'validates required content, safety and hashes for bundled %s', (name) => {
+      const dir = setup();
+      const relative = 'skills/content-producer/references/niches/trivia/' + name;
+      expect(CANDIDATE_FILES).toContain(relative);
+      const source = join(dir, 'plugin', relative);
+      const original = readFileSync(source, 'utf8');
+      rmSync(source);
+      expect(() => validatePluginSource(dir)).toThrow(/Required plugin file missing/);
+      writeFileSync(source, original);
+      for (const [addition, error] of [
+        ['\n[escape](../../../../../../README.md)\n', /Broken or escaping reference/],
+        ['\n[encoded escape](%2e%2e/README.md)\n', /Unsafe reference link/],
+        ['\n-----BEGIN PRIVATE KEY-----\n', /credential/],
+        ['\nsave_post\n', /Retired v1 tool/],
+      ] as const) {
+        writeFileSync(source, original + addition);
+        expect(() => validatePluginSource(dir)).toThrow(error);
+      }
+      writeFileSync(source, original);
+      const out = join(dir, 'artifacts/plugin-candidate');
+      const index = createCandidate(dir, out);
+      expect(index.files.find(entry => entry.path === relative)?.sha256)
+        .toBe(createHash('sha256').update(original).digest('hex'));
+      const candidate = join(out, relative);
+      writeFileSync(candidate, original + '\nTampered atlas/playbook.\n');
+      expect(() => verifyCandidate(dir, out)).toThrow(/hashes differ/);
+      rmSync(candidate);
+      expect(() => verifyCandidate(dir, out)).toThrow(/Required plugin file missing/);
+    },
+  );
 });

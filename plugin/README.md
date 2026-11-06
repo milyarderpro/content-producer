@@ -1,69 +1,25 @@
 # Source paket plugin PRIVATE
 
-Direktori ini berisi manifest dan instruksi yang digunakan ChatGPT untuk alur
-Content Producer. [plugin.json](plugin.json) menyatakan kandidat source versi
-`0.4.0`; [.app.json](.app.json) memetakan satu app owner OAuth `mcpku2` yang sudah
-ada. Versi source ini belum membuktikan versi plugin terpasang;
-perubahan source sesudahnya tidak boleh diberi ulang nomor rilis tersebut. Source paket, archive
-kandidat, dan release yang terpasang adalah bukti berbeda; ringkasan bertanggal
-ada di [operations](../docs/operations.md).
+Manifest source kandidat versi `0.5.7`. Packaging bukan instalasi atau bukti
+hasil generasi. App owner OAuth `mcpku2` dipertahankan; tidak ada perubahan backend.
 
-## Isi paket dan batasnya
+Allowlist pada [plugin-package.ts](../scripts/plugin-package.ts) memuat 15 file:
+manifest, mapping app, satu skill, lima referensi core dan tujuh referensi trivia.
+README, changelog, dataset dan corpus QA tidak masuk paket.
 
-Allowlist pada [plugin-package.ts](../scripts/plugin-package.ts) berisi 13 file:
+Sesudah preflight durasi, jalankan `pnpm run package-plugin` lalu
+`pnpm exec tsx scripts/verify-plugin-candidate.ts`. Hasil kandidat/filelist/hash
+berada di `artifacts/` yang diabaikan Git. CI memeriksa ZIP dan seluruh hash.
 
-- `plugin.json` dan `.app.json`;
-- `skills/content-producer/SKILL.md`;
-- lima referensi core dan lima referensi niche trivia.
+DNA mengatur pilihan topik, variasi payoff, urutan dan bahasa en-US sehari-hari.
+Atlas contoh asli dan playbook mengarahkan review sebelum preview/save/revise.
+Sumber contoh per klaim ada pada
+[companion developer](../docs/editorial/reference-example-sources.md).
+Dasar keputusan ada pada [CR-061](../docs/decisions/2026-11-05-cr-061-plugin-reference-content-dna.md).
+Lihat [changelog](CHANGELOG.md) untuk kalibrasi berikutnya.
 
-README, schema generator lama, dan placeholder bukan bagian paket tersebut.
-Kandidat sekarang tidak menyertakan `mcp.json`/`.mcp.json`, token, credential,
-atau konfigurasi OAuth rahasia. Mapping app yang sudah ada dipertahankan; generator
-No-auth lama hanya untuk referensi/regresi dan tidak menambah koneksi kedua.
-
-Bahasa konten produk tetap `en-US` sesuai kontrak. Mengubah bahasa dokumentasi
-developer tidak otomatis mengubah instruksi runtime, locale, atau editorial policy.
-
-## Membuat dan memeriksa kandidat
-
-Dari root repository, setelah [preflight durasi](../docs/testing.md#1-estimasi-sebelum-menjalankan-pemeriksaan):
-
-```sh
-pnpm run package-plugin
-pnpm exec tsx scripts/verify-plugin-candidate.ts
-```
-
-Hasilnya adalah direktori `artifacts/plugin-candidate/` dan
-`artifacts/plugin-candidate-filelist.json` berisi daftar byte/hash. Output diabaikan
-Git. Packaging mengganti kandidat lama pada lokasi itu, memvalidasi source, dan
-menyalin hanya file allowlist; bukan pembuatan ZIP atau instalasi plugin.
-
-Validator/test memeriksa manifest, schema generator, link/path/symlink, larangan
-credential, aturan editorial, dan urutan 31 tool aktif setelah lima nama v1
-dipensiunkan menurut CR-059. Karena
-itu `plans/tool-inventory.md`, DNA trivia, serta schema legacy tertentu masih
-merupakan dependensi yang harus direkonsiliasi sebelum dipindah/dihapus.
-
-## Update dan pembuktian hasil
-
-Kandidat v0.4.0 memakai alur trivia v2 saja setelah katalog runtime terverifikasi.
-Sumber cukup kalimat + satu URL/fakta; post lama yang telah direset dinyatakan
-tidak tersedia dan tidak dibuat ulang otomatis. Backend harus dirilis dan
-diverifikasi sebelum pemasangan plugin v2 sesuai P7/P8 dan izin tersendiri;
-build kandidat lokal tidak membuktikan runtime/plugin terpasang atau cutover.
-
-Update dilakukan pada plugin PRIVATE yang sama, lalu baca ulang release/version,
-hash archive yang diunggah, dan binding app. Periksa tool/schema dan Read owner
-pada chat baru yang memilih plugin yang benar. Refresh koneksi yang sama bila
-metadata tool masih memakai snapshot lama. Approval host atau instalasi tidak
-membuktikan write sudah berjalan dan tidak memberi izin write berikutnya.
-
-CI mengambil nama ZIP/artefak dari versi manifest, lalu memeriksa seluruh 13 file
-dan hash ekstraksinya. Gunakan manifest dan hash nyata sebagai bukti paket;
-packaging tidak memperbarui release yang terpasang. LT-016 serta batas retest-nya tercatat di
-[log live](../docs/live-test/results.md); MAN-03/04 historis dijelaskan pada
-[CR-048](../docs/decisions/2026-10-20-phase-10-4-owner-oauth-evidence-acceptance.md).
-
-Panduan developer: [arsitektur](../docs/architecture.md),
-[kontrak tool](../docs/tool-contracts.md), [development](../docs/development.md),
-[testing](../docs/testing.md), dan [operations](../docs/operations.md).
+Remediasi 0.5.7 terkait Issue #134–#136: qualifier per kalimat, kurasi payoff
+berulang, penjelasan objek bernama, dan format yang mengikuti perangkat editorial.
+Kontrak v2, context/CAS/dedup, tiga checks dan approval owner tetap.
+Test source/fixture tidak membuktikan kualitas copy host; retest saved-copy
+pada runtime yang terverifikasi tetap diperlukan sebelum klaim FIXED.
