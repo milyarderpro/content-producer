@@ -1,5 +1,7 @@
 # Panduan operasi production
 
+> Snapshot publik disanitasi: identifier QA/release dan tautan ChatGPT privat memakai alias. Isi naskah, skor, revision, content hash dan verdict dipertahankan. Hash fixture yang tercantum adalah hash bukti asli lokal; hash snapshot publik ada pada [indeks redaksi](editorial/reference-dna-public-evidence.md).
+
 Panduan ini menjelaskan cara memastikan identitas runtime, merilis perubahan,
 memulihkan layanan, dan menelusuri masalah. Untuk pekerjaan lokal baca
 [development](development.md); untuk pemilihan gate dan batas durasi baca
@@ -21,7 +23,7 @@ dan [bukti host/cleanup QA](../openspec/changes/archive/2026-11-05-cutover-trivi
 | Komponen             | Yang dapat dirujuk sekarang                                                                                                                                      | Batas bukti                                                                                        |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | Source yang ditinjau | Backend exact G4 `37fbbbeb0a0c628d9c5e628b21b5f804a4df9501`; source paket/QA `352347c420fa389212718010b4c9d835064f0ff9` | Selisih keduanya hanya laporan/checklist; bukti pada laporan cutover 4 November 2026 |
-| Paket plugin | PRIVATE Content Producer **0.4.0**, release `pluginrel_6aeb5dffa8688191831a1f71f107d8fd`; readback 13 file + overlay kompatibilitas sesuai | LIVE Plugin Creator dan satu QA host v2 PASS, 4 November 2026; bukan seluruh tool LIVE |
+| Paket plugin | PRIVATE Content Producer **0.5.7**, release `QA-RELEASE-10c52114aae7`; source kandidat `8069bb1bfd03316700e0dca9cfb4c6c8e880229a`, readback 15 source files + overlay sesuai | LIVE retest 6 November 2026: **10/10 D6 PASS sesudah repair terarah**, lima format dan output batch lulus; plan tetap completed 5/5. [Laporan/batas bukti](editorial/reference-dna-d6-retest-0.5.7-2026-11-06.md). PR #137 OPEN/CI PASS; Issue #134–#136 closed. FAIL lama tetap historis; tidak mengklaim first-pass atau factual certification baru |
 | Edge `mcp` | **v37**, verify_jwt=false; 24/24 file bundle provider identik kandidat backend pada rilis 4 November 2026 | Bukti task 5.2; tidak redeploy pada sesi QA task 5.4 |
 | Database | **85 migration**, latest `20261103072943`; seluruh konten owner final nol setelah reset dan cleanup QA | LIVE 4 November 2026; akun/workspace/4 Page/config dan 5 ledger Page tetap |
 | Gate historis CR-049 | Kandidat `1a4e755a48f3c77eb557b931fd6bd99d5e1b24fd`, [run 39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314)                | Record pada CR-049; jangan menempelkan exact-SHA PASS tersebut ke HEAD yang berbeda                |
@@ -37,6 +39,11 @@ Sumber: [log live](live-test/results.md),
 ditelusuri; cantumkan kapan diperiksa, bukan sekadar menaikkan nomor versi.
 
 ### Format catatan runtime/rilis
+
+Pembaruan plugin-only 5 November 2026 untuk evaluasi CR-061 tercatat pada
+[readback release 0.5.0–0.5.6](editorial/reference-dna-plugin-release-2026-11-05.md).
+Baseline 0.4.0 dan QA host 4 November dipertahankan di laporan cutover. Source
+0.5.6 memakai base lokal `413121c` + diff plugin; tidak mengubah backend SHA atau bukti G4. [Review 6 November](editorial/reference-dna-review-2026-11-06.md) membedakan first-pass, repair terarah, reuse output historis dan saved-copy.
 
 Catat di Issue/PR operasional yang sesuai, tanpa credential:
 
@@ -193,9 +200,12 @@ Status OFF dalam catatan lama bukan bukti setting sekarang. Jangan mengaktifkan
 ### Plugin PRIVATE
 
 Periksa kandidat/filelist/hash terhadap source, lalu ZIP yang benar-benar akan
-diunggah, manifest version, dan daftar 13 file yang diizinkan. CI mengambil nama
+diunggah, manifest version, dan daftar 15 file kandidat CR-061 0.5.0 yang diizinkan
+(baseline 0.4.0 memiliki 13 file). CI mengambil nama
 ZIP/artefak dari versi manifest. Nama file saja tetap bukan bukti versi terpasang
 atau kesamaan byte; gunakan manifest dan hash nyata dari kandidat yang diperiksa.
+Build source/kandidat saja tidak memperbarui bukti release terpasang pada tabel bagian 1;
+hasil editorial preview dan saved-copy tetap memerlukan evaluasi task 5–6.
 
 Update plugin PRIVATE yang sudah ada, dengan satu app owner OAuth `mcpku2`.
 Pertahankan `.app.json`; paket sekarang tidak menyertakan `mcp.json`/`.mcp.json`

@@ -1,0 +1,1531 @@
+{
+  "schema_version": 1,
+  "test_id": "DNA-D6-056-01",
+  "date": "2026-11-06",
+  "evidence_level": "LIVE owner-scoped readback + semantic review by Codex; not blind/independent owner review",
+  "plugin_version": "0.5.6",
+  "plugin_release_id": "QA-RELEASE-cb7b33da5f8d",
+  "source_sha": "82f698b0c7f873fc5906919ae64f34242cb49e61",
+  "backend_sha": "NOT VERIFIED by this review",
+  "rubric": {
+    "minimum": 13,
+    "maximum": 16,
+    "no_zero_dimensions": true,
+    "naturalness_required": 2,
+    "no_known_accuracy_qualifier_config_budget_issue": true
+  },
+  "basis_files": [
+    {
+      "path": "docs/live-test/fixtures/reference-dna-saved-copy-2026-11-06.json",
+      "sha256": "74927e4fa86554f2eeb2a028801ccb2f561bf90fa02d48dd85076c6404b6e48d"
+    },
+    {
+      "path": "docs/live-test/fixtures/reference-dna-batch-2026-11-06.json",
+      "sha256": "70215025709d6878c0e5f99b411c45d0cfb76fcc023bd54a2ef82377d924bbac"
+    }
+  ],
+  "live_readback": [
+    {
+      "id": "E01",
+      "post_public_id": "QA-ID-834222c2456a",
+      "revision": 1,
+      "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+      "status": "draft",
+      "quality_status": "passed",
+      "system_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+        "overall_status": "passed",
+        "checks": [
+          {
+            "id": "trivia.facts.count_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.exact_match",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.hard_budget",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.sources.url_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.reuse.allowed",
+            "status": "passed"
+          }
+        ]
+      },
+      "editorial_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+        "overall_status": "passed",
+        "checks": {
+          "meaning_preserved": "pass",
+          "caption_no_new_claim": "pass",
+          "no_known_substantive_issue": "pass"
+        }
+      },
+      "fact_count": 7,
+      "source_snapshots_unchanged": true,
+      "content_payload_unchanged": true,
+      "current_fact_warnings": [],
+      "approval": null,
+      "plan_item_public_id": null
+    },
+    {
+      "id": "E08",
+      "post_public_id": "QA-ID-1112e26848ac",
+      "revision": 1,
+      "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+      "status": "draft",
+      "quality_status": "passed",
+      "system_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+        "overall_status": "passed",
+        "checks": [
+          {
+            "id": "trivia.facts.count_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.exact_match",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.hard_budget",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.sources.url_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.reuse.allowed",
+            "status": "passed"
+          }
+        ]
+      },
+      "editorial_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+        "overall_status": "passed",
+        "checks": {
+          "meaning_preserved": "pass",
+          "caption_no_new_claim": "pass",
+          "no_known_substantive_issue": "pass"
+        }
+      },
+      "fact_count": 6,
+      "source_snapshots_unchanged": true,
+      "content_payload_unchanged": true,
+      "current_fact_warnings": [],
+      "approval": null,
+      "plan_item_public_id": null
+    },
+    {
+      "id": "E02",
+      "post_public_id": "QA-ID-2f4994901bb3",
+      "revision": 1,
+      "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+      "status": "draft",
+      "quality_status": "passed",
+      "system_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+        "overall_status": "passed",
+        "checks": [
+          {
+            "id": "trivia.facts.count_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.exact_match",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.hard_budget",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.sources.url_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.reuse.allowed",
+            "status": "passed"
+          }
+        ]
+      },
+      "editorial_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+        "overall_status": "passed",
+        "checks": {
+          "meaning_preserved": "pass",
+          "caption_no_new_claim": "pass",
+          "no_known_substantive_issue": "pass"
+        }
+      },
+      "fact_count": 6,
+      "source_snapshots_unchanged": true,
+      "content_payload_unchanged": true,
+      "current_fact_warnings": [],
+      "approval": null,
+      "plan_item_public_id": null
+    },
+    {
+      "id": "E03",
+      "post_public_id": "QA-ID-2efa1c2e80c0",
+      "revision": 1,
+      "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+      "status": "draft",
+      "quality_status": "passed",
+      "system_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+        "overall_status": "passed",
+        "checks": [
+          {
+            "id": "trivia.facts.count_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.exact_match",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.hard_budget",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.sources.url_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.reuse.allowed",
+            "status": "passed"
+          }
+        ]
+      },
+      "editorial_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+        "overall_status": "passed",
+        "checks": {
+          "meaning_preserved": "pass",
+          "caption_no_new_claim": "pass",
+          "no_known_substantive_issue": "pass"
+        }
+      },
+      "fact_count": 7,
+      "source_snapshots_unchanged": true,
+      "content_payload_unchanged": true,
+      "current_fact_warnings": [],
+      "approval": null,
+      "plan_item_public_id": null
+    },
+    {
+      "id": "E04",
+      "post_public_id": "QA-ID-9b0689b5acf3",
+      "revision": 1,
+      "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+      "status": "draft",
+      "quality_status": "passed",
+      "system_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+        "overall_status": "passed",
+        "checks": [
+          {
+            "id": "trivia.facts.count_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.exact_match",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.hard_budget",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.sources.url_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.reuse.allowed",
+            "status": "passed"
+          }
+        ]
+      },
+      "editorial_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+        "overall_status": "passed",
+        "checks": {
+          "meaning_preserved": "pass",
+          "caption_no_new_claim": "pass",
+          "no_known_substantive_issue": "pass"
+        }
+      },
+      "fact_count": 6,
+      "source_snapshots_unchanged": true,
+      "content_payload_unchanged": true,
+      "current_fact_warnings": [],
+      "approval": null,
+      "plan_item_public_id": null
+    },
+    {
+      "id": "B1",
+      "post_public_id": "QA-ID-6343ba3a3224",
+      "revision": 1,
+      "content_hash": "4dc750e3c7a54bb6dc20c98bbbfa91ab8e43267202a6e86f333b9262d25040b9",
+      "status": "draft",
+      "quality_status": "passed",
+      "system_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "4dc750e3c7a54bb6dc20c98bbbfa91ab8e43267202a6e86f333b9262d25040b9",
+        "overall_status": "passed",
+        "checks": [
+          {
+            "id": "trivia.facts.count_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.exact_match",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.hard_budget",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.sources.url_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.reuse.allowed",
+            "status": "passed"
+          }
+        ]
+      },
+      "editorial_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "4dc750e3c7a54bb6dc20c98bbbfa91ab8e43267202a6e86f333b9262d25040b9",
+        "overall_status": "passed",
+        "checks": {
+          "meaning_preserved": "pass",
+          "caption_no_new_claim": "pass",
+          "no_known_substantive_issue": "pass"
+        }
+      },
+      "fact_count": 7,
+      "source_snapshots_unchanged": true,
+      "content_payload_unchanged": true,
+      "current_fact_warnings": [],
+      "approval": null,
+      "plan_item_public_id": "QA-ID-a8e492fb5347"
+    },
+    {
+      "id": "B2",
+      "post_public_id": "QA-ID-5ac933583f9f",
+      "revision": 1,
+      "content_hash": "9a99e2e8e82c351df676c8a06e07588323ce28b17a05081a3bbe4c4462f6e2a7",
+      "status": "draft",
+      "quality_status": "passed",
+      "system_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "9a99e2e8e82c351df676c8a06e07588323ce28b17a05081a3bbe4c4462f6e2a7",
+        "overall_status": "passed",
+        "checks": [
+          {
+            "id": "trivia.facts.count_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.exact_match",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.hard_budget",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.sources.url_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.reuse.allowed",
+            "status": "passed"
+          }
+        ]
+      },
+      "editorial_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "9a99e2e8e82c351df676c8a06e07588323ce28b17a05081a3bbe4c4462f6e2a7",
+        "overall_status": "passed",
+        "checks": {
+          "meaning_preserved": "pass",
+          "caption_no_new_claim": "pass",
+          "no_known_substantive_issue": "pass"
+        }
+      },
+      "fact_count": 7,
+      "source_snapshots_unchanged": true,
+      "content_payload_unchanged": true,
+      "current_fact_warnings": [],
+      "approval": null,
+      "plan_item_public_id": "QA-ID-02b4a58bcf76"
+    },
+    {
+      "id": "B3",
+      "post_public_id": "QA-ID-6821aa81b974",
+      "revision": 1,
+      "content_hash": "cbc857c28caf74384b799fb5c2f4dc303bee6b6cf4ade69954a6807a3d2f1405",
+      "status": "draft",
+      "quality_status": "passed",
+      "system_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "cbc857c28caf74384b799fb5c2f4dc303bee6b6cf4ade69954a6807a3d2f1405",
+        "overall_status": "passed",
+        "checks": [
+          {
+            "id": "trivia.facts.count_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.exact_match",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.hard_budget",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.sources.url_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.reuse.allowed",
+            "status": "passed"
+          }
+        ]
+      },
+      "editorial_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "cbc857c28caf74384b799fb5c2f4dc303bee6b6cf4ade69954a6807a3d2f1405",
+        "overall_status": "passed",
+        "checks": {
+          "meaning_preserved": "pass",
+          "caption_no_new_claim": "pass",
+          "no_known_substantive_issue": "pass"
+        }
+      },
+      "fact_count": 7,
+      "source_snapshots_unchanged": true,
+      "content_payload_unchanged": true,
+      "current_fact_warnings": [],
+      "approval": null,
+      "plan_item_public_id": "QA-ID-3e57a03b1d2d"
+    },
+    {
+      "id": "B4",
+      "post_public_id": "QA-ID-1b061bd35c5e",
+      "revision": 1,
+      "content_hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+      "status": "draft",
+      "quality_status": "passed",
+      "system_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+        "overall_status": "passed",
+        "checks": [
+          {
+            "id": "trivia.facts.count_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.exact_match",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.hard_budget",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.sources.url_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.reuse.allowed",
+            "status": "passed"
+          }
+        ]
+      },
+      "editorial_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+        "overall_status": "passed",
+        "checks": {
+          "meaning_preserved": "pass",
+          "caption_no_new_claim": "pass",
+          "no_known_substantive_issue": "pass"
+        }
+      },
+      "fact_count": 6,
+      "source_snapshots_unchanged": true,
+      "content_payload_unchanged": true,
+      "current_fact_warnings": [],
+      "approval": null,
+      "plan_item_public_id": "QA-ID-fa3adbcc9368"
+    },
+    {
+      "id": "B5",
+      "post_public_id": "QA-ID-069385c57142",
+      "revision": 1,
+      "content_hash": "19b008bed4212b559a5ce6e8724a1beea0f40a03e9e42e81a7b6f827488e9e4e",
+      "status": "draft",
+      "quality_status": "passed",
+      "system_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "19b008bed4212b559a5ce6e8724a1beea0f40a03e9e42e81a7b6f827488e9e4e",
+        "overall_status": "passed",
+        "checks": [
+          {
+            "id": "trivia.facts.count_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.exact_match",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.render.hard_budget",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.sources.url_valid",
+            "status": "passed"
+          },
+          {
+            "id": "trivia.reuse.allowed",
+            "status": "passed"
+          }
+        ]
+      },
+      "editorial_checks": {
+        "schema_version": 2,
+        "post_revision": 1,
+        "content_hash": "19b008bed4212b559a5ce6e8724a1beea0f40a03e9e42e81a7b6f827488e9e4e",
+        "overall_status": "passed",
+        "checks": {
+          "meaning_preserved": "pass",
+          "caption_no_new_claim": "pass",
+          "no_known_substantive_issue": "pass"
+        }
+      },
+      "fact_count": 6,
+      "source_snapshots_unchanged": true,
+      "content_payload_unchanged": true,
+      "current_fact_warnings": [],
+      "approval": null,
+      "plan_item_public_id": "QA-ID-8e7f3dd9f0a8"
+    }
+  ],
+  "batch_control": {
+    "plan_public_id": "QA-ID-6efb71a0e89b",
+    "name": "QA DNA batch 2026-11-06 T64",
+    "page_public_id": "QA-ID-7b6e770529b4",
+    "niche_key": "trivia",
+    "status": "completed",
+    "requested_count": 5,
+    "progress": {
+      "pending": 0,
+      "in_progress": 0,
+      "completed": 5,
+      "failed": 0,
+      "cancelled": 0
+    },
+    "created_at": "2026-11-06T03:04:57.622973Z",
+    "updated_at": "2026-11-06T05:46:17.221870Z"
+  },
+  "reviews": [
+    {
+      "id": "E01",
+      "post_public_id": "QA-ID-834222c2456a",
+      "revision": 1,
+      "content_hash": "8cc192c32553fb318eac17ad08a3a332a099836741d912228451cef6ef846963",
+      "format_key": "single_subject_fast",
+      "patterns": [
+        "RP01",
+        "RP03"
+      ],
+      "total": 16,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Red pandas got the name \"panda\" before giant pandas did."
+          ],
+          "reason": "Subjek langsung bernama; asal sebutan panda menjadi angle familiar dengan kebalikan yang jelas."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Red pandas use their tongues to inspect scent marks."
+          ],
+          "reason": "Penggunaan lidah untuk memeriksa scent marks merupakan kemampuan spesifik yang mudah diceritakan ulang."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Thick fur even covers the bottoms of red pandas' feet.",
+            "Reddish coats help them blend into moss-covered branches.",
+            "Young red pandas can whistle when they're distressed.",
+            "Red pandas have their own animal family, separate from bears."
+          ],
+          "reason": "Insulasi kaki, kamuflase, suara dan identitas keluarga memberi empat pengalaman berbeda; tidak mengulang diet atau gerak memanjat."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 2,
+          "quotes": [
+            "When threatened, red pandas may stand upright and swipe with sharp claws."
+          ],
+          "reason": "Penutup berdiri dan mengayun cakar memberi adegan visual baru setelah nama dan indra."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Young red pandas can whistle when they're distressed."
+          ],
+          "reason": "Contraction they're dan kata whistle/distressed terasa percakapan; tidak diawali taksonomi ilmiah."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Hook literal dan perpindahan nama–fisik–indra–pertahanan mengikuti kartu hewan tanpa menyalin fakta contoh."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Red pandas got the name \"panda\" before giant pandas did."
+          ],
+          "reason": "Tujuh baris mandiri dengan satu gagasan utama; exact rendering dan budget revision ini lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Share this with a red panda fan."
+          ],
+          "reason": "Share diarahkan kepada red panda fan, satu aksi dan penerima yang relevan."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nRed pandas got the name \"panda\" before giant pandas did.\n\nThick fur even covers the bottoms of red pandas' feet.\n\nReddish coats help them blend into moss-covered branches.\n\nYoung red pandas can whistle when they're distressed.\n\nRed pandas use their tongues to inspect scent marks.\n\nRed pandas have their own animal family, separate from bears.\n\nWhen threatened, red pandas may stand upright and swipe with sharp claws.\n\nShare this with a red panda fan.",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia.",
+      "issue": null
+    },
+    {
+      "id": "E08",
+      "post_public_id": "QA-ID-1112e26848ac",
+      "revision": 1,
+      "content_hash": "19910c446e9bbcf4927f69ce10100cab40da7cac6402994aa68cd68fee3a601e",
+      "format_key": "themed_utility",
+      "patterns": [
+        "RP06",
+        "RP05"
+      ],
+      "total": 15,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Keep berries unwashed in the fridge; rinse them only before eating."
+          ],
+          "reason": "Berries/greens dan kebiasaan sebelum makan langsung dikenali sebagai kebutuhan rumah tangga."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Keep greens away from apples; their ripening gas can cause yellowing."
+          ],
+          "reason": "Apel yang mempercepat yellowing memberi akibat konkret; bukan janji umur simpan pasti."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Leave strawberry tops attached until you're ready to prepare them.",
+            "Keep loose spinach in an open bag in your refrigerator's crisper.",
+            "Keep raspberries in shallow containers to prevent crushing."
+          ],
+          "reason": "Persiapan strawberry, kemasan spinach dan wadah raspberry masing-masing menawarkan tindakan berbeda."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 1,
+          "quotes": [
+            "Prewashed, ready-to-eat salad needs refrigeration, but no extra rinse."
+          ],
+          "reason": "Penutup ready-to-eat/no extra rinse berguna, tetapi kembali ke tema pencucian pembuka; variasi ending lebih ringan daripada baris gas."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Keep greens away from apples; their ripening gas can cause yellowing."
+          ],
+          "reason": "Ripening gas menjelaskan istilah tanpa kuliah ethylene; qualifier can tetap terdengar natural."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Plain hook, rotasi objek/tindakan dan saveable ending selaras pola utility Daily Facts."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Prewashed, ready-to-eat salad needs refrigeration, but no extra rinse."
+          ],
+          "reason": "Enam baris dengan kondisi unwashed/ready-to-eat yang terbaca; batas keras dan source bindings lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Save this for your next grocery trip."
+          ],
+          "reason": "Save untuk grocery trip mempunyai alasan pakai yang jelas dan satu aksi."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nKeep berries unwashed in the fridge; rinse them only before eating.\n\nLeave strawberry tops attached until you're ready to prepare them.\n\nKeep loose spinach in an open bag in your refrigerator's crisper.\n\nKeep raspberries in shallow containers to prevent crushing.\n\nKeep greens away from apples; their ripening gas can cause yellowing.\n\nPrewashed, ready-to-eat salad needs refrigeration, but no extra rinse.\n\nSave this for your next grocery trip.",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia.",
+      "issue": null
+    },
+    {
+      "id": "E02",
+      "post_public_id": "QA-ID-2f4994901bb3",
+      "revision": 1,
+      "content_hash": "4ae1eea255aeba9b0c06ee246408093403e05226a345305ff3a8599e4f28373d",
+      "format_key": "emotional_animal_collection",
+      "patterns": [
+        "RP03",
+        "RP01"
+      ],
+      "total": 16,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Adult meerkats teach pups using scorpions with the stingers removed."
+          ],
+          "reason": "Adult meerkats menyebut spesies sesudah hook generik dan membuka dengan praktik mengajar yang spesifik."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Adult meerkats teach pups using scorpions with the stingers removed."
+          ],
+          "reason": "Scorpion dengan stinger dilepas memberi detail mengejutkan; bukan kalimat umum hewan saling membantu."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Meerkats can shut their ears to keep sand out while digging.",
+            "Their burrows have separate rooms for sleeping and using the toilet.",
+            "Together, meerkats can overwhelm even venomous snakes.",
+            "Meerkats press their bellies against cooler rocks to cool off."
+          ],
+          "reason": "Telinga, chamber toilet, pertahanan ular dan pendinginan tubuh memberi nilai berbeda tanpa cluster caregiving atau warning calls."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 2,
+          "quotes": [
+            "At night, meerkats curl up and snuggle together."
+          ],
+          "reason": "Awal hunting practice dan akhir snuggling memberi perubahan rasa penasaran ke adegan hangat."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Their burrows have separate rooms for sleeping and using the toilet."
+          ],
+          "reason": "Using the toilet dan cool off merupakan kata sehari-hari, tanpa jargon anatomi."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "At night, meerkats curl up and snuggle together."
+          ],
+          "reason": "Snuggle adalah perilaku terlihat, dekat pola DYK, tanpa mengarang motif cinta manusia."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Adult meerkats teach pups using scorpions with the stingers removed."
+          ],
+          "reason": "Enam fakta utuh dalam adaptive; tidak ada pengisi demi tujuh dan render/budget lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Share this with someone who loves meerkats."
+          ],
+          "reason": "Satu ajakan share kepada orang yang menyukai meerkat sesuai isi."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nAdult meerkats teach pups using scorpions with the stingers removed.\n\nMeerkats can shut their ears to keep sand out while digging.\n\nTheir burrows have separate rooms for sleeping and using the toilet.\n\nTogether, meerkats can overwhelm even venomous snakes.\n\nMeerkats press their bellies against cooler rocks to cool off.\n\nAt night, meerkats curl up and snuggle together.\n\nShare this with someone who loves meerkats.",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia.",
+      "issue": null
+    },
+    {
+      "id": "E03",
+      "post_public_id": "QA-ID-2efa1c2e80c0",
+      "revision": 1,
+      "content_hash": "33ef3b282bf02fbc1fc64d954aecef0925733cee29ab3a954b9065f11e6934ad",
+      "format_key": "comparison",
+      "patterns": [
+        "RP11",
+        "RP01"
+      ],
+      "total": 15,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "African elephants have two trunk \"fingers\"; Asian elephants have one."
+          ],
+          "reason": "Pasangan African/Asian elephants langsung jelas bagi pembaca umum."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "African elephants have two trunk \"fingers\"; Asian elephants have one."
+          ],
+          "reason": "Dua trunk fingers versus satu memberi perbedaan fisik yang mudah dibayangkan."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Asian elephants have twin head domes; African elephants have rounder heads.",
+            "African savanna elephants generally outweigh Asian elephants.",
+            "Africa has two living elephant species; Asia has just one.",
+            "African savanna elephants' backs dip; Asian elephants' backs usually arch."
+          ],
+          "reason": "Bentuk kepala, berat, spesies dan punggung merupakan dimensi berbeda; bukan deret satu ukuran."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 1,
+          "quotes": [
+            "Female African elephants often have tusks; Asian females rarely have visible ones."
+          ],
+          "reason": "Awal kuat dan akhir tusks sah, tetapi telinga/kepala di tengah masih berasa identifikasi; ini kekurangan ritme minor."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Female African elephants often have tusks; Asian females rarely have visible ones."
+          ],
+          "reason": "Have/usually/visible dan fingers dalam tanda kutip mudah dipahami; tidak memakai istilah teknis yang menutupi reveal."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Like-for-like per pasangan mengikuti RP11 dengan variasi dimensi yang sah."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "African savanna elephants' backs dip; Asian elephants' backs usually arch."
+          ],
+          "reason": "Setiap baris membandingkan dimensi sama; generally/savanna/usually/often/rarely/visible dipertahankan dan budget lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Which difference surprised you most?"
+          ],
+          "reason": "Which difference menanyakan perbandingan yang benar-benar ada dengan satu aksi comment."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nAfrican elephants have two trunk \"fingers\"; Asian elephants have one.\n\nAfrican elephants have larger ears than Asian elephants.\n\nAsian elephants have twin head domes; African elephants have rounder heads.\n\nAfrican savanna elephants generally outweigh Asian elephants.\n\nAfrica has two living elephant species; Asia has just one.\n\nAfrican savanna elephants' backs dip; Asian elephants' backs usually arch.\n\nFemale African elephants often have tusks; Asian females rarely have visible ones.\n\nWhich difference surprised you most?",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia.",
+      "issue": null
+    },
+    {
+      "id": "E04",
+      "post_public_id": "QA-ID-9b0689b5acf3",
+      "revision": 1,
+      "content_hash": "707ed63a9aa5b06fd0c4ffa06682a8a405112f0300901d8658c9c95cb65c7c79",
+      "format_key": "myth_vs_fact",
+      "patterns": [
+        "RP05",
+        "RP03"
+      ],
+      "total": 15,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Flying fox bats use sight and smell, not echolocation."
+          ],
+          "reason": "Flying fox bats memberi nama subjek dan langsung membantah anggapan semua bat berekolokasi."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Flying fox bats use sight and smell, not echolocation."
+          ],
+          "reason": "Sight/smell memberi alternatif kemampuan yang konkret, bukan hanya negasi."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Some bats roost in trees, not just caves.",
+            "Bats groom themselves regularly; they're not naturally filthy.",
+            "Some bats migrate for winter instead of hibernating.",
+            "Bats don't gnaw through wood or wires like mice."
+          ],
+          "reason": "Roost, grooming, migrasi dan kebiasaan menggerogoti membawa empat angle yang berbeda."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 1,
+          "quotes": [
+            "Some bats eat fruit or drink nectar, not just insects."
+          ],
+          "reason": "Ending buah/nectar benar menambah sudut, tetapi kejutan lebih ringan daripada navigasi pembuka; tidak perlu mengulang label myth."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Bats groom themselves regularly; they're not naturally filthy."
+          ],
+          "reason": "They're not naturally filthy terasa bahasa pembaca umum, tanpa klaim bebas penyakit atau saran handling."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Koreksi langsung mengikuti pola RP05; tidak ada parade Myth/Fact mekanis."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Some bats migrate for winter instead of hibernating."
+          ],
+          "reason": "Enam koreksi singkat, some tetap ada, format myth_vs_fact sesuai isi dan budget lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Which bat myth surprised you the most?"
+          ],
+          "reason": "Pertanyaan tentang bat myth relevan dengan koreksi yang baru dibaca."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nFlying fox bats use sight and smell, not echolocation.\n\nSome bats roost in trees, not just caves.\n\nBats groom themselves regularly; they're not naturally filthy.\n\nSome bats migrate for winter instead of hibernating.\n\nBats don't gnaw through wood or wires like mice.\n\nSome bats eat fruit or drink nectar, not just insects.\n\nWhich bat myth surprised you the most?",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia.",
+      "issue": null
+    },
+    {
+      "id": "B1",
+      "post_public_id": "QA-ID-6343ba3a3224",
+      "revision": 1,
+      "content_hash": "4dc750e3c7a54bb6dc20c98bbbfa91ab8e43267202a6e86f333b9262d25040b9",
+      "format_key": "comparison",
+      "patterns": [
+        "RP11",
+        "RP12"
+      ],
+      "total": 15,
+      "verdict": "FAIL",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Ganymede is wider than Mercury, despite being a moon."
+          ],
+          "reason": "Moons dikenalkan lewat relasi dengan Mercury sehingga subjek/angle perbandingan terbaca."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Ganymede is wider than Mercury, despite being a moon."
+          ],
+          "reason": "Moon lebih lebar daripada planet memberi hubungan ukuran yang bisa dibayangkan."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Triton circles Neptune backward relative to the planet's spin.",
+            "Titan's atmosphere is thicker than Earth's; our Moon barely has one.",
+            "Enceladus shines brightly; parts of Iapetus are dark as asphalt."
+          ],
+          "reason": "Arah orbit, atmosfer dan kecerahan bervariasi; tidak menjadi tujuh diameter."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 1,
+          "quotes": [
+            "Charon is half Pluto's width; our Moon is a quarter of Earth's."
+          ],
+          "reason": "Phobos membuka cepat, tetapi ending rasio kembali ke ukuran setelah Ganymede; ritmenya sedikit berulang."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Phobos races around Mars roughly three times every day."
+          ],
+          "reason": "Races/barely has one terdengar percakapan tanpa jargon; masalah scope dinilai sebagai gate terpisah."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Bentuk hook dan hubungan lintas dunia menyerupai surprise comparison, tidak hanya katalog angka."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Enceladus shines brightly; parts of Iapetus are dark as asphalt."
+          ],
+          "reason": "Beberapa pasangan eksplisit dan baseline spin/planet sah; plain lines serta budget lulus. Ini tidak menghapus gate qualifier."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Which moon surprised you the most?"
+          ],
+          "reason": "Which moon cocok dengan pilihan moon yang dibahas dan satu tujuan comment."
+        }
+      ],
+      "hard_gate_issues": [
+        {
+          "kind": "qualifier_scope",
+          "fact_position": 5,
+          "canonical": "Io is the solar system's most volcanically active world.",
+          "rendered": "Io has more volcanic activity than any other world.",
+          "reason": "Canonical membatasi superlatif Io ke solar system; Canva mandiri memperluasnya menjadi any other world. Scope itu tidak boleh hanya disimpan pada internal subject/caption."
+        },
+        {
+          "kind": "approximation",
+          "fact_position": 7,
+          "canonical": "Charon is about half Pluto's width; our Moon is about one-quarter Earth's width.",
+          "rendered": "Charon is half Pluto's width; our Moon is a quarter of Earth's.",
+          "reason": "Canonical menyebut about pada kedua rasio; copy menyatakan is half/is a quarter. Pulihkan penanda pembulatan; skor bahasa tinggi tidak menghapus perbedaan makna."
+        }
+      ],
+      "copy": "Did you know?\n\nPhobos races around Mars roughly three times every day.\n\nGanymede is wider than Mercury, despite being a moon.\n\nTriton circles Neptune backward relative to the planet's spin.\n\nTitan's atmosphere is thicker than Earth's; our Moon barely has one.\n\nIo has more volcanic activity than any other world.\n\nEnceladus shines brightly; parts of Iapetus are dark as asphalt.\n\nCharon is half Pluto's width; our Moon is a quarter of Earth's.\n\nWhich moon surprised you the most?",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia.",
+      "issue": {
+        "number": 134,
+        "url": "https://github.com/milyarderpro/content-producer/issues/134",
+        "title": "[P1] Plugin 0.5.6 melepas scope/approximation canonical pada copy moon tersimpan"
+      }
+    },
+    {
+      "id": "B2",
+      "post_public_id": "QA-ID-5ac933583f9f",
+      "revision": 1,
+      "content_hash": "9a99e2e8e82c351df676c8a06e07588323ce28b17a05081a3bbe4c4462f6e2a7",
+      "format_key": "single_subject_fast",
+      "patterns": [
+        "RP07",
+        "RP08"
+      ],
+      "total": 10,
+      "verdict": "FAIL",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Butchart Gardens' five-acre Sunken Garden fills an old limestone quarry."
+          ],
+          "reason": "Perubahan quarry menjadi garden membentuk adegan tempat yang jelas dan menarik."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 1,
+          "quotes": [
+            "When conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink."
+          ],
+          "reason": "Canal skating dan quarry memberi reveal, tetapi sebagian besar baris tengah hanya fasilitas/jarak yang rutin."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 0,
+          "quotes": [
+            "Calgary's Plus 15 carries walkers above streets on enclosed skywalks.",
+            "Toronto's PATH runs over 30 km, mostly beneath downtown.",
+            "Montreal's underground pedestrian network runs about 32 km."
+          ],
+          "reason": "Skywalk Calgary, PATH Toronto dan underground Montreal mengulang pengalaman pedestrian network. Beda kota tidak cukup menjadi tiga nilai baru."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 0,
+          "quotes": [
+            "Stanley Park spans about 400 hectares on Vancouver's coast."
+          ],
+          "reason": "Ending luas Stanley Park mengganti adegan menjadi statistik biasa; posisi terakhir belum menghasilkan kejutan yang layak dipertahankan."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Butchart Gardens' five-acre Sunken Garden fills an old limestone quarry."
+          ],
+          "reason": "Fills/carries/runs dan when conditions allow natural; tidak perlu revisi bahasa besar."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 1,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Hook/shape sesuai, tetapi isi kembali mendekati daftar geografi yang ditolak pemilik, bukan perjalanan reveal bervariasi."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Historic Quebec City retains North America's only complete colonial city walls."
+          ],
+          "reason": "Country places sebagai satu subject/umbrella masih sah; baris singkat, qualifier kondisi dan budget dipertahankan."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Follow for more unexpected places."
+          ],
+          "reason": "Follow for unexpected places satu aksi dan sesuai topik, meskipun janji kejutan belum konsisten dipenuhi isi."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nButchart Gardens' five-acre Sunken Garden fills an old limestone quarry.\n\nWhen conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink.\n\nCalgary's Plus 15 carries walkers above streets on enclosed skywalks.\n\nToronto's PATH runs over 30 km, mostly beneath downtown.\n\nHistoric Quebec City retains North America's only complete colonial city walls.\n\nMontreal's underground pedestrian network runs about 32 km.\n\nStanley Park spans about 400 hectares on Vancouver's coast.\n\nFollow for more unexpected places.",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia.",
+      "issue": {
+        "number": 135,
+        "url": "https://github.com/milyarderpro/content-producer/issues/135",
+        "title": "[P1] Batch plugin 0.5.6 menyimpan cluster payoff berulang pada places dan zipper"
+      }
+    },
+    {
+      "id": "B3",
+      "post_public_id": "QA-ID-6821aa81b974",
+      "revision": 1,
+      "content_hash": "cbc857c28caf74384b799fb5c2f4dc303bee6b6cf4ade69954a6807a3d2f1405",
+      "format_key": "single_subject_fast",
+      "patterns": [
+        "RP10",
+        "RP09"
+      ],
+      "total": 13,
+      "verdict": "FAIL",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "An Apollo spacesuit used a special zipper to seal in air."
+          ],
+          "reason": "Zipper dalam Apollo suit membuka benda sehari-hari melalui penggunaan tak terduga."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "A Van Cleef & Arpels Zip necklace transforms into a bracelet."
+          ],
+          "reason": "Kalung yang menjadi gelang memberi perubahan bentuk konkret, bukan biografi penemu biasa."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 0,
+          "quotes": [
+            "Judson's early fastener was meant to replace long bootlaces.",
+            "The word zipper echoed the sound of fastening rubber boots.",
+            "Inventor Whitcomb Judson died before his fastener got that name."
+          ],
+          "reason": "Bootlaces, bunyi rubber boots dan kematian sebelum nama kembali membentuk cluster asal/nama yang sebelumnya ditolak pemilik. Perlu kurasi fakta, bukan sekadar memindahkan urutan."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 2,
+          "quotes": [
+            "A Van Cleef & Arpels Zip necklace transforms into a bracelet."
+          ],
+          "reason": "Pembuka pressure seal dan penutup transformable jewelry kuat; alur tidak lagi berupa versi awal–perbaikan–adopsi."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "An Apollo spacesuit used a special zipper to seal in air."
+          ],
+          "reason": "Seal in air dan decorative details menggunakan bahasa biasa; tidak ada nama peristiwa yang tak dijelaskan."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 1,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Bentuk dan dua anchor kuat selaras contoh benda, tetapi cluster tengah mengurangi variasi pengalaman dibanding R2 yang diterima."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Early fasteners could jam or spring open without warning."
+          ],
+          "reason": "Tujuh baris tetap terbaca dan legal secara adaptive/budget; jumlah legal tidak meluluskan komposisi."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Follow for more unexpected invention stories."
+          ],
+          "reason": "Follow mengarah pada seri invention stories dengan satu aksi."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nAn Apollo spacesuit used a special zipper to seal in air.\n\nSome 1930s dresses showed off zippers as decorative details.\n\nJudson's early fastener was meant to replace long bootlaces.\n\nEarly fasteners could jam or spring open without warning.\n\nThe word zipper echoed the sound of fastening rubber boots.\n\nInventor Whitcomb Judson died before his fastener got that name.\n\nA Van Cleef & Arpels Zip necklace transforms into a bracelet.\n\nFollow for more unexpected invention stories.",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia.",
+      "issue": {
+        "number": 135,
+        "url": "https://github.com/milyarderpro/content-producer/issues/135",
+        "title": "[P1] Batch plugin 0.5.6 menyimpan cluster payoff berulang pada places dan zipper"
+      }
+    },
+    {
+      "id": "B4",
+      "post_public_id": "QA-ID-1b061bd35c5e",
+      "revision": 1,
+      "content_hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+      "format_key": "single_subject_fast",
+      "patterns": [
+        "RP12",
+        "RP01"
+      ],
+      "total": 16,
+      "verdict": "PASS",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Some mangroves push excess salt out through tiny leaf glands."
+          ],
+          "reason": "Mangrove dan salt lewat daun mengubah pohon familiar menjadi kemampuan yang konkret."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 2,
+          "quotes": [
+            "Some mangroves push excess salt out through tiny leaf glands."
+          ],
+          "reason": "Push excess salt out memberi mekanisme dan hasil singkat yang bisa diceritakan ulang."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "Neighboring trees of the same species can join their roots naturally.",
+            "Some pond pine cones release their seeds after a fire.",
+            "Silver birch branches can droop overnight as their water balance shifts.",
+            "Trees can wall off damaged wood to slow spreading decay."
+          ],
+          "reason": "Root graft, fire-triggered seed release, gerak malam dan pembatasan decay masing-masing memberi pengalaman berbeda."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 2,
+          "quotes": [
+            "Some oaks release airborne chemicals that ready nearby trees' defenses."
+          ],
+          "reason": "Awal membuang garam dan akhir chemical defense berbeda skala/fungsi; tengah tidak mengikuti bab struktur pohon."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 2,
+          "quotes": [
+            "Trees can wall off damaged wood to slow spreading decay."
+          ],
+          "reason": "Wall off damaged wood menjelaskan proses tanpa istilah akademis; tidak memberi pohon niat atau pikiran manusia."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 2,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Perpindahan kemampuan konkret mengikuti pola nature surprises RP12 dengan fakta sendiri."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 2,
+          "quotes": [
+            "Silver birch branches can droop overnight as their water balance shifts."
+          ],
+          "reason": "Enam fakta cukup dalam adaptive; some/can/same species tetap dipertahankan, semua budget lulus."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 2,
+          "quotes": [
+            "Share these surprising tree facts."
+          ],
+          "reason": "Share tree facts singkat, satu aksi dan relevan untuk pembaca pecinta alam."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nSome mangroves push excess salt out through tiny leaf glands.\n\nNeighboring trees of the same species can join their roots naturally.\n\nSome pond pine cones release their seeds after a fire.\n\nSilver birch branches can droop overnight as their water balance shifts.\n\nTrees can wall off damaged wood to slow spreading decay.\n\nSome oaks release airborne chemicals that ready nearby trees' defenses.\n\nShare these surprising tree facts.",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia.",
+      "issue": null
+    },
+    {
+      "id": "B5",
+      "post_public_id": "QA-ID-069385c57142",
+      "revision": 1,
+      "content_hash": "19b008bed4212b559a5ce6e8724a1beea0f40a03e9e42e81a7b6f827488e9e4e",
+      "format_key": "comparison",
+      "patterns": [
+        "RP07",
+        "RP08"
+      ],
+      "total": 9,
+      "verdict": "FAIL",
+      "dimensions": [
+        {
+          "dimension": "A familiarity/angle",
+          "score": 2,
+          "quotes": [
+            "Some Australian magpies swoop at people during nesting season."
+          ],
+          "reason": "Australia dan kehidupan sehari-harinya familiar, walau negara baru disebut setelah opening."
+        },
+        {
+          "dimension": "B surprise/utility",
+          "score": 1,
+          "quotes": [
+            "City white ibises scavenge, earning the nickname bin chickens."
+          ],
+          "reason": "Bin chickens memberi detail spesifik, tetapi beberapa baris hanya menyebut ikon/fasilitas atau fitur uang tanpa payoff kuat."
+        },
+        {
+          "dimension": "C komposisi",
+          "score": 2,
+          "quotes": [
+            "City white ibises scavenge, earning the nickname bin chickens.",
+            "Some Australian magpies swoop at people during nesting season.",
+            "Some Australian parks offer free gas or electric barbecues.",
+            "The rotary Hills Hoist became an Australian backyard icon.",
+            "Election-day sausage stalls are nicknamed democracy sausages.",
+            "Australian polymer banknotes have transparent security windows."
+          ],
+          "reason": "Burung, fasilitas publik, backyard, pemilu dan uang memberi ragam domain; kegagalan utama bukan semua fakta berulang."
+        },
+        {
+          "dimension": "D urutan",
+          "score": 1,
+          "quotes": [
+            "Australian polymer banknotes have transparent security windows."
+          ],
+          "reason": "Closing security windows berbeda dari opening, tetapi lebih seperti fitur rutin daripada penutup yang kuat."
+        },
+        {
+          "dimension": "E naturalness",
+          "score": 1,
+          "quotes": [
+            "The rotary Hills Hoist became an Australian backyard icon."
+          ],
+          "reason": "Rotary Hills Hoist tidak menjelaskan bahwa itu clothesline; pembaca US/UK/CA/AU tidak boleh harus mengenal nama merek untuk membayangkan baris."
+        },
+        {
+          "dimension": "F pola referensi",
+          "score": 1,
+          "quotes": [
+            "Did you know?"
+          ],
+          "reason": "Hook dan daftar negara mengarah ke country trivia, sementara caption/CTA menjanjikan contrasts yang belum dibangun."
+        },
+        {
+          "dimension": "G scanability/format",
+          "score": 0,
+          "quotes": [
+            "Some Australian parks offer free gas or electric barbecues."
+          ],
+          "reason": "Format tersimpan comparison, tetapi tidak ada perangkat perbandingan bermakna yang konsisten, baik pasangan maupun baseline jelas. Ragam fakta satu negara tidak sama dengan comparison."
+        },
+        {
+          "dimension": "H CTA",
+          "score": 1,
+          "quotes": [
+            "Which Australian contrast surprised you most?"
+          ],
+          "reason": "Which Australian contrast memakai satu aksi, tetapi presupposes kontras yang tidak disediakan; kata surprise saja tidak menyelesaikan salah pemetaan format."
+        }
+      ],
+      "hard_gate_issues": [],
+      "copy": "Did you know?\n\nCity white ibises scavenge, earning the nickname bin chickens.\n\nSome Australian magpies swoop at people during nesting season.\n\nSome Australian parks offer free gas or electric barbecues.\n\nThe rotary Hills Hoist became an Australian backyard icon.\n\nElection-day sausage stalls are nicknamed democracy sausages.\n\nAustralian polymer banknotes have transparent security windows.\n\nWhich Australian contrast surprised you most?",
+      "mechanical_status": "passed",
+      "research_basis": "Pool riset QA sebelumnya; URL tidak dibuka/verifikasi ulang; penilaian makna terhadap canonical snapshot dan batas bukti yang tersedia.",
+      "issue": {
+        "number": 136,
+        "url": "https://github.com/milyarderpro/content-producer/issues/136",
+        "title": "[P1] Plugin 0.5.6 memetakan kartu Australia tanpa perbandingan ke comparison"
+      }
+    }
+  ],
+  "summary": {
+    "pass": 6,
+    "fail": 4,
+    "formats": {
+      "pass": 5,
+      "fail": 0,
+      "provenance": "guided review/edits before save"
+    },
+    "batch": {
+      "pass": 1,
+      "fail": 4,
+      "operational_count": "PASS 5/5",
+      "provenance": "bounded previous research pool; no fact-count instruction"
+    },
+    "overall": "FAIL",
+    "fixed": false,
+    "task_6_5_complete": false
+  },
+  "issues": {
+    "qualifier": {
+      "number": 134,
+      "url": "https://github.com/milyarderpro/content-producer/issues/134",
+      "title": "[P1] Plugin 0.5.6 melepas scope/approximation canonical pada copy moon tersimpan"
+    },
+    "composition": {
+      "number": 135,
+      "url": "https://github.com/milyarderpro/content-producer/issues/135",
+      "title": "[P1] Batch plugin 0.5.6 menyimpan cluster payoff berulang pada places dan zipper"
+    },
+    "format": {
+      "number": 136,
+      "url": "https://github.com/milyarderpro/content-producer/issues/136",
+      "title": "[P1] Plugin 0.5.6 memetakan kartu Australia tanpa perbandingan ke comparison"
+    }
+  },
+  "research_limit": "Previous QA pool/canonical snapshots; no source URL opening or reverification.",
+  "mutations": {
+    "content_producer_business_write": 0,
+    "source_package_change": false,
+    "backend_change": false,
+    "plugin_upgrade": false,
+    "github_issues_created": [
+      134,
+      135,
+      136
+    ]
+  },
+  "egress_note": "Original GitHub payload rejected by automatic approval review for private chat URL/internal post-release metadata. Reconciled; redacted summaries without those details succeeded. No CLI bypass.",
+  "remediation_retest": "NOT RUN; preserve original revision/hash and failed evidence; no replacement or new batch count inferred.",
+  "public_snapshot": {
+    "redacted": true,
+    "notice": "Stable QA-ID aliases and private-reference placeholders replace object/release identifiers and private ChatGPT URLs. This is documentation evidence, not an executable production payload. Raw evidence and original hashes remain in local commits.",
+    "original_sha256": "67ce79adc7f87a93ddec61e6aed113ad26fc4ca4cfa387521651f619fc7ee184"
+  }
+}

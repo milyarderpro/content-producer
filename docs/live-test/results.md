@@ -1,5 +1,7 @@
 # Log hasil — Content Producer Live Test & Fix
 
+> Snapshot publik disanitasi: identifier QA/release dan tautan ChatGPT privat memakai alias. Isi naskah, skor, revision, content hash dan verdict dipertahankan. Hash fixture yang tercantum adalah hash bukti asli lokal; hash snapshot publik ada pada [indeks redaksi](../editorial/reference-dna-public-evidence.md).
+
 **Kampanye:** [Issue #25](https://github.com/milyarderpro/content-producer/issues/25) · **Matriks:** [test-matrix.md](test-matrix.md) · **Workflow:** [README.md](README.md).
 
 Dokumen ini menyimpan **hasil kampanye historis v1** dan bukti LIVE v2 terbaru
@@ -10,15 +12,15 @@ secara terpisah. Satu E2E v2 PASS tidak membuktikan seluruh 31 tool diuji LIVE. 
 ### CUT-V2-HOST-01 — 4 November 2026 — PASS LIVE (Chrome + readback independen)
 
 Plugin PRIVATE Content Producer **0.4.0**, release
-`pluginrel_6aeb5dffa8688191831a1f71f107d8fd`, diuji pada
-[chat ChatGPT baru](https://chatgpt.com/c/6aeb5f61-1de4-83ec-80e1-a9ff95fe4635)
+`QA-RELEASE-acfec925389b`, diuji pada
+chat ChatGPT baru (PRIVATE-REFERENCE-175207d5dc2d)
 dengan parent-plugin Content Producer saja dan dependency owner OAuth `mcpku2`.
 Pemilik mengizinkan QA melalui Chrome. Setelah preview payload ditinjau, tepat
-satu draft v2 disimpan pada Page QA `3c7dc8b2-43db-42b5-abd6-d334aac0ff83`.
+satu draft v2 disimpan pada Page QA `QA-ID-7b6e770529b4`.
 
 Host: profile/workspace/Page/context → riset URL nyata → dedup v2 → preview →
 persetujuan satu payload → dedup/context terbaru → `save_post_v2` →
-`get_post` dengan sources/checks. Post `ff10ff32-788a-45c2-80d6-3b4f6fd64b4b`,
+`get_post` dengan sources/checks. Post `QA-ID-e25a2f3e0705`,
 schema 2/draft/revision 1, tujuh fakta/URL, quality passed, 5 mechanical passed,
 3 editorial pass. Read OAuth independen mengonfirmasi konten dan hash
 `dbaaa6d1b4a7e36b7a1066d076773504ec7f7e71a1395129e71b8e0c46d06847`.
@@ -61,7 +63,7 @@ Pemilik menjalankan **enam tool Read** lewat PRIVATE Content Producer pada konek
 
 | Test ID | Tool                        | Verdict                 | Actual                                                                                                                                              |
 | ------- | --------------------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| LT-007  | `list_content_plans`        | PASS LIVE               | 1 plan `08c75cc2-c123-4471-852a-4c159f26f22e`, pending, 3 item                                                                                      |
+| LT-007  | `list_content_plans`        | PASS LIVE               | 1 plan `QA-ID-18d465bf32a8`, pending, 3 item                                                                                      |
 | LT-009  | `get_content_plan`          | PASS LIVE               | 3/3 pending; 22/24/26 Oktober 2026 pukul 21 WIB; 0 claim/attempt                                                                                    |
 | LT-022  | `get_post`                  | PASS LIVE               | Moon post ready rev 3; 7 allocated, verified facts, 3 NASA URLs; 19/19 system dan 18/18 editorial checks, approved hash cocok                       |
 | LT-016  | `trivia_find_similar_facts` | **FAIL — needs triage** | MCP `INVALID_ARGUMENT` / SQL `VALIDATION_FAILED` pada satu calon fakta dengan `numbers.unit:null` dan `qualifiers:{negated:false}`; tidak ada match |
@@ -125,8 +127,8 @@ untuk membuktikan nihil pemanggilan backend belum tersedia.
 Metadata plugin dan versi Edge tidak muncul di hasil Read.
 
 **Verifikasi navigator independen:** melalui Plugin Creator, PRIVATE
-plugin ID `plugins_6ad5bf91a278819182951ebb312eca06` memiliki release
-aktif `pluginrel_6ad88fd9d5a88191b680e9416d649adf`,
+plugin ID `QA-PLUGIN-58151d60d6a8` memiliki release
+aktif `QA-RELEASE-7705233fec02`,
 **v0.2.3**, mengikat registered app yang sama dalam
 `.app.json` (`asdk_app_6ad6ebeab5fc8191a1d2cd54b87cd96f`).
 Source GitHub `trivia_fact.ts` telah memakai required closed enum.
@@ -169,7 +171,7 @@ Pada retest terdahulu schema host masih optional/free-string; ini
 
 Verifikasi terpisah oleh navigator melalui Plugin Creator menyatakan
 PRIVATE plugin yang sama sudah v0.2.3, release
-`pluginrel_6ad88fd9d5a88191b680e9416d649adf` dan registered app
+`QA-RELEASE-7705233fec02` dan registered app
 tetap sama. Edge `mcp` v32 dan bundle SHA adalah bukti rollout
 implementer di [Issue #29](https://github.com/milyarderpro/content-producer/issues/29),
 bukan pembacaan Edge saat sesi schema-only.
@@ -265,3 +267,108 @@ File lama `lt_e2e_01_elephant_prewrite_preview.json` hanya dilaporkan sebagai la
 Bukti dedup yang dapat dikutip: **6/6 Read owner-reported + 1/1 Read navigator** berhasil; 35 hasil Moon top-five `numeric`-only dinilai bukan duplikat semantik. Ini bukan pemeriksaan menyeluruh ataupun snapshot dedup saat Write. Sumber `published_at`/`updated_at` yang tanggal pastinya tak diketahui tetap `null`; tanggal akses dan koreksi artikel F4 dicatat terpisah. Belum ada reservasi, `save_post` atau readback draft baru; field runtime (CAS, operation key, reservation token, expiry, fact/post IDs) sengaja tidak disimpan.
 
 **Outcome E2E: BLOCKED / belum ada PASS draft.** Berikutnya hanya setelah pekerjaan pemulihan fixture ini ditinjau: buka fixture dari repository dalam chat baru, jalankan Read preflight terbaru, cek budget renderer, review tepat satu draft dan izin produksi per Write sebelum eksekusi. Tidak ada Write, deploy, full CI atau perubahan backend pada tugas fixture ini. Referensi: [Issue #26](https://github.com/milyarderpro/content-producer/issues/26).
+
+
+## DNA-SAVED-056-01 — lima format saved-copy (6 November 2026)
+
+**Outcome: PASS LIVE task 6.3**, setelah guided pre-save editorial review.
+PRIVATE Content Producer 0.5.6, release
+`QA-RELEASE-cb7b33da5f8d`, source
+`82f698b0c7f873fc5906919ae64f34242cb49e61`; owner OAuth `mcpku2`.
+Target: Content Producer QA Sandbox (Verified), baseline nol post, tanpa
+perubahan config atau bypass `workspace_unique`. Tepat lima draft baru
+(E01/E08/E02/E03/E04), 32 fakta, revision 1, quality passed; 5/5 system checks
+dan 3/3 editorial checks per post lulus pada hash/revision yang sama.
+Readback coordinator `get_post` sources/checks membuktikan copy, claims,
+urutan, URL, caption dan hashtags exact. Inventaris akhir tepat lima post.
+
+[Laporan dengan ID/hash/copy/chat](../editorial/reference-dna-saved-copy-2026-11-06.md)
+dan [fixture readback](fixtures/reference-dna-saved-copy-2026-11-06.json)
+menyimpan bukti yang disanitasi. Riset memakai pool QA lama; URL tidak dibuka
+atau diverifikasi ulang sesuai instruksi pemilik. Raw invocation trace lengkap
+tidak tersedia; versi katalog final E02 tidak tertangkap. Preview awal E02
+BLOCKED karena ambiguitas “sudah dipakai” diperbaiki lewat klarifikasi dalam
+chat yang sama sebelum Write; bukan first-pass PASS atau patch backend.
+Tidak mengedit 18 draft audit, membuat plan, approve/ready, publish, schedule
+atau cleanup. Task 6.4 batch dan task 6.5 D6/readback verdict **NOT RUN**;
+belum ada klaim FIXED atau perubahan versi backend. Tidak ada push/PR/Actions
+pada run ini; handoff Issue/PR tetap mengikuti record remediasi.
+
+
+## DNA-BATCH-056-01 — batch lima draft (6 November 2026)
+
+**PASS LIVE task 6.4 pada scope count/config/progress/readback**, bukan D6/FIXED.
+PRIVATE Content Producer 0.5.6, release
+`QA-RELEASE-cb7b33da5f8d`, source
+`82f698b0c7f873fc5906919ae64f34242cb49e61`; owner OAuth `mcpku2`.
+Satu plan `QA-ID-6efb71a0e89b`, requested 5 /
+completed 5 / remaining 0; jumlah fakta **7, 7, 7, 6, 6**, 33 bindings.
+Seluruh item_config hanya profile_key fast_trivia, tanpa override fact_count.
+Readback plan per item dan get_post sources/checks membuktikan lima draft
+revision 1/quality passed; Page/config unchanged, inventaris QA 5→10 post,
+0→1 plan. Metadata lima post QA lama tidak berubah.
+
+[Laporan dan ID/hash/copy](../editorial/reference-dna-batch-2026-11-06.md),
+[fixture](fixtures/reference-dna-batch-2026-11-06.json). Prompt QA mengatur
+scope plan/turn, memakai pool riset lama, tanpa instruksi jumlah fakta atau
+membuka ulang URL. Item 2 mengalami host-reported budget rejection sebelum
+perbaikan wording dan save berhasil; raw error code tidak tertangkap. Display
+jawaban final host item 1 tidak terbaca, tetapi state draft terbukti langsung.
+Scope qualifier Io/rasio, komposisi zipper/Canadian places dan format Australia
+ditahan untuk task 6.5; **jangan mengklaim semua naskah sesuai DNA/FIXED**.
+Tidak revise item completed, approve/ready, publish, schedule, discard, cleanup,
+backend deploy atau push/PR/Actions.
+
+
+## DNA-D6-056-01 — review naskah tersimpan (6 November 2026)
+
+**Outcome editorial: FAIL task 6.5 — 6 PASS, 4 FAIL.**
+Readback owner-scoped terbaru atas 10 post: revision/hash/content_payload/
+fact_bindings sama dengan fixture task 6.3/6.4; draft revision 1, system dan
+editorial checks passed. Plan tetap completed 5/5. Ini bukti state **LIVE**;
+nilai D6 merupakan review semantik Codex, bukan skor dari server, blind review
+atau penerimaan owner baru.
+
+Lima format yang melalui review terarah pada task 6.3 **5/5 PASS**: E01 16,
+E08 15, E02 16, E03 15, E04 15. Batch: B1 moons **15 FAIL qualifier**;
+B2 Canadian places **10 FAIL C/D=0**; B3 zipper **13 FAIL C=0**;
+B4 trees **16 PASS**; B5 Australia **9 FAIL G=0/E=1**.
+Tidak memakai rata-rata untuk menutup kegagalan. Kontrol count/progress task
+6.4 tetap PASS; penerimaan DNA batch belum lulus dan **belum FIXED**.
+
+[Laporan lengkap/80 penilaian dimensi](../editorial/reference-dna-d6-saved-review-2026-11-06.md),
+[fixture review](fixtures/reference-dna-d6-review-2026-11-06.json).
+Issue terpisah: [#134 qualifier](https://github.com/milyarderpro/content-producer/issues/134),
+[#135 komposisi](https://github.com/milyarderpro/content-producer/issues/135),
+[#136 format](https://github.com/milyarderpro/content-producer/issues/136).
+Ketiganya open, belum patch/PR/Actions/retest. Payload GitHub disanitasi setelah
+auto-review menolak URL chat privat/metadata internal; bukti rinci tetap lokal.
+
+Plugin 0.5.6 / release `QA-RELEASE-cb7b33da5f8d`;
+source `82f698b0c7f873fc5906919ae64f34242cb49e61`.
+Riset memakai pool QA lama, tanpa membuka/verifikasi ulang URL. Tidak melakukan
+business Write, source/plugin upgrade, backend change, approval, publikasi atau
+cleanup. Task 6.5 tetap terbuka **27/28** sampai remediasi/retest lulus.
+
+## Retest 0.5.7 — task 6.5 tuntas, 6 November 2026
+
+**LIVE PASS: 10/10 saved-copy; 28/28 task selesai.** Empat kasus gagal
+B1/B2/B3/B5 diperbaiki melalui host baru pada post QA yang sama; D6 masing-masing
+15/15/16/14, tanpa 0, E=2, qualifier/config/budget lulus. Enam saved-copy
+regresi identik dan tetap PASS; bukan enam generasi baru. Lima format dan
+kelima output batch lulus; plan tetap completed 5/5, inventaris tetap 10.
+Tidak ada post pengganti atau perubahan completed item/config/production.
+Hasil adalah penerimaan sesudah repair terarah, bukan first-pass atau jaminan viral.
+
+Source PR #137: `8069bb1bfd03316700e0dca9cfb4c6c8e880229a`;
+[Actions 42176824421](https://github.com/milyarderpro/content-producer/actions/runs/42176824421)
+PASS 53 detik. Lokal check PASS 184 source + 19 frontend; packaging/verify
+15 file PASS. Plugin PRIVATE yang sama kini **0.5.7**, release
+`QA-RELEASE-10c52114aae7`, readback source 15/15 sama.
+PR [#137](https://github.com/milyarderpro/content-producer/pull/137) masih OPEN,
+belum merge; Issue #134–#136 CLOSED/COMPLETED setelah retest. Tidak ada backend
+change/deploy atau G4 baru. Metadata QA privat tetap lokal, source PR disanitasi.
+Tidak membuka/verifikasi ulang URL sumber; pool/snapshot QA lama, bukan
+sertifikasi faktual baru. FAIL 0.5.6 tetap historis, tidak ditimpa.
+
+[Laporan lengkap](../editorial/reference-dna-d6-retest-0.5.7-2026-11-06.md), [fixture retest](fixtures/reference-dna-d6-retest-0.5.7-2026-11-06.json).
