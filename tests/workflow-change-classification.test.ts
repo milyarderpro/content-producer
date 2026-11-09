@@ -182,4 +182,29 @@ describe('Light CI memilih pemeriksaan dari kedua sisi perubahan', () => {
     const result = classify({}, { 'auth-frontend/vercel.json': '{}\n' });
     expect(result.checks.need_check).toBe('true');
   });
+
+  it.each(['reference-patterns.md', 'writing-playbook.md'])(
+    'memilih paket saat referensi runtime %s ditambahkan atau dihapus', (name) => {
+      const path = 'plugin/skills/content-producer/references/niches/trivia/' + name;
+      for (const result of [classify({}, { [path]: 'Fixture\n' }),
+        classify({ [path]: 'Fixture\n' }, {})]) {
+        expect(result.checks.package_changed).toBe('true');
+        expect(result.checks.mcp_changed).toBe('false');
+        expect(result.checks.backend_review).toBe('false');
+      }
+    },
+  );
+
+  it('memilih source checks dari companion sumber tanpa membundel corpus QA', () => {
+    const path = 'docs/editorial/reference-example-sources.md';
+    for (const result of [classify({}, { [path]: 'Fixture\n' }),
+      classify({ [path]: 'Fixture\n' }, {})]) {
+      expect(result.checks.need_check).toBe('true');
+      expect(result.checks.package_changed).toBe('false');
+      expect(result.checks.mcp_changed).toBe('false');
+    }
+    const runtime = classify({}, { 'scripts/plugin-package.ts': 'Fixture\n' });
+    expect(runtime.checks.need_check).toBe('true');
+    expect(runtime.checks.package_changed).toBe('true');
+  });
 });

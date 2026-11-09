@@ -1,0 +1,2899 @@
+{
+  "schema_version": 1,
+  "test_id": "DNA-BATCH-056-01",
+  "date": "2026-11-06",
+  "scope": "Task 6.4 batch/count/progress/readback only; D6 remains task 6.5",
+  "outcome": "PASS LIVE within scope after one host-reported budget rejection/repair",
+  "preflight": {
+    "test_id": "DNA-BATCH-056-01",
+    "scope": {
+      "draft_count": 5,
+      "page_public_id": "QA-ID-7b6e770529b4",
+      "plan_name": "QA DNA batch 2026-11-06 T64",
+      "scheduled": false,
+      "approve": false,
+      "publication": false,
+      "source_url_reverification": false
+    },
+    "host_chat": "PRIVATE-REFERENCE-81426f193193",
+    "source_sha": "82f698b0c7f873fc5906919ae64f34242cb49e61",
+    "plugin": {
+      "version": "0.5.6",
+      "release_id": "QA-RELEASE-cb7b33da5f8d"
+    },
+    "before": {
+      "context": {
+        "page": {
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "name": "Content Producer QA Sandbox (Verified)",
+          "slug": "cp-qa-sandbox-20261021",
+          "timezone": "Asia/Jakarta",
+          "target_markets": [
+            "US"
+          ],
+          "is_active": true,
+          "enabled_niches": [
+            {
+              "niche_key": "trivia",
+              "is_enabled": true,
+              "is_default": false,
+              "config_schema_version": 1,
+              "updated_at": "2026-10-21T16:08:12.627461Z"
+            }
+          ],
+          "updated_at": "2026-10-22T02:09:46.387531Z",
+          "created_at": "2026-10-21T16:08:12.627461Z"
+        },
+        "module": {
+          "niche_key": "trivia",
+          "display_name": "Trivia Facts",
+          "module_version": 1,
+          "status": "active",
+          "config_schema_version": 1,
+          "content_schema_versions": [
+            1
+          ],
+          "capabilities": [
+            "project_generation_context",
+            "validate_content_payload",
+            "render_content",
+            "find_similar_items",
+            "register_and_reserve_items",
+            "release_items",
+            "reverify_sources",
+            "correct_items",
+            "project_performance_dimensions"
+          ]
+        },
+        "config_public_id": "QA-ID-70dc81dc5199",
+        "config": {
+          "allowed_formats": [
+            "single_subject_fast",
+            "themed_utility",
+            "emotional_animal_collection",
+            "comparison",
+            "myth_vs_fact"
+          ],
+          "format_weights": {
+            "single_subject_fast": 35,
+            "themed_utility": 20,
+            "emotional_animal_collection": 20,
+            "comparison": 15,
+            "myth_vs_fact": 10
+          },
+          "allowed_topics": [
+            "animals",
+            "pet_safety",
+            "food_science",
+            "food_storage_home",
+            "practical_utility",
+            "human_body",
+            "nature_science",
+            "geography",
+            "history_origins",
+            "inventions_everyday",
+            "general_trivia"
+          ],
+          "topic_group_weights": {
+            "animals_pet_safety": 30,
+            "human_body_food_myth": 20,
+            "practical_utility": 15,
+            "places_geography": 15,
+            "nature_space": 10,
+            "history_inventions_people": 10
+          },
+          "fact_count": {
+            "mode": "adaptive",
+            "min": 5,
+            "preferred": 7,
+            "max": 9
+          },
+          "profiles": {
+            "fast_trivia": {
+              "fact_count_min": 7,
+              "fact_count_max": 8,
+              "words_per_fact_min": 8,
+              "words_per_fact_max": 11,
+              "total_words_min": 65,
+              "total_words_max": 85
+            },
+            "practical_utility": {
+              "fact_count_min": 5,
+              "fact_count_max": 6,
+              "words_per_fact_min": 10,
+              "words_per_fact_max": 14,
+              "total_words_min": 65,
+              "total_words_max": 85
+            }
+          },
+          "fact_reuse_scope": "workspace_unique",
+          "render_style": "plain_lines",
+          "allowed_interaction_goals": [
+            "share",
+            "save",
+            "comment",
+            "follow"
+          ],
+          "text_budget": {
+            "hook_max_chars": 45,
+            "fact_max_chars": 90,
+            "facts_total_max_chars": 500,
+            "cta_max_chars": 50,
+            "canva_total_max_chars": 600
+          },
+          "caption": {
+            "max_chars": 500
+          },
+          "hashtags": {
+            "default_count": 3,
+            "min_count": 0,
+            "max_count": 5
+          },
+          "style": {
+            "english_variant": "en-US",
+            "tone": "conversational_credible",
+            "emoji_allowed": false,
+            "regional_slang_allowed": false
+          }
+        },
+        "generation_rules": {
+          "allowed_topics": [
+            "animals",
+            "pet_safety",
+            "food_science",
+            "food_storage_home",
+            "practical_utility",
+            "human_body",
+            "nature_science",
+            "geography",
+            "history_origins",
+            "inventions_everyday",
+            "general_trivia"
+          ],
+          "allowed_formats": [
+            "single_subject_fast",
+            "themed_utility",
+            "emotional_animal_collection",
+            "comparison",
+            "myth_vs_fact"
+          ],
+          "allowed_profiles": [
+            "fast_trivia",
+            "practical_utility"
+          ],
+          "allowed_interaction_goals": [
+            "share",
+            "save",
+            "comment",
+            "follow"
+          ],
+          "fact_count": {
+            "mode": "adaptive",
+            "min": 5,
+            "preferred": 7,
+            "max": 9
+          },
+          "profiles": {
+            "fast_trivia": {
+              "fact_count_min": 7,
+              "fact_count_max": 8,
+              "words_per_fact_min": 8,
+              "words_per_fact_max": 11,
+              "total_words_min": 65,
+              "total_words_max": 85
+            },
+            "practical_utility": {
+              "fact_count_min": 5,
+              "fact_count_max": 6,
+              "words_per_fact_min": 10,
+              "words_per_fact_max": 14,
+              "total_words_min": 65,
+              "total_words_max": 85
+            }
+          },
+          "text_budget": {
+            "hook_max_chars": 45,
+            "fact_max_chars": 90,
+            "facts_total_max_chars": 500,
+            "cta_max_chars": 50,
+            "canva_total_max_chars": 600
+          },
+          "locale": "en-US",
+          "english_variant": "en-US",
+          "render_style": "plain_lines"
+        },
+        "reuse_policy": {
+          "scope": "workspace_unique",
+          "reservation_ttl_minutes": 30,
+          "requires_verified_facts": true,
+          "eligible_fact_count": 0
+        },
+        "recent_variety": [
+          {
+            "post_public_id": "QA-ID-2f4994901bb3",
+            "status": "draft",
+            "topic_key": "animals",
+            "format_key": "emotional_animal_collection",
+            "interaction_goal": "share",
+            "hook": "Did you know?",
+            "cta": "Share this with someone who loves meerkats.",
+            "updated_at": "2026-11-06T02:19:39.715132Z"
+          },
+          {
+            "post_public_id": "QA-ID-9b0689b5acf3",
+            "status": "draft",
+            "topic_key": "animals",
+            "format_key": "myth_vs_fact",
+            "interaction_goal": "comment",
+            "hook": "Did you know?",
+            "cta": "Which bat myth surprised you the most?",
+            "updated_at": "2026-11-06T02:17:59.851498Z"
+          },
+          {
+            "post_public_id": "QA-ID-2efa1c2e80c0",
+            "status": "draft",
+            "topic_key": "animals",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "hook": "Did you know?",
+            "cta": "Which difference surprised you most?",
+            "updated_at": "2026-11-06T02:15:40.670600Z"
+          },
+          {
+            "post_public_id": "QA-ID-834222c2456a",
+            "status": "draft",
+            "topic_key": "animals",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "share",
+            "hook": "Did you know?",
+            "cta": "Share this with a red panda fan.",
+            "updated_at": "2026-11-06T02:13:34.401739Z"
+          },
+          {
+            "post_public_id": "QA-ID-1112e26848ac",
+            "status": "draft",
+            "topic_key": "food_storage_home",
+            "format_key": "themed_utility",
+            "interaction_goal": "save",
+            "hook": "Did you know?",
+            "cta": "Save this for your next grocery trip.",
+            "updated_at": "2026-11-06T02:11:50.787293Z"
+          }
+        ],
+        "performance_signals": [],
+        "context_version": {
+          "page_updated_at": "2026-10-22T02:09:46.387531Z",
+          "config_updated_at": "2026-10-21T16:08:12.627461Z"
+        }
+      },
+      "posts": {
+        "items": [
+          {
+            "content_schema_version": 2,
+            "post_public_id": "QA-ID-2f4994901bb3",
+            "page_public_id": "QA-ID-7b6e770529b4",
+            "niche_key": "trivia",
+            "status": "draft",
+            "revision": 1,
+            "format_key": "emotional_animal_collection",
+            "topic_key": "animals",
+            "interaction_goal": "share",
+            "scheduled_at": null,
+            "published_at": null,
+            "quality_status": "passed",
+            "hook_preview": "Did you know?",
+            "updated_at": "2026-11-06T02:19:39.715132Z"
+          },
+          {
+            "content_schema_version": 2,
+            "post_public_id": "QA-ID-9b0689b5acf3",
+            "page_public_id": "QA-ID-7b6e770529b4",
+            "niche_key": "trivia",
+            "status": "draft",
+            "revision": 1,
+            "format_key": "myth_vs_fact",
+            "topic_key": "animals",
+            "interaction_goal": "comment",
+            "scheduled_at": null,
+            "published_at": null,
+            "quality_status": "passed",
+            "hook_preview": "Did you know?",
+            "updated_at": "2026-11-06T02:17:59.851498Z"
+          },
+          {
+            "content_schema_version": 2,
+            "post_public_id": "QA-ID-2efa1c2e80c0",
+            "page_public_id": "QA-ID-7b6e770529b4",
+            "niche_key": "trivia",
+            "status": "draft",
+            "revision": 1,
+            "format_key": "comparison",
+            "topic_key": "animals",
+            "interaction_goal": "comment",
+            "scheduled_at": null,
+            "published_at": null,
+            "quality_status": "passed",
+            "hook_preview": "Did you know?",
+            "updated_at": "2026-11-06T02:15:40.670600Z"
+          },
+          {
+            "content_schema_version": 2,
+            "post_public_id": "QA-ID-834222c2456a",
+            "page_public_id": "QA-ID-7b6e770529b4",
+            "niche_key": "trivia",
+            "status": "draft",
+            "revision": 1,
+            "format_key": "single_subject_fast",
+            "topic_key": "animals",
+            "interaction_goal": "share",
+            "scheduled_at": null,
+            "published_at": null,
+            "quality_status": "passed",
+            "hook_preview": "Did you know?",
+            "updated_at": "2026-11-06T02:13:34.401739Z"
+          },
+          {
+            "content_schema_version": 2,
+            "post_public_id": "QA-ID-1112e26848ac",
+            "page_public_id": "QA-ID-7b6e770529b4",
+            "niche_key": "trivia",
+            "status": "draft",
+            "revision": 1,
+            "format_key": "themed_utility",
+            "topic_key": "food_storage_home",
+            "interaction_goal": "save",
+            "scheduled_at": null,
+            "published_at": null,
+            "quality_status": "passed",
+            "hook_preview": "Did you know?",
+            "updated_at": "2026-11-06T02:11:50.787293Z"
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false
+      },
+      "plans": {
+        "items": [],
+        "next_cursor": null,
+        "has_more": false
+      }
+    },
+    "input_limits": "No fact-count instruction; bounded previous QA research pool (trees, Canadian places, Australia, zipper, moons); live dedup, no URL reopening; one item per host turn."
+  },
+  "plan_initial": {
+    "plan": {
+      "plan_public_id": "QA-ID-6efb71a0e89b",
+      "name": "QA DNA batch 2026-11-06 T64",
+      "page_public_id": "QA-ID-7b6e770529b4",
+      "niche_key": "trivia",
+      "status": "in_progress",
+      "requested_count": 5,
+      "progress": {
+        "pending": 4,
+        "in_progress": 1,
+        "completed": 0,
+        "failed": 0,
+        "cancelled": 0
+      },
+      "created_at": "2026-11-06T03:04:57.622973Z",
+      "updated_at": "2026-11-06T03:05:04.585371Z"
+    },
+    "items": [
+      {
+        "plan_item_public_id": "QA-ID-a8e492fb5347",
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "position": 1,
+        "status": "in_progress",
+        "scheduled_at": null,
+        "topic_key": "nature_science",
+        "format_key": "comparison",
+        "interaction_goal": "comment",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "attempt_count": 1,
+        "claim_expires_at": "2026-11-06T03:35:04.603381Z",
+        "active_post_public_id": null,
+        "last_error": null,
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T03:05:04.585371Z"
+      },
+      {
+        "plan_item_public_id": "QA-ID-02b4a58bcf76",
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "position": 2,
+        "status": "pending",
+        "scheduled_at": null,
+        "topic_key": "geography",
+        "format_key": "single_subject_fast",
+        "interaction_goal": "follow",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "attempt_count": 0,
+        "claim_expires_at": null,
+        "active_post_public_id": null,
+        "last_error": null,
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T03:04:57.622973Z"
+      },
+      {
+        "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "position": 3,
+        "status": "pending",
+        "scheduled_at": null,
+        "topic_key": "inventions_everyday",
+        "format_key": "single_subject_fast",
+        "interaction_goal": "follow",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "attempt_count": 0,
+        "claim_expires_at": null,
+        "active_post_public_id": null,
+        "last_error": null,
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T03:04:57.622973Z"
+      },
+      {
+        "plan_item_public_id": "QA-ID-fa3adbcc9368",
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "position": 4,
+        "status": "pending",
+        "scheduled_at": null,
+        "topic_key": "nature_science",
+        "format_key": "single_subject_fast",
+        "interaction_goal": "share",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "attempt_count": 0,
+        "claim_expires_at": null,
+        "active_post_public_id": null,
+        "last_error": null,
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T03:04:57.622973Z"
+      },
+      {
+        "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "position": 5,
+        "status": "pending",
+        "scheduled_at": null,
+        "topic_key": "geography",
+        "format_key": "comparison",
+        "interaction_goal": "comment",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "attempt_count": 0,
+        "claim_expires_at": null,
+        "active_post_public_id": null,
+        "last_error": null,
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T03:04:57.622973Z"
+      }
+    ],
+    "next_cursor": null,
+    "has_more": false
+  },
+  "progress_snapshots": [
+    {
+      "stage": "before",
+      "plans": {
+        "items": [],
+        "next_cursor": null,
+        "has_more": false
+      }
+    },
+    {
+      "stage": "initial_claim",
+      "data": {
+        "plan": {
+          "plan_public_id": "QA-ID-6efb71a0e89b",
+          "name": "QA DNA batch 2026-11-06 T64",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "in_progress",
+          "requested_count": 5,
+          "progress": {
+            "pending": 4,
+            "in_progress": 1,
+            "completed": 0,
+            "failed": 0,
+            "cancelled": 0
+          },
+          "created_at": "2026-11-06T03:04:57.622973Z",
+          "updated_at": "2026-11-06T03:05:04.585371Z"
+        },
+        "items": [
+          {
+            "plan_item_public_id": "QA-ID-a8e492fb5347",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 1,
+            "status": "in_progress",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": "2026-11-06T03:35:04.603381Z",
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:05:04.585371Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-02b4a58bcf76",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 2,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 3,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "inventions_everyday",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-fa3adbcc9368",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 4,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "share",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 5,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false
+      }
+    },
+    {
+      "stage": "after_item_1",
+      "data": {
+        "plan": {
+          "plan_public_id": "QA-ID-6efb71a0e89b",
+          "name": "QA DNA batch 2026-11-06 T64",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "partially_completed",
+          "requested_count": 5,
+          "progress": {
+            "pending": 4,
+            "in_progress": 0,
+            "completed": 1,
+            "failed": 0,
+            "cancelled": 0
+          },
+          "created_at": "2026-11-06T03:04:57.622973Z",
+          "updated_at": "2026-11-06T03:05:59.762163Z"
+        },
+        "items": [
+          {
+            "plan_item_public_id": "QA-ID-a8e492fb5347",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 1,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-6343ba3a3224",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:05:59.762163Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-02b4a58bcf76",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 2,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 3,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "inventions_everyday",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-fa3adbcc9368",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 4,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "share",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 5,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false
+      }
+    },
+    {
+      "stage": "after_item_2",
+      "data": {
+        "plan": {
+          "plan_public_id": "QA-ID-6efb71a0e89b",
+          "name": "QA DNA batch 2026-11-06 T64",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "partially_completed",
+          "requested_count": 5,
+          "progress": {
+            "pending": 3,
+            "in_progress": 0,
+            "completed": 2,
+            "failed": 0,
+            "cancelled": 0
+          },
+          "created_at": "2026-11-06T03:04:57.622973Z",
+          "updated_at": "2026-11-06T05:39:00.340403Z"
+        },
+        "items": [
+          {
+            "plan_item_public_id": "QA-ID-a8e492fb5347",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 1,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-6343ba3a3224",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:05:59.762163Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-02b4a58bcf76",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 2,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-5ac933583f9f",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T05:39:00.340403Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 3,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "inventions_everyday",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-fa3adbcc9368",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 4,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "share",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 5,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false
+      }
+    },
+    {
+      "stage": "after_item_3",
+      "data": {
+        "plan": {
+          "plan_public_id": "QA-ID-6efb71a0e89b",
+          "name": "QA DNA batch 2026-11-06 T64",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "partially_completed",
+          "requested_count": 5,
+          "progress": {
+            "pending": 2,
+            "in_progress": 0,
+            "completed": 3,
+            "failed": 0,
+            "cancelled": 0
+          },
+          "created_at": "2026-11-06T03:04:57.622973Z",
+          "updated_at": "2026-11-06T05:41:40.679307Z"
+        },
+        "items": [
+          {
+            "plan_item_public_id": "QA-ID-a8e492fb5347",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 1,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-6343ba3a3224",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:05:59.762163Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-02b4a58bcf76",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 2,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-5ac933583f9f",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T05:39:00.340403Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 3,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "inventions_everyday",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-6821aa81b974",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T05:41:40.679307Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-fa3adbcc9368",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 4,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "share",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 5,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false
+      }
+    },
+    {
+      "stage": "after_item_4",
+      "data": {
+        "plan": {
+          "plan_public_id": "QA-ID-6efb71a0e89b",
+          "name": "QA DNA batch 2026-11-06 T64",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "partially_completed",
+          "requested_count": 5,
+          "progress": {
+            "pending": 1,
+            "in_progress": 0,
+            "completed": 4,
+            "failed": 0,
+            "cancelled": 0
+          },
+          "created_at": "2026-11-06T03:04:57.622973Z",
+          "updated_at": "2026-11-06T05:43:58.940226Z"
+        },
+        "items": [
+          {
+            "plan_item_public_id": "QA-ID-a8e492fb5347",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 1,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-6343ba3a3224",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:05:59.762163Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-02b4a58bcf76",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 2,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-5ac933583f9f",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T05:39:00.340403Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 3,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "inventions_everyday",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-6821aa81b974",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T05:41:40.679307Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-fa3adbcc9368",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 4,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "share",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-1b061bd35c5e",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T05:43:58.940226Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 5,
+            "status": "pending",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 0,
+            "claim_expires_at": null,
+            "active_post_public_id": null,
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:04:57.622973Z"
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false
+      }
+    },
+    {
+      "stage": "after_item_5",
+      "data": {
+        "plan": {
+          "plan_public_id": "QA-ID-6efb71a0e89b",
+          "name": "QA DNA batch 2026-11-06 T64",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "completed",
+          "requested_count": 5,
+          "progress": {
+            "pending": 0,
+            "in_progress": 0,
+            "completed": 5,
+            "failed": 0,
+            "cancelled": 0
+          },
+          "created_at": "2026-11-06T03:04:57.622973Z",
+          "updated_at": "2026-11-06T05:46:17.221870Z"
+        },
+        "items": [
+          {
+            "plan_item_public_id": "QA-ID-a8e492fb5347",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 1,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-6343ba3a3224",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T03:05:59.762163Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-02b4a58bcf76",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 2,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-5ac933583f9f",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T05:39:00.340403Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 3,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "inventions_everyday",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "follow",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-6821aa81b974",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T05:41:40.679307Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-fa3adbcc9368",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 4,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "nature_science",
+            "format_key": "single_subject_fast",
+            "interaction_goal": "share",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-1b061bd35c5e",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T05:43:58.940226Z"
+          },
+          {
+            "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+            "plan_public_id": "QA-ID-6efb71a0e89b",
+            "position": 5,
+            "status": "completed",
+            "scheduled_at": null,
+            "topic_key": "geography",
+            "format_key": "comparison",
+            "interaction_goal": "comment",
+            "item_config": {
+              "profile_key": "fast_trivia"
+            },
+            "attempt_count": 1,
+            "claim_expires_at": null,
+            "active_post_public_id": "QA-ID-069385c57142",
+            "last_error": null,
+            "created_at": "2026-11-06T03:04:57.622973Z",
+            "updated_at": "2026-11-06T05:46:17.221870Z"
+          }
+        ],
+        "next_cursor": null,
+        "has_more": false
+      }
+    }
+  ],
+  "plan_final": {
+    "plan": {
+      "plan_public_id": "QA-ID-6efb71a0e89b",
+      "name": "QA DNA batch 2026-11-06 T64",
+      "page_public_id": "QA-ID-7b6e770529b4",
+      "niche_key": "trivia",
+      "status": "completed",
+      "requested_count": 5,
+      "progress": {
+        "pending": 0,
+        "in_progress": 0,
+        "completed": 5,
+        "failed": 0,
+        "cancelled": 0
+      },
+      "created_at": "2026-11-06T03:04:57.622973Z",
+      "updated_at": "2026-11-06T05:46:17.221870Z"
+    },
+    "items": [
+      {
+        "plan_item_public_id": "QA-ID-a8e492fb5347",
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "position": 1,
+        "status": "completed",
+        "scheduled_at": null,
+        "topic_key": "nature_science",
+        "format_key": "comparison",
+        "interaction_goal": "comment",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "attempt_count": 1,
+        "claim_expires_at": null,
+        "active_post_public_id": "QA-ID-6343ba3a3224",
+        "last_error": null,
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T03:05:59.762163Z"
+      },
+      {
+        "plan_item_public_id": "QA-ID-02b4a58bcf76",
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "position": 2,
+        "status": "completed",
+        "scheduled_at": null,
+        "topic_key": "geography",
+        "format_key": "single_subject_fast",
+        "interaction_goal": "follow",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "attempt_count": 1,
+        "claim_expires_at": null,
+        "active_post_public_id": "QA-ID-5ac933583f9f",
+        "last_error": null,
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T05:39:00.340403Z"
+      },
+      {
+        "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "position": 3,
+        "status": "completed",
+        "scheduled_at": null,
+        "topic_key": "inventions_everyday",
+        "format_key": "single_subject_fast",
+        "interaction_goal": "follow",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "attempt_count": 1,
+        "claim_expires_at": null,
+        "active_post_public_id": "QA-ID-6821aa81b974",
+        "last_error": null,
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T05:41:40.679307Z"
+      },
+      {
+        "plan_item_public_id": "QA-ID-fa3adbcc9368",
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "position": 4,
+        "status": "completed",
+        "scheduled_at": null,
+        "topic_key": "nature_science",
+        "format_key": "single_subject_fast",
+        "interaction_goal": "share",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "attempt_count": 1,
+        "claim_expires_at": null,
+        "active_post_public_id": "QA-ID-1b061bd35c5e",
+        "last_error": null,
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T05:43:58.940226Z"
+      },
+      {
+        "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "position": 5,
+        "status": "completed",
+        "scheduled_at": null,
+        "topic_key": "geography",
+        "format_key": "comparison",
+        "interaction_goal": "comment",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "attempt_count": 1,
+        "claim_expires_at": null,
+        "active_post_public_id": "QA-ID-069385c57142",
+        "last_error": null,
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T05:46:17.221870Z"
+      }
+    ],
+    "next_cursor": null,
+    "has_more": false
+  },
+  "cases": [
+    {
+      "position": 1,
+      "validation": {
+        "position": 1,
+        "post_public_id": "QA-ID-6343ba3a3224",
+        "plan_item_public_id": "QA-ID-a8e492fb5347",
+        "format": "comparison",
+        "topic": "nature_science",
+        "fact_count": 7,
+        "revision": 1,
+        "hash": "4dc750e3c7a54bb6dc20c98bbbfa91ab8e43267202a6e86f333b9262d25040b9",
+        "status": "draft",
+        "quality": "passed",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "checks": {
+          "same_page": true,
+          "same_item": true,
+          "draft_only": true,
+          "assembly_exact": true,
+          "bindings_exact": true,
+          "source_count": true,
+          "adaptive_count": true,
+          "no_fixed_override": true,
+          "format_allowed": true,
+          "topic_allowed": true,
+          "quality_passed": true,
+          "revision_hash_exact": true,
+          "no_current_warning": true
+        }
+      },
+      "host_display_copy": null,
+      "host_display_check": "NOT RUN — host final response failed to load",
+      "readback": {
+        "post": {
+          "post_public_id": "QA-ID-6343ba3a3224",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "4dc750e3c7a54bb6dc20c98bbbfa91ab8e43267202a6e86f333b9262d25040b9",
+          "format_key": "comparison",
+          "topic_key": "nature_science",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Unexpected moons of the solar system",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Phobos races around Mars roughly three times every day."
+                },
+                {
+                  "position": 2,
+                  "text": "Ganymede is wider than Mercury, despite being a moon."
+                },
+                {
+                  "position": 3,
+                  "text": "Triton circles Neptune backward relative to the planet's spin."
+                },
+                {
+                  "position": 4,
+                  "text": "Titan's atmosphere is thicker than Earth's; our Moon barely has one."
+                },
+                {
+                  "position": 5,
+                  "text": "Io has more volcanic activity than any other world."
+                },
+                {
+                  "position": 6,
+                  "text": "Enceladus shines brightly; parts of Iapetus are dark as asphalt."
+                },
+                {
+                  "position": 7,
+                  "text": "Charon is half Pluto's width; our Moon is a quarter of Earth's."
+                }
+              ]
+            },
+            "cta": "Which moon surprised you the most?",
+            "canva_copy": "Did you know?\n\nPhobos races around Mars roughly three times every day.\n\nGanymede is wider than Mercury, despite being a moon.\n\nTriton circles Neptune backward relative to the planet's spin.\n\nTitan's atmosphere is thicker than Earth's; our Moon barely has one.\n\nIo has more volcanic activity than any other world.\n\nEnceladus shines brightly; parts of Iapetus are dark as asphalt.\n\nCharon is half Pluto's width; our Moon is a quarter of Earth's.\n\nWhich moon surprised you the most?",
+            "caption": "From wild orbits to strange surfaces, the moons of our solar system have surprises of their own. Which one caught your attention?",
+            "hashtags": [
+              "#MoonFacts",
+              "#SpaceTrivia",
+              "#DidYouKnow"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                55,
+                53,
+                62,
+                68,
+                51,
+                64,
+                63
+              ],
+              "facts_total_chars": 428,
+              "cta_chars": 34,
+              "canva_total_chars": 479,
+              "word_count": 78,
+              "fact_word_counts": [
+                9,
+                9,
+                9,
+                11,
+                9,
+                10,
+                12
+              ],
+              "line_count": 24,
+              "fact_line_counts": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 6,
+              "hook_line_count": 1,
+              "cta_line_count": 1,
+              "estimated_read_seconds": 26.6,
+              "replay_ratio": 2.046154,
+              "estimated_loops": 3
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "4dc750e3c7a54bb6dc20c98bbbfa91ab8e43267202a6e86f333b9262d25040b9",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "4dc750e3c7a54bb6dc20c98bbbfa91ab8e43267202a6e86f333b9262d25040b9",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-44519c7bd90a",
+              "fact_role": "general",
+              "rendered_text": "Phobos races around Mars roughly three times every day.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Phobos circles Mars about three times per day.",
+                "source_url": "https://science.nasa.gov/mars/moons/phobos/"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-acd670f2ca98",
+              "fact_role": "general",
+              "rendered_text": "Ganymede is wider than Mercury, despite being a moon.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Ganymede is wider than Mercury, even though Ganymede is a moon.",
+                "source_url": "https://science.nasa.gov/solar-system/moons/10-things-about-our-solar-systems-most-marvelous-moons/"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-515473a4a75d",
+              "fact_role": "general",
+              "rendered_text": "Triton circles Neptune backward relative to the planet's spin.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Triton orbits Neptune opposite the planet's spin.",
+                "source_url": "https://science.nasa.gov/solar-system/moons/10-things-about-our-solar-systems-most-marvelous-moons/"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-552967d72ab1",
+              "fact_role": "general",
+              "rendered_text": "Titan's atmosphere is thicker than Earth's; our Moon barely has one.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Titan has a thicker atmosphere than Earth, while our Moon has almost none.",
+                "source_url": "https://science.nasa.gov/solar-system/moons/10-things-about-our-solar-systems-most-marvelous-moons/"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-521b521ec912",
+              "fact_role": "general",
+              "rendered_text": "Io has more volcanic activity than any other world.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Io is the solar system's most volcanically active world.",
+                "source_url": "https://science.nasa.gov/solar-system/moons/10-things-about-our-solar-systems-most-marvelous-moons/"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-a43fd7da7fae",
+              "fact_role": "general",
+              "rendered_text": "Enceladus shines brightly; parts of Iapetus are dark as asphalt.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Enceladus reflects bright light, while parts of Iapetus are dark as asphalt.",
+                "source_url": "https://science.nasa.gov/solar-system/moons/10-things-about-our-solar-systems-most-marvelous-moons/"
+              }
+            },
+            {
+              "position": 7,
+              "fact_public_id": "QA-ID-992016d9324d",
+              "fact_role": "general",
+              "rendered_text": "Charon is half Pluto's width; our Moon is a quarter of Earth's.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Charon is about half Pluto's width; our Moon is about one-quarter Earth's width.",
+                "source_url": "https://science.nasa.gov/asset/hubble/pluto-and-its-moon-charon/"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T03:05:59.762163Z",
+          "updated_at": "2026-11-06T03:05:59.762163Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": "QA-ID-a8e492fb5347",
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    {
+      "position": 2,
+      "validation": {
+        "position": 2,
+        "post_public_id": "QA-ID-5ac933583f9f",
+        "plan_item_public_id": "QA-ID-02b4a58bcf76",
+        "format": "single_subject_fast",
+        "topic": "geography",
+        "fact_count": 7,
+        "revision": 1,
+        "hash": "9a99e2e8e82c351df676c8a06e07588323ce28b17a05081a3bbe4c4462f6e2a7",
+        "status": "draft",
+        "quality": "passed",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "checks": {
+          "same_page": true,
+          "same_item": true,
+          "draft_only": true,
+          "assembly_exact": true,
+          "bindings_exact": true,
+          "source_count": true,
+          "adaptive_count": true,
+          "no_fixed_override": true,
+          "format_allowed": true,
+          "topic_allowed": true,
+          "quality_passed": true,
+          "revision_hash_exact": true,
+          "no_current_warning": true
+        }
+      },
+      "host_display_copy": "Did you know?\n\nButchart Gardens' five-acre Sunken Garden fills an old limestone quarry.\n\nWhen conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink.\n\nCalgary's Plus 15 carries walkers above streets on enclosed skywalks.\n\nToronto's PATH runs over 30 km, mostly beneath downtown.\n\nHistoric Quebec City retains North America's only complete colonial city walls.\n\nMontreal's underground pedestrian network runs about 32 km.\n\nStanley Park spans about 400 hectares on Vancouver's coast.\n\nFollow for more unexpected places.",
+      "host_display_check": "PASS exact",
+      "readback": {
+        "post": {
+          "post_public_id": "QA-ID-5ac933583f9f",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "9a99e2e8e82c351df676c8a06e07588323ce28b17a05081a3bbe4c4462f6e2a7",
+          "format_key": "single_subject_fast",
+          "topic_key": "geography",
+          "interaction_goal": "follow",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Unexpected places across Canada",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Butchart Gardens' five-acre Sunken Garden fills an old limestone quarry."
+                },
+                {
+                  "position": 2,
+                  "text": "When conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink."
+                },
+                {
+                  "position": 3,
+                  "text": "Calgary's Plus 15 carries walkers above streets on enclosed skywalks."
+                },
+                {
+                  "position": 4,
+                  "text": "Toronto's PATH runs over 30 km, mostly beneath downtown."
+                },
+                {
+                  "position": 5,
+                  "text": "Historic Quebec City retains North America's only complete colonial city walls."
+                },
+                {
+                  "position": 6,
+                  "text": "Montreal's underground pedestrian network runs about 32 km."
+                },
+                {
+                  "position": 7,
+                  "text": "Stanley Park spans about 400 hectares on Vancouver's coast."
+                }
+              ]
+            },
+            "cta": "Follow for more unexpected places.",
+            "canva_copy": "Did you know?\n\nButchart Gardens' five-acre Sunken Garden fills an old limestone quarry.\n\nWhen conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink.\n\nCalgary's Plus 15 carries walkers above streets on enclosed skywalks.\n\nToronto's PATH runs over 30 km, mostly beneath downtown.\n\nHistoric Quebec City retains North America's only complete colonial city walls.\n\nMontreal's underground pedestrian network runs about 32 km.\n\nStanley Park spans about 400 hectares on Vancouver's coast.\n\nFollow for more unexpected places.",
+            "caption": "From a garden inside an old quarry to a canal that can become a skating route, Canada has plenty of unexpected places to explore.",
+            "hashtags": [
+              "#CanadaTrivia",
+              "#GeographyFacts",
+              "#DidYouKnow"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                72,
+                75,
+                69,
+                56,
+                79,
+                59,
+                59
+              ],
+              "facts_total_chars": 481,
+              "cta_chars": 34,
+              "canva_total_chars": 532,
+              "word_count": 77,
+              "fact_word_counts": [
+                10,
+                12,
+                10,
+                9,
+                11,
+                8,
+                9
+              ],
+              "line_count": 28,
+              "fact_line_counts": [
+                3,
+                3,
+                3,
+                2,
+                3,
+                2,
+                2
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 5,
+              "hook_line_count": 1,
+              "cta_line_count": 1,
+              "estimated_read_seconds": 26.3,
+              "replay_ratio": 2.023077,
+              "estimated_loops": 3
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "9a99e2e8e82c351df676c8a06e07588323ce28b17a05081a3bbe4c4462f6e2a7",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "9a99e2e8e82c351df676c8a06e07588323ce28b17a05081a3bbe4c4462f6e2a7",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-884a965b32fc",
+              "fact_role": "general",
+              "rendered_text": "Butchart Gardens' five-acre Sunken Garden fills an old limestone quarry.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Near Victoria, Butchart Gardens' five-acre Sunken Garden occupies a former limestone quarry.",
+                "source_url": "https://butchartgardens.com/garden/sunken-garden/"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-e5a5eb556206",
+              "fact_role": "general",
+              "rendered_text": "When conditions allow, Ottawa's Rideau Canal becomes a 7.8-km skating rink.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Ottawa's Rideau Canal can become a 7.8-kilometer skating rink when winter conditions allow.",
+                "source_url": "https://ncc-ccn.gc.ca/places/rideau-canal-skateway"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-1268acfb018c",
+              "fact_role": "general",
+              "rendered_text": "Calgary's Plus 15 carries walkers above streets on enclosed skywalks.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Calgary's Plus 15 network lets pedestrians cross streets on enclosed elevated skywalks.",
+                "source_url": "https://www.calgary.ca/bike-walk-roll/plus-15-network.html"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-5706f9460788",
+              "fact_role": "general",
+              "rendered_text": "Toronto's PATH runs over 30 km, mostly beneath downtown.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Toronto's PATH walkway network stretches more than 30 kilometers, mostly under downtown.",
+                "source_url": "https://www.toronto.ca/explore-enjoy/visitor-toronto/path-torontos-downtown-pedestrian-walkway/"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-9b5dc66f3012",
+              "fact_role": "general",
+              "rendered_text": "Historic Quebec City retains North America's only complete colonial city walls.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Quebec City's historic district preserves North America's only surviving complete colonial city walls.",
+                "source_url": "https://www.pc.gc.ca/apps/dfhd/page_nhs_eng.aspx?id=680"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-38ab7cbff311",
+              "fact_role": "general",
+              "rendered_text": "Montreal's underground pedestrian network runs about 32 km.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Montreal's underground pedestrian network extends roughly 32 kilometers.",
+                "source_url": "https://www.mtl.org/en/what-to-do/culture-arts-heritage/underground-pedestrian-network"
+              }
+            },
+            {
+              "position": 7,
+              "fact_public_id": "QA-ID-c2fecd2164ba",
+              "fact_role": "general",
+              "rendered_text": "Stanley Park spans about 400 hectares on Vancouver's coast.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Vancouver's Stanley Park covers about 400 hectares along the coast.",
+                "source_url": "https://vancouver.ca/parks-recreation-culture/stanley-park.aspx"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T05:39:00.340403Z",
+          "updated_at": "2026-11-06T05:39:00.340403Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": "QA-ID-02b4a58bcf76",
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    {
+      "position": 3,
+      "validation": {
+        "position": 3,
+        "post_public_id": "QA-ID-6821aa81b974",
+        "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+        "format": "single_subject_fast",
+        "topic": "inventions_everyday",
+        "fact_count": 7,
+        "revision": 1,
+        "hash": "cbc857c28caf74384b799fb5c2f4dc303bee6b6cf4ade69954a6807a3d2f1405",
+        "status": "draft",
+        "quality": "passed",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "checks": {
+          "same_page": true,
+          "same_item": true,
+          "draft_only": true,
+          "assembly_exact": true,
+          "bindings_exact": true,
+          "source_count": true,
+          "adaptive_count": true,
+          "no_fixed_override": true,
+          "format_allowed": true,
+          "topic_allowed": true,
+          "quality_passed": true,
+          "revision_hash_exact": true,
+          "no_current_warning": true
+        }
+      },
+      "host_display_copy": "Did you know?\n\nAn Apollo spacesuit used a special zipper to seal in air.\n\nSome 1930s dresses showed off zippers as decorative details.\n\nJudson's early fastener was meant to replace long bootlaces.\n\nEarly fasteners could jam or spring open without warning.\n\nThe word zipper echoed the sound of fastening rubber boots.\n\nInventor Whitcomb Judson died before his fastener got that name.\n\nA Van Cleef & Arpels Zip necklace transforms into a bracelet.\n\nFollow for more unexpected invention stories.",
+      "host_display_check": "PASS exact",
+      "readback": {
+        "post": {
+          "post_public_id": "QA-ID-6821aa81b974",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "cbc857c28caf74384b799fb5c2f4dc303bee6b6cf4ade69954a6807a3d2f1405",
+          "format_key": "single_subject_fast",
+          "topic_key": "inventions_everyday",
+          "interaction_goal": "follow",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Unexpected zipper stories",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "An Apollo spacesuit used a special zipper to seal in air."
+                },
+                {
+                  "position": 2,
+                  "text": "Some 1930s dresses showed off zippers as decorative details."
+                },
+                {
+                  "position": 3,
+                  "text": "Judson's early fastener was meant to replace long bootlaces."
+                },
+                {
+                  "position": 4,
+                  "text": "Early fasteners could jam or spring open without warning."
+                },
+                {
+                  "position": 5,
+                  "text": "The word zipper echoed the sound of fastening rubber boots."
+                },
+                {
+                  "position": 6,
+                  "text": "Inventor Whitcomb Judson died before his fastener got that name."
+                },
+                {
+                  "position": 7,
+                  "text": "A Van Cleef & Arpels Zip necklace transforms into a bracelet."
+                }
+              ]
+            },
+            "cta": "Follow for more unexpected invention stories.",
+            "canva_copy": "Did you know?\n\nAn Apollo spacesuit used a special zipper to seal in air.\n\nSome 1930s dresses showed off zippers as decorative details.\n\nJudson's early fastener was meant to replace long bootlaces.\n\nEarly fasteners could jam or spring open without warning.\n\nThe word zipper echoed the sound of fastening rubber boots.\n\nInventor Whitcomb Judson died before his fastener got that name.\n\nA Van Cleef & Arpels Zip necklace transforms into a bracelet.\n\nFollow for more unexpected invention stories.",
+            "caption": "Zippers have turned up in some surprising places, from fashion to space gear. Which detail caught you off guard?",
+            "hashtags": [
+              "#ZipperFacts",
+              "#InventionTrivia",
+              "#DidYouKnow"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                57,
+                60,
+                60,
+                57,
+                59,
+                64,
+                61
+              ],
+              "facts_total_chars": 430,
+              "cta_chars": 45,
+              "canva_total_chars": 492,
+              "word_count": 77,
+              "fact_word_counts": [
+                11,
+                9,
+                9,
+                9,
+                10,
+                10,
+                10
+              ],
+              "line_count": 25,
+              "fact_line_counts": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 6,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 26.3,
+              "replay_ratio": 2.023077,
+              "estimated_loops": 3
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "cbc857c28caf74384b799fb5c2f4dc303bee6b6cf4ade69954a6807a3d2f1405",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "cbc857c28caf74384b799fb5c2f4dc303bee6b6cf4ade69954a6807a3d2f1405",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-421d6e2a8f47",
+              "fact_role": "general",
+              "rendered_text": "An Apollo spacesuit used a special zipper to seal in air.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "An Apollo spacesuit used a special pressure-sealing zipper to retain air.",
+                "source_url": "https://www.si.edu/object/pressure-suit-a7-lb-irwin-apollo-15-flown%3Anasm_A19740132000"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-9e438aeb7270",
+              "fact_role": "general",
+              "rendered_text": "Some 1930s dresses showed off zippers as decorative details.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "In the 1930s, some dresses displayed zippers as decorative details.",
+                "source_url": "https://www.vam.ac.uk/info/schiaparelli-fashion-becomes-art-exhibition-large-print-guide"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-53673ff580c6",
+              "fact_role": "general",
+              "rendered_text": "Judson's early fastener was meant to replace long bootlaces.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Judson's early fastener aimed to replace lengthy bootlaces.",
+                "source_url": "https://lemelson.mit.edu/resources/whitcomb-judson"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-ada6b6281ff1",
+              "fact_role": "general",
+              "rendered_text": "Early fasteners could jam or spring open without warning.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Early zipper-like fasteners could jam or spring open unexpectedly.",
+                "source_url": "https://ykkamericas.com/history-of-the-zipper/"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-370bf30a91a6",
+              "fact_role": "general",
+              "rendered_text": "The word zipper echoed the sound of fastening rubber boots.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "The name zipper imitated the fastening sound of rubber boots.",
+                "source_url": "https://lemelson.mit.edu/resources/whitcomb-judson"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-5ab486f7a091",
+              "fact_role": "general",
+              "rendered_text": "Inventor Whitcomb Judson died before his fastener got that name.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Whitcomb Judson died before his fastener became known as the zipper.",
+                "source_url": "https://lemelson.mit.edu/resources/whitcomb-judson"
+              }
+            },
+            {
+              "position": 7,
+              "fact_public_id": "QA-ID-9de1c5fc2d50",
+              "fact_role": "general",
+              "rendered_text": "A Van Cleef & Arpels Zip necklace transforms into a bracelet.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "A Van Cleef & Arpels Zip necklace can transform into a bracelet.",
+                "source_url": "https://www.vancleefarpels.com/en/the-maison/the-heritage-gallery/zip.html"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T05:41:40.679307Z",
+          "updated_at": "2026-11-06T05:41:40.679307Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": "QA-ID-3e57a03b1d2d",
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    {
+      "position": 4,
+      "validation": {
+        "position": 4,
+        "post_public_id": "QA-ID-1b061bd35c5e",
+        "plan_item_public_id": "QA-ID-fa3adbcc9368",
+        "format": "single_subject_fast",
+        "topic": "nature_science",
+        "fact_count": 6,
+        "revision": 1,
+        "hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+        "status": "draft",
+        "quality": "passed",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "checks": {
+          "same_page": true,
+          "same_item": true,
+          "draft_only": true,
+          "assembly_exact": true,
+          "bindings_exact": true,
+          "source_count": true,
+          "adaptive_count": true,
+          "no_fixed_override": true,
+          "format_allowed": true,
+          "topic_allowed": true,
+          "quality_passed": true,
+          "revision_hash_exact": true,
+          "no_current_warning": true
+        }
+      },
+      "host_display_copy": "Did you know?\n\nSome mangroves push excess salt out through tiny leaf glands.\n\nNeighboring trees of the same species can join their roots naturally.\n\nSome pond pine cones release their seeds after a fire.\n\nSilver birch branches can droop overnight as their water balance shifts.\n\nTrees can wall off damaged wood to slow spreading decay.\n\nSome oaks release airborne chemicals that ready nearby trees' defenses.\n\nShare these surprising tree facts.",
+      "host_display_check": "PASS exact",
+      "readback": {
+        "post": {
+          "post_public_id": "QA-ID-1b061bd35c5e",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+          "format_key": "single_subject_fast",
+          "topic_key": "nature_science",
+          "interaction_goal": "share",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Surprising ways trees survive",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "Some mangroves push excess salt out through tiny leaf glands."
+                },
+                {
+                  "position": 2,
+                  "text": "Neighboring trees of the same species can join their roots naturally."
+                },
+                {
+                  "position": 3,
+                  "text": "Some pond pine cones release their seeds after a fire."
+                },
+                {
+                  "position": 4,
+                  "text": "Silver birch branches can droop overnight as their water balance shifts."
+                },
+                {
+                  "position": 5,
+                  "text": "Trees can wall off damaged wood to slow spreading decay."
+                },
+                {
+                  "position": 6,
+                  "text": "Some oaks release airborne chemicals that ready nearby trees' defenses."
+                }
+              ]
+            },
+            "cta": "Share these surprising tree facts.",
+            "canva_copy": "Did you know?\n\nSome mangroves push excess salt out through tiny leaf glands.\n\nNeighboring trees of the same species can join their roots naturally.\n\nSome pond pine cones release their seeds after a fire.\n\nSilver birch branches can droop overnight as their water balance shifts.\n\nTrees can wall off damaged wood to slow spreading decay.\n\nSome oaks release airborne chemicals that ready nearby trees' defenses.\n\nShare these surprising tree facts.",
+            "caption": "Trees have some remarkable ways of surviving and responding to their surroundings. Which fact would you share with a nature lover?",
+            "hashtags": [
+              "#TreeFacts",
+              "#NatureScience",
+              "#DidYouKnow"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                61,
+                69,
+                54,
+                72,
+                56,
+                71
+              ],
+              "facts_total_chars": 393,
+              "cta_chars": 34,
+              "canva_total_chars": 444,
+              "word_count": 70,
+              "fact_word_counts": [
+                10,
+                11,
+                10,
+                11,
+                10,
+                10
+              ],
+              "line_count": 24,
+              "fact_line_counts": [
+                2,
+                3,
+                2,
+                3,
+                2,
+                3
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 5,
+              "hook_line_count": 1,
+              "cta_line_count": 1,
+              "estimated_read_seconds": 23.8,
+              "replay_ratio": 1.830769,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "a60a0b9c423dbc18f8b8f3fd2aae3c7d0f913ce79416157f4754e401b305febc",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-358729064ded",
+              "fact_role": "general",
+              "rendered_text": "Some mangroves push excess salt out through tiny leaf glands.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Some mangroves expel excess salt through glands in their leaves.",
+                "source_url": "https://oceanservice.noaa.gov/education/tutorial_estuaries/est07_adaptations.html"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-901aad84dad3",
+              "fact_role": "general",
+              "rendered_text": "Neighboring trees of the same species can join their roots naturally.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Neighboring trees of the same species can naturally graft their roots together.",
+                "source_url": "https://naturalresources.extension.iastate.edu/forestry/tree_biology/101.html"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-e9e1dac1feb2",
+              "fact_role": "general",
+              "rendered_text": "Some pond pine cones release their seeds after a fire.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Pond pine cones can release seeds after exposure to fire.",
+                "source_url": "https://research.fs.usda.gov/feis/species-reviews/pinser"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-89417f661bce",
+              "fact_role": "general",
+              "rendered_text": "Silver birch branches can droop overnight as their water balance shifts.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Silver birch branches can droop overnight as changes in water balance occur.",
+                "source_url": "https://www.uef.fi/en/article/water-makes-tree-branches-droop-at-night"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-a257ee6f1ec3",
+              "fact_role": "general",
+              "rendered_text": "Trees can wall off damaged wood to slow spreading decay.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Trees can isolate damaged wood to slow the spread of decay.",
+                "source_url": "https://extension.colostate.edu/resource/tree-growth-and-decay/"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-1d21fc031133",
+              "fact_role": "general",
+              "rendered_text": "Some oaks release airborne chemicals that ready nearby trees' defenses.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Some oaks release airborne chemicals that prime defenses in nearby trees.",
+                "source_url": "https://www.nps.gov/articles/species-spotlight-tree-and-plant-communication.htm"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T05:43:58.940226Z",
+          "updated_at": "2026-11-06T05:43:58.940226Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": "QA-ID-fa3adbcc9368",
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    },
+    {
+      "position": 5,
+      "validation": {
+        "position": 5,
+        "post_public_id": "QA-ID-069385c57142",
+        "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+        "format": "comparison",
+        "topic": "geography",
+        "fact_count": 6,
+        "revision": 1,
+        "hash": "19b008bed4212b559a5ce6e8724a1beea0f40a03e9e42e81a7b6f827488e9e4e",
+        "status": "draft",
+        "quality": "passed",
+        "item_config": {
+          "profile_key": "fast_trivia"
+        },
+        "checks": {
+          "same_page": true,
+          "same_item": true,
+          "draft_only": true,
+          "assembly_exact": true,
+          "bindings_exact": true,
+          "source_count": true,
+          "adaptive_count": true,
+          "no_fixed_override": true,
+          "format_allowed": true,
+          "topic_allowed": true,
+          "quality_passed": true,
+          "revision_hash_exact": true,
+          "no_current_warning": true
+        }
+      },
+      "host_display_copy": "Did you know?\n\nCity white ibises scavenge, earning the nickname bin chickens.\n\nSome Australian magpies swoop at people during nesting season.\n\nSome Australian parks offer free gas or electric barbecues.\n\nThe rotary Hills Hoist became an Australian backyard icon.\n\nElection-day sausage stalls are nicknamed democracy sausages.\n\nAustralian polymer banknotes have transparent security windows.\n\nWhich Australian contrast surprised you most?",
+      "host_display_check": "PASS exact",
+      "readback": {
+        "post": {
+          "post_public_id": "QA-ID-069385c57142",
+          "page_public_id": "QA-ID-7b6e770529b4",
+          "niche_key": "trivia",
+          "status": "draft",
+          "revision": 1,
+          "content_hash": "19b008bed4212b559a5ce6e8724a1beea0f40a03e9e42e81a7b6f827488e9e4e",
+          "format_key": "comparison",
+          "topic_key": "geography",
+          "interaction_goal": "comment",
+          "scheduled_at": null,
+          "published_at": null,
+          "content_payload": {
+            "schema_version": 2,
+            "hook": "Did you know?",
+            "body": {
+              "subject": "Contrasts in everyday Australia",
+              "facts": [
+                {
+                  "position": 1,
+                  "text": "City white ibises scavenge, earning the nickname bin chickens."
+                },
+                {
+                  "position": 2,
+                  "text": "Some Australian magpies swoop at people during nesting season."
+                },
+                {
+                  "position": 3,
+                  "text": "Some Australian parks offer free gas or electric barbecues."
+                },
+                {
+                  "position": 4,
+                  "text": "The rotary Hills Hoist became an Australian backyard icon."
+                },
+                {
+                  "position": 5,
+                  "text": "Election-day sausage stalls are nicknamed democracy sausages."
+                },
+                {
+                  "position": 6,
+                  "text": "Australian polymer banknotes have transparent security windows."
+                }
+              ]
+            },
+            "cta": "Which Australian contrast surprised you most?",
+            "canva_copy": "Did you know?\n\nCity white ibises scavenge, earning the nickname bin chickens.\n\nSome Australian magpies swoop at people during nesting season.\n\nSome Australian parks offer free gas or electric barbecues.\n\nThe rotary Hills Hoist became an Australian backyard icon.\n\nElection-day sausage stalls are nicknamed democracy sausages.\n\nAustralian polymer banknotes have transparent security windows.\n\nWhich Australian contrast surprised you most?",
+            "caption": "From city birds to backyard icons and election-day traditions, Australian everyday life has unexpected contrasts. Which one stood out?",
+            "hashtags": [
+              "#AustraliaTrivia",
+              "#GeographyFacts",
+              "#DidYouKnow"
+            ],
+            "render_style": "plain_lines",
+            "text_metrics": {
+              "hook_chars": 13,
+              "fact_chars": [
+                62,
+                62,
+                59,
+                58,
+                61,
+                63
+              ],
+              "facts_total_chars": 375,
+              "cta_chars": 45,
+              "canva_total_chars": 437,
+              "word_count": 59,
+              "fact_word_counts": [
+                9,
+                9,
+                9,
+                9,
+                7,
+                7
+              ],
+              "line_count": 22,
+              "fact_line_counts": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              "hook_word_count": 3,
+              "cta_word_count": 6,
+              "hook_line_count": 1,
+              "cta_line_count": 2,
+              "estimated_read_seconds": 20.5,
+              "replay_ratio": 1.576923,
+              "estimated_loops": 2
+            }
+          },
+          "system_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "19b008bed4212b559a5ce6e8724a1beea0f40a03e9e42e81a7b6f827488e9e4e",
+            "overall_status": "passed",
+            "checks": [
+              {
+                "id": "trivia.facts.count_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.exact_match",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.render.hard_budget",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.sources.url_valid",
+                "status": "passed"
+              },
+              {
+                "id": "trivia.reuse.allowed",
+                "status": "passed"
+              }
+            ]
+          },
+          "editorial_checks": {
+            "schema_version": 2,
+            "post_revision": 1,
+            "content_hash": "19b008bed4212b559a5ce6e8724a1beea0f40a03e9e42e81a7b6f827488e9e4e",
+            "overall_status": "passed",
+            "checks": {
+              "meaning_preserved": "pass",
+              "caption_no_new_claim": "pass",
+              "no_known_substantive_issue": "pass"
+            }
+          },
+          "quality_status": "passed",
+          "fact_bindings": [
+            {
+              "position": 1,
+              "fact_public_id": "QA-ID-7e59908819b2",
+              "fact_role": "general",
+              "rendered_text": "City white ibises scavenge, earning the nickname bin chickens.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "City-dwelling Australian white ibises are nicknamed bin chickens because they scavenge.",
+                "source_url": "https://birdlife.org.au/bird-profiles/australian-white-ibis/"
+              }
+            },
+            {
+              "position": 2,
+              "fact_public_id": "QA-ID-a46b3f2bd8e5",
+              "fact_role": "general",
+              "rendered_text": "Some Australian magpies swoop at people during nesting season.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Some Australian magpies swoop at nearby people during nesting season.",
+                "source_url": "https://australian.museum/learn/species-identification/ask-an-expert/why-do-magpies-swoop/"
+              }
+            },
+            {
+              "position": 3,
+              "fact_public_id": "QA-ID-44f7aa2a3391",
+              "fact_role": "general",
+              "rendered_text": "Some Australian parks offer free gas or electric barbecues.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Some Australian parks provide free gas or electric barbecues for visitors.",
+                "source_url": "https://www.nationalparks.nsw.gov.au/things-to-do/walking-tracks/rockpools-view-walk/visitor-info"
+              }
+            },
+            {
+              "position": 4,
+              "fact_public_id": "QA-ID-80ea0c40a2a9",
+              "fact_role": "general",
+              "rendered_text": "The rotary Hills Hoist became an Australian backyard icon.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Australia's rotary Hills Hoist clothesline became an icon of the backyard.",
+                "source_url": "https://www.abc.net.au/news/2017-01-04/hills-hoist-australian-backyard-icon-ownership-change/8161430"
+              }
+            },
+            {
+              "position": 5,
+              "fact_public_id": "QA-ID-38424f4bca37",
+              "fact_role": "general",
+              "rendered_text": "Election-day sausage stalls are nicknamed democracy sausages.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Election-day sausage stalls in Australia are nicknamed democracy sausages.",
+                "source_url": "https://www.abc.net.au/btn/classroom/election-lingo-democracy-sausage/13878386"
+              }
+            },
+            {
+              "position": 6,
+              "fact_public_id": "QA-ID-25fade47a41a",
+              "fact_role": "general",
+              "rendered_text": "Australian polymer banknotes have transparent security windows.",
+              "allocation_state": "allocated",
+              "source_snapshot": {
+                "schema_version": 2,
+                "canonical_claim": "Australian polymer banknotes include transparent windows as security features.",
+                "source_url": "https://www.rba.gov.au/publications/bulletin/2016/sep/1.html"
+              }
+            }
+          ],
+          "created_at": "2026-11-06T05:46:17.221870Z",
+          "updated_at": "2026-11-06T05:46:17.221870Z",
+          "content_schema_version": 2
+        },
+        "approval": null,
+        "plan_item_public_id": "QA-ID-8e7f3dd9f0a8",
+        "current_fact_warnings": [],
+        "latest_metrics": null
+      }
+    }
+  ],
+  "after_posts": {
+    "items": [
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-069385c57142",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "comparison",
+        "topic_key": "geography",
+        "interaction_goal": "comment",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T05:46:17.221870Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-1b061bd35c5e",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "single_subject_fast",
+        "topic_key": "nature_science",
+        "interaction_goal": "share",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T05:43:58.940226Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-6821aa81b974",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "single_subject_fast",
+        "topic_key": "inventions_everyday",
+        "interaction_goal": "follow",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T05:41:40.679307Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-5ac933583f9f",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "single_subject_fast",
+        "topic_key": "geography",
+        "interaction_goal": "follow",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T05:39:00.340403Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-6343ba3a3224",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "comparison",
+        "topic_key": "nature_science",
+        "interaction_goal": "comment",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T03:05:59.762163Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-2f4994901bb3",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "emotional_animal_collection",
+        "topic_key": "animals",
+        "interaction_goal": "share",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T02:19:39.715132Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-9b0689b5acf3",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "myth_vs_fact",
+        "topic_key": "animals",
+        "interaction_goal": "comment",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T02:17:59.851498Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-2efa1c2e80c0",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "comparison",
+        "topic_key": "animals",
+        "interaction_goal": "comment",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T02:15:40.670600Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-834222c2456a",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "single_subject_fast",
+        "topic_key": "animals",
+        "interaction_goal": "share",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T02:13:34.401739Z"
+      },
+      {
+        "content_schema_version": 2,
+        "post_public_id": "QA-ID-1112e26848ac",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "draft",
+        "revision": 1,
+        "format_key": "themed_utility",
+        "topic_key": "food_storage_home",
+        "interaction_goal": "save",
+        "scheduled_at": null,
+        "published_at": null,
+        "quality_status": "passed",
+        "hook_preview": "Did you know?",
+        "updated_at": "2026-11-06T02:11:50.787293Z"
+      }
+    ],
+    "next_cursor": null,
+    "has_more": false
+  },
+  "after_plans": {
+    "items": [
+      {
+        "plan_public_id": "QA-ID-6efb71a0e89b",
+        "name": "QA DNA batch 2026-11-06 T64",
+        "page_public_id": "QA-ID-7b6e770529b4",
+        "niche_key": "trivia",
+        "status": "completed",
+        "requested_count": 5,
+        "progress": {
+          "pending": 0,
+          "in_progress": 0,
+          "completed": 5,
+          "failed": 0,
+          "cancelled": 0
+        },
+        "created_at": "2026-11-06T03:04:57.622973Z",
+        "updated_at": "2026-11-06T05:46:17.221870Z"
+      }
+    ],
+    "next_cursor": null,
+    "has_more": false
+  },
+  "config_unchanged": true,
+  "existing_qa_post_metadata_unchanged": true,
+  "evidence_limits": [
+    "No new source URL browsing or verification; previous QA pool reused.",
+    "Input explicitly scoped one plan and one active item per host turn; it did not specify final fact counts or fixed/adaptive overrides.",
+    "Candidate pool limits generalization to unrestricted topic/research generation.",
+    "Host raw tool invocation trace unavailable; independent owner Read proves persisted plan and posts.",
+    "Item 1 host final response failed to load; direct get_post proves saved copy, not successful display of the host final answer.",
+    "Item 2 had a host-reported failed save for >500-character facts block before repaired save; no first-pass PASS claim.",
+    "D6 saved-copy evaluation and FIXED verdict remain task 6.5; qualifier/composition observations are preserved."
+  ],
+  "review_notes": {
+    "item1": [
+      "Scope qualifier: canonical Io claim says solar system; rendered line says any other world. Review this wording under task 6.5; no rewrite or FIXED claim during batch count test.",
+      "Approximation: Charon/Moon width ratios expressed without about in rendered copy; canonical retains about. Review under task 6.5."
+    ],
+    "input_correction": [
+      "Before item 2 continuation, excluded uncertain source mapping for tree-root water redistribution; no URL reopening and no fact-count instruction."
+    ],
+    "item2": [
+      "First save rejected for facts block >500 characters, host-reported rollback; final save/readback passed at 481 facts-block characters with 7 facts.",
+      "Potential composition repetition: Toronto PATH and Montreal underground network provide similar experiences; retain for task 6.5 review."
+    ],
+    "item3": [
+      "Seven facts retained, including bootlaces/name/death cluster. Review composition against owner-accepted five-fact zipper example under task 6.5."
+    ],
+    "item5": [
+      "Stored comparison format contains mostly a single-country collection without clear paired or shared-baseline contrasts. Server format validity does not prove editorial mapping; review under task 6.5.",
+      "Opening City white ibises does not name Australia after generic hook; country appears in later lines. Review clarity under task 6.5."
+    ]
+  },
+  "public_snapshot": {
+    "redacted": true,
+    "notice": "Stable QA-ID aliases and private-reference placeholders replace object/release identifiers and private ChatGPT URLs. This is documentation evidence, not an executable production payload. Raw evidence and original hashes remain in local commits.",
+    "original_sha256": "70215025709d6878c0e5f99b411c45d0cfb76fcc023bd54a2ef82377d924bbac"
+  }
+}

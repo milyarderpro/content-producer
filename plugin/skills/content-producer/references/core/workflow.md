@@ -15,6 +15,15 @@ Verify the three v2 tool names in the actual catalog; never assume deployment.
 
 1. One draft needs no plan. For 2–100 drafts, create one unscheduled plan of the
    exact size, theme in `plan_intent`; claim one item before researching it.
+   Choose a non-null format only after the angle supports its device; otherwise
+   use format_key: null when no explicit format was requested. Do not allocate
+   comparison merely to meet a batch weight. Resolve item intent before save;
+   never silently rewrite an existing completed plan item.
+   Draft count does not set fact count. Preserve Page adaptive settings unless
+   a legitimate explicit count/item override applies; honor fixed count/title.
+   For trivia, read DNA and the pattern index before choosing the angle, then
+   two relevant complete cards and one anti-example before writing. Follow
+   the niche playbook for curation, editing and final review.
 2. Research more candidate sentences than final facts. Open real source pages;
    one supporting `source_url` per final fact is sufficient. No tier/expiry,
    ontology input, year on every line or separate reservation is required by v2.
@@ -22,14 +31,30 @@ Verify the three v2 tool names in the actual catalog; never assume deployment.
    as SAME/DISTINCT/UNCERTAIN. Replace used, uncertain, ineligible or incomplete
    candidates, including host clipping; research replacements when reserves run
    out. SAME uses the old ID if eligible, never a parallel identity.
-4. Compose and pass the three v2 editorial checks. Read current generation
+   Curate for distinct reader value; replace filler, repeated measurements or
+   repeated reactions before copy. Semantic eligibility alone is not DNA fit.
+4. Finish the niche's writing review before save/revise: angle, opening,
+   contributions, order, closing, naturalness and reference fit on the exact
+   payload copy. Repair wording or research/dedup replacements before Write,
+   even when the server could accept the old copy. After two directed editorial
+   repair rounds still fail, report the limitation and proven progress without
+   filler, silent count reduction, forced DISTINCT or a replacement post.
+   This adds no routine preview/GO checkpoint or server attestation.
+   Assess exactly the three v2 editorial checks with unchanged meanings.
+   `no_known_substantive_issue` is not a DNA/style score. Read current generation
    context immediately before `save_post_v2`/`revise_post_v2`; preserve six-digit
    config timestamp and catalog string exactly. Send `text_metrics: {}`; the
    server computes metrics/bindings/snapshots and rejects stale catalog/config.
+   Revalidate changed config and fresh dedup/catalog before submission. Any
+   further editing/research requires another immediate pre-Write context Read.
 5. `get_post` with sources/checks after every save/revise, then `get_content_plan`
    before the next item. Match IDs, Page, content, URL snapshots, draft status,
    revision/hash and checks. If readback fails, reconcile that same post before
    proceeding; do not create a replacement merely to make readback succeed.
+   Compare reviewed copy, submitted copy and authoritative rendered readback.
+   If they differ, do not claim persisted DNA success or silently rewrite the
+   displayed copy. Reconcile the same post under CAS and scope; no automatic
+   revise, approval, replacement or new intent is granted by a mismatch.
 6. Resume starts with `get_content_plan`; if several plans match, ask which.
    Completed output is never regenerated. Preserve successful earlier drafts;
    report exact requested/proven/remaining counts with plan/post IDs. No worker.

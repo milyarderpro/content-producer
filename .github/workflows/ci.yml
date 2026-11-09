@@ -66,6 +66,10 @@ jobs:
           backend_review="$all_checks"
           for file in "${files[@]}"; do
             case "$file" in
+              docs/editorial/reference-example-sources.md)
+                need_check=true ;;
+            esac
+            case "$file" in
               scripts/trivia-v2-catalog*|scripts/legacy-catalog-audit.ts|scripts/phase-6-catalog-audit.ts)
                 need_check=true
                 backend_review=true ;;
@@ -145,7 +149,7 @@ jobs:
           fi
           pnpm run package-plugin
           pnpm exec tsx scripts/verify-plugin-candidate.ts
-          test "$(find artifacts/plugin-candidate -type f | wc -l)" -eq 13
+          test "$(find artifacts/plugin-candidate -type f | wc -l)" -eq 15
 
       - name: Read package artifact identity
         id: package_identity
@@ -178,7 +182,7 @@ jobs:
           unzip -t "$archive" >/dev/null
           entries="$RUNNER_TEMP/plugin-zip-entries.txt"
           unzip -Z1 "$archive" | tee "$entries"
-          test "$(wc -l < "$entries")" -eq 13
+          test "$(wc -l < "$entries")" -eq 15
           test "$(grep -Fxc '.app.json' "$entries")" -eq 1
           if grep -Fxq 'mcp.json' "$entries" || grep -Fxq '.mcp.json' "$entries"; then
             echo "Bundled MCP configuration is forbidden"
@@ -200,7 +204,7 @@ jobs:
             echo "## Kandidat plugin PRIVATE v$PLUGIN_VERSION"
             echo "- Source SHA: $(git rev-parse HEAD)"
             echo "- ZIP: $ARCHIVE_NAME; SHA-256: $(sha256sum "$archive" | cut -d ' ' -f1)"
-            echo "- 13 file dan hash hasil ekstraksi sesuai filelist source"
+            echo "- 15 file dan hash hasil ekstraksi sesuai filelist source"
             echo "- App owner OAuth mcpku2; tanpa bundled MCP atau credential"
             echo "- Packaging bukan instalasi atau bukti business Write"
           } >> "$GITHUB_STEP_SUMMARY"
