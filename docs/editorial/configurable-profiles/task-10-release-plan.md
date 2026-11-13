@@ -1,6 +1,6 @@
 # Rencana rilis dan rollback CR-062 — task 10
 
-Tanggal 13 November 2026 (Asia/Jakarta). **Persiapan lokal**, bukan izin merge,
+Tanggal 13 November 2026 (Asia/Jakarta). **Persiapan PR**, bukan izin merge,
 deploy atau Write data. Sumber aturan: [AGENTS §6](../../../AGENTS.md),
 [operations](../../operations.md), [CR-052](../../decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md),
 [task 9](task-9-results.md). Review editorial memakai DNA referensi tertulis;
@@ -14,15 +14,17 @@ CAS/replay dan approval tetap berdiri sendiri.
 - Branch kandidat: `codex/configurable-trivia-editorial-profiles`.
 - Judul PR: **Dukung profil editorial trivia per Page dan katalog owner versioned**.
 - [Body Issue](task-10-issue.md) dan [body draft PR](task-10-pr.md) siap ditinjau.
-- Seluruh perubahan task 1–9 serta dokumen persiapan ini akan menjadi satu kandidat.
+- Commit backend `a71fe5cb932c79d200e3efc4d14fc8ce0ddb0964` memuat seluruh
+  perubahan task 1–9 serta persiapan PR; follow-up handoff hanya dokumentasi.
   Perubahan pemilik tetap utuh; commit persiapan PR mencakup hanya scope CR-062.
 - [Issue #138](https://github.com/milyarderpro/content-producer/issues/138) sudah dibuat.
-  SHA kandidat dan URL PR/CI dicatat pada handoff setelah GitHub mengonfirmasinya;
-  base SHA bukan bukti perubahan ini sudah dipasang.
+  [Draft PR #139](https://github.com/milyarderpro/content-producer/pull/139) terbuka.
+  [Handoff](task-10-results.md) dan [verifikasi](task-10-verification.json) mencatat
+  SHA kandidat/CI; base SHA bukan bukti perubahan ini sudah dipasang.
 
 ## Riwayat dan estimasi sebelum eksekusi
 
-Pemeriksaan GitHub read-only pada 13 November: tidak ada PR terbuka; main tidak protected
+Pemeriksaan GitHub sebelum membuat PR pada 13 November: tidak ada PR terbuka; main tidak protected
 serta branch rules kosong. Keadaan ini bukan izin merge dan tidak menggantikan
 pemeriksaan gate oleh operator.
 
@@ -43,8 +45,8 @@ akhiri respons tanpa menunggu hasil. Lanjut pemeriksaan hanya setelah pesan
 
 | Tahap | Hasil wajib sebelum tahap berikutnya | Status kini |
 | --- | --- | --- |
-| Commit/push/Issue/draft PR |Permintaan task 10 mencakup persiapan PR; kandidat pada branch usulan, body siap dan daftar file exact|Dilanjutkan setelah pemeriksaan paket|
-| Light CI/review |Run pada head SHA PR benar, pemeriksaan terdampak lulus dan perubahan ditinjau|NOT RUN untuk kandidat|
+| Commit/push/Issue/draft PR |Permintaan task 10 mencakup persiapan PR; kandidat pada branch usulan, body siap dan daftar file exact|Commit/push, Issue #138 dan draft PR #139 selesai|
+| Light CI/review |Run pada head SHA PR benar, pemeriksaan terdampak lulus dan perubahan ditinjau|Light CI backend SHA a71fe5c PASS; review dan keputusan merge masih menunggu|
 | Merge |Keputusan merge tersendiri; catat exact final SHA main, jangan menyamakan PR SHA/merge SHA|NOT RUN|
 | G4 |Manual main, input=checkout=head SHA; committed config exact; source+dua DB shard+aggregate PASS beserta report/hash|NOT RUN|
 | Hosted preflight |Target/owner/resource/issuer, applied history, backup/recovery point, dry-run dan compatibility terverifikasi|Belum diverifikasi|

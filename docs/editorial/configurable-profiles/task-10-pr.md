@@ -13,14 +13,14 @@ Page production atau perubahan koneksi plugin.
 
 ## Verifikasi
 
-- LOCAL/FIXTURE: 16 integrasi profil+custom/data-only;169 hash runtime/demo tetap.
-- Database11 file/174 kasus unik PASS setelah retest 13 kasus Page secara serial;
+- LOCAL/FIXTURE: 16 integrasi profil+custom/data-only; 169 hash runtime/demo tetap.
+- Database 11 file/174 kasus unik PASS setelah retest 13 kasus Page secara serial;
   run awal memuat dua timeout 5000ms. Tidak menaikkan timeout atau melemahkan assertion.
-- `pnpm run check`:208 source dan19 frontend; MCP 18 file/130 kasus PASS.
+- `pnpm run check`: 208 source dan 19 frontend; MCP 18 file/130 kasus PASS.
 - Authenticated Inspector 33 valid/33 invalid, lima v1 ditolak, owner denial/privacy PASS.
-- Pin katalog 94 migration/33 RPC/19 RLS,5 negative controls, lint, advisors lokal
+- Pin katalog 94 migration/33 RPC/19 RLS, 5 negative controls, lint, advisors lokal
   terpisah dan cleanup PASS. Paket 15 file/ZIP/hash cocok.
-- Inventory G4 direkonsiliasi ke 238 kasus runtime,158+80 pada 15+18 file;
+- Inventory G4 direkonsiliasi ke 238 kasus runtime, 158+80 pada 15+18 file;
   collection statis tidak mengikuti semua tabel impor. Seluruh kasus lama tetap.
 
 Full G4 manual pada exact final main SHA dan LIVE config2 masih **NOT RUN**.
@@ -37,3 +37,5 @@ DNA ditinjau terhadap profil referensi tertulis; layout ponsel bukan gate.
 Tidak ada frontend baru, Facebook/Canva API, worker AI, atau laporan DNA/CTA baru.
 
 Refs #138.
+
+Light CI kandidat backend `a71fe5c` [PASS dalam 54 detik](https://github.com/milyarderpro/content-producer/actions/runs/43393463414). Handoff dan rencana rollback: `docs/editorial/configurable-profiles/task-10-results.md` serta `task-10-release-plan.md`.
