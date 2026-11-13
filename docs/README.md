@@ -31,6 +31,25 @@ Untuk mulai merencanakan fitur, lihat
 [contoh penelusuran perubahan](development.md#7-contoh-penelusuran-perubahan):
 metadata Read, format trivia, niche baru, dan penyajian hasil plugin.
 
+## Kontrak editorial kandidat CR-062
+
+- [MCP config2 dan katalog](contracts/trivia-editorial-mcp.md): 33 tool owner OAuth,
+  schema Page/context/plan/post, diagnostics dan inventaris gate.
+- [Page/resolver](contracts/trivia-page-editorial-profiles.md),
+  [renderer](contracts/trivia-render-config2.md),
+  [snapshot](contracts/trivia-post-editorial-snapshots.md), dan
+  [batch](contracts/trivia-config2-plan-batch.md) menjelaskan kontrak SQL/core.
+- [Bukti task 7](editorial/configurable-profiles/task-7-results.md) memisahkan
+  LOCAL/FIXTURE dari formal G4 dan LIVE.
+- [Bukti task 8](editorial/configurable-profiles/task-8-results.md): panduan
+  config2/paket 0.5.8 dan readback update plugin yang sama, terpisah dari
+  refresh host, penerimaan task 9, deployment serta LIVE.
+
+- [Bukti task 9](editorial/configurable-profiles/task-9-results.md): penerimaan
+  integrasi teknis lokal per profil, ekstensi data-only dan inventaris runtime238.
+  [Addendum pemilik](decisions/2026-11-13-cr-062-task-9-technical-acceptance.md)
+  mengeluarkan review naskah/layout ponsel dari gate.
+
 ## Operasional dan bukti
 
 - [Live Test & Fix](live-test/README.md) adalah workflow aktif untuk pengujian

@@ -108,7 +108,7 @@ const discardOutput = envelope(
     post_public_id: uuid,
     status: z.literal('discarded'),
     revision,
-    released_fact_public_ids: z.array(uuid).min(1).max(9),
+    released_fact_public_ids: z.array(uuid).min(1).max(12),
     plan_item: z
       .strictObject({
         plan_item_public_id: uuid,

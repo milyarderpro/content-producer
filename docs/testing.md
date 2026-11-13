@@ -18,6 +18,24 @@ lokal dan **belum bagian dari commit baseline tersebut**; ini bukan status kini.
 workflow G4 **sudah efektif** sebagai gate rilis manual pada exact final SHA `main`.
 Daftar command di sini bukan catatan bahwa seluruh suite dijalankan pada cleanup.
 
+## Kandidat CR-062 — inventaris source 13 November 2026
+
+Kandidat task 9 menargetkan 18 file/130 kasus MCP dan 33 valid/33 invalid Inspector,
+dengan lima nama v1 ditolak + owner denial. Collection runtime Vitest mencatat
+**33 file/238 kasus database**, partisi **15+18 file, 158+80 kasus**. Ini terdiri
+dari 222 kasus existing dan 16 integrasi tambahan; tidak ada kasus lama dihapus.
+Gunakan `pnpm exec vitest list --config vitest.database.config.ts --staticParse=false --json`
+untuk tabel `it.each` yang diimpor. Default static parser tidak mengikuti import;
+collection statis task 7 sebanyak 200 tetap bukti historis, bukan target jumlah
+runtime yang sah. [Temuan task 9](editorial/configurable-profiles/task-9-findings.md)
+menjelaskan rekonsiliasi; aggregate kini menolak jumlah selain 238.
+
+Target 33 tool dihitung dari registry; exact-SHA/config, satu clean reset per shard,
+audit/advisors/cleanup dan single-owner MCP/Inspector tetap wajib. Collection
+bukan PASS seluruh database atau formal G4. Hasil fokus/preview dicatat pada
+[hasil task 9](editorial/configurable-profiles/task-9-results.md); bukti task 7
+serta angka lama tetap historis. Lihat [kontrak MCP editorial](contracts/trivia-editorial-mcp.md).
+
 ## 1. Estimasi sebelum menjalankan pemeriksaan
 
 Aturan berlaku untuk CI lokal, Actions, dispatch, dan push/PR yang men-trigger CI.

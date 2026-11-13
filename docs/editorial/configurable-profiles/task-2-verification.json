@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-12",
+  "evidence": "LOCAL/FIXTURE; not release or LIVE",
+  "base_source_sha": "c02c5413479cebf50f39abc10149fafca757611a",
+  "candidate": "base SHA plus working-tree file hashes; no commit made",
+  "runtimes": {
+    "node": "24.15.0",
+    "pnpm": "10.33.2",
+    "supabase_cli": "2.120.0"
+  },
+  "checks": {
+    "database": {
+      "status": "PASS",
+      "files": 2,
+      "cases": 25,
+      "new_editorial_cases": 14,
+      "skipped": 0,
+      "duration_seconds": 61.09
+    },
+    "source": {
+      "status": "PASS",
+      "files": 14,
+      "cases": 184
+    },
+    "frontend": {
+      "status": "PASS",
+      "cases": 19
+    },
+    "db_lint_errors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "local_security_advisors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "migration_history": {
+      "status": "PASS",
+      "count": 87
+    },
+    "acl_cleanup": {
+      "status": "PASS",
+      "definitions": 0,
+      "states": 0,
+      "api_acl_ok": true,
+      "caller_helpers": 0,
+      "api_signatures": 33
+    }
+  },
+  "files": [
+    {
+      "path": "supabase/migrations/20261112101957_add_trivia_editorial_catalog.sql",
+      "sha256": "9a772bdbde871da3cbc90124800dd7d2bb9fb1b3b9b65ec966b5300b13f60ae6"
+    },
+    {
+      "path": "supabase/migrations/20261112103621_fix_editorial_architecture_minimum.sql",
+      "sha256": "993d82659984bd6d58494dc50bf41baed23a650238de2c15c75e90df351cf0eb"
+    },
+    {
+      "path": "supabase/tests/database/api-trivia-v2-read.test.ts",
+      "sha256": "950601b82e4ca8826dac409332bb3c89493beaac85652241062df6b1234f40bc"
+    },
+    {
+      "path": "supabase/tests/database/api-security-kernel.test.ts",
+      "sha256": "f08b449ff77609b6ccc66b47c6f9ca144136808da32332035376c90c3acec118"
+    },
+    {
+      "path": "docs/contracts/trivia-editorial-catalog.md",
+      "sha256": "101eb7406d78b48a2a096ff72e98705d257d9ca98dda8bcee129a6e48bd5ef5a"
+    }
+  ],
+  "not_run": [
+    "Actions",
+    "G4 formal exact-SHA",
+    "MCP facade",
+    "config2 Page adoption",
+    "deployment",
+    "plugin installation",
+    "LIVE"
+  ]
+}

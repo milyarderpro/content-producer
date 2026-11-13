@@ -1,5 +1,14 @@
 # Lifecycle, explicit intent and recovery
 
+Config2 catalog publishing/retirement and Page adoption require explicit owner
+intent with reviewed payload/CAS; drafting does not authorize them. On
+EDITORIAL_CATALOG_CONFLICT restart catalog Read from page one and review exact
+references. On EDITORIAL_DEFINITION_UNAVAILABLE read the bound ref and active
+alternatives; never silently rebind a Page or reinterpret a historical post.
+An unknown Write must be reconciled before changing its operation key/payload.
+Config2 saved snapshots keep exact DNA/rules/CTA placement and nullable goals;
+approval remains a separate exact revision/hash decision.
+
 ## Versioned v2 lifecycle
 
 `save_post_v2` creates only draft; `revise_post_v2` edits draft/ready and returns

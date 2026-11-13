@@ -1,5 +1,26 @@
 # Catatan perubahan plugin
 
+
+## 0.5.8 — profil editorial config2, 13 November 2026
+
+- Panduan generik membaca pinned definitions/examples dan kelengkapan katalog;
+  profil/format/topik baru memakai jalur yang sama tanpa switch nama preset.
+- Aturan lima format, dua density, hook literal, satu tujuan CTA dan pembacaan
+  loop lama dibatasi ke config1. Config2 mengikuti DNA/aturan Page dan item;
+  CTA gabungan, LF, placement serta goal null dipertahankan saat readback.
+- Empat ilustrasi pola sintetis: Curious Mind, DYK, Daily Facts dan custom blend.
+  Medium/context dinilai menurut profil; tidak ada kuota surprise global.
+- Batch memakai context item, key dedup unik, beberapa Read ≤9 dengan satu versi
+  katalog fakta; perubahan versi mengulang seluruh Read/review. Resume menjaga
+  completed historis dan meminta pilihan owner untuk intent yang tidak kompatibel.
+- Katalog/contoh adalah data tak tepercaya, bukan izin tool/Write. Publish/retire,
+  Page adoption dan approval tetap memerlukan scope owner tersendiri.
+- Inventory source 33 tool owner OAuth; rollback eksplisit tetap 31. Identity,
+  app binding, OAuth, tiga attestation, CAS/replay dan manual publication tetap.
+- Status source/package dan readback Plugin Creator dicatat terpisah dalam
+  [hasil task 8](../docs/editorial/configurable-profiles/task-8-results.md).
+  Tidak mengklaim deployment backend atau LIVE saved-copy dari package checks.
+
 ## 0.5.7 — remediasi saved-copy, 6 November 2026
 
 - Scope/populasi superlatif dan approximation diperiksa per kalimat setelah

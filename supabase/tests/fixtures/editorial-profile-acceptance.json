@@ -1,0 +1,1059 @@
+{
+  "schema_version": 1,
+  "evidence": "LOCAL/FIXTURE + authored preview; not production, published content, host AI behavior or LIVE",
+  "researched_at": "2026-11-13",
+  "sources": {
+    "egg": {
+      "title": "American Egg Board — Discover the Eggstraordinary Egg",
+      "url": "https://www.incredibleegg.org/wp-content/uploads/2023/08/DiscovertheEggstraordinaryEgg.pdf",
+      "support": "pp.2–3: egg parts, albumen and whipping"
+    },
+    "oct": {
+      "title": "Natural History Museum — Octopuses keep surprising us",
+      "url": "https://www.nhm.ac.uk/discover/octopuses-keep-surprising-us-here-are-eight-examples-how.html",
+      "support": "sections1–8; retain species/study scope"
+    },
+    "gas": {
+      "title": "NIH/NIDDK — Symptoms & Causes of Gas",
+      "url": "https://www.niddk.nih.gov/health-information/digestive-diseases/gas-digestive-tract/symptoms-causes",
+      "support": "symptoms/causes; average and about-half qualifiers; no diagnosis"
+    },
+    "balance": {
+      "title": "NIH/NIDCD — Balance Disorders",
+      "url": "https://www.nidcd.nih.gov/health/balance-disorders",
+      "support": "How does my body keep its balance?"
+    },
+    "smell": {
+      "title": "NIH/NIDCD — Smell Disorders",
+      "url": "https://www.nidcd.nih.gov/health/smell-disorders",
+      "support": "How does your sense of smell work?"
+    },
+    "eye": {
+      "title": "NIH/NEI — How the Eyes Work",
+      "url": "https://www.nei.nih.gov/eye-health-information/healthy-vision/how-eyes-work",
+      "support": "cornea, pupil, iris and photoreceptors"
+    },
+    "micro": {
+      "title": "FDA — Microwave Ovens",
+      "url": "https://www.fda.gov/radiation-emitting-products/resources-you-radiation-emitting-products/microwave-ovens",
+      "support": "Cooking with Microwaves; nutrition and containers"
+    },
+    "fridge": {
+      "title": "FDA — Are You Storing Food Safely?",
+      "url": "https://www.fda.gov/consumers/consumer-updates/are-you-storing-food-safely",
+      "support": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained"
+    },
+    "franklin": {
+      "title": "The Franklin Institute — Benjamin Franklin’s Inventions",
+      "url": "https://fi.edu/en/science-and-education/benjamin-franklin/inventions",
+      "support": "bifocals, swim fins, stove and no patents"
+    },
+    "franklin_nps": {
+      "title": "NPS — Benjamin Franklin and Science",
+      "url": "https://www.nps.gov/inde/learn/historyculture/people-franklin-science.htm",
+      "support": "nautical inventions and electrical tricks"
+    },
+    "croc": {
+      "title": "Florida FWC — Crocodiles and Alligators",
+      "url": "https://myfwc.com/wildlifehabitats/wildlife/american-crocodile/croc-or-gator/",
+      "support": "American species: teeth, snouts, color; no approach/handling advice"
+    },
+    "volcano": {
+      "title": "NPS — Pyroclasts and Pyroclastic Rocks",
+      "url": "https://home.nps.gov/subjects/volcanoes/pyroclasts.htm",
+      "support": "pyroclast sizes, breadcrust bombs, Pele’s hair, pumice"
+    },
+    "wetash": {
+      "title": "USGS — Volcanic Ash Conductivity",
+      "url": "https://volcanoes.usgs.gov/volcanic_ash/conductivity.html",
+      "support": "dry versus wet ash conductivity; possible flashover not certainty"
+    },
+    "london": {
+      "title": "Visit London — Famous Landmarks",
+      "url": "https://www.visitlondon.com/things-to-do/sightseeing/famous-landmarks-london",
+      "support": "Tower Bridge glass walkways, London Eye capsules, landmark descriptions"
+    },
+    "parliament": {
+      "title": "UK Parliament — The towers of Parliament",
+      "url": "https://www.parliament.uk/about/living-heritage/building/palace/architecture/palacestructure/towers-of-parliament/",
+      "support": "Central Tower chimney and Big Ben bell"
+    },
+    "bridge": {
+      "title": "Tower Bridge — Bridge Lifts",
+      "url": "https://www.towerbridge.org.uk/bridge-lifts?page=1",
+      "support": "bridge lifts for vessels; no schedules/annual count used"
+    },
+    "rail": {
+      "title": "London Transport Museum — Underground steam trains",
+      "url": "https://library.ltmuseum.co.uk/portal/Default/en-GB/RecordView/Index/97",
+      "support": "steam services began underground in1863; not all trains everywhere"
+    },
+    "dog": {
+      "title": "American Kennel Club — Dog Facts",
+      "url": "https://www.akc.org/expert-advice/lifestyle/dog-facts/",
+      "support": "nose print, Basenji yodel, Australian Shepherd origin, color vision"
+    }
+  },
+  "cases": [
+    {
+      "id": "CM-FOOD-09",
+      "profile": "curious_mind",
+      "format": "single_subject_fast",
+      "topic": "food_science",
+      "architecture": "single_subject",
+      "facts": [
+        {
+          "text": "An eggshell’s color does not determine its nutritional value.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e1"
+        },
+        {
+          "text": "Those white egg cords help hold the yolk in place.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e2"
+        },
+        {
+          "text": "A hen’s feed influences the color of its egg yolks.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e3"
+        },
+        {
+          "text": "A fresh egg’s cloudy white can come from trapped carbon dioxide.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e4"
+        },
+        {
+          "text": "Eggshells contain thousands of tiny pores that let gas escape.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e5"
+        },
+        {
+          "text": "The air pocket inside an egg grows as it ages.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e6"
+        },
+        {
+          "text": "Egg white is about 90 percent water and 10 percent protein.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e7"
+        },
+        {
+          "text": "Two thin membranes lie just beneath an egg’s shell.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e8"
+        },
+        {
+          "text": "Whipping egg whites unfolds proteins that help trap air bubbles.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e9"
+        }
+      ],
+      "hook": "Did You Know?",
+      "cta": "Follow for more small discoveries.",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "Single food; 9 facts; color contrast and ratio; a light anatomy bridge earns its place."
+    },
+    {
+      "id": "CM-BODY-10",
+      "profile": "curious_mind",
+      "format": "themed_curiosity",
+      "topic": "human_body",
+      "architecture": "themed",
+      "facts": [
+        {
+          "text": "Fluid moving inside your inner ear helps detect head rotation.",
+          "source": "balance",
+          "support_note": "How does my body keep its balance?",
+          "id": "b1"
+        },
+        {
+          "text": "Tiny calcium-carbonate grains in your inner ear help sense gravity.",
+          "source": "balance",
+          "support_note": "How does my body keep its balance?",
+          "id": "b2"
+        },
+        {
+          "text": "Food aromas can reach your nose from behind your throat.",
+          "source": "smell",
+          "support_note": "How does your sense of smell work?",
+          "id": "b3"
+        },
+        {
+          "text": "Menthol’s cooling sensation involves nerve endings, not just smell receptors.",
+          "source": "smell",
+          "support_note": "How does your sense of smell work?",
+          "id": "b4"
+        },
+        {
+          "text": "Your pupil is an opening; the iris controls its size.",
+          "source": "eye",
+          "support_note": "cornea, pupil, iris and photoreceptors",
+          "id": "b5"
+        },
+        {
+          "text": "Light-sensitive cells in your retina turn light into electrical signals.",
+          "source": "eye",
+          "support_note": "cornea, pupil, iris and photoreceptors",
+          "id": "b6"
+        },
+        {
+          "text": "Gut bacteria produce gas while breaking down undigested carbohydrates.",
+          "source": "gas",
+          "support_note": "symptoms/causes; average and about-half qualifiers; no diagnosis",
+          "id": "b7"
+        },
+        {
+          "text": "Sulfur can give intestinal gas its unpleasant smell.",
+          "source": "gas",
+          "support_note": "symptoms/causes; average and about-half qualifiers; no diagnosis",
+          "id": "b8"
+        },
+        {
+          "text": "Studies suggest people pass gas an average of 8–14 times daily.",
+          "source": "gas",
+          "support_note": "symptoms/causes; average and about-half qualifiers; no diagnosis",
+          "id": "b9"
+        },
+        {
+          "text": "Only about half of people feeling bloated also develop visible swelling.",
+          "source": "gas",
+          "support_note": "symptoms/causes; average and about-half qualifiers; no diagnosis",
+          "id": "b10"
+        }
+      ],
+      "hook": "Your body, quietly surprising",
+      "cta": "Follow for another everyday surprise.",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "Body; 10 facts; rotate senses and digestion, retain average/about-half rather than diagnose."
+    },
+    {
+      "id": "CM-FOOD-THEME",
+      "profile": "curious_mind",
+      "format": "themed_curiosity",
+      "topic": "food_science",
+      "architecture": "themed",
+      "facts": [
+        {
+          "text": "Microwave cooking does not make food radioactive.",
+          "source": "micro",
+          "support_note": "Cooking with Microwaves; nutrition and containers",
+          "id": "m1"
+        },
+        {
+          "text": "Those white egg cords help hold the yolk in place.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e2"
+        },
+        {
+          "text": "A microwave-safe dish can still get hot from the food inside.",
+          "source": "micro",
+          "support_note": "Cooking with Microwaves; nutrition and containers",
+          "id": "m4"
+        },
+        {
+          "text": "A fresh egg’s cloudy white can come from trapped carbon dioxide.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e4"
+        },
+        {
+          "text": "Egg white is about 90 percent water and 10 percent protein.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e7"
+        },
+        {
+          "text": "Whipping egg whites unfolds proteins that help trap air bubbles.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e9"
+        }
+      ],
+      "hook": "A closer look at the kitchen",
+      "cta": "Follow for the next small discovery.",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "Themed food; alternate heat, texture and structure; no universal surprise quota."
+    },
+    {
+      "id": "CM-MIXED",
+      "profile": "curious_mind",
+      "format": "mixed_curiosity",
+      "topic": "general_trivia",
+      "architecture": "mixed",
+      "facts": [
+        {
+          "text": "Veined octopuses in Indonesia were observed carrying coconut shells for shelter.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o4"
+        },
+        {
+          "text": "A fresh egg’s cloudy white can come from trapped carbon dioxide.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e4"
+        },
+        {
+          "text": "Tiny calcium-carbonate grains in your inner ear help sense gravity.",
+          "source": "balance",
+          "support_note": "How does my body keep its balance?",
+          "id": "b2"
+        },
+        {
+          "text": "Franklin’s childhood swimming fins were held in his hands.",
+          "source": "franklin",
+          "support_note": "bifocals, swim fins, stove and no patents",
+          "id": "h1"
+        },
+        {
+          "text": "Pumice can float because its glassy structure contains many gas-bubble cavities.",
+          "source": "volcano",
+          "support_note": "pyroclast sizes, breadcrust bombs, Pele’s hair, pumice",
+          "id": "v5"
+        },
+        {
+          "text": "Basenjis can yodel, despite being called barkless dogs.",
+          "source": "dog",
+          "support_note": "nose print, Basenji yodel, Australian Shepherd origin, color vision",
+          "id": "d2"
+        },
+        {
+          "text": "London’s first Underground services used steam trains between Paddington and Farringdon in 1863.",
+          "source": "rail",
+          "support_note": "steam services began underground in1863; not all trains everywhere",
+          "id": "l5"
+        },
+        {
+          "text": "Food aromas can reach your nose from behind your throat.",
+          "source": "smell",
+          "support_note": "How does your sense of smell work?",
+          "id": "b3"
+        }
+      ],
+      "hook": "Did You Know?",
+      "cta": "Follow for more everyday discoveries.",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "Mixed 8; concrete images, medium contextual line, varied opening/middle/closing."
+    },
+    {
+      "id": "DYK-SINGLE-10",
+      "profile": "dyk",
+      "format": "single_subject_fast",
+      "topic": "animals",
+      "architecture": "single_subject",
+      "facts": [
+        {
+          "text": "An octopus has three hearts, with two serving its gills.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o1"
+        },
+        {
+          "text": "Octopus arms can taste and touch while acting partly independently.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o2"
+        },
+        {
+          "text": "Copper in an octopus’s oxygen-carrying protein helps make its blood blue.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o3"
+        },
+        {
+          "text": "Veined octopuses in Indonesia were observed carrying coconut shells for shelter.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o4"
+        },
+        {
+          "text": "Octopuses can raise tiny skin bumps to change their texture.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o5"
+        },
+        {
+          "text": "In aquarium experiments, giant Pacific octopuses distinguished two human keepers.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o6"
+        },
+        {
+          "text": "Octopuses in experiments learned to guide an arm through a maze.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o7"
+        },
+        {
+          "text": "A mimic octopus can imitate animals such as sea snakes.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o8"
+        },
+        {
+          "text": "Many male octopuses transfer sperm using a specially modified arm.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o9"
+        },
+        {
+          "text": "One deep-sea octopus was observed brooding eggs for 53 months.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o10"
+        }
+      ],
+      "hook": "DID YOU KNOW",
+      "cta": "Which surprised you? Like the video and follow for more. ❤️",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "Single subject 10; species/study qualifiers retained; camouflage has one texture line."
+    },
+    {
+      "id": "DYK-ANIMALS",
+      "profile": "dyk",
+      "format": "emotional_animal_collection",
+      "topic": "animals",
+      "architecture": "themed",
+      "facts": [
+        {
+          "text": "A dog’s nose print is individual, rather like a fingerprint.",
+          "source": "dog",
+          "support_note": "nose print, Basenji yodel, Australian Shepherd origin, color vision",
+          "id": "d1"
+        },
+        {
+          "text": "Veined octopuses in Indonesia were observed carrying coconut shells for shelter.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o4"
+        },
+        {
+          "text": "Basenjis can yodel, despite being called barkless dogs.",
+          "source": "dog",
+          "support_note": "nose print, Basenji yodel, Australian Shepherd origin, color vision",
+          "id": "d2"
+        },
+        {
+          "text": "In aquarium experiments, giant Pacific octopuses distinguished two human keepers.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o6"
+        },
+        {
+          "text": "The Australian Shepherd was developed as an American breed.",
+          "source": "dog",
+          "support_note": "nose print, Basenji yodel, Australian Shepherd origin, color vision",
+          "id": "d3"
+        },
+        {
+          "text": "One deep-sea octopus was observed brooding eggs for 53 months.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o10"
+        },
+        {
+          "text": "Dogs can see blue and yellow; their vision is not black-and-white.",
+          "source": "dog",
+          "support_note": "nose print, Basenji yodel, Australian Shepherd origin, color vision",
+          "id": "d4"
+        }
+      ],
+      "hook": "DID YOU KNOW",
+      "cta": "Like these details?\nTag an animal-loving friend. ❤️",
+      "cta_placement": {
+        "kind": "after_fact",
+        "position": 6
+      },
+      "cta_actions": [
+        "react",
+        "tag"
+      ],
+      "review_focus": "Animal collection; question+like/tag, multiline CTA before final fact; one caregiving beat only."
+    },
+    {
+      "id": "DYK-COMPARE",
+      "profile": "dyk",
+      "format": "comparison",
+      "topic": "animals",
+      "architecture": "themed",
+      "facts": [
+        {
+          "text": "The American crocodile has a narrow, tapered snout.",
+          "source": "croc",
+          "support_note": "American species: teeth, snouts, color; no approach/handling advice",
+          "id": "c1"
+        },
+        {
+          "text": "The American alligator has a broad, rounded snout.",
+          "source": "croc",
+          "support_note": "American species: teeth, snouts, color; no approach/handling advice",
+          "id": "c2"
+        },
+        {
+          "text": "A closed American crocodile’s mouth exposes its fourth lower tooth.",
+          "source": "croc",
+          "support_note": "American species: teeth, snouts, color; no approach/handling advice",
+          "id": "c3"
+        },
+        {
+          "text": "A closed American alligator’s mouth normally shows only upper teeth.",
+          "source": "croc",
+          "support_note": "American species: teeth, snouts, color; no approach/handling advice",
+          "id": "c4"
+        },
+        {
+          "text": "Young American crocodiles are light-colored with dark stripes.",
+          "source": "croc",
+          "support_note": "American species: teeth, snouts, color; no approach/handling advice",
+          "id": "c5"
+        },
+        {
+          "text": "Young American alligators are dark with yellow stripes.",
+          "source": "croc",
+          "support_note": "American species: teeth, snouts, color; no approach/handling advice",
+          "id": "c6"
+        }
+      ],
+      "hook": "CROCODILE OR ALLIGATOR?",
+      "cta": "Which difference stood out? Like and tag a curious friend.",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "American species only; three adjacent equivalent comparisons, not unrelated features."
+    },
+    {
+      "id": "DYK-MYTH",
+      "profile": "dyk",
+      "format": "myth_vs_fact",
+      "topic": "food_science",
+      "architecture": "single_subject",
+      "facts": [
+        {
+          "text": "Microwave cooking does not make food radioactive.",
+          "source": "micro",
+          "support_note": "Cooking with Microwaves; nutrition and containers",
+          "id": "m1"
+        },
+        {
+          "text": "Thick food does not cook from the inside out in a microwave.",
+          "source": "micro",
+          "support_note": "Cooking with Microwaves; nutrition and containers",
+          "id": "m2"
+        },
+        {
+          "text": "Microwave cooking does not destroy more nutrients than conventional cooking.",
+          "source": "micro",
+          "support_note": "Cooking with Microwaves; nutrition and containers",
+          "id": "m3"
+        },
+        {
+          "text": "A microwave-safe dish can still get hot from the food inside.",
+          "source": "micro",
+          "support_note": "Cooking with Microwaves; nutrition and containers",
+          "id": "m4"
+        },
+        {
+          "text": "Some plastics can melt from the heat of microwaved food.",
+          "source": "micro",
+          "support_note": "Cooking with Microwaves; nutrition and containers",
+          "id": "m5"
+        },
+        {
+          "text": "Water overheated in a clean cup may not look as if it is boiling.",
+          "source": "micro",
+          "support_note": "Cooking with Microwaves; nutrition and containers",
+          "id": "m6"
+        }
+      ],
+      "hook": "MICROWAVE MYTHS, MEET FACTS",
+      "cta": "Which surprised you? Like the video and share your answer below.",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "Correct belief directly, distinguish thick food/containers/overheated water without unsafe experiments."
+    },
+    {
+      "id": "DYK-UTILITY",
+      "profile": "dyk",
+      "format": "themed_utility",
+      "topic": "food_storage_home",
+      "architecture": "themed",
+      "facts": [
+        {
+          "text": "Keep refrigerated food at 40°F or below; check with an appliance thermometer.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s1"
+        },
+        {
+          "text": "Perishables need refrigeration within two hours, or one hour above 90°F.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s2"
+        },
+        {
+          "text": "Leave room in the refrigerator so cold air can circulate around food.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s3"
+        },
+        {
+          "text": "Wipe refrigerator spills promptly; raw-meat drips can spread bacteria to other foods.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s4"
+        },
+        {
+          "text": "Marinate food in the refrigerator, where cold slows bacterial growth.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s5"
+        },
+        {
+          "text": "Food may contain harmful bacteria even when it looks and smells normal.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s6"
+        }
+      ],
+      "hook": "SMALL FRIDGE HABITS THAT MATTER",
+      "cta": "Save this. Like it, tag a friend, and follow for more.",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": [
+        "save",
+        "react",
+        "tag",
+        "follow"
+      ],
+      "review_focus": "Utility; all time/temperature conditions; four natural CTA invitations in budget."
+    },
+    {
+      "id": "DYK-HISTORY",
+      "profile": "dyk",
+      "format": "themed_curiosity",
+      "topic": "history_origins",
+      "architecture": "themed",
+      "facts": [
+        {
+          "text": "Franklin’s childhood swimming fins were held in his hands.",
+          "source": "franklin",
+          "support_note": "bifocals, swim fins, stove and no patents",
+          "id": "h1"
+        },
+        {
+          "text": "His bifocals combined reading and distance lenses in one pair.",
+          "source": "franklin",
+          "support_note": "bifocals, swim fins, stove and no patents",
+          "id": "h2"
+        },
+        {
+          "text": "Franklin once used a kite to pull himself across a pond.",
+          "source": "franklin_nps",
+          "support_note": "nautical inventions and electrical tricks",
+          "id": "h3"
+        },
+        {
+          "text": "He entertained people with a charged metal spider that moved.",
+          "source": "franklin_nps",
+          "support_note": "nautical inventions and electrical tricks",
+          "id": "h4"
+        },
+        {
+          "text": "His Gulf Stream charts helped explain differences in Atlantic sailing times.",
+          "source": "franklin_nps",
+          "support_note": "nautical inventions and electrical tricks",
+          "id": "h5"
+        },
+        {
+          "text": "Franklin never patented his inventions, believing they should be shared freely.",
+          "source": "franklin",
+          "support_note": "bifocals, swim fins, stove and no patents",
+          "id": "h6"
+        }
+      ],
+      "hook": "FRANKLIN BEYOND THE KITE",
+      "cta": "Which project surprised you? Comment below and like the video.",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "Historical collection; different devices rather than a development timeline; no uncertain lightning-strike story."
+    },
+    {
+      "id": "DYK-CONSEQUENCE",
+      "profile": "dyk",
+      "format": "themed_curiosity",
+      "topic": "nature_science",
+      "architecture": "themed",
+      "facts": [
+        {
+          "text": "Explosively expanding gas can shatter magma into tiny ash fragments.",
+          "source": "volcano",
+          "support_note": "pyroclast sizes, breadcrust bombs, Pele’s hair, pumice",
+          "id": "v1"
+        },
+        {
+          "text": "Volcanic ash grains are smaller than two millimeters across.",
+          "source": "volcano",
+          "support_note": "pyroclast sizes, breadcrust bombs, Pele’s hair, pumice",
+          "id": "v2"
+        },
+        {
+          "text": "Some volcanic bombs develop cracked crusts as their interiors keep expanding.",
+          "source": "volcano",
+          "support_note": "pyroclast sizes, breadcrust bombs, Pele’s hair, pumice",
+          "id": "v3"
+        },
+        {
+          "text": "Pele’s hair forms when lava droplets stretch into glass threads.",
+          "source": "volcano",
+          "support_note": "pyroclast sizes, breadcrust bombs, Pele’s hair, pumice",
+          "id": "v4"
+        },
+        {
+          "text": "Pumice can float because its glassy structure contains many gas-bubble cavities.",
+          "source": "volcano",
+          "support_note": "pyroclast sizes, breadcrust bombs, Pele’s hair, pumice",
+          "id": "v5"
+        },
+        {
+          "text": "Wet volcanic ash can conduct electricity and trigger power-insulator flashovers.",
+          "source": "wetash",
+          "support_note": "dry versus wet ash conductivity; possible flashover not certainty",
+          "id": "v6"
+        }
+      ],
+      "hook": "LAVA LEAVES STRANGE THINGS BEHIND",
+      "cta": "Which detail surprised you? Like this and follow for more.",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "Consequence; meaningful glass/expansion effects; wet-ash condition retained; no eruption advice."
+    },
+    {
+      "id": "DYK-MIXED-11",
+      "profile": "dyk",
+      "format": "mixed_curiosity",
+      "topic": "general_trivia",
+      "architecture": "mixed",
+      "facts": [
+        {
+          "text": "Veined octopuses in Indonesia carried coconut shells for shelters.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o4"
+        },
+        {
+          "text": "Trapped carbon dioxide can cloud a very fresh egg white.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e4"
+        },
+        {
+          "text": "Franklin’s childhood swim fins were held in his hands.",
+          "source": "franklin",
+          "support_note": "bifocals, swim fins, stove and no patents",
+          "id": "h1"
+        },
+        {
+          "text": "Pumice can float thanks to its many gas-bubble cavities.",
+          "source": "volcano",
+          "support_note": "pyroclast sizes, breadcrust bombs, Pele’s hair, pumice",
+          "id": "v5"
+        },
+        {
+          "text": "Tiny inner-ear grains of calcium carbonate help sense gravity.",
+          "source": "balance",
+          "support_note": "How does my body keep its balance?",
+          "id": "b2"
+        },
+        {
+          "text": "Basenjis can yodel, despite their barkless reputation.",
+          "source": "dog",
+          "support_note": "nose print, Basenji yodel, Australian Shepherd origin, color vision",
+          "id": "d2"
+        },
+        {
+          "text": "London’s first Underground trains, in 1863, ran on steam.",
+          "source": "rail",
+          "support_note": "steam services began underground in1863; not all trains everywhere",
+          "id": "l5"
+        },
+        {
+          "text": "Whipping egg whites unfolds proteins that trap air bubbles.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e9"
+        },
+        {
+          "text": "An octopus’s oxygen-carrying protein contains copper, making its blood blue.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o3"
+        },
+        {
+          "text": "Food aromas can reach your nose from behind your throat.",
+          "source": "smell",
+          "support_note": "How does your sense of smell work?",
+          "id": "b3"
+        },
+        {
+          "text": "Franklin never patented his inventions, wanting them shared freely.",
+          "source": "franklin",
+          "support_note": "bifocals, swim fins, stove and no patents",
+          "id": "h6"
+        }
+      ],
+      "hook": "DID YOU KNOW",
+      "cta": "Like these facts?\nTag a friend, save this, and follow. ❤️",
+      "cta_placement": {
+        "kind": "after_fact",
+        "position": 10
+      },
+      "cta_actions": null,
+      "review_focus": "Mixed 11; short alternating domains, 4+ invitations, internal CTA and varied ending."
+    },
+    {
+      "id": "DF-PLACES",
+      "profile": "daily_facts",
+      "format": "themed_curiosity",
+      "topic": "geography",
+      "architecture": "themed",
+      "facts": [
+        {
+          "text": "London’s famous Big Ben name belongs to the main bell in Elizabeth Tower.",
+          "source": "parliament",
+          "support_note": "Central Tower chimney and Big Ben bell",
+          "id": "l1"
+        },
+        {
+          "text": "Tower Bridge lifts its roadway to let vessels pass along the Thames.",
+          "source": "bridge",
+          "support_note": "bridge lifts for vessels; no schedules/annual count used",
+          "id": "l2"
+        },
+        {
+          "text": "Its glass walkways sit 42 meters above the river, giving a very different view.",
+          "source": "london",
+          "support_note": "Tower Bridge glass walkways, London Eye capsules, landmark descriptions",
+          "id": "l3"
+        },
+        {
+          "text": "The London Eye carries visitors in 32 glass capsules around its enormous wheel.",
+          "source": "london",
+          "support_note": "Tower Bridge glass walkways, London Eye capsules, landmark descriptions",
+          "id": "l4"
+        },
+        {
+          "text": "London’s first Underground services used steam trains between Paddington and Farringdon in 1863.",
+          "source": "rail",
+          "support_note": "steam services began underground in1863; not all trains everywhere",
+          "id": "l5"
+        },
+        {
+          "text": "Parliament’s Central Tower was designed as a chimney for stale air and fireplace smoke.",
+          "source": "parliament",
+          "support_note": "Central Tower chimney and Big Ben bell",
+          "id": "l6"
+        }
+      ],
+      "hook": "London has a second story",
+      "cta": "Like the facts? Like the video and follow for more!",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "City collection; longer explanatory rhythm, sentence case, no emoji, like+follow; no invented attraction schedule."
+    },
+    {
+      "id": "DF-STORAGE",
+      "profile": "daily_facts",
+      "format": "themed_utility",
+      "topic": "food_storage_home",
+      "architecture": "themed",
+      "facts": [
+        {
+          "text": "Keep your refrigerator at 40°F or below, and use an appliance thermometer to check its actual temperature.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s1"
+        },
+        {
+          "text": "Perishables need refrigeration within two hours, or just one hour when air temperatures exceed 90°F.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s2"
+        },
+        {
+          "text": "Do not pack the fridge tightly, because cold air needs room to circulate around stored food.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s3"
+        },
+        {
+          "text": "Wiping spills promptly helps prevent raw-meat drips from carrying bacteria onto other foods in the refrigerator.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s4"
+        },
+        {
+          "text": "Marinate food in the refrigerator, where cold slows the bacterial growth that can accelerate at room temperature.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s5"
+        },
+        {
+          "text": "Food can contain harmful bacteria without looking or smelling spoiled, so your senses alone cannot prove its safety.",
+          "source": "fridge",
+          "support_note": "Storage Basics/Refrigeration Tips; all temperature/time conditions retained",
+          "id": "s6"
+        }
+      ],
+      "hook": "Small storage habits, useful reasons",
+      "cta": "Like the facts? Like the video and follow for more!",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "Storage utility; 6 longer lines and full conditions; instruction is supported, not blanket safety certification."
+    },
+    {
+      "id": "DF-MIXED",
+      "profile": "daily_facts",
+      "format": "mixed_curiosity",
+      "topic": "general_trivia",
+      "architecture": "mixed",
+      "facts": [
+        {
+          "text": "A very fresh egg can have a cloudy white because carbon dioxide is still trapped inside.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e4"
+        },
+        {
+          "text": "Veined octopuses observed in Indonesia carried coconut shells to assemble into shelters when needed.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o4"
+        },
+        {
+          "text": "Franklin’s childhood hand fins were wooden paddles that helped push him through the water.",
+          "source": "franklin",
+          "support_note": "bifocals, swim fins, stove and no patents",
+          "id": "h1"
+        },
+        {
+          "text": "Pumice can float on water because numerous gas-bubble cavities make its glassy structure unusually light.",
+          "source": "volcano",
+          "support_note": "pyroclast sizes, breadcrust bombs, Pele’s hair, pumice",
+          "id": "v5"
+        },
+        {
+          "text": "Food aromas can reach your nose through a passage from your throat, helping create familiar flavors.",
+          "source": "smell",
+          "support_note": "How does your sense of smell work?",
+          "id": "b3"
+        },
+        {
+          "text": "London’s first Underground services ran between Paddington and Farringdon in 1863, using steam trains.",
+          "source": "rail",
+          "support_note": "steam services began underground in1863; not all trains everywhere",
+          "id": "l5"
+        }
+      ],
+      "hook": "Everyday facts with a little more context",
+      "cta": "Like the facts? Like the video and follow for more!",
+      "cta_placement": {
+        "kind": "after_facts"
+      },
+      "cta_actions": null,
+      "review_focus": "Mixed 6; explain mechanisms without becoming DYK fragments."
+    },
+    {
+      "id": "CUSTOM-DATA-ONLY",
+      "profile": "custom",
+      "format": "evidence_trail",
+      "topic": "everyday_connections",
+      "architecture": "mixed",
+      "facts": [
+        {
+          "text": "Whipping egg whites unfolds their proteins, helping build a structure that traps air bubbles.",
+          "source": "egg",
+          "support_note": "pp.2–3: egg parts, albumen and whipping",
+          "id": "e9"
+        },
+        {
+          "text": "Veined octopuses observed in Indonesia carried coconut shells, then assembled them into shelters.",
+          "source": "oct",
+          "support_note": "sections1–8; retain species/study scope",
+          "id": "o4"
+        },
+        {
+          "text": "Franklin’s childhood swimming fins were hand-held wooden paddles, designed to add thrust in water.",
+          "source": "franklin",
+          "support_note": "bifocals, swim fins, stove and no patents",
+          "id": "h1"
+        },
+        {
+          "text": "Pumice can float because its glassy structure contains a large number of gas-bubble cavities.",
+          "source": "volcano",
+          "support_note": "pyroclast sizes, breadcrust bombs, Pele’s hair, pumice",
+          "id": "v5"
+        },
+        {
+          "text": "Food aromas reach smell receptors from behind your throat as well as through your nostrils.",
+          "source": "smell",
+          "support_note": "How does your sense of smell work?",
+          "id": "b3"
+        },
+        {
+          "text": "Parliament’s Central Tower was designed to carry stale air and fireplace smoke out of the building.",
+          "source": "parliament",
+          "support_note": "Central Tower chimney and Big Ben bell",
+          "id": "l6"
+        }
+      ],
+      "hook": "Small details, clearer connections",
+      "cta": "Save a favorite detail.\nWhich would you tell a friend?",
+      "cta_placement": {
+        "kind": "after_fact",
+        "position": 3
+      },
+      "cta_actions": [
+        "save",
+        "conversation_prompt"
+      ],
+      "review_focus": "Explicit DYK+Daily blend, new format/topic/density/profile registered after source freeze, numbered layout and middle CTA."
+    }
+  ]
+}

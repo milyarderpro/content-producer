@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-13",
+  "base_source_sha": "c02c5413479cebf50f39abc10149fafca757611a",
+  "candidate": "base HEAD plus staged task1-7 and unstaged task8; no new commit",
+  "evidence": "SOURCE/FIXTURE + PACKAGE + Plugin Creator release readback; not LIVE/host refresh/deployment",
+  "checks": {
+    "focused_plugin": {
+      "status": "PASS",
+      "files": 4,
+      "cases": 69,
+      "seconds": 1.14
+    },
+    "source_check": {
+      "status": "PASS",
+      "files": 14,
+      "cases": 207
+    },
+    "frontend_check": {
+      "status": "PASS",
+      "cases": 19
+    },
+    "frozen_corpus": {
+      "status": "PASS",
+      "raw": 176,
+      "unique_account_id": 172,
+      "unique_bodies": 171
+    },
+    "package": {
+      "status": "PASS",
+      "file_count": 15
+    },
+    "git_diff_check": "PASS"
+  },
+  "archives": {
+    "candidate": {
+      "path": "artifacts/configurable-profiles-task8-dt_0st9d/content-producer-0.5.8-candidate.zip",
+      "sha256": "aca33e059570e2b08939d398014924b07390d4ee4d41e9b701f1c4c0f2957524",
+      "file_count": 15
+    },
+    "update": {
+      "path": "artifacts/configurable-profiles-task8-dt_0st9d/content-producer-0.5.8-update.zip",
+      "sha256": "9bc1a73189958fa308eb276572a7d42f679abbd39c2787a23d3ee2fc9f3274df",
+      "file_count": 16
+    }
+  },
+  "remote_release_readback": {
+    "version": "0.5.8",
+    "canonicalFileCount": 15,
+    "readbackMismatch": [],
+    "portableIdentityUnchanged": true,
+    "compatibilityIdentityUnchanged": true,
+    "appBytesUnchanged": true,
+    "audienceUnchanged": true,
+    "filesUnchanged": true,
+    "defaultPrompt": null,
+    "compatibility_bytes_match_expected": true,
+    "expected_release_guard_used": true,
+    "same_plugin_id": true,
+    "before_version": "0.5.7",
+    "after_version": "0.5.8",
+    "scope": "USER",
+    "discoverability": "PRIVATE",
+    "readback_source": "Plugin Creator get_plugin_files",
+    "before_release_alias": "TASK8-BEFORE-0.5.7",
+    "after_release_alias": "TASK8-AFTER-0.5.8",
+    "host_refresh_or_new_chat": "NOT RUN",
+    "backend_deployment": "NOT RUN"
+  },
+  "runtime_files": [
+    {
+      "path": ".app.json",
+      "bytes": 132,
+      "sha256": "51e72d5559cb963fb62fb2a69e1314eedb2d1764b9e99192114c29a6ee9e3a08"
+    },
+    {
+      "path": "plugin.json",
+      "bytes": 713,
+      "sha256": "7978995fd317fa15f7f9704b5e6966afa59e6f489fe7780f05a58c818e332449"
+    },
+    {
+      "path": "skills/content-producer/SKILL.md",
+      "bytes": 15953,
+      "sha256": "a0db3f3fa040236e088b5f59d71f71e80ff68fbbfaf2f66db86144385c706673"
+    },
+    {
+      "path": "skills/content-producer/references/core/lifecycle.md",
+      "bytes": 6809,
+      "sha256": "cce36aa873fcad311c0aa702d55ceaa5045ba936a00df92499199199d5eb320f"
+    },
+    {
+      "path": "skills/content-producer/references/core/output-contract.md",
+      "bytes": 5220,
+      "sha256": "581d6cad01bfe2280f6b74870b8ff7d8d00d5a41ad9c246c3971efcfdcb2e94d"
+    },
+    {
+      "path": "skills/content-producer/references/core/source-policy.md",
+      "bytes": 1767,
+      "sha256": "8ff50c7e55ce307c02b0f6a45a4a9d3fbbe09d9581408b26385d92301ee15101"
+    },
+    {
+      "path": "skills/content-producer/references/core/tool-sequences.md",
+      "bytes": 7334,
+      "sha256": "79bf6148476af388943a4cffe1f52314f3b2ab0a3f9b3ee802deeee088c530cb"
+    },
+    {
+      "path": "skills/content-producer/references/core/workflow.md",
+      "bytes": 7986,
+      "sha256": "ad3c674d52d277d7769180a15c7d834ff7f8e529f6a65ccc7f2cfe83f4c97ba7"
+    },
+    {
+      "path": "skills/content-producer/references/niches/trivia/content-dna.md",
+      "bytes": 10441,
+      "sha256": "f2e09d690deb5a7eeee51fac7f1aed7fd695a3f34899d898f2a54ce91b2dd7db"
+    },
+    {
+      "path": "skills/content-producer/references/niches/trivia/dedup-ontology.md",
+      "bytes": 2507,
+      "sha256": "9c87da05a7daaaede836cf9f09013ac3bdd3b18264309bed6a29510d6da1707b"
+    },
+    {
+      "path": "skills/content-producer/references/niches/trivia/fact-checking.md",
+      "bytes": 1400,
+      "sha256": "02d2e905be1af958cde10f59f609dc8585536452aa0ebd65b4f087225cd8c8dd"
+    },
+    {
+      "path": "skills/content-producer/references/niches/trivia/formats.md",
+      "bytes": 19318,
+      "sha256": "9bcd4a5479fdd3ad203cdc1aad6cd7f241ffaa46cca9f772b41838545d417d5c"
+    },
+    {
+      "path": "skills/content-producer/references/niches/trivia/quality-rubric.md",
+      "bytes": 4244,
+      "sha256": "b1a3180fdfae4f209221b96068b6966186901e60ad4320d1021581ef2f3caea7"
+    },
+    {
+      "path": "skills/content-producer/references/niches/trivia/reference-patterns.md",
+      "bytes": 26025,
+      "sha256": "b31c0feec7cc4a00b5868081431310196b0838cc8fd727474ec803ecd15ef815"
+    },
+    {
+      "path": "skills/content-producer/references/niches/trivia/writing-playbook.md",
+      "bytes": 17981,
+      "sha256": "4d7813330be9a70bd92b02190f7b92c428cc57b28036142ee62767f5c238f906"
+    }
+  ],
+  "task7_hashes": {
+    "total": 58,
+    "matched_before_status_edits": 58,
+    "matched_after_status_edits": 55,
+    "document_only_delta": [
+      "docs/README.md",
+      "docs/operations.md",
+      "openspec/changes/add-configurable-trivia-editorial-profiles/tasks.md"
+    ],
+    "backend_source_unchanged": true
+  },
+  "git_index_sha256_before_after_status_edits": "fa67f0fb530fb34047edea01c0dee947e4874ee2a2e92de666d6a82cf98912c9",
+  "files": [
+    {
+      "path": "docs/README.md",
+      "sha256": "2eabc6ce5d17836002d5fbcf8cc5703e93a898538bf2690fd1504b5833cb7ee5"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-8-results.md",
+      "sha256": "1c67bd443bf7231a330c3eaa23dbc3e9971576593510d32a149076c9ee722a7d"
+    },
+    {
+      "path": "docs/operations.md",
+      "sha256": "80b05647a0d7f0966e2a2f95ef4ef92d2ad11ad4376d7ac5d65ceaac21090f60"
+    },
+    {
+      "path": "openspec/changes/add-configurable-trivia-editorial-profiles/tasks.md",
+      "sha256": "c9be9c54a74989c6921f8a3860facb161c9dcc01eccdb1e9bebda36d6c670ea6"
+    },
+    {
+      "path": "plugin/.app.json",
+      "sha256": "51e72d5559cb963fb62fb2a69e1314eedb2d1764b9e99192114c29a6ee9e3a08"
+    },
+    {
+      "path": "plugin/.codex-plugin/.gitkeep",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "plugin/CHANGELOG.md",
+      "sha256": "6bae29dad01efb33e134faf3f78a539a6e9f64701476240732f33de0274acb98"
+    },
+    {
+      "path": "plugin/README.md",
+      "sha256": "f316691db0236012f0c7b4365089936b7ec7cdebd53aad15b0afbb4fd09accf3"
+    },
+    {
+      "path": "plugin/plugin.json",
+      "sha256": "7978995fd317fa15f7f9704b5e6966afa59e6f489fe7780f05a58c818e332449"
+    },
+    {
+      "path": "plugin/schemas/mcp-connection-input.schema.json",
+      "sha256": "432abf874c807457a92562656ca59528ea470d3bdab6258c3c377726ab081c9e"
+    },
+    {
+      "path": "plugin/skills/content-producer/SKILL.md",
+      "sha256": "a0db3f3fa040236e088b5f59d71f71e80ff68fbbfaf2f66db86144385c706673"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/core/lifecycle.md",
+      "sha256": "cce36aa873fcad311c0aa702d55ceaa5045ba936a00df92499199199d5eb320f"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/core/output-contract.md",
+      "sha256": "581d6cad01bfe2280f6b74870b8ff7d8d00d5a41ad9c246c3971efcfdcb2e94d"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/core/source-policy.md",
+      "sha256": "8ff50c7e55ce307c02b0f6a45a4a9d3fbbe09d9581408b26385d92301ee15101"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/core/tool-sequences.md",
+      "sha256": "79bf6148476af388943a4cffe1f52314f3b2ab0a3f9b3ee802deeee088c530cb"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/core/workflow.md",
+      "sha256": "ad3c674d52d277d7769180a15c7d834ff7f8e529f6a65ccc7f2cfe83f4c97ba7"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/content-dna.md",
+      "sha256": "f2e09d690deb5a7eeee51fac7f1aed7fd695a3f34899d898f2a54ce91b2dd7db"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/dedup-ontology.md",
+      "sha256": "9c87da05a7daaaede836cf9f09013ac3bdd3b18264309bed6a29510d6da1707b"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/fact-checking.md",
+      "sha256": "02d2e905be1af958cde10f59f609dc8585536452aa0ebd65b4f087225cd8c8dd"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/formats.md",
+      "sha256": "9bcd4a5479fdd3ad203cdc1aad6cd7f241ffaa46cca9f772b41838545d417d5c"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/quality-rubric.md",
+      "sha256": "b1a3180fdfae4f209221b96068b6966186901e60ad4320d1021581ef2f3caea7"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/reference-patterns.md",
+      "sha256": "b31c0feec7cc4a00b5868081431310196b0838cc8fd727474ec803ecd15ef815"
+    },
+    {
+      "path": "plugin/skills/content-producer/references/niches/trivia/writing-playbook.md",
+      "sha256": "4d7813330be9a70bd92b02190f7b92c428cc57b28036142ee62767f5c238f906"
+    },
+    {
+      "path": "scripts/plugin-package.ts",
+      "sha256": "f7a45fd72b0889aec0b7ad2c6b55d759fde83dfc066add4b9f0eb3b2a90d892d"
+    },
+    {
+      "path": "tests/plugin-package.test.ts",
+      "sha256": "ba74c38f9e14fdee60fb8cf30846403ec658af9dee3142540d65967ed4b77523"
+    },
+    {
+      "path": "tests/plugin-skill.test.ts",
+      "sha256": "8395e29054a3d9c27d6890d65358c3ce89e03850a8cc77f8f69b21b2318589de"
+    }
+  ],
+  "not_run": [
+    "Actions",
+    "formal exact-SHA G4",
+    "backend deployment",
+    "production business Write",
+    "host refresh/new chat",
+    "task9 integration/phone layout/editorial acceptance",
+    "LIVE config2"
+  ]
+}

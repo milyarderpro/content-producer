@@ -19,6 +19,7 @@ function check(value: unknown, message: string): asserts value {
   if (!value) throw new Error(message);
 }
 const domains: Record<string, string> = {
+  get_trivia_editorial_catalog:'EDITORIAL_CATALOG_CONFLICT', update_trivia_editorial_catalog:'EDITORIAL_DEFINITION_UNAVAILABLE',
   get_account_profile: 'WORKSPACE_NOT_FOUND', get_workspace_context: 'WORKSPACE_NOT_FOUND',
   list_pages: 'VALIDATION_FAILED', get_page_generation_context: 'PAGE_NOT_FOUND',
   create_page: 'PAGE_SLUG_CONFLICT', update_page: 'PAGE_VERSION_CONFLICT',
@@ -102,9 +103,9 @@ for (const tool of tools) {
     } finally { globalThis.fetch = originalFetch; console.info = originalLog; }
   });
 }
-Deno.test('P6 diagnostic inventory is exactly the actual 36-tool catalog, including D2', () => {
+Deno.test('P6 diagnostic inventory is exactly the actual 33-tool catalog, including D2', () => {
   const expected = errorTaxonomy.groups.flatMap(g => [...g.reads, ...g.writes]).sort();
-  check(tools.length === 31 && new Set(tools.map(t => t.name)).size === 31, 'catalog drift');
+  check(tools.length === 33 && new Set(tools.map(t => t.name)).size === 33, 'catalog drift');
   check(JSON.stringify(tools.map(t => t.name).sort()) === JSON.stringify(expected), 'diagnostic coverage drift');
   check(JSON.stringify(Object.keys(domains).sort()) === JSON.stringify(expected), 'per-tool domain inventory drift');
 });

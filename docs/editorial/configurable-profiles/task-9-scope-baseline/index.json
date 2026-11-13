@@ -1,0 +1,22 @@
+[
+  {
+    "original_path": "openspec/changes/add-configurable-trivia-editorial-profiles/proposal.md",
+    "snapshot_path": "docs/editorial/configurable-profiles/task-9-scope-baseline/openspec__changes__add-configurable-trivia-editorial-profiles__proposal.md",
+    "sha256": "576fcd2257b28cbbaa21dc8ae1df1333fa2e952126466069ad005fe3780e492d"
+  },
+  {
+    "original_path": "openspec/changes/add-configurable-trivia-editorial-profiles/design.md",
+    "snapshot_path": "docs/editorial/configurable-profiles/task-9-scope-baseline/openspec__changes__add-configurable-trivia-editorial-profiles__design.md",
+    "sha256": "47d3489e22f147231e3209ffd6b1ba020960ad1679f8c0c95f6e123d7ccd93c7"
+  },
+  {
+    "original_path": "openspec/changes/add-configurable-trivia-editorial-profiles/specs/trivia-page-editorial-profiles/spec.md",
+    "snapshot_path": "docs/editorial/configurable-profiles/task-9-scope-baseline/openspec__changes__add-configurable-trivia-editorial-profiles__specs__trivia-page-editorial-profiles__spec.md",
+    "sha256": "903c9bcef4febbcc57b5af01cfc0b9d1e06f7ec36d0a951ecdd56e8a62679faa"
+  },
+  {
+    "original_path": "docs/editorial/configurable-profiles/contract.md",
+    "snapshot_path": "docs/editorial/configurable-profiles/task-9-scope-baseline/docs__editorial__configurable-profiles__contract.md",
+    "sha256": "7860dee515ec9d7e992d41a5992379c8697c66b5cbd2ed8e3e6b0c06898b1a89"
+  }
+]

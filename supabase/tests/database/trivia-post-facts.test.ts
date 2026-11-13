@@ -396,8 +396,10 @@ describe('Phase 4 checkpoint 4.5 trivia post-fact usage snapshots', () => {
                 and relname in ('workspaces', 'niches', 'pages', 'page_niche_configs', 'content_plans', 'content_plan_items',
                   'posts', 'post_metrics', 'trivia_facts', 'trivia_post_facts', 'operation_ledger', 'rate_limit_buckets')
                 and relrowsecurity) <> 12
-              -- CR-059: 31 active v2-only RPC signatures.
-              or (select count(*) from information_schema.routines where routine_schema = 'api') <> 31 then
+              -- CR-062 adds exactly the two owner editorial catalog RPCs; v1 remains retired.
+              or (select count(*) from information_schema.routines where routine_schema = 'api') <> 33
+              or to_regprocedure('api.get_trivia_editorial_catalog(integer,uuid,jsonb,boolean,integer,text)') is null
+              or to_regprocedure('api.update_trivia_editorial_catalog(integer,uuid,uuid,text,jsonb)') is null then
             raise exception 'Phase 4 inventory or API boundary changed';
           end if;
 

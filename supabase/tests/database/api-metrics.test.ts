@@ -181,7 +181,9 @@ describe('5.8 RPC-METRIC public append and replay', () => {
         row(`select has_table_privilege('content_producer_api_owner','public.post_metrics','UPDATE,DELETE,TRUNCATE') mutable,
         (select count(*) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api') api`)
           .api,
-      ).toBe(31); // Active cutover catalog; retired trivia v1 operations are absent.
+      ).toBe(33); // CR-062: the two editorial catalog RPCs join the v2-only catalog.
+      expect(row<{ n: number }>(`select count(*)::integer n from pg_proc p join pg_namespace n on n.oid=p.pronamespace
+        where n.nspname='api' and p.proname in ('get_trivia_editorial_catalog','update_trivia_editorial_catalog')`).n).toBe(2);
     } finally {
       cleanup(f);
       cleanup(other);

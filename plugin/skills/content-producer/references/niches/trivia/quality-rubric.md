@@ -1,5 +1,16 @@
 # Trivia editorial rubric and safe outcomes
 
+## Apply the current config branch first (CR-062)
+
+For config2, read [the generic profile workflow](formats.md) and the exact pinned
+catalog guidance/examples before using this reference. Its global counts,
+five-format/two-density list, default hook, single-goal CTA, legacy budget/loop
+formula and shock-heavy example selection are **config1 fallback only**.
+Config2 review follows its resolved profile: medium/context facts can earn their
+place, CTA may combine invitations, and new registered keys need no code switch.
+Shared source-meaning, semantic dedup, scope, repair and readback safeguards below
+still apply. Older atlas cards are optional aids, never the config2 authority.
+
 ## Current v2 — three required editorial results
 
 After research/dedup and final copy, submit exactly `meaning_preserved`,

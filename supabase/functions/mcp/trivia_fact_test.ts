@@ -31,10 +31,10 @@ async function mcp(method: string, params?: object) {
   return JSON.parse(frame ? frame.slice(6) : body);
 }
 
-Deno.test('CR-059 owner catalog contains 31 unique tools and no retired trivia v1 name', async () => {
+Deno.test('CR-059 owner catalog contains 33 unique tools and no retired trivia v1 name', async () => {
   const listed = (await mcp('tools/list')).result.tools as Array<{ name: string }>;
-  check(MCP_TOOL_COUNT === 31 && listed.length === 31, 'ACTIVE_31_TOOLS');
-  check(new Set(listed.map((tool) => tool.name)).size === 31, 'UNIQUE_TOOLS');
+  check(MCP_TOOL_COUNT === 33 && listed.length === 33, 'ACTIVE_31_TOOLS');
+  check(new Set(listed.map((tool) => tool.name)).size === 33, 'UNIQUE_TOOLS');
   for (const name of retired) check(!listed.some((tool) => tool.name === name), 'RETIRED_VISIBLE_' + name);
   for (const name of ['trivia_find_similar_facts_v2', 'save_post_v2', 'revise_post_v2']) {
     check(listed.some((tool) => tool.name === name), 'V2_MISSING_' + name);

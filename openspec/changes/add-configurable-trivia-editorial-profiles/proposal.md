@@ -34,3 +34,10 @@ Sistem trivia saat ini mengunci lima format, dua profil kepadatan, tanpa emoji, 
 - Perubahan bersifat aditif untuk config versi 1. Kemampuan baru memakai config versi 2; kompatibilitas config v1 tidak membuka kembali tool atau konten trivia v1 yang sudah dipensiunkan.
 - Di luar scope rilis yang direncanakan: laporan/perbandingan performa per versi DNA serta filter/pengelompokan label CTA baru. Data provenance yang diperlukan tetap dicatat agar kemampuan tersebut dapat ditambahkan kelak.
 - Di luar scope eksekusi proposal: implementasi, commit/push/PR/merge, deploy, pembuatan/pengubahan Page production, penulisan post, publikasi Facebook, OpenAI API, embeddings, UI baru, dan pengarsipan change lain. Proposal tidak menjanjikan hasil viral atau penyalinan naskah referensi.
+
+## Penyesuaian penerimaan — 13 November 2026
+
+Instruksi pemilik mengeluarkan review naskah manual dan QA layout ponsel dari
+penerimaan change ini. Task9 berfokus pada integrasi teknis per profil dan
+ekstensi data-only; tidak mengklaim kelulusan editorial dari technical PASS.
+Kontrol runtime, G4 dan batas LIVE tetap. Lihat [addendum CR-062](../../../docs/decisions/2026-11-13-cr-062-task-9-technical-acceptance.md).

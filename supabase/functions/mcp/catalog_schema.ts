@@ -4,10 +4,20 @@ export function closeUnionWrapper(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(closeUnionWrapper);
   if (!value || typeof value !== 'object') return value;
   const result = Object.fromEntries(Object.entries(value).map(([k, v]) => [k, closeUnionWrapper(v)]));
+  // A dynamic catalog map is closed to the registered key syntax and typed values.
+  // This is equivalent to propertyNames+additionalProperties, not a free JSON object.
+  const keyPattern = result.propertyNames && typeof result.propertyNames === 'object' && 'pattern' in result.propertyNames
+    ? result.propertyNames.pattern : undefined;
+  if (result.type === 'object' && typeof keyPattern === 'string' && result.additionalProperties &&
+    typeof result.additionalProperties === 'object') {
+    result.patternProperties = { [keyPattern]: result.additionalProperties };
+    result.additionalProperties = false;
+  }
+  const branches = result.anyOf ?? result.oneOf;
   if (result.type === 'object' && result.additionalProperties === undefined &&
-    Array.isArray(result.anyOf) && result.anyOf.every((b) =>
+    Array.isArray(branches) && branches.every((b) =>
       b && typeof b === 'object' && b.type === 'object' && b.additionalProperties === false)) {
-    result.properties = Object.fromEntries(result.anyOf.flatMap((b) =>
+    result.properties = Object.fromEntries(branches.flatMap((b) =>
       Object.keys(b.properties ?? {}).map((k) => [k, {}])));
     result.additionalProperties = false;
   }

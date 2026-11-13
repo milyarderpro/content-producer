@@ -1,4 +1,6 @@
+import { acceptanceCases, runEditorialAcceptance } from './helpers/editorial-acceptance.js';
 import { randomUUID } from 'node:crypto';
+import * as ep from './helpers/editorial-post.js';
 import { describe, expect, it } from 'vitest';
 import { cancel, claim, createPlan, expire, fail, renew, retry } from './helpers/plan-lifecycle.js';
 import { approve as approveV2, publish as publishV2 } from './helpers/trivia-v2.js';
@@ -672,5 +674,329 @@ describe('P4-T4 sequential draft plan and resume', () => {
       expect((rpc(f, `api.get_post(1,'${f.workspace}','${id}')`).data.post as { status: string }).status)
         .toBe('draft');
     } finally { cleanup(f); }
+  }, 45_000);
+});
+
+
+// CR-062 task5: schema3 transactions and lifecycle on isolated owner fixtures.
+describe('CR-062 editorial snapshot3 post workflow', () => {
+  it.each([1, 10, 11, 12])('saves, reads, approves and publishes all %i positions with null goal', (n) => {
+    const f = ep.editorialFixture();
+    try {
+      const v = ep.input(f, n); const p = ep.saved(f, v);
+      expect(p.interaction_goal).toBeNull();
+      expect(p.generation_snapshot).toMatchObject({ schema_version: 3, config_schema_version: 2,
+        config_public_id: v.config, config_updated_at: v.time, profile_key: null,
+        effective_rules_hash: v.context!.effective_rules_hash,
+        editorial_definitions: { profile: { key: 'dyk' }, format: { key: v.format }, topic: { key: v.topic } } });
+      expect(p.generation_snapshot.editorial_context.cta_actions).toBeNull();
+      expect(p.fact_bindings).toHaveLength(n);
+      expect(p.content_payload.body.facts).toEqual(v.content.body.facts);
+      const approved = rpc(f, approveV2(f, p.post_public_id));
+      expect(approved.data.status).toBe('ready');
+      const posted = rpc(f, publishV2(f, p.post_public_id));
+      expect(posted.data.published_fact_public_ids).toHaveLength(n);
+      expect(ep.get(f, p.post_public_id).generation_snapshot).toEqual(p.generation_snapshot);
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it.each(['curious_mind', 'dyk', 'daily_facts'])('keeps %s profile rules and original CTA on save/revise/readback', (profile) => {
+    const f = ep.editorialFixture(profile);
+    try {
+      const v = ep.input(f, 6);
+      v.content.cta = profile === 'daily_facts' ? 'Like the facts? Like the video and follow for more!'
+        : profile === 'dyk' ? 'Which stood out? Like the video and tag a curious friend! ❤️'
+        : 'Keep this one in mind. Follow for more discoveries.';
+      ep.assemble(v.content);
+      const p = ep.saved(f, v);
+      expect(p.generation_snapshot.editorial_definitions.profile.key).toBe(profile);
+      expect(p.content_payload.cta).toBe(v.content.cta);
+      v.key = randomUUID(); v.goal = null; ep.review(f, v);
+      const r = rpc(f, ep.revise(f, v, p));
+      expect((r.data.post as { revision: number }).revision).toBe(2);
+      expect(ep.get(f, p.post_public_id).interaction_goal).toBeNull();
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it('retains multiline CTA before final fact, new labels and optional legacy annotation', () => {
+    const f = ep.editorialFixture();
+    try {
+      const v = ep.input(f, 7); v.goal = 'follow';
+      v.context!.cta_actions = ['react', 'tag', 'save', 'follow', 'send_to_a_friend'];
+      v.content.cta = 'Like this?\nTag a friend.\nSave it.\nFollow for more! ❤️';
+      v.content.cta_placement = { kind: 'after_fact', position: 6 }; ep.assemble(v.content);
+      const p = ep.saved(f, v);
+      expect(p.content_payload.cta).toBe(v.content.cta);
+      expect(p.content_payload.canva_copy).toContain(v.content.cta + '\n\n' + v.facts[6]!.claim_text);
+      expect(p.generation_snapshot.cta).toEqual({ text: v.content.cta, placement: v.content.cta_placement, actions: v.context!.cta_actions });
+      expect(p.interaction_goal).toBe('follow');
+      expect(p.generation_snapshot.editorial_context.cta_actions).toEqual(v.context!.cta_actions);
+      const list = rpc(f, `api.list_posts(1,'${f.workspace}','${f.page}')`).data.items as Array<{ editorial_context: unknown; interaction_goal: string }>;
+      expect(list[0]!.editorial_context).toEqual(p.generation_snapshot.editorial_context);
+      expect(list[0]!.interaction_goal).toBe('follow');
+      v.key = randomUUID(); delete v.goal; v.context!.cta_actions = []; ep.review(f, v);
+      rpc(f, ep.revise(f, v, p));
+      const revised = ep.get(f, p.post_public_id);
+      expect(revised.interaction_goal).toBeNull();
+      expect(revised.generation_snapshot.cta.actions).toEqual([]);
+      expect(revised.content_hash).not.toBe(p.content_hash);
+      expect(revised.fact_bindings.map(x => x.fact_public_id)).toEqual(p.fact_bindings.map(x => x.fact_public_id));
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it('stores text above legacy length and 12 fact bindings, with server metrics authoritative', () => {
+    const f = ep.editorialFixture();
+    try {
+      const v = ep.input(f, 12);
+      v.facts[0]!.claim_text = 'x'.repeat(130);
+      v.content.body.facts[0]!.text = v.facts[0]!.claim_text; ep.assemble(v.content); ep.review(f, v);
+      const p = ep.saved(f, v);
+      expect(p.fact_bindings[0]!.rendered_text).toHaveLength(130);
+      expect(p.content_payload.text_metrics.fact_chars).toEqual([130, ...Array(11).fill(36)]);
+      expect(p.fact_bindings[11]!.position).toBe(12);
+      const bad = structuredClone(v); bad.key = randomUUID(); bad.content.text_metrics = { word_count: 1 };
+      expect(() => rpc(f, ep.save(f, bad))).toThrow('CONTENT_PAYLOAD_INVALID');
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it('rolls back stale versions, invalid references/architecture/labels and failed review atomically', () => {
+    const f = ep.editorialFixture(); const foreign = ep.editorialFixture();
+    try {
+      const v = ep.input(f); const before = counts(f);
+      const failures: Array<[string, (x: ep.Input) => void]> = [
+        ['PAGE_VERSION_CONFLICT', x => { x.time = '2020-01-01T00:00:00.000000Z'; }],
+        ['FACT_CATALOG_CONFLICT', x => { x.catalog = '999'; }],
+        ['PAGE_VERSION_CONFLICT', x => { x.context!.effective_rules_hash = '0'.repeat(64); }],
+        ['EDITORIAL_DEFINITION_UNAVAILABLE', x => { x.context!.format_ref = ep.definition(foreign, 'format', 'themed_curiosity').reference; }],
+        ['EDITORIAL_DEFINITION_UNAVAILABLE', x => { x.context!.topic_ref = ep.definition(foreign, 'topic', 'nature_science').reference; }],
+        ['PAGE_VERSION_CONFLICT', x => { x.context!.editorial_profile_ref = ep.definition(foreign, 'profile', 'dyk').reference; }],
+        ['EDITORIAL_DEFINITION_UNAVAILABLE', x => { x.context!.architecture = 'single_subject'; }],
+        ['PROFILE_UNSUPPORTED', x => { x.context!.profile_key = 'unregistered_density'; }],
+        ['VALIDATION_FAILED', x => { x.context!.cta_actions = { primary: 'follow' }; }],
+        ['VALIDATION_FAILED', x => { x.facts[0]!.dedup.complete = false; }],
+        ['EDITORIAL_REVIEW_REQUIRED', x => { x.editorial.meaning_preserved = 'needs_revision'; }],
+      ];
+      for (const [error, mutate] of failures) {
+        const bad = structuredClone(v); bad.key = randomUUID(); mutate(bad);
+        expect(() => rpc(f, ep.save(f, bad))).toThrow(error);
+        expect(counts(f)).toEqual(before);
+      }
+      const tooMany = ep.input(f, 13);
+      expect(() => rpc(f, ep.save(f, tooMany))).toThrow('VALIDATION_FAILED');
+      expect(counts(f)).toEqual(before);
+      expect(row<{ n: number }>(`select count(*)::integer n from internal.operation_ledger l join public.workspaces w on w.id=l.workspace_id where w.public_id='${f.workspace}' and l.operation_name='save_post_v2'`).n).toBe(0);
+      expect(() => rpc(f, ep.save(f, v), f.other)).toThrow('OWNER_ACCESS_REQUIRED');
+    } finally { cleanup(f); cleanup(foreign); }
+  }, 60_000);
+
+  it('requires context for config2 and rejects it on config1 without opening legacy null goal', () => {
+    const f = ep.editorialFixture(); const legacy = fixture();
+    try {
+      const v = ep.input(f, 5); const bad = structuredClone(v); delete bad.context;
+      expect(() => rpc(f, ep.save(f, bad))).toThrow('VALIDATION_FAILED');
+      const old = input(legacy);
+      expect(() => rpc(legacy, save(legacy, old).slice(0, -1) + ',' + json(v.context) + ')')).toThrow('VALIDATION_FAILED');
+      const original = save(legacy, old);
+      const expression = original.replace("'food_storage_home','save'", "'food_storage_home',null");
+      expect(expression).not.toBe(original);
+      expect(() => rpc(legacy, expression)).toThrow('VALIDATION_FAILED');
+      expect(counts(legacy).posts).toBe(0);
+    } finally { cleanup(f); cleanup(legacy); }
+  }, 30_000);
+
+  it('replays exact successful save/revise before changed Page/catalog/retirement checks', () => {
+    const f = ep.editorialFixture();
+    try {
+      const v = ep.input(f, 11); const first = rpc(f, ep.save(f, v));
+      const p = ep.get(f, (first.data.post as { post_public_id: string }).post_public_id);
+      const revision = structuredClone(v); revision.key = randomUUID(); revision.context!.cta_actions = ['new_action']; ep.review(f, revision);
+      const revised = rpc(f, ep.revise(f, revision, p));
+      const before = ep.get(f, p.post_public_id);
+      ep.retire(f, v.context!.editorial_profile_ref);
+      const c = ep.context(f); ep.updateConfig(f, { ...c.config, overrides: { fact_count: { mode: 'fixed', value: 1 } } });
+      expect(rpc(f, ep.save(f, v)).data).toEqual({ ...first.data, replayed: true });
+      expect(rpc(f, ep.revise(f, revision, p)).data).toEqual({ ...revised.data, replayed: true });
+      expect(ep.get(f, p.post_public_id)).toEqual(before);
+      const different = structuredClone(v); different.context!.cta_actions = [];
+      expect(() => rpc(f, ep.save(f, different))).toThrow('OPERATION_KEY_REUSED');
+      expect(() => rpc(f, ep.save(f, v), f.other)).toThrow('OWNER_ACCESS_REQUIRED');
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it('keeps approval valid after new catalog versions and retirement of Page-bound definitions', () => {
+    const f = ep.editorialFixture();
+    try {
+      const v = ep.input(f); const p = ep.saved(f, v);
+      const d = ep.definition(f, 'profile', 'dyk');
+      ep.publishDefinition(f, 'profile', 'dyk', { ...d.payload, voice: 'New immutable fixture voice.' }, 1);
+      for (const ref of [v.context!.editorial_profile_ref, v.context!.format_ref, v.context!.topic_ref]) ep.retire(f, ref);
+      expect(ep.context(f).editorial_context.editorial_profile_ref).toEqual(v.context!.editorial_profile_ref);
+      expect(rpc(f, approveV2(f, p.post_public_id)).data.status).toBe('ready');
+      expect(rpc(f, publishV2(f, p.post_public_id)).data.published_fact_public_ids).toHaveLength(12);
+      expect(ep.get(f, p.post_public_id).generation_snapshot).toEqual(p.generation_snapshot);
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it('requires explicit revision after Page adoption and preserves posted/archived provenance', () => {
+    const f = ep.editorialFixture();
+    try {
+      const v = ep.input(f, 10); const p = ep.saved(f, v);
+      const d = ep.definition(f, 'profile', 'dyk');
+      const next = ep.publishDefinition(f, 'profile', 'dyk', { ...d.payload, voice: 'Updated fixture voice.' }, 1);
+      const c = ep.context(f); ep.updateConfig(f, { ...c.config, editorial_profile_ref: next });
+      expect(() => rpc(f, approveV2(f, p.post_public_id))).toThrow('PAGE_VERSION_CONFLICT');
+      expect(ep.get(f, p.post_public_id).generation_snapshot).toEqual(p.generation_snapshot);
+      const fresh = ep.context(f); v.key = randomUUID(); v.time = fresh.context_version.config_updated_at;
+      v.context!.editorial_profile_ref = next; v.context!.effective_rules_hash = fresh.editorial_context.effective_rules_hash; ep.review(f, v);
+      rpc(f, ep.revise(f, v, p));
+      const revised = ep.get(f, p.post_public_id);
+      expect(revised.generation_snapshot.editorial_definitions.profile.reference).toEqual(next);
+      rpc(f, approveV2(f, p.post_public_id)); rpc(f, publishV2(f, p.post_public_id));
+      const posted = ep.get(f, p.post_public_id);
+      ep.updateConfig(f, { ...ep.context(f).config, editorial_profile_ref: d.reference });
+      rpc(f, `api.archive_post(1,'${f.workspace}','${randomUUID()}','${p.post_public_id}',${posted.revision},'Archive fixture.',true)`);
+      const archived = ep.get(f, p.post_public_id);
+      expect(archived.status).toBe('archived');
+      expect(archived.generation_snapshot).toEqual(posted.generation_snapshot);
+      expect(archived.content_hash).toBe(posted.content_hash);
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it('recomputes narrow budget/emoji policy for approval and publication without rewriting snapshot', () => {
+    const f = ep.editorialFixture();
+    try {
+      const v = ep.input(f, 10); v.content.cta += ' ❤️'; ep.assemble(v.content);
+      const p = ep.saved(f, v); rpc(f, approveV2(f, p.post_public_id));
+      const c = ep.context(f); ep.updateConfig(f, { ...c.config, overrides: { style: { emoji_policy: 'forbidden' } } });
+      expect(() => rpc(f, publishV2(f, p.post_public_id))).toThrow('PAGE_VERSION_CONFLICT');
+      const ready = ep.get(f, p.post_public_id);
+      expect(ready.status).toBe('ready'); expect(ready.generation_snapshot).toEqual(p.generation_snapshot);
+      rpc(f, `api.revoke_post_approval(1,'${f.workspace}','${randomUUID()}','${p.post_public_id}',${ready.revision},'${ready.content_hash}','Review new rules.',true)`);
+      const current = ep.get(f, p.post_public_id); const fresh = ep.context(f);
+      v.key = randomUUID(); v.time = fresh.context_version.config_updated_at;
+      v.context!.effective_rules_hash = fresh.editorial_context.effective_rules_hash; ep.review(f, v);
+      expect(() => rpc(f, ep.revise(f, v, current))).toThrow('CONTENT_PAYLOAD_INVALID');
+      ep.updateConfig(f, { ...ep.context(f).config, overrides: { fact_count: { mode: 'fixed', value: 1 } } });
+      expect(() => rpc(f, approveV2(f, p.post_public_id))).toThrow('PAGE_VERSION_CONFLICT');
+      expect(ep.get(f, p.post_public_id).status).toBe('draft');
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it('returns ready to draft on revision and preserves immutable old bindings and CAS', () => {
+    const f = ep.editorialFixture();
+    try {
+      const v = ep.input(f); const p = ep.saved(f, v); rpc(f, approveV2(f, p.post_public_id));
+      const ready = ep.get(f, p.post_public_id); ep.review(f, v); v.key = randomUUID();
+      expect(() => rpc(f, ep.revise(f, v, p))).toThrow('REVISION_CONFLICT');
+      const wrong = { ...ready, content_hash: '0'.repeat(64) };
+      expect(() => rpc(f, ep.revise(f, v, wrong))).toThrow('CONTENT_HASH_CONFLICT');
+      rpc(f, ep.revise(f, v, ready));
+      const revised = ep.get(f, p.post_public_id);
+      expect(revised.status).toBe('draft'); expect(revised.revision).toBe(ready.revision + 1);
+      expect(row<{ approval: unknown; all: number; old: number }>(`select approval_snapshot approval,
+        (select count(*)::integer from public.trivia_post_facts where post_id=p.id) all,
+        (select count(*)::integer from public.trivia_post_facts where post_id=p.id and not is_current) old from public.posts p where public_id='${p.post_public_id}'`)).toEqual({ approval: null, all: 24, old: 12 });
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it('reschedules/revokes/discards all 12 facts and replays release IDs exactly', () => {
+    const f = ep.editorialFixture();
+    try {
+      const p = ep.saved(f, ep.input(f));
+      rpc(f, `api.reschedule_post(1,'${f.workspace}','${randomUUID()}','${p.post_public_id}',${p.revision},'2040-01-01T00:00:00Z','Fixture schedule.')`);
+      const scheduled = ep.get(f, p.post_public_id);
+      expect(scheduled.content_hash).toBe(p.content_hash); expect(scheduled.generation_snapshot).toEqual(p.generation_snapshot);
+      rpc(f, approveV2(f, p.post_public_id)); const ready = ep.get(f, p.post_public_id);
+      rpc(f, `api.revoke_post_approval(1,'${f.workspace}','${randomUUID()}','${p.post_public_id}',${ready.revision},'${ready.content_hash}','Fixture revoke.',true)`);
+      const draft = ep.get(f, p.post_public_id); const key = randomUUID();
+      const expression = `api.discard_post(1,'${f.workspace}','${key}','${p.post_public_id}',${draft.revision},'Fixture discard.',true)`;
+      const r = rpc(f, expression);
+      expect(r.data.released_fact_public_ids).toHaveLength(12);
+      expect(rpc(f, expression).data).toEqual({ ...r.data, replayed: true });
+      expect(ep.get(f, p.post_public_id).generation_snapshot).toEqual(p.generation_snapshot);
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it('reads dynamic format/topic and null goal through existing metrics and insight dimensions', () => {
+    const f = ep.editorialFixture();
+    try {
+      const format = ep.publishDefinition(f, 'format', 'new_curiosity', ep.definition(f, 'format', 'themed_curiosity').payload, null);
+      const topic = ep.publishDefinition(f, 'topic', 'new_nature', ep.definition(f, 'topic', 'nature_science').payload, null);
+      const c = ep.context(f); ep.updateConfig(f, { ...c.config, allowed_format_refs: [format], allowed_topic_refs: [topic], format_weights: { new_curiosity: 100 }, topic_weights: { new_nature: 100 } });
+      const v = ep.input(f, 11, 'new_curiosity', 'new_nature'); v.context!.profile_key = 'fast_trivia';
+      const p = ep.saved(f, v); rpc(f, approveV2(f, p.post_public_id)); rpc(f, publishV2(f, p.post_public_id));
+      rpc(f, `api.record_post_performance(1,'${f.workspace}','${randomUUID()}','${p.post_public_id}','2026-11-02T01:00:00Z',${json({ views: 100 })},${json({ source_type: 'facebook_ui', metric_definition_version: 1 })})`);
+      const metrics = rpc(f, `api.get_post_performance(1,'${f.workspace}','${p.post_public_id}')`);
+      expect((metrics.data.snapshots as unknown[]).length).toBe(1);
+      const insights = rpc(f, `api.get_performance_insights(1,'${f.workspace}','${f.page}','trivia',null,null,array['format','topic','interaction_goal','profile','fact_count'],'views',1,20)`);
+      expect(JSON.stringify(insights.data)).toContain('new_curiosity');
+      const dimensions = row<{ dimensions: unknown }>(`select internal.metric_dimensions_v1(p,array['format','topic','interaction_goal','profile','fact_count']) dimensions from public.posts p where public_id='${p.post_public_id}'`).dimensions;
+      expect(dimensions).toEqual({ format: 'new_curiosity', topic: 'new_nature', interaction_goal: null, profile: 'fast_trivia', fact_count: 11 });
+      expect(ep.get(f, p.post_public_id).generation_snapshot.editorial_context.profile_key).toBe('fast_trivia');
+      const unclassified = ep.saved(f, ep.input(f, 10, 'new_curiosity', 'new_nature'));
+      rpc(f, approveV2(f, unclassified.post_public_id));
+      rpc(f, publishV2(f, unclassified.post_public_id).replace("'fixture-only'", 'null').replace("'https://example.org/fixture/publication'", 'null'));
+      rpc(f, `api.record_post_performance(1,'${f.workspace}','${randomUUID()}','${unclassified.post_public_id}','2026-11-02T01:00:00Z',${json({ views: 200 })},${json({ source_type: 'facebook_ui', metric_definition_version: 1 })})`);
+      const result = rpc(f, `api.get_performance_insights(1,'${f.workspace}','${f.page}','trivia',null,null,array['interaction_goal','profile'],'views',1,20)`).data;
+      expect(result.eligible_post_count).toBe(2);
+      expect((result.groups as Array<{ dimension_values: unknown }>).map(x => x.dimension_values))
+        .toContainEqual({ interaction_goal: null, profile: null });
+
+      expect(() => rpc(f, `api.get_performance_insights(1,'${f.workspace}','${f.page}','trivia',null,null,array['editorial_profile'],'views',1,20)`)).toThrow('VALIDATION_FAILED');
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it('rejects malformed stored snapshot metadata and a content/CTA mismatch', () => {
+    const f = ep.editorialFixture();
+    try {
+      const p = ep.saved(f, ep.input(f, 1));
+      const valid = row<{ valid: boolean }>(`select internal.post_generation_valid_v2(generation_snapshot) valid from public.posts where public_id='${p.post_public_id}'`).valid;
+      expect(valid).toBe(true);
+      for (const expression of [
+        "jsonb_set(generation_snapshot,'{editorial_definitions,profile,key}','null')",
+        "jsonb_set(generation_snapshot,'{editorial_definitions,profile,key}','true')",
+        "generation_snapshot#-'{editorial_definitions,topic,payload}'",
+        "jsonb_set(generation_snapshot,'{editorial_context,architecture}','\"single_subject\"')",
+        "jsonb_set(generation_snapshot,'{editorial_definitions,format,key}','\"unregistered_format\"')",
+        "jsonb_set(generation_snapshot,'{fact_count_applied}','13')",
+      ]) expect(row<{ valid: boolean }>(`select internal.post_generation_valid_v2(${expression}) valid from public.posts where public_id='${p.post_public_id}'`).valid).toBe(false);
+      expect(row<{ valid: boolean }>(`select internal.post_bundle_config2_valid_v2(
+        jsonb_set(content_payload,'{cta}','"Changed CTA"'),generation_snapshot,format_key,topic_key,interaction_goal) valid
+        from public.posts where public_id='${p.post_public_id}'`).valid).toBe(false);
+    } finally { cleanup(f); }
+  }, 30_000);
+
+  it('keeps exactly one eighteen-argument signature per writer and all new helpers private', () => {
+    const result = row<{ writers: number; arity: boolean; api: number; helpers: number; private: boolean }>(`select
+      (select count(*)::integer from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api' and p.proname in ('save_post_v2','revise_post_v2')) writers,
+      (select bool_and(p.pronargs=18 and p.prosecdef and r.rolname='content_producer_api_owner'
+        and has_function_privilege('authenticated',p.oid,'execute') and not has_function_privilege('anon',p.oid,'execute') and not has_function_privilege('service_role',p.oid,'execute'))
+        from pg_proc p join pg_namespace n on n.oid=p.pronamespace join pg_roles r on r.oid=p.proowner where n.nspname='api' and p.proname in ('save_post_v2','revise_post_v2')) arity,
+      (select count(*)::integer from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api') api,
+      count(*)::integer helpers, bool_and(not p.prosecdef and r.rolname='content_producer_api_owner' and p.proconfig=array['search_path=""']
+        and not exists(select 1 from (values('anon'),('authenticated'),('service_role')) c(role) where has_function_privilege(c.role,p.oid,'execute'))) private
+      from pg_proc p join pg_namespace n on n.oid=p.pronamespace join pg_roles r on r.oid=p.proowner
+      where n.nspname='internal' and p.proname in ('post_engine_rules_config2_v2','post_editorial_context_shape_config2_v2','post_prepare_config2_v2','post_generation_config2_valid_v2','post_bundle_config2_valid_v2')`);
+    expect(result).toEqual({ writers: 2, arity: true, api: 33, helpers: 5, private: true });
+  });
+
+  it('serializes concurrent config2 saves at the workspace lock and rolls stale catalog back', async () => {
+    const f = ep.editorialFixture();
+    try {
+      const a = ep.input(f); const b = ep.input(f);
+      const results = await overlap(f, ep.save(f, a), ep.save(f, b));
+      expect(results.map(x => x.code).sort()).toEqual([0, 3]);
+      expect(counts(f).posts).toBe(1);
+      expect(counts(f).usage).toBe(12);
+      expect(results.some(x => x.error === 'FACT_CATALOG_CONFLICT')).toBe(true);
+    } finally { cleanup(f); }
+  }, 30_000);
+});
+
+
+// Cross-package acceptance adds to, rather than replaces, the task2–7 regressions.
+describe('CR-062 task9 editorial matrix integration', () => {
+  it.each(acceptanceCases)('$id: catalog → Page → plan/context → save/revise/readback → lifecycle/insights', (test) => {
+    runEditorialAcceptance(test);
   }, 45_000);
 });

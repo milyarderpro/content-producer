@@ -84,7 +84,7 @@ Deno.test(
       const event = (await listed.text()).split('\n').find((line) => line.startsWith('data: '));
       assert(event, 'tools/list event missing');
       const tools = JSON.parse(event.slice(6)).result?.tools as Array<Record<string, unknown>>;
-      assert(Array.isArray(tools) && tools.length === 31, 'OAuth catalog must list 31 tools');
+      assert(Array.isArray(tools) && tools.length === 33, 'OAuth catalog must list 33 tools');
       assert(
         tools.some((tool) => tool.name === 'create_page'),
         'create_page absent',

@@ -15,6 +15,7 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { activeMcpToolNames, mcpTestCaseCount } from './mcp-catalog-inventory.js';
 import { resolveRuntimeEvidence, type RuntimeEvidence } from './runtime-range.js';
 
 type Mode = 'source' | 'backend' | 'full';
@@ -106,22 +107,35 @@ function files(directory: string, suffix: string): string[] {
   return result.sort();
 }
 
+// CR-062: counts come from the registered source and test declarations.
+const sourceToolCount = activeMcpToolNames(root).length;
+const sourceMcpCases = mcpTestCaseCount(files('supabase/functions/mcp', '_test.ts'), root);
+export const CANDIDATE_DATABASE_CASES = 238; // Runtime collection: 222 existing +16 task9; static parsing misses imported tables.
+export function assertExactDatabaseCaseCount(count: number): void {
+  if (count !== CANDIDATE_DATABASE_CASES) throw new Error('SHARD_CASE_COUNT_MISMATCH');
+}
+const inspectorSummary = `${sourceToolCount} valid; ${sourceToolCount} invalid; five retired v1 rejected; owner denial`;
+const inspectorPattern = new RegExp(
+  `${sourceToolCount}/${sourceToolCount} valid and ${sourceToolCount}/${sourceToolCount} invalid tool calls; five retired v1 rejected; owner denial.*PASS`,
+);
+
 export function validateManifest(
   manifest: Manifest,
   packageScripts: Record<string, string>,
 ): Record<string, number> {
   if (
     manifest.schemaVersion !== 1 ||
-    JSON.stringify(manifest.cutoverEvidence) !== JSON.stringify({
-      apiNames: 31,
-      mcpCases: 114,
-      inspectorValid: 31,
-      inspectorInvalid: 31,
-      retiredV1NamesRejected: 5,
-      ownerDenialRequired: true,
-      databaseFiles: 33,
-      databaseCases: 132,
-    }) ||
+    JSON.stringify(manifest.cutoverEvidence) !==
+      JSON.stringify({
+        apiNames: sourceToolCount,
+        mcpCases: sourceMcpCases,
+        inspectorValid: sourceToolCount,
+        inspectorInvalid: sourceToolCount,
+        retiredV1NamesRejected: 5,
+        ownerDenialRequired: true,
+        databaseFiles: 33,
+        databaseCases: CANDIDATE_DATABASE_CASES,
+      }) ||
     Object.keys(manifest.suites).sort().join(',') !== 'database,mcp,source'
   )
     fail('MANIFEST_SCHEMA_DRIFT');
@@ -149,7 +163,7 @@ export function validateManifest(
     )
       fail('MANIFEST_FILE_DRIFT');
   }
-  if (expected.mcp.length !== 17 || expected.database.length !== 33) fail('MANIFEST_COUNT_DRIFT');
+  if (expected.mcp.length !== 18 || expected.database.length !== 33) fail('MANIFEST_COUNT_DRIFT');
   const mcpCommand =
     (packageScripts['test:mcp'] ?? '')
       .split(/\s*&&\s*/)
@@ -160,7 +174,7 @@ export function validateManifest(
     .map((part) => `supabase/functions/${part}`);
   const last = invoked.sort();
   if (
-    invoked.length !== 17 ||
+    invoked.length !== 18 ||
     new Set(invoked).size !== invoked.length ||
     last.join('\0') !== expected.mcp.join('\0') ||
     packageScripts['test:database'] !== 'tsx scripts/supabase-local.ts test-database'
@@ -265,8 +279,8 @@ export function validateSingleMcpInspector(proofs: ShardProof[]): void {
     const item = owners[0].stages.find((stage) => stage.name === name);
     if (
       item?.status !== 'PASS' ||
-      (name === 'mcp' && item.count !== '114') ||
-      (name === 'inspector' && item.count !== '31 valid; 31 invalid; five retired v1 rejected; owner denial')
+      (name === 'mcp' && item.count !== String(sourceMcpCases)) ||
+      (name === 'inspector' && item.count !== inspectorSummary)
     )
       fail('SHARD_SINGLE_OWNER_EVIDENCE_INVALID', 'FAIL');
   }
@@ -351,6 +365,10 @@ export function preflight(expectedSha = process.env.GATE_CANDIDATE_SHA): Identit
     'pnpm-lock.yaml',
     'scripts/trivia-v2-catalog.sql',
     'scripts/trivia-v2-catalog-pin.json',
+    'scripts/mcp-catalog-inventory.ts',
+    'scripts/inspector-input.mjs',
+    'tests/fixtures/trivia-editorial-v2.json',
+    'tests/fixtures/tool-errors-v2.ts',
   ];
   const inputsHash = hash(inputPaths.map((path) => `${path}:${hash(read(path))}`).join('\n'));
   return {
@@ -562,10 +580,7 @@ function stageCopy(projectId: string, base: number): { path: string; overlayHash
 
 export function countFromOutput(name: string, rawOutput: string): string | undefined {
   const output = plainEvidence(rawOutput);
-  if (name === 'inspector')
-    return /31\/31 valid and 31\/31 invalid tool calls; five retired v1 rejected; owner denial.*PASS/.test(output)
-      ? '31 valid; 31 invalid; five retired v1 rejected; owner denial'
-      : undefined;
+  if (name === 'inspector') return inspectorPattern.test(output) ? inspectorSummary : undefined;
   if (name === 'database')
     return /Test Files\s+\d+ passed/.test(output) && /Tests\s+\d+ passed/.test(output)
       ? output.match(/Tests\s+(\d+) passed/)?.[1]
@@ -728,8 +743,18 @@ async function backendStages(
     run('start', 'pnpm', ['run', 'supabase:start']);
     assertStartedTarget(projectId, base);
     run('reset', 'pnpm', ['run', 'supabase:reset']);
-    run('migration-names', 'pnpm', ['run', 'verify-migrations'], /Validated 85 migration filename/);
-    if (!shard || shard === '1') run('mcp', 'pnpm', ['run', 'test:mcp'], /\b114 passed/);
+    run(
+      'migration-names',
+      'pnpm',
+      ['run', 'verify-migrations'],
+      new RegExp(
+        'Validated ' +
+          JSON.parse(read('scripts/trivia-v2-catalog-pin.json').toString()).migrationCount +
+          ' migration filename',
+      ),
+    );
+    if (!shard || shard === '1')
+      run('mcp', 'pnpm', ['run', 'test:mcp'], new RegExp('\\b' + sourceMcpCases + ' passed'));
     run(
       'audit-before',
       'pnpm',
@@ -741,7 +766,7 @@ async function backendStages(
         'inspector',
         'pnpm',
         ['exec', 'tsx', 'scripts/phase-6-13.ts', '--v2-inspector'],
-        /31\/31 valid and 31\/31 invalid tool calls; five retired v1 rejected; owner denial.*PASS/,
+        inspectorPattern,
       );
     run(
       'audit-after',

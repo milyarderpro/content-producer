@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-13",
+  "evidence": "SOURCE COLLECTION; database cases not executed as one full suite in task 7",
+  "registry_names": [
+    "approve_post",
+    "archive_post",
+    "cancel_content_plan",
+    "claim_content_plan_items",
+    "create_content_plan",
+    "create_page",
+    "discard_post",
+    "get_account_profile",
+    "get_content_plan",
+    "get_page_generation_context",
+    "get_performance_insights",
+    "get_post",
+    "get_post_performance",
+    "get_trivia_editorial_catalog",
+    "get_workspace_context",
+    "list_content_plans",
+    "list_pages",
+    "list_posts",
+    "mark_post_posted",
+    "record_post_performance",
+    "renew_content_plan_claim",
+    "replace_discarded_plan_item",
+    "report_content_plan_item_failure",
+    "reschedule_post",
+    "retry_content_plan_item",
+    "revise_post_v2",
+    "revoke_post_approval",
+    "save_post_v2",
+    "trivia_correct_fact",
+    "trivia_find_similar_facts_v2",
+    "trivia_reverify_fact",
+    "update_page",
+    "update_trivia_editorial_catalog"
+  ],
+  "mcp": {
+    "files": 18,
+    "cases": 130
+  },
+  "database": {
+    "files": 33,
+    "cases": 200,
+    "case_inventory": [
+      {
+        "path": "supabase/tests/database/api-metrics-concurrency.test.ts",
+        "cases": 3,
+        "sha256": "dbd844c631a7238d264e940cf0459c9d73f9587e6faae9078ec677c77ae63e91"
+      },
+      {
+        "path": "supabase/tests/database/api-metrics-insights.test.ts",
+        "cases": 4,
+        "sha256": "23651931c89fa79b0180fe3b30b13e6fc87c1b3a37bc861c0c818d7a69956b3f"
+      },
+      {
+        "path": "supabase/tests/database/api-metrics.test.ts",
+        "cases": 5,
+        "sha256": "9499f3a896387ea21a192350b4bd01e586d96bfc29e3b0838cd157c3cc517460"
+      },
+      {
+        "path": "supabase/tests/database/api-page-plan-writes.test.ts",
+        "cases": 18,
+        "sha256": "a183a81fb9769c4d16e25db433a657a90878b0534a9d85fedbd122127fab38f3"
+      },
+      {
+        "path": "supabase/tests/database/api-phase-five-acceptance.test.ts",
+        "cases": 3,
+        "sha256": "7659a5ff7be018cd7e2f949f4304266f9ad0ea0eb5fdebef98316c512beaf1de"
+      },
+      {
+        "path": "supabase/tests/database/api-plan-concurrency.test.ts",
+        "cases": 8,
+        "sha256": "49d3131e8e7e813ee9f9dbf232ec757adcf051ef049e764d50e3b1a49558281e"
+      },
+      {
+        "path": "supabase/tests/database/api-plan-lifecycle.test.ts",
+        "cases": 24,
+        "sha256": "93f8e0a844e497bc98ed760e0888071d53645132d76416715745acf23b9fce09"
+      },
+      {
+        "path": "supabase/tests/database/api-read-rpcs.test.ts",
+        "cases": 4,
+        "sha256": "3e275cebbae5b219572480590ed338dc6d6d97d5a4093a6ee0b21051b004ffb2"
+      },
+      {
+        "path": "supabase/tests/database/api-security-kernel.test.ts",
+        "cases": 8,
+        "sha256": "f08b449ff77609b6ccc66b47c6f9ca144136808da32332035376c90c3acec118"
+      },
+      {
+        "path": "supabase/tests/database/api-trivia-populated-performance.test.ts",
+        "cases": 1,
+        "sha256": "07034bbee51536ac0e67e901c6f8e851fc4c24592708ecffabff5dc1eed767e7"
+      },
+      {
+        "path": "supabase/tests/database/api-trivia-public-gold.test.ts",
+        "cases": 1,
+        "sha256": "3921d33d07d4efe5dbe35475bb4a538d0395c720a25c5488165e3553a6e6264b"
+      },
+      {
+        "path": "supabase/tests/database/api-trivia-v2-corpus.test.ts",
+        "cases": 1,
+        "sha256": "f45103e3020f75f741cf67d79e813ae76daeaa704b01494c8de1ec66fe1fa41d"
+      },
+      {
+        "path": "supabase/tests/database/api-trivia-v2-lifecycle.test.ts",
+        "cases": 6,
+        "sha256": "ffe3f73969649ea84a0bbda0ba23bfcd152ebd3e5c9acf958c0cf454e9c02eaa"
+      },
+      {
+        "path": "supabase/tests/database/api-trivia-v2-maintenance.test.ts",
+        "cases": 5,
+        "sha256": "4c83ff17d6b1df1d5431444b389f22c3c93118aebd8d724e71f69a9e5bd1af81"
+      },
+      {
+        "path": "supabase/tests/database/api-trivia-v2-read.test.ts",
+        "cases": 17,
+        "sha256": "950601b82e4ca8826dac409332bb3c89493beaac85652241062df6b1234f40bc"
+      },
+      {
+        "path": "supabase/tests/database/api-trivia-v2-save.test.ts",
+        "cases": 34,
+        "sha256": "9ae7d85a8dfb35d24e662960b15a7647010d48de8a6500787bd926f08a19f3c8"
+      },
+      {
+        "path": "supabase/tests/database/baseline.test.ts",
+        "cases": 1,
+        "sha256": "368b0b6fd84730798f6f97cea6becccba6273464480c0707c4e6f7c90fba5e51"
+      },
+      {
+        "path": "supabase/tests/database/content-plans-and-plan-items.test.ts",
+        "cases": 1,
+        "sha256": "fb3758251b1777665691ae8367b747502901c1f1ed3f7b9617a8e2a93024904c"
+      },
+      {
+        "path": "supabase/tests/database/core-primitives-and-validators.test.ts",
+        "cases": 23,
+        "sha256": "6673ee88950ea7130821a1812f3890dfe7a0d75783d4cb8aac2b3861b37664cf"
+      },
+      {
+        "path": "supabase/tests/database/final-remediation.test.ts",
+        "cases": 1,
+        "sha256": "8e01cd85c0a45daeb25e7281c11629f835d41119e6ca2c8f96076c2d8fc87025"
+      },
+      {
+        "path": "supabase/tests/database/oauth-resource-audience-hook.test.ts",
+        "cases": 1,
+        "sha256": "191e378c588670b790ed16d87c0a7c79eacc34c0a5f99d446ce8037c04a2bea7"
+      },
+      {
+        "path": "supabase/tests/database/operation-ledger-and-rate-limit-buckets.test.ts",
+        "cases": 1,
+        "sha256": "dc1a5d37ed675f4a4ab8179bc7987ee6f1e885208bb6db25b929b90e28185c85"
+      },
+      {
+        "path": "supabase/tests/database/pages-and-page-niche-configs.test.ts",
+        "cases": 13,
+        "sha256": "ac2341d15e36f67e3b8ca28920ee3316fb7a3f8e5ed6599ea66f41fc916abc3b"
+      },
+      {
+        "path": "supabase/tests/database/phase-5-operation-map.test.ts",
+        "cases": 1,
+        "sha256": "7dafe9f261f9fdae940f9e7a52a9e763944882b55e96567fae408a62cfcc1437"
+      },
+      {
+        "path": "supabase/tests/database/posts-and-post-metrics.test.ts",
+        "cases": 1,
+        "sha256": "d5d6af3162799e331a5befd19c124013eb3ab12dde2f7cbf8d1a3abafe11de57"
+      },
+      {
+        "path": "supabase/tests/database/trivia-audit-remediation.test.ts",
+        "cases": 1,
+        "sha256": "addd9013e860b348bfd08d0cbb7f7833b1ba1d0a25c814cc1631f494aecaef80"
+      },
+      {
+        "path": "supabase/tests/database/trivia-candidate-retrieval.test.ts",
+        "cases": 5,
+        "sha256": "29734518e877c59b1019b5b3add37f1b27911543f62eef61add0729ec2842aea"
+      },
+      {
+        "path": "supabase/tests/database/trivia-facts-schema.test.ts",
+        "cases": 1,
+        "sha256": "dc947e81a2161a91f31c64a53cfca714dc9bf99e70c860c0f2bdd75cd0d24eb9"
+      },
+      {
+        "path": "supabase/tests/database/trivia-identity-and-source.test.ts",
+        "cases": 1,
+        "sha256": "b9ca3cafb4cf353563dddf105f63e83aef446acc240ed32a491ec04c38695a68"
+      },
+      {
+        "path": "supabase/tests/database/trivia-lineage-and-reverification.test.ts",
+        "cases": 3,
+        "sha256": "3b84dc4628b00e8b4bc55ab0dc89665e88cb16becd6c30cae72b76b0f637d01d"
+      },
+      {
+        "path": "supabase/tests/database/trivia-post-facts.test.ts",
+        "cases": 1,
+        "sha256": "6f021438e45ef9fb024ca22b6fbe647dd585411e3fad6e0db804da03b8387b7a"
+      },
+      {
+        "path": "supabase/tests/database/trivia-reservation-and-reuse.test.ts",
+        "cases": 2,
+        "sha256": "d95120ba73724bc9a65cd1995a4e7e837561a08528413e77f67edf500073614f"
+      },
+      {
+        "path": "supabase/tests/database/workspaces-and-niches.test.ts",
+        "cases": 1,
+        "sha256": "c779f9594b90c5d5a4e73874dec5d8fc1d10bd0cc8f1ee7f94a8cc8a37ff6a1a"
+      }
+    ]
+  },
+  "shards": {
+    "1": {
+      "files": 15,
+      "cases": 125
+    },
+    "2": {
+      "files": 18,
+      "cases": 75
+    }
+  }
+}

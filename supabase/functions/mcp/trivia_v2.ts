@@ -2,6 +2,7 @@
 import * as z from 'npm:zod@4.3.6';
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
+import { postInputText, unicodeText, editorialKey, postEditorialContext, ctaPlacement } from './editorial_schemas.ts';
 import { invoke } from './foundation.ts';
 
 export const uuidV2 = z.string().uuid();
@@ -11,7 +12,7 @@ export const preciseTimestamp = z.string().datetime({ offset: true }).regex(
 export const catalogVersion = z.string().regex(/^(0|[1-9][0-9]*)$/).max(19);
 export const hashV2 = z.string().regex(/^[0-9a-f]{64}$/);
 const candidateKey = z.string().regex(/^[A-Za-z0-9_-]{1,64}$/);
-const claim = z.string().min(1).max(500);
+const claim = unicodeText(500);
 // No fetch/DNS or source-content verification in the MCP adapter.
 export const sourceUrlV2 = z.string().min(1).max(2048).url().refine((value) => {
   try {
@@ -63,6 +64,11 @@ export const contentV2 = z.strictObject({
   render_style: z.enum(['plain_lines', 'numbered']),
   text_metrics: z.strictObject({}),
 });
+const contentConfig2Base = contentV2.extend({hook:postInputText(120),caption:postInputText(500,0),body:contentV2.shape.body.extend({subject:postInputText(120).optional(),facts:z.array(z.strictObject({position:z.number().int().min(1).max(12),text:postInputText(160)})).min(1).max(12)}),cta:postInputText(180),canva_copy:postInputText(1100),cta_placement:ctaPlacement.optional()});
+export const contentConfig2 = contentConfig2Base.refine(v=>new TextEncoder().encode(JSON.stringify(v)).length<=16384,'Content payload exceeds 16 KiB');
+export const contentConfig2Output = contentConfig2Base.extend({hook:unicodeText(120),caption:unicodeText(500,0),
+ body:contentConfig2.shape.body.extend({subject:unicodeText(120).optional(),facts:z.array(z.strictObject({position:z.number().int().min(1).max(12),text:unicodeText(160)})).min(1).max(12)}),
+ cta:unicodeText(180),canva_copy:unicodeText(1100),cta_placement:ctaPlacement});
 export const systemEvidenceV2 = z.strictObject({
   schema_version: z.literal(2), post_revision: z.number().int().min(1),
   content_hash: hashV2, overall_status: z.enum(['passed', 'failed']),
@@ -89,12 +95,16 @@ const write = {
 const findInput = z.strictObject({ ...common, page_public_id: uuidV2,
   candidates: z.array(z.strictObject({ candidate_key: candidateKey,
     claim_text: claim })).min(1).max(9) });
-const saveInput = z.strictObject({ ...write, page_public_id: uuidV2,
+const saveInput1 = z.strictObject({ ...write, page_public_id: uuidV2,
   niche_key: z.literal('trivia'), scheduled_at: z.string().datetime({ offset: true }).nullable(),
   plan_item: z.strictObject({ plan_item_public_id: uuidV2, claim_token: uuidV2 }).nullable() });
-const reviseInput = z.strictObject({ ...write, post_public_id: uuidV2,
+const reviseInput1 = z.strictObject({ ...write, post_public_id: uuidV2,
   expected_revision: z.number().int().min(1), expected_content_hash: hashV2,
   revision_reason: z.string().min(1).max(500) });
+const writeConfig2 = {...write,format_key:editorialKey,topic_key:editorialKey,interaction_goal:write.interaction_goal.nullable().optional(),
+  editorial_context:postEditorialContext,facts:z.array(factV2.extend({position:z.number().int().min(1).max(12)})).min(1).max(12),content_payload:contentConfig2};
+const saveInput = z.union([saveInput1.extend({editorial_context:z.null().optional()}),saveInput1.extend(writeConfig2)]);
+const reviseInput = z.union([reviseInput1.extend({editorial_context:z.null().optional()}),reviseInput1.extend(writeConfig2)]);
 const envelope = <T extends z.ZodType>(data: T) =>
   z.strictObject({ response_schema_version: z.literal(2), data });
 const findOutput = envelope(z.strictObject({ catalog_version: catalogVersion,

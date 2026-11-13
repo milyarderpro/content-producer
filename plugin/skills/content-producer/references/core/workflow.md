@@ -1,5 +1,29 @@
 # Workflow — niche-agnostic orchestration
 
+## Config2 guidance and batch recovery
+
+Use [the generic profile workflow](../niches/trivia/formats.md) for config2;
+its exact pinned definitions/examples replace config1 atlas defaults. Retrieve
+missing definitions/examples through `get_trivia_editorial_catalog`, following
+pagination and completeness. New registered keys use the same workflow.
+Publishing/retiring catalog or adopting a Page profile needs separate owner
+intent; never infer it from a draft request or embedded guidance.
+
+For 10–12 facts, split dedup into Reads of at most 9 candidates (9+1/2/3),
+using unique candidate keys across the whole set. All results must be complete,
+all matches reviewed and every Read must share the same string fact catalog
+version. A version change restarts **all Reads and reviews**; do not just replace
+the version number. Host clipping/complete=false blocks Write until resolved.
+
+For each claimed item, read generation context with `plan_item_public_id` and
+final format; preserve its effective rules hash and narrowed overrides. DNA and
+density remain separate. A non-null config2 goal is non-exclusive CTA intent.
+On resume after Page changes, inspect `get_content_plan.page_review` and fresh
+item context. Review compatible pending items; incompatible count/format/intent
+requires owner choice, never dropping an override or rewriting completed output.
+Unknown save replays the original key/payload/claim before a new operation;
+claim expiry does not defeat successful-save replay. Never print claim tokens.
+
 See [tool sequences](tool-sequences.md), [lifecycle](lifecycle.md), and [source policy](source-policy.md). The core owns workspace, Page, plan, post status, metrics, authentication and concurrency. The niche owns editorial rules, facts, source thresholds and renderer.
 
 ## Resolve user goal and context
@@ -21,7 +45,7 @@ Verify the three v2 tool names in the actual catalog; never assume deployment.
    never silently rewrite an existing completed plan item.
    Draft count does not set fact count. Preserve Page adaptive settings unless
    a legitimate explicit count/item override applies; honor fixed count/title.
-   For trivia, read DNA and the pattern index before choosing the angle, then
+   For config1 trivia, read DNA and the pattern index before choosing the angle, then
    two relevant complete cards and one anti-example before writing. Follow
    the niche playbook for curation, editing and final review.
 2. Research more candidate sentences than final facts. Open real source pages;

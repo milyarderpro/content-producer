@@ -70,7 +70,7 @@ jobs:
                 need_check=true ;;
             esac
             case "$file" in
-              scripts/trivia-v2-catalog*|scripts/legacy-catalog-audit.ts|scripts/phase-6-catalog-audit.ts)
+              scripts/trivia-v2-catalog*|scripts/legacy-catalog-audit.ts|scripts/phase-6-catalog-audit.ts|scripts/mcp-catalog-inventory.ts|scripts/inspector-input.mjs|tests/fixtures/trivia-editorial-v2.json|tests/fixtures/tool-errors-v2.ts)
                 need_check=true
                 backend_review=true ;;
             esac
@@ -79,7 +79,7 @@ jobs:
                 need_check=true ;;
             esac
             case "$file" in
-              supabase/functions/mcp/*|supabase/functions/batch_a_server.ts|supabase/functions/deno.json|supabase/functions/deno.lock|supabase/config.toml|.deno-version|scripts/phase-6-13.ts|plans/tool-inventory.md|package.json|pnpm-lock.yaml|.github/workflows/*|.github/actions/*)
+              supabase/functions/mcp/*|supabase/functions/batch_a_server.ts|supabase/functions/deno.json|supabase/functions/deno.lock|supabase/config.toml|.deno-version|scripts/phase-6-13.ts|scripts/mcp-catalog-inventory.ts|scripts/inspector-input.mjs|tests/fixtures/trivia-editorial-v2.json|tests/fixtures/tool-errors-v2.ts|plans/tool-inventory.md|package.json|pnpm-lock.yaml|.github/workflows/*|.github/actions/*)
                 mcp_changed=true ;;
             esac
             case "$file" in

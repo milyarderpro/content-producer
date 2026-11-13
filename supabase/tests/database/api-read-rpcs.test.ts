@@ -431,7 +431,7 @@ function businessState(workspacePublicId: string): JsonRecord {
 }
 
 describe('Phase 5.2 owner-scoped read projections', () => {
-  it('exposes exactly 36 authenticated RPC names/38 signatures with narrow catalog privileges', () => {
+  it('exposes the CR-062 33 authenticated owner RPC signatures with narrow catalog privileges', () => {
     const catalog = querySingleRow(`
       with api_functions as (
         select procedure.oid, procedure.proname
@@ -452,7 +452,7 @@ describe('Phase 5.2 owner-scoped read projections', () => {
         has_table_privilege('service_role', 'public.post_metrics', 'select') as service_role_metrics_select
     `);
 
-    expect(catalog.api_function_count).toBe(31);
+    expect(catalog.api_function_count).toBe(33); // CR-062: two additive owner catalog RPCs.
     expect(String(catalog.api_function_names).replace(/[{}]/g, '').split(',')).toEqual([
       'approve_post',
       'archive_post',
@@ -467,6 +467,7 @@ describe('Phase 5.2 owner-scoped read projections', () => {
       'get_performance_insights',
       'get_post',
       'get_post_performance',
+      'get_trivia_editorial_catalog',
       'get_workspace_context',
       'list_content_plans',
       'list_pages',
@@ -485,8 +486,9 @@ describe('Phase 5.2 owner-scoped read projections', () => {
       'trivia_find_similar_facts_v2',
       'trivia_reverify_fact',
       'update_page',
+      'update_trivia_editorial_catalog',
     ]);
-    expect(catalog.authenticated_execute_count).toBe(31);
+    expect(catalog.authenticated_execute_count).toBe(33);
     expect(catalog.non_authenticated_execute_count).toBe(0);
     expect(catalog.caller_internal_helper_count).toBe(0);
     expect(catalog.api_owner_create).toBe(false);

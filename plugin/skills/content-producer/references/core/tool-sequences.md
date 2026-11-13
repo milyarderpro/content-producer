@@ -1,6 +1,6 @@
 # Exact MCP tool inventory and orchestration
 
-The cutover catalog has **31 active tools, 11 Read/20 Write**: three trivia v2 tools plus shared tools for Page, plan, lifecycle, and metrics. Five retired v1 content names are absent. All require owner-scoped OAuth. Confirm the runtime catalog and supported versions before use; this package is not deployment evidence. Trust structured results and readback, not HTTP 200, prose or an email as authorization.
+The config2 owner OAuth catalog has **33 active tools, 12 Read/21 Write**: three trivia v2 tools, two editorial catalog tools plus shared tools for Page, plan, lifecycle, and metrics. Five retired v1 content names are absent. All require owner-scoped OAuth. Confirm the runtime catalog and supported versions before use; this package is not deployment evidence. Trust structured results and readback, not HTTP 200, prose or an email as authorization.
 
 |   # | Tool                              | Purpose                              |
 | --: | --------------------------------- | ------------------------------------ |
@@ -35,6 +35,17 @@ The cutover catalog has **31 active tools, 11 Read/20 Write**: three trivia v2 t
 |  29 | trivia_find_similar_facts_v2       | Sentence-based dedup, complete/catalog |
 |  30 | save_post_v2                      | One atomic draft, no separate reserve |
 |  31 | revise_post_v2                    | CAS v2 edit with three editorial checks |
+|  32 | get_trivia_editorial_catalog       | Pinned definitions/examples, paginated Read |
+|  33 | update_trivia_editorial_catalog    | Explicit owner publish/retire, CAS/replay |
+
+The explicit fixed-pilot rollback retains 31 tools without the two catalog
+names; never enable it to bypass missing config2 capability. Read actual runtime
+support, not this package, before using config2. Both catalog tools use version1
+envelopes; config/content/snapshot versions are distinct.
+
+For config2, use [profile guidance](../niches/trivia/formats.md), including exact
+catalog refs/examples, consistent multi-Read dedup and item-aware context. The
+legacy flow below keeps its source/scope/approval safeguards for both branches.
 
 ## Primary v2 flow (CR-053/054/056)
 

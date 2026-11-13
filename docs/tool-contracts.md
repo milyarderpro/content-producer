@@ -1,5 +1,25 @@
 # Kontrak dan pemakaian tool MCP
 
+## Kandidat source config2 — CR-062 (13 November 2026)
+
+Registry owner OAuth kandidat memuat **33 tool: 12 Read dan 21 Write**.
+Dua tambahan ialah `get_trivia_editorial_catalog` dan
+`update_trivia_editorial_catalog`; keduanya request1. Create/update Page dan
+plan/context menerima config1/2, sementara save/revise tetap content2 dengan
+snapshot3 untuk config2. Goal null, key dinamis, CTA multiline/placement dan
+hingga 12 fakta mengikuti [kontrak MCP editorial](contracts/trivia-editorial-mcp.md).
+Lima nama v1 tetap absen/ditolak. `fixed-pilot` tetap rollback 31 tool sebelumnya;
+kedua tool katalog memerlukan owner OAuth, tanpa grant caller baru.
+
+Kontrak SQL rinci: [katalog](contracts/trivia-editorial-catalog.md),
+[Page](contracts/trivia-page-editorial-profiles.md),
+[post](contracts/trivia-post-editorial-snapshots.md),
+[plan/batch](contracts/trivia-config2-plan-batch.md).
+[Hasil task 7](editorial/configurable-profiles/task-7-results.md) adalah
+LOCAL/FIXTURE; ini bukan bukti versi live atau pemasangan plugin. Inventaris
+cutover/transisi di bawah tetap **historis**, termasuk tabel yang memuat nama
+v1. Gunakan registry dan kontrak editorial untuk kandidat ini.
+
 ## Batas kompatibilitas source cutover v2 — CR-059 (3 November 2026)
 
 Source pada change `cutover-trivia-v2-only` memasang **31 tool**. Lima nama

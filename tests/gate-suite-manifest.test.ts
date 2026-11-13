@@ -1,3 +1,4 @@
+import { activeMcpToolNames, mcpTestCaseCount } from '../scripts/mcp-catalog-inventory.js';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -55,15 +56,20 @@ describe('mandatory suite inventory (not a release gate)', () => {
     expect(manifest.schemaVersion).toBe(1);
     expect(manifest.baseSha).toMatch(/^[0-9a-f]{40}$/);
     expect(manifest.cutoverEvidence).toEqual({
-      apiNames: 31, mcpCases: 114, inspectorValid: 31, inspectorInvalid: 31,
-      retiredV1NamesRejected: 5, ownerDenialRequired: true,
-      databaseFiles: 33, databaseCases: 132,
+      apiNames: 33,
+      mcpCases: 130,
+      inspectorValid: 33,
+      inspectorInvalid: 33,
+      retiredV1NamesRejected: 5,
+      ownerDenialRequired: true,
+      databaseFiles: 33,
+      databaseCases: 238,
     });
     expect(Object.keys(manifest.suites).sort()).toEqual(['database', 'mcp', 'source']);
     assertMandatory(manifest.suites.source, 'tests/');
     assertMandatory(manifest.suites.mcp, 'supabase/functions/mcp/');
     assertMandatory(manifest.suites.database, 'supabase/tests/database/');
-    expect(manifest.suites.mcp.files).toHaveLength(17);
+    expect(manifest.suites.mcp.files).toHaveLength(18);
     expect(manifest.suites.database.files).toHaveLength(33);
   });
 
@@ -107,5 +113,39 @@ describe('mandatory suite inventory (not a release gate)', () => {
     const manifestPaths = manifest.suites.mcp.files.map((file) => file.path);
     expect(invoked.sort()).toEqual(discovered);
     expect(manifestPaths.sort()).toEqual(discovered);
+  });
+});
+
+it('derives the closed CR-062 census and MCP case target from registered source', () => {
+  const names = activeMcpToolNames();
+  expect(names).toHaveLength(33);
+  expect(new Set(names).size).toBe(33);
+  expect(names).toContain('get_trivia_editorial_catalog');
+  expect(names).toContain('update_trivia_editorial_catalog');
+  for (const name of [
+    'trivia_find_similar_facts',
+    'trivia_register_and_reserve_facts',
+    'trivia_release_facts',
+    'save_post',
+    'revise_post',
+  ])
+    expect(names).not.toContain(name);
+  expect(manifest.cutoverEvidence.apiNames).toBe(names.length);
+  expect(manifest.cutoverEvidence.mcpCases).toBe(
+    mcpTestCaseCount(manifest.suites.mcp.files.map((f) => f.path)),
+  );
+});
+
+
+describe('CR-062 task9 acceptance matrix inventory', () => {
+  it('counts every data-driven case in addition to the 222 existing runtime cases', () => {
+    const fixture = JSON.parse(read('supabase/tests/fixtures/editorial-profile-acceptance.json')) as {
+      cases: Array<{ id: string; profile: string; facts: unknown[] }>
+    };
+    expect(fixture.cases).toHaveLength(16);
+    expect(new Set(fixture.cases.map(c => c.id)).size).toBe(16);
+    expect([...new Set(fixture.cases.map(c => c.profile))].sort())
+      .toEqual(['curious_mind', 'custom', 'daily_facts', 'dyk']);
+    expect(manifest.cutoverEvidence.databaseCases).toBe(222 + fixture.cases.length);
   });
 });
