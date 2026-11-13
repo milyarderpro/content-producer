@@ -59,8 +59,8 @@
     }
   },
   "formal_g4": {
-    "status": "NOT RUN",
-    "candidate": "pending authorized merge and exact final main SHA",
+    "status": "FAIL",
+    "candidate": "3b56ff33b9229765a88f1a04f31877c60fe9c820",
     "database_files": 33,
     "database_cases": 238,
     "shards": [
@@ -76,10 +76,11 @@
     "estimated_minutes": [
       15,
       20
-    ]
+    ],
+    "run_url": "https://github.com/milyarderpro/content-producer/actions/runs/43396490933",
+    "failure": "both shards audit-before; database and Inspector NOT RUN; source/MCP/cleanup PASS"
   },
   "not_run": [
-    "merge",
     "hosted preflight",
     "deployment",
     "LIVE config2 owner/plugin retest",
@@ -93,5 +94,11 @@
   },
   "evidence_boundary": "CI/FIXTURE and source/release readback are not LIVE PASS or FIXED",
   "release_plan": "task-10-release-plan.md",
-  "documentation_followup": "Documentation-only commit after backend candidate; final head CI is checked independently and reported in handoff. Backend fingerprints must remain identical."
+  "documentation_followup": "Documentation-only commit after backend candidate; final head CI is checked independently and reported in handoff. Backend fingerprints must remain identical.",
+  "merge": {
+    "status": "MERGED",
+    "sha": "3b56ff33b9229765a88f1a04f31877c60fe9c820",
+    "pr": 139
+  },
+  "pin_correction": "task-10-catalog-pin-correction.json; LOCAL/CLEAN-REPLAY PASS; corrected final main G4 NOT RUN"
 }

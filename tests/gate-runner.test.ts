@@ -55,7 +55,16 @@ const sha = 'b'.repeat(40);
 
 test('catalog pins reject function, ACL, RLS, schema section and migration drift', () => {
   const catalog = {
-    functions: [],
+    functions: [
+      {
+        signature: 'api.create_content_plan(integer,uuid,uuid,uuid,text,integer,jsonb,text,text)',
+        owner: 'content_producer_api_owner',
+        definer: true,
+        settings: ['search_path=""'],
+        source_sha256: '54b4f0be4b302b96330d813f5e60b9093349932a9e7ba0d68b5d278625d7e41c',
+        acl: '{authenticated=X/content_producer_api_owner}',
+      },
+    ],
     objects: [],
     policies: [{ using: 'owner_id = auth.uid()' }],
   } as Catalog;
@@ -67,6 +76,18 @@ test('catalog pins reject function, ACL, RLS, schema section and migration drift
   assert.doesNotThrow(() => assertCatalogPin(catalog, pin, []));
   for (const changed of [
     { ...catalog, functions: [{ signature: 'internal.unexpected()' }] },
+    // The old pin came from six spaces on a blank line in the local function.
+    // Metadata and semantics match, but the exact source hash must still fail.
+    {
+      ...catalog,
+      functions: [
+        {
+          ...catalog.functions[0]!,
+          source_sha256: 'aa281126a4e531205ed8c9542c454eb1b8a153a01cd248f5991e7b8b31191a13',
+        },
+      ],
+    },
+    { ...catalog, functions: [{ ...catalog.functions[0]!, acl: '{anon=X/postgres}' }] },
     { ...catalog, objects: [{ acl: '{anon=r/postgres}', rls: false }] },
     { ...catalog, policies: [{ using: 'true' }] },
     { ...catalog, constraints: [] },
