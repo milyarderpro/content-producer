@@ -18,7 +18,9 @@ CAS/replay dan approval tetap berdiri sendiri.
   perubahan task 1–9 serta persiapan PR; follow-up handoff hanya dokumentasi.
   Perubahan pemilik tetap utuh; commit persiapan PR mencakup hanya scope CR-062.
 - [Issue #138](https://github.com/milyarderpro/content-producer/issues/138) sudah dibuat.
-  [Draft PR #139](https://github.com/milyarderpro/content-producer/pull/139) terbuka.
+  [PR #139](https://github.com/milyarderpro/content-producer/pull/139) sudah merged
+  pada `3b56ff33b9229765a88f1a04f31877c60fe9c820`; [koreksi G4](task-10-g4-findings.md)
+  perlu PR/merge berikutnya sebelum gate ulang.
   [Handoff](task-10-results.md) dan [verifikasi](task-10-verification.json) mencatat
   SHA kandidat/CI; base SHA bukan bukti perubahan ini sudah dipasang.
 
@@ -46,9 +48,9 @@ akhiri respons tanpa menunggu hasil. Lanjut pemeriksaan hanya setelah pesan
 | Tahap | Hasil wajib sebelum tahap berikutnya | Status kini |
 | --- | --- | --- |
 | Commit/push/Issue/draft PR |Permintaan task 10 mencakup persiapan PR; kandidat pada branch usulan, body siap dan daftar file exact|Commit/push, Issue #138 dan draft PR #139 selesai|
-| Light CI/review |Run pada head SHA PR benar, pemeriksaan terdampak lulus dan perubahan ditinjau|Light CI backend SHA a71fe5c PASS; review dan keputusan merge masih menunggu|
-| Merge |Keputusan merge tersendiri; catat exact final SHA main, jangan menyamakan PR SHA/merge SHA|NOT RUN|
-| G4 |Manual main, input=checkout=head SHA; committed config exact; source+dua DB shard+aggregate PASS beserta report/hash|NOT RUN|
+| Light CI/review |Run pada head SHA PR benar, pemeriksaan terdampak lulus dan perubahan ditinjau|Light CI head cf321a2 PASS; merge #139 sudah disetujui|
+| Merge |Keputusan merge tersendiri; catat exact final SHA main, jangan menyamakan PR SHA/merge SHA|PR #139 MERGED, SHA 3b56ff3|
+| G4 |Manual main, input=checkout=head SHA; committed config exact; source+dua DB shard+aggregate PASS beserta report/hash|Run 43396490933 FAIL; koreksi pin lokal PASS, G4 ulang NOT RUN|
 | Hosted preflight |Target/owner/resource/issuer, applied history, backup/recovery point, dry-run dan compatibility terverifikasi|Belum diverifikasi|
 | Migration/Edge |Izin deploy konkret setelah G4/preflight; source sama dengan gate|NOT RUN|
 | QA owner/plugin |Page QA dan payload/aksi yang diizinkan; context terbaru lalu Write/readback; DNA sesuai profil|NOT RUN|
@@ -64,7 +66,8 @@ gh workflow run backend-gate-candidate.yml --repo milyarderpro/content-producer 
 ```
 
 `FINAL_MAIN_SHA` adalah placeholder yang **wajib diganti** dengan SHA40hex yang
-dibaca dari GitHub setelah merge; command di atas belum dijalankan.
+dibaca dari GitHub setelah merge; run pada SHA 3b56ff3 sudah dijalankan dan FAIL. Command harus memakai final
+SHA baru setelah merge koreksi pin, bukan mengulang kandidat lama.
 Periksa run event workflow_dispatch, head/input/checkout SHA identik; runtime
 exact yang sama pada source/shard/aggregate; committed `supabase/config.toml`.
 
@@ -77,8 +80,8 @@ exact yang sama pada source/shard/aggregate; committed `supabase/config.toml`.
 - Aggregate PASS untuk 238 kasus, bukan hanya source/job sukses. Tidak ada bypass, overlay
   security config, reset ulang tersembunyi atau reuse PASS dari SHA lain.
 
-Workflow legacy dan `pnpm run test-all` dipertahankan untuk rollback. G4 tidak
-dijalankan pada working tree ini karena belum memiliki final main SHA kandidat.
+Workflow legacy dan `pnpm run test-all` dipertahankan untuk rollback. G4 pada SHA 3b56ff3 sudah FAIL. Koreksi pin perlu merge berizin
+dan exact final main SHA baru sebelum satu gate ulang.
 
 ## Preflight dan urutan deployment setelah izin
 

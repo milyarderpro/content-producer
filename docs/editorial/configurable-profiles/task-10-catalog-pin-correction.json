@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "issue": "https://github.com/milyarderpro/content-producer/issues/140",
+  "failed_g4": {
+    "run_id": 43396490933,
+    "sha": "3b56ff33b9229765a88f1a04f31877c60fe9c820",
+    "source": "PASS 208 root tests",
+    "mcp": "PASS 130 cases in shard1",
+    "both_shards": "FAIL audit-before",
+    "database_cases_executed": 0,
+    "inspector": "NOT RUN",
+    "advisors": "NOT RUN",
+    "cleanup": "PASS both",
+    "aggregate": "FAIL"
+  },
+  "local_reproduction": {
+    "source_tree": "cf321a2ac9ef264c577a61b6d0ad3ce860539618 (tree equals merge SHA)",
+    "config_overlay": "project_id and ports only; diagnostic, not formal G4",
+    "clean_reset_count": 1,
+    "seconds": 148,
+    "audit": "FAIL CATALOG_SCHEMA_SOURCE_OR_ACL_DRIFT",
+    "cleanup": "PASS"
+  },
+  "correction": {
+    "section": "functions",
+    "old_sha256": "2c4a6c227d646b8d23995733791cf479c53df20293ec98eada513e14a8bf7db8",
+    "fresh_sha256": "9f971044e3ed67533c93b45e9a606e42b6d6948ad327b6e7dc2c066538786452",
+    "changed_functions": 1,
+    "function_before": {
+      "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+      "owner": "content_producer_api_owner",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "signature": "api.create_content_plan(integer,uuid,uuid,uuid,text,integer,jsonb,text,text)",
+      "source_sha256": "aa281126a4e531205ed8c9542c454eb1b8a153a01cd248f5991e7b8b31191a13"
+    },
+    "function_after": {
+      "acl": "{content_producer_api_owner=X/content_producer_api_owner,authenticated=X/content_producer_api_owner}",
+      "owner": "content_producer_api_owner",
+      "definer": true,
+      "settings": [
+        "search_path=\"\""
+      ],
+      "signature": "api.create_content_plan(integer,uuid,uuid,uuid,text,integer,jsonb,text,text)",
+      "source_sha256": "54b4f0be4b302b96330d813f5e60b9093349932a9e7ba0d68b5d278625d7e41c"
+    },
+    "all_other_sections_identical": true,
+    "all_function_metadata_identical": true,
+    "body_difference": "six U+0020 characters on one blank line; committed migration has an empty line",
+    "migration_changed": false,
+    "comparator_changed": false,
+    "normalization_added": false,
+    "committed_definition_hash_matches_fresh_replay": true
+  },
+  "fixed_validation": {
+    "status": "PASS LOCAL/CLEAN-REPLAY",
+    "clean_reset_count": 1,
+    "seconds": 101,
+    "section_drift": [],
+    "catalog": "94 source/applied migrations, 33 RPC, 19/19 RLS, exact schema/source/ACL and zero fixtures/faults PASS",
+    "cleanup": "PASS",
+    "check": "PASS lint/typecheck; 14 files/208 root tests; 19 frontend tests",
+    "formal_g4": "NOT RUN for corrected candidate"
+  },
+  "deployment": "NOT RUN",
+  "evidence_reports": [
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/g4-43396490933/candidate-db-shard-1-3b56ff33b9229765a88f1a04f31877c60fe9c820/report.json",
+      "sha256": "48c1cce462270ba816005c307f4dae6257eaf10ae464e19468f02aced8dcfa31"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/g4-43396490933/candidate-db-shard-2-3b56ff33b9229765a88f1a04f31877c60fe9c820/report.json",
+      "sha256": "e59396ac1048debf4f20cbe297843c5835e0e3c5caa10eef79547b1af6778ce3"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/g4-43396490933/candidate-source-3b56ff33b9229765a88f1a04f31877c60fe9c820/report.json",
+      "sha256": "96901271060a317e63012e9e2463691626d95a43dc2106016af339be9726347e"
+    }
+  ]
+}

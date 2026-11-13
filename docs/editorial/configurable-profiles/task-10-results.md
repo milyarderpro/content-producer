@@ -14,8 +14,8 @@ memuat 145 file perubahan task 1–9 beserta persiapan rilis; base
 
 Test lokal tambahan: 3 file/63 kasus PASS dalam 1,55 detik. Validasi OpenSpec
 strict, reproduksi corpus/freeze dan whitespace PASS. Sebanyak 169 fingerprint
-runtime/demo serta 15 file runtime plugin cocok dengan bukti task 9; task 10
-hanya menambah persiapan PR dan dokumentasi rilis. Hasil task 9 tetap historis
+runtime/demo serta 15 file runtime plugin cocok dengan bukti task 9; pada tahap persiapan PR, task 10
+hanya menambah dokumentasi rilis; koreksi pin audit sesudah G4 dijelaskan terpisah. Hasil task 9 tetap historis
 pada working tree waktu itu, tidak ditulis ulang sebagai bukti LIVE.
 
 Plugin Creator readback pada plugin PRIVATE yang sama: versi 0.5.8, 15/15 file
@@ -29,14 +29,18 @@ Identitas dan batas bukti ada pada [verifikasi](task-10-verification.json).
 Commit dokumentasi handoff sesudah kandidat tidak mengubah backend; CI head PR
 terbaru diperiksa terpisah sebelum penyerahan. PASS ini tidak berlaku otomatis
 untuk merge SHA yang belum ada.
-Full G4, merge, hosted preflight, deployment dan retest LIVE/Write QA **NOT RUN**.
+PR #139 sudah merged pada `3b56ff33b9229765a88f1a04f31877c60fe9c820`.
+G4 43396490933 **FAIL** pada audit-before kedua shard; source/MCP dan cleanup PASS.
+Inspector, test database dan advisors NOT RUN. [Temuan serta koreksi](task-10-g4-findings.md)
+memuat reproduksi dan pin yang diperbaiki; G4 kandidat terkoreksi masih NOT RUN.
+Hosted preflight, deployment dan retest LIVE/Write QA **NOT RUN**.
 Review naskah runtime hanya terhadap DNA referensi tertulis; layout ponsel
 bukan persyaratan dan tidak dipindahkan dari task 9 menjadi gate task 10.
 
 ## Handoff dan langkah berikutnya
 
 [Rencana rilis/rollback](task-10-release-plan.md) memuat urutan dan syaratnya.
-Sesudah keputusan merge tersendiri, baca exact final SHA `main` dan jalankan
+Sesudah PR perbaikan ditinjau dan merge tersendiri diotorisasi, baca exact final SHA `main` dan jalankan
 satu G4 manual dengan committed config. Estimasi 15–20 menit berdasarkan run
 historis 8m51s dan 11m30s serta tambahan kasus. Setelah run dimulai, laporkan
 SHA/URL/status sekali dan akhiri respons; periksa lagi hanya setelah `lanjutkan`.
