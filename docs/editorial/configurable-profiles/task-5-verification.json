@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-12",
+  "evidence": "LOCAL/FIXTURE; not release or LIVE",
+  "base_source_sha": "c02c5413479cebf50f39abc10149fafca757611a",
+  "candidate": "base SHA plus working file hashes; no new commit",
+  "checks": {
+    "database": {
+      "status": "PASS",
+      "unique_files": 9,
+      "unique_cases": 109,
+      "new_schema3_workflow_cases": 21,
+      "evidence": "composed focused results, not one full gate",
+      "final_a": {
+        "files": 2,
+        "cases": 73,
+        "skipped": 0,
+        "seconds": 165.08
+      },
+      "unchanged_b": {
+        "files": 5,
+        "cases": 30,
+        "source_and_test_dependencies_unchanged": true
+      },
+      "retest_b": {
+        "files": 2,
+        "cases": 6,
+        "skipped": 0,
+        "seconds": 28.18
+      }
+    },
+    "source": {
+      "status": "PASS",
+      "files": 14,
+      "cases": 184
+    },
+    "frontend": {
+      "status": "PASS",
+      "cases": 19
+    },
+    "db_lint_errors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "local_security_advisors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "migration_history": {
+      "status": "PASS",
+      "count": 93,
+      "exact": true
+    },
+    "acl_cleanup": {
+      "status": "PASS",
+      "posts": 0,
+      "writers": {
+        "save_post_v2": {
+          "defaults": 7,
+          "arguments": 18,
+          "last_argument": "p_editorial_context"
+        },
+        "revise_post_v2": {
+          "defaults": 6,
+          "arguments": 18,
+          "last_argument": "p_editorial_context"
+        }
+      },
+      "bindings": 0,
+      "definitions": 0,
+      "config2_rows": 0,
+      "post_history": 0,
+      "api_signatures": 33,
+      "caller_helpers": 0,
+      "catalog_states": 0,
+      "owner_schema_create": false,
+      "owner_login_or_bypass": false,
+      "direct_caller_post_access": false
+    },
+    "legacy_functions": {
+      "status": "PASS",
+      "hashes": {
+        "post_hash_v2": "2a530305085ccf3c1b78bfc4da9ce1008b8be9e1a5ebac0a3446a6d9fee237b6",
+        "post_render_v1": "39d82659cac4cd6042707f317a34854f657a93b7ad20f2c0486b1cce047f517f",
+        "post_render_v2": "cd523245aeeca73c8b38ab5891506d777cafd952ffd302e3c5da800bc989516d"
+      }
+    },
+    "pre_migration_ledger_replay_readback_hash": {
+      "status": "PASS",
+      "synthetic_fixture_cleaned": true
+    },
+    "frozen_task1": {
+      "status": "PASS"
+    },
+    "openspec_strict": {
+      "status": "PASS"
+    }
+  },
+  "earlier_runs": [
+    {
+      "scope": "A initial",
+      "passed": 66,
+      "failed": 5,
+      "seconds": 148.03
+    },
+    {
+      "scope": "A after null-insight fix",
+      "passed": 70,
+      "failed": 2,
+      "seconds": 164.55
+    },
+    {
+      "scope": "isolated diagnostics",
+      "passed": 3,
+      "skipped": 36,
+      "seconds": 14.95,
+      "excluded_from_unique_case_total": true
+    },
+    {
+      "scope": "B initial",
+      "passed": 34,
+      "failed": 2,
+      "seconds": 119.82,
+      "failure": "two stale 31-RPC inventory assertions; reconciled with CR-062 and retested"
+    }
+  ],
+  "files": [
+    {
+      "path": "supabase/migrations/20261112133936_integrate_trivia_editorial_post_snapshots.sql",
+      "sha256": "f441f594753f37dcfe6647a0facb30ac5f11a5ed64d03d48ca95dcca4784e165"
+    },
+    {
+      "path": "supabase/migrations/20261112135417_preserve_config2_unclassified_insight_dimensions.sql",
+      "sha256": "3db92ee37565fd326ddea84637bf1519afac6675cd8c93c59875acc435483aea"
+    },
+    {
+      "path": "supabase/migrations/20261112135704_harden_editorial_snapshot_metadata.sql",
+      "sha256": "ab65bbd6642f37827d5c3ac1c2c9b9a05a17dc7ab800473aaba70cca46d4bfca"
+    },
+    {
+      "path": "supabase/tests/database/helpers/editorial-post.ts",
+      "sha256": "6336aa1b534bdfe433e8618fb3912cbad7726a9af9cd498b541aa5a9d9023031"
+    },
+    {
+      "path": "supabase/tests/database/api-trivia-v2-save.test.ts",
+      "sha256": "9ae7d85a8dfb35d24e662960b15a7647010d48de8a6500787bd926f08a19f3c8"
+    },
+    {
+      "path": "supabase/tests/database/api-metrics.test.ts",
+      "sha256": "9499f3a896387ea21a192350b4bd01e586d96bfc29e3b0838cd157c3cc517460"
+    },
+    {
+      "path": "supabase/tests/database/trivia-post-facts.test.ts",
+      "sha256": "6f021438e45ef9fb024ca22b6fbe647dd585411e3fad6e0db804da03b8387b7a"
+    },
+    {
+      "path": "docs/contracts/trivia-post-editorial-snapshots.md",
+      "sha256": "2c62ffb50732095b82a8d79c437d0622296408feccc670daaa9a0b90212dfd3b"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-5-results.md",
+      "sha256": "0bca3ff74bac21276d5d6ddc73da5f84a6e89117378dbaff379d8e5d89d6e1ba"
+    }
+  ],
+  "not_run": [
+    "Actions",
+    "formal G4 exact-SHA",
+    "config2 plan/batch override integration",
+    "MCP facade/schema/Inspector",
+    "plugin packaging/install",
+    "visual QA",
+    "deployment",
+    "LIVE"
+  ]
+}

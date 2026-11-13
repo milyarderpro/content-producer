@@ -1,0 +1,325 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-13",
+  "base_source_sha": "c02c5413479cebf50f39abc10149fafca757611a",
+  "candidate": "same HEAD plus staged task1-8 and unstaged task9; no new commit",
+  "evidence": "LOCAL/FIXTURE technical acceptance only; not LIVE/formal G4/editorial/layout acceptance",
+  "owner_scope": {
+    "decision_record": "docs/decisions/2026-11-13-cr-062-task-9-technical-acceptance.md",
+    "excluded": [
+      "manual script/DNA review",
+      "phone layout QA as acceptance gate"
+    ],
+    "not_deferred_to_task10": true,
+    "runtime_quality_authorization_controls_unchanged": true
+  },
+  "checks": {
+    "database_unique": {
+      "status": "PASS after targeted serial retest",
+      "files": 11,
+      "cases": 174,
+      "group_a": {
+        "status": "PASS",
+        "files": 2,
+        "cases": 79,
+        "seconds": 365.66,
+        "skipped": 0
+      },
+      "group_b_initial": {
+        "status": "FAIL two 5000ms timeouts",
+        "files": 9,
+        "passed": 93,
+        "failed": 2,
+        "seconds": 236.22
+      },
+      "page_serial_retest": {
+        "status": "PASS",
+        "files": 1,
+        "cases": 13,
+        "seconds": 34.99,
+        "timeout_assertions_unchanged": true
+      },
+      "final_matrix": {
+        "status": "PASS",
+        "cases": 16,
+        "seconds": 129.92,
+        "filtered_other_cases": 39,
+        "other_cases_already_in_group_a": true
+      }
+    },
+    "source": {
+      "status": "PASS",
+      "files": 14,
+      "cases": 208,
+      "vitest_seconds": 6.65
+    },
+    "frontend": {
+      "status": "PASS",
+      "cases": 19
+    },
+    "focused_final": {
+      "status": "PASS",
+      "files": 7,
+      "cases": 132,
+      "seconds": 5.45
+    },
+    "mcp": {
+      "status": "PASS",
+      "files": 18,
+      "cases": 130,
+      "skipped": 0
+    },
+    "inspector": {
+      "status": "PASS",
+      "valid": 33,
+      "invalid": 33,
+      "retired_v1_rejected": 5,
+      "owner_denial": true,
+      "log_privacy": true
+    },
+    "catalog": {
+      "status": "PASS before/after/final",
+      "migrations": 94,
+      "api_names": 33,
+      "rls_tables": 19,
+      "zero_fixture_faults": true
+    },
+    "negative_controls": {
+      "status": "PASS rolled back",
+      "cases": 5
+    },
+    "db_lint": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "local_security_advisors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "package": {
+      "status": "PASS",
+      "files": 15,
+      "same_as_task8": true,
+      "prior_zip_crc_list_hash_reverified": true
+    },
+    "active_freeze": {
+      "status": "PASS",
+      "revision": "cr-062-r2-technical-acceptance",
+      "files": 13
+    },
+    "historical_r1": {
+      "status": "PASS",
+      "files": 12,
+      "changed_planning_snapshots_retained": 4
+    },
+    "openspec_strict": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "database_inventory": {
+    "mode": "Vitest runtime collection --staticParse=false",
+    "files": 33,
+    "cases": 238,
+    "existing_cases": 222,
+    "new_cases": 16,
+    "shard_files": [
+      15,
+      18
+    ],
+    "shard_cases": [
+      158,
+      80
+    ],
+    "full_238_run": "NOT RUN",
+    "formal_exact_sha_g4": "NOT RUN"
+  },
+  "extensibility": {
+    "cases": 16,
+    "custom_new_keys": [
+      "evidence_trail",
+      "everyday_connections",
+      "curious_bridge",
+      "gentle_bridge"
+    ],
+    "source_files_identical_before_after": 169,
+    "plugin_runtime_files_unchanged": 15,
+    "other_pages_unchanged": true
+  },
+  "index_sha256_before_after": "a38b0cbe065edeb321153192363dae78277b0bc92e2d2a95e2925a99f22dade3",
+  "logs": [
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/advisors.json",
+      "sha256": "ac16630c7479d9c630e53f68e0e441b520f6ffb5d8f400434dc2ec5bbeecaa1c"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/audit-before.log",
+      "sha256": "91dccc14e593faa76a301270d63b78da2079476b9535aebd8e7d2dc4066cca59"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/audit-final.log",
+      "sha256": "91dccc14e593faa76a301270d63b78da2079476b9535aebd8e7d2dc4066cca59"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/check-final.log",
+      "sha256": "3af519ca8b4513a421f775c46ab38774c7a158dc3eadc08ec6bd109efa90fa19"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/controls.log",
+      "sha256": "b81cb5aca88b697c259fce92c2d64f32d39da6c8a1f3e2f903a6440633150b79"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/db-a.log",
+      "sha256": "61de06f38d86dc017a2aab5f8d737f3760238e9abd247858779b16518564b955"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/db-b.log",
+      "sha256": "e85c7840cee9e059002b4db19651b57351420eff5f6888bea82bfc66aac0e519"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/db-lint.log",
+      "sha256": "7fd3e3d8d85cec1ddbd2aa382eb5d2680345f0c03b6f85e08c2e4f4636ab72d2"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/focused-final.log",
+      "sha256": "23f943adde89f554083b5e895ec0dcf05fbff507e3d1df2b11bc295800159efa"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/inspector.log",
+      "sha256": "d5e881121046b4346b94e78544bcd2c4d1dbe7bee22826144f8c5e409ee3c720"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/matrix-final.log",
+      "sha256": "45c5415b10e0130d0342cec538595ff4c43afb84db49218da57a40cd4d2bb8e3"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/mcp.log",
+      "sha256": "f8739fab4fed4b2dc21824e0ded6dedb41076f5b9c315297b3f7301cc7fa8dd3"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/pages-retest.log",
+      "sha256": "514ad1acd0fb4a3f469d896051b9e20206510872479836ab623aa41a1adf61d5"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/README.md",
+      "sha256": "4f2b3473eb75650cb23e28544ecb7814e69e7f08ddf6231455764d1a1da7b659"
+    },
+    {
+      "path": "docs/contracts/trivia-editorial-mcp.md",
+      "sha256": "e9dd83a47cf7ea42d0469e1287ce6e3699351e24e3b1b0eb3359d14d34bd4fed"
+    },
+    {
+      "path": "docs/decisions/2026-11-13-cr-062-task-9-technical-acceptance.md",
+      "sha256": "e5ab0e8596842adddf9ae8a6e53a2901a1ad162ae02d9a2fde1408dc7ab3edfe"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/contract.md",
+      "sha256": "f82b36de82555ecb6019b2752ad434b6ab2b81cfade3f15f6450932725ed4900"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/freeze-task-1-r1.json",
+      "sha256": "5dbfaffdba170907d31dfc2cec43d947f46ea2b4bd91b5b1fe3ef4b1e3023099"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/freeze.json",
+      "sha256": "4e411b04dd1c382ebd6532cce3467dbe595f7c929d463d0f2a4a0b2dcea61544"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-9-findings.md",
+      "sha256": "b24a707c03adaad830f3631531c1b44c3915368314737244e4ff2c6091488478"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-9-results.md",
+      "sha256": "5babe47ec746244267fad68bd3ab18f61d712722feebcfa42f15d794c36bb40b"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-9-scope-baseline/docs__editorial__configurable-profiles__contract.md",
+      "sha256": "7860dee515ec9d7e992d41a5992379c8697c66b5cbd2ed8e3e6b0c06898b1a89"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-9-scope-baseline/index.json",
+      "sha256": "8983b1aad97434b853516bc611b50c28215dd2fceca721e2052fb406a34d7f3e"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-9-scope-baseline/openspec__changes__add-configurable-trivia-editorial-profiles__design.md",
+      "sha256": "47d3489e22f147231e3209ffd6b1ba020960ad1679f8c0c95f6e123d7ccd93c7"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-9-scope-baseline/openspec__changes__add-configurable-trivia-editorial-profiles__proposal.md",
+      "sha256": "576fcd2257b28cbbaa21dc8ae1df1333fa2e952126466069ad005fe3780e492d"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-9-scope-baseline/openspec__changes__add-configurable-trivia-editorial-profiles__specs__trivia-page-editorial-profiles__spec.md",
+      "sha256": "903c9bcef4febbcc57b5af01cfc0b9d1e06f7ec36d0a951ecdd56e8a62679faa"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-9-suite-inventory.json",
+      "sha256": "b4f9090bf1f95a99cb630edabed97c1c736b348e8bc6a1b35c20814b8f1d4104"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-9-technical-cases.json",
+      "sha256": "376407b52f50325834106164e53a53d89e8b8d1c5f931d076ddfc78a7b209f38"
+    },
+    {
+      "path": "docs/testing.md",
+      "sha256": "091371d5d521a9e116e3fe4729608bf5888414345c6da427af00dcddf1dbcd6f"
+    },
+    {
+      "path": "openspec/changes/add-configurable-trivia-editorial-profiles/design.md",
+      "sha256": "d6ed15b7b6f13cd8c53f5a579c72bf44e63e04902801326dcc0a94160b5d6e06"
+    },
+    {
+      "path": "openspec/changes/add-configurable-trivia-editorial-profiles/proposal.md",
+      "sha256": "7259d16e1f95e64104aad4578506c49e5b64f38057ed74845064fd5687ec6de3"
+    },
+    {
+      "path": "openspec/changes/add-configurable-trivia-editorial-profiles/specs/trivia-page-editorial-profiles/spec.md",
+      "sha256": "53600e2bca633c54e61316dffd1699321f0d2ea1a76215446689b4aa75c163f4"
+    },
+    {
+      "path": "openspec/changes/add-configurable-trivia-editorial-profiles/tasks.md",
+      "sha256": "55bc20c21ce4862695ec7368136b84fecd87d08233efeda14a092f926ce66b34"
+    },
+    {
+      "path": "scripts/gate-runner.ts",
+      "sha256": "4e4287f4c21c801d23cea15e1a7dfcb124120173418859a0c82ae88c23296b89"
+    },
+    {
+      "path": "scripts/gate-suite-manifest.json",
+      "sha256": "b2d20faa6fdf6a4ab007f54661c4c85b48673133f2a596f17438d565be73dfe8"
+    },
+    {
+      "path": "supabase/tests/database/api-trivia-v2-save.test.ts",
+      "sha256": "37f9f3569d1c764f38fab1826cf633ee79b291b217317b069f12cfa4a986d993"
+    },
+    {
+      "path": "supabase/tests/database/helpers/editorial-acceptance.ts",
+      "sha256": "0682a03a66c86005ad21445f1fdeeb5c59a311b6c021c9ca87eebe8af64116ac"
+    },
+    {
+      "path": "supabase/tests/fixtures/editorial-profile-acceptance.json",
+      "sha256": "17159b5a43d254c1a899b3953437789d91b7242c2c47aebcc860e64001ce032c"
+    },
+    {
+      "path": "tests/gate-runner.test.ts",
+      "sha256": "41d78b675dd92fc105ccf2b59eba244b103214c3872502b82d7b2bc18015bafb"
+    },
+    {
+      "path": "tests/gate-suite-manifest.test.ts",
+      "sha256": "5ea28e4d20e0afba8e55ea888ace5fafb4f43357a0b6d8170443b747e1c5273f"
+    }
+  ],
+  "not_run": [
+    "Actions",
+    "full 238-case database execution",
+    "formal exact-SHA G4",
+    "backend deployment",
+    "host refresh/new-chat execution",
+    "production business Write",
+    "LIVE config2"
+  ],
+  "not_required_by_owner": [
+    "manual script/profile acceptance review",
+    "phone layout acceptance review"
+  ]
+}

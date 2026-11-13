@@ -1,3 +1,6 @@
+import * as ep from './helpers/editorial-post.js';
+import * as pa from './helpers/editorial-plan.js';
+import { approve as approveEditorial } from './helpers/trivia-v2.js';
 import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import {
@@ -698,4 +701,395 @@ describe('Checkpoint 5.4 public plan lifecycle', () => {
       cleanup(f);
     }
   }, 30_000);
+});
+
+// CR-062 task6: real multi-Read fixtures and config2 plan transactions.
+describe('CR-062 config2 plans and sequential batch', () => {
+  it('keeps null format/goal, completes two drafts with 12 facts each and replays lost save', () => {
+    const f = ep.editorialFixture();
+    try {
+      const expression = pa.create(f, 2);
+      const created = ep.rpc(f, expression);
+      const id = pa.planId(created);
+      expect(
+        pa.read(f, id).items.every((i) => i.format_key === null && i.interaction_goal === null),
+      ).toBe(true);
+      const hashes: string[] = [];
+      for (let i = 0; i < 2; i++) {
+        const c = pa.claim(f, id);
+        const v = pa.input(f, c);
+        const write = pa.save(f, v, c);
+        const r = ep.rpc(f, write);
+        const p = ep.get(f, (r.data.post as { post_public_id: string }).post_public_id);
+        expect(p.fact_bindings).toHaveLength(12);
+        expect(p.interaction_goal).toBeNull();
+        expect(p.generation_snapshot).toMatchObject({
+          plan_context: {
+            plan_public_id: id,
+            plan_item_public_id: c.item.plan_item_public_id,
+            item_config: {},
+            intent_goal: null,
+          },
+        });
+        expect(ep.rpc(f, write).data).toEqual({ ...r.data, replayed: true });
+        hashes.push(p.content_hash);
+        expect(pa.read(f, id).plan.progress.completed).toBe(i + 1);
+      }
+      const plan = pa.read(f, id);
+      expect(plan.plan.requested_count).toBe(2);
+      expect(plan.plan.status).toBe('completed');
+      expect(plan.items).toHaveLength(2);
+      expect(new Set(hashes).size).toBe(2);
+      expect(ep.rpc(f, expression).data).toEqual({ ...created.data, replayed: true });
+      expect(
+        ep.row<{ n: number }>(
+          `select count(*)::integer n from public.trivia_post_facts j join public.workspaces w on w.id=j.workspace_id where w.public_id='${f.workspace}'`,
+        ).n,
+      ).toBe(24);
+    } finally {
+      ep.cleanup(f);
+    }
+  }, 60_000);
+
+  it('uses item count/density/budget and accepts several CTA invitations without required goal', () => {
+    const f = ep.editorialFixture();
+    try {
+      const cfg = {
+        fact_count: { mode: 'fixed', value: 10 },
+        profile_key: 'fast_trivia',
+        text_budget: { hook_max_chars: 20 },
+      };
+      const id = pa.planId(
+        ep.rpc(f, pa.create(f, 1, [{ interaction_goal: 'follow', item_config: cfg }])),
+      );
+      const c = pa.claim(f, id);
+      const g = pa.context(f, c.item.plan_item_public_id);
+      expect(g.generation_rules.fact_count).toEqual({ mode: 'fixed', value: 10 });
+      expect(g.plan_context.intent_goal).toBe('follow');
+      const v = pa.input(f, c, 10);
+      v.content.cta = 'Like the video, tag a friend, save it, and follow for more.';
+      ep.assemble(v.content);
+      const r = ep.rpc(f, pa.save(f, v, c));
+      const p = ep.get(f, (r.data.post as { post_public_id: string }).post_public_id);
+      expect(p.interaction_goal).toBeNull();
+      expect(p.content_payload.cta).toBe(v.content.cta);
+      expect(p.generation_snapshot.profile_key).toBe('fast_trivia');
+      expect(
+        (p.generation_snapshot as unknown as { plan_context: { item_config: unknown } })
+          .plan_context.item_config,
+      ).toEqual(cfg);
+      expect(ep.rpc(f, approveEditorial(f, p.post_public_id)).data.status).toBe('ready');
+      const next = pa.input(f, c, 10);
+      next.facts = v.facts;
+      next.content = v.content;
+      ep.review(f, next);
+      const ready = ep.get(f, p.post_public_id);
+      ep.rpc(f, ep.revise(f, next, ready));
+      expect(ep.get(f, p.post_public_id).generation_snapshot).toMatchObject({
+        plan_context: { item_config: cfg },
+      });
+    } finally {
+      ep.cleanup(f);
+    }
+  }, 40_000);
+
+  it('rejects unknown choices, expanded item limits and DNA override without partial plan/ledger', () => {
+    const f = ep.editorialFixture();
+    try {
+      for (const patch of [
+        { format_key: 'unknown_format' },
+        { topic_key: 'unknown_topic' },
+        { item_config: { fact_count: { mode: 'fixed', value: 13 } } },
+        { item_config: { text_budget: { fact_max_chars: 151 } } },
+        {
+          item_config: {
+            editorial_profile_ref: ep.definition(f, 'profile', 'daily_facts').reference,
+          },
+        },
+        { item_config: { profile_key: 'unknown_density' } },
+        { item_config: { render_style: 'numbered' } },
+      ]) {
+        expect(() => ep.rpc(f, pa.create(f, 1, [patch]))).toThrow();
+        expect(
+          ep.row<{ n: number }>(
+            `select count(*)::integer n from public.content_plans p join public.workspaces w on w.id=p.workspace_id where w.public_id='${f.workspace}'`,
+          ).n,
+        ).toBe(0);
+      }
+      expect(
+        ep.row<{ n: number }>(
+          `select count(*)::integer n from internal.operation_ledger l join public.workspaces w on w.id=l.workspace_id where w.public_id='${f.workspace}' and l.operation_name='create_content_plan'`,
+        ).n,
+      ).toBe(0);
+    } finally {
+      ep.cleanup(f);
+    }
+  }, 30_000);
+
+  it('resumes compatible pending work on fresh Page context and leaves completed history unchanged', () => {
+    const f = ep.editorialFixture();
+    try {
+      const id = pa.planId(ep.rpc(f, pa.create(f, 2)));
+      const first = pa.claim(f, id);
+      const a = pa.input(f, first, 11);
+      const saved = ep.rpc(f, pa.save(f, a, first));
+      const p = ep.get(f, (saved.data.post as { post_public_id: string }).post_public_id);
+      const old = ep.row<{ config: unknown }>(
+        `select plan_config config from public.content_plans where public_id='${id}'`,
+      ).config;
+      const definition = ep.definition(f, 'profile', 'dyk');
+      const ref = ep.publishDefinition(
+        f,
+        'profile',
+        'dyk',
+        { ...definition.payload, voice: 'Updated fixture voice.' },
+        1,
+      );
+      ep.updateConfig(f, { ...ep.context(f).config, editorial_profile_ref: ref });
+      expect(pa.read(f, id).page_review).toMatchObject({
+        requires_review: true,
+        completed_historical_count: 1,
+      });
+      const c = pa.claim(f, id);
+      const stale = ep.input(f, 12);
+      stale.time = a.time;
+      stale.context = a.context;
+      expect(() => ep.rpc(f, pa.save(f, stale, c))).toThrow('PAGE_VERSION_CONFLICT');
+      const v = pa.input(f, c, 12);
+      expect(pa.context(f, c.item.plan_item_public_id).plan_context.requires_review).toBe(true);
+      const r = ep.rpc(f, pa.save(f, v, c));
+      expect((r.data.plan as { progress: { completed: number } }).progress.completed).toBe(2);
+      expect(ep.get(f, p.post_public_id).generation_snapshot).toEqual(p.generation_snapshot);
+      expect(ep.get(f, p.post_public_id).content_hash).toBe(p.content_hash);
+      expect(
+        ep.row<{ config: unknown }>(
+          `select plan_config config from public.content_plans where public_id='${id}'`,
+        ).config,
+      ).toEqual(old);
+    } finally {
+      ep.cleanup(f);
+    }
+  }, 50_000);
+
+  it('blocks incompatible pending intent after Page changes and never rewrites it or completed item', () => {
+    const f = ep.editorialFixture();
+    try {
+      const id = pa.planId(
+        ep.rpc(
+          f,
+          pa.create(f, 2, [{}, { item_config: { fact_count: { mode: 'fixed', value: 12 } } }]),
+        ),
+      );
+      const first = pa.claim(f, id);
+      ep.rpc(f, pa.save(f, pa.input(f, first, 10), first));
+      const before = pa.read(f, id);
+      ep.updateConfig(f, {
+        ...ep.context(f).config,
+        overrides: { fact_count: { mode: 'adaptive', min: 1, preferred: 6, max: 10 } },
+      });
+      expect(() => pa.claim(f, id)).toThrow('CONFIG_INVALID');
+      expect(() => pa.context(f, before.items[1]!.plan_item_public_id)).toThrow('CONFIG_INVALID');
+      const after = pa.read(f, id);
+      expect(
+        after.items.map((i) => ({
+          status: i.status,
+          item_config: i.item_config,
+          active_post_public_id: i.active_post_public_id,
+        })),
+      ).toEqual(
+        before.items.map((i) => ({
+          status: i.status,
+          item_config: i.item_config,
+          active_post_public_id: i.active_post_public_id,
+        })),
+      );
+      expect(after.plan.progress).toEqual(before.plan.progress);
+    } finally {
+      ep.cleanup(f);
+    }
+  }, 40_000);
+
+  it('keeps active claims usable only with refreshed config and applies current budgets at save', () => {
+    const f = ep.editorialFixture();
+    try {
+      const id = pa.planId(
+        ep.rpc(f, pa.create(f, 1, [{ item_config: { fact_count: { mode: 'fixed', value: 11 } } }])),
+      );
+      const c = pa.claim(f, id);
+      const old = pa.input(f, c, 11);
+      ep.updateConfig(f, {
+        ...ep.context(f).config,
+        overrides: { text_budget: { hook_max_chars: 12 } },
+      });
+      expect(() => ep.rpc(f, pa.save(f, old, c))).toThrow('PAGE_VERSION_CONFLICT');
+      const v = pa.input(f, c, 11);
+      expect(() => ep.rpc(f, pa.save(f, v, c))).toThrow('CONTENT_BUDGET_EXCEEDED');
+      expect(pa.read(f, id).plan.progress.in_progress).toBe(1);
+      v.content.hook = 'Notes';
+      ep.assemble(v.content);
+      expect(ep.rpc(f, pa.save(f, v, c)).data.post).toBeDefined();
+    } finally {
+      ep.cleanup(f);
+    }
+  }, 35_000);
+
+  it('rejects direct-context bypass of item rules and foreign item context, while public reads hide leases', () => {
+    const f = ep.editorialFixture();
+    const other = ep.editorialFixture();
+    try {
+      const id = pa.planId(
+        ep.rpc(f, pa.create(f, 1, [{ item_config: { fact_count: { mode: 'fixed', value: 10 } } }])),
+      );
+      const c = pa.claim(f, id);
+      const direct = ep.input(f, 10);
+      expect(() => ep.rpc(f, pa.save(f, direct, c))).toThrow('PAGE_VERSION_CONFLICT');
+      expect(() => pa.context(other, c.item.plan_item_public_id)).toThrow('PLAN_ITEM_NOT_FOUND');
+      expect(!JSON.stringify(pa.read(f, id)).includes(c.claim_token)).toBe(true);
+      expect(
+        !JSON.stringify(pa.context(f, c.item.plan_item_public_id)).includes(c.claim_token),
+      ).toBe(true);
+      expect(() => ep.rpc(f, pa.create(f, 1), f.other)).toThrow('OWNER_ACCESS_REQUIRED');
+      const v = pa.input(f, c, 10);
+      expect(ep.rpc(f, pa.save(f, v, c)).data.post).toBeDefined();
+    } finally {
+      ep.cleanup(f);
+      ep.cleanup(other);
+    }
+  }, 35_000);
+
+  it('detects catalog changes between 9+3 Reads and replaces all decisions before save', () => {
+    const f = ep.editorialFixture();
+    try {
+      const id = pa.planId(ep.rpc(f, pa.create(f, 1)));
+      const c = pa.claim(f, id);
+      const v = pa.input(f, c, 12);
+      const first = ep.rpc(
+        f,
+        `api.trivia_find_similar_facts_v2(2,'${f.workspace}','${f.page}',${ep.json(v.facts.slice(0, 9).map((x) => ({ candidate_key: x.candidate_key, claim_text: x.claim_text })))})`,
+      );
+      pa.seedFacts(f, ['Fixture catalog changed between Reads.']);
+      const second = ep.rpc(
+        f,
+        `api.trivia_find_similar_facts_v2(2,'${f.workspace}','${f.page}',${ep.json(v.facts.slice(9).map((x) => ({ candidate_key: x.candidate_key, claim_text: x.claim_text })))})`,
+      );
+      expect(first.data.catalog_version).not.toBe(second.data.catalog_version);
+      v.catalog = first.data.catalog_version as string;
+      expect(() => ep.rpc(f, pa.save(f, v, c))).toThrow('FACT_CATALOG_CONFLICT');
+      expect(pa.read(f, id).plan.progress.completed).toBe(0);
+      ep.review(f, v);
+      expect(v.catalog).toBe(second.data.catalog_version);
+      expect(new Set(v.facts.map((x) => x.candidate_key)).size).toBe(12);
+      expect(ep.rpc(f, pa.save(f, v, c)).data.post).toBeDefined();
+    } finally {
+      ep.cleanup(f);
+    }
+  }, 35_000);
+
+  it('does not save on incomplete matching and rejects a fabricated complete review', () => {
+    const f = ep.editorialFixture();
+    try {
+      const id = pa.planId(ep.rpc(f, pa.create(f, 1)));
+      const c = pa.claim(f, id);
+      const v = pa.input(f, c, 12);
+      pa.seedFacts(
+        f,
+        Array.from({ length: 21 }, (_, i) => `Fixture collision marker number ${i + 1}.`),
+      );
+      v.facts[0]!.claim_text = 'Fixture collision marker number 40.';
+      v.content.body.facts[0]!.text = v.facts[0]!.claim_text;
+      ep.assemble(v.content);
+      const read = ep.rpc(
+        f,
+        `api.trivia_find_similar_facts_v2(2,'${f.workspace}','${f.page}',${ep.json([{ candidate_key: v.facts[0]!.candidate_key, claim_text: v.facts[0]!.claim_text }])})`,
+      );
+      expect((read.data.candidates as Array<{ complete: boolean }>)[0]!.complete).toBe(false);
+      v.catalog = read.data.catalog_version as string;
+      expect(() => ep.rpc(f, pa.save(f, v, c))).toThrow('FACT_REVIEW_REQUIRED');
+      expect(pa.read(f, id).plan.progress.completed).toBe(0);
+      expect(
+        ep.row<{ n: number }>(
+          `select count(*)::integer n from public.posts p join public.workspaces w on w.id=p.workspace_id where w.public_id='${f.workspace}'`,
+        ).n,
+      ).toBe(0);
+    } finally {
+      ep.cleanup(f);
+    }
+  }, 35_000);
+
+  it('preserves pinned catalog versions and claim replay after Page change, then supports cancellation', () => {
+    const f = ep.editorialFixture();
+    try {
+      const create = pa.create(f, 2);
+      const initial = ep.rpc(f, create);
+      const id = pa.planId(initial);
+      const key = randomUUID();
+      const c = pa.claim(f, id, key);
+      const v = pa.input(f, c, 10);
+      ep.retire(f, v.context!.editorial_profile_ref);
+      ep.updateConfig(f, {
+        ...ep.context(f).config,
+        overrides: { fact_count: { mode: 'adaptive', min: 1, preferred: 9, max: 12 } },
+      });
+      expect(ep.rpc(f, create).data).toEqual({ ...initial.data, replayed: true });
+      const replay = pa.claim(f, id, key);
+      expect(replay.item.plan_item_public_id).toBe(c.item.plan_item_public_id);
+      expect(replay.claim_token === c.claim_token).toBe(true);
+      const fresh = pa.input(f, c, 10);
+      expect(ep.rpc(f, pa.save(f, fresh, c)).data.post).toBeDefined();
+      ep.rpc(
+        f,
+        `api.cancel_content_plan(1,'${f.workspace}','${randomUUID()}','${id}','Stop fixture work.',true)`,
+      );
+      const cancelled = pa.read(f, id);
+      expect(cancelled.plan.progress.completed).toBe(1);
+      expect(cancelled.plan.progress.cancelled).toBe(1);
+    } finally {
+      ep.cleanup(f);
+    }
+  }, 40_000);
+  it('reclaims expired config2 work, rejects the old lease, and resumes after failure/retry', () => {
+    const f = ep.editorialFixture();
+    try {
+      const id = pa.planId(
+        ep.rpc(f, pa.create(f, 1, [{ item_config: { fact_count: { mode: 'fixed', value: 11 } } }])),
+      );
+      const old = pa.claim(f, id);
+      const v = pa.input(f, old, 11);
+      expire(old);
+      const next = pa.claim(f, id);
+      expect(next.item.attempt_count).toBe(2);
+      expect(next.claim_token !== old.claim_token).toBe(true);
+      expect(() => ep.rpc(f, pa.save(f, v, old))).toThrow('PLAN_ITEM_CLAIM_MISMATCH');
+      ep.rpc(f, fail(f, next));
+      expect(pa.read(f, id).items[0]!.status).toBe('failed');
+      ep.rpc(f, retry(f, next.item.plan_item_public_id));
+      const resumed = pa.claim(f, id);
+      expect(resumed.item.attempt_count).toBe(3);
+      ep.rpc(f, pa.save(f, pa.input(f, resumed, 11), resumed));
+      expect(pa.read(f, id).plan.status).toBe('completed');
+    } finally {
+      ep.cleanup(f);
+    }
+  }, 40_000);
+
+  it('keeps context and plan helpers private with one public generation-context signature', () => {
+    const result = ep.row<{
+      api: number;
+      context: number;
+      arity: boolean;
+      helpers: number;
+      private: boolean;
+    }>(`select
+      (select count(*)::integer from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api') api,
+      (select count(*)::integer from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api' and p.proname='get_page_generation_context') context,
+      (select bool_and(p.pronargs=10 and p.prosecdef and has_function_privilege('authenticated',p.oid,'execute')
+        and not has_function_privilege('anon',p.oid,'execute') and not has_function_privilege('service_role',p.oid,'execute'))
+        from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api' and p.proname='get_page_generation_context') arity,
+      count(*)::integer helpers,bool_and(r.rolname='content_producer_api_owner' and not p.prosecdef and p.proconfig=array['search_path=""']
+        and not exists(select 1 from (values('anon'),('authenticated'),('service_role')) c(role) where has_function_privilege(c.role,p.oid,'execute'))) private
+      from pg_proc p join pg_namespace n on n.oid=p.pronamespace join pg_roles r on r.oid=p.proowner where n.nspname='internal'
+        and p.proname in ('plan_override_shape_config2_v2','plan_post_context_shape_config2_v2','plan_item_resolve_config2_v2',
+          'plan_context_snapshot_config2_v2','plan_config_shape_config2_v2','editorial_plan_generation_v2','post_prepare_config2_v2')`);
+    expect(result).toEqual({ api: 33, context: 1, arity: true, helpers: 7, private: true });
+  });
 });

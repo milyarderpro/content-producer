@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-13",
+  "change": "add-configurable-trivia-editorial-profiles",
+  "task_10": "IN PROGRESS; 9/10 tasks complete",
+  "base_sha": "c02c5413479cebf50f39abc10149fafca757611a",
+  "backend_candidate_sha": "a71fe5cb932c79d200e3efc4d14fc8ce0ddb0964",
+  "branch": "codex/configurable-trivia-editorial-profiles",
+  "issue_url": "https://github.com/milyarderpro/content-producer/issues/138",
+  "draft_pr_url": "https://github.com/milyarderpro/content-producer/pull/139",
+  "checks": {
+    "focused_local": {
+      "status": "PASS",
+      "files": 3,
+      "cases": 63,
+      "seconds": 1.55
+    },
+    "openspec_strict": "PASS",
+    "corpus_reproduce": "PASS",
+    "git_diff_check": "PASS",
+    "light_ci": {
+      "status": "PASS",
+      "head_sha": "a71fe5cb932c79d200e3efc4d14fc8ce0ddb0964",
+      "run_id": 43393463414,
+      "url": "https://github.com/milyarderpro/content-producer/actions/runs/43393463414",
+      "created_at": "2026-11-13T08:28:14Z",
+      "completed_at": "2026-11-13T08:29:08Z",
+      "elapsed_seconds": 54,
+      "estimated_minutes_before_run": [
+        1,
+        3
+      ]
+    },
+    "unchanged_task9_runtime_demo": {
+      "status": "PASS",
+      "files": 169,
+      "mismatches": [],
+      "fingerprint_map_sha256": "7c1c233c1959df2dbb7e4b7463f9fb985baa95533a4b2d64f24a7d46116396f6",
+      "reference": "task-9-technical-cases.json"
+    },
+    "plugin_source": {
+      "status": "PASS",
+      "version": "0.5.8",
+      "files": 15,
+      "mismatches": []
+    },
+    "plugin_creator_readback": {
+      "status": "PASS source/release only",
+      "same_plugin": true,
+      "version": "0.5.8",
+      "runtime_files": 15,
+      "all_bytes_match": true,
+      "overlay_version": "0.5.8",
+      "app_binding_preserved": true,
+      "audience": "PRIVATE",
+      "scope": "USER",
+      "default_prompt_preserved": true,
+      "new_update_performed": false
+    }
+  },
+  "formal_g4": {
+    "status": "NOT RUN",
+    "candidate": "pending authorized merge and exact final main SHA",
+    "database_files": 33,
+    "database_cases": 238,
+    "shards": [
+      {
+        "files": 15,
+        "cases": 158
+      },
+      {
+        "files": 18,
+        "cases": 80
+      }
+    ],
+    "estimated_minutes": [
+      15,
+      20
+    ]
+  },
+  "not_run": [
+    "merge",
+    "hosted preflight",
+    "deployment",
+    "LIVE config2 owner/plugin retest",
+    "business QA Write"
+  ],
+  "owner_scope": {
+    "phone_layout_review": "not required",
+    "runtime_editorial_review": "written reference DNA with existing prewrite quality controls",
+    "commit_push_draft_pr": "task10 PR preparation",
+    "merge_deploy_business_write": "separate authorization required"
+  },
+  "evidence_boundary": "CI/FIXTURE and source/release readback are not LIVE PASS or FIXED",
+  "release_plan": "task-10-release-plan.md",
+  "documentation_followup": "Documentation-only commit after backend candidate; final head CI is checked independently and reported in handoff. Backend fingerprints must remain identical."
+}

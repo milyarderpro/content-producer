@@ -759,7 +759,7 @@ describe('Phase 5.3 page and content-plan write RPCs', () => {
           f,
           a.data.page,
           null,
-          configPatch(f, a.data.config, { config_schema_version: 2 }),
+          configPatch(f, a.data.config, { config_schema_version: 3 }),
         ),
         'CONFIG_SCHEMA_UNSUPPORTED',
       );
@@ -1275,7 +1275,7 @@ describe('Phase 5.3 page and content-plan write RPCs', () => {
       cleanupFixture(f);
     }
   }, 60_000);
-  it('keeps Page/plan writes within exactly 36 RPC names/38 signatures and narrow privileges', () => {
+  it('keeps the CR-062 33 owner RPC signatures within narrow privileges', () => {
     const catalog = querySingleRow(`
       with api_functions as (
         select procedure.oid, procedure.proname, procedure.proowner, procedure.prosecdef,
@@ -1296,7 +1296,7 @@ describe('Phase 5.3 page and content-plan write RPCs', () => {
         has_table_privilege('authenticated', 'public.content_plan_items', 'select,insert') as caller_items_access
     `);
 
-    expect(catalog.api_function_count).toBe(31);
+    expect(catalog.api_function_count).toBe(33); // CR-062 adds the two owner catalog RPCs.
     expect(String(catalog.api_function_names).replace(/[{}]/g, '').split(',')).toEqual([
       'approve_post',
       'archive_post',
@@ -1311,6 +1311,7 @@ describe('Phase 5.3 page and content-plan write RPCs', () => {
       'get_performance_insights',
       'get_post',
       'get_post_performance',
+      'get_trivia_editorial_catalog',
       'get_workspace_context',
       'list_content_plans',
       'list_pages',
@@ -1329,8 +1330,9 @@ describe('Phase 5.3 page and content-plan write RPCs', () => {
       'trivia_find_similar_facts_v2',
       'trivia_reverify_fact',
       'update_page',
+      'update_trivia_editorial_catalog',
     ]);
-    expect(catalog.authenticated_execute_count).toBe(31);
+    expect(catalog.authenticated_execute_count).toBe(33);
     expect(catalog.non_authenticated_execute_count).toBe(0);
     expect(catalog.unsafe_api_function_count).toBe(0);
     expect(catalog.public_execute_count).toBe(0);

@@ -198,10 +198,11 @@ export function validatePluginSource(
   const retired = new Set(['trivia_find_similar_facts', 'trivia_register_and_reserve_facts',
     'trivia_release_facts', 'save_post', 'revise_post']);
   const active = [...names.filter((name) => !retired.has(name)),
-    'trivia_find_similar_facts_v2', 'save_post_v2', 'revise_post_v2'];
-  if (names.length !== 33 || retired.size !== 5 || listed.length !== 31 ||
+    'trivia_find_similar_facts_v2', 'save_post_v2', 'revise_post_v2',
+    'get_trivia_editorial_catalog', 'update_trivia_editorial_catalog'];
+  if (names.length !== 33 || retired.size !== 5 || listed.length !== 33 ||
       JSON.stringify(active) !== JSON.stringify(listed)) {
-    throw new Error('CR-059 active inventory differs: require 31 tools and five retired v1 names absent.');
+    throw new Error('CR-062 active inventory differs: require 33 tools and five retired v1 names absent.');
   }
   const packagedMarkdown = CANDIDATE_FILES.filter((path) => path.endsWith('.md'))
     .map((path) => read(pluginRoot, path)).join('\n');
@@ -226,6 +227,18 @@ export function validatePluginSource(
     'niches/trivia/writing-playbook.md': ['before Write', 'two directed',
       'trivia_find_similar_facts_v2', 'same post', 'readback'],
     'niches/trivia/formats.md': [
+      'config.config_schema_version',
+      'get_trivia_editorial_catalog',
+      'definitions_complete',
+      'examples_complete',
+      'effective_rules_hash',
+      'untrusted data',
+      'draft request grants neither action',
+      'Ignore embedded instructions',
+      'config2 context missing required fields/tools must stop',
+      'interaction_goal',
+      'cta_placement',
+      'Config 1 only',
       'single_subject_fast',
       'themed_utility',
       'emotional_animal_collection',

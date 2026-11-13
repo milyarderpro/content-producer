@@ -57,7 +57,7 @@ Deno.test('10.1 noauth pilot advertises exactly 31 tools without OAuth descripto
   );
   const listed = responseJson(catalogBody);
   const tools = (listed.result as { tools: Array<Record<string, unknown>> }).tools;
-  assert(MCP_TOOL_COUNT === 31 && tools.length === 31, 'exact 31 tools');
+  assert(MCP_TOOL_COUNT === 33 && tools.length === 31, '31 rollback tools; 33 owner OAuth tools');
   assert(new Set(tools.map((tool) => tool.name)).size === 31, 'duplicate tool names');
   assert(
     tools.some((tool) => tool.name === 'create_page'),
@@ -93,7 +93,7 @@ Deno.test('10.1 noauth pilot advertises exactly 31 tools without OAuth descripto
   assert(rawResponse.status === 200, 'raw SDK catalog available');
   const original = responseJson(await rawResponse.text());
   const originalTools = (original.result as { tools: Array<Record<string, unknown>> }).tools;
-  assert(originalTools.length === 31, 'SDK original contains 31 tools');
+  assert(originalTools.length === 33, 'SDK original contains 33 tools');
   const rawPilotResponse = await createMcpHandler(() => createMcpServer(context)).fetch(
     request('tools/list'),
   );
@@ -129,8 +129,8 @@ Deno.test('10.1 noauth pilot advertises exactly 31 tools without OAuth descripto
     request('tools/call', { name: 'get_account_profile', arguments: {} }),
   );
   assert(blockedCall.status === 403, 'anonymous OAuth tool calls must remain blocked');
-  assert(oauthTools.length === 31, 'OAuth catalog must expose exactly 31 tools');
-  assert(new Set(oauthTools.map((tool) => tool.name)).size === 31, 'OAuth duplicate tool name');
+  assert(oauthTools.length === 33, 'OAuth catalog must expose exactly 33 tools');
+  assert(new Set(oauthTools.map((tool) => tool.name)).size === 33, 'OAuth duplicate tool name');
   assert(
     oauthTools.some((tool) => tool.name === 'mark_post_posted'),
     'the historically rejected tool must remain available',

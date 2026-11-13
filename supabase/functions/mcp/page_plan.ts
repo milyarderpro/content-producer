@@ -3,6 +3,7 @@ import * as z from 'npm:zod@4.3.6';
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { invoke } from './foundation.ts';
+import { triviaConfig2, editorialRules, editorialHash, editorialTime, planOverrideConfig2, planPageReview } from './editorial_schemas.ts';
 import { triviaConfig, triviaPlanItemConfig } from './schemas.ts';
 
 const uuid = z.string().uuid();
@@ -48,7 +49,7 @@ const pageSummary = z.strictObject({
   created_at: timestamp,
   updated_at: timestamp,
 });
-const configSummary = z.strictObject({
+const configSummary1 = z.strictObject({
   niche_key: z.literal('trivia'),
   config_schema_version: version,
   config: triviaConfig,
@@ -56,7 +57,8 @@ const configSummary = z.strictObject({
   is_default: z.boolean(),
   updated_at: timestamp,
 });
-const pageInput = z.strictObject({
+const configSummary = z.union([configSummary1, configSummary1.extend({config_schema_version:z.literal(2),config:triviaConfig2,effective_rules:editorialRules,effective_rules_hash:editorialHash})]);
+const pageInput1 = z.strictObject({
   ...write,
   name,
   slug,
@@ -67,6 +69,7 @@ const pageInput = z.strictObject({
   config: triviaConfig,
   make_default: z.boolean().optional(),
 });
+const pageInput = z.discriminatedUnion('config_schema_version',[pageInput1,pageInput1.extend({config_schema_version:z.literal(2),config:triviaConfig2})]);
 const pagePatch = z
   .strictObject({
     name: name.optional(),
@@ -75,7 +78,7 @@ const pagePatch = z
     target_markets: countries.optional(),
   })
   .refine((p) => Object.keys(p).length > 0, 'page_patch must not be empty');
-const configPatch = z.strictObject({
+const configPatch1 = z.strictObject({
   niche_key: z.literal('trivia'),
   expected_config_updated_at: timestamp,
   config_schema_version: version,
@@ -83,6 +86,7 @@ const configPatch = z.strictObject({
   is_enabled: z.boolean(),
   is_default: z.boolean(),
 });
+const configPatch = z.discriminatedUnion('config_schema_version',[configPatch1,configPatch1.extend({config_schema_version:z.literal(2),config:triviaConfig2,expected_config_updated_at:editorialTime})]);
 const updateInput = z
   .strictObject({
     ...write,
@@ -114,7 +118,7 @@ export const planSummary = z.strictObject({
   created_at: timestamp,
   updated_at: timestamp,
 });
-const itemConfig = triviaPlanItemConfig;
+const itemConfig = z.union([triviaPlanItemConfig, planOverrideConfig2]);
 export const planItem = z.strictObject({
   plan_item_public_id: uuid,
   plan_public_id: uuid,
@@ -162,14 +166,14 @@ const createPlanInput = z
     page_public_id: uuid,
     niche_key: key,
     name: name.nullable().optional(),
-    config_schema_version: z.number().int().min(1),
+    config_schema_version: z.union([z.literal(1),z.literal(2)]),
     items: z.array(planSlot).min(1).max(100),
     plan_intent: z.string().min(1).max(1000),
   })
   .refine(
     (p) => p.items.every((item, index) => item.position === index + 1),
     'positions must be unique, ascending, and contiguous from 1',
-  );
+  ).refine(p => p.config_schema_version !== 1 || p.items.every(i=>triviaPlanItemConfig.safeParse(i.item_config).success), 'config1 item overrides must retain their legacy contract');
 const getPlanInput = z.strictObject({
   ...common,
   plan_public_id: uuid,
@@ -211,6 +215,7 @@ const createPlanOutput = envelope(
 const getPlanOutput = envelope(
   z.strictObject({
     plan: planSummary,
+    page_review: planPageReview.optional(),
     items: z.array(planItem),
     next_cursor: cursor.nullable(),
     has_more: z.boolean(),

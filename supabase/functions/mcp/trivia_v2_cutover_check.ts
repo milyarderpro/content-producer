@@ -34,7 +34,7 @@ async function mcp(method: string, params?: object) {
   return JSON.parse(frame ? frame.slice(6) : body);
 }
 
-Deno.test('CR-059 catalog has exactly 31 tools and refuses v1 calls before database access', async () => {
+Deno.test('CR-062 catalog has exactly 33 tools and refuses v1 calls before database access', async () => {
   const original = globalThis.fetch;
   let dispatched = 0;
   globalThis.fetch = (() => {
@@ -44,8 +44,8 @@ Deno.test('CR-059 catalog has exactly 31 tools and refuses v1 calls before datab
   try {
     const listed = await mcp('tools/list');
     const names = (listed.result.tools as Array<{ name: string }>).map(tool => tool.name);
-    assert(MCP_TOOL_COUNT === 31 && names.length === 31, 'EXACT_31_TOOLS');
-    assert(new Set(names).size === 31, 'DUPLICATE_TOOL');
+    assert(MCP_TOOL_COUNT === 33 && names.length === 33, 'EXACT_33_TOOLS');
+    assert(new Set(names).size === 33, 'DUPLICATE_TOOL');
     for (const name of [
       'get_account_profile', 'get_workspace_context', 'list_pages',
       'create_content_plan', 'claim_content_plan_items', 'list_posts',

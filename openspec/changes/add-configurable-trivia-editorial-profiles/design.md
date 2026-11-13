@@ -160,7 +160,7 @@ Ceiling mesin untuk config v2 berikut dipilih di atas maksimum corpus guna menye
 
 Default hard budget seed profil adalah hook 60, fakta 150, blok 750, CTA 140, copy 900 karakter; ceiling kata digunakan sebagai batas maksimum, dengan preferensi lebih sempit pada D5. Copy mentah terpanjang 728 karakter dan blok fakta terpanjang 660, sehingga default baru menyediakan ruang tanpa membutuhkan pelonggaran untuk setiap referensi. Klaim yang tidak dapat dipadatkan jujur tetap diganti, bukan dipotong qualifier-nya.
 
-Config v1 tetap memakai batas lamanya. Renderer v2 dipisahkan dari ketergantungan pada validator/renderer konten v1, tanpa membuka tool v1. Untuk config v2, wrap/time/replay adalah metrics advisori, bukan gate lama 3 lines/fact atau ratio 2,5 yang tersamar. Review visual pada template ponsel tetap syarat penerimaan editorial; caption/hash/source tidak dipakai untuk menyembunyikan teks panjang. NFC dan pemisah LF tetap deterministik; emoji dihitung konsisten sebagai karakter Unicode dan tidak dihapus. `text_metrics: {}` tetap input; server menghitung metrics.
+Config v1 tetap memakai batas lamanya. Renderer v2 dipisahkan dari ketergantungan pada validator/renderer konten v1, tanpa membuka tool v1. Untuk config v2, wrap/time/replay adalah metrics advisori, bukan gate lama 3 lines/fact atau ratio 2,5 yang tersamar. Menurut addendum penerimaan 13 November 2026, review naskah/layout ponsel bukan gate change ini. Hard budget tetap ditegakkan; technical PASS tidak menyatakan penerimaan editorial. NFC dan pemisah LF tetap deterministik; emoji dihitung konsisten sebagai karakter Unicode dan tidak dihapus. `text_metrics: {}` tetap input; server menghitung metrics.
 
 CTA config2 mendukung beberapa baris dalam komponen teks yang sama; LF internal dihitung pada budget dan dipertahankan pada copy/readback. Tambahkan `cta_placement` opsional pada payload config2 dengan bentuk `after_facts` (default bila tidak diisi) atau `after_fact` beserta posisi fakta valid 1..jumlah fakta. Penempatan menentukan penyisipan CTA pada assembled copy tanpa mengubah posisi/identitas fakta. Blok fakta dan metriknya tetap menghitung fakta saja; full-copy metrics menghitung seluruh komponen serta separator. Ini tetap struktur trivia hook, fakta, dan CTA, tanpa menambah kuis/narasi atau bahasa layout executable.
 
@@ -204,7 +204,7 @@ Pertahankan review pre-write CR-061 dan arti tiga attestations. Ganti aturan eks
 
 Implementasi dimulai dengan Issue dan change record baru yang menyebut bagian frozen yang berubah pada `plans/trivia-content-dna.md`, module/tool/config contracts, CR-053, CR-059, dan CR-061. Proposal bukan izin mengubah kontrak frozen diam-diam.
 
-Change `align-plugin-reference-content-dna` sudah selesai tetapi belum diarsipkan. Pertahankan hasil 28/28 dan bukti LIVE historisnya. Saat sinkronisasi spec kelak, urutan baseline CR-061 harus direkonsiliasi sebelum delta ini agar TDW-04/06/07 tidak saling menimpa. Tidak mengarsipkan atau membuka ulang pekerjaan historis sebagai bagian otomatis proposal ini.
+Change `align-plugin-reference-content-dna` sudah selesai 28/28 dan berada di `openspec/changes/archive/align-plugin-reference-content-dna/` pada source task 1. Baseline utama CR-061 sudah tersinkronisasi; pertahankan kewajiban TDW-04/06/07 serta bukti LIVE historisnya saat menerapkan delta ini. Rekonsiliasi ini dicatat dalam [CR-062](../../../docs/decisions/2026-11-12-cr-062-configurable-trivia-editorial-profiles.md); tidak mengarsipkan ulang atau membuka ulang pekerjaan historis.
 
 Perubahan schema umum bersifat aditif: config 1 tetap diterima, config 2 memakai pilihan baru, request envelope umum 1 dan konten 2 tetap. Direct SQL business grants, owner OAuth, source/dedup, claim/lease, CAS, replay, approval dan publication boundaries dipertahankan. Tidak reset database/post production atau auto-rewrite migration lama.
 
@@ -218,7 +218,7 @@ Pengurangan scope fungsional hanya laporan/perbandingan DNA dan filter/pengelomp
 
 - **[Katalog menjadi prompt injection]** → schema tertutup, batas ukuran, tidak ada executable code/URL instruction fetch, dan panduan selalu di bawah aturan sumber/izin host. Test adversarial pada examples wajib.
 - **[Profile update mengubah semua Page]** → versi immutable dan pinned references; adopsi versi baru melalui CAS Page eksplisit. Retirement menutup selection baru, bukan mematikan binding lama.
-- **[Naskah lebih panjang sulit dibaca]** → preferensi corpus tetap sempit, mechanical estimate transparan, dan QA visual pada template 13 detik; tidak mengklaim loop estimasi sebagai retention nyata.
+- **[Naskah lebih panjang sulit dibaca]** → preferensi corpus tetap sempit, mechanical estimate transparan; QA visual bukan gate menurut instruksi pemilik 13 November 2026; tidak mengklaim loop estimasi sebagai retention nyata.
 - **[Style classifier dianggap bukti fakta]** → schema/technical PASS dan penilaian DNA dipisahkan; sources produksi diperiksa ulang, contoh viral bukan sumber fakta.
 - **[Input menerima 12 tetapi output menolak]** → matriks lintas context/plan/save/revise/get/approve/discard/publication/metrics dan smoke pada 10/11/12 posisi, bukan test save saja.
 - **[Snapshot/compatibility drift]** → golden post config v1, replay sebelum/sesudah config berubah, pemisahan kepadatan/DNA, dan migrasi aditif tanpa mengubah hash histori.
@@ -230,7 +230,7 @@ Pengurangan scope fungsional hanya laporan/perbandingan DNA dan filter/pengelomp
 1. Terima change record dan kontrak perubahan; gunakan audit corpus/hash serta cakupan regresi yang sudah tersedia dan lengkapi gap tanpa mengubah expected untuk menutupi defect. Tentukan matriks capaian di bawah sebelum implementasi; laksanakan dalam 10 paket dengan test/dokumen per paket.
 2. Buat migration baru melalui Supabase CLI project yang dipin, setelah membaca help; jangan upgrade CLI/dependency sebagai efek samping. Tambah storage/RLS/RPC katalog, seed idempotent, resolver/config2, snapshot/renderer/lifecycle compatibility pada fixture terisolasi.
 3. Tambah facade dan schema MCP aditif, update registry/catalog closure/diagnostics, audit pin serta manifest G4 dengan alasan objek/grant yang berubah. Tetap pertahankan lima tool v1 absen/ditolak dan owner denial. Target jumlah tool dihitung ulang dari registry, bukan angka historis.
-4. Perbarui plugin yang sama dan dokumentasi; jalankan check serta regresi fokus menurut estimasi. Suite baru masuk manifest tanpa melemahkan coverage lama. Review naskah/visual awal memakai fixture atau preview dan tetap dibedakan dari hasil LIVE.
+4. Perbarui plugin yang sama dan dokumentasi; jalankan check serta regresi fokus menurut estimasi. Suite baru masuk manifest tanpa melemahkan coverage lama. Pengujian penerimaan berfokus pada integrasi teknis fixture; review naskah/layout ponsel dikeluarkan dari scope sesuai instruksi pemilik.
 5. Commit/push/PR/merge memerlukan scope masing-masing. Setelah kandidat rilis final berada di `main` melalui alur yang diotorisasi, jalankan satu full backend gate formal G4 manual pada exact SHA itu sebelum deployment: committed config, source, dua stack/shard dan aggregate PASS. Bila run yang diizinkan diperkirakan >10 menit, mulai, catat SHA/URL/estimasi, lalu hentikan pemantauan chat sesuai AGENTS; tidak menandai PASS sebelum hasil selesai. Deployment dan instalasi tetap mempunyai izin terpisah.
 6. Sesudah deployment yang diotorisasi, verifikasi katalog/context actual dan instal versi baru plugin yang sama. Uji saved-copy hanya pada Page/fixture terisolasi yang diotorisasi, lalu readback. Tidak mengubah OdlyTrue/corious facts atau Page production lain otomatis.
 7. Adopsi profil per Page menjadi tindakan owner terpisah. Rollback menutup pengikatan config2 baru dan memakai release kompatibel yang tetap mampu membaca data config2; jangan memasang backend lama yang tidak dapat membaca post baru atau menghapus katalog untuk memaksa rollback. Definisi/binding lama tetap utuh; perbaikan forward diprioritaskan.
@@ -245,10 +245,22 @@ Pengurangan scope fungsional hanya laporan/perbandingan DNA dan filter/pengelomp
 | Daily Facts | Koleksi kota/tempat, storage utility, mixed, 5–7 fakta, kalimat lebih menjelaskan, sentence-case, CTA react + follow tanpa emoji |
 | Profil custom | Satu profil campuran dengan panduan hasil gabungan eksplisit dapat dipilih Page dan melewati context/save/readback/revise tanpa inheritance engine atau perubahan Page lain |
 | CTA lintas profil | CTA DYK pertanyaan + like / like + tag, Daily Facts like + follow, beberapa baris, penempatan sebelum fakta terakhir, null goal dan label opsional terbaca utuh; kasus sintetis 3+ ajakan sah tanpa daftar kombinasi atau hierarki; config1 tetap kompatibel |
-| Extensibility | Setelah build/deploy fixture, daftarkan format, topik, dan profil referensi baru lewat RPC/tool, Page pilih, preview/save/readback/revise sukses; hash source/plugin/registry tidak berubah sepanjang percobaan |
+| Extensibility | Setelah build/deploy fixture, daftarkan format, topik, dan profil referensi baru lewat RPC/tool, Page pilih, context/save/readback/revise sukses; hash source/plugin/registry tidak berubah sepanjang percobaan |
 | Analitik kompatibel | Insights lama tetap dapat membaca data config1/2 dengan key dinamis dan goal null tanpa klasifikasi palsu; versi DNA dan label opsional tersedia pada readback, tanpa mensyaratkan laporan/filter DNA/CTA baru |
 | Integrity | Unknown key/cross-owner/reference cycle/retired new binding/stale CAS/replay/lost response/unsafe URL/over-budget/emoji policy ditolak tanpa hasil parsial |
 | Lifecycle | Config1 golden dan config2 10/11/12 fakta; batch/resume, reschedule/revoke/discard/publish/archive; references/metrics/IDs tidak terpotong; history dan approval tetap tepat |
-| Acceptance | Review per kasus dan QA visual; CI/FIXTURE tidak menggantikan LIVE; satu profil FAIL tidak ditutupi rata-rata atau status teknis passed |
+| Acceptance | Hasil teknis per kasus/profil; review naskah dan QA layout ponsel dikeluarkan dari gate. CI/FIXTURE tidak menggantikan LIVE dan satu profil technical FAIL tidak ditutupi rata-rata. Tidak ada klaim kelulusan editorial dari technical PASS |
 
 Referensi tambahan yang dibaca untuk prinsip privilege/RLS: [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security). Implementasi tetap mengikuti role/API architecture project, bukan memberikan grant langsung yang tidak diperlukan.
+
+## Pembekuan task 1 — 12 November 2026
+
+[CR-062](../../../docs/decisions/2026-11-12-cr-062-configurable-trivia-editorial-profiles.md) membekukan D1–D11 untuk perubahan config2. [Kontrak/kompatibilitas](../../../docs/editorial/configurable-profiles/contract.md), [audit tambahan](../../../docs/editorial/configurable-profiles/audit.md), matriks 172 record serta fingerprint artefak tersedia sebelum perubahan source implementasi. Nama dua tool D2 adalah kontrak frozen; bentuk wire rinci tetap wajib konsisten dengan batas/perilaku tersebut. Ini bukti kontrak/corpus lokal, bukan PASS implementasi, release atau LIVE.
+
+## Addendum penerimaan task9 — 13 November 2026
+
+[Keputusan pemilik](../../../docs/decisions/2026-11-13-cr-062-task-9-technical-acceptance.md) mengeluarkan review naskah manual dan QA layout
+ponsel dari gate change ini. Matriks profil di atas mengarahkan variasi input
+serta assertion teknis, bukan penilaian naturalness/kemiripan. Tidak memindahkan
+review itu ke task10. D1–D11 fungsional, kontrol penulisan runtime, ketiga input
+corpus dan pemisahan LOCAL/FIXTURE/LIVE tetap dipertahankan.

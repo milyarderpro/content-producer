@@ -1,5 +1,16 @@
 # Reference patterns — complete Canva cards
 
+## Apply the current config branch first (CR-062)
+
+For config2, read [the generic profile workflow](formats.md) and the exact pinned
+catalog guidance/examples before using this reference. Its global counts,
+five-format/two-density list, default hook, single-goal CTA, legacy budget/loop
+formula and shock-heavy example selection are **config1 fallback only**.
+Config2 review follows its resolved profile: medium/context facts can earn their
+place, CTA may combine invitations, and new registered keys need no code switch.
+Shared source-meaning, semantic dedup, scope, repair and readback safeguards below
+still apply. Older atlas cards are optional aids, never the config2 authority.
+
 These are original teaching cards, not production drafts or a facts bank.
 Pattern provenance identifies structure only; factual support was checked
 independently on 5 November 2026 and is recorded per line in the developer
@@ -9,7 +20,8 @@ No card is a saved or approved post. Static integrity does not prove naturalness
 
 ## Routing index
 
-Read two relevant cards and one relevant anti-example before writing.
+For config1, read two relevant cards and one relevant anti-example before writing.
+Config2 reads its own pinned profile examples; this atlas is optional.
 Use this index to select by reader payoff, not just by animal/object.
 
 | Card | Reader payoff | Format | Profile |

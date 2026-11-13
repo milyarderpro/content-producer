@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "baseSha": "7d9449816593818a3abbf4769b4af911158c84d0",
+  "baseSha": "c02c5413479cebf50f39abc10149fafca757611a",
   "cutoverEvidence": {
-    "apiNames": 31,
-    "mcpCases": 114,
-    "inspectorValid": 31,
-    "inspectorInvalid": 31,
+    "apiNames": 33,
+    "mcpCases": 130,
+    "inspectorValid": 33,
+    "inspectorInvalid": 33,
     "retiredV1NamesRejected": 5,
     "ownerDenialRequired": true,
     "databaseFiles": 33,
-    "databaseCases": 132
+    "databaseCases": 238
   },
   "suites": {
     "source": {
@@ -144,6 +144,10 @@
         },
         {
           "path": "supabase/functions/mcp/trivia_v2_test.ts",
+          "status": "mandatory"
+        },
+        {
+          "path": "supabase/functions/mcp/editorial_catalog_test.ts",
           "status": "mandatory"
         }
       ]

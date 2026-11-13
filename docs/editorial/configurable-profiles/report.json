@@ -1,0 +1,2155 @@
+{
+  "schema_version": 1,
+  "evidence": "LOCAL/CORPUS; not LIVE or claim verification",
+  "profiles": {
+    "curious_mind": {
+      "input_sha256": "7388ba52b29aab246841c0d046535f19568c32def0ae6e56a43b3d4254b485da",
+      "raw_records": 55,
+      "unique_account_ids": 51,
+      "duplicate_id_lines": {
+        "POST-016": [
+          16,
+          20
+        ],
+        "POST-017": [
+          17,
+          21
+        ],
+        "POST-018": [
+          18,
+          22
+        ],
+        "POST-019": [
+          19,
+          23
+        ]
+      },
+      "statistics": {
+        "engagement_complete": 51,
+        "fact_count_min": 6,
+        "fact_count_max": 10,
+        "median_copy_words": 82,
+        "median_fact_words": 9.0,
+        "max_copy_words": 109,
+        "max_copy_chars": 624,
+        "copy_over_600": 2,
+        "blocks_over_500": 5,
+        "max_block_chars": 574,
+        "max_cta_chars": 93,
+        "heart_records": 0,
+        "surprise_high_medium_low": [
+          209,
+          185,
+          10
+        ]
+      },
+      "format_counts": {
+        "comparison": 0,
+        "emotional_animal_collection": 0,
+        "mixed_curiosity": 8,
+        "myth_vs_fact": 0,
+        "single_subject_fast": 20,
+        "themed_curiosity": 22,
+        "themed_utility": 1
+      },
+      "topic_counts": {
+        "animals": 7,
+        "food_science": 7,
+        "food_storage_home": 0,
+        "general_trivia": 6,
+        "geography": 6,
+        "history_origins": 5,
+        "human_body": 9,
+        "inventions_everyday": 5,
+        "nature_science": 5,
+        "pet_safety": 1,
+        "practical_utility": 0
+      },
+      "recommended_format_weights": {
+        "comparison": 0,
+        "emotional_animal_collection": 0,
+        "mixed_curiosity": 16,
+        "myth_vs_fact": 0,
+        "single_subject_fast": 39,
+        "themed_curiosity": 43,
+        "themed_utility": 2
+      },
+      "recommended_topic_weights": {
+        "animals": 14,
+        "food_science": 13,
+        "food_storage_home": 0,
+        "general_trivia": 12,
+        "geography": 12,
+        "history_origins": 10,
+        "human_body": 17,
+        "inventions_everyday": 10,
+        "nature_science": 10,
+        "pet_safety": 2,
+        "practical_utility": 0
+      },
+      "cases": [
+        {
+          "id": "POST-001",
+          "fact_count": 7,
+          "copy_chars": 501,
+          "block_chars": 415,
+          "cta_chars": 69,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-002",
+          "fact_count": 8,
+          "copy_chars": 554,
+          "block_chars": 494,
+          "cta_chars": 43,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-003",
+          "fact_count": 8,
+          "copy_chars": 528,
+          "block_chars": 460,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-004",
+          "fact_count": 6,
+          "copy_chars": 552,
+          "block_chars": 494,
+          "cta_chars": 41,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-005",
+          "fact_count": 9,
+          "copy_chars": 590,
+          "block_chars": 528,
+          "cta_chars": 45,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-006",
+          "fact_count": 7,
+          "copy_chars": 564,
+          "block_chars": 453,
+          "cta_chars": 93,
+          "cta_lines": 2,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-007",
+          "fact_count": 8,
+          "copy_chars": 404,
+          "block_chars": 351,
+          "cta_chars": 36,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-008",
+          "fact_count": 8,
+          "copy_chars": 518,
+          "block_chars": 449,
+          "cta_chars": 52,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-009",
+          "fact_count": 8,
+          "copy_chars": 565,
+          "block_chars": 498,
+          "cta_chars": 50,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-010",
+          "fact_count": 9,
+          "copy_chars": 466,
+          "block_chars": 416,
+          "cta_chars": 33,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-011",
+          "fact_count": 7,
+          "copy_chars": 367,
+          "block_chars": 318,
+          "cta_chars": 32,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-012",
+          "fact_count": 8,
+          "copy_chars": 456,
+          "block_chars": 408,
+          "cta_chars": 31,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-013",
+          "fact_count": 8,
+          "copy_chars": 483,
+          "block_chars": 430,
+          "cta_chars": 36,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-014",
+          "fact_count": 7,
+          "copy_chars": 495,
+          "block_chars": 441,
+          "cta_chars": 37,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-015",
+          "fact_count": 7,
+          "copy_chars": 431,
+          "block_chars": 377,
+          "cta_chars": 37,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-016",
+          "fact_count": 7,
+          "copy_chars": 472,
+          "block_chars": 419,
+          "cta_chars": 36,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-017",
+          "fact_count": 8,
+          "copy_chars": 527,
+          "block_chars": 469,
+          "cta_chars": 41,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-018",
+          "fact_count": 8,
+          "copy_chars": 505,
+          "block_chars": 458,
+          "cta_chars": 30,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-019",
+          "fact_count": 8,
+          "copy_chars": 453,
+          "block_chars": 403,
+          "cta_chars": 33,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-020",
+          "fact_count": 8,
+          "copy_chars": 434,
+          "block_chars": 382,
+          "cta_chars": 35,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-021",
+          "fact_count": 8,
+          "copy_chars": 530,
+          "block_chars": 467,
+          "cta_chars": 46,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-022",
+          "fact_count": 8,
+          "copy_chars": 415,
+          "block_chars": 355,
+          "cta_chars": 43,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-023",
+          "fact_count": 7,
+          "copy_chars": 451,
+          "block_chars": 384,
+          "cta_chars": 50,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-024",
+          "fact_count": 8,
+          "copy_chars": 460,
+          "block_chars": 402,
+          "cta_chars": 41,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-025",
+          "fact_count": 8,
+          "copy_chars": 497,
+          "block_chars": 438,
+          "cta_chars": 42,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-026",
+          "fact_count": 9,
+          "copy_chars": 501,
+          "block_chars": 449,
+          "cta_chars": 35,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-027",
+          "fact_count": 9,
+          "copy_chars": 521,
+          "block_chars": 462,
+          "cta_chars": 42,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-028",
+          "fact_count": 8,
+          "copy_chars": 466,
+          "block_chars": 407,
+          "cta_chars": 42,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-029",
+          "fact_count": 8,
+          "copy_chars": 481,
+          "block_chars": 418,
+          "cta_chars": 46,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-030",
+          "fact_count": 9,
+          "copy_chars": 570,
+          "block_chars": 522,
+          "cta_chars": 31,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-031",
+          "fact_count": 8,
+          "copy_chars": 624,
+          "block_chars": 574,
+          "cta_chars": 33,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-032",
+          "fact_count": 10,
+          "copy_chars": 619,
+          "block_chars": 549,
+          "cta_chars": 53,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-033",
+          "fact_count": 7,
+          "copy_chars": 496,
+          "block_chars": 388,
+          "cta_chars": 90,
+          "cta_lines": 2,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-034",
+          "fact_count": 8,
+          "copy_chars": 518,
+          "block_chars": 408,
+          "cta_chars": 92,
+          "cta_lines": 2,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-035",
+          "fact_count": 8,
+          "copy_chars": 448,
+          "block_chars": 397,
+          "cta_chars": 34,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-036",
+          "fact_count": 8,
+          "copy_chars": 492,
+          "block_chars": 447,
+          "cta_chars": 28,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-037",
+          "fact_count": 9,
+          "copy_chars": 484,
+          "block_chars": 434,
+          "cta_chars": 33,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-042",
+          "fact_count": 7,
+          "copy_chars": 467,
+          "block_chars": 407,
+          "cta_chars": 43,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-043",
+          "fact_count": 7,
+          "copy_chars": 453,
+          "block_chars": 402,
+          "cta_chars": 34,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-044",
+          "fact_count": 8,
+          "copy_chars": 532,
+          "block_chars": 464,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-045",
+          "fact_count": 8,
+          "copy_chars": 455,
+          "block_chars": 396,
+          "cta_chars": 42,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-046",
+          "fact_count": 8,
+          "copy_chars": 382,
+          "block_chars": 330,
+          "cta_chars": 35,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-047",
+          "fact_count": 7,
+          "copy_chars": 429,
+          "block_chars": 370,
+          "cta_chars": 42,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-048",
+          "fact_count": 9,
+          "copy_chars": 549,
+          "block_chars": 490,
+          "cta_chars": 42,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-049",
+          "fact_count": 8,
+          "copy_chars": 480,
+          "block_chars": 421,
+          "cta_chars": 42,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-050",
+          "fact_count": 8,
+          "copy_chars": 458,
+          "block_chars": 401,
+          "cta_chars": 40,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-051",
+          "fact_count": 9,
+          "copy_chars": 567,
+          "block_chars": 508,
+          "cta_chars": 42,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-052",
+          "fact_count": 7,
+          "copy_chars": 429,
+          "block_chars": 370,
+          "cta_chars": 42,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-053",
+          "fact_count": 8,
+          "copy_chars": 473,
+          "block_chars": 418,
+          "cta_chars": 38,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-054",
+          "fact_count": 8,
+          "copy_chars": 458,
+          "block_chars": 406,
+          "cta_chars": 35,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-055",
+          "fact_count": 8,
+          "copy_chars": 464,
+          "block_chars": 412,
+          "cta_chars": 35,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        }
+      ]
+    },
+    "dyk": {
+      "input_sha256": "4d975bd91fa6ebfecc101ca6958b5b0bacd2490a6ccb1ad72a55274ac283594f",
+      "raw_records": 103,
+      "unique_account_ids": 103,
+      "duplicate_id_lines": {},
+      "statistics": {
+        "engagement_complete": 100,
+        "fact_count_min": 5,
+        "fact_count_max": 11,
+        "median_copy_words": 89,
+        "median_fact_words": 10,
+        "max_copy_words": 125,
+        "max_copy_chars": 708,
+        "copy_over_600": 14,
+        "blocks_over_500": 25,
+        "max_block_chars": 635,
+        "max_cta_chars": 122,
+        "heart_records": 60,
+        "surprise_high_medium_low": [
+          339,
+          427,
+          17
+        ]
+      },
+      "format_counts": {
+        "comparison": 1,
+        "emotional_animal_collection": 8,
+        "mixed_curiosity": 10,
+        "myth_vs_fact": 1,
+        "single_subject_fast": 39,
+        "themed_curiosity": 37,
+        "themed_utility": 7
+      },
+      "topic_counts": {
+        "animals": 23,
+        "food_science": 16,
+        "food_storage_home": 0,
+        "general_trivia": 4,
+        "geography": 6,
+        "history_origins": 10,
+        "human_body": 12,
+        "inventions_everyday": 10,
+        "nature_science": 15,
+        "pet_safety": 1,
+        "practical_utility": 6
+      },
+      "recommended_format_weights": {
+        "comparison": 1,
+        "emotional_animal_collection": 8,
+        "mixed_curiosity": 9,
+        "myth_vs_fact": 1,
+        "single_subject_fast": 38,
+        "themed_curiosity": 36,
+        "themed_utility": 7
+      },
+      "recommended_topic_weights": {
+        "animals": 22,
+        "food_science": 15,
+        "food_storage_home": 0,
+        "general_trivia": 4,
+        "geography": 6,
+        "history_origins": 10,
+        "human_body": 12,
+        "inventions_everyday": 10,
+        "nature_science": 14,
+        "pet_safety": 1,
+        "practical_utility": 6
+      },
+      "cases": [
+        {
+          "id": "POST-055",
+          "fact_count": 6,
+          "copy_chars": 487,
+          "block_chars": 426,
+          "cta_chars": 45,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-056",
+          "fact_count": 6,
+          "copy_chars": 385,
+          "block_chars": 323,
+          "cta_chars": 46,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-057",
+          "fact_count": 7,
+          "copy_chars": 447,
+          "block_chars": 386,
+          "cta_chars": 45,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_fact",
+            "position": 6
+          }
+        },
+        {
+          "id": "POST-058",
+          "fact_count": 7,
+          "copy_chars": 536,
+          "block_chars": 463,
+          "cta_chars": 57,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-059",
+          "fact_count": 7,
+          "copy_chars": 581,
+          "block_chars": 447,
+          "cta_chars": 118,
+          "cta_lines": 2,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-060",
+          "fact_count": 7,
+          "copy_chars": 515,
+          "block_chars": 377,
+          "cta_chars": 122,
+          "cta_lines": 4,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-061",
+          "fact_count": 7,
+          "copy_chars": 528,
+          "block_chars": 452,
+          "cta_chars": 60,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-062",
+          "fact_count": 7,
+          "copy_chars": 483,
+          "block_chars": 411,
+          "cta_chars": 56,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-063",
+          "fact_count": 7,
+          "copy_chars": 473,
+          "block_chars": 398,
+          "cta_chars": 58,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-064",
+          "fact_count": 8,
+          "copy_chars": 513,
+          "block_chars": 450,
+          "cta_chars": 47,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-065",
+          "fact_count": 9,
+          "copy_chars": 545,
+          "block_chars": 482,
+          "cta_chars": 47,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-066",
+          "fact_count": 6,
+          "copy_chars": 468,
+          "block_chars": 407,
+          "cta_chars": 45,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-067",
+          "fact_count": 8,
+          "copy_chars": 473,
+          "block_chars": 412,
+          "cta_chars": 45,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-068",
+          "fact_count": 8,
+          "copy_chars": 578,
+          "block_chars": 528,
+          "cta_chars": 34,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-069",
+          "fact_count": 8,
+          "copy_chars": 552,
+          "block_chars": 486,
+          "cta_chars": 50,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-070",
+          "fact_count": 8,
+          "copy_chars": 600,
+          "block_chars": 506,
+          "cta_chars": 65,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-071",
+          "fact_count": 7,
+          "copy_chars": 706,
+          "block_chars": 627,
+          "cta_chars": 63,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-072",
+          "fact_count": 7,
+          "copy_chars": 708,
+          "block_chars": 635,
+          "cta_chars": 57,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-073",
+          "fact_count": 7,
+          "copy_chars": 585,
+          "block_chars": 511,
+          "cta_chars": 58,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-074",
+          "fact_count": 7,
+          "copy_chars": 463,
+          "block_chars": 389,
+          "cta_chars": 58,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-075",
+          "fact_count": 7,
+          "copy_chars": 647,
+          "block_chars": 577,
+          "cta_chars": 54,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-076",
+          "fact_count": 7,
+          "copy_chars": 628,
+          "block_chars": 558,
+          "cta_chars": 54,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-077",
+          "fact_count": 7,
+          "copy_chars": 525,
+          "block_chars": 465,
+          "cta_chars": 44,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-078",
+          "fact_count": 9,
+          "copy_chars": 548,
+          "block_chars": 488,
+          "cta_chars": 44,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-079",
+          "fact_count": 7,
+          "copy_chars": 678,
+          "block_chars": 610,
+          "cta_chars": 52,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-080",
+          "fact_count": 8,
+          "copy_chars": 598,
+          "block_chars": 530,
+          "cta_chars": 52,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-081",
+          "fact_count": 7,
+          "copy_chars": 511,
+          "block_chars": 437,
+          "cta_chars": 58,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-082",
+          "fact_count": 8,
+          "copy_chars": 597,
+          "block_chars": 523,
+          "cta_chars": 58,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-083",
+          "fact_count": 8,
+          "copy_chars": 555,
+          "block_chars": 494,
+          "cta_chars": 45,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-084",
+          "fact_count": 8,
+          "copy_chars": 545,
+          "block_chars": 484,
+          "cta_chars": 45,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-085",
+          "fact_count": 8,
+          "copy_chars": 580,
+          "block_chars": 519,
+          "cta_chars": 45,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-086",
+          "fact_count": 8,
+          "copy_chars": 478,
+          "block_chars": 417,
+          "cta_chars": 45,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-087",
+          "fact_count": 7,
+          "copy_chars": 603,
+          "block_chars": 523,
+          "cta_chars": 64,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-088",
+          "fact_count": 7,
+          "copy_chars": 679,
+          "block_chars": 603,
+          "cta_chars": 60,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-089",
+          "fact_count": 6,
+          "copy_chars": 630,
+          "block_chars": 549,
+          "cta_chars": 65,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-090",
+          "fact_count": 11,
+          "copy_chars": 613,
+          "block_chars": 550,
+          "cta_chars": 47,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-091",
+          "fact_count": 10,
+          "copy_chars": 461,
+          "block_chars": 401,
+          "cta_chars": 44,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-092",
+          "fact_count": 10,
+          "copy_chars": 525,
+          "block_chars": 462,
+          "cta_chars": 47,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-093",
+          "fact_count": 6,
+          "copy_chars": 535,
+          "block_chars": 466,
+          "cta_chars": 53,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-094",
+          "fact_count": 5,
+          "copy_chars": 483,
+          "block_chars": 419,
+          "cta_chars": 48,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-095",
+          "fact_count": 8,
+          "copy_chars": 552,
+          "block_chars": 491,
+          "cta_chars": 45,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-096",
+          "fact_count": 7,
+          "copy_chars": 511,
+          "block_chars": 441,
+          "cta_chars": 54,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-097",
+          "fact_count": 7,
+          "copy_chars": 415,
+          "block_chars": 348,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-098",
+          "fact_count": 8,
+          "copy_chars": 455,
+          "block_chars": 393,
+          "cta_chars": 46,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-099",
+          "fact_count": 6,
+          "copy_chars": 397,
+          "block_chars": 340,
+          "cta_chars": 41,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-100",
+          "fact_count": 9,
+          "copy_chars": 612,
+          "block_chars": 535,
+          "cta_chars": 61,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-101",
+          "fact_count": 9,
+          "copy_chars": 600,
+          "block_chars": 534,
+          "cta_chars": 50,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-102",
+          "fact_count": 8,
+          "copy_chars": 557,
+          "block_chars": 490,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-103",
+          "fact_count": 8,
+          "copy_chars": 560,
+          "block_chars": 498,
+          "cta_chars": 46,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-104",
+          "fact_count": 6,
+          "copy_chars": 591,
+          "block_chars": 502,
+          "cta_chars": 73,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-105",
+          "fact_count": 7,
+          "copy_chars": 627,
+          "block_chars": 539,
+          "cta_chars": 72,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-106",
+          "fact_count": 7,
+          "copy_chars": 414,
+          "block_chars": 352,
+          "cta_chars": 46,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-107",
+          "fact_count": 6,
+          "copy_chars": 362,
+          "block_chars": 308,
+          "cta_chars": 38,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-108",
+          "fact_count": 8,
+          "copy_chars": 516,
+          "block_chars": 453,
+          "cta_chars": 47,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-109",
+          "fact_count": 7,
+          "copy_chars": 437,
+          "block_chars": 370,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-110",
+          "fact_count": 8,
+          "copy_chars": 522,
+          "block_chars": 472,
+          "cta_chars": 34,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-111",
+          "fact_count": 8,
+          "copy_chars": 603,
+          "block_chars": 546,
+          "cta_chars": 41,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-112",
+          "fact_count": 6,
+          "copy_chars": 556,
+          "block_chars": 494,
+          "cta_chars": 46,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-113",
+          "fact_count": 8,
+          "copy_chars": 530,
+          "block_chars": 460,
+          "cta_chars": 54,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-114",
+          "fact_count": 6,
+          "copy_chars": 531,
+          "block_chars": 461,
+          "cta_chars": 54,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-115",
+          "fact_count": 8,
+          "copy_chars": 551,
+          "block_chars": 482,
+          "cta_chars": 53,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-116",
+          "fact_count": 7,
+          "copy_chars": 591,
+          "block_chars": 516,
+          "cta_chars": 59,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-117",
+          "fact_count": 7,
+          "copy_chars": 507,
+          "block_chars": 452,
+          "cta_chars": 39,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-118",
+          "fact_count": 9,
+          "copy_chars": 626,
+          "block_chars": 560,
+          "cta_chars": 50,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-119",
+          "fact_count": 8,
+          "copy_chars": 552,
+          "block_chars": 481,
+          "cta_chars": 55,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-120",
+          "fact_count": 8,
+          "copy_chars": 482,
+          "block_chars": 418,
+          "cta_chars": 48,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-121",
+          "fact_count": 8,
+          "copy_chars": 543,
+          "block_chars": 476,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-122",
+          "fact_count": 9,
+          "copy_chars": 661,
+          "block_chars": 600,
+          "cta_chars": 45,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-123",
+          "fact_count": 7,
+          "copy_chars": 492,
+          "block_chars": 426,
+          "cta_chars": 50,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-124",
+          "fact_count": 9,
+          "copy_chars": 418,
+          "block_chars": 372,
+          "cta_chars": 30,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-125",
+          "fact_count": 8,
+          "copy_chars": 417,
+          "block_chars": 355,
+          "cta_chars": 46,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-126",
+          "fact_count": 8,
+          "copy_chars": 529,
+          "block_chars": 467,
+          "cta_chars": 46,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-127",
+          "fact_count": 8,
+          "copy_chars": 418,
+          "block_chars": 378,
+          "cta_chars": 24,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-128",
+          "fact_count": 8,
+          "copy_chars": 435,
+          "block_chars": 382,
+          "cta_chars": 37,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-129",
+          "fact_count": 8,
+          "copy_chars": 529,
+          "block_chars": 469,
+          "cta_chars": 44,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-130",
+          "fact_count": 7,
+          "copy_chars": 470,
+          "block_chars": 419,
+          "cta_chars": 35,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-131",
+          "fact_count": 8,
+          "copy_chars": 458,
+          "block_chars": 408,
+          "cta_chars": 34,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-132",
+          "fact_count": 7,
+          "copy_chars": 369,
+          "block_chars": 318,
+          "cta_chars": 35,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-133",
+          "fact_count": 9,
+          "copy_chars": 468,
+          "block_chars": 416,
+          "cta_chars": 36,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-134",
+          "fact_count": 8,
+          "copy_chars": 567,
+          "block_chars": 498,
+          "cta_chars": 53,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-135",
+          "fact_count": 8,
+          "copy_chars": 405,
+          "block_chars": 351,
+          "cta_chars": 38,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-136",
+          "fact_count": 9,
+          "copy_chars": 593,
+          "block_chars": 530,
+          "cta_chars": 47,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-137",
+          "fact_count": 9,
+          "copy_chars": 576,
+          "block_chars": 519,
+          "cta_chars": 41,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-138",
+          "fact_count": 7,
+          "copy_chars": 463,
+          "block_chars": 437,
+          "cta_chars": 16,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-139",
+          "fact_count": 9,
+          "copy_chars": 489,
+          "block_chars": 451,
+          "cta_chars": 30,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-140",
+          "fact_count": 9,
+          "copy_chars": 512,
+          "block_chars": 469,
+          "cta_chars": 35,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-141",
+          "fact_count": 8,
+          "copy_chars": 480,
+          "block_chars": 436,
+          "cta_chars": 35,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-142",
+          "fact_count": 8,
+          "copy_chars": 529,
+          "block_chars": 477,
+          "cta_chars": 43,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-143",
+          "fact_count": 8,
+          "copy_chars": 493,
+          "block_chars": 438,
+          "cta_chars": 46,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-144",
+          "fact_count": 7,
+          "copy_chars": 488,
+          "block_chars": 462,
+          "cta_chars": 16,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-145",
+          "fact_count": 8,
+          "copy_chars": 448,
+          "block_chars": 423,
+          "cta_chars": 16,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-146",
+          "fact_count": 7,
+          "copy_chars": 498,
+          "block_chars": 472,
+          "cta_chars": 16,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-147",
+          "fact_count": 7,
+          "copy_chars": 405,
+          "block_chars": 379,
+          "cta_chars": 16,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-148",
+          "fact_count": 7,
+          "copy_chars": 492,
+          "block_chars": 466,
+          "cta_chars": 16,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-149",
+          "fact_count": 8,
+          "copy_chars": 427,
+          "block_chars": 402,
+          "cta_chars": 16,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-150",
+          "fact_count": 8,
+          "copy_chars": 448,
+          "block_chars": 423,
+          "cta_chars": 16,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-151",
+          "fact_count": 7,
+          "copy_chars": 411,
+          "block_chars": 385,
+          "cta_chars": 16,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-152",
+          "fact_count": 8,
+          "copy_chars": 429,
+          "block_chars": 404,
+          "cta_chars": 16,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-153",
+          "fact_count": 7,
+          "copy_chars": 466,
+          "block_chars": 409,
+          "cta_chars": 47,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-154",
+          "fact_count": 6,
+          "copy_chars": 428,
+          "block_chars": 376,
+          "cta_chars": 41,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-155",
+          "fact_count": 8,
+          "copy_chars": 467,
+          "block_chars": 420,
+          "cta_chars": 38,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-156",
+          "fact_count": 8,
+          "copy_chars": 442,
+          "block_chars": 397,
+          "cta_chars": 36,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-157",
+          "fact_count": 8,
+          "copy_chars": 380,
+          "block_chars": 322,
+          "cta_chars": 49,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        }
+      ]
+    },
+    "daily_facts": {
+      "input_sha256": "f00bf8cbd7c33735e40a9c21e9052677f05eaabc172ee60c50d322c340edf329",
+      "raw_records": 18,
+      "unique_account_ids": 18,
+      "duplicate_id_lines": {},
+      "statistics": {
+        "engagement_complete": 18,
+        "fact_count_min": 5,
+        "fact_count_max": 7,
+        "median_copy_words": 97.5,
+        "median_fact_words": 14,
+        "max_copy_words": 124,
+        "max_copy_chars": 728,
+        "copy_over_600": 7,
+        "blocks_over_500": 10,
+        "max_block_chars": 660,
+        "max_cta_chars": 51,
+        "heart_records": 0,
+        "surprise_high_medium_low": [
+          60,
+          47,
+          2
+        ]
+      },
+      "format_counts": {
+        "comparison": 0,
+        "emotional_animal_collection": 0,
+        "mixed_curiosity": 4,
+        "myth_vs_fact": 0,
+        "single_subject_fast": 0,
+        "themed_curiosity": 6,
+        "themed_utility": 8
+      },
+      "topic_counts": {
+        "animals": 0,
+        "food_science": 0,
+        "food_storage_home": 5,
+        "general_trivia": 4,
+        "geography": 6,
+        "history_origins": 0,
+        "human_body": 0,
+        "inventions_everyday": 0,
+        "nature_science": 0,
+        "pet_safety": 0,
+        "practical_utility": 3
+      },
+      "recommended_format_weights": {
+        "comparison": 0,
+        "emotional_animal_collection": 0,
+        "mixed_curiosity": 22,
+        "myth_vs_fact": 0,
+        "single_subject_fast": 0,
+        "themed_curiosity": 33,
+        "themed_utility": 45
+      },
+      "recommended_topic_weights": {
+        "animals": 0,
+        "food_science": 0,
+        "food_storage_home": 28,
+        "general_trivia": 22,
+        "geography": 33,
+        "history_origins": 0,
+        "human_body": 0,
+        "inventions_everyday": 0,
+        "nature_science": 0,
+        "pet_safety": 0,
+        "practical_utility": 17
+      },
+      "cases": [
+        {
+          "id": "POST-158",
+          "fact_count": 6,
+          "copy_chars": 552,
+          "block_chars": 484,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-159",
+          "fact_count": 6,
+          "copy_chars": 606,
+          "block_chars": 538,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-160",
+          "fact_count": 6,
+          "copy_chars": 615,
+          "block_chars": 547,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-161",
+          "fact_count": 6,
+          "copy_chars": 524,
+          "block_chars": 456,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-162",
+          "fact_count": 6,
+          "copy_chars": 640,
+          "block_chars": 572,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-163",
+          "fact_count": 5,
+          "copy_chars": 559,
+          "block_chars": 491,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-164",
+          "fact_count": 6,
+          "copy_chars": 557,
+          "block_chars": 489,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-165",
+          "fact_count": 6,
+          "copy_chars": 666,
+          "block_chars": 598,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-166",
+          "fact_count": 6,
+          "copy_chars": 631,
+          "block_chars": 563,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-167",
+          "fact_count": 6,
+          "copy_chars": 572,
+          "block_chars": 504,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-168",
+          "fact_count": 6,
+          "copy_chars": 659,
+          "block_chars": 591,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-169",
+          "fact_count": 5,
+          "copy_chars": 578,
+          "block_chars": 510,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-170",
+          "fact_count": 7,
+          "copy_chars": 560,
+          "block_chars": 492,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-171",
+          "fact_count": 7,
+          "copy_chars": 728,
+          "block_chars": 660,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-172",
+          "fact_count": 7,
+          "copy_chars": 533,
+          "block_chars": 465,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-173",
+          "fact_count": 6,
+          "copy_chars": 518,
+          "block_chars": 450,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-174",
+          "fact_count": 6,
+          "copy_chars": 595,
+          "block_chars": 527,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        },
+        {
+          "id": "POST-175",
+          "fact_count": 6,
+          "copy_chars": 537,
+          "block_chars": 469,
+          "cta_chars": 51,
+          "cta_lines": 1,
+          "placement": {
+            "kind": "after_facts"
+          }
+        }
+      ]
+    }
+  },
+  "raw_records": 176,
+  "unique_account_ids": 172,
+  "exact_unique_content_bodies": 171,
+  "exact_duplicate_groups": [
+    [
+      "curious_mind/POST-016@16",
+      "curious_mind/POST-016@20"
+    ],
+    [
+      "curious_mind/POST-017@17",
+      "curious_mind/POST-017@21"
+    ],
+    [
+      "curious_mind/POST-018@18",
+      "curious_mind/POST-018@22"
+    ],
+    [
+      "curious_mind/POST-019@19",
+      "curious_mind/POST-019@23"
+    ],
+    [
+      "curious_mind/POST-047@47",
+      "curious_mind/POST-052@52"
+    ]
+  ],
+  "matrix_sha256": "b7b05fa2cb64748581359a483b199a437d5d47a657301e088d367fe01f7c9e3c"
+}

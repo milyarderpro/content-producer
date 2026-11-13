@@ -1,5 +1,16 @@
 # Trivia content DNA — editorial decisions
 
+## Apply the current config branch first (CR-062)
+
+For config2, read [the generic profile workflow](formats.md) and the exact pinned
+catalog guidance/examples before using this reference. Its global counts,
+five-format/two-density list, default hook, single-goal CTA, legacy budget/loop
+formula and shock-heavy example selection are **config1 fallback only**.
+Config2 review follows its resolved profile: medium/context facts can earn their
+place, CTA may combine invitations, and new registered keys need no code switch.
+Shared source-meaning, semantic dedup, scope, repair and readback safeguards below
+still apply. Older atlas cards are optional aids, never the config2 authority.
+
 ## Authority and scope
 
 Apply only to the enabled `trivia` niche. CR-061 updates the writer's obligations
@@ -11,7 +22,7 @@ Minor style preferences after the writing standard is met remain nonblocking.
 Explicit user intent and current Page/item config control subject, count, format,
 layout and hard budgets. Never change them to imitate an example. Five drafts
 means five posts, not five facts per post. Respect a legitimate explicit fixed
-count. When config permits, prefer 7–8 fast facts or 5–6 utility facts.
+count. For config1, when config permits, prefer 7–8 fast facts or 5–6 utility facts.
 The 65–85-word target is a preference, not a minimum: never pad a short reveal.
 
 Read [formats](formats.md), [fact checking](fact-checking.md),
@@ -20,7 +31,8 @@ The [core workflow](../../core/workflow.md) owns authorization, scope and lifecy
 Frozen authority remains `plans/trivia-content-dna.md` and
 `plans/module-contract.md`, with CR-061's limited editorial overrides.
 The reference-patterns atlas provides complete examples; read its index and two
-relevant cards plus a relevant anti-example before composing. Examples teach
+relevant cards plus a relevant anti-example before composing in config1;
+config2 uses its own selected profile definitions/examples. Examples teach
 decisions, not reusable production text.
 
 ## What the reader should experience
@@ -58,7 +70,7 @@ medical advice; utility is not automatically a safety lecture; animal emotion
 must remain grounded in observed behavior. Do not escape a difficult requested
 history/body/place topic by switching to animals or space.
 
-Allowed `topic_key` values: `animals`, `pet_safety`, `food_science`,
+Config1 legacy `topic_key` values: `animals`, `pet_safety`, `food_science`,
 `food_storage_home`, `practical_utility`, `human_body`, `nature_science`,
 `geography`, `history_origins`, `inventions_everyday`, `general_trivia`.
 A mixed collection needs an understandable umbrella and an honest active-format
@@ -123,7 +135,7 @@ stacked hedging, filler, fake shock, unsupported superlatives and assumed animal
 motives. Follow Page casing/emoji settings. Do not replace source precision
 with a catchy but false analogy.
 
-Default hook: `Did you know?`. Plain fact lines separated by blank lines and
+Config1 default hook: `Did you know?`. Plain fact lines separated by blank lines and
 one short CTA. Honor an explicit title/layout. Choose save for practical value,
 share for relevance to another person, comment for a real choice, follow for a
 coherent series. Avoid stiff CTAs that ask people to share "group behaviors."

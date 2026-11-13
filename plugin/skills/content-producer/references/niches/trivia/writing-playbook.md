@@ -1,5 +1,16 @@
 # Trivia writing playbook — finish the card before Write
 
+## Apply the current config branch first (CR-062)
+
+For config2, read [the generic profile workflow](formats.md) and the exact pinned
+catalog guidance/examples before using this reference. Its global counts,
+five-format/two-density list, default hook, single-goal CTA, legacy budget/loop
+formula and shock-heavy example selection are **config1 fallback only**.
+Config2 review follows its resolved profile: medium/context facts can earn their
+place, CTA may combine invitations, and new registered keys need no code switch.
+Shared source-meaning, semantic dedup, scope, repair and readback safeguards below
+still apply. Older atlas cards are optional aids, never the config2 authority.
+
 Use with [content DNA](content-dna.md), the [pattern index](reference-patterns.md),
 [formats](formats.md), [fact checking](fact-checking.md),
 [dedup](dedup-ontology.md) and [core workflow](../../core/workflow.md).
@@ -16,9 +27,10 @@ Resolve owner scope, Page, enabled niche, requested draft count and theme.
 Read generation context for allowed topics/formats, fact count and budgets.
 Five drafts means five plan items; it does not imply `fixed: 5` facts.
 Honor explicit fixed count/title/layout and the current item config.
-Prefer 7–8 fast facts or 5–6 utility facts only when allowed.
+For config1, prefer 7–8 fast facts or 5–6 utility facts only when allowed.
+Config2 follows its resolved density/count preferences instead.
 
-Before choosing the angle, read DNA and the pattern index. Before composing,
+For config1, before choosing the angle, read DNA and the pattern index. Before composing,
 read two relevant cards and one relevant anti-example. If only one card uses
 the exact format, choose a second by reader payoff or voice; keep the requested
 subject and valid format. Do not copy the example's facts, sequence or count.
@@ -153,7 +165,7 @@ not a substitute for a missing boundary. Do this after the last shortening,
 not only on an earlier draft. Define an unfamiliar named product or object
 on its line; a proper name plus a vague word such as icon is not a reveal.
 
-Default to the literal `Did you know?`, plain lines with blank lines, and one
+For config1, default to the literal `Did you know?`, plain lines with blank lines, and one
 natural CTA. Do not append a teaser or substitute a subject title merely
 because the prompt names a topic. Honor an explicitly requested title/layout.
 Correct myths directly without a repeated label parade. Follow explicit
@@ -172,8 +184,8 @@ not a nicer version shown only in chat.
 
 ### Submission audit — including previews
 
-Do a reader audition before counting: place the complete draft beside the two
-selected example cards and compare concrete reveals, changes of payoff and the
+Do a reader audition before counting: place the complete draft beside the selected
+profile examples (two atlas cards for config1) and compare concrete reveals, changes of payoff and the
 ending. Identify the weakest line. If it is a definition, routine processing,
 vague ancient origin, ordinary adoption or design-upgrade connective tissue,
 replace the selection rather than just its adjectives. A single lighter line

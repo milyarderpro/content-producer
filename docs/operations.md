@@ -23,7 +23,8 @@ dan [bukti host/cleanup QA](../openspec/changes/archive/2026-11-05-cutover-trivi
 | Komponen             | Yang dapat dirujuk sekarang                                                                                                                                      | Batas bukti                                                                                        |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | Source yang ditinjau | Backend exact G4 `37fbbbeb0a0c628d9c5e628b21b5f804a4df9501`; source paket/QA `352347c420fa389212718010b4c9d835064f0ff9` | Selisih keduanya hanya laporan/checklist; bukti pada laporan cutover 4 November 2026 |
-| Paket plugin | PRIVATE Content Producer **0.5.7**, release `QA-RELEASE-10c52114aae7`; source kandidat `8069bb1bfd03316700e0dca9cfb4c6c8e880229a`, readback 15 source files + overlay sesuai | LIVE retest 6 November 2026: **10/10 D6 PASS sesudah repair terarah**, lima format dan output batch lulus; plan tetap completed 5/5. [Laporan/batas bukti](editorial/reference-dna-d6-retest-0.5.7-2026-11-06.md). PR #137 OPEN/CI PASS; Issue #134–#136 closed. FAIL lama tetap historis; tidak mengklaim first-pass atau factual certification baru |
+| Paket plugin, readback 13 November | PRIVATE Content Producer **0.5.8**, plugin yang sama; 15/15 file runtime dan compatibility overlay cocok melalui Plugin Creator. [Hasil task 8](editorial/configurable-profiles/task-8-results.md) | Scope source/package + readback release; identity, audience dan koneksi mcpku2 tetap. Refresh/chat baru, backend config2, G4, layout serta LIVE config2 belum diuji/deploy pada task ini. Bukti 0.5.7 di bawah tetap historis |
+| Paket plugin historis 6 November | PRIVATE Content Producer **0.5.7**, release `QA-RELEASE-10c52114aae7`; source kandidat `8069bb1bfd03316700e0dca9cfb4c6c8e880229a`, readback 15 source files + overlay sesuai | LIVE retest 6 November 2026: **10/10 D6 PASS sesudah repair terarah**, lima format dan output batch lulus; plan tetap completed 5/5. [Laporan/batas bukti](editorial/reference-dna-d6-retest-0.5.7-2026-11-06.md). PR #137 OPEN/CI PASS; Issue #134–#136 closed. FAIL lama tetap historis; tidak mengklaim first-pass atau factual certification baru |
 | Edge `mcp` | **v37**, verify_jwt=false; 24/24 file bundle provider identik kandidat backend pada rilis 4 November 2026 | Bukti task 5.2; tidak redeploy pada sesi QA task 5.4 |
 | Database | **85 migration**, latest `20261103072943`; seluruh konten owner final nol setelah reset dan cleanup QA | LIVE 4 November 2026; akun/workspace/4 Page/config dan 5 ledger Page tetap |
 | Gate historis CR-049 | Kandidat `1a4e755a48f3c77eb557b931fd6bd99d5e1b24fd`, [run 39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314)                | Record pada CR-049; jangan menempelkan exact-SHA PASS tersebut ke HEAD yang berbeda                |
@@ -97,8 +98,9 @@ perlu membuat plugin atau koneksi kedua.
   adalah legacy CR-020/044 (termasuk urutan focused OAuth/owner dan Inspector).
   **Setelah merge**, gunakan **CR-052 G4 release gate manual exact-SHA** dari
   `main` dengan committed exact config: source/frontend, dua stack terisolasi
-  (**satu reset per shard**), MCP/Inspector 31 valid/31 invalid serta lima nama
-  v1 absen/ditolak dan owner denial di shard 1, DB **33 file/132 kasus**,
+  (**satu reset per shard**), MCP **18 file/130 kasus**, Inspector **33 valid/33 invalid**
+  serta lima nama v1 absen/ditolak dan owner denial di shard 1, DB **33 file/238 kasus**
+  untuk kandidat CR-062 (angka cutover CR-059 sebelumnya historis),
   audit, migration history/DB lint, **advisors terpisah**, cleanup, dan
   **aggregate PASS** pada SHA final; cek URL serta report aman secara manual
   sesuai [prosedur §9](#9-release-gate-g4-manual-dan-rollback-issue-104).
@@ -320,9 +322,10 @@ Lokal pada SHA sama **PASS 18m50s** seluruh tahap tetapi label
    **committed exact config**, tanpa overlay.
 3. Terima release evidence hanya jika source/frontend, kedua
    database shard 15+18 dan **aggregate PASS** di SHA tepat, report
-   lengkap dan hash cocok; total DB 33/132 tanpa skipped, MCP 17/114,
-   Inspector 31 valid/31 invalid + lima nama v1 absen/ditolak + owner denial
-   untuk kandidat cutover, migration/history,
+   lengkap dan hash cocok; untuk kandidat CR-062 total DB **33 file/238 kasus**
+   (15+18 file, 158+80 kasus) tanpa skipped, MCP **18 file/130 kasus**,
+   Inspector **33 valid/33 invalid** + lima nama v1 absen/ditolak + owner denial.
+   Angka cutover CR-059 33/132, 17/114 dan 31/31 tetap historis. Migration/history,
    DB lint **dan local security advisors terpisah**, audit katalog
    RLS/grant/default ACL/fixture before/after/final serta cleanup
    semuanya PASS. Simpan hanya laporan teredaksi/artifact aman.

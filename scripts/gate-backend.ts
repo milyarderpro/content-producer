@@ -2,15 +2,14 @@ import { readFileSync } from 'node:fs';
 import { assertEquivalentRuntimeEvidence } from './runtime-range.js';
 import {
   main,
+  assertExactDatabaseCaseCount,
   validateManifest,
   validateShards,
   validateShardProofs,
   validateSingleMcpInspector,
 } from './gate-runner.js';
 
-export function assertExactDatabaseCaseCount(count: number): void {
-  if (count !== 132) throw new Error('SHARD_CASE_COUNT_MISMATCH');
-}
+export { assertExactDatabaseCaseCount } from './gate-runner.js';
 
 function aggregate(args: string[]): void {
   type SafeStage = { name: string; status: string; count?: string };

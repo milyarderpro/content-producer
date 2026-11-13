@@ -16,6 +16,12 @@ Supabase 2.120.0 yang diperiksa; penulisan panduan tidak menjalankan database at
 deployment. Semua command di bawah dijalankan dari root repository, kecuali jika
 disebutkan lain.
 
+**Kandidat CR-062 (13 November 2026):** source lokal menambah dua facade katalog
+owner OAuth dan dukungan config2 pada schema MCP. [Kontrak MCP editorial](contracts/trivia-editorial-mcp.md)
+serta [hasil task 7](editorial/configurable-profiles/task-7-results.md) memuat
+scope dan batas buktinya. Catatan baseline 31 tool di atas tetap historis;
+versi CLI/dependency tidak dinaikkan untuk perubahan ini.
+
 ## 1. Prasyarat sesuai pekerjaan
 
 | Alat              | Versi/acuan                                                   | Kapan diperlukan                                               |
@@ -251,7 +257,7 @@ keputusan kontraknya sebelum mengedit.
    `generation_snapshot` bukan field yang dibuka read tersebut.
 3. Tentukan regresi pada [post_base_test.ts](../supabase/functions/mcp/post_base_test.ts),
    [api-read-rpcs.test.ts](../supabase/tests/database/api-read-rpcs.test.ts), dan
-   [api-source-evidence-mcp-compat.test.ts](../supabase/tests/database/api-source-evidence-mcp-compat.test.ts)
+   [api-trivia-v2-save.test.ts](../supabase/tests/database/api-trivia-v2-save.test.ts)
    yang relevan. Periksa owner denial, opsi include_sources/checks, ukuran hasil,
    dan pelestarian nested `null`.
 4. Perubahan RPC dilakukan melalui migration baru dan mengikuti kategori business
@@ -271,7 +277,7 @@ keputusan kontraknya sebelum mengedit.
    helpers. Menambahkan nama di config saja belum membuat format diterima.
 3. Perbarui instruksi/rubric niche dan fixture renderer yang relevan. Titik awal
    regresi adalah [plugin-trivia.test.ts](../tests/plugin-trivia.test.ts),
-   [api-post-render-quality.test.ts](../supabase/tests/database/api-post-render-quality.test.ts),
+   [core-primitives-and-validators.test.ts](../supabase/tests/database/core-primitives-and-validators.test.ts),
    dan [post-render-v1.json](../supabase/tests/database/fixtures/post-render-v1.json).
 4. Pastikan data lama tetap terbaca, makna fakta tetap terjaga, dan batas efektif
    sesuai config serta validator aktif. Perubahan aturan SQL/renderer membutuhkan

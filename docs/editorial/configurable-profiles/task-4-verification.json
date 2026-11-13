@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-12",
+  "evidence": "LOCAL/FIXTURE; not release or LIVE",
+  "base_source_sha": "c02c5413479cebf50f39abc10149fafca757611a",
+  "candidate": "base SHA plus working file hashes; no new commit",
+  "checks": {
+    "database": {
+      "status": "PASS",
+      "files": 4,
+      "cases": 73,
+      "new_renderer_cases": 31,
+      "skipped": 0,
+      "duration_seconds": 126.29
+    },
+    "source": {
+      "status": "PASS",
+      "files": 14,
+      "cases": 184
+    },
+    "frontend": {
+      "status": "PASS",
+      "cases": 19
+    },
+    "db_lint_errors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "local_security_advisors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "migration_history": {
+      "status": "PASS",
+      "count": 90,
+      "exact": true
+    },
+    "acl_cleanup": {
+      "status": "PASS",
+      "helpers": 4,
+      "definitions": 0,
+      "config2_rows": 0,
+      "api_signatures": 33,
+      "caller_helpers": 0,
+      "catalog_states": 0,
+      "renderer_fixture_workspaces": 0
+    },
+    "legacy": {
+      "status": "PASS",
+      "rendered_payload_sha256": "d70383d39a1c7bcb29d0d82694cfb7f2ff964c71a0806a6e936df69ac3b0a6ba",
+      "function_hashes": {
+        "post_hash_v2": "2a530305085ccf3c1b78bfc4da9ce1008b8be9e1a5ebac0a3446a6d9fee237b6",
+        "post_render_v1": "39d82659cac4cd6042707f317a34854f657a93b7ad20f2c0486b1cce047f517f",
+        "post_render_v2": "cd523245aeeca73c8b38ab5891506d777cafd952ffd302e3c5da800bc989516d"
+      }
+    },
+    "frozen_task1": {
+      "status": "PASS"
+    },
+    "openspec_strict": {
+      "status": "PASS"
+    }
+  },
+  "initial_database_run": {
+    "passed": 69,
+    "failed": 3,
+    "duration_seconds": 109.95,
+    "resolved_by": "additive config2 text normalizer migration; valid OAuth client_id fixture; privacy regressions added"
+  },
+  "files": [
+    {
+      "path": "supabase/migrations/20261112131501_add_trivia_config2_renderer.sql",
+      "sha256": "193dc10af68e437b3fff2b13ec8ba9f06531206a9162ff26fd1e69313acbd51a"
+    },
+    {
+      "path": "supabase/migrations/20261112132449_isolate_config2_text_normalization.sql",
+      "sha256": "adf52da9abb679b378e736ea8e015d6dba3cde126bad782e0767aee818aab562"
+    },
+    {
+      "path": "supabase/tests/database/core-primitives-and-validators.test.ts",
+      "sha256": "6673ee88950ea7130821a1812f3890dfe7a0d75783d4cb8aac2b3861b37664cf"
+    },
+    {
+      "path": "docs/contracts/trivia-render-config2.md",
+      "sha256": "c44b197945784820e76ff358ec3a56c5e78b9fd07668aefef9ece48d21eb9976"
+    },
+    {
+      "path": "docs/contracts/unicode-license.txt",
+      "sha256": "e7a93b009565cfce55919a381437ac4db883e9da2126fa28b91d12732bc53d96"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-4-results.md",
+      "sha256": "02ca367c7865c95ef38baf0d7783264ea2c12482833b3543150350836a3800c1"
+    }
+  ],
+  "not_run": [
+    "Actions",
+    "formal G4 exact-SHA",
+    "config2 save/revise/snapshot/lifecycle/plan integration",
+    "MCP facade",
+    "plugin consumption",
+    "visual template QA",
+    "deployment",
+    "LIVE"
+  ]
+}

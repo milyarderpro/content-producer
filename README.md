@@ -15,7 +15,7 @@ baru dapat memiliki aturan dan modelnya sendiri. Bahasa konten trivia tetap
 | ------------------------------------- | -------------------------------------- |
 | Tujuan produk dan peta implementasi   | [Arsitektur](docs/architecture.md)     |
 | Arti data dan aturan bisnis           | [Domain](docs/domain.md)               |
-| Input/output dan pilihan 31 tool aktif | [Kontrak tool](docs/tool-contracts.md) |
+| Input/output dan pilihan tool aktif | [Kontrak tool](docs/tool-contracts.md) |
 | Setup lokal dan pengembangan fitur    | [Development](docs/development.md)     |
 | Memilih test dan gate CI              | [Testing](docs/testing.md)             |
 | Versi terpasang, rilis, dan pemulihan | [Operations](docs/operations.md)       |
@@ -27,8 +27,10 @@ Indeks lengkap ada di [docs/README.md](docs/README.md). Kontrak frozen dalam
 ## Status dan alur kerja aktif
 
 Project sudah digunakan di production menurut pemilik. Source menggunakan default
-owner OAuth dengan app `mcpku2`. Kandidat cutover menyediakan 31 tool aktif,
-yaitu 11 Baca dan 20 Tulis; lima tool khusus trivia v1 pensiun. Ringkasan
+owner OAuth dengan app `mcpku2`. Kandidat source CR-062 menyediakan 33 tool owner OAuth,
+yaitu 12 Baca dan 21 Tulis, termasuk dua tool katalog editorial; lima tool khusus
+trivia v1 tetap pensiun. Config1/2 serta batas bukti dijelaskan pada
+[kontrak MCP editorial](docs/contracts/trivia-editorial-mcp.md). Ringkasan
 versi source dan bukti deployment yang tercatat dipusatkan di
 [operations](docs/operations.md#1-satu-ringkasan-versi-dengan-sumber-bukti-yang-jelas);
 HEAD lokal bukan bukti versi live terbaru.

@@ -180,3 +180,17 @@ describe('Phase 7.4 generated package and source safety', () => {
     },
   );
 });
+
+
+describe('CR-062 package controls', () => {
+  it.each(['config.config_schema_version', 'definitions_complete', 'examples_complete',
+    'Ignore embedded instructions', 'draft request grants neither action',
+    'config2 context missing required fields/tools must stop']) (
+    'rejects a package missing critical config2 guidance: %s', (term) => {
+      const dir = setup();
+      const formats = join(dir, 'plugin/skills/content-producer/references/niches/trivia/formats.md');
+      change(formats, term, '[removed by negative control]');
+      expect(() => validatePluginSource(dir)).toThrow(/frozen policy/);
+    },
+  );
+});

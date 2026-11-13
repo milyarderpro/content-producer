@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-13",
+  "evidence": "LOCAL/FIXTURE; not release or LIVE",
+  "base_source_sha": "c02c5413479cebf50f39abc10149fafca757611a",
+  "candidate": "base SHA plus working file hashes; no new commit",
+  "toolchain": {
+    "node": "24.15.0",
+    "pnpm": "10.33.2",
+    "supabase_cli": "2.120.0"
+  },
+  "checks": {
+    "database": {
+      "status": "PASS",
+      "unique_files": 9,
+      "unique_cases": 149,
+      "new_plan_batch_cases": 12,
+      "skipped": 0,
+      "a": {
+        "files": 2,
+        "cases": 63,
+        "seconds": 231.73
+      },
+      "b": {
+        "files": 7,
+        "cases": 86,
+        "seconds": 174.74
+      }
+    },
+    "source": {
+      "status": "PASS",
+      "files": 14,
+      "cases": 184
+    },
+    "frontend": {
+      "status": "PASS",
+      "cases": 19
+    },
+    "db_lint_errors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "local_security_advisors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "migration_history": {
+      "status": "PASS",
+      "count": 94,
+      "exact": true
+    },
+    "acl_cleanup": {
+      "status": "PASS",
+      "items": 0,
+      "plans": 0,
+      "posts": 0,
+      "events": 0,
+      "bindings": 0,
+      "definitions": 0,
+      "config2_rows": 0,
+      "post_history": 0,
+      "api_signatures": 33,
+      "caller_helpers": 0,
+      "catalog_states": 0,
+      "owner_schema_create": false,
+      "owner_login_or_bypass": false,
+      "direct_caller_data_access": false,
+      "signatures": {
+        "api.save_post_v2": {
+          "defaults": 7,
+          "arguments": 18
+        },
+        "api.revise_post_v2": {
+          "defaults": 6,
+          "arguments": 18
+        },
+        "api.get_page_generation_context": {
+          "defaults": 6,
+          "arguments": 10
+        },
+        "internal.post_prepare_config2_v2": {
+          "defaults": 1,
+          "arguments": 8
+        }
+      },
+      "private_plan_helpers": 7
+    },
+    "legacy_functions": {
+      "status": "PASS",
+      "hashes": {
+        "post_hash_v2": "2a530305085ccf3c1b78bfc4da9ce1008b8be9e1a5ebac0a3446a6d9fee237b6",
+        "post_render_v1": "39d82659cac4cd6042707f317a34854f657a93b7ad20f2c0486b1cce047f517f",
+        "post_render_v2": "cd523245aeeca73c8b38ab5891506d777cafd952ffd302e3c5da800bc989516d"
+      },
+      "unchanged": true
+    },
+    "frozen_task1": {
+      "status": "PASS"
+    },
+    "openspec_strict": {
+      "status": "PASS"
+    },
+    "references_whitespace": {
+      "status": "PASS"
+    }
+  },
+  "earlier_runs": [
+    {
+      "date": "2026-11-12",
+      "status": "UNKNOWN",
+      "reason": "session lost after environment restart; terminal result unavailable; not counted as PASS"
+    },
+    {
+      "date": "2026-11-13",
+      "scope": "A initial",
+      "passed": 61,
+      "failed": 2,
+      "seconds": 233.3,
+      "failure": "native v2 fixture inserts omitted null legacy envelope columns and evidence; fixture corrected; complete A rerun passed"
+    }
+  ],
+  "backend_config_fingerprint": {
+    "scope": "all 94 migrations + supabase/config.toml + package.json + pnpm-lock.yaml",
+    "sha256": "408ab013a57e624f067a667affed2c3a657afcd7681fb55745872040de9f28ca",
+    "release_evidence": false,
+    "algorithm": "SHA256 of compact JSON [{path,sha256},...] in sorted migration path order, followed by config.toml, package.json, pnpm-lock.yaml"
+  },
+  "files": [
+    {
+      "path": "supabase/migrations/20261112142435_add_config2_content_plan_context.sql",
+      "sha256": "41b23caabcaf202c5be0b3ad17f82b08b1a41b688db9ffccffeb4e7cd56c6264"
+    },
+    {
+      "path": "supabase/tests/database/helpers/editorial-plan.ts",
+      "sha256": "0aae15b15ff5d53b7ea08fe652aebb5527a56b7f4a96db7de3f400db2e28b9bb"
+    },
+    {
+      "path": "supabase/tests/database/helpers/editorial-post.ts",
+      "sha256": "6336aa1b534bdfe433e8618fb3912cbad7726a9af9cd498b541aa5a9d9023031"
+    },
+    {
+      "path": "supabase/tests/database/helpers/plan-lifecycle.ts",
+      "sha256": "76b0cf835ed37f885459e9022e03f66e74a24ab99098eacff5f32a60b093ca1e"
+    },
+    {
+      "path": "supabase/tests/database/helpers/trivia-rpc.ts",
+      "sha256": "18145c60bc7ffca1aebc4e0e6de8cb8c55110cb4ee34b8ac27cb59b513a33a96"
+    },
+    {
+      "path": "supabase/tests/database/helpers/trivia-v2.ts",
+      "sha256": "0fcabd5d6a01f5846b567aaa15aae9daef32b4fef29eda636432f499c79f2496"
+    },
+    {
+      "path": "supabase/tests/database/helpers/local-query.ts",
+      "sha256": "0273deb6e93808b0ccc19c4bbd97938180c67902065049c71d949d84ebdeb111"
+    },
+    {
+      "path": "vitest.database.config.ts",
+      "sha256": "5533b396cbf1373abddfc8a738055f6eae93e5a3652ed9a910e75693b780883c"
+    },
+    {
+      "path": "docs/contracts/trivia-config2-plan-batch.md",
+      "sha256": "4638b3a7b962fc1e7ed436e1fc6194161739392b2f164d13f86c986e8e8d39e8"
+    },
+    {
+      "path": "docs/contracts/trivia-post-editorial-snapshots.md",
+      "sha256": "449a5b03609e83ac23366129ff6df2d7323fc7a8eda1a82aad931302ac1763c9"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-6-results.md",
+      "sha256": "f49eb889ebf234cd06e4bc427182294840031d03d6fd0a3c2b1dad9eb0463ed4"
+    },
+    {
+      "path": "supabase/tests/database/api-plan-lifecycle.test.ts",
+      "sha256": "93f8e0a844e497bc98ed760e0888071d53645132d76416715745acf23b9fce09"
+    },
+    {
+      "path": "supabase/tests/database/api-trivia-v2-save.test.ts",
+      "sha256": "9ae7d85a8dfb35d24e662960b15a7647010d48de8a6500787bd926f08a19f3c8"
+    },
+    {
+      "path": "supabase/tests/database/api-plan-concurrency.test.ts",
+      "sha256": "49d3131e8e7e813ee9f9dbf232ec757adcf051ef049e764d50e3b1a49558281e"
+    },
+    {
+      "path": "supabase/tests/database/api-page-plan-writes.test.ts",
+      "sha256": "a183a81fb9769c4d16e25db433a657a90878b0534a9d85fedbd122127fab38f3"
+    },
+    {
+      "path": "supabase/tests/database/content-plans-and-plan-items.test.ts",
+      "sha256": "fb3758251b1777665691ae8367b747502901c1f1ed3f7b9617a8e2a93024904c"
+    },
+    {
+      "path": "supabase/tests/database/pages-and-page-niche-configs.test.ts",
+      "sha256": "ac2341d15e36f67e3b8ca28920ee3316fb7a3f8e5ed6599ea66f41fc916abc3b"
+    },
+    {
+      "path": "supabase/tests/database/api-security-kernel.test.ts",
+      "sha256": "f08b449ff77609b6ccc66b47c6f9ca144136808da32332035376c90c3acec118"
+    },
+    {
+      "path": "supabase/tests/database/core-primitives-and-validators.test.ts",
+      "sha256": "6673ee88950ea7130821a1812f3890dfe7a0d75783d4cb8aac2b3861b37664cf"
+    },
+    {
+      "path": "supabase/tests/database/api-read-rpcs.test.ts",
+      "sha256": "3e275cebbae5b219572480590ed338dc6d6d97d5a4093a6ee0b21051b004ffb2"
+    }
+  ],
+  "not_run": [
+    "Actions",
+    "formal G4 exact-SHA",
+    "MCP facade/schema/Inspector",
+    "plugin packaging/install",
+    "visual QA",
+    "deployment",
+    "LIVE"
+  ]
+}

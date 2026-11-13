@@ -37,6 +37,8 @@ export const errorTaxonomy = {
       'RESERVATION_REQUIRED',
     ],
     state_conflict: [
+      'EDITORIAL_CATALOG_CONFLICT',
+      'EDITORIAL_DEFINITION_UNAVAILABLE',
       'WORKSPACE_NOT_FOUND',
       'PAGE_NOT_FOUND',
       'MODULE_NOT_FOUND',
@@ -137,6 +139,16 @@ export const errorTaxonomy = {
   ],
   write_codes: ['OPERATION_KEY_REUSED', 'PILOT_WRITE_LOCKED'],
   groups: [
+    {
+      name: 'editorial_catalog',
+      reads: ['get_trivia_editorial_catalog'],
+      writes: ['update_trivia_editorial_catalog'],
+      domain_codes: [
+        'EDITORIAL_CATALOG_CONFLICT',
+        'EDITORIAL_DEFINITION_UNAVAILABLE',
+        'VALIDATION_FAILED',
+      ],
+    },
     {
       name: 'foundation',
       reads: [

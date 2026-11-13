@@ -1,5 +1,16 @@
 # Output contract
 
+For config2, preserve the server's exact CTA placement and LF, including CTA
+between facts, optional action labels, numbering and up to 12 fact positions.
+Preserve the nullable goal. Do not force CTA to the end or synthesize a primary
+interaction goal when null.
+Show DNA profile exact reference/version/hash, separate density key, resolved
+rules hash and plan/item provenance when present, using authoritative snapshot3
+readback. Historical snapshot2/config1 is not upgraded to the latest profile.
+Keep definitions/examples/internal metadata out of public copy. Server metrics
+are authoritative; config2 reading-time/loop advisories are not global gates.
+Registered profile/format/topic keys are data, not a fixed UI list.
+
 For v2, a successful save_post_v2 summary followed by matching get_post readback proves a saved **draft**; after revise_post_v2, read back that same post. Match Page/facts/URLs/copy/status/revision/hash/checks. A locally composed preview is **unsaved**; a lost tool response is **unconfirmed** until reconciliation/replay and readback. HTTP 200 or host approval is not proof of persistence. A separate successful approve_post for the exact reviewed revision/hash establishes ready.
 
 ## CANVA COPY

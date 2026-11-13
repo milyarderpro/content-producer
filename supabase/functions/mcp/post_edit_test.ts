@@ -216,10 +216,10 @@ response.reschedule_post = {
 };
 
 Deno.test(
-  '6.10: post-edit schemas remain closed among 31 OAuth tools with destructive annotations',
+  '6.10: post-edit schemas remain closed among 33 OAuth tools with destructive annotations',
   async () => {
     const tools = (await mcp('tools/list')).result.tools;
-    check(MCP_TOOL_COUNT === 31 && tools.length === 31, 'EXACT_36');
+    check(MCP_TOOL_COUNT === 33 && tools.length === 33, 'EXACT_36');
     for (const name of POST_EDIT_TOOL_NAMES) {
       const tool = tools.find((x: { name: string }) => x.name === name);
       check(tool?.inputSchema.additionalProperties === false, 'CLOSED_INPUT');

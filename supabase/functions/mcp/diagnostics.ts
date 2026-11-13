@@ -4,7 +4,7 @@ type FieldError = { path: string; code: string; message: string };
 const reads = new Set(['get_account_profile', 'get_workspace_context', 'list_pages',
   'get_page_generation_context', 'list_content_plans', 'get_content_plan',
   'trivia_find_similar_facts', 'list_posts', 'get_post', 'get_post_performance',
-  'get_performance_insights', 'trivia_find_similar_facts_v2']);
+  'get_performance_insights', 'trivia_find_similar_facts_v2', 'get_trivia_editorial_catalog']);
 const aliases: Record<string, string> = {
   EDITORIAL_REVIEW_REQUIRED: 'QUALITY_EDITORIAL_INCOMPLETE',
   CONTENT_BUDGET_EXCEEDED: 'TEXT_BUDGET_EXCEEDED',

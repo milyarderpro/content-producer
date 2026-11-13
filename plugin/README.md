@@ -4,11 +4,31 @@
 
 Direktori ini berisi manifest dan instruksi yang digunakan ChatGPT untuk alur
 Content Producer. [plugin.json](plugin.json) menyatakan kandidat source versi
-`0.5.7`; [.app.json](.app.json) memetakan satu app owner OAuth `mcpku2` yang sudah
+`0.5.8`; [.app.json](.app.json) memetakan satu app owner OAuth `mcpku2` yang sudah
 ada. Versi source ini belum membuktikan versi plugin terpasang;
 perubahan source sesudahnya tidak boleh diberi ulang nomor rilis tersebut. Source paket, archive
 kandidat, dan release yang terpasang adalah bukti berbeda; ringkasan bertanggal
 ada di [operations](../docs/operations.md).
+
+## Kandidat 0.5.8 — CR-062 task 8
+
+Config2 membaca definisi/contoh pinned dari context/katalog, lalu memakai aturan
+profil dan Page/item aktual. Tidak ada switch tiga nama preset; format/topik/profil
+baru memakai alur generik. Ilustrasi tiga DNA dan custom blend bukan bank fakta.
+Aturan global lima format/satu tujuan CTA/kuota surprise tidak berlaku pada
+config2; config1 tetap mempunyai fallback historisnya. Dedup >9 calon mengulang
+semua Read bila versi katalog fakta berbeda; context item dan readback menjaga
+CTA LF/placement, nullable goal serta provenance. Katalog bukan izin business Write.
+
+Allowlist tetap 15 file. Hasil SOURCE/FIXTURE, ZIP/hash, kompatibilitas identity
+serta hasil update plugin yang sama melalui Plugin Creator dicatat dalam
+[hasil task 8](../docs/editorial/configurable-profiles/task-8-results.md).
+Readback Plugin Creator pada 13 November 2026 membuktikan release PRIVATE
+**0.5.8** tersimpan pada plugin yang sama: 15/15 file runtime dan compatibility
+overlay cocok; identity, audience, presentation serta app binding tidak berubah.
+Refresh/cache host atau chat baru belum diuji. Build/package dan save release
+tidak membuktikan runtime backend baru atau LIVE.
+Bukti 0.5.7 di bawah adalah historis bertanggal, bukan retest config2.
 
 ## Isi paket dan batasnya
 
@@ -45,8 +65,8 @@ Git. Packaging mengganti kandidat lama pada lokasi itu, memvalidasi source, dan
 menyalin hanya file allowlist; bukan pembuatan ZIP atau instalasi plugin.
 
 Validator/test memeriksa manifest, schema generator, link/path/symlink, larangan
-credential, aturan editorial, dan urutan 31 tool aktif setelah lima nama v1
-dipensiunkan menurut CR-059. Karena
+credential, aturan editorial, dan inventaris 33 tool owner OAuth (31 pada rollback eksplisit), setelah lima
+nama v1 dipensiunkan menurut CR-059 dan dua tool katalog ditambah CR-062. Karena
 itu `plans/tool-inventory.md`, DNA trivia, serta schema legacy tertentu masih
 merupakan dependensi yang harus direkonsiliasi sebelum dipindah/dihapus.
 

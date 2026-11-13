@@ -5,8 +5,9 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
 import { invoke } from './foundation.ts';
 import { metricAnomalyFlags } from './post_metrics.ts';
+import { unicodeText, editorialSnapshot, postEditorialContext } from './editorial_schemas.ts';
 import { triviaConfig } from './schemas.ts';
-import { contentV2, editorialEvidenceV2, systemEvidenceV2, sourceUrlV2 } from './trivia_v2.ts';
+import { contentConfig2Output, contentV2, editorialEvidenceV2, systemEvidenceV2, sourceUrlV2 } from './trivia_v2.ts';
 
 const uuid = z.string().uuid();
 const timestamp = z.string().datetime({ offset: true });
@@ -274,7 +275,7 @@ export const editorialInput = z.strictObject({
     )
     .max(20),
 });
-const postSummary = z.strictObject({
+const postSummary1 = z.strictObject({
   content_schema_version: z.literal(2).optional(),
   post_public_id: uuid,
   page_public_id: uuid,
@@ -290,6 +291,7 @@ const postSummary = z.strictObject({
   hook_preview: z.string().max(120),
   updated_at: timestamp,
 });
+const postSummary = z.union([postSummary1,postSummary1.extend({content_schema_version:z.literal(2),interaction_goal:goal.nullable(),editorial_context:postEditorialContext})]);
 const listInput = z
   .strictObject({
     ...common,
@@ -345,7 +347,7 @@ const legacyPostPackage = z.strictObject({
   created_at: timestamp,
   updated_at: timestamp,
 });
-export const postPackage = z.union([legacyPostPackage, legacyPostPackage.extend({
+const nativePostPackage = legacyPostPackage.extend({
   content_schema_version: z.literal(2),
   content_payload: contentV2.extend({ text_metrics: textMetrics }),
   system_checks: z.union([systemEvidenceV2, z.strictObject({}), z.null()]),
@@ -355,6 +357,13 @@ export const postPackage = z.union([legacyPostPackage, legacyPostPackage.extend(
     source_snapshot: z.strictObject({ schema_version: z.literal(2),
       canonical_claim: z.string().min(1).max(500), source_url: sourceUrlV2 }).optional(),
   })).max(200),
+});
+const config2Metrics = textMetrics.extend({fact_chars:z.array(smallCount).max(12),fact_word_counts:z.array(smallCount).max(12),fact_line_counts:z.array(smallCount).max(12),
+  estimator_version:z.literal(1),line_width_chars:z.literal(34),target_video_seconds:z.literal(13)});
+export const postPackage = z.union([legacyPostPackage,nativePostPackage,nativePostPackage.extend({interaction_goal:goal.nullable(),
+  generation_snapshot:editorialSnapshot,content_payload:contentConfig2Output.extend({text_metrics:config2Metrics}),
+  fact_bindings:z.array(bindingInput.extend({position:z.number().int().min(1).max(12),rendered_text:unicodeText(160),
+    allocation_state:z.enum(['allocated','published','released']),source_snapshot:z.strictObject({schema_version:z.literal(2),canonical_claim:z.string().min(1).max(500),source_url:sourceUrlV2}).optional()})).max(200),
 })]);
 const listOutput = envelope(
   z.strictObject({

@@ -1,0 +1,5642 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "profile": "curious_mind",
+      "id": "POST-001",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        1
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-002",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        2
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-003",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        3
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-004",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        4
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-005",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        5
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [
+        "fact_word_order"
+      ],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-006",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        6
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "teaser_then_follow"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-007",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        7
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "origin_or_history",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-008",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        8
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-009",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        9
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-010",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        10
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-011",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        11
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-012",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        12
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-013",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        13
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-014",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        14
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-015",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        15
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-016",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        16,
+        20
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [
+        "cta_ocr_ambiguous"
+      ],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [],
+        "ambiguity": "OCR: do not infer action",
+        "shape": "ambiguous"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-017",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        17,
+        21
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-018",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        18,
+        22
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [
+        "facts_and_cta_word_order"
+      ],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [],
+        "ambiguity": "OCR: do not infer action",
+        "shape": "ambiguous"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-019",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        19,
+        23
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-020",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        24
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "save"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-021",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        25
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-022",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        26
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [
+        "cta_word_order"
+      ],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [],
+        "ambiguity": "OCR: do not infer action",
+        "shape": "ambiguous"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-023",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        27
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "save"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-024",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        28
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-025",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        29
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-026",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        30
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-027",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        31
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-028",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        32
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-029",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        33
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-030",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        34
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-031",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        35
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-032",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        36
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 10,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-033",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        37
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "origin_or_history",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "teaser_then_follow"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-034",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        38
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "assumption_reversal",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "teaser_then_follow"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-035",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        39
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-036",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        40
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-037",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        41
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "pet_safety",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-042",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        42
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-043",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        43
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "assumption_reversal",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-044",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        44
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-045",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        45
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-046",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        46
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-047",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        47
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-048",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        48
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-049",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        49
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-050",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        50
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-051",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        51
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-052",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        52
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [
+        "exact_content_duplicate_of_POST-047"
+      ],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-053",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        53
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-054",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        54
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "curious_mind",
+      "id": "POST-055",
+      "source_file": "dataset-reference/post-coriousmind.txt",
+      "source_lines": [
+        55
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-055",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        1
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-056",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        2
+      ],
+      "architecture": "themed",
+      "format_key": "myth_vs_fact",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "assumption_reversal"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-057",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        3
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [
+        "cta_before_final_fact"
+      ],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_fact",
+          "position": 6
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-058",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        4
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-059",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        5
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "consequence"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment",
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-060",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        6
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "practical_utility",
+      "mechanisms": [
+        "concrete_explanation",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment",
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-061",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        7
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "practical_utility",
+      "mechanisms": [
+        "everyday_oddity",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment",
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-062",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        8
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-063",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        9
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-064",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        10
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [
+        "surface_OCR_la_and_l_egg"
+      ],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-065",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        11
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-066",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        12
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-067",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        13
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-068",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        14
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-069",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        15
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "tag"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-070",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        16
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [
+        "egg_subheading_excluded_from_facts"
+      ],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-071",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        17
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-072",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        18
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-073",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        19
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-074",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        20
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "practical_utility",
+      "mechanisms": [
+        "concrete_explanation",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-075",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        21
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [],
+        "ambiguity": "emoji_target_unspecified: no forced comment/react classification",
+        "shape": "ambiguous"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-076",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        22
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [],
+        "ambiguity": "emoji_target_unspecified: no forced comment/react classification",
+        "shape": "ambiguous"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-077",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        23
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-078",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        24
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-079",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        25
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "practical_utility",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "everyday_oddity",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-080",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        26
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-081",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        27
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "practical_utility",
+      "mechanisms": [
+        "concrete_explanation",
+        "everyday_oddity",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [
+        "engagement_null"
+      ],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-082",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        28
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-083",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        29
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-084",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        30
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [
+        "architecture_adjudicated: airport collections / wood+fungi / body theme; raw label retained"
+      ],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-085",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        31
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-086",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        32
+      ],
+      "architecture": "single_subject",
+      "format_key": "emotional_animal_collection",
+      "topic_key": "animals",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity",
+        "recognizable_behavior"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-087",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        33
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "consequence"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-088",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        34
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "practical_utility",
+      "mechanisms": [
+        "concrete_explanation",
+        "everyday_oddity",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-089",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        35
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-090",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        36
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 11,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-091",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        37
+      ],
+      "architecture": "themed",
+      "format_key": "emotional_animal_collection",
+      "topic_key": "animals",
+      "mechanisms": [
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity",
+        "recognizable_behavior"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 10,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-092",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        38
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 10,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-093",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        39
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-094",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        40
+      ],
+      "architecture": "themed",
+      "format_key": "emotional_animal_collection",
+      "topic_key": "animals",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity",
+        "recognizable_behavior"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 5,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-095",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        41
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-096",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        42
+      ],
+      "architecture": "single_subject",
+      "format_key": "emotional_animal_collection",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity",
+        "recognizable_behavior"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-097",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        43
+      ],
+      "architecture": "single_subject",
+      "format_key": "emotional_animal_collection",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity",
+        "recognizable_behavior"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-098",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        44
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "pet_safety",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-099",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        45
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-100",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        46
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-101",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        47
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [],
+        "ambiguity": "emoji_target_unspecified: no forced comment/react classification",
+        "shape": "ambiguous"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-102",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        48
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-103",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        49
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-104",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        50
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-105",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        51
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-106",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        52
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-107",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        53
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-108",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        54
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-109",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        55
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-110",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        56
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "share"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-111",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        57
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-112",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        58
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-113",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        59
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-114",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        60
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-115",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        61
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-116",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        62
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-117",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        63
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-118",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        64
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-119",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        65
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-120",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        66
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-121",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        67
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-122",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        68
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-123",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        69
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [],
+        "ambiguity": "emoji_target_unspecified: no forced comment/react classification",
+        "shape": "ambiguous"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-124",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        70
+      ],
+      "architecture": "single_subject",
+      "format_key": "emotional_animal_collection",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity",
+        "recognizable_behavior"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-125",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        71
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-126",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        72
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "comment"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-127",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        73
+      ],
+      "architecture": "single_subject",
+      "format_key": "emotional_animal_collection",
+      "topic_key": "animals",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity",
+        "recognizable_behavior"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "tag"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-128",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        74
+      ],
+      "architecture": "single_subject",
+      "format_key": "emotional_animal_collection",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity",
+        "recognizable_behavior"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "save"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-129",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        75
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-130",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        76
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-131",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        77
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [
+        "architecture_adjudicated: airport collections / wood+fungi / body theme; raw label retained"
+      ],
+      "flags": [
+        "engagement_null"
+      ],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-132",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        78
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-133",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        79
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-134",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        80
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-135",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        81
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-136",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        82
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "food_science",
+      "mechanisms": [
+        "origin_or_history",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-137",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        83
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-138",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        84
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-139",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        85
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [],
+        "ambiguity": "emoji_target_unspecified: no forced comment/react classification",
+        "shape": "ambiguous"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-140",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        86
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "consequence"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 9,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-141",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        87
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-142",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        88
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-143",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        89
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "origin_or_history",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-144",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        90
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-145",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        91
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "inventions_everyday",
+      "mechanisms": [
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-146",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        92
+      ],
+      "architecture": "single_subject",
+      "format_key": "comparison",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "paired_contrast"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-147",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        93
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-148",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        94
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-149",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        95
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-150",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        96
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "concrete_explanation",
+        "consequence"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [
+        "architecture_adjudicated: airport collections / wood+fungi / body theme; raw label retained"
+      ],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-151",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        97
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [
+        "engagement_null"
+      ],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-152",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        98
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-153",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        99
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "history_origins",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [
+        "repeated_proposition_facts_3_4"
+      ],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-154",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        100
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "nature_science",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-155",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        101
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-156",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        102
+      ],
+      "architecture": "single_subject",
+      "format_key": "single_subject_fast",
+      "topic_key": "animals",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "dyk",
+      "id": "POST-157",
+      "source_file": "dataset-reference/post-dyk.txt",
+      "source_lines": [
+        103
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "human_body",
+      "mechanisms": [
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [
+        "architecture_adjudicated: airport collections / wood+fungi / body theme; raw label retained"
+      ],
+      "flags": [],
+      "fact_count": 8,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "single_invitation"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-158",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        1
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-159",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        2
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal",
+        "concrete_explanation"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-160",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        3
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-161",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        4
+      ],
+      "architecture": "mixed",
+      "format_key": "mixed_curiosity",
+      "topic_key": "general_trivia",
+      "mechanisms": [
+        "scale_or_record",
+        "concrete_explanation",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-162",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        5
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "assumption_reversal",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-163",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        6
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 5,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-164",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        7
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "food_storage_home",
+      "mechanisms": [
+        "concrete_explanation",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-165",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        8
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-166",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        9
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-167",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        11
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "food_storage_home",
+      "mechanisms": [
+        "concrete_explanation",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-168",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        12
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-169",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        13
+      ],
+      "architecture": "themed",
+      "format_key": "themed_curiosity",
+      "topic_key": "geography",
+      "mechanisms": [
+        "scale_or_record",
+        "everyday_oddity"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 5,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-170",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        14
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "food_storage_home",
+      "mechanisms": [
+        "concrete_explanation",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-171",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        16
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "practical_utility",
+      "mechanisms": [
+        "concrete_explanation",
+        "everyday_oddity",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-172",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        17
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "food_storage_home",
+      "mechanisms": [
+        "concrete_explanation",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 7,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-173",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        18
+      ],
+      "architecture": "themed",
+      "format_key": "themed_utility",
+      "topic_key": "food_storage_home",
+      "mechanisms": [
+        "concrete_explanation",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-174",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        19
+      ],
+      "architecture": "mixed",
+      "format_key": "themed_utility",
+      "topic_key": "practical_utility",
+      "mechanisms": [
+        "concrete_explanation",
+        "everyday_oddity",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    },
+    {
+      "profile": "daily_facts",
+      "id": "POST-175",
+      "source_file": "dataset-reference/post-dailyfacts.txt",
+      "source_lines": [
+        20
+      ],
+      "architecture": "mixed",
+      "format_key": "themed_utility",
+      "topic_key": "practical_utility",
+      "mechanisms": [
+        "scale_or_record",
+        "origin_or_history",
+        "concrete_explanation",
+        "everyday_oddity",
+        "action_condition_outcome"
+      ],
+      "reader_benefits": [
+        "practical_reference"
+      ],
+      "mapping_basis": "existing architecture/topic/theme/fact_types; targeted gap adjudication, not claim verification",
+      "notes": [],
+      "flags": [],
+      "fact_count": 6,
+      "cta": {
+        "placement": {
+          "kind": "after_facts"
+        },
+        "actions": [
+          "react",
+          "follow"
+        ],
+        "ambiguity": null,
+        "shape": "combined_invitations"
+      }
+    }
+  ]
+}

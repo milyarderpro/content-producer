@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "contract_revision": "cr-062-r1",
+  "date": "2026-11-12",
+  "source_sha": "c02c5413479cebf50f39abc10149fafca757611a",
+  "scope": "Contract/corpus only; tasks tracking and execution report excluded to permit honest progress updates. No implementation/LIVE acceptance.",
+  "files": [
+    {
+      "path": "docs/decisions/2026-11-12-cr-062-configurable-trivia-editorial-profiles.md",
+      "sha256": "15099b3abd613be6f24c0e52c8ac7a69551047f25cb76e373ca00b0722c58c9b"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/issue.md",
+      "sha256": "6e17b498f51cea594cdccfdc5720e4eeb152eef5ff04cb9c43018430d016e76c"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/contract.md",
+      "sha256": "7860dee515ec9d7e992d41a5992379c8697c66b5cbd2ed8e3e6b0c06898b1a89"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/audit.md",
+      "sha256": "36795b6fe3e99d482b695f68763bdbda6f51d0c76c79e9ea0c0da8a8eaccf5f1"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/record-matrix.json",
+      "sha256": "b7b05fa2cb64748581359a483b199a437d5d47a657301e088d367fe01f7c9e3c"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/report.json",
+      "sha256": "9cf137c91b845fe4cb36d3aa197faedf5bc9bfb0016de52de8889eb0c9970d7f"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/reproduce.py",
+      "sha256": "2b5eaeb308ea1b2ccaa1284d311eb254f825c760065e6f43a74d4741fd4d2478"
+    },
+    {
+      "path": "openspec/changes/add-configurable-trivia-editorial-profiles/proposal.md",
+      "sha256": "576fcd2257b28cbbaa21dc8ae1df1333fa2e952126466069ad005fe3780e492d"
+    },
+    {
+      "path": "openspec/changes/add-configurable-trivia-editorial-profiles/design.md",
+      "sha256": "47d3489e22f147231e3209ffd6b1ba020960ad1679f8c0c95f6e123d7ccd93c7"
+    },
+    {
+      "path": "openspec/changes/add-configurable-trivia-editorial-profiles/specs/trivia-draft-workflow/spec.md",
+      "sha256": "fa8d7806a9111714cadcdc19d1069cc5a3cab245e3a1e89baccb313badc7ce53"
+    },
+    {
+      "path": "openspec/changes/add-configurable-trivia-editorial-profiles/specs/trivia-editorial-catalog/spec.md",
+      "sha256": "8d89d1c5c46e23e687f81953baa8175e1b258b46f5dbef540ccac2b420b05cfd"
+    },
+    {
+      "path": "openspec/changes/add-configurable-trivia-editorial-profiles/specs/trivia-page-editorial-profiles/spec.md",
+      "sha256": "903c9bcef4febbcc57b5af01cfc0b9d1e06f7ec36d0a951ecdd56e8a62679faa"
+    }
+  ]
+}

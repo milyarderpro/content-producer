@@ -180,15 +180,15 @@ Waktu baca, jumlah baris estimasi, dan putaran video SHALL dilaporkan sebagai es
 
 ### Requirement: TEP-13 Bukti penerimaan mencakup tiga profil
 
-Penerimaan SHALL mencakup matriks pola ketiga akun, review naskah per profil, penambahan format melalui data, dan save/readback pada runtime yang diotorisasi. Bukti LIVE, CI/FIXTURE, dan preview MUST dilaporkan terpisah tanpa menyebut pengujian yang belum dijalankan sebagai PASS.
+Penerimaan SHALL mencakup matriks input teknis ketiga profil, profil custom, penambahan format melalui data, serta context/save/revise/readback pada runtime yang diotorisasi. Sesuai keputusan pemilik 13 November 2026, review naskah manual dan QA layout ponsel tidak menjadi gate penerimaan change ini; technical PASS MUST NOT disebut sebagai kelulusan editorial. Bukti LIVE, CI/FIXTURE, dan preview MUST dilaporkan terpisah tanpa menyebut pengujian yang belum dijalankan sebagai PASS.
 
-#### Scenario: Dua profil berhasil dan satu masih campuran
-- **WHEN** DYK dan Curious Mind diterima tetapi output Daily Facts masih mengikuti gaya DYK
-- **THEN** kasus Daily Facts tetap FAIL dan tidak ditutupi skor rata-rata tiga profil
+#### Scenario: Dua profil berhasil dan satu binding salah
+- **WHEN** DYK dan Curious Mind lulus tetapi context atau snapshot Daily Facts memakai reference profil yang salah
+- **THEN** kasus Daily Facts tetap FAIL secara teknis dan tidak ditutupi rata-rata atau klaim editorial
 
 #### Scenario: Profil campuran diuji terpisah
 - **WHEN** owner memilih profil custom campuran yang didefinisikan eksplisit
-- **THEN** penerimaan menilai output terhadap definisi gabungan tersebut dan membuktikan context/save/readback/revise, bukan menilai campuran itu sebagai kegagalan meniru salah satu preset
+- **THEN** penerimaan membuktikan exact binding/aturan definisi gabungan melalui context/save/readback/revise; tidak menilai kemiripan manual terhadap salah satu preset
 
 #### Scenario: Referensi keempat ditambahkan tanpa kode
 - **WHEN** format, topik, dan profil referensi baru didaftarkan melalui tool katalog pada fixture dengan source/plugin yang dibekukan

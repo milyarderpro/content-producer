@@ -11,6 +11,13 @@ deployment langsung. Versi terpasang dan batas bukti dicatat di
 Kontrak frozen dan keputusan yang diterima tetap berlaku; panduan ini membantu
 membacanya, bukan mengganti kontrak secara diam-diam.
 
+**Kandidat CR-062, 13 November 2026:** katalog editorial dan resolver config2
+menambah dua tabel berscope workspace serta dua facade owner OAuth, menjadi
+33 tool. Schema/config/context/snapshot3 memakai
+[`editorial_schemas.ts`](../supabase/functions/mcp/editorial_schemas.ts), sedangkan
+aturan serta transaksi tetap SQL. [Kontrak MCP editorial](contracts/trivia-editorial-mcp.md)
+menjelaskan perubahan; angka baseline/cutover berikut tetap historis, bukan versi live.
+
 ## 1. Produk ini membantu pekerjaan apa?
 
 Content Producer membantu pemilik menyiapkan konten trivia Facebook melalui
@@ -197,10 +204,10 @@ tidak pernah diperbarui oleh migration berikutnya.
 | Identitas, ledger, rate limit      | [Security kernel](../supabase/migrations/20261010132708_phase_5_security_kernel.sql) dan perbaikan setelahnya                                                                                  | [api-security-kernel.test.ts](../supabase/tests/database/api-security-kernel.test.ts)                                                                                                                                                                                         |
 | Page dan pembuatan plan            | [Page/plan writes](../supabase/migrations/20261011052125_phase_5_3_page_and_content_plan_writes.sql)                                                                                           | [api-page-plan-writes.test.ts](../supabase/tests/database/api-page-plan-writes.test.ts)                                                                                                                                                                                       |
 | Claim dan pemulihan plan           | [Plan lifecycle RPCs](../supabase/migrations/20261011101753_phase_5_4_plan_lifecycle_rpcs.sql)                                                                                                 | [api-plan-lifecycle.test.ts](../supabase/tests/database/api-plan-lifecycle.test.ts), [api-plan-concurrency.test.ts](../supabase/tests/database/api-plan-concurrency.test.ts)                                                                                                  |
-| Registrasi/reservasi fakta         | [Trivia registration/reservation RPCs](../supabase/migrations/20261011131505_phase_5_5_trivia_registration_reservation_rpcs.sql)                                                               | [api-trivia-facts.test.ts](../supabase/tests/database/api-trivia-facts.test.ts)                                                                                                                                                                                               |
-| Reverify/correction                | [Trivia correction RPCs](../supabase/migrations/20261011131507_phase_5_5_trivia_reverification_correction_rpcs.sql)                                                                            | [api-trivia-correction.test.ts](../supabase/tests/database/api-trivia-correction.test.ts)                                                                                                                                                                                     |
-| Renderer, save, revise, reschedule | [Renderer dan quality](../supabase/migrations/20261011164409_phase_5_6_renderer_and_quality.sql), [post write RPCs](../supabase/migrations/20261011164415_phase_5_6_post_write_rpcs.sql)       | [api-post-render-quality.test.ts](../supabase/tests/database/api-post-render-quality.test.ts), [api-post-save-revise.test.ts](../supabase/tests/database/api-post-save-revise.test.ts), [api-post-reschedule.test.ts](../supabase/tests/database/api-post-reschedule.test.ts) |
-| Approval sampai arsip              | [Lifecycle RPCs](../supabase/migrations/20261012045018_phase_5_7_lifecycle_rpcs.sql)                                                                                                           | [api-post-approval-quality.test.ts](../supabase/tests/database/api-post-approval-quality.test.ts), [api-post-lifecycle.test.ts](../supabase/tests/database/api-post-lifecycle.test.ts)                                                                                        |
+| Registrasi/reservasi fakta         | [Trivia registration/reservation RPCs](../supabase/migrations/20261011131505_phase_5_5_trivia_registration_reservation_rpcs.sql)                                                               | [api-trivia-v2-read.test.ts](../supabase/tests/database/api-trivia-v2-read.test.ts)                                                                                                                                                                                               |
+| Reverify/correction                | [Trivia correction RPCs](../supabase/migrations/20261011131507_phase_5_5_trivia_reverification_correction_rpcs.sql)                                                                            | [api-trivia-v2-maintenance.test.ts](../supabase/tests/database/api-trivia-v2-maintenance.test.ts)                                                                                                                                                                                     |
+| Renderer, save, revise, reschedule | [Renderer dan quality](../supabase/migrations/20261011164409_phase_5_6_renderer_and_quality.sql), [post write RPCs](../supabase/migrations/20261011164415_phase_5_6_post_write_rpcs.sql)       | [core-primitives-and-validators.test.ts](../supabase/tests/database/core-primitives-and-validators.test.ts), [api-trivia-v2-save.test.ts](../supabase/tests/database/api-trivia-v2-save.test.ts), [api-trivia-v2-lifecycle.test.ts](../supabase/tests/database/api-trivia-v2-lifecycle.test.ts) |
+| Approval sampai arsip              | [Lifecycle RPCs](../supabase/migrations/20261012045018_phase_5_7_lifecycle_rpcs.sql)                                                                                                           | [api-trivia-v2-lifecycle.test.ts](../supabase/tests/database/api-trivia-v2-lifecycle.test.ts), [api-trivia-v2-lifecycle.test.ts](../supabase/tests/database/api-trivia-v2-lifecycle.test.ts)                                                                                        |
 | Metrik dan insights                | [Pencatatan metrik](../supabase/migrations/20261012072242_phase_5_8_record_post_performance.sql), [metrics reads](../supabase/migrations/20261012072243_phase_5_8_metrics_read_completion.sql) | [api-metrics.test.ts](../supabase/tests/database/api-metrics.test.ts), [api-metrics-insights.test.ts](../supabase/tests/database/api-metrics-insights.test.ts)                                                                                                                |
 
 ## 8. Peta keputusan penting
@@ -230,7 +237,8 @@ pada `ca5c43597af97c95ea9eaa87876237fd2d45e10c`,
 [CR-052](decisions/2026-10-29-cr-052-full-backend-gate-equivalence.md)
 menetapkan `.github/workflows/backend-gate-candidate.yml` sebagai gate rilis
 **manual exact final SHA `main`**: source, dua shard database terisolasi
-21+25 (46 file/221 kasus) dan aggregate PASS. CR-020/044 tetap mengikat
+15+18 (33 file/238 kasus untuk kandidat CR-062) dan aggregate PASS;
+46 file/221 kasus merupakan inventaris historis. CR-020/044 tetap mengikat
 kontrol keamanan. Gate tidak otomatis diwajibkan branch protection;
 `backend-technical-gate.yml`/`pnpm run test-all` adalah legacy/rollback.
 Lihat [testing](testing.md) dan [operations](operations.md).

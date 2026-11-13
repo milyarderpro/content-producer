@@ -1,0 +1,471 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-13",
+  "evidence": "LOCAL/FIXTURE; not formal G4 or LIVE",
+  "base_source_sha": "c02c5413479cebf50f39abc10149fafca757611a",
+  "candidate": "base SHA plus working file hashes; no new commit",
+  "toolchain": {
+    "node": "24.15.0",
+    "pnpm": "10.33.2",
+    "deno": "2.9.8",
+    "supabase_cli": "2.120.0",
+    "inspector": "2.5.0"
+  },
+  "checks": {
+    "source": {
+      "status": "PASS",
+      "files": 14,
+      "cases": 190,
+      "vitest_seconds": 6.5
+    },
+    "frontend": {
+      "status": "PASS",
+      "cases": 19
+    },
+    "mcp": {
+      "status": "PASS",
+      "files": 18,
+      "cases": 130,
+      "new_explicit_cases": 14,
+      "new_diagnostic_matrix_cases": 2,
+      "skipped": 0,
+      "test_seconds": 10
+    },
+    "manual_cutover": {
+      "status": "PASS",
+      "cases": 1,
+      "in_mandatory_130": false
+    },
+    "inspector": {
+      "status": "PASS",
+      "valid": 33,
+      "invalid_active": 33,
+      "invalid_retired": 5,
+      "owner_denial": true,
+      "log_privacy": true,
+      "approximate_seconds": 127,
+      "timing_basis": "final CLI log last-write minus creation time; not a formal report duration",
+      "valid_names": [
+        "approve_post",
+        "archive_post",
+        "cancel_content_plan",
+        "claim_content_plan_items",
+        "create_content_plan",
+        "create_page",
+        "discard_post",
+        "get_account_profile",
+        "get_content_plan",
+        "get_page_generation_context",
+        "get_performance_insights",
+        "get_post",
+        "get_post_performance",
+        "get_trivia_editorial_catalog",
+        "get_workspace_context",
+        "list_content_plans",
+        "list_pages",
+        "list_posts",
+        "mark_post_posted",
+        "record_post_performance",
+        "renew_content_plan_claim",
+        "replace_discarded_plan_item",
+        "report_content_plan_item_failure",
+        "reschedule_post",
+        "retry_content_plan_item",
+        "revise_post_v2",
+        "revoke_post_approval",
+        "save_post_v2",
+        "trivia_correct_fact",
+        "trivia_find_similar_facts_v2",
+        "trivia_reverify_fact",
+        "update_page",
+        "update_trivia_editorial_catalog"
+      ],
+      "invalid_names": [
+        "approve_post",
+        "archive_post",
+        "cancel_content_plan",
+        "claim_content_plan_items",
+        "create_content_plan",
+        "create_page",
+        "discard_post",
+        "get_account_profile",
+        "get_content_plan",
+        "get_page_generation_context",
+        "get_performance_insights",
+        "get_post",
+        "get_post_performance",
+        "get_trivia_editorial_catalog",
+        "get_workspace_context",
+        "list_content_plans",
+        "list_pages",
+        "list_posts",
+        "mark_post_posted",
+        "record_post_performance",
+        "renew_content_plan_claim",
+        "replace_discarded_plan_item",
+        "report_content_plan_item_failure",
+        "reschedule_post",
+        "retry_content_plan_item",
+        "revise_post",
+        "revise_post_v2",
+        "revoke_post_approval",
+        "save_post",
+        "save_post_v2",
+        "trivia_correct_fact",
+        "trivia_find_similar_facts",
+        "trivia_find_similar_facts_v2",
+        "trivia_register_and_reserve_facts",
+        "trivia_release_facts",
+        "trivia_reverify_fact",
+        "update_page",
+        "update_trivia_editorial_catalog"
+      ]
+    },
+    "catalog": {
+      "status": "PASS",
+      "functions": 300,
+      "api_names": 33,
+      "tables": 19,
+      "rls": 19,
+      "negative_controls": 5,
+      "before_after_final": true
+    },
+    "migration_history": {
+      "status": "PASS",
+      "count": 94,
+      "exact": true
+    },
+    "acl_cleanup": {
+      "status": "PASS",
+      "items": 0,
+      "plans": 0,
+      "posts": 0,
+      "events": 0,
+      "bindings": 0,
+      "definitions": 0,
+      "config2_rows": 0,
+      "post_history": 0,
+      "api_signatures": 33,
+      "caller_helpers": 0,
+      "catalog_states": 0,
+      "owner_schema_create": false,
+      "owner_login_or_bypass": false,
+      "direct_caller_data_access": false,
+      "signatures": {
+        "api.save_post_v2": {
+          "defaults": 7,
+          "arguments": 18
+        },
+        "api.revise_post_v2": {
+          "defaults": 6,
+          "arguments": 18
+        },
+        "api.get_page_generation_context": {
+          "defaults": 6,
+          "arguments": 10
+        },
+        "internal.post_prepare_config2_v2": {
+          "defaults": 1,
+          "arguments": 8
+        }
+      }
+    },
+    "legacy_functions": {
+      "status": "PASS",
+      "hashes": {
+        "post_hash_v2": "2a530305085ccf3c1b78bfc4da9ce1008b8be9e1a5ebac0a3446a6d9fee237b6",
+        "post_render_v1": "39d82659cac4cd6042707f317a34854f657a93b7ad20f2c0486b1cce047f517f",
+        "post_render_v2": "cd523245aeeca73c8b38ab5891506d777cafd952ffd302e3c5da800bc989516d"
+      },
+      "unchanged": true
+    },
+    "db_lint_errors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "local_security_advisors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "frozen_task1": {
+      "status": "PASS"
+    },
+    "openspec_strict": {
+      "status": "PASS"
+    },
+    "references_whitespace_fingerprints": {
+      "status": "PASS"
+    }
+  },
+  "database_inventory": {
+    "files": 33,
+    "cases": 200,
+    "shards": {
+      "1": {
+        "files": 15,
+        "cases": 125
+      },
+      "2": {
+        "files": 18,
+        "cases": 75
+      }
+    },
+    "evidence": "Vitest collection only; NOT RUN as one full suite in task 7"
+  },
+  "previous_focused_database": {
+    "task": 6,
+    "cases": 149,
+    "fingerprints_checked": 20,
+    "all_unchanged": true,
+    "evidence": "previous LOCAL/FIXTURE evidence; not counted as task 7 execution or formal G4 reuse"
+  },
+  "interim_findings": [
+    "Closed oneOf union wrappers as well as anyOf; retained typed dynamic map constraints.",
+    "Corrected fixture create-plan optional-name mapping and explicit pilotMode field/import process checks.",
+    "Updated source-derived census and metadata counts; fixed aggregate CLI test startup overhead without raising timeout or removing boundary assertions.",
+    "Added code-point/NFC boundary validation that passes raw input unchanged; final source/MCP/Inspector rerun passed."
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "0157e531b63c80affd0480c32a40aa40c71eca7edb1c25eb4baf34a8984bf1f7"
+    },
+    {
+      "path": "README.md",
+      "sha256": "25007eb331626a3e5dcd2556f879f10fbc5da7decb3ee9336eae88a1862b5b2e"
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "169068f881aeb18ed1a3279a4b7b70dd62774b598ecc9a970e79118f0873aaef"
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "f4b6f0b6567ea5b62013e9ce172cbe1676044e8a44064b664e2758dd6aea455e"
+    },
+    {
+      "path": "docs/contracts/tool-errors-v2.md",
+      "sha256": "33599c9b8c52f0be127111962d0c19fe20316cb1c2f9d997933562c459b0d5d7"
+    },
+    {
+      "path": "docs/contracts/trivia-editorial-mcp.md",
+      "sha256": "17cb255c02e1cfee19c750ffd2b292f08d48d606ad5927ff72285ce277145073"
+    },
+    {
+      "path": "docs/development.md",
+      "sha256": "f65cfef5e2f2857335b94ad356cd566c2d0812713c127036e7026aadcc419317"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-7-catalog-review.json",
+      "sha256": "4d83065db94ba903c07af7856a6f5ecf41ecd70977b1b2015005b68ee941b70b"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-7-results.md",
+      "sha256": "708c8492d31dd2d61499f57bbd11bc5a245ba604d2f7e6055a60f51f3b334db0"
+    },
+    {
+      "path": "docs/editorial/configurable-profiles/task-7-suite-inventory.json",
+      "sha256": "08d8ab3e66c11a92ae63d040228de6534500ca38d3f0cd2a02aa4d1b7fccf32c"
+    },
+    {
+      "path": "docs/operations.md",
+      "sha256": "a777e18ba0e1e489240c4503a26fc677e8e6cebe3b87ecb97045cba216b7a66c"
+    },
+    {
+      "path": "docs/testing.md",
+      "sha256": "9353eadb33da5d1e2803aca122d028968d8f02676357260c8cc30cf1db7d4f2b"
+    },
+    {
+      "path": "docs/tool-contracts.md",
+      "sha256": "30777a4c22bd8b320020470515b18cc3302361d2f33f311bae832cc5d6fd5f8a"
+    },
+    {
+      "path": "package.json",
+      "sha256": "35f223011b2f63302100de29785cea70bbddb1f70a3be0e20d894db606233018"
+    },
+    {
+      "path": "scripts/gate-backend.ts",
+      "sha256": "ef27ccb26a99865a07c49c58e287774b8145d3e2c82cfa6df28bf42517e1ebcb"
+    },
+    {
+      "path": "scripts/gate-runner.ts",
+      "sha256": "bfeceac18df0f8e96d7c8a3d519d7bd26f1e553823591d2dfddd26308c1c4b91"
+    },
+    {
+      "path": "scripts/gate-suite-manifest.json",
+      "sha256": "bf030b8902e8390b2122ec56b08d0be0bb5199ae63a9b3da145cbf0a557b20b5"
+    },
+    {
+      "path": "scripts/inspector-input.mjs",
+      "sha256": "7b4461b0b4474051791a5a4d0a86af38fb00edfef42858234cca36fcaa32a9d4"
+    },
+    {
+      "path": "scripts/mcp-catalog-inventory.ts",
+      "sha256": "20c4e38e2e4404dc5f0663b2fab709f40a959a5772a8d77731ede53ad30ef762"
+    },
+    {
+      "path": "scripts/phase-6-13.ts",
+      "sha256": "8ce28b60366a08a04b029a2c4960149e41be8a025bf3e9039ef468ede5017592"
+    },
+    {
+      "path": "scripts/trivia-v2-catalog-audit.ts",
+      "sha256": "5e6743e5d11fc3f2fcc12574218c73bf220c64c441b1e8f4b1a1a6b4bdbf0bf1"
+    },
+    {
+      "path": "scripts/trivia-v2-catalog-pin.json",
+      "sha256": "84b687f486e9b370948716a38f28700d8b0bda77d2e2e53cd4c72b29de0d99a6"
+    },
+    {
+      "path": "supabase/functions/mcp/auth_test.ts",
+      "sha256": "24914828345b1189f150ffed81bd4d9983a3116de12559ee68e7690f3adc0b61"
+    },
+    {
+      "path": "supabase/functions/mcp/catalog_schema.ts",
+      "sha256": "38c01bc8b65f3567b6b723d64e122ce972d5892897ec05f3f9df38669c1bf251"
+    },
+    {
+      "path": "supabase/functions/mcp/diagnostics.ts",
+      "sha256": "5c6708868cea81e02907e010e4bb7c3f7c4cb2afdef3fba961dfe49cea2d814b"
+    },
+    {
+      "path": "supabase/functions/mcp/diagnostics_test.ts",
+      "sha256": "a8648870769c893fadfcc1aea8065057daa1832735877a4464ed6f7474d0f6c5"
+    },
+    {
+      "path": "supabase/functions/mcp/editorial_catalog.ts",
+      "sha256": "d677ce0e83edd1e6a3a8db10143a4cff070c2f917c36d94097c21eaf217482d5"
+    },
+    {
+      "path": "supabase/functions/mcp/editorial_catalog_test.ts",
+      "sha256": "b0e78ec1c83ca4a59919bfc354898c34b114cece7254407030d202dac64e4fe1"
+    },
+    {
+      "path": "supabase/functions/mcp/editorial_schemas.ts",
+      "sha256": "66a2c123478616a18217a1ab51bf50cd208bd4205b635fc9091952d2d0dcfa22"
+    },
+    {
+      "path": "supabase/functions/mcp/foundation.ts",
+      "sha256": "9bc0b951f6d38b032b770575826811fc250c68e91cf4f3bb33fe0fc7f20aece4"
+    },
+    {
+      "path": "supabase/functions/mcp/foundation_test.ts",
+      "sha256": "227e648ef4bd2ea5e7ef0a28c11f1691ee5bf38f4edd81d3f8aa0a94af896e5a"
+    },
+    {
+      "path": "supabase/functions/mcp/oauth_production_test.ts",
+      "sha256": "682bcdc0f0aafc5e91b78c4f8d540481392716a721e1db4d3928dc822b4277a1"
+    },
+    {
+      "path": "supabase/functions/mcp/page_plan.ts",
+      "sha256": "b5bbeb5fbd02b247e42dc4935f162b01c37a6c0fb084002359ebb638e84f827b"
+    },
+    {
+      "path": "supabase/functions/mcp/page_plan_test.ts",
+      "sha256": "01165a6c1f496061589cacc69215e2f4886a20133dc6d087b0db3da441b640e8"
+    },
+    {
+      "path": "supabase/functions/mcp/pilot_db_test.ts",
+      "sha256": "d9b7fb4bb68ef39fe21078eca5b88b84211691d3c70e3942fd87a75dce334cca"
+    },
+    {
+      "path": "supabase/functions/mcp/plan_claim_test.ts",
+      "sha256": "8030eee08eb9e44d05ee1dcabce5cb01c37f5630ccdfa628616b866a4cdfe6b0"
+    },
+    {
+      "path": "supabase/functions/mcp/plan_recovery_test.ts",
+      "sha256": "8c41de4af17b53a2c44369085db2eb55ce827108097c577e562d1514ade412e9"
+    },
+    {
+      "path": "supabase/functions/mcp/post_approval.ts",
+      "sha256": "0cb33b75685def7929c94734417350a9bf7b5293dc024a9074bd6ee822db5db9"
+    },
+    {
+      "path": "supabase/functions/mcp/post_approval_test.ts",
+      "sha256": "643dfa88f50bf18cdc7fd301583f8fd0e51c0453572a8dbeaead42decdd7221c"
+    },
+    {
+      "path": "supabase/functions/mcp/post_base.ts",
+      "sha256": "f2ecf17c72cfa7b901dc6d2929c703af1e69b859a34be16c9fe854889c324826"
+    },
+    {
+      "path": "supabase/functions/mcp/post_base_test.ts",
+      "sha256": "48b8c099404b34f9b55e3517ca8bbd3bc24d1d03250b157e5522a38874d4cadf"
+    },
+    {
+      "path": "supabase/functions/mcp/post_edit_test.ts",
+      "sha256": "afe21502e86231008ad83d68c8c824d3a670473f585db583a4d354d139880924"
+    },
+    {
+      "path": "supabase/functions/mcp/post_metrics_test.ts",
+      "sha256": "cd52feac9e05f4cc68676f94e6a2d95c51c75704b045354db56a546ee8decd32"
+    },
+    {
+      "path": "supabase/functions/mcp/post_publication.ts",
+      "sha256": "8af6e72f60ee6b0d62a8db7b9c3e888829a0087d1d46bc6fc0a5729b3b235c6c"
+    },
+    {
+      "path": "supabase/functions/mcp/post_publication_test.ts",
+      "sha256": "0622382659007a2492896767f2b34d21c7cfc4f9c87ae7367910c3b4428e9f30"
+    },
+    {
+      "path": "supabase/functions/mcp/registry.ts",
+      "sha256": "73cfe132509dd28fdbe00a4509187bf81020d6b82aede3ea5ab025945302af81"
+    },
+    {
+      "path": "supabase/functions/mcp/transport_test.ts",
+      "sha256": "17bffec81db09c0597b3f6457cf151aabc4eed45e7cebdf8f1250d32d096666e"
+    },
+    {
+      "path": "supabase/functions/mcp/trivia_correction_test.ts",
+      "sha256": "c1de9591163803317324c8695a31579f4c4728220b8a60d00a0c1804d8aad41b"
+    },
+    {
+      "path": "supabase/functions/mcp/trivia_fact_test.ts",
+      "sha256": "d24b06959d313442a73598c5f8c8af285df776156854654986e7f30bf4457f4a"
+    },
+    {
+      "path": "supabase/functions/mcp/trivia_v2.ts",
+      "sha256": "5bbfe9bb8160aaa18b2ed75383322353054df4a664adc04924e3697b612db9b0"
+    },
+    {
+      "path": "supabase/functions/mcp/trivia_v2_cutover_check.ts",
+      "sha256": "67046bfd91325c297ffc5910e9051ac6c67c9c453ba0e121400142a39779cae7"
+    },
+    {
+      "path": "tests/fixtures/tool-errors-v2.ts",
+      "sha256": "2d14216622539d67b238d1520003300c38608953aa507a5e589bde2837dd2609"
+    },
+    {
+      "path": "tests/fixtures/trivia-editorial-v2.json",
+      "sha256": "928fcf9856e528c2edcc8a5c164c4630a272723bea17cab309c0f519b6e1bf17"
+    },
+    {
+      "path": "tests/gate-runner.test.ts",
+      "sha256": "f195fb9324134558bb5b76c61949293dafc5e6afbe1b228ca69b5dafd6791a81"
+    },
+    {
+      "path": "tests/gate-suite-manifest.test.ts",
+      "sha256": "96859f3325dc40aae46f9a50c2512023fdacf8759b65c7aee74cfbdad456211b"
+    },
+    {
+      "path": "tests/trivia-draft-v2-contracts.test.ts",
+      "sha256": "ec5c6e74d326adccb5349db8c37e533bfdab355ec30398462fa2902e8d18ae61"
+    },
+    {
+      "path": "tests/workflow-change-classification.test.ts",
+      "sha256": "b471e7fd005c0fc16f74e2444461b7b3b48d457216497995655bd6ef67b347eb"
+    },
+    {
+      "path": "openspec/changes/add-configurable-trivia-editorial-profiles/tasks.md",
+      "sha256": "8a3e9d3c8d561c42ecca959660524ac73516cfb2d0fa4bc85d0eaa7f5c8b3aec"
+    }
+  ],
+  "not_run": [
+    "Actions",
+    "formal exact-SHA G4",
+    "one full 200-case database execution in task 7",
+    "plugin packaging/install",
+    "visual QA",
+    "deployment",
+    "LIVE"
+  ]
+}

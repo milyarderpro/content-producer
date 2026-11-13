@@ -1,5 +1,13 @@
 # Trivia canonical identity and dedup decisions
 
+For 10–12 final candidates, use multiple Reads of at most 9 (e.g. 9+3).
+Use unique candidate keys across the whole set. Compare string fact catalog
+versions from every Read; if they differ, discard the mixed-version decisions
+and restart all Reads/reviews. Never copy only the last version onto stale
+reviews. The editorial catalog version is a different version, not a substitute.
+Incomplete/clipped results block Write; complete results still require every
+match review and the server's final atomic reuse/catalog validation.
+
 ## Current v2 decision path
 
 Use `trivia_find_similar_facts_v2` with Page and candidate sentences; no structured

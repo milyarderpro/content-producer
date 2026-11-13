@@ -20,6 +20,17 @@ contract ke vocabulary tool tanpa menghilangkan lokasi/konteks aman yang diketah
 Module version unsupported tetap berbeda dari config schema unsupported; tidak
 digabung menjadi kode yang menyalahkan versi konfigurasi.
 
+## Tambahan kandidat CR-062 (13 November 2026)
+
+Katalog owner OAuth kandidat memuat 33 tool, termasuk Read/write katalog editorial.
+Matriks diagnostics runtime mengikuti seluruh 33 tool secara otomatis; metadata,
+owner denial, input, domain, rate-limit, transport, output, unknown outcome serta
+privacy diuji pada kedua tool baru. `EDITORIAL_CATALOG_CONFLICT` dan
+`EDITORIAL_DEFINITION_UNAVAILABLE` menjadi kode request1 stabil dengan kategori
+state_conflict dan recovery yang menjaga scope/replay. [Kontrak MCP editorial](trivia-editorial-mcp.md)
+memuat detail. Catatan 36 tool/transisi di atas tetap historis; tidak menyatakan
+versi live. Panduan plugin diperbarui pada task 8.
+
 ## 1. Canonical diagnostic dan bentuk pengiriman
 
 Canonical diagnostic memuat field wajib:

@@ -50,7 +50,7 @@ const publicationOutput = envelope(
     published_at: timestamp,
     platform_post_id: platformId.nullable(),
     published_url: httpsUrl.nullable(),
-    published_fact_public_ids: z.array(uuid).max(9),
+    published_fact_public_ids: z.array(uuid).max(12),
     replayed: z.boolean(),
   }),
 );

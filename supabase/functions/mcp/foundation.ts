@@ -3,6 +3,7 @@
 import * as z from 'npm:zod@4.3.6';
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { RequestContext } from './auth.ts';
+import { unicodeText, triviaConfig2, editorialRules, editorialTime, generationEditorialContext, readPlanContext } from './editorial_schemas.ts';
 import { triviaConfig, workspaceSettings } from './schemas.ts';
 import { executePilotRpc } from './pilot_db.ts';
 import { isApprovedMan02CreatePage } from './pilot_write.ts';
@@ -45,10 +46,11 @@ const contextInput = z.strictObject({
     .strictObject({
       topic_key: choiceKey.optional(),
       format_key: choiceKey.optional(),
-      interaction_goal: z.enum(['share', 'save', 'comment', 'follow']).optional(),
+      interaction_goal: z.enum(['share', 'save', 'comment', 'follow']).nullable().optional(),
       scheduled_at: timestamp.nullable().optional(),
     })
     .optional(),
+  plan_item_public_id: publicId.nullable().optional(),
   recent_post_limit: z.number().int().min(1).max(30).optional(),
 });
 
@@ -131,8 +133,7 @@ const pagesOutput = response(
     has_more: z.boolean(),
   }),
 );
-const contextOutput = response(
-  z.strictObject({
+const legacyContextData = z.strictObject({
     page: z.strictObject({ ...pageFields, created_at: timestamp }),
     module: z.strictObject({
       niche_key: nicheKey,
@@ -190,12 +191,20 @@ const contextOutput = response(
       page_updated_at: timestamp,
       config_updated_at: timestamp,
     }),
-  }),
-);
+  });
+const contextOutput = response(z.union([legacyContextData,legacyContextData.extend({
+  module:legacyContextData.shape.module.extend({config_schema_version:z.literal(2),config_schema_versions:z.tuple([z.literal(1),z.literal(2)])}),
+  config:triviaConfig2,generation_rules:editorialRules,editorial_context:generationEditorialContext,plan_context:readPlanContext.optional(),
+  recent_variety:z.array(z.strictObject({post_public_id:publicId,status:z.string(),topic_key:z.string().nullable(),format_key:z.string().nullable(),
+    interaction_goal:z.string().nullable(),hook:unicodeText(120,0).nullable(),cta:unicodeText(180,0).nullable(),scheduled_at:timestamp.nullable(),updated_at:editorialTime})),
+  context_version:z.strictObject({page_updated_at:editorialTime,config_updated_at:editorialTime}),
+})]));
 
 const securitySchemes = [{ type: 'oauth2', scopes: ['openid', 'email'] }];
 const annotations = { readOnlyHint: true, destructiveHint: false, openWorldHint: false };
 const safeErrors = {
+  EDITORIAL_CATALOG_CONFLICT: ['The editorial catalog changed.', false, 'Read the editorial catalog from the first page, review the intended change, and use its current revision for a new operation. Reconcile an uncertain write before changing its original key or payload.'],
+  EDITORIAL_DEFINITION_UNAVAILABLE: ['The editorial reference is unavailable for this selection.', false, 'Read exact references in the current workspace and review active alternatives. Keep existing valid bindings; do not switch Page/profile or publish a definition without owner instructions.'],
   AUTH_REQUIRED: ['Connection authentication is required.', false, 'Relink the account.'],
   PILOT_WRITE_LOCKED: [
     'Pilot business writes are disabled during Phase 10.1.',
@@ -764,6 +773,7 @@ export function registerFoundationTools(server: McpServer, context?: RequestCont
           p_page_public_id: args.page_public_id,
           p_niche_key: args.niche_key,
           p_recent_post_limit: args.recent_post_limit ?? 12,
+          ...(args.plan_item_public_id === undefined ? {} : {p_plan_item_public_id:args.plan_item_public_id}),
           ...(args.intent?.topic_key === undefined
             ? {}
             : { p_intent_topic_key: args.intent.topic_key }),

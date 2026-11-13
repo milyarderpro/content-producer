@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-12",
+  "evidence": "LOCAL/FIXTURE; not release or LIVE",
+  "base_source_sha": "c02c5413479cebf50f39abc10149fafca757611a",
+  "candidate": "base SHA plus working file hashes; no new commit",
+  "checks": {
+    "database": {
+      "status": "PASS",
+      "files": 5,
+      "cases": 60,
+      "new_page_profile_cases": 12,
+      "skipped": 0,
+      "duration_seconds": 158
+    },
+    "source": {
+      "status": "PASS",
+      "files": 14,
+      "cases": 184
+    },
+    "frontend": {
+      "status": "PASS",
+      "cases": 19
+    },
+    "db_lint_errors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "local_security_advisors": {
+      "status": "PASS",
+      "findings": 0
+    },
+    "migration_history": {
+      "status": "PASS",
+      "count": 88
+    },
+    "acl_cleanup": {
+      "status": "PASS",
+      "definitions": 0,
+      "catalog_states": 0,
+      "config2_rows": 0,
+      "api_signatures": 33,
+      "caller_helpers": 0,
+      "api_acl_ok": true,
+      "caller_config_access": false
+    },
+    "seed_weights_vs_frozen_audit": {
+      "status": "PASS",
+      "profiles": 3,
+      "distributions": 6,
+      "fixture_rolled_back": true
+    }
+  },
+  "files": [
+    {
+      "path": "supabase/migrations/20261112124337_add_trivia_page_editorial_profiles.sql",
+      "sha256": "062502cdb01ae838b53886713c10905921749fb785f075addfb5de0b6a745a4f"
+    },
+    {
+      "path": "supabase/tests/database/pages-and-page-niche-configs.test.ts",
+      "sha256": "ac2341d15e36f67e3b8ca28920ee3316fb7a3f8e5ed6599ea66f41fc916abc3b"
+    },
+    {
+      "path": "supabase/tests/database/api-page-plan-writes.test.ts",
+      "sha256": "a183a81fb9769c4d16e25db433a657a90878b0534a9d85fedbd122127fab38f3"
+    },
+    {
+      "path": "supabase/tests/database/api-read-rpcs.test.ts",
+      "sha256": "3e275cebbae5b219572480590ed338dc6d6d97d5a4093a6ee0b21051b004ffb2"
+    },
+    {
+      "path": "docs/contracts/trivia-page-editorial-profiles.md",
+      "sha256": "f1ee7b4d3dc83b6996b52e55c1c486a2069a79f7abb32dc91a1ceb33a1f31249"
+    }
+  ],
+  "not_run": [
+    "Actions",
+    "formal G4 exact-SHA",
+    "config2 renderer/save/lifecycle/plan integration",
+    "MCP facade",
+    "plugin consumption",
+    "deployment",
+    "LIVE"
+  ]
+}

@@ -112,7 +112,9 @@ describe('Light CI memilih pemeriksaan dari kedua sisi perubahan', () => {
   });
 
   it('menolak whitespace rusak pada path dengan spasi', () => {
-    expect(() => classify({}, { 'tests/with spaces.test.ts': 'export const value = 1;   \n' })).toThrow();
+    expect(() =>
+      classify({}, { 'tests/with spaces.test.ts': 'export const value = 1;   \n' }),
+    ).toThrow();
   });
 
   it('perubahan workflow memilih source, MCP, probe, dan package', () => {
@@ -149,8 +151,9 @@ describe('Light CI memilih pemeriksaan dari kedua sisi perubahan', () => {
     }
   });
 
-  it.each(['scripts/trivia-v2-catalog.sql', 'scripts/trivia-v2-catalog-pin.json']) (
-    'memilih source dan review backend untuk input audit %s', (path) => {
+  it.each(['scripts/trivia-v2-catalog.sql', 'scripts/trivia-v2-catalog-pin.json'])(
+    'memilih source dan review backend untuk input audit %s',
+    (path) => {
       const result = classify({}, { [path]: 'Fixture\n' });
       expect(result.checks.need_check).toBe('true');
       expect(result.checks.backend_review).toBe('true');
@@ -184,10 +187,13 @@ describe('Light CI memilih pemeriksaan dari kedua sisi perubahan', () => {
   });
 
   it.each(['reference-patterns.md', 'writing-playbook.md'])(
-    'memilih paket saat referensi runtime %s ditambahkan atau dihapus', (name) => {
+    'memilih paket saat referensi runtime %s ditambahkan atau dihapus',
+    (name) => {
       const path = 'plugin/skills/content-producer/references/niches/trivia/' + name;
-      for (const result of [classify({}, { [path]: 'Fixture\n' }),
-        classify({ [path]: 'Fixture\n' }, {})]) {
+      for (const result of [
+        classify({}, { [path]: 'Fixture\n' }),
+        classify({ [path]: 'Fixture\n' }, {}),
+      ]) {
         expect(result.checks.package_changed).toBe('true');
         expect(result.checks.mcp_changed).toBe('false');
         expect(result.checks.backend_review).toBe('false');
@@ -197,8 +203,10 @@ describe('Light CI memilih pemeriksaan dari kedua sisi perubahan', () => {
 
   it('memilih source checks dari companion sumber tanpa membundel corpus QA', () => {
     const path = 'docs/editorial/reference-example-sources.md';
-    for (const result of [classify({}, { [path]: 'Fixture\n' }),
-      classify({ [path]: 'Fixture\n' }, {})]) {
+    for (const result of [
+      classify({}, { [path]: 'Fixture\n' }),
+      classify({ [path]: 'Fixture\n' }, {}),
+    ]) {
       expect(result.checks.need_check).toBe('true');
       expect(result.checks.package_changed).toBe('false');
       expect(result.checks.mcp_changed).toBe('false');
@@ -207,4 +215,16 @@ describe('Light CI memilih pemeriksaan dari kedua sisi perubahan', () => {
     expect(runtime.checks.need_check).toBe('true');
     expect(runtime.checks.package_changed).toBe('true');
   });
+});
+
+it.each([
+  'scripts/mcp-catalog-inventory.ts',
+  'scripts/inspector-input.mjs',
+  'tests/fixtures/trivia-editorial-v2.json',
+  'tests/fixtures/tool-errors-v2.ts',
+])('keeps MCP and backend review selected when its shared input is deleted: %s', (path) => {
+  const result = classify({ [path]: 'fixture dependency' }, {});
+  expect(result.checks.need_check).toBe('true');
+  expect(result.checks.mcp_changed).toBe('true');
+  expect(result.checks.backend_review).toBe('true');
 });

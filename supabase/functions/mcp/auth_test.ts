@@ -212,7 +212,7 @@ Deno.test('6.2 discovery and 401 WWW-Authenticate bind exact resource', async ()
     ).status === 204,
     'preflight closed',
   );
-  assert(MCP_TOOL_COUNT === 31, 'P6 must have 36 owner-scoped tools');
+  assert(MCP_TOOL_COUNT === 33, 'P6 must have 36 owner-scoped tools');
 });
 
 Deno.test(
@@ -248,8 +248,8 @@ Deno.test(
     const event = (await listed.text()).split('\n').find((line) => line.startsWith('data: '));
     assert(event, 'missing tools/list event');
     const tools = JSON.parse(event.slice(6)).result?.tools;
-    assert(Array.isArray(tools) && tools.length === 31, 'public catalog count');
-    assert(new Set(tools.map((tool: { name: string }) => tool.name)).size === 31, 'duplicate tool');
+    assert(Array.isArray(tools) && tools.length === 33, 'public catalog count');
+    assert(new Set(tools.map((tool: { name: string }) => tool.name)).size === 33, 'duplicate tool');
     assert(
       tools.some((tool: { name: string }) => tool.name === 'create_page'),
       'create_page absent',
@@ -429,7 +429,7 @@ Deno.test(
         const frame = body.split('\n').find((line) => line.startsWith('data: '));
         assert(frame, 'signed owner tools/list frame missing');
         const tools = JSON.parse(frame.slice(6)).result.tools;
-        assert(tools.length === 31, 'signed owner must see exactly 31 tools');
+        assert(tools.length === 33, 'signed owner must see exactly 33 tools');
         assert(
           tools.some((tool: { name: string }) => tool.name === 'create_page'),
           'write tool absent',

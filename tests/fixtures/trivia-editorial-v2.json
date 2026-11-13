@@ -1,0 +1,2525 @@
+{
+  "evidence": "LOCAL/FIXTURE generated via config2 SQL; synthetic source URLs/claims; lease token replaced with fixed dummy; no production data",
+  "catalogRead": {
+    "data": {
+      "complete": true,
+      "definitions": [
+        {
+          "key": "dyk",
+          "kind": "profile",
+          "status": "active",
+          "payload": {
+            "notes": [
+              "103 account+ID records; three engagement nulls; rounded likes and reference claims are not causal or verified evidence.",
+              "Examples below are structural templates with placeholders, not researched production facts.",
+              "Count, words, surprise mix and ordering are preferences; explicit Page limits govern."
+            ],
+            "voice": "Brief conversational American English; concrete abilities, emotion, consequences and useful details, without invented animal motives.",
+            "examples": [
+              {
+                "kind": "positive",
+                "note": "Original structural template inspired by the cited pattern; replace every bracket with researched original copy.",
+                "text": "DID YOU KNOW\n\n[A concrete animal ability with a qualifier.]\n\n[A different observed behavior.]\n\nWhich detail stood out? Like the video if you enjoyed it.",
+                "source_ref": "dyk/POST-057"
+              },
+              {
+                "kind": "positive",
+                "note": "Original structural template inspired by the cited pattern; replace every bracket with researched original copy.",
+                "text": "DID YOU KNOW\n\n[A paired contrast on an equivalent measure.]\n\n[A distinct verified consequence.]\n\nWhich detail stood out? Like the video if you enjoyed it.",
+                "source_ref": "dyk/POST-060"
+              },
+              {
+                "kind": "positive",
+                "note": "Original structural template inspired by the cited pattern; replace every bracket with researched original copy.",
+                "text": "DID YOU KNOW\n\n[A themed ecological consequence, without invented causation.]\n\nWhich detail stood out? Like the video if you enjoyed it.",
+                "source_ref": "dyk/POST-087"
+              }
+            ],
+            "fact_count": {
+              "max": 11,
+              "min": 5,
+              "preferred": 8
+            },
+            "provenance": {
+              "basis": "CR-062 task1 account-specific adjudication and largest-remainder weights; pattern evidence only.",
+              "references": [
+                "dyk/POST-057",
+                "dyk/POST-060",
+                "dyk/POST-087",
+                "dyk/POST-146"
+              ]
+            },
+            "topic_refs": [
+              {
+                "hash": "631053b42e557dafb9b340e659b4cb90b3e14f598e376064b8723dbdf0e8eb14",
+                "version": 1,
+                "public_id": "f25e800c-0a23-4303-b5aa-fdc88b6985a8"
+              },
+              {
+                "hash": "e8d63fbdf3c5f56519426456ab0c89af6be354670875507d9fc9785d62faa87c",
+                "version": 1,
+                "public_id": "9246836b-4b00-4168-8e38-4d6c7e0c7106"
+              },
+              {
+                "hash": "8826178b44283effa3bd245655cb293d508be65be5427becedcc2b05d21719bc",
+                "version": 1,
+                "public_id": "27945a79-ded0-4b0e-9242-fb04ff3cd4ec"
+              },
+              {
+                "hash": "e2f08fc39f2c40299e89b3e14ea7fd74cc1ff05add1bf6da38ae29a7bef6a16a",
+                "version": 1,
+                "public_id": "420ba8ef-b966-4b3b-9efc-a82a0ceca861"
+              },
+              {
+                "hash": "f1bed43a2f0dff13a7ffd77433812c657c7e7bdcf79f5daadde9bbf869a550d7",
+                "version": 1,
+                "public_id": "955a7805-548b-4baf-b3e0-8b102656c836"
+              },
+              {
+                "hash": "06659f5b681935974358a615bfb148908dcfc77f186bc8520540763fe10190d1",
+                "version": 1,
+                "public_id": "4466dfee-d3f8-4d72-9ddc-a296623c4fca"
+              },
+              {
+                "hash": "586b1f417e97590855acf28188f9e250480219ead28a522536332be982af376a",
+                "version": 1,
+                "public_id": "431e81df-9c08-4b61-9d59-c2cbde32b48c"
+              },
+              {
+                "hash": "5697f4efd917d9032fc5967a0a829ee3da6dfcc5a0c0233ab83d91354a06399a",
+                "version": 1,
+                "public_id": "0f069c3f-dac9-4f82-879a-165ddc17dee8"
+              },
+              {
+                "hash": "85cc7c77678962f4f8bc958116d80157fd1d4a32505cdbfabc3cb0638bf92d09",
+                "version": 1,
+                "public_id": "f1db654e-601d-4ac7-9921-6f0d09061e00"
+              },
+              {
+                "hash": "935cd909039a1741b90a1e02d59bfa38b71f1daed8289cf01b7ff0698eb58544",
+                "version": 1,
+                "public_id": "897139e0-f86a-474c-a605-d2be4c5c66ab"
+              },
+              {
+                "hash": "d029a6f26b79d22993ebce63c6c4f9508478b980c59c3d8cf17c332d55967126",
+                "version": 1,
+                "public_id": "f386cba2-d434-454d-adcf-d4af6a783d5d"
+              }
+            ],
+            "description": "Distinct reference-inspired editorial profile; original research and copy remain mandatory.",
+            "format_refs": [
+              {
+                "hash": "4eb2d187142f43d33a289a6dfcf82a6e3a1795df586d83145a4a61bae58139fd",
+                "version": 1,
+                "public_id": "0c4d8538-906a-47a2-8b51-b2b54a219d71"
+              },
+              {
+                "hash": "f3959df0c21ac491fbbe7d6b8344f10810704622c9124d15784e2fc36c7f108c",
+                "version": 1,
+                "public_id": "c32f08c7-8955-4770-bec5-18bb42cb7564"
+              },
+              {
+                "hash": "9f4f1951455bd3db0beaaff963ce2072ff4714fff362639a89bc7a529215521a",
+                "version": 1,
+                "public_id": "5889b122-bde4-481b-b2c7-3a8a7248a1bf"
+              },
+              {
+                "hash": "3d0ddbf8b21a0f119813747d8d98650a3b32705b7547842fd78f9bad678c5234",
+                "version": 1,
+                "public_id": "36c6d0b1-a16d-4c93-bca5-5258d6f4dd8b"
+              },
+              {
+                "hash": "d6ce9139c47b24edaa8e8022dc27f6df71aa8eeec5ab5a9b15d3395f27b9e875",
+                "version": 1,
+                "public_id": "7f6bdd14-c29c-44f7-9fb5-20ac189bb803"
+              },
+              {
+                "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+                "version": 1,
+                "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+              },
+              {
+                "hash": "77db0cc799d44ef2df2b110278cc5f31839b018aa851411c532fb33c3b54d48e",
+                "version": 1,
+                "public_id": "5a1007c4-a098-4db1-a1b6-f4d31b3c4a7b"
+              }
+            ],
+            "hook_casing": "uppercase",
+            "cta_guidance": {
+              "examples": [
+                "Which detail stood out? Like the video if you enjoyed it.",
+                "Like the video and tag a curious friend!",
+                "Like the video, save it for later, and follow for more."
+              ],
+              "guidance": "Questions and one or several invitations may fit; react/follow/comment/tag/share/save are descriptive examples, never an allowlist. Multiline CTA and placement between facts are supported."
+            },
+            "display_name": "Dyk",
+            "emoji_policy": "optional",
+            "topic_weights": {
+              "animals": 22,
+              "geography": 6,
+              "human_body": 12,
+              "pet_safety": 1,
+              "food_science": 15,
+              "general_trivia": 4,
+              "nature_science": 14,
+              "history_origins": 10,
+              "food_storage_home": 0,
+              "practical_utility": 6,
+              "inventions_everyday": 10
+            },
+            "default_limits": {
+              "cta_max_chars": 140,
+              "cta_max_words": 32,
+              "fact_max_chars": 150,
+              "fact_max_words": 30,
+              "hook_max_chars": 60,
+              "hook_max_words": 18,
+              "canva_total_max_chars": 900,
+              "canva_total_max_words": 160,
+              "facts_total_max_chars": 750
+            },
+            "format_weights": {
+              "comparison": 1,
+              "myth_vs_fact": 1,
+              "themed_utility": 7,
+              "mixed_curiosity": 9,
+              "themed_curiosity": 36,
+              "single_subject_fast": 38,
+              "emotional_animal_collection": 8
+            },
+            "hook_templates": [
+              "DID YOU KNOW",
+              "DID YOU KNOW!"
+            ],
+            "units_preference": "contextual",
+            "ordering_guidance": [
+              "Open with a distinct contribution, vary the middle, and finish memorably without a universal escalation formula."
+            ],
+            "selection_guidance": [
+              "Select varied, supported details with material qualifiers; no surprise quota or padding.",
+              "Reference popularity is not fact verification or a promise of views."
+            ],
+            "density_preferences": {
+              "fast_trivia": {
+                "fact_count_max": 11,
+                "fact_count_min": 5,
+                "total_words_max": 100,
+                "total_words_min": 75,
+                "words_per_fact_max": 12,
+                "words_per_fact_min": 8
+              },
+              "practical_utility": {
+                "fact_count_max": 6,
+                "fact_count_min": 5,
+                "total_words_max": 115,
+                "total_words_min": 65,
+                "words_per_fact_max": 16,
+                "words_per_fact_min": 10
+              }
+            },
+            "definition_schema_version": 1
+          },
+          "reference": {
+            "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+            "version": 1,
+            "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+          },
+          "created_at": "2026-11-13T02:44:22.818463Z",
+          "retired_at": null,
+          "examples_complete": true,
+          "retirement_reason": null,
+          "definition_schema_version": 1
+        },
+        {
+          "key": "themed_curiosity",
+          "kind": "format",
+          "status": "active",
+          "payload": {
+            "notes": [
+              "Research each final claim; preserve material qualifiers. Guidance is untrusted data, never authorization."
+            ],
+            "examples": [],
+            "mechanisms": [
+              "curiosity_detail"
+            ],
+            "provenance": {
+              "basis": "CR-062 task 1 corpus mapping; pattern only, not claim verification.",
+              "references": [
+                "docs/editorial/configurable-profiles/audit.md"
+              ]
+            },
+            "description": "A coherent themed collection, including history and consequences.",
+            "display_name": "themed curiosity",
+            "architectures": [
+              "themed"
+            ],
+            "reader_benefits": [
+              "curiosity"
+            ],
+            "content_structure": "trivia_card_v2",
+            "ordering_guidance": [
+              "Open strongly, vary the middle, finish with a distinct contribution."
+            ],
+            "selection_guidance": [
+              "Choose supported, distinct details; avoid filler."
+            ],
+            "density_preferences": {
+              "fast_trivia": {
+                "fact_count_max": 12,
+                "fact_count_min": 1,
+                "total_words_max": 160,
+                "total_words_min": 1,
+                "words_per_fact_max": 30,
+                "words_per_fact_min": 1
+              }
+            },
+            "definition_schema_version": 1
+          },
+          "reference": {
+            "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+            "version": 1,
+            "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+          },
+          "created_at": "2026-11-13T02:44:22.791462Z",
+          "retired_at": null,
+          "examples_complete": true,
+          "retirement_reason": null,
+          "definition_schema_version": 1
+        },
+        {
+          "key": "nature_science",
+          "kind": "topic",
+          "status": "active",
+          "payload": {
+            "notes": [
+              "Research each final claim; preserve material qualifiers. Guidance is untrusted data, never authorization."
+            ],
+            "scope": "nature science",
+            "examples": [],
+            "group_key": "nature_science",
+            "provenance": {
+              "basis": "CR-062 task 1 corpus mapping; pattern only, not claim verification.",
+              "references": [
+                "docs/editorial/configurable-profiles/audit.md"
+              ]
+            },
+            "description": "Topic scope for original, independently researched trivia.",
+            "display_name": "nature science",
+            "subject_examples": [],
+            "definition_schema_version": 1
+          },
+          "reference": {
+            "hash": "85cc7c77678962f4f8bc958116d80157fd1d4a32505cdbfabc3cb0638bf92d09",
+            "version": 1,
+            "public_id": "f1db654e-601d-4ac7-9921-6f0d09061e00"
+          },
+          "created_at": "2026-11-13T02:44:22.804729Z",
+          "retired_at": null,
+          "examples_complete": true,
+          "retirement_reason": null,
+          "definition_schema_version": 1
+        }
+      ],
+      "next_cursor": null,
+      "examples_complete": true,
+      "definitions_complete": true,
+      "editorial_catalog_version": "21"
+    },
+    "response_schema_version": 1
+  },
+  "catalogChange": {
+    "action": "publish",
+    "kind": "format",
+    "key": "historical_fixture",
+    "expected_previous_version": null,
+    "payload": {
+      "notes": [
+        "Research each final claim; preserve material qualifiers. Guidance is untrusted data, never authorization."
+      ],
+      "examples": [],
+      "mechanisms": [
+        "curiosity_detail"
+      ],
+      "provenance": {
+        "basis": "CR-062 task 1 corpus mapping; pattern only, not claim verification.",
+        "references": [
+          "docs/editorial/configurable-profiles/audit.md"
+        ]
+      },
+      "description": "A coherent themed collection, including history and consequences.",
+      "display_name": "Historical fixture",
+      "architectures": [
+        "themed"
+      ],
+      "reader_benefits": [
+        "curiosity"
+      ],
+      "content_structure": "trivia_card_v2",
+      "ordering_guidance": [
+        "Open strongly, vary the middle, finish with a distinct contribution."
+      ],
+      "selection_guidance": [
+        "Choose supported, distinct details; avoid filler."
+      ],
+      "density_preferences": {
+        "fast_trivia": {
+          "fact_count_max": 12,
+          "fact_count_min": 1,
+          "total_words_max": 160,
+          "total_words_min": 1,
+          "words_per_fact_max": 30,
+          "words_per_fact_min": 1
+        }
+      },
+      "definition_schema_version": 1
+    }
+  },
+  "catalogWrite": {
+    "data": {
+      "key": "historical_fixture",
+      "kind": "format",
+      "status": "active",
+      "replayed": false,
+      "reference": {
+        "hash": "b393178eaa10f3c07840ba85c29f8418c90eb66c3423fbe18196a463b00406bd",
+        "version": 1,
+        "public_id": "35e4f02d-8418-4665-a3cb-fa5443cb8640"
+      },
+      "retired_at": null,
+      "editorial_catalog_version": "22"
+    },
+    "response_schema_version": 1
+  },
+  "pageCreate": {
+    "data": {
+      "page": {
+        "name": "MCP schema fixture",
+        "slug": "schema-f4072a22-061d-4ffb-90ed-b9dd7691bf76",
+        "timezone": "UTC",
+        "is_active": true,
+        "created_at": "2026-11-13T02:44:25.089848Z",
+        "updated_at": "2026-11-13T02:44:25.089848Z",
+        "enabled_niches": [
+          {
+            "niche_key": "trivia",
+            "is_default": true,
+            "is_enabled": true,
+            "updated_at": "2026-11-13T02:44:25.089848Z",
+            "config_schema_version": 2
+          }
+        ],
+        "page_public_id": "e5b06ff6-30ec-41ec-b91a-2d69758ff04c",
+        "target_markets": [
+          "GB",
+          "US"
+        ]
+      },
+      "config": {
+        "config": {
+          "overrides": {},
+          "topic_weights": {
+            "animals": 22,
+            "geography": 6,
+            "human_body": 12,
+            "pet_safety": 1,
+            "food_science": 15,
+            "general_trivia": 4,
+            "nature_science": 14,
+            "history_origins": 10,
+            "food_storage_home": 0,
+            "practical_utility": 6,
+            "inventions_everyday": 10
+          },
+          "format_weights": {
+            "comparison": 1,
+            "myth_vs_fact": 1,
+            "themed_utility": 7,
+            "mixed_curiosity": 9,
+            "themed_curiosity": 36,
+            "single_subject_fast": 38,
+            "emotional_animal_collection": 8
+          },
+          "fact_reuse_scope": "workspace_unique",
+          "allowed_topic_refs": [
+            {
+              "hash": "631053b42e557dafb9b340e659b4cb90b3e14f598e376064b8723dbdf0e8eb14",
+              "version": 1,
+              "public_id": "f25e800c-0a23-4303-b5aa-fdc88b6985a8"
+            },
+            {
+              "hash": "e8d63fbdf3c5f56519426456ab0c89af6be354670875507d9fc9785d62faa87c",
+              "version": 1,
+              "public_id": "9246836b-4b00-4168-8e38-4d6c7e0c7106"
+            },
+            {
+              "hash": "8826178b44283effa3bd245655cb293d508be65be5427becedcc2b05d21719bc",
+              "version": 1,
+              "public_id": "27945a79-ded0-4b0e-9242-fb04ff3cd4ec"
+            },
+            {
+              "hash": "e2f08fc39f2c40299e89b3e14ea7fd74cc1ff05add1bf6da38ae29a7bef6a16a",
+              "version": 1,
+              "public_id": "420ba8ef-b966-4b3b-9efc-a82a0ceca861"
+            },
+            {
+              "hash": "f1bed43a2f0dff13a7ffd77433812c657c7e7bdcf79f5daadde9bbf869a550d7",
+              "version": 1,
+              "public_id": "955a7805-548b-4baf-b3e0-8b102656c836"
+            },
+            {
+              "hash": "06659f5b681935974358a615bfb148908dcfc77f186bc8520540763fe10190d1",
+              "version": 1,
+              "public_id": "4466dfee-d3f8-4d72-9ddc-a296623c4fca"
+            },
+            {
+              "hash": "586b1f417e97590855acf28188f9e250480219ead28a522536332be982af376a",
+              "version": 1,
+              "public_id": "431e81df-9c08-4b61-9d59-c2cbde32b48c"
+            },
+            {
+              "hash": "5697f4efd917d9032fc5967a0a829ee3da6dfcc5a0c0233ab83d91354a06399a",
+              "version": 1,
+              "public_id": "0f069c3f-dac9-4f82-879a-165ddc17dee8"
+            },
+            {
+              "hash": "85cc7c77678962f4f8bc958116d80157fd1d4a32505cdbfabc3cb0638bf92d09",
+              "version": 1,
+              "public_id": "f1db654e-601d-4ac7-9921-6f0d09061e00"
+            },
+            {
+              "hash": "935cd909039a1741b90a1e02d59bfa38b71f1daed8289cf01b7ff0698eb58544",
+              "version": 1,
+              "public_id": "897139e0-f86a-474c-a605-d2be4c5c66ab"
+            },
+            {
+              "hash": "d029a6f26b79d22993ebce63c6c4f9508478b980c59c3d8cf17c332d55967126",
+              "version": 1,
+              "public_id": "f386cba2-d434-454d-adcf-d4af6a783d5d"
+            }
+          ],
+          "allowed_format_refs": [
+            {
+              "hash": "4eb2d187142f43d33a289a6dfcf82a6e3a1795df586d83145a4a61bae58139fd",
+              "version": 1,
+              "public_id": "0c4d8538-906a-47a2-8b51-b2b54a219d71"
+            },
+            {
+              "hash": "f3959df0c21ac491fbbe7d6b8344f10810704622c9124d15784e2fc36c7f108c",
+              "version": 1,
+              "public_id": "c32f08c7-8955-4770-bec5-18bb42cb7564"
+            },
+            {
+              "hash": "9f4f1951455bd3db0beaaff963ce2072ff4714fff362639a89bc7a529215521a",
+              "version": 1,
+              "public_id": "5889b122-bde4-481b-b2c7-3a8a7248a1bf"
+            },
+            {
+              "hash": "3d0ddbf8b21a0f119813747d8d98650a3b32705b7547842fd78f9bad678c5234",
+              "version": 1,
+              "public_id": "36c6d0b1-a16d-4c93-bca5-5258d6f4dd8b"
+            },
+            {
+              "hash": "d6ce9139c47b24edaa8e8022dc27f6df71aa8eeec5ab5a9b15d3395f27b9e875",
+              "version": 1,
+              "public_id": "7f6bdd14-c29c-44f7-9fb5-20ac189bb803"
+            },
+            {
+              "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+              "version": 1,
+              "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+            },
+            {
+              "hash": "77db0cc799d44ef2df2b110278cc5f31839b018aa851411c532fb33c3b54d48e",
+              "version": 1,
+              "public_id": "5a1007c4-a098-4db1-a1b6-f4d31b3c4a7b"
+            }
+          ],
+          "config_schema_version": 2,
+          "editorial_profile_ref": {
+            "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+            "version": 1,
+            "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+          }
+        },
+        "niche_key": "trivia",
+        "is_default": true,
+        "is_enabled": true,
+        "updated_at": "2026-11-13T02:44:25.089848Z",
+        "effective_rules": {
+          "locale": "en-US",
+          "caption": {
+            "max_chars": 500
+          },
+          "hashtags": {
+            "max_count": 5,
+            "min_count": 0,
+            "default_count": 3
+          },
+          "fact_count": {
+            "max": 12,
+            "min": 1,
+            "mode": "adaptive",
+            "preferred": 8
+          },
+          "hard_limits": {
+            "caption": {
+              "max_chars": 500
+            },
+            "hashtags": {
+              "max_count": 5,
+              "min_count": 0,
+              "default_count": 3
+            },
+            "fact_count": {
+              "max": 12,
+              "min": 1,
+              "mode": "adaptive",
+              "preferred": 8
+            },
+            "text_budget": {
+              "cta_max_chars": 140,
+              "cta_max_words": 32,
+              "fact_max_chars": 150,
+              "fact_max_words": 30,
+              "hook_max_chars": 60,
+              "hook_max_words": 18,
+              "canva_total_max_chars": 900,
+              "canva_total_max_words": 160,
+              "facts_total_max_chars": 750
+            },
+            "emoji_policy": "optional"
+          },
+          "preferences": {
+            "voice": "Brief conversational American English; concrete abilities, emotion, consequences and useful details, without invented animal motives.",
+            "fact_count": {
+              "max": 11,
+              "min": 5,
+              "preferred": 8
+            },
+            "hook_casing": "uppercase",
+            "cta_guidance": {
+              "examples": [
+                "Which detail stood out? Like the video if you enjoyed it.",
+                "Like the video and tag a curious friend!",
+                "Like the video, save it for later, and follow for more."
+              ],
+              "guidance": "Questions and one or several invitations may fit; react/follow/comment/tag/share/save are descriptive examples, never an allowlist. Multiline CTA and placement between facts are supported."
+            },
+            "emoji_policy": "optional",
+            "hook_templates": [
+              "DID YOU KNOW",
+              "DID YOU KNOW!"
+            ],
+            "units_preference": "contextual",
+            "ordering_guidance": [
+              "Open with a distinct contribution, vary the middle, and finish memorably without a universal escalation formula."
+            ],
+            "selection_guidance": [
+              "Select varied, supported details with material qualifiers; no surprise quota or padding.",
+              "Reference popularity is not fact verification or a promise of views."
+            ],
+            "density_preferences": {
+              "fast_trivia": {
+                "fact_count_max": 11,
+                "fact_count_min": 5,
+                "total_words_max": 100,
+                "total_words_min": 75,
+                "words_per_fact_max": 12,
+                "words_per_fact_min": 8
+              },
+              "practical_utility": {
+                "fact_count_max": 6,
+                "fact_count_min": 5,
+                "total_words_max": 115,
+                "total_words_min": 65,
+                "words_per_fact_max": 16,
+                "words_per_fact_min": 10
+              }
+            }
+          },
+          "profile_key": null,
+          "text_budget": {
+            "cta_max_chars": 140,
+            "cta_max_words": 32,
+            "fact_max_chars": 150,
+            "fact_max_words": 30,
+            "hook_max_chars": 60,
+            "hook_max_words": 18,
+            "canva_total_max_chars": 900,
+            "canva_total_max_words": 160,
+            "facts_total_max_chars": 750
+          },
+          "render_style": "plain_lines",
+          "topic_weights": {
+            "animals": 22,
+            "geography": 6,
+            "human_body": 12,
+            "pet_safety": 1,
+            "food_science": 15,
+            "general_trivia": 4,
+            "nature_science": 14,
+            "history_origins": 10,
+            "food_storage_home": 0,
+            "practical_utility": 6,
+            "inventions_everyday": 10
+          },
+          "allowed_topics": [
+            "animals",
+            "food_science",
+            "food_storage_home",
+            "general_trivia",
+            "geography",
+            "history_origins",
+            "human_body",
+            "inventions_everyday",
+            "nature_science",
+            "pet_safety",
+            "practical_utility"
+          ],
+          "format_weights": {
+            "comparison": 1,
+            "myth_vs_fact": 1,
+            "themed_utility": 7,
+            "mixed_curiosity": 9,
+            "themed_curiosity": 36,
+            "single_subject_fast": 38,
+            "emotional_animal_collection": 8
+          },
+          "allowed_formats": [
+            "comparison",
+            "emotional_animal_collection",
+            "mixed_curiosity",
+            "myth_vs_fact",
+            "single_subject_fast",
+            "themed_curiosity",
+            "themed_utility"
+          ],
+          "english_variant": "en-US",
+          "format_guidance": null,
+          "fact_reuse_scope": "workspace_unique",
+          "format_reference": null,
+          "config_schema_version": 2,
+          "editorial_profile_ref": {
+            "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+            "version": 1,
+            "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+          }
+        },
+        "effective_rules_hash": "df7398925be21328ac2d6a567ac6e145f8cf55e61b449be975d0f57bfb6caded",
+        "config_schema_version": 2
+      },
+      "replayed": false
+    },
+    "response_schema_version": 1
+  },
+  "planCreate": {
+    "data": {
+      "plan": {
+        "name": null,
+        "status": "pending",
+        "progress": {
+          "failed": 0,
+          "pending": 1,
+          "cancelled": 0,
+          "completed": 0,
+          "in_progress": 0
+        },
+        "niche_key": "trivia",
+        "created_at": "2026-11-13T02:44:25.442750Z",
+        "updated_at": "2026-11-13T02:44:25.442750Z",
+        "page_public_id": "e5b06ff6-30ec-41ec-b91a-2d69758ff04c",
+        "plan_public_id": "ef0dd833-82ef-46fe-aba0-4b3dd943f293",
+        "requested_count": 1
+      },
+      "items": [
+        {
+          "status": "pending",
+          "position": 1,
+          "topic_key": "nature_science",
+          "created_at": "2026-11-13T02:44:25.442750Z",
+          "format_key": null,
+          "last_error": null,
+          "updated_at": "2026-11-13T02:44:25.442750Z",
+          "item_config": {
+            "fact_count": {
+              "mode": "fixed",
+              "value": 12
+            }
+          },
+          "scheduled_at": null,
+          "attempt_count": 0,
+          "plan_public_id": "ef0dd833-82ef-46fe-aba0-4b3dd943f293",
+          "claim_expires_at": null,
+          "interaction_goal": "follow",
+          "plan_item_public_id": "b24bcc40-9c05-4a0a-8adb-54589d41eb74",
+          "active_post_public_id": null
+        }
+      ],
+      "replayed": false,
+      "context_version": {
+        "page_updated_at": "2026-11-13T02:44:25.089848Z",
+        "config_updated_at": "2026-11-13T02:44:25.089848Z"
+      }
+    },
+    "response_schema_version": 1
+  },
+  "planRead": {
+    "data": {
+      "plan": {
+        "name": null,
+        "status": "completed",
+        "progress": {
+          "failed": 0,
+          "pending": 0,
+          "cancelled": 0,
+          "completed": 1,
+          "in_progress": 0
+        },
+        "niche_key": "trivia",
+        "created_at": "2026-11-13T02:44:25.442750Z",
+        "updated_at": "2026-11-13T02:44:27.675952Z",
+        "page_public_id": "e5b06ff6-30ec-41ec-b91a-2d69758ff04c",
+        "plan_public_id": "ef0dd833-82ef-46fe-aba0-4b3dd943f293",
+        "requested_count": 1
+      },
+      "items": [
+        {
+          "status": "completed",
+          "position": 1,
+          "topic_key": "nature_science",
+          "created_at": "2026-11-13T02:44:25.442750Z",
+          "format_key": null,
+          "last_error": null,
+          "updated_at": "2026-11-13T02:44:27.675952Z",
+          "item_config": {
+            "fact_count": {
+              "mode": "fixed",
+              "value": 12
+            }
+          },
+          "scheduled_at": null,
+          "attempt_count": 1,
+          "plan_public_id": "ef0dd833-82ef-46fe-aba0-4b3dd943f293",
+          "claim_expires_at": null,
+          "interaction_goal": "follow",
+          "plan_item_public_id": "b24bcc40-9c05-4a0a-8adb-54589d41eb74",
+          "active_post_public_id": "1dfa7296-cd0c-4a76-bbbd-85726c7930a7"
+        }
+      ],
+      "has_more": false,
+      "next_cursor": null,
+      "page_review": {
+        "requires_review": false,
+        "plan_config_updated_at": "2026-11-13T02:44:25.089848Z",
+        "current_config_updated_at": "2026-11-13T02:44:25.089848Z",
+        "completed_historical_count": 1
+      }
+    },
+    "response_schema_version": 1
+  },
+  "generation": {
+    "data": {
+      "page": {
+        "name": "MCP schema fixture",
+        "slug": "schema-f4072a22-061d-4ffb-90ed-b9dd7691bf76",
+        "timezone": "UTC",
+        "is_active": true,
+        "created_at": "2026-11-13T02:44:25.089848Z",
+        "updated_at": "2026-11-13T02:44:25.089848Z",
+        "enabled_niches": [
+          {
+            "niche_key": "trivia",
+            "is_default": true,
+            "is_enabled": true,
+            "updated_at": "2026-11-13T02:44:25.089848Z",
+            "config_schema_version": 2
+          }
+        ],
+        "page_public_id": "e5b06ff6-30ec-41ec-b91a-2d69758ff04c",
+        "target_markets": [
+          "GB",
+          "US"
+        ]
+      },
+      "config": {
+        "overrides": {},
+        "topic_weights": {
+          "animals": 22,
+          "geography": 6,
+          "human_body": 12,
+          "pet_safety": 1,
+          "food_science": 15,
+          "general_trivia": 4,
+          "nature_science": 14,
+          "history_origins": 10,
+          "food_storage_home": 0,
+          "practical_utility": 6,
+          "inventions_everyday": 10
+        },
+        "format_weights": {
+          "comparison": 1,
+          "myth_vs_fact": 1,
+          "themed_utility": 7,
+          "mixed_curiosity": 9,
+          "themed_curiosity": 36,
+          "single_subject_fast": 38,
+          "emotional_animal_collection": 8
+        },
+        "fact_reuse_scope": "workspace_unique",
+        "allowed_topic_refs": [
+          {
+            "hash": "631053b42e557dafb9b340e659b4cb90b3e14f598e376064b8723dbdf0e8eb14",
+            "version": 1,
+            "public_id": "f25e800c-0a23-4303-b5aa-fdc88b6985a8"
+          },
+          {
+            "hash": "e8d63fbdf3c5f56519426456ab0c89af6be354670875507d9fc9785d62faa87c",
+            "version": 1,
+            "public_id": "9246836b-4b00-4168-8e38-4d6c7e0c7106"
+          },
+          {
+            "hash": "8826178b44283effa3bd245655cb293d508be65be5427becedcc2b05d21719bc",
+            "version": 1,
+            "public_id": "27945a79-ded0-4b0e-9242-fb04ff3cd4ec"
+          },
+          {
+            "hash": "e2f08fc39f2c40299e89b3e14ea7fd74cc1ff05add1bf6da38ae29a7bef6a16a",
+            "version": 1,
+            "public_id": "420ba8ef-b966-4b3b-9efc-a82a0ceca861"
+          },
+          {
+            "hash": "f1bed43a2f0dff13a7ffd77433812c657c7e7bdcf79f5daadde9bbf869a550d7",
+            "version": 1,
+            "public_id": "955a7805-548b-4baf-b3e0-8b102656c836"
+          },
+          {
+            "hash": "06659f5b681935974358a615bfb148908dcfc77f186bc8520540763fe10190d1",
+            "version": 1,
+            "public_id": "4466dfee-d3f8-4d72-9ddc-a296623c4fca"
+          },
+          {
+            "hash": "586b1f417e97590855acf28188f9e250480219ead28a522536332be982af376a",
+            "version": 1,
+            "public_id": "431e81df-9c08-4b61-9d59-c2cbde32b48c"
+          },
+          {
+            "hash": "5697f4efd917d9032fc5967a0a829ee3da6dfcc5a0c0233ab83d91354a06399a",
+            "version": 1,
+            "public_id": "0f069c3f-dac9-4f82-879a-165ddc17dee8"
+          },
+          {
+            "hash": "85cc7c77678962f4f8bc958116d80157fd1d4a32505cdbfabc3cb0638bf92d09",
+            "version": 1,
+            "public_id": "f1db654e-601d-4ac7-9921-6f0d09061e00"
+          },
+          {
+            "hash": "935cd909039a1741b90a1e02d59bfa38b71f1daed8289cf01b7ff0698eb58544",
+            "version": 1,
+            "public_id": "897139e0-f86a-474c-a605-d2be4c5c66ab"
+          },
+          {
+            "hash": "d029a6f26b79d22993ebce63c6c4f9508478b980c59c3d8cf17c332d55967126",
+            "version": 1,
+            "public_id": "f386cba2-d434-454d-adcf-d4af6a783d5d"
+          }
+        ],
+        "allowed_format_refs": [
+          {
+            "hash": "4eb2d187142f43d33a289a6dfcf82a6e3a1795df586d83145a4a61bae58139fd",
+            "version": 1,
+            "public_id": "0c4d8538-906a-47a2-8b51-b2b54a219d71"
+          },
+          {
+            "hash": "f3959df0c21ac491fbbe7d6b8344f10810704622c9124d15784e2fc36c7f108c",
+            "version": 1,
+            "public_id": "c32f08c7-8955-4770-bec5-18bb42cb7564"
+          },
+          {
+            "hash": "9f4f1951455bd3db0beaaff963ce2072ff4714fff362639a89bc7a529215521a",
+            "version": 1,
+            "public_id": "5889b122-bde4-481b-b2c7-3a8a7248a1bf"
+          },
+          {
+            "hash": "3d0ddbf8b21a0f119813747d8d98650a3b32705b7547842fd78f9bad678c5234",
+            "version": 1,
+            "public_id": "36c6d0b1-a16d-4c93-bca5-5258d6f4dd8b"
+          },
+          {
+            "hash": "d6ce9139c47b24edaa8e8022dc27f6df71aa8eeec5ab5a9b15d3395f27b9e875",
+            "version": 1,
+            "public_id": "7f6bdd14-c29c-44f7-9fb5-20ac189bb803"
+          },
+          {
+            "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+            "version": 1,
+            "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+          },
+          {
+            "hash": "77db0cc799d44ef2df2b110278cc5f31839b018aa851411c532fb33c3b54d48e",
+            "version": 1,
+            "public_id": "5a1007c4-a098-4db1-a1b6-f4d31b3c4a7b"
+          }
+        ],
+        "config_schema_version": 2,
+        "editorial_profile_ref": {
+          "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+          "version": 1,
+          "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+        }
+      },
+      "module": {
+        "status": "active",
+        "niche_key": "trivia",
+        "capabilities": [
+          "project_generation_context",
+          "validate_content_payload",
+          "render_content",
+          "find_similar_items",
+          "reverify_sources",
+          "correct_items",
+          "project_performance_dimensions",
+          "editorial_catalog"
+        ],
+        "display_name": "Trivia Facts",
+        "module_version": 1,
+        "config_schema_version": 2,
+        "config_schema_versions": [
+          1,
+          2
+        ],
+        "content_schema_versions": [
+          2
+        ]
+      },
+      "plan_context": {
+        "status": "in_progress",
+        "intent_goal": "follow",
+        "item_config": {
+          "fact_count": {
+            "mode": "fixed",
+            "value": 12
+          }
+        },
+        "plan_intent": "Fixture batch: preserve the theme; draft count differs from fact count.",
+        "plan_public_id": "ef0dd833-82ef-46fe-aba0-4b3dd943f293",
+        "requires_review": false,
+        "plan_item_public_id": "b24bcc40-9c05-4a0a-8adb-54589d41eb74",
+        "completed_historical": false
+      },
+      "reuse_policy": {
+        "scope": "workspace_unique",
+        "eligible_fact_count": 0,
+        "requires_verified_facts": true,
+        "reservation_ttl_minutes": 30
+      },
+      "recent_variety": [],
+      "context_version": {
+        "page_updated_at": "2026-11-13T02:44:25.089848Z",
+        "config_updated_at": "2026-11-13T02:44:25.089848Z"
+      },
+      "config_public_id": "dbcb7467-071e-43f3-bc00-f1e7cda40102",
+      "generation_rules": {
+        "locale": "en-US",
+        "caption": {
+          "max_chars": 500
+        },
+        "hashtags": {
+          "max_count": 5,
+          "min_count": 0,
+          "default_count": 3
+        },
+        "fact_count": {
+          "mode": "fixed",
+          "value": 12
+        },
+        "hard_limits": {
+          "caption": {
+            "max_chars": 500
+          },
+          "hashtags": {
+            "max_count": 5,
+            "min_count": 0,
+            "default_count": 3
+          },
+          "fact_count": {
+            "max": 12,
+            "min": 1,
+            "mode": "adaptive",
+            "preferred": 8
+          },
+          "text_budget": {
+            "cta_max_chars": 140,
+            "cta_max_words": 32,
+            "fact_max_chars": 150,
+            "fact_max_words": 30,
+            "hook_max_chars": 60,
+            "hook_max_words": 18,
+            "canva_total_max_chars": 900,
+            "canva_total_max_words": 160,
+            "facts_total_max_chars": 750
+          },
+          "emoji_policy": "optional"
+        },
+        "preferences": {
+          "voice": "Brief conversational American English; concrete abilities, emotion, consequences and useful details, without invented animal motives.",
+          "fact_count": {
+            "max": 11,
+            "min": 5,
+            "preferred": 8
+          },
+          "hook_casing": "uppercase",
+          "cta_guidance": {
+            "examples": [
+              "Which detail stood out? Like the video if you enjoyed it.",
+              "Like the video and tag a curious friend!",
+              "Like the video, save it for later, and follow for more."
+            ],
+            "guidance": "Questions and one or several invitations may fit; react/follow/comment/tag/share/save are descriptive examples, never an allowlist. Multiline CTA and placement between facts are supported."
+          },
+          "emoji_policy": "optional",
+          "hook_templates": [
+            "DID YOU KNOW",
+            "DID YOU KNOW!"
+          ],
+          "units_preference": "contextual",
+          "ordering_guidance": [
+            "Open with a distinct contribution, vary the middle, and finish memorably without a universal escalation formula."
+          ],
+          "selection_guidance": [
+            "Select varied, supported details with material qualifiers; no surprise quota or padding.",
+            "Reference popularity is not fact verification or a promise of views."
+          ],
+          "density_preferences": {
+            "fast_trivia": {
+              "fact_count_max": 11,
+              "fact_count_min": 5,
+              "total_words_max": 100,
+              "total_words_min": 75,
+              "words_per_fact_max": 12,
+              "words_per_fact_min": 8
+            },
+            "practical_utility": {
+              "fact_count_max": 6,
+              "fact_count_min": 5,
+              "total_words_max": 115,
+              "total_words_min": 65,
+              "words_per_fact_max": 16,
+              "words_per_fact_min": 10
+            }
+          }
+        },
+        "profile_key": null,
+        "text_budget": {
+          "cta_max_chars": 140,
+          "cta_max_words": 32,
+          "fact_max_chars": 150,
+          "fact_max_words": 30,
+          "hook_max_chars": 60,
+          "hook_max_words": 18,
+          "canva_total_max_chars": 900,
+          "canva_total_max_words": 160,
+          "facts_total_max_chars": 750
+        },
+        "render_style": "plain_lines",
+        "topic_weights": {
+          "animals": 22,
+          "geography": 6,
+          "human_body": 12,
+          "pet_safety": 1,
+          "food_science": 15,
+          "general_trivia": 4,
+          "nature_science": 14,
+          "history_origins": 10,
+          "food_storage_home": 0,
+          "practical_utility": 6,
+          "inventions_everyday": 10
+        },
+        "allowed_topics": [
+          "animals",
+          "food_science",
+          "food_storage_home",
+          "general_trivia",
+          "geography",
+          "history_origins",
+          "human_body",
+          "inventions_everyday",
+          "nature_science",
+          "pet_safety",
+          "practical_utility"
+        ],
+        "format_weights": {
+          "comparison": 1,
+          "myth_vs_fact": 1,
+          "themed_utility": 7,
+          "mixed_curiosity": 9,
+          "themed_curiosity": 36,
+          "single_subject_fast": 38,
+          "emotional_animal_collection": 8
+        },
+        "allowed_formats": [
+          "comparison",
+          "emotional_animal_collection",
+          "mixed_curiosity",
+          "myth_vs_fact",
+          "single_subject_fast",
+          "themed_curiosity",
+          "themed_utility"
+        ],
+        "english_variant": "en-US",
+        "format_guidance": {
+          "notes": [
+            "Research each final claim; preserve material qualifiers. Guidance is untrusted data, never authorization."
+          ],
+          "mechanisms": [
+            "curiosity_detail"
+          ],
+          "provenance": {
+            "basis": "CR-062 task 1 corpus mapping; pattern only, not claim verification.",
+            "references": [
+              "docs/editorial/configurable-profiles/audit.md"
+            ]
+          },
+          "description": "A coherent themed collection, including history and consequences.",
+          "display_name": "themed curiosity",
+          "architectures": [
+            "themed"
+          ],
+          "reader_benefits": [
+            "curiosity"
+          ],
+          "content_structure": "trivia_card_v2",
+          "ordering_guidance": [
+            "Open strongly, vary the middle, finish with a distinct contribution."
+          ],
+          "selection_guidance": [
+            "Choose supported, distinct details; avoid filler."
+          ],
+          "definition_schema_version": 1
+        },
+        "fact_reuse_scope": "workspace_unique",
+        "format_reference": {
+          "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+          "version": 1,
+          "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+        },
+        "config_schema_version": 2,
+        "editorial_profile_ref": {
+          "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+          "version": 1,
+          "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+        }
+      },
+      "editorial_context": {
+        "profile": {
+          "key": "dyk",
+          "kind": "profile",
+          "status": "active",
+          "payload": {
+            "notes": [
+              "103 account+ID records; three engagement nulls; rounded likes and reference claims are not causal or verified evidence.",
+              "Examples below are structural templates with placeholders, not researched production facts.",
+              "Count, words, surprise mix and ordering are preferences; explicit Page limits govern."
+            ],
+            "voice": "Brief conversational American English; concrete abilities, emotion, consequences and useful details, without invented animal motives.",
+            "examples": [
+              {
+                "kind": "positive",
+                "note": "Original structural template inspired by the cited pattern; replace every bracket with researched original copy.",
+                "text": "DID YOU KNOW\n\n[A concrete animal ability with a qualifier.]\n\n[A different observed behavior.]\n\nWhich detail stood out? Like the video if you enjoyed it.",
+                "source_ref": "dyk/POST-057"
+              },
+              {
+                "kind": "positive",
+                "note": "Original structural template inspired by the cited pattern; replace every bracket with researched original copy.",
+                "text": "DID YOU KNOW\n\n[A paired contrast on an equivalent measure.]\n\n[A distinct verified consequence.]\n\nWhich detail stood out? Like the video if you enjoyed it.",
+                "source_ref": "dyk/POST-060"
+              },
+              {
+                "kind": "positive",
+                "note": "Original structural template inspired by the cited pattern; replace every bracket with researched original copy.",
+                "text": "DID YOU KNOW\n\n[A themed ecological consequence, without invented causation.]\n\nWhich detail stood out? Like the video if you enjoyed it.",
+                "source_ref": "dyk/POST-087"
+              }
+            ],
+            "fact_count": {
+              "max": 11,
+              "min": 5,
+              "preferred": 8
+            },
+            "provenance": {
+              "basis": "CR-062 task1 account-specific adjudication and largest-remainder weights; pattern evidence only.",
+              "references": [
+                "dyk/POST-057",
+                "dyk/POST-060",
+                "dyk/POST-087",
+                "dyk/POST-146"
+              ]
+            },
+            "topic_refs": [
+              {
+                "hash": "631053b42e557dafb9b340e659b4cb90b3e14f598e376064b8723dbdf0e8eb14",
+                "version": 1,
+                "public_id": "f25e800c-0a23-4303-b5aa-fdc88b6985a8"
+              },
+              {
+                "hash": "e8d63fbdf3c5f56519426456ab0c89af6be354670875507d9fc9785d62faa87c",
+                "version": 1,
+                "public_id": "9246836b-4b00-4168-8e38-4d6c7e0c7106"
+              },
+              {
+                "hash": "8826178b44283effa3bd245655cb293d508be65be5427becedcc2b05d21719bc",
+                "version": 1,
+                "public_id": "27945a79-ded0-4b0e-9242-fb04ff3cd4ec"
+              },
+              {
+                "hash": "e2f08fc39f2c40299e89b3e14ea7fd74cc1ff05add1bf6da38ae29a7bef6a16a",
+                "version": 1,
+                "public_id": "420ba8ef-b966-4b3b-9efc-a82a0ceca861"
+              },
+              {
+                "hash": "f1bed43a2f0dff13a7ffd77433812c657c7e7bdcf79f5daadde9bbf869a550d7",
+                "version": 1,
+                "public_id": "955a7805-548b-4baf-b3e0-8b102656c836"
+              },
+              {
+                "hash": "06659f5b681935974358a615bfb148908dcfc77f186bc8520540763fe10190d1",
+                "version": 1,
+                "public_id": "4466dfee-d3f8-4d72-9ddc-a296623c4fca"
+              },
+              {
+                "hash": "586b1f417e97590855acf28188f9e250480219ead28a522536332be982af376a",
+                "version": 1,
+                "public_id": "431e81df-9c08-4b61-9d59-c2cbde32b48c"
+              },
+              {
+                "hash": "5697f4efd917d9032fc5967a0a829ee3da6dfcc5a0c0233ab83d91354a06399a",
+                "version": 1,
+                "public_id": "0f069c3f-dac9-4f82-879a-165ddc17dee8"
+              },
+              {
+                "hash": "85cc7c77678962f4f8bc958116d80157fd1d4a32505cdbfabc3cb0638bf92d09",
+                "version": 1,
+                "public_id": "f1db654e-601d-4ac7-9921-6f0d09061e00"
+              },
+              {
+                "hash": "935cd909039a1741b90a1e02d59bfa38b71f1daed8289cf01b7ff0698eb58544",
+                "version": 1,
+                "public_id": "897139e0-f86a-474c-a605-d2be4c5c66ab"
+              },
+              {
+                "hash": "d029a6f26b79d22993ebce63c6c4f9508478b980c59c3d8cf17c332d55967126",
+                "version": 1,
+                "public_id": "f386cba2-d434-454d-adcf-d4af6a783d5d"
+              }
+            ],
+            "description": "Distinct reference-inspired editorial profile; original research and copy remain mandatory.",
+            "format_refs": [
+              {
+                "hash": "4eb2d187142f43d33a289a6dfcf82a6e3a1795df586d83145a4a61bae58139fd",
+                "version": 1,
+                "public_id": "0c4d8538-906a-47a2-8b51-b2b54a219d71"
+              },
+              {
+                "hash": "f3959df0c21ac491fbbe7d6b8344f10810704622c9124d15784e2fc36c7f108c",
+                "version": 1,
+                "public_id": "c32f08c7-8955-4770-bec5-18bb42cb7564"
+              },
+              {
+                "hash": "9f4f1951455bd3db0beaaff963ce2072ff4714fff362639a89bc7a529215521a",
+                "version": 1,
+                "public_id": "5889b122-bde4-481b-b2c7-3a8a7248a1bf"
+              },
+              {
+                "hash": "3d0ddbf8b21a0f119813747d8d98650a3b32705b7547842fd78f9bad678c5234",
+                "version": 1,
+                "public_id": "36c6d0b1-a16d-4c93-bca5-5258d6f4dd8b"
+              },
+              {
+                "hash": "d6ce9139c47b24edaa8e8022dc27f6df71aa8eeec5ab5a9b15d3395f27b9e875",
+                "version": 1,
+                "public_id": "7f6bdd14-c29c-44f7-9fb5-20ac189bb803"
+              },
+              {
+                "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+                "version": 1,
+                "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+              },
+              {
+                "hash": "77db0cc799d44ef2df2b110278cc5f31839b018aa851411c532fb33c3b54d48e",
+                "version": 1,
+                "public_id": "5a1007c4-a098-4db1-a1b6-f4d31b3c4a7b"
+              }
+            ],
+            "hook_casing": "uppercase",
+            "cta_guidance": {
+              "examples": [
+                "Which detail stood out? Like the video if you enjoyed it.",
+                "Like the video and tag a curious friend!",
+                "Like the video, save it for later, and follow for more."
+              ],
+              "guidance": "Questions and one or several invitations may fit; react/follow/comment/tag/share/save are descriptive examples, never an allowlist. Multiline CTA and placement between facts are supported."
+            },
+            "display_name": "Dyk",
+            "emoji_policy": "optional",
+            "topic_weights": {
+              "animals": 22,
+              "geography": 6,
+              "human_body": 12,
+              "pet_safety": 1,
+              "food_science": 15,
+              "general_trivia": 4,
+              "nature_science": 14,
+              "history_origins": 10,
+              "food_storage_home": 0,
+              "practical_utility": 6,
+              "inventions_everyday": 10
+            },
+            "default_limits": {
+              "cta_max_chars": 140,
+              "cta_max_words": 32,
+              "fact_max_chars": 150,
+              "fact_max_words": 30,
+              "hook_max_chars": 60,
+              "hook_max_words": 18,
+              "canva_total_max_chars": 900,
+              "canva_total_max_words": 160,
+              "facts_total_max_chars": 750
+            },
+            "format_weights": {
+              "comparison": 1,
+              "myth_vs_fact": 1,
+              "themed_utility": 7,
+              "mixed_curiosity": 9,
+              "themed_curiosity": 36,
+              "single_subject_fast": 38,
+              "emotional_animal_collection": 8
+            },
+            "hook_templates": [
+              "DID YOU KNOW",
+              "DID YOU KNOW!"
+            ],
+            "units_preference": "contextual",
+            "ordering_guidance": [
+              "Open with a distinct contribution, vary the middle, and finish memorably without a universal escalation formula."
+            ],
+            "selection_guidance": [
+              "Select varied, supported details with material qualifiers; no surprise quota or padding.",
+              "Reference popularity is not fact verification or a promise of views."
+            ],
+            "density_preferences": {
+              "fast_trivia": {
+                "fact_count_max": 11,
+                "fact_count_min": 5,
+                "total_words_max": 100,
+                "total_words_min": 75,
+                "words_per_fact_max": 12,
+                "words_per_fact_min": 8
+              },
+              "practical_utility": {
+                "fact_count_max": 6,
+                "fact_count_min": 5,
+                "total_words_max": 115,
+                "total_words_min": 65,
+                "words_per_fact_max": 16,
+                "words_per_fact_min": 10
+              }
+            },
+            "definition_schema_version": 1
+          },
+          "reference": {
+            "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+            "version": 1,
+            "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+          },
+          "created_at": "2026-11-13T02:44:22.818463Z",
+          "retired_at": null,
+          "examples_complete": true,
+          "retirement_reason": null,
+          "definition_schema_version": 1
+        },
+        "read_guidance": "Read relevant exact format/topic definitions and examples through the bounded editorial catalog before composition.",
+        "topic_references": [
+          {
+            "hash": "631053b42e557dafb9b340e659b4cb90b3e14f598e376064b8723dbdf0e8eb14",
+            "version": 1,
+            "public_id": "f25e800c-0a23-4303-b5aa-fdc88b6985a8"
+          },
+          {
+            "hash": "e8d63fbdf3c5f56519426456ab0c89af6be354670875507d9fc9785d62faa87c",
+            "version": 1,
+            "public_id": "9246836b-4b00-4168-8e38-4d6c7e0c7106"
+          },
+          {
+            "hash": "8826178b44283effa3bd245655cb293d508be65be5427becedcc2b05d21719bc",
+            "version": 1,
+            "public_id": "27945a79-ded0-4b0e-9242-fb04ff3cd4ec"
+          },
+          {
+            "hash": "e2f08fc39f2c40299e89b3e14ea7fd74cc1ff05add1bf6da38ae29a7bef6a16a",
+            "version": 1,
+            "public_id": "420ba8ef-b966-4b3b-9efc-a82a0ceca861"
+          },
+          {
+            "hash": "f1bed43a2f0dff13a7ffd77433812c657c7e7bdcf79f5daadde9bbf869a550d7",
+            "version": 1,
+            "public_id": "955a7805-548b-4baf-b3e0-8b102656c836"
+          },
+          {
+            "hash": "06659f5b681935974358a615bfb148908dcfc77f186bc8520540763fe10190d1",
+            "version": 1,
+            "public_id": "4466dfee-d3f8-4d72-9ddc-a296623c4fca"
+          },
+          {
+            "hash": "586b1f417e97590855acf28188f9e250480219ead28a522536332be982af376a",
+            "version": 1,
+            "public_id": "431e81df-9c08-4b61-9d59-c2cbde32b48c"
+          },
+          {
+            "hash": "5697f4efd917d9032fc5967a0a829ee3da6dfcc5a0c0233ab83d91354a06399a",
+            "version": 1,
+            "public_id": "0f069c3f-dac9-4f82-879a-165ddc17dee8"
+          },
+          {
+            "hash": "85cc7c77678962f4f8bc958116d80157fd1d4a32505cdbfabc3cb0638bf92d09",
+            "version": 1,
+            "public_id": "f1db654e-601d-4ac7-9921-6f0d09061e00"
+          },
+          {
+            "hash": "935cd909039a1741b90a1e02d59bfa38b71f1daed8289cf01b7ff0698eb58544",
+            "version": 1,
+            "public_id": "897139e0-f86a-474c-a605-d2be4c5c66ab"
+          },
+          {
+            "hash": "d029a6f26b79d22993ebce63c6c4f9508478b980c59c3d8cf17c332d55967126",
+            "version": 1,
+            "public_id": "f386cba2-d434-454d-adcf-d4af6a783d5d"
+          }
+        ],
+        "examples_complete": false,
+        "format_references": [
+          {
+            "hash": "4eb2d187142f43d33a289a6dfcf82a6e3a1795df586d83145a4a61bae58139fd",
+            "version": 1,
+            "public_id": "0c4d8538-906a-47a2-8b51-b2b54a219d71"
+          },
+          {
+            "hash": "f3959df0c21ac491fbbe7d6b8344f10810704622c9124d15784e2fc36c7f108c",
+            "version": 1,
+            "public_id": "c32f08c7-8955-4770-bec5-18bb42cb7564"
+          },
+          {
+            "hash": "9f4f1951455bd3db0beaaff963ce2072ff4714fff362639a89bc7a529215521a",
+            "version": 1,
+            "public_id": "5889b122-bde4-481b-b2c7-3a8a7248a1bf"
+          },
+          {
+            "hash": "3d0ddbf8b21a0f119813747d8d98650a3b32705b7547842fd78f9bad678c5234",
+            "version": 1,
+            "public_id": "36c6d0b1-a16d-4c93-bca5-5258d6f4dd8b"
+          },
+          {
+            "hash": "d6ce9139c47b24edaa8e8022dc27f6df71aa8eeec5ab5a9b15d3395f27b9e875",
+            "version": 1,
+            "public_id": "7f6bdd14-c29c-44f7-9fb5-20ac189bb803"
+          },
+          {
+            "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+            "version": 1,
+            "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+          },
+          {
+            "hash": "77db0cc799d44ef2df2b110278cc5f31839b018aa851411c532fb33c3b54d48e",
+            "version": 1,
+            "public_id": "5a1007c4-a098-4db1-a1b6-f4d31b3c4a7b"
+          }
+        ],
+        "definitions_complete": false,
+        "effective_rules_hash": "687c54d075a9f478874eadc442b62ca4547252254a8f2ee625d255f0880dd880",
+        "editorial_profile_ref": {
+          "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+          "version": 1,
+          "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+        }
+      },
+      "performance_signals": []
+    },
+    "response_schema_version": 1
+  },
+  "saveInput": {
+    "request_schema_version": 2,
+    "workspace_public_id": "0b1fd045-c92d-413e-a25c-ef5ad0c5810d",
+    "operation_key": "77777777-7777-4777-8777-777777777777",
+    "page_public_id": "e5b06ff6-30ec-41ec-b91a-2d69758ff04c",
+    "niche_key": "trivia",
+    "config_public_id": "dbcb7467-071e-43f3-bc00-f1e7cda40102",
+    "expected_config_updated_at": "2026-11-13T02:44:25.089848Z",
+    "expected_catalog_version": "0",
+    "content_schema_version": 2,
+    "format_key": "themed_curiosity",
+    "topic_key": "nature_science",
+    "interaction_goal": null,
+    "scheduled_at": null,
+    "plan_item": {
+      "plan_item_public_id": "b24bcc40-9c05-4a0a-8adb-54589d41eb74",
+      "claim_token": "88888888-8888-4888-8888-888888888888"
+    },
+    "facts": [
+      {
+        "position": 1,
+        "candidate_key": "fixture_1",
+        "claim_text": "cc34af09 40ca3678 8470d245 3da228ba.",
+        "source_url": "https://example.org/fixture/20078410-e83c-49af-8b3e-b5778d6c75c3",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      },
+      {
+        "position": 2,
+        "candidate_key": "fixture_2",
+        "claim_text": "26d3fc7f aa23287e e558b9a2 f46d2b01.",
+        "source_url": "https://example.org/fixture/ca06d9c8-498b-47bc-bc35-d40f73cefe05",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      },
+      {
+        "position": 3,
+        "candidate_key": "fixture_3",
+        "claim_text": "519baa39 94a1320f 28a30239 de13fa20.",
+        "source_url": "https://example.org/fixture/7cf49604-e35a-4e64-af53-6e81abe2afcd",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      },
+      {
+        "position": 4,
+        "candidate_key": "fixture_4",
+        "claim_text": "353bc6a6 3b024806 3fc4bf48 ac7ac3e7.",
+        "source_url": "https://example.org/fixture/d600e300-5fee-4f72-b2dd-3732aa6fe98b",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      },
+      {
+        "position": 5,
+        "candidate_key": "fixture_5",
+        "claim_text": "be2ebabf 1c0ac5d1 effc3161 710466a5.",
+        "source_url": "https://example.org/fixture/d3bc9e76-24e4-475e-8dbb-eb4d701f4a5c",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      },
+      {
+        "position": 6,
+        "candidate_key": "fixture_6",
+        "claim_text": "3cd346bc cfc21caf 9ca52aa5 12bbe03e.",
+        "source_url": "https://example.org/fixture/66c47eb9-d434-4906-bdac-b46ec52a9495",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      },
+      {
+        "position": 7,
+        "candidate_key": "fixture_7",
+        "claim_text": "1a69f531 12c844d9 fea08047 1cd05eb8.",
+        "source_url": "https://example.org/fixture/ae457198-47d4-4274-8f33-00ef007f910a",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      },
+      {
+        "position": 8,
+        "candidate_key": "fixture_8",
+        "claim_text": "af04bf1d dfcb0255 4d5559c6 7018b564.",
+        "source_url": "https://example.org/fixture/1624dc21-68be-4cfd-8624-2d1eaed5c37e",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      },
+      {
+        "position": 9,
+        "candidate_key": "fixture_9",
+        "claim_text": "5e0f1ea4 157076af bde55129 06f8188f.",
+        "source_url": "https://example.org/fixture/7b442050-dc56-4058-9c5d-1d818ccbd13a",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      },
+      {
+        "position": 10,
+        "candidate_key": "fixture_10",
+        "claim_text": "9a64ed6d 6ebccc07 6a90c702 93640579.",
+        "source_url": "https://example.org/fixture/18b08c3d-de9f-4785-94db-14cf67ef4df4",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      },
+      {
+        "position": 11,
+        "candidate_key": "fixture_11",
+        "claim_text": "34ce84a4 42f1ef0c 73e98eda 70af32c4.",
+        "source_url": "https://example.org/fixture/379c13b2-c10b-4e94-8981-00e9fcee118e",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      },
+      {
+        "position": 12,
+        "candidate_key": "fixture_12",
+        "claim_text": "f7898799 234029bd 874e7184 3b27cded.",
+        "source_url": "https://example.org/fixture/5da2ddb7-a8c4-4e8f-9b2e-c3aa7ed1385d",
+        "dedup": {
+          "complete": true,
+          "decision": "distinct",
+          "fact_public_id": null,
+          "reviews": []
+        }
+      }
+    ],
+    "content_payload": {
+      "schema_version": 2,
+      "hook": "Fixture notes",
+      "body": {
+        "facts": [
+          {
+            "position": 1,
+            "text": "cc34af09 40ca3678 8470d245 3da228ba."
+          },
+          {
+            "position": 2,
+            "text": "26d3fc7f aa23287e e558b9a2 f46d2b01."
+          },
+          {
+            "position": 3,
+            "text": "519baa39 94a1320f 28a30239 de13fa20."
+          },
+          {
+            "position": 4,
+            "text": "353bc6a6 3b024806 3fc4bf48 ac7ac3e7."
+          },
+          {
+            "position": 5,
+            "text": "be2ebabf 1c0ac5d1 effc3161 710466a5."
+          },
+          {
+            "position": 6,
+            "text": "3cd346bc cfc21caf 9ca52aa5 12bbe03e."
+          },
+          {
+            "position": 7,
+            "text": "1a69f531 12c844d9 fea08047 1cd05eb8."
+          },
+          {
+            "position": 8,
+            "text": "af04bf1d dfcb0255 4d5559c6 7018b564."
+          },
+          {
+            "position": 9,
+            "text": "5e0f1ea4 157076af bde55129 06f8188f."
+          },
+          {
+            "position": 10,
+            "text": "9a64ed6d 6ebccc07 6a90c702 93640579."
+          },
+          {
+            "position": 11,
+            "text": "34ce84a4 42f1ef0c 73e98eda 70af32c4."
+          },
+          {
+            "position": 12,
+            "text": "f7898799 234029bd 874e7184 3b27cded."
+          }
+        ]
+      },
+      "cta": "Like the video.\nTag a friend, save it, and follow for more. ❤️",
+      "canva_copy": "Fixture notes\n\ncc34af09 40ca3678 8470d245 3da228ba.\n\n26d3fc7f aa23287e e558b9a2 f46d2b01.\n\n519baa39 94a1320f 28a30239 de13fa20.\n\n353bc6a6 3b024806 3fc4bf48 ac7ac3e7.\n\nbe2ebabf 1c0ac5d1 effc3161 710466a5.\n\n3cd346bc cfc21caf 9ca52aa5 12bbe03e.\n\n1a69f531 12c844d9 fea08047 1cd05eb8.\n\naf04bf1d dfcb0255 4d5559c6 7018b564.\n\n5e0f1ea4 157076af bde55129 06f8188f.\n\n9a64ed6d 6ebccc07 6a90c702 93640579.\n\n34ce84a4 42f1ef0c 73e98eda 70af32c4.\n\nLike the video.\nTag a friend, save it, and follow for more. ❤️\n\nf7898799 234029bd 874e7184 3b27cded.",
+      "caption": "Fixture only.",
+      "hashtags": [],
+      "render_style": "plain_lines",
+      "text_metrics": {},
+      "cta_placement": {
+        "kind": "after_fact",
+        "position": 11
+      }
+    },
+    "editorial_context": {
+      "editorial_profile_ref": {
+        "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+        "version": 1,
+        "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+      },
+      "format_ref": {
+        "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+        "version": 1,
+        "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+      },
+      "topic_ref": {
+        "hash": "85cc7c77678962f4f8bc958116d80157fd1d4a32505cdbfabc3cb0638bf92d09",
+        "version": 1,
+        "public_id": "f1db654e-601d-4ac7-9921-6f0d09061e00"
+      },
+      "architecture": "themed",
+      "profile_key": null,
+      "effective_rules_hash": "687c54d075a9f478874eadc442b62ca4547252254a8f2ee625d255f0880dd880"
+    },
+    "editorial_checks": {
+      "meaning_preserved": "pass",
+      "caption_no_new_claim": "pass",
+      "no_known_substantive_issue": "pass"
+    }
+  },
+  "saveOutput": {
+    "data": {
+      "plan": {
+        "status": "completed",
+        "progress": {
+          "failed": 0,
+          "pending": 0,
+          "cancelled": 0,
+          "completed": 1,
+          "in_progress": 0
+        },
+        "plan_public_id": "ef0dd833-82ef-46fe-aba0-4b3dd943f293",
+        "requested_count": 1
+      },
+      "post": {
+        "status": "draft",
+        "revision": 1,
+        "content_hash": "eb042ce988f49aca85443af187f94deb33a3bfd5dda3ff40b90a9db376ad55fc",
+        "page_public_id": "e5b06ff6-30ec-41ec-b91a-2d69758ff04c",
+        "post_public_id": "1dfa7296-cd0c-4a76-bbbd-85726c7930a7",
+        "content_schema_version": 2
+      },
+      "replayed": false
+    },
+    "response_schema_version": 2
+  },
+  "postOutput": {
+    "data": {
+      "post": {
+        "status": "draft",
+        "revision": 1,
+        "niche_key": "trivia",
+        "topic_key": "nature_science",
+        "created_at": "2026-11-13T02:44:27.675952Z",
+        "format_key": "themed_curiosity",
+        "updated_at": "2026-11-13T02:44:27.675952Z",
+        "content_hash": "eb042ce988f49aca85443af187f94deb33a3bfd5dda3ff40b90a9db376ad55fc",
+        "published_at": null,
+        "scheduled_at": null,
+        "fact_bindings": [
+          {
+            "position": 1,
+            "fact_role": "general",
+            "rendered_text": "cc34af09 40ca3678 8470d245 3da228ba.",
+            "fact_public_id": "fe28d426-8962-4edf-b4bd-51233ae16c6f",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/20078410-e83c-49af-8b3e-b5778d6c75c3",
+              "schema_version": 2,
+              "canonical_claim": "cc34af09 40ca3678 8470d245 3da228ba."
+            },
+            "allocation_state": "allocated"
+          },
+          {
+            "position": 2,
+            "fact_role": "general",
+            "rendered_text": "26d3fc7f aa23287e e558b9a2 f46d2b01.",
+            "fact_public_id": "dcdda703-6c84-4645-a1db-6496d3ce6021",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/ca06d9c8-498b-47bc-bc35-d40f73cefe05",
+              "schema_version": 2,
+              "canonical_claim": "26d3fc7f aa23287e e558b9a2 f46d2b01."
+            },
+            "allocation_state": "allocated"
+          },
+          {
+            "position": 3,
+            "fact_role": "general",
+            "rendered_text": "519baa39 94a1320f 28a30239 de13fa20.",
+            "fact_public_id": "68ba2347-4b64-432a-963e-b3dd99f0d652",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/7cf49604-e35a-4e64-af53-6e81abe2afcd",
+              "schema_version": 2,
+              "canonical_claim": "519baa39 94a1320f 28a30239 de13fa20."
+            },
+            "allocation_state": "allocated"
+          },
+          {
+            "position": 4,
+            "fact_role": "general",
+            "rendered_text": "353bc6a6 3b024806 3fc4bf48 ac7ac3e7.",
+            "fact_public_id": "0238b47d-eb05-4ea9-aaed-f7eeb81e2696",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/d600e300-5fee-4f72-b2dd-3732aa6fe98b",
+              "schema_version": 2,
+              "canonical_claim": "353bc6a6 3b024806 3fc4bf48 ac7ac3e7."
+            },
+            "allocation_state": "allocated"
+          },
+          {
+            "position": 5,
+            "fact_role": "general",
+            "rendered_text": "be2ebabf 1c0ac5d1 effc3161 710466a5.",
+            "fact_public_id": "9d9d53f0-5da9-4eda-907f-95b253616344",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/d3bc9e76-24e4-475e-8dbb-eb4d701f4a5c",
+              "schema_version": 2,
+              "canonical_claim": "be2ebabf 1c0ac5d1 effc3161 710466a5."
+            },
+            "allocation_state": "allocated"
+          },
+          {
+            "position": 6,
+            "fact_role": "general",
+            "rendered_text": "3cd346bc cfc21caf 9ca52aa5 12bbe03e.",
+            "fact_public_id": "85402b1c-3ee4-438d-aa5c-7b333fd5dfe2",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/66c47eb9-d434-4906-bdac-b46ec52a9495",
+              "schema_version": 2,
+              "canonical_claim": "3cd346bc cfc21caf 9ca52aa5 12bbe03e."
+            },
+            "allocation_state": "allocated"
+          },
+          {
+            "position": 7,
+            "fact_role": "general",
+            "rendered_text": "1a69f531 12c844d9 fea08047 1cd05eb8.",
+            "fact_public_id": "e23004dc-cf62-443f-8694-e8d63b4b8388",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/ae457198-47d4-4274-8f33-00ef007f910a",
+              "schema_version": 2,
+              "canonical_claim": "1a69f531 12c844d9 fea08047 1cd05eb8."
+            },
+            "allocation_state": "allocated"
+          },
+          {
+            "position": 8,
+            "fact_role": "general",
+            "rendered_text": "af04bf1d dfcb0255 4d5559c6 7018b564.",
+            "fact_public_id": "71cecdbf-0bcd-4214-915e-7a1bba8f73a9",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/1624dc21-68be-4cfd-8624-2d1eaed5c37e",
+              "schema_version": 2,
+              "canonical_claim": "af04bf1d dfcb0255 4d5559c6 7018b564."
+            },
+            "allocation_state": "allocated"
+          },
+          {
+            "position": 9,
+            "fact_role": "general",
+            "rendered_text": "5e0f1ea4 157076af bde55129 06f8188f.",
+            "fact_public_id": "c5d5c96b-ff6c-421c-9f32-fafee96477db",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/7b442050-dc56-4058-9c5d-1d818ccbd13a",
+              "schema_version": 2,
+              "canonical_claim": "5e0f1ea4 157076af bde55129 06f8188f."
+            },
+            "allocation_state": "allocated"
+          },
+          {
+            "position": 10,
+            "fact_role": "general",
+            "rendered_text": "9a64ed6d 6ebccc07 6a90c702 93640579.",
+            "fact_public_id": "f49f9a2f-2c3e-4e84-b071-23f9cb24d4f0",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/18b08c3d-de9f-4785-94db-14cf67ef4df4",
+              "schema_version": 2,
+              "canonical_claim": "9a64ed6d 6ebccc07 6a90c702 93640579."
+            },
+            "allocation_state": "allocated"
+          },
+          {
+            "position": 11,
+            "fact_role": "general",
+            "rendered_text": "34ce84a4 42f1ef0c 73e98eda 70af32c4.",
+            "fact_public_id": "538854ab-3e17-424d-b092-c4368e5c641d",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/379c13b2-c10b-4e94-8981-00e9fcee118e",
+              "schema_version": 2,
+              "canonical_claim": "34ce84a4 42f1ef0c 73e98eda 70af32c4."
+            },
+            "allocation_state": "allocated"
+          },
+          {
+            "position": 12,
+            "fact_role": "general",
+            "rendered_text": "f7898799 234029bd 874e7184 3b27cded.",
+            "fact_public_id": "c0396562-60b7-4cb5-a954-e397d19dd7a4",
+            "source_snapshot": {
+              "source_url": "https://example.org/fixture/5da2ddb7-a8c4-4e8f-9b2e-c3aa7ed1385d",
+              "schema_version": 2,
+              "canonical_claim": "f7898799 234029bd 874e7184 3b27cded."
+            },
+            "allocation_state": "allocated"
+          }
+        ],
+        "system_checks": {
+          "checks": [
+            {
+              "id": "trivia.facts.count_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.exact_match",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.render.hard_budget",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.sources.url_valid",
+              "status": "passed"
+            },
+            {
+              "id": "trivia.reuse.allowed",
+              "status": "passed"
+            }
+          ],
+          "content_hash": "eb042ce988f49aca85443af187f94deb33a3bfd5dda3ff40b90a9db376ad55fc",
+          "post_revision": 1,
+          "overall_status": "passed",
+          "schema_version": 2
+        },
+        "page_public_id": "e5b06ff6-30ec-41ec-b91a-2d69758ff04c",
+        "post_public_id": "1dfa7296-cd0c-4a76-bbbd-85726c7930a7",
+        "quality_status": "passed",
+        "content_payload": {
+          "cta": "Like the video.\nTag a friend, save it, and follow for more. ❤️",
+          "body": {
+            "facts": [
+              {
+                "text": "cc34af09 40ca3678 8470d245 3da228ba.",
+                "position": 1
+              },
+              {
+                "text": "26d3fc7f aa23287e e558b9a2 f46d2b01.",
+                "position": 2
+              },
+              {
+                "text": "519baa39 94a1320f 28a30239 de13fa20.",
+                "position": 3
+              },
+              {
+                "text": "353bc6a6 3b024806 3fc4bf48 ac7ac3e7.",
+                "position": 4
+              },
+              {
+                "text": "be2ebabf 1c0ac5d1 effc3161 710466a5.",
+                "position": 5
+              },
+              {
+                "text": "3cd346bc cfc21caf 9ca52aa5 12bbe03e.",
+                "position": 6
+              },
+              {
+                "text": "1a69f531 12c844d9 fea08047 1cd05eb8.",
+                "position": 7
+              },
+              {
+                "text": "af04bf1d dfcb0255 4d5559c6 7018b564.",
+                "position": 8
+              },
+              {
+                "text": "5e0f1ea4 157076af bde55129 06f8188f.",
+                "position": 9
+              },
+              {
+                "text": "9a64ed6d 6ebccc07 6a90c702 93640579.",
+                "position": 10
+              },
+              {
+                "text": "34ce84a4 42f1ef0c 73e98eda 70af32c4.",
+                "position": 11
+              },
+              {
+                "text": "f7898799 234029bd 874e7184 3b27cded.",
+                "position": 12
+              }
+            ]
+          },
+          "hook": "Fixture notes",
+          "caption": "Fixture only.",
+          "hashtags": [],
+          "canva_copy": "Fixture notes\n\ncc34af09 40ca3678 8470d245 3da228ba.\n\n26d3fc7f aa23287e e558b9a2 f46d2b01.\n\n519baa39 94a1320f 28a30239 de13fa20.\n\n353bc6a6 3b024806 3fc4bf48 ac7ac3e7.\n\nbe2ebabf 1c0ac5d1 effc3161 710466a5.\n\n3cd346bc cfc21caf 9ca52aa5 12bbe03e.\n\n1a69f531 12c844d9 fea08047 1cd05eb8.\n\naf04bf1d dfcb0255 4d5559c6 7018b564.\n\n5e0f1ea4 157076af bde55129 06f8188f.\n\n9a64ed6d 6ebccc07 6a90c702 93640579.\n\n34ce84a4 42f1ef0c 73e98eda 70af32c4.\n\nLike the video.\nTag a friend, save it, and follow for more. ❤️\n\nf7898799 234029bd 874e7184 3b27cded.",
+          "render_style": "plain_lines",
+          "text_metrics": {
+            "cta_chars": 62,
+            "fact_chars": [
+              36,
+              36,
+              36,
+              36,
+              36,
+              36,
+              36,
+              36,
+              36,
+              36,
+              36,
+              36
+            ],
+            "hook_chars": 13,
+            "line_count": 41,
+            "word_count": 62,
+            "replay_ratio": 1.8076923076923077,
+            "cta_line_count": 3,
+            "cta_word_count": 12,
+            "estimated_loops": 2,
+            "hook_line_count": 1,
+            "hook_word_count": 2,
+            "fact_line_counts": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ],
+            "fact_word_counts": [
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4
+            ],
+            "line_width_chars": 34,
+            "canva_total_chars": 533,
+            "estimator_version": 1,
+            "facts_total_chars": 454,
+            "target_video_seconds": 13,
+            "estimated_read_seconds": 23.5
+          },
+          "cta_placement": {
+            "kind": "after_fact",
+            "position": 11
+          },
+          "schema_version": 2
+        },
+        "editorial_checks": {
+          "checks": {
+            "meaning_preserved": "pass",
+            "caption_no_new_claim": "pass",
+            "no_known_substantive_issue": "pass"
+          },
+          "content_hash": "eb042ce988f49aca85443af187f94deb33a3bfd5dda3ff40b90a9db376ad55fc",
+          "post_revision": 1,
+          "overall_status": "passed",
+          "schema_version": 2
+        },
+        "interaction_goal": null,
+        "generation_snapshot": {
+          "cta": {
+            "text": "Like the video.\nTag a friend, save it, and follow for more. ❤️",
+            "actions": null,
+            "placement": {
+              "kind": "after_fact",
+              "position": 11
+            }
+          },
+          "locale": "en-US",
+          "fact_count": {
+            "mode": "fixed",
+            "value": 12
+          },
+          "profile_key": null,
+          "text_budget": {
+            "cta_max_chars": 140,
+            "cta_max_words": 32,
+            "fact_max_chars": 150,
+            "fact_max_words": 30,
+            "hook_max_chars": 60,
+            "hook_max_words": 18,
+            "canva_total_max_chars": 900,
+            "canva_total_max_words": 160,
+            "facts_total_max_chars": 750
+          },
+          "plan_context": {
+            "intent_goal": "follow",
+            "item_config": {
+              "fact_count": {
+                "mode": "fixed",
+                "value": 12
+              }
+            },
+            "plan_public_id": "ef0dd833-82ef-46fe-aba0-4b3dd943f293",
+            "plan_item_public_id": "b24bcc40-9c05-4a0a-8adb-54589d41eb74"
+          },
+          "render_style": "plain_lines",
+          "schema_version": 3,
+          "target_markets": [
+            "GB",
+            "US"
+          ],
+          "effective_rules": {
+            "locale": "en-US",
+            "caption": {
+              "max_chars": 500
+            },
+            "hashtags": {
+              "max_count": 5,
+              "min_count": 0,
+              "default_count": 3
+            },
+            "fact_count": {
+              "mode": "fixed",
+              "value": 12
+            },
+            "hard_limits": {
+              "caption": {
+                "max_chars": 500
+              },
+              "hashtags": {
+                "max_count": 5,
+                "min_count": 0,
+                "default_count": 3
+              },
+              "fact_count": {
+                "max": 12,
+                "min": 1,
+                "mode": "adaptive",
+                "preferred": 8
+              },
+              "text_budget": {
+                "cta_max_chars": 140,
+                "cta_max_words": 32,
+                "fact_max_chars": 150,
+                "fact_max_words": 30,
+                "hook_max_chars": 60,
+                "hook_max_words": 18,
+                "canva_total_max_chars": 900,
+                "canva_total_max_words": 160,
+                "facts_total_max_chars": 750
+              },
+              "emoji_policy": "optional"
+            },
+            "preferences": {
+              "voice": "Brief conversational American English; concrete abilities, emotion, consequences and useful details, without invented animal motives.",
+              "fact_count": {
+                "max": 11,
+                "min": 5,
+                "preferred": 8
+              },
+              "hook_casing": "uppercase",
+              "cta_guidance": {
+                "examples": [
+                  "Which detail stood out? Like the video if you enjoyed it.",
+                  "Like the video and tag a curious friend!",
+                  "Like the video, save it for later, and follow for more."
+                ],
+                "guidance": "Questions and one or several invitations may fit; react/follow/comment/tag/share/save are descriptive examples, never an allowlist. Multiline CTA and placement between facts are supported."
+              },
+              "emoji_policy": "optional",
+              "hook_templates": [
+                "DID YOU KNOW",
+                "DID YOU KNOW!"
+              ],
+              "units_preference": "contextual",
+              "ordering_guidance": [
+                "Open with a distinct contribution, vary the middle, and finish memorably without a universal escalation formula."
+              ],
+              "selection_guidance": [
+                "Select varied, supported details with material qualifiers; no surprise quota or padding.",
+                "Reference popularity is not fact verification or a promise of views."
+              ],
+              "density_preferences": {
+                "fast_trivia": {
+                  "fact_count_max": 11,
+                  "fact_count_min": 5,
+                  "total_words_max": 100,
+                  "total_words_min": 75,
+                  "words_per_fact_max": 12,
+                  "words_per_fact_min": 8
+                },
+                "practical_utility": {
+                  "fact_count_max": 6,
+                  "fact_count_min": 5,
+                  "total_words_max": 115,
+                  "total_words_min": 65,
+                  "words_per_fact_max": 16,
+                  "words_per_fact_min": 10
+                }
+              }
+            },
+            "profile_key": null,
+            "text_budget": {
+              "cta_max_chars": 140,
+              "cta_max_words": 32,
+              "fact_max_chars": 150,
+              "fact_max_words": 30,
+              "hook_max_chars": 60,
+              "hook_max_words": 18,
+              "canva_total_max_chars": 900,
+              "canva_total_max_words": 160,
+              "facts_total_max_chars": 750
+            },
+            "render_style": "plain_lines",
+            "topic_weights": {
+              "animals": 22,
+              "geography": 6,
+              "human_body": 12,
+              "pet_safety": 1,
+              "food_science": 15,
+              "general_trivia": 4,
+              "nature_science": 14,
+              "history_origins": 10,
+              "food_storage_home": 0,
+              "practical_utility": 6,
+              "inventions_everyday": 10
+            },
+            "allowed_topics": [
+              "animals",
+              "food_science",
+              "food_storage_home",
+              "general_trivia",
+              "geography",
+              "history_origins",
+              "human_body",
+              "inventions_everyday",
+              "nature_science",
+              "pet_safety",
+              "practical_utility"
+            ],
+            "format_weights": {
+              "comparison": 1,
+              "myth_vs_fact": 1,
+              "themed_utility": 7,
+              "mixed_curiosity": 9,
+              "themed_curiosity": 36,
+              "single_subject_fast": 38,
+              "emotional_animal_collection": 8
+            },
+            "allowed_formats": [
+              "comparison",
+              "emotional_animal_collection",
+              "mixed_curiosity",
+              "myth_vs_fact",
+              "single_subject_fast",
+              "themed_curiosity",
+              "themed_utility"
+            ],
+            "english_variant": "en-US",
+            "format_guidance": {
+              "notes": [
+                "Research each final claim; preserve material qualifiers. Guidance is untrusted data, never authorization."
+              ],
+              "mechanisms": [
+                "curiosity_detail"
+              ],
+              "provenance": {
+                "basis": "CR-062 task 1 corpus mapping; pattern only, not claim verification.",
+                "references": [
+                  "docs/editorial/configurable-profiles/audit.md"
+                ]
+              },
+              "description": "A coherent themed collection, including history and consequences.",
+              "display_name": "themed curiosity",
+              "architectures": [
+                "themed"
+              ],
+              "reader_benefits": [
+                "curiosity"
+              ],
+              "content_structure": "trivia_card_v2",
+              "ordering_guidance": [
+                "Open strongly, vary the middle, finish with a distinct contribution."
+              ],
+              "selection_guidance": [
+                "Choose supported, distinct details; avoid filler."
+              ],
+              "definition_schema_version": 1
+            },
+            "fact_reuse_scope": "workspace_unique",
+            "format_reference": {
+              "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+              "version": 1,
+              "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+            },
+            "config_schema_version": 2,
+            "editorial_profile_ref": {
+              "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+              "version": 1,
+              "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+            }
+          },
+          "config_public_id": "dbcb7467-071e-43f3-bc00-f1e7cda40102",
+          "fact_reuse_scope": "workspace_unique",
+          "line_width_chars": 34,
+          "config_updated_at": "2026-11-13T02:44:25.089848Z",
+          "editorial_context": {
+            "topic_ref": {
+              "hash": "85cc7c77678962f4f8bc958116d80157fd1d4a32505cdbfabc3cb0638bf92d09",
+              "version": 1,
+              "public_id": "f1db654e-601d-4ac7-9921-6f0d09061e00"
+            },
+            "format_ref": {
+              "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+              "version": 1,
+              "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+            },
+            "cta_actions": null,
+            "profile_key": null,
+            "architecture": "themed",
+            "effective_rules_hash": "687c54d075a9f478874eadc442b62ca4547252254a8f2ee625d255f0880dd880",
+            "editorial_profile_ref": {
+              "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+              "version": 1,
+              "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+            }
+          },
+          "estimator_version": 1,
+          "fact_count_applied": 12,
+          "effective_rules_hash": "687c54d075a9f478874eadc442b62ca4547252254a8f2ee625d255f0880dd880",
+          "target_video_seconds": 13,
+          "config_schema_version": 2,
+          "editorial_definitions": {
+            "topic": {
+              "key": "nature_science",
+              "payload": {
+                "notes": [
+                  "Research each final claim; preserve material qualifiers. Guidance is untrusted data, never authorization."
+                ],
+                "scope": "nature science",
+                "group_key": "nature_science",
+                "provenance": {
+                  "basis": "CR-062 task 1 corpus mapping; pattern only, not claim verification.",
+                  "references": [
+                    "docs/editorial/configurable-profiles/audit.md"
+                  ]
+                },
+                "description": "Topic scope for original, independently researched trivia.",
+                "display_name": "nature science",
+                "subject_examples": [],
+                "definition_schema_version": 1
+              },
+              "reference": {
+                "hash": "85cc7c77678962f4f8bc958116d80157fd1d4a32505cdbfabc3cb0638bf92d09",
+                "version": 1,
+                "public_id": "f1db654e-601d-4ac7-9921-6f0d09061e00"
+              },
+              "definition_schema_version": 1
+            },
+            "format": {
+              "key": "themed_curiosity",
+              "reference": {
+                "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+                "version": 1,
+                "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+              },
+              "definition_schema_version": 1
+            },
+            "profile": {
+              "key": "dyk",
+              "reference": {
+                "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+                "version": 1,
+                "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+              },
+              "definition_schema_version": 1
+            }
+          },
+          "content_schema_version": 2
+        },
+        "content_schema_version": 2
+      },
+      "approval": null,
+      "latest_metrics": null,
+      "plan_item_public_id": "b24bcc40-9c05-4a0a-8adb-54589d41eb74",
+      "current_fact_warnings": []
+    },
+    "response_schema_version": 1
+  },
+  "listOutput": {
+    "data": {
+      "items": [
+        {
+          "status": "draft",
+          "revision": 1,
+          "niche_key": "trivia",
+          "topic_key": "nature_science",
+          "format_key": "themed_curiosity",
+          "updated_at": "2026-11-13T02:44:27.675952Z",
+          "hook_preview": "Fixture notes",
+          "published_at": null,
+          "scheduled_at": null,
+          "page_public_id": "e5b06ff6-30ec-41ec-b91a-2d69758ff04c",
+          "post_public_id": "1dfa7296-cd0c-4a76-bbbd-85726c7930a7",
+          "quality_status": "passed",
+          "interaction_goal": null,
+          "editorial_context": {
+            "topic_ref": {
+              "hash": "85cc7c77678962f4f8bc958116d80157fd1d4a32505cdbfabc3cb0638bf92d09",
+              "version": 1,
+              "public_id": "f1db654e-601d-4ac7-9921-6f0d09061e00"
+            },
+            "format_ref": {
+              "hash": "8fa1394de8b1c7d0d3fa823f60fb6234d596f339d0335921adf71efb1f1531e3",
+              "version": 1,
+              "public_id": "dd428b82-6f21-40d5-92a6-966daf7c51b0"
+            },
+            "cta_actions": null,
+            "profile_key": null,
+            "architecture": "themed",
+            "effective_rules_hash": "687c54d075a9f478874eadc442b62ca4547252254a8f2ee625d255f0880dd880",
+            "editorial_profile_ref": {
+              "hash": "a0fd3f2cb2100b0669aee21c7080ea7691b8d87d8489209857bd2710e3389fe3",
+              "version": 1,
+              "public_id": "ce21425e-027d-476f-be41-6ae42d0f3d1c"
+            }
+          },
+          "content_schema_version": 2
+        }
+      ],
+      "has_more": false,
+      "next_cursor": null
+    },
+    "response_schema_version": 1
+  }
+}

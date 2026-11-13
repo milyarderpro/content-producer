@@ -1,0 +1,954 @@
+[
+  {
+    "name": "P4-T1 atomic trivia v2 draft save > creates one complete draft and replays the exact operation",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T1 atomic trivia v2 draft save > rolls back URL, renderer, hard budget and editorial failures without partial rows",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T1 atomic trivia v2 draft save > rejects stale catalog and config under workspace lock",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T1 atomic trivia v2 draft save > completes a claimed plan item with its post and allocations in one commit",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T2 separate-session collisions and replay > observes lock overlap for same-key replay and both commit orders of the same identity",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T2 separate-session collisions and replay > blocks overlapping fact sets across Pages, while another workspace has independent scope",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T2 separate-session collisions and replay > allows page_unique reuse on another Page without duplicating canonical facts",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T2 separate-session collisions and replay > rejects retired v1 reservation and release without affecting v2 save",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T2 separate-session collisions and replay > keeps lost-response save certain on replay after claim is consumed; expired new claim rejects",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T2 separate-session collisions and replay > times out behind a held workspace lock and retries the same operation key safely",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T2 separate-session collisions and replay > rejects retired v1 post writes without affecting v2 draft creation",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T3 revise and version-aware readback > keeps shared lifecycle, metrics and readback available for a v2 post",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T3 revise and version-aware readback > revises a draft, preserves historical bindings, and reads current v2 evidence",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T3 revise and version-aware readback > rejects stale revision/hash and releases unpublished allocations on discard",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T3 revise and version-aware readback > replaces a changed claim and keeps schedule-only edits separate",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T3 revise and version-aware readback > returns a ready v2 draft to draft and invalidates its approval",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T4 sequential draft plan and resume > creates five themed drafts one at a time and resumes after partial failure and lost response",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "P4-T4 sequential draft plan and resume > reclaims an expired item across two chats and cancellation preserves completed drafts",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > saves, reads, approves and publishes all 1 positions with null goal",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > saves, reads, approves and publishes all 10 positions with null goal",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > saves, reads, approves and publishes all 11 positions with null goal",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > saves, reads, approves and publishes all 12 positions with null goal",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > keeps curious_mind profile rules and original CTA on save/revise/readback",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > keeps dyk profile rules and original CTA on save/revise/readback",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > keeps daily_facts profile rules and original CTA on save/revise/readback",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > retains multiline CTA before final fact, new labels and optional legacy annotation",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > stores text above legacy length and 12 fact bindings, with server metrics authoritative",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > rolls back stale versions, invalid references/architecture/labels and failed review atomically",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > requires context for config2 and rejects it on config1 without opening legacy null goal",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > replays exact successful save/revise before changed Page/catalog/retirement checks",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > keeps approval valid after new catalog versions and retirement of Page-bound definitions",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > requires explicit revision after Page adoption and preserves posted/archived provenance",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > recomputes narrow budget/emoji policy for approval and publication without rewriting snapshot",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > returns ready to draft on revision and preserves immutable old bindings and CAS",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > reschedules/revokes/discards all 12 facts and replays release IDs exactly",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > reads dynamic format/topic and null goal through existing metrics and insight dimensions",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > rejects malformed stored snapshot metadata and a content/CTA mismatch",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > keeps exactly one eighteen-argument signature per writer and all new helpers private",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 editorial snapshot3 post workflow > serializes concurrent config2 saves at the workspace lock and rolls stale catalog back",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > CM-FOOD-09: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > CM-BODY-10: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > CM-FOOD-THEME: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > CM-MIXED: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > DYK-SINGLE-10: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > DYK-ANIMALS: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > DYK-COMPARE: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > DYK-MYTH: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > DYK-UTILITY: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > DYK-HISTORY: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > DYK-CONSEQUENCE: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > DYK-MIXED-11: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > DF-PLACES: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > DF-STORAGE: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > DF-MIXED: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "CR-062 task9 editorial matrix integration > CUSTOM-DATA-ONLY: catalog \u2192 Page \u2192 plan/context \u2192 save/revise/readback \u2192 lifecycle/insights",
+    "file": "supabase/tests/database/api-trivia-v2-save.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > CORE-001/002 exact empty and 1/2/3-item replay retains original tokens after renewal, reclaim, failure and cancellation",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > CORE-002 renewal is one-time, no attempt increment, capped at initial +60 minutes and fails for expired claims",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > CORE-001/004 failure, retry and cancellation replay exact responses after later mutations; all six semantic mismatches reject",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > RPC-PLAN-TERM covers every aggregate precedence including mixed completed/cancelled and explicit cancellation preserving posts",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > CORE-004 replacement requires explicit intent and all discarded pre-publication history; never restores or deletes old outputs",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > SEC/INPUT validates all six contexts, bounds, safe details and illegal transitions with full rollback",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > SEC-GRANT event history is owner-RLS, app-append-only, and absent from every caller/helper surface",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > RPC-ROLLBACK each operation rolls back item/event/plan/ledger when completion fails; cancellation has no partial item set",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > CORE-008 both write groups enforce rate limits without mutations and return bounded retry recovery",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > CORE-001 closed replay rejects unknown nested overrides, duplicate event references and foreign-operation history",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > SEC-OWNER an authorized second workspace cannot discover foreign plan/item/post existence",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 public plan lifecycle > SEC-BUSY query cancellation maps to DATABASE_BUSY and rolls back even after event insertion",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > keeps null format/goal, completes two drafts with 12 facts each and replays lost save",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > uses item count/density/budget and accepts several CTA invitations without required goal",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > rejects unknown choices, expanded item limits and DNA override without partial plan/ledger",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > resumes compatible pending work on fresh Page context and leaves completed history unchanged",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > blocks incompatible pending intent after Page changes and never rewrites it or completed item",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > keeps active claims usable only with refreshed config and applies current budgets at save",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > rejects direct-context bypass of item rules and foreign item context, while public reads hide leases",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > detects catalog changes between 9+3 Reads and replaces all decisions before save",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > does not save on incomplete matching and rejects a fabricated complete review",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > preserves pinned catalog versions and claim replay after Page change, then supports cancellation",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > reclaims expired config2 work, rejects the old lease, and resumes after failure/retry",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-062 config2 plans and sequential batch > keeps context and plan helpers private with one public generation-context signature",
+    "file": "supabase/tests/database/api-plan-lifecycle.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > AC-002 isolated owner workspace supports three different Page trivia configurations",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > CORE-001 replays all three immutable responses after Page/config/plan/item mutation and rejects mismatched payloads",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > SEC-5.3 denies each public write uniformly for non-owner, absent and malformed request context",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > accepts eight ISO Page markets including DE, rejects aliases/noncodes and preserves workspace defaults",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > rejects closed Page patches, null fields, invalid config, slug conflict and one-microsecond stale CAS without partial writes",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > validates every override type/key/value and stored context ceiling through create_content_plan",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > proves 100-item success, contiguous positions, closed schedule intent and public config error mapping",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > rolls back Page/config, plan/items and ledger completion on injected downstream failures",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > rechecks both slot tables per item, rolls back a later collision, and honors cancelled/discarded occupancy",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > maps current unsupported registry config to CONFIG_INVALID and disabled registry to MODULE_DISABLED",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > rate-limits all three public write paths before mutation, including replay requests",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > CON-003 materializes numeric multi-slot locks before writes and serializes conflicting public plans",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > serializes identical concurrent public operation keys to one mutation for all three writes",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > keeps the CR-062 33 owner RPC signatures within narrow privileges",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > creates a Page and config atomically, replays exactly, and rejects owner/context violations",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > creates a non-default Page config without changing the default niche",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > updates Page/config with exact CAS and rejects stale writes without partial mutation",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "Phase 5.3 page and content-plan write RPCs > creates exact ordered plan items, links all children to one ledger row, and protects schedules atomically",
+    "file": "supabase/tests/database/api-page-plan-writes.test.ts"
+  },
+  {
+    "name": "P3 trivia v2 canonical Read and additive schema > uses the original fact ID, requires one URL, isolates owner, and rejects retired v1 Read",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "P3 trivia v2 canonical Read and additive schema > keeps the in-place v2 mapping idempotent and protects native evidence",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "P3 trivia v2 canonical Read and additive schema > sees v2 usage, negative history, and an incomplete 21st match without rewriting snapshots",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > publishes dynamic keys, returns exact immutable references and honest example completeness",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > denies cross-owner, anonymous, service-role and direct table/helper access",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > rejects unregistered structures, fields, type confusion, excessive nesting and text bounds atomically",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > validates profile references, graph direction, dynamic weight keys and hard ceilings",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > allows registered zero-weight choices and extra density keys without runtime code",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > increments versions with both CAS checks and preserves old payload/hash and Page config",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > retirement blocks new references while old bound versions and identical replay remain available",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > replays the exact original result and rejects key reuse or a different owner before replay",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > serializes two publication sessions at the same catalog revision without partial ledger state",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > serializes duplicate simultaneous operation keys into one immutable version",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > seeds idempotently without overwriting owner data, retired keys, or config1",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > paginates without duplicates, binds cursors to workspace/filter/revision, and bounds output",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > splits large pages by bytes and never truncates examples or individual definitions",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "CR-062 owner editorial catalog (config2 storage, not Page adoption) > bounds key capacity and rejects bad references, malformed cursors and invalid versions",
+    "file": "supabase/tests/database/api-trivia-v2-read.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.4 gold development gate > returns deterministic, capped private candidates and retains its search indexes",
+    "file": "supabase/tests/database/trivia-candidate-retrieval.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.4 gold development gate > validates fixture provenance, editorial evidence, quotas, and canonical unordered uniqueness",
+    "file": "supabase/tests/database/trivia-candidate-retrieval.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.4 gold development gate > binds the frozen holdout to its source-controlled checksum",
+    "file": "supabase/tests/database/trivia-candidate-retrieval.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.4 gold development gate > evaluates development through the private database helper",
+    "file": "supabase/tests/database/trivia-candidate-retrieval.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.4 gold development gate > evaluates frozen holdout through the private database helper",
+    "file": "supabase/tests/database/trivia-candidate-retrieval.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.4 gold development gate > uses the expected indexes in actual exact, structured, FTS, and trigram plans",
+    "file": "supabase/tests/database/trivia-candidate-retrieval.test.ts"
+  },
+  {
+    "name": "Phase 3 Pages and Page niche configs > enforces workspace-scoped Page and niche-config ownership",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > provides three distinct presets and keeps bootstrap idempotent without adopting config1",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > creates Pages with exact profile references and exposes hard limits separately from preferences",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > resolves format defaults then profile then Page then bounded item overrides deterministically",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > rejects item expansion, unknown density/DNA fields, count13 and invalid Page ceilings",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > allows dynamic registered format/topic keys and exact zero-weight choices without enabling profile defaults outside Page",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > selects an explicitly published mixed custom profile and extra density key through the same resolver",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > keeps pinned versions, Page timestamps and other Pages unchanged after catalog updates and adoption on one Page",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > preserves binding times on Page-only/config override updates and keeps retired old references usable",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > rejects stale or rounded CAS and replays the exact original Page response after retirement",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > isolates foreign references and denies anonymous/direct helper and metadata writes",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > supports explicit config1 adoption without changing old post history or another Page",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "CR-062 Page editorial profiles config2 > serializes simultaneous Page config2 CAS updates and rolls back the stale operation",
+    "file": "supabase/tests/database/pages-and-page-niche-configs.test.ts"
+  },
+  {
+    "name": "Phase 5.1 API security kernel > keeps the API-owner role narrow, private helpers uncallable, and no business API premature",
+    "file": "supabase/tests/database/api-security-kernel.test.ts"
+  },
+  {
+    "name": "Phase 5.1 API security kernel > denies caller table, sequence, and internal-helper access while retaining api schema usage",
+    "file": "supabase/tests/database/api-security-kernel.test.ts"
+  },
+  {
+    "name": "Phase 5.1 API security kernel > applies request identity and owner RLS to the narrow API role",
+    "file": "supabase/tests/database/api-security-kernel.test.ts"
+  },
+  {
+    "name": "Phase 5.1 API security kernel > canonicalizes semantic hashes and provides safe timeout mapping",
+    "file": "supabase/tests/database/api-security-kernel.test.ts"
+  },
+  {
+    "name": "Phase 5.1 API security kernel > bounds ledger lock contention and exposes only DATABASE_BUSY",
+    "file": "supabase/tests/database/api-security-kernel.test.ts"
+  },
+  {
+    "name": "Phase 5.1 API security kernel > serializes replay, rejects key reuse, and rolls back an uncompleted ledger claim",
+    "file": "supabase/tests/database/api-security-kernel.test.ts"
+  },
+  {
+    "name": "Phase 5.1 API security kernel > binds completion to the workspace and operation that claimed the ledger row",
+    "file": "supabase/tests/database/api-security-kernel.test.ts"
+  },
+  {
+    "name": "Phase 5.1 API security kernel > increments rate buckets atomically and blocks writes at the limit",
+    "file": "supabase/tests/database/api-security-kernel.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 separate-session public RPC concurrency > CON-PLAN/REPLAY parallel workers receive different items and duplicate keys mutate only once",
+    "file": "supabase/tests/database/api-plan-concurrency.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 separate-session public RPC concurrency > CON-LEASE SKIP LOCKED bypasses a held first item while the public owner RPC claims the next item",
+    "file": "supabase/tests/database/api-plan-concurrency.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 separate-session public RPC concurrency > CON-PLAN different Pages progress independently while one public claim transaction holds its Page/plan",
+    "file": "supabase/tests/database/api-plan-concurrency.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 separate-session public RPC concurrency > CON-PLAN claim-first and cancel-first RPC transactions wait in one direction and finish without deadlock",
+    "file": "supabase/tests/database/api-plan-concurrency.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 separate-session public RPC concurrency > CON-LEASE retry-first and claim-first races preserve attempts, and competing renewals have one winner",
+    "file": "supabase/tests/database/api-plan-concurrency.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 separate-session public RPC concurrency > CON-LEASE reclaimed token rejects a waiting old renewal and lease expiry is rechecked after locks",
+    "file": "supabase/tests/database/api-plan-concurrency.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 separate-session public RPC concurrency > CON-SCHEDULE cancellation acquires sorted numeric slots before plan/item/post locks; freed slot races new plan legally",
+    "file": "supabase/tests/database/api-plan-concurrency.test.ts"
+  },
+  {
+    "name": "Checkpoint 5.4 separate-session public RPC concurrency > SEC-BUSY a held Page beyond lock_timeout maps safely and rolls back the public mutation/ledger/event",
+    "file": "supabase/tests/database/api-plan-concurrency.test.ts"
+  },
+  {
+    "name": "P5-T3 URL maintenance, CAS and immutable history > refreshes canonical URL only, with CAS, same-meaning protection, replay and owner denial",
+    "file": "supabase/tests/database/api-trivia-v2-maintenance.test.ts"
+  },
+  {
+    "name": "P5-T3 URL maintenance, CAS and immutable history > invalidates mutable approvals and preserves posted/archived evidence",
+    "file": "supabase/tests/database/api-trivia-v2-maintenance.test.ts"
+  },
+  {
+    "name": "P5-T3 URL maintenance, CAS and immutable history > supersedes only after current complete dedup, preserves lineage, and rolls back stale/conflicting successors",
+    "file": "supabase/tests/database/api-trivia-v2-maintenance.test.ts"
+  },
+  {
+    "name": "P5-T3 URL maintenance, CAS and immutable history > serializes competing URL refreshes with exact fact CAS in both commit orders",
+    "file": "supabase/tests/database/api-trivia-v2-maintenance.test.ts"
+  },
+  {
+    "name": "P5-T2/T3 observable correction/approval/publication races for v2 content > content v2: approve, correction commits first",
+    "file": "supabase/tests/database/api-trivia-v2-maintenance.test.ts"
+  },
+  {
+    "name": "P5-T2/T3 observable correction/approval/publication races for v2 content > content v2: approve, correction commits second",
+    "file": "supabase/tests/database/api-trivia-v2-maintenance.test.ts"
+  },
+  {
+    "name": "P5-T2/T3 observable correction/approval/publication races for v2 content > content v2: publish, correction commits first",
+    "file": "supabase/tests/database/api-trivia-v2-maintenance.test.ts"
+  },
+  {
+    "name": "P5-T2/T3 observable correction/approval/publication races for v2 content > content v2: publish, correction commits second",
+    "file": "supabase/tests/database/api-trivia-v2-maintenance.test.ts"
+  },
+  {
+    "name": "5.8 RPC-METRIC public append and replay > QUALITY-006 preserves null/zero, subset, UTC/source, unchanged post and immutable historical replay",
+    "file": "supabase/tests/database/api-metrics.test.ts"
+  },
+  {
+    "name": "5.8 RPC-METRIC public append and replay > RPC-METRIC validates closed metrics/source, numeric range and timestamp boundaries with atomic denial",
+    "file": "supabase/tests/database/api-metrics.test.ts"
+  },
+  {
+    "name": "5.8 RPC-METRIC public append and replay > SEC-RLS denies missing identity/client, foreign scope, unpublished states and caller tables/helpers",
+    "file": "supabase/tests/database/api-metrics.test.ts"
+  },
+  {
+    "name": "5.8 RPC-METRIC public append and replay > CORE-001 insert/completion faults rollback and corrupted v8 envelopes fail closed",
+    "file": "supabase/tests/database/api-metrics.test.ts"
+  },
+  {
+    "name": "5.8 RPC-METRIC public append and replay > CORE-008 enforces write/read/expensive-read limits without mutation and exposes cautious insufficient",
+    "file": "supabase/tests/database/api-metrics.test.ts"
+  },
+  {
+    "name": "5.8 RPC-METRIC-002 / RPC-INSIGHT-001 > paginates adjacent deltas across pages, incompatible/null sources, totals versus point averages and period bounds",
+    "file": "supabase/tests/database/api-metrics-insights.test.ts"
+  },
+  {
+    "name": "5.8 RPC-METRIC-002 / RPC-INSIGHT-001 > negative total watch time is anomalous while average-only decrease remains descriptive and legacy source is unknown",
+    "file": "supabase/tests/database/api-metrics-insights.test.ts"
+  },
+  {
+    "name": "5.8 RPC-METRIC-002 / RPC-INSIGHT-001 > counts latest distinct posts, disjoint exclusions, numeric median/outliers and cautious thresholds without causation",
+    "file": "supabase/tests/database/api-metrics-insights.test.ts"
+  },
+  {
+    "name": "5.8 RPC-METRIC-002 / RPC-INSIGHT-001 > returns empty successful evidence and rejects invalid dimensions/metrics/periods/null bounds through public reads",
+    "file": "supabase/tests/database/api-metrics-insights.test.ts"
+  },
+  {
+    "name": "5.8 public separate-session metrics races > CON-METRIC duplicate key has one append; duplicate capture conflicts; distinct captures both commit",
+    "file": "supabase/tests/database/api-metrics-concurrency.test.ts"
+  },
+  {
+    "name": "5.8 public separate-session metrics races > CON-METRIC record/archive both orders wait on workspace and preserve publication/snapshot",
+    "file": "supabase/tests/database/api-metrics-concurrency.test.ts"
+  },
+  {
+    "name": "5.8 public separate-session metrics races > DATABASE_BUSY held workspace timeout and cancellation rollback then same-key retry",
+    "file": "supabase/tests/database/api-metrics-concurrency.test.ts"
+  },
+  {
+    "name": "Phase 3 core validators and private primitives > validates versions and classifies private replay and schedule conflicts",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "Phase 3 core validators and private primitives > serializes cross-session Page schedule contention",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "Phase 3 core validators and private primitives > permits independent slots and supports self-exclusion",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > accepts 1 facts independently of legacy count and profile preference",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > accepts 10 facts independently of legacy count and profile preference",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > accepts 11 facts independently of legacy count and profile preference",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > accepts 12 facts independently of legacy count and profile preference",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > rejects zero, thirteen and malformed fact positions without truncating",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > locks a golden copy, all metrics and render hash; SQL roundtrip stays exact",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > preserves numbered positions 10\u201312 and counts prefixes in full/block metrics",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > accepts Daily Facts CTA with no mandatory goal or labels",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > accepts DYK question + like CTA with no mandatory goal or labels",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > accepts DYK like + tag CTA with no mandatory goal or labels",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > accepts ambiguous unlabeled CTA with no mandatory goal or labels",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > accepts synthetic three-plus actions CTA with no mandatory goal or labels",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > preserves four CTA lines and blank lines between facts; counts only facts in block",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > inserts CTA after fact six of seven without renumbering or losing final fact",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > rejects unsupported placement and a copy assembled at a different placement",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > accepts empty, incomplete, new and many descriptive labels without hierarchy",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > enforces hook character ceiling exactly at 120",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > enforces fact character ceiling exactly at 160",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > enforces cta character ceiling exactly at 180",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > enforces 900-character fact block and 1100-character full copy including separators",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > enforces hook word ceiling exactly at 18",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > enforces fact word ceiling exactly at 30",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > enforces cta word ceiling exactly at 32",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > enforces 160 full-copy words while replay/loops remain advisory",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > honors all nine narrower budgets, explicit Page count, caption and hashtags limits",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > normalizes NFC/CRLF deterministically and preserves Unicode emoji code points",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > applies forbidden emoji across every product text component without deleting it",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > keeps artifact/control/privacy denial under optional emoji policy",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > preserves config1 rendered bytes/hash and the three legacy function definitions",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > consumes actual resolved preset rules and keeps preferences advisory",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "CR-062 config2 deterministic renderer and optional CTA metadata > keeps new helpers private and immutable with no new public RPC",
+    "file": "supabase/tests/database/core-primitives-and-validators.test.ts"
+  },
+  {
+    "name": "Phase 5 operation map > keeps the active 31-operation inventory machine-readable",
+    "file": "supabase/tests/database/api-phase-five-acceptance.test.ts"
+  },
+  {
+    "name": "5.9 phase-wide public surface and scope acceptance > SEC-* exact 31 v2 RPC signatures, owner policies/default ACL and historical replay security",
+    "file": "supabase/tests/database/api-phase-five-acceptance.test.ts"
+  },
+  {
+    "name": "5.9 phase-wide public surface and scope acceptance > RPC-METRIC numeric normalization and immutable v8 preserve exact request/replay boundaries without new post revision",
+    "file": "supabase/tests/database/api-phase-five-acceptance.test.ts"
+  },
+  {
+    "name": "5.9 phase-wide public surface and scope acceptance > PERF-READ / PERF-WRITE populated local public metrics/read p95 and normal-planner plans meet frozen targets",
+    "file": "supabase/tests/database/api-phase-five-acceptance.test.ts"
+  },
+  {
+    "name": "P5-T1 current mechanical and editorial v2 gate > recomputes v2 checks without v1 source metadata or 18 editorial criteria",
+    "file": "supabase/tests/database/api-trivia-v2-lifecycle.test.ts"
+  },
+  {
+    "name": "P5-T1 current mechanical and editorial v2 gate > blocks current Page, count, format, budget and binding violations",
+    "file": "supabase/tests/database/api-trivia-v2-lifecycle.test.ts"
+  },
+  {
+    "name": "P5-T1 current mechanical and editorial v2 gate > rejects invalid URL, reuse conflicts and failed system evidence even if old checks passed",
+    "file": "supabase/tests/database/api-trivia-v2-lifecycle.test.ts"
+  },
+  {
+    "name": "P5-T2 explicit version-aware lifecycle > approves/publishes v2 facts with native evidence and no legacy expiry fields",
+    "file": "supabase/tests/database/api-trivia-v2-lifecycle.test.ts"
+  },
+  {
+    "name": "P5-T2 explicit version-aware lifecycle > approves/replays, reschedules, revokes and reapproves the reviewed v2 version",
+    "file": "supabase/tests/database/api-trivia-v2-lifecycle.test.ts"
+  },
+  {
+    "name": "P5-T2 explicit version-aware lifecycle > records confirmed publication and archives without rewriting publication evidence",
+    "file": "supabase/tests/database/api-trivia-v2-lifecycle.test.ts"
+  },
+  {
+    "name": "CR-016 public populated retrieval > P1-02 authenticated 5,001-fact v2 search p95 and normal-planner plans",
+    "file": "supabase/tests/database/api-trivia-populated-performance.test.ts"
+  },
+  {
+    "name": "Phase 5.2 owner-scoped read projections > exposes the CR-062 33 authenticated owner RPC signatures with narrow catalog privileges",
+    "file": "supabase/tests/database/api-read-rpcs.test.ts"
+  },
+  {
+    "name": "Phase 5.2 owner-scoped read projections > serves every read projection for the owner, including safe pagination and performance output",
+    "file": "supabase/tests/database/api-read-rpcs.test.ts"
+  },
+  {
+    "name": "Phase 5.2 owner-scoped read projections > denies every workspace-scoped read to a non-owner without revealing resource existence",
+    "file": "supabase/tests/database/api-read-rpcs.test.ts"
+  },
+  {
+    "name": "Phase 5.2 owner-scoped read projections > returns stable validation, owner-safe not-found, and empty-success responses without business mutation",
+    "file": "supabase/tests/database/api-read-rpcs.test.ts"
+  },
+  {
+    "name": "P3 frozen dedup-v2 corpus on the canonical database > preserves 92 IDs, finds 40/40 paraphrases and 18/18 negative history, and reports complete truthfully",
+    "file": "supabase/tests/database/api-trivia-v2-corpus.test.ts"
+  },
+  {
+    "name": "Phase 2 Supabase local baseline > enforces the extension, privilege, Data API, and OAuth boundary",
+    "file": "supabase/tests/database/baseline.test.ts"
+  },
+  {
+    "name": "v2 source-free public gold retrieval > checks development corpus through authenticated v2 RPC",
+    "file": "supabase/tests/database/api-trivia-public-gold.test.ts"
+  },
+  {
+    "name": "v2 source-free public gold retrieval > checks holdout corpus through authenticated v2 RPC",
+    "file": "supabase/tests/database/api-trivia-public-gold.test.ts"
+  },
+  {
+    "name": "Phase 3 operation ledger and rate-limit buckets > enforces private idempotency and operational-counter invariants",
+    "file": "supabase/tests/database/operation-ledger-and-rate-limit-buckets.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.6 trivia reservation and reuse > reserves exact eligible sets atomically and enforces release, expiry, context, and reuse",
+    "file": "supabase/tests/database/trivia-reservation-and-reuse.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.6 trivia reservation and reuse > allows one ten-session contender with no partial loser and independent facts proceed",
+    "file": "supabase/tests/database/trivia-reservation-and-reuse.test.ts"
+  },
+  {
+    "name": "Phase 3 workspace and niche registry > enforces tenant, registry, catalog, RLS, and privilege invariants",
+    "file": "supabase/tests/database/workspaces-and-niches.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.7 trivia lineage and reverification > refreshes only same-meaning facts and preserves published evidence through corrections",
+    "file": "supabase/tests/database/trivia-lineage-and-reverification.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.7 trivia lineage and reverification > permits one concurrent correction winner and no partial successor",
+    "file": "supabase/tests/database/trivia-lineage-and-reverification.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.7 trivia lineage and reverification > keeps candidate retrieval and simple reserve-release below the local p95 target",
+    "file": "supabase/tests/database/trivia-lineage-and-reverification.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.5 trivia post-fact usage snapshots > enforces scoped immutable fact usage and the closed caller boundary",
+    "file": "supabase/tests/database/trivia-post-facts.test.ts"
+  },
+  {
+    "name": "Phase 3 final remediation > fails closed for trivia, evidence, timezone, market, and metrics contracts",
+    "file": "supabase/tests/database/final-remediation.test.ts"
+  },
+  {
+    "name": "Phase 3 posts and post metrics > enforces post lifecycle, scope, metrics, indexes, and private privileges",
+    "file": "supabase/tests/database/posts-and-post-metrics.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.2 trivia fact schema > enforces canonical scope, lifecycle shape, and caller isolation",
+    "file": "supabase/tests/database/trivia-facts-schema.test.ts"
+  },
+  {
+    "name": "Phase 3 content plans and plan items > enforces scoped plans, schedules, leases, and private privileges",
+    "file": "supabase/tests/database/content-plans-and-plan-items.test.ts"
+  },
+  {
+    "name": "Phase 4 checkpoint 4.3 identity and source policy > derives deterministic identity and fails closed on invalid evidence",
+    "file": "supabase/tests/database/trivia-identity-and-source.test.ts"
+  },
+  {
+    "name": "Phase 4 Batch A audit remediation > closes identity, source, review, and reservation-context validation gaps",
+    "file": "supabase/tests/database/trivia-audit-remediation.test.ts"
+  },
+  {
+    "name": "CR-021 Supabase OAuth audience hook > binds OAuth code and refresh tokens to MCP without changing ordinary sessions",
+    "file": "supabase/tests/database/oauth-resource-audience-hook.test.ts"
+  },
+  {
+    "name": "Phase 5 operation map > keeps the active 31-operation inventory machine-readable",
+    "file": "supabase/tests/database/phase-5-operation-map.test.ts"
+  }
+]
