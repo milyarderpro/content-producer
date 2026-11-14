@@ -5,6 +5,15 @@ schema `spec-driven`. **Progres 9/10; task 10 belum selesai.** Rilis backend
 sudah terverifikasi; retest config2 melalui owner/plugin masih BLOCKED oleh
 metadata tool lama pada sesi chat saat ini. Tidak ada business Write QA pada sesi ini.
 
+## Follow-up LIVE Issue #145
+
+QA minimal pada backend v38 menemukan generation context config1 gagal pada
+validasi output MCP, terulang pada Read berikutnya. Ini blocker tambahan atas
+metadata chat lama; OAuth, Page discovery, runtime dan discovery33tool lulus.
+Tidak ada business Write QA. [Perbaikan dan bukti lokal](task-10-context-fix.md)
+menambah regresi serta compatibility Read database→Inspector. Sampai G4,
+deployment dan retest relevan selesai, Issue145 tetap OPEN, bukan FIXED.
+
 ## Rilis dan bukti formal
 
 PR [#139](https://github.com/milyarderpro/content-producer/pull/139),

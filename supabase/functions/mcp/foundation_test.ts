@@ -489,6 +489,60 @@ Deno.test(
   },
 );
 
+Deno.test('CR-062 config1 context accepts current SQL versions and rejects unknown module fields', async () => {
+  const original = globalThis.fetch;
+  const legacy = payloads.get_page_generation_context as { data: Record<string, unknown> };
+  const module = legacy.data.module as Record<string, unknown>;
+  const exactTime = '2026-11-14T05:10:31.123456Z';
+  let rpcModule: Record<string, unknown> = {
+    ...module,
+    content_schema_versions: [2],
+    config_schema_versions: [1, 2],
+  };
+  globalThis.fetch = (() => Promise.resolve(Response.json(envelope({
+    ...legacy.data,
+    module: rpcModule,
+    context_version: { page_updated_at: exactTime, config_updated_at: exactTime },
+  })))) as typeof fetch;
+  const read = async () => {
+    const raw = await request('tools/call', {
+      name: 'get_page_generation_context',
+      arguments: {
+        request_schema_version: 1,
+        workspace_public_id: workspace,
+        page_public_id: page,
+        niche_key: 'trivia',
+        recent_post_limit: 1,
+      },
+    });
+    const frame = raw.split('\n').find((line) => line.startsWith('data: '));
+    assert(frame, 'context MCP data frame missing');
+    return JSON.parse(frame.slice(6)).result;
+  };
+  try {
+    const result = await read();
+    assert(result.isError !== true, 'current SQL config1 context rejected');
+    const data = result.structuredContent.data;
+    assert(data.module.config_schema_version === 1, 'config1 reader changed version');
+    assert(JSON.stringify(data.module.config_schema_versions) === '[1,2]', 'SQL versions lost');
+    assert(data.context_version.config_updated_at === exactTime, 'six microseconds lost');
+    assert(JSON.stringify(data.config) === JSON.stringify(legacy.data.config), 'config1 rules changed');
+    for (const invalid of [
+      { ...rpcModule, unexpected_field: true },
+      { ...rpcModule, config_schema_versions: [1, 3] },
+      { ...rpcModule, config_schema_versions: [2, 1] },
+      { ...rpcModule, config_schema_versions: null },
+    ]) {
+      rpcModule = invalid;
+      const rejected = await read();
+      assert(rejected.isError === true, 'invalid module output was accepted');
+      assert(rejected.structuredContent.error.code === 'DATABASE_UNAVAILABLE', 'unsafe output error');
+    }
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
 Deno.test('6.3 SQL and sensitive outputs are not returned in tool errors', async () => {
   const original = globalThis.fetch;
   globalThis.fetch = (() =>

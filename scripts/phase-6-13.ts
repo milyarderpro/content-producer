@@ -498,6 +498,26 @@ try {
     await valid('get_account_profile', {});
     await valid('get_workspace_context', common());
     await valid('list_pages', common());
+    // Config1 remains in production: validate its actual SQL response through
+    // authenticated Inspector as well as the config2 valid-tool path below.
+    const legacyResult = await inspector('tools/call', 'get_page_generation_context', {
+      ...common(),
+      page_public_id: f.page,
+      niche_key: 'trivia',
+      recent_post_limit: 1,
+    });
+    const legacyContext = legacyResult?.structuredContent?.data;
+    check(legacyResult?.isError !== true && legacyContext, 'INSPECTOR_CONFIG1_CONTEXT_OUTPUT');
+    check(
+      legacyContext.page.page_public_id === f.page &&
+        legacyContext.module.config_schema_version === 1 &&
+        JSON.stringify(legacyContext.module.config_schema_versions) === '[1,2]' &&
+        legacyContext.config_public_id === row<{ public_id: string }>(
+          `select c.public_id from public.page_niche_configs c join public.pages p on p.id=c.page_id where p.public_id='${f.page}'`,
+        ).public_id,
+      'INSPECTOR_CONFIG1_CONTEXT_IDENTITY',
+    );
+    console.info('CR-062 config1 database -> authenticated Inspector context: PASS');
     ep.privateCall(
       f,
       `internal.editorial_seed_profiles_v2((select id from public.workspaces where public_id='${f.workspace}'))`,
