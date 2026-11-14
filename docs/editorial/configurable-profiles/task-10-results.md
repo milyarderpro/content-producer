@@ -3,6 +3,13 @@
 Diperbarui 14 November 2026. Change `add-configurable-trivia-editorial-profiles`,
 schema `spec-driven`. **Progres 9/10; task 10 belum selesai.**
 
+## Positive QA config2 — blocker connector Issue #148
+
+Percobaan publish format pada mcpv39 ditolak connector sebelum MCP karena key
+map dinamis; katalog tetap revision0/kosong dan tidak ada Write sukses.
+[Reproduksi, perbaikan dan kelanjutan](task-10-host-map-fix.md) memuat batas bukti.
+Issue145 tetap FIXED; Issue148 masih OPEN sampai retest connector positif.
+
 ## Hasil terkini — perbaikan Issue #145
 
 [PR146](https://github.com/milyarderpro/content-producer/pull/146) merged pada

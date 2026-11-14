@@ -122,9 +122,11 @@ versi DNA dan label CTA baru tetap di luar scope.
 ## Wire schema dan diagnostics
 
 Semua object domain tetap tertutup. Map katalog dibatasi regex key dan schema
-nilai, bukan object JSON bebas. Representasi wire mengubah pasangan
-`propertyNames.pattern` + typed `additionalProperties` menjadi ekuivalen
-`patternProperties` + `additionalProperties:false`. Wrapper `anyOf` maupun
+nilai, bukan object JSON bebas. Setelah [reproduksi host Issue148](../decisions/2026-11-14-cr-062-host-dynamic-map-schema.md),
+representasi wire mempertahankan `propertyNames.pattern` + typed
+`additionalProperties`: connector yang diamati menolak key sah pada bentuk
+`patternProperties` + `additionalProperties:false` yang semula ekuivalen.
+Strict object domain lain dan validator runtime tetap tertutup. Wrapper `anyOf` maupun
 `oneOf` ditutup dengan himpunan key cabangnya. Factoring menggunakan local refs;
 test expand/roundtrip mempertahankan constraints. Output validator tetap aktif
 walaupun metadata outputSchema OAuth selain profile tidak dikirim ke host.
@@ -150,7 +152,8 @@ bukti historis task7 yang melewatkan beberapa tabel dinamis. Matcher/manifest
 kini238; tidak ada kasus dihapus. [Temuan task9](../editorial/configurable-profiles/task-9-findings.md)
 menjelaskan delta. Ini bukan PASS full238 atau formal G4.
 
-Manifest kandidat CR-062 memuat **18 file/130 kasus MCP**, termasuk 14 test baru
+Manifest kandidat kini memuat **18 file/132 kasus MCP**:130task7 ditambah regresi
+Issue145 dan Issue148. Inventaris task7 historis termasuk14test baru
 serta dua penambahan kasus pada matriks diagnostics otomatis per tool. Katalog
 owner/Inspector ialah 33 valid/33 invalid dengan lima nama v1 ditolak dan owner
 denial. Database tetap 33 file, partisi 15+18; collection Vitest mencatat 200 kasus

@@ -3,7 +3,7 @@
   "baseSha": "c02c5413479cebf50f39abc10149fafca757611a",
   "cutoverEvidence": {
     "apiNames": 33,
-    "mcpCases": 131,
+    "mcpCases": 132,
     "inspectorValid": 33,
     "inspectorInvalid": 33,
     "retiredV1NamesRejected": 5,
