@@ -15,19 +15,22 @@ import {
 } from './helpers/metrics-rpc.js';
 
 describe('5.9 phase-wide public surface and scope acceptance', () => {
-  it('SEC-* exact 31 v2 RPC signatures, owner policies/default ACL and historical replay security', () => {
-    // Keep the archived query immutable and project its allowlist onto CR-059.
+  it('SEC-* exact 33 v2 RPC signatures, owner policies/default ACL and historical replay security', () => {
+    // Keep the archived query immutable and project its allowlist onto CR-059/062.
     const auditSql = readFileSync('docs/phase-5-8-catalog-audit.sql', 'utf8')
-      .replace("'trivia_find_similar_facts','trivia_register_and_reserve_facts','trivia_release_facts',",
-        "'trivia_find_similar_facts_v2',")
-      .replace("'save_post','revise_post',", "'save_post_v2','revise_post_v2',");
-    const a = JSON.parse(sql(auditSql)) as Record<
-      string,
-      unknown
-    >;
-    expect(a.api_function_count).toBe(31);
-    expect(a.authenticated_api_execute_count).toBe(31);
-    expect(a.rls_enabled_table_count).toBe(17);
+      .replace(
+        "'trivia_find_similar_facts','trivia_register_and_reserve_facts','trivia_release_facts',",
+        "'trivia_find_similar_facts_v2',",
+      )
+      .replace(
+        "'save_post','revise_post',",
+        "'save_post_v2','revise_post_v2','get_trivia_editorial_catalog','update_trivia_editorial_catalog',",
+      );
+    const a = JSON.parse(sql(auditSql)) as Record<string, unknown>;
+    expect(a.api_function_count).toBe(33);
+    expect(a.authenticated_api_execute_count).toBe(33);
+    expect(a.business_table_count).toBe(19);
+    expect(a.rls_enabled_table_count).toBe(19);
     expect(a.overloaded_api_count).toBe(0);
     const maintenance = row<{ signatures: string[] }>(`select array_agg(p.oid::regprocedure::text
       order by p.oid::regprocedure::text) signatures from pg_proc p
@@ -53,15 +56,46 @@ describe('5.9 phase-wide public surface and scope acceptance', () => {
       expect(a[key], key).toBe(0);
     const policies = a.policy_inventory as {
       table: string;
+      name: string;
       command: string;
+      roles: string[];
       using: string | null;
       check: string | null;
     }[];
+    // CR-062 uses a workspace-scoped auth.uid() subquery only on these two
+    // new tables. Keep the legacy helper requirement on every older table.
+    const editorialTables = new Set([
+      'trivia_editorial_definitions',
+      'internal.trivia_editorial_catalog_state',
+    ]);
+    expect(
+      policies
+        .filter((policy) => editorialTables.has(policy.table))
+        .map((policy) => `${policy.table}:${policy.name}:${policy.command}`)
+        .sort(),
+    ).toEqual([
+      'internal.trivia_editorial_catalog_state:editorial_state_owner:*',
+      'trivia_editorial_definitions:editorial_owner_insert:a',
+      'trivia_editorial_definitions:editorial_owner_select:r',
+      'trivia_editorial_definitions:editorial_owner_update:w',
+    ]);
+    const apiOwner = row<{ oid: string }>(
+      "select oid::text oid from pg_roles where rolname='content_producer_api_owner'",
+    ).oid;
     for (const policy of policies) {
+      const editorial = editorialTables.has(policy.table);
+      if (editorial) {
+        const table = policy.table.split('.').at(-1)!;
+        const ownerScope = `(EXISTS ( SELECT 1\n   FROM workspaces w\n  WHERE ((w.id = ${table}.workspace_id) AND w.is_active AND (w.owner_user_id = ( SELECT auth.uid() AS uid)))))`;
+        expect(policy.roles).toEqual([apiOwner]);
+        expect(policy.using).toBe(policy.command === 'a' ? null : ownerScope);
+        expect(policy.check).toBe(policy.command === 'r' ? null : ownerScope);
+      }
       const expressions = [policy.using, policy.check].filter((x): x is string => x !== null);
       expect(expressions.length).toBeGreaterThan(0);
       for (const expression of expressions) {
-        expect(expression).toMatch(/internal\.(current_auth_uid_v1|request_actor_user_id_v1)/);
+        if (!editorial)
+          expect(expression).toMatch(/internal\.(current_auth_uid_v1|request_actor_user_id_v1)/);
         if (policy.table !== 'niches' && policy.table !== 'internal.rate_limit_buckets')
           expect(expression).toContain('owner_user_id');
       }
@@ -131,12 +165,17 @@ describe('5.9 phase-wide public surface and scope acceptance', () => {
     expect(frontendFiles).toContain('auth.js');
     expect(readdirSync('plugin/.codex-plugin').filter((x) => x !== '.gitkeep')).toEqual([]);
     expect(readFileSync('supabase/seed.sql', 'utf8')).not.toMatch(/\b(insert|update|delete)\b/i);
-    const retired = new Set(['trivia_find_similar_facts', 'trivia_register_and_reserve_facts',
-      'trivia_release_facts', 'save_post', 'revise_post']);
+    const retired = new Set([
+      'trivia_find_similar_facts',
+      'trivia_register_and_reserve_facts',
+      'trivia_release_facts',
+      'save_post',
+      'revise_post',
+    ]);
     const allowed = new Set(phaseFiveOperationMap.map((x) => x.name));
-    expect(allowed.size).toBe(31);
+    expect(allowed.size).toBe(33);
     expect([...allowed].every((name) => !retired.has(name))).toBe(true);
-    expect(new Set((a.api_inventory as { name: string }[]).map((x) => x.name)).size).toBe(31);
+    expect(new Set((a.api_inventory as { name: string }[]).map((x) => x.name)).size).toBe(33);
     expect((a.api_inventory as { name: string }[]).every((x) => allowed.has(x.name))).toBe(true);
   });
   it('RPC-METRIC numeric normalization and immutable v8 preserve exact request/replay boundaries without new post revision', () => {
@@ -189,7 +228,11 @@ describe('5.9 phase-wide public surface and scope acceptance', () => {
         '{"source_type":"facebook_ui","metric_definition_version":1,"source_reported_at":null,"timezone":null,"note":null}'::jsonb
         from public.posts p cross join generate_series(1,40) g where workspace_id=(select id from public.workspaces where public_id='${f.workspace}');
         analyze public.posts;analyze public.post_metrics;`);
-      expect(row(`select count(*) n from public.post_metrics where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`).n).toBe(10040);
+      expect(
+        row(
+          `select count(*) n from public.post_metrics where workspace_id=(select id from public.workspaces where public_id='${f.workspace}')`,
+        ).n,
+      ).toBe(10040);
       const expressions = {
         get_post: `api.get_post(1,'${f.workspace}','${p.post_public_id}',false,false,true)`,
         list_posts: `api.list_posts(1,'${f.workspace}','${f.page}')`,

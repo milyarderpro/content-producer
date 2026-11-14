@@ -53,3 +53,18 @@ production otomatis atau klaim LIVE PASS/FIXED dari light CI.
 Task 10 tetap unchecked hingga seluruh bukti rilis dan retest yang diwajibkan
 terpenuhi. Persiapan PR ini bukan izin merge/deploy/Write menurut AGENTS §6 dan
 syarat task 10.1.
+
+## Pembaruan 14 November — Issue #142
+
+PR #141 sudah merged pada 93c38cb8. G4 43406057727 FAIL: source dan shard 1 lengkap
+PASS (158 DB,130MCP,Inspector33/33,advisors/audit/history/cleanup); shard 2 FAIL
+pada test database setelah audit-before/after PASS. Kedua cleanup PASS.
+[Hasil perbaikan inventaris/policy](task-10-shard2-results.md) mencatat 79/80
+pada run lokal awal dan SEC-only 1 PASS sesudah koreksi, cleanup 20 tabel nol,
+serta source/frontend final208/19 PASS. Failure dan skipped retest dipertahankan.
+
+Pemilik sudah memberikan otorisasi operasional untuk menyelesaikan task 10,
+termasuk commit/push/PR/merge/rilis/QA tanpa pertanyaan izin ulang. Prasyarat G4,
+preflight, context, scope fixture dan readback tetap dipenuhi. Kandidat ini perlu
+PR/Actions, merge, lalu G4 exact final main SHA baru. Belum deploy/Write QA;
+task tetap unchecked,9/10.
