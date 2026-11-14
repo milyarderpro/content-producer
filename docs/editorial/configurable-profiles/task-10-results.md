@@ -1,20 +1,27 @@
 # Hasil sementara task 10 — rilis CR-062
 
 Diperbarui 14 November 2026. Change `add-configurable-trivia-editorial-profiles`,
-schema `spec-driven`. **Progres 9/10; task 10 belum selesai.** Rilis backend
-sudah terverifikasi; retest config2 melalui owner/plugin masih BLOCKED oleh
-metadata tool lama pada sesi chat saat ini. Tidak ada business Write QA pada sesi ini.
+schema `spec-driven`. **Progres 9/10; task 10 belum selesai.**
 
-## Follow-up LIVE Issue #145
+## Hasil terkini — perbaikan Issue #145
 
-QA minimal pada backend v38 menemukan generation context config1 gagal pada
-validasi output MCP, terulang pada Read berikutnya. Ini blocker tambahan atas
-metadata chat lama; OAuth, Page discovery, runtime dan discovery33tool lulus.
-Tidak ada business Write QA. [Perbaikan dan bukti lokal](task-10-context-fix.md)
-menambah regresi serta compatibility Read database→Inspector. Sampai G4,
-deployment dan retest relevan selesai, Issue145 tetap OPEN, bukan FIXED.
+[PR146](https://github.com/milyarderpro/content-producer/pull/146) merged pada
+`04ca90cbba3552f99b60b976cd0704f1219c618d`;
+[G4 43561690208](https://github.com/milyarderpro/content-producer/actions/runs/43561690208)
+PASS 11m12s, DB 238 tanpa skip, MCP 131, Inspector serta kedua audit/advisors/cleanup
+lulus. Edge **mcp v39 ACTIVE**,26/26 file provider cocok source G4.
 
-## Rilis dan bukti formal
+QA minimal owner OAuth pada Page config1 yang sama kini **PASS**: generation
+context, config/timestamp 6 digit, workspace/Page discovery, runtime, discovery 33
+dan anonymous business Read denial. Katalog Read baru juga PASS; metadata chat
+33 tool tersedia. Tidak ada business Write. **Issue #145 FIXED berdasarkan LIVE
+retest**; FAIL sebelumnya tetap historis. [Laporan/batas bukti](task-10-context-fix.md)
+dan [JSON retest](task-10-issue145-live-retest.json) memuat rincian.
+
+Sisa task 10 adalah positive QA config2 profile/data-only publish→Page→save/revise
+→readback yang belum dijalankan. Tidak ada adopsi Page production atau publikasi.
+
+## Rilis awal dan bukti historis sebelum Issue #145
 
 PR [#139](https://github.com/milyarderpro/content-producer/pull/139),
 [#141](https://github.com/milyarderpro/content-producer/pull/141), dan
@@ -39,7 +46,7 @@ Edge `mcp` sekarang **v38 ACTIVE**, bundle
 `b621a18c359fd43f6d7ed9c033450c55ce03e36138d99f21dab68262c1f7724f`.
 Semua 26 file provider cocok byte source G4. Gateway verify_jwt=false dipertahankan;
 middleware owner OAuth tetap aktif. `mcp-probe` v13 tidak berubah; frontend tidak
-dideploy. Owner Read berhasil; workspace mengiklankan config_schema_versions[1,2].
+dideploy. Owner Read berhasil; workspace mengiklankan config_schema_versions [1,2].
 Discovery publik mengembalikan 33 tool. Business Read tanpa OAuth menghasilkan
 HTTP 200 **isError=true Authentication required** dan challenge; HTTP 200 itu
 bukan bukti akses bisnis berhasil.

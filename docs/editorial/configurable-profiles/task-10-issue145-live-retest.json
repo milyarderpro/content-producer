@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-14",
+  "scope": "Minimal LIVE read-only QA for Issue145; no business Write",
+  "status": "PASS",
+  "issue145": "FIXED by relevant LIVE retest",
+  "backend_sha": "04ca90cbba3552f99b60b976cd0704f1219c618d",
+  "formal_g4": {
+    "status": "PASS",
+    "run_url": "https://github.com/milyarderpro/content-producer/actions/runs/43561690208",
+    "seconds": 672,
+    "database_files": 33,
+    "database_cases": 238,
+    "database_skipped": 0,
+    "mcp_files": 18,
+    "mcp_cases": 131,
+    "inspector": "33 valid/33 invalid + mandatory config1 SQL compatibility Read + retired5 + owner denial",
+    "advisors_audit_history_cleanup": "PASS both shards",
+    "committed_config": true,
+    "strict_report_aggregate": "PASS"
+  },
+  "edge": {
+    "version": 39,
+    "bundle_sha256": "bdfd6c5401deecaeee20598459ce2bc8d10d6c777652e91f8668493bd441ea9d",
+    "runtime_files": 26,
+    "all_provider_bytes_match_gated_source": true,
+    "verify_jwt": false
+  },
+  "checks": {
+    "owner_oauth": "PASS",
+    "workspace_context": "PASS",
+    "qa_page_discovery": "PASS; one matching existing internal QA Page",
+    "generation_context": "PASS; exact same request that failed before fix",
+    "page_config_schema_version": 1,
+    "supported_config_versions": [
+      1,
+      2
+    ],
+    "config_updated_at_preserved": "2026-10-21T16:08:12.627461Z",
+    "public_discovery": "PASS33",
+    "anonymous_business_read": "PASS denied; HTTP200 with MCP isError=true and OAuth challenge",
+    "editorial_catalog_read": "PASS; complete=true, version0, no definitions"
+  },
+  "business_writes_performed": 0,
+  "not_run": [
+    "config2 catalog publish/Page/save/revise/readback",
+    "profile/data-only positive Write acceptance"
+  ],
+  "task10_complete": false,
+  "task10_progress": "9/10"
+}
