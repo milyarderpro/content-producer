@@ -166,5 +166,6 @@
     "current_chat_tools": 31,
     "config2_owner_qa": "BLOCKED current chat cached metadata; no QA business writes performed"
   },
-  "next_step": "New model turn/session after connection refresh: verify 33 declared tools and config2 schemas before catalog/Page QA writes. No redeploy or G4 rerun for unchanged backend."
+  "next_step": "New model turn/session after connection refresh: verify 33 declared tools and config2 schemas before catalog/Page QA writes. No redeploy or G4 rerun for unchanged backend.",
+  "later_edge_fix_and_retest": "task-10-issue145-live-retest.json"
 }

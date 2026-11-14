@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-11-14",
   "change": "add-configurable-trivia-editorial-profiles",
-  "task_10": "IN PROGRESS; 9/10 tasks complete; LIVE config2 owner QA BLOCKED by current chat metadata",
+  "task_10": "IN PROGRESS; 9/10; minimal LIVE Read QA PASS, config2 positive Write acceptance NOT RUN",
   "base_sha": "c02c5413479cebf50f39abc10149fafca757611a",
   "backend_candidate_sha": "a71fe5cb932c79d200e3efc4d14fc8ce0ddb0964",
   "branch": "codex/configurable-trivia-editorial-profiles",
@@ -60,32 +60,18 @@
   },
   "formal_g4": {
     "status": "PASS",
-    "formal": "Actions manual exact-SHA committed config",
-    "sha": "30e8b3e31fb394b913114ad33cd743021e8f748f",
-    "run": 43543996820,
-    "seconds": 760,
-    "source": "PASS208root/19frontend",
-    "database": "PASS33files/238cases;158+80;0skip",
-    "mcp": "PASS18files/130cases once shard1",
-    "inspector": "PASS33valid/33invalid+5retired+ownerdenial once shard1",
-    "audits_advisors_cleanup": "PASS both shards",
-    "identity_fields_match": true,
-    "strict_local_report_verifier": "PASS",
-    "reports": [
-      {
-        "path": "candidate-db-shard-1-30e8b3e31fb394b913114ad33cd743021e8f748f/report.json",
-        "sha256": "2aa202674ddeeecbdc61769b9117a7fc3192e7c8b6f368c0f5cec1d43e3b1689"
-      },
-      {
-        "path": "candidate-db-shard-2-30e8b3e31fb394b913114ad33cd743021e8f748f/report.json",
-        "sha256": "6f08fd08c790771b130f0725ed8c9be3e75ff5294d37e7a517a7cac2bfdaf750"
-      },
-      {
-        "path": "candidate-source-30e8b3e31fb394b913114ad33cd743021e8f748f/report.json",
-        "sha256": "4c7f33d410c73e73b9ece7abee472b4201bd259697074dfc260f6f0f5b18d233"
-      }
-    ],
-    "run_url": "https://github.com/milyarderpro/content-producer/actions/runs/43543996820"
+    "run_url": "https://github.com/milyarderpro/content-producer/actions/runs/43561690208",
+    "seconds": 672,
+    "database_files": 33,
+    "database_cases": 238,
+    "database_skipped": 0,
+    "mcp_files": 18,
+    "mcp_cases": 131,
+    "inspector": "33 valid/33 invalid + mandatory config1 SQL compatibility Read + retired5 + owner denial",
+    "advisors_audit_history_cleanup": "PASS both shards",
+    "committed_config": true,
+    "strict_report_aggregate": "PASS",
+    "sha": "04ca90cbba3552f99b60b976cd0704f1219c618d"
   },
   "not_run": [
     "LIVE config2 owner/plugin profile and data-only extension retest",
@@ -134,16 +120,45 @@
       ],
       "run_url": "https://github.com/milyarderpro/content-producer/actions/runs/43406057727",
       "failure": "shard2 database; source and shard1 full PASS; both cleanup PASS"
+    },
+    {
+      "status": "PASS",
+      "formal": "Actions manual exact-SHA committed config",
+      "sha": "30e8b3e31fb394b913114ad33cd743021e8f748f",
+      "run": 43543996820,
+      "seconds": 760,
+      "source": "PASS208root/19frontend",
+      "database": "PASS33files/238cases;158+80;0skip",
+      "mcp": "PASS18files/130cases once shard1",
+      "inspector": "PASS33valid/33invalid+5retired+ownerdenial once shard1",
+      "audits_advisors_cleanup": "PASS both shards",
+      "identity_fields_match": true,
+      "strict_local_report_verifier": "PASS",
+      "reports": [
+        {
+          "path": "candidate-db-shard-1-30e8b3e31fb394b913114ad33cd743021e8f748f/report.json",
+          "sha256": "2aa202674ddeeecbdc61769b9117a7fc3192e7c8b6f368c0f5cec1d43e3b1689"
+        },
+        {
+          "path": "candidate-db-shard-2-30e8b3e31fb394b913114ad33cd743021e8f748f/report.json",
+          "sha256": "6f08fd08c790771b130f0725ed8c9be3e75ff5294d37e7a517a7cac2bfdaf750"
+        },
+        {
+          "path": "candidate-source-30e8b3e31fb394b913114ad33cd743021e8f748f/report.json",
+          "sha256": "4c7f33d410c73e73b9ece7abee472b4201bd259697074dfc260f6f0f5b18d233"
+        }
+      ],
+      "run_url": "https://github.com/milyarderpro/content-producer/actions/runs/43543996820"
     }
   ],
   "live_release": "task-10-live-release.json",
   "issue_145": {
-    "status": "OPEN; LIVE FAIL, local fix PASS awaiting final G4/deployment/retest",
+    "status": "FIXED; LIVE minimal retest PASS on verified mcpv39",
     "report": "task-10-context-fix.md",
-    "mcp_files": 18,
-    "mcp_cases": 131,
-    "database_cases_unchanged": 238,
-    "new_inspector_path": "config1 actual SQL compatibility Read in addition to existing config2 valid path",
-    "current_runtime": "mcp v38; fix not deployed"
-  }
+    "evidence": "task-10-issue145-live-retest.json",
+    "current_runtime": "mcp v39;26/26 source files match G4",
+    "config2_positive_write": "NOT RUN"
+  },
+  "current_backend_sha": "04ca90cbba3552f99b60b976cd0704f1219c618d",
+  "current_live_evidence": "task-10-issue145-live-retest.json"
 }
