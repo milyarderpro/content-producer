@@ -542,9 +542,9 @@ test('backend candidate aggregate accepts exactly 238 database cases', () => {
   }
 });
 
-test('MCP 18 files/130 cases and authenticated v2 Inspector belong to shard 1 exactly once', () => {
+test('MCP 18 files/131 cases and authenticated v2 Inspector belong to shard 1 exactly once', () => {
   const stages: ShardProof['stages'] = [
-    { name: 'mcp', status: 'PASS' as const, durationMs: 1, count: '130' },
+    { name: 'mcp', status: 'PASS' as const, durationMs: 1, count: '131' },
     {
       name: 'inspector',
       status: 'PASS' as const,
@@ -603,7 +603,7 @@ test('final two-shard reports satisfy both validators', () => {
       name,
       status: 'PASS',
       durationMs: 1,
-      ...(name === 'mcp' ? { count: '130' } : {}),
+      ...(name === 'mcp' ? { count: '131' } : {}),
       ...(name === 'inspector'
         ? { count: '33 valid; 33 invalid; five retired v1 rejected; owner denial' }
         : {}),

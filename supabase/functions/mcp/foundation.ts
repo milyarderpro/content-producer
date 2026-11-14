@@ -141,6 +141,8 @@ const legacyContextData = z.strictObject({
       module_version: z.number().int().min(1),
       status: z.literal('active'),
       config_schema_version: z.number().int().min(1),
+      // CR-062 SQL adds this to config1 too; absent remains valid for rollback.
+      config_schema_versions: z.tuple([z.literal(1), z.literal(2)]).optional(),
       content_schema_versions: z.array(z.number().int().min(1)),
       capabilities: z.array(z.string()),
     }),

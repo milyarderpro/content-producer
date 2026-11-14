@@ -136,5 +136,14 @@
       "failure": "shard2 database; source and shard1 full PASS; both cleanup PASS"
     }
   ],
-  "live_release": "task-10-live-release.json"
+  "live_release": "task-10-live-release.json",
+  "issue_145": {
+    "status": "OPEN; LIVE FAIL, local fix PASS awaiting final G4/deployment/retest",
+    "report": "task-10-context-fix.md",
+    "mcp_files": 18,
+    "mcp_cases": 131,
+    "database_cases_unchanged": 238,
+    "new_inspector_path": "config1 actual SQL compatibility Read in addition to existing config2 valid path",
+    "current_runtime": "mcp v38; fix not deployed"
+  }
 }
