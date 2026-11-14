@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-11-14",
   "change": "add-configurable-trivia-editorial-profiles",
-  "task_10": "IN PROGRESS; 9/10; minimal LIVE Read QA PASS, config2 positive Write acceptance NOT RUN",
+  "task_10": "COMPLETE;10/10;minimal LIVE config2 publish/Page/save/revise/readback PASS",
   "base_sha": "c02c5413479cebf50f39abc10149fafca757611a",
   "backend_candidate_sha": "a71fe5cb932c79d200e3efc4d14fc8ce0ddb0964",
   "branch": "codex/configurable-trivia-editorial-profiles",
@@ -159,15 +159,23 @@
     "current_runtime": "mcp v39;26/26 source files match G4",
     "config2_positive_write": "NOT RUN"
   },
-  "current_backend_sha": "04ca90cbba3552f99b60b976cd0704f1219c618d",
-  "current_live_evidence": "task-10-issue145-live-retest.json",
+  "current_backend_sha": "90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f",
+  "current_live_evidence": "task-10-final-live.json",
   "issue_148": {
-    "status": "OPEN; HOST schema rejection, catalog remains0, no business Write succeeded",
+    "status": "FIXED;LIVE connector publish and exact catalog/post readback PASS on mcpv40",
     "report": "task-10-host-map-fix.md",
     "mcp_files": 18,
     "mcp_cases": 132,
     "database_cases_unchanged": 238,
-    "fix_deployed": false,
-    "live_connector_retest": "NOT RUN"
+    "fix_deployed": true,
+    "live_connector_retest": "PASS",
+    "evidence": "task-10-final-live.json"
+  },
+  "final_release": {
+    "status": "PASS",
+    "formal_g4_run": 43571709067,
+    "backend_sha": "90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f",
+    "edge_version": 40,
+    "evidence": "task-10-final-live.json"
   }
 }

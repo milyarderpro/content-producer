@@ -9,20 +9,27 @@ CAS/replay dan approval tetap berdiri sendiri.
 
 ## Status 14 November 2026
 
-Pemilik telah mengotorisasi operasional task 10 tanpa pertanyaan izin ulang.
-PR #143 merged; backend `30e8b3e31fb394b913114ad33cd743021e8f748f` lulus
-[G4 exact-SHA 43543996820](https://github.com/milyarderpro/content-producer/actions/runs/43543996820)
-aggregate PASS 12m40s, DB 238 kasus tanpa skip. Hosted history 94/pin PASS, Edge mcp v38
-26/26 file cocok source,16 tabel existing utuh. Backup CLI privat diverifikasi;
-restore belum diuji/PITR tidak tersedia. Plugin existing 0.5.8 byte-match dan
-refresh koneksi memperlihatkan 33 tool. **QA config2 belum dijalankan**, karena
-sesi chat masih menyediakan 31 tool lama. [Hasil terkini](task-10-results.md) dan
-[readback](task-10-live-release.json) adalah status operasional sekarang.
+Pemilik mengotorisasi operasional task10 tanpa pertanyaan izin ulang. PR149
+merged; backend `90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f` lulus
+[G4 exact-SHA43571709067](https://github.com/milyarderpro/content-producer/actions/runs/43571709067)
+aggregate PASS12m29s (DB238/MCP132/Inspector33+33, advisors/audit/cleanup kedua
+shard). Edge mcpv40 ACTIVE/26file byte-match. Plugin existing0.5.8/release/binding
+sama, refresh metadata selesai. **QA minimal config2 LIVE PASS**:3definisi,
+satu Page QA baru, satu draft+revisi/get_post. **Task10 selesai10/10**.
+[Bukti final](task-10-final-live.json) dan [hasil](task-10-results.md) adalah
+status sekarang. Lima Page existing tetapconfig1 dan tujuh hash tabel existing
+utuh. Source291file identik selama demo data-only.
+
+Rollback konkret: source04ca90cb/G443561690208 dan bundle mcpv39
+bdfd6c5401deecaeee20598459ce2bc8d10d6c777652e91f8668493bd441ea9d tersedia
+sebagai fallback, tetapi mengembalikan blocker148. Utamakan forward-fix, jangan
+undo migration94/latest20261112142435. Backup CLI privat awal tersedia;
+restore belum diuji/PITR tidak tersedia. Tidak perlu rollback pada hasil PASS ini.
 
 Bagian persiapan/tabel di bawah merupakan **rencana historis 13 November**,
 bukan status rilis terkini atau pencabutan otorisasi pemilik. Jangan mengulang
 G4/deployment pada backend identik hanya karena SHA dokumentasi berubah.
-Lanjutkan QA pada sesi dengan 33 declared tools/schema 2, tanpa adopsi Page existing.
+QA minimal sudah selesai pada koneksi existing dengan33tool/schema2.
 Rollback mengutamakan forward-fix; jangan undo migration atau menganggap Edge v37
 kompatibel otomatis. Review layout ponsel tetap tidak diperlukan.
 

@@ -1,16 +1,60 @@
-# Hasil sementara task 10 — rilis CR-062
+# Hasil task 10 — rilis CR-062
 
 Diperbarui 14 November 2026. Change `add-configurable-trivia-editorial-profiles`,
-schema `spec-driven`. **Progres 9/10; task 10 belum selesai.**
+schema `spec-driven`. **Progres 10/10; task 10 selesai.**
 
-## Positive QA config2 — blocker connector Issue #148
+## Hasil final — perbaikan Issue #148 dan QA minimal LIVE
+
+[PR149](https://github.com/milyarderpro/content-producer/pull/149) merged pada
+`90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f`. [G4 manual exact-SHA43571709067](https://github.com/milyarderpro/content-producer/actions/runs/43571709067)
+**PASS12m29s**, committed config: source208/frontend19, DB33file/238kasus
+(158+80,0skip), MCP18file/132kasus, authenticated Inspector33valid/33invalid,
+retired5 dan owner denial; history/lint/advisors/audit/cleanup kedua shard PASS.
+Report/hash/identity cocok dan verifier aggregate lokal PASS.
+
+Edge **mcpv40 ACTIVE**,26/26 file provider cocok source gated; bundle
+`a1e2471f7710bcf6c7df6385c6c1c5b1b07bbbe3eb227f42474f3da04132119d`.
+Plugin PRIVATE Content Producer **0.5.8**, release dan binding mcpku2 existing
+sama; metadata di-refresh, tanpa upload paket identik atau koneksi tambahan.
+Tidak ada migration baru; hosted tetap94/latest20261112142435.
+
+**LIVE PASS:** publish format `qa_shoreline_pair` dengan density key baru
+`compact_pair`, topic `qa_outer_worlds`, profile `qa_compact_curiosity`; katalog
+revision0→3 dan ketiga payload/ref/example cocok lewat Read. Satu Page QA baru
+config2 fixed2facts berhasil dibuat/context Read. Satu draft save revision1,
+lalu revisi CTA pada post yang sama revision2, keduanya cocok melalui get_post
+beserta sources/checks. Snapshot3/exact refs/rules hash, timestamp enam digit,
+CTA multiline sesudah fakta1, goal null dan question+save utuh. Kedua canonical
+fact IDs/sumber dipertahankan pada revisi. System5/5 dan tiga attestation PASS;
+status akhir **draft**, tanpa approval/publikasi/metrics.
+
+Fakta diverifikasi terhadap [NASA Titan facts](https://science.nasa.gov/saturn/moons/titan/facts/),
+tiga calon diteliti untuk memilih dua, semua match dedup direview. Fingerprint
+**291file source/plugin identik** sepanjang demo data-only; tujuh tabel existing
+mempertahankan count/SHA256 pada cutoff awal. Lima Page existing tetapconfig1;
+state kini6Page/54post/330fact/9plan. Ini bukan klaim semua33tool diuji LIVE:
+matriks luas/preset tetap CI/FIXTURE; scope LIVE minimal mengikuti pemilik.
+Review runtime mengikuti DNA tertulis, bukan layout ponsel.
+
+[Bukti final tersanitasi](task-10-final-live.json) memuat hash report, runtime,
+readback dan batas bukti; payload/hasil asli tersanitasi tersimpan lokal pada
+`artifacts/editorial-profile-acceptance/evidence/issue148-live-20261114/`.
+Issue148 **FIXED melalui retest LIVE**. Rollback source04ca90cb/mcpv39 tersedia
+namun membawa kembali blocker148; utamakan forward-fix, tanpa undo migration.
+Backup CLI privat sebelumnya tetap tersedia; restore belum diuji/PITR tidak diklaim.
+SHA handoff dokumentasi berikutnya dipisahkan dari backend90a16e1; tidak deploy
+ulang atau menjalankan full gate baru untuk dokumentasi saja.
+
+## Riwayat reproduksi Issue #148 sebelum perbaikan
+
 
 Percobaan publish format pada mcpv39 ditolak connector sebelum MCP karena key
 map dinamis; katalog tetap revision0/kosong dan tidak ada Write sukses.
 [Reproduksi, perbaikan dan kelanjutan](task-10-host-map-fix.md) memuat batas bukti.
-Issue145 tetap FIXED; Issue148 masih OPEN sampai retest connector positif.
+Issue145 tetap FIXED; checkpoint Issue148 OPEN ini historis. Retest positif
+pada hasil final di atas menyelesaikan blocker.
 
-## Hasil terkini — perbaikan Issue #145
+## Riwayat perbaikan Issue #145
 
 [PR146](https://github.com/milyarderpro/content-producer/pull/146) merged pada
 `04ca90cbba3552f99b60b976cd0704f1219c618d`;
@@ -25,8 +69,8 @@ dan anonymous business Read denial. Katalog Read baru juga PASS; metadata chat
 retest**; FAIL sebelumnya tetap historis. [Laporan/batas bukti](task-10-context-fix.md)
 dan [JSON retest](task-10-issue145-live-retest.json) memuat rincian.
 
-Sisa task 10 adalah positive QA config2 profile/data-only publish→Page→save/revise
-→readback yang belum dijalankan. Tidak ada adopsi Page production atau publikasi.
+Pada checkpoint145, positive QA config2 belum dijalankan. Alur tersebut kini
+PASS pada hasil final di atas; tidak ada adopsi Page existing atau publikasi.
 
 ## Rilis awal dan bukti historis sebelum Issue #145
 

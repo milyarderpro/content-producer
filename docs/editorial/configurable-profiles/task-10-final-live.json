@@ -1,0 +1,348 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-14",
+  "scope": "Minimal owner OAuth LIVE config2 acceptance through existing PRIVATE Content Producer/mcpku2; public QA identifiers are aliases",
+  "status": "PASS",
+  "task10_complete": true,
+  "progress": "10/10",
+  "backend_sha": "90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f",
+  "fix_pr": "https://github.com/milyarderpro/content-producer/pull/149",
+  "formal_g4": {
+    "status": "PASS",
+    "sha": "90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f",
+    "run_url": "https://github.com/milyarderpro/content-producer/actions/runs/43571709067",
+    "seconds": 749,
+    "strict_aggregate_local": "PASS",
+    "reports": [
+      {
+        "artifact": "candidate-db-shard-1-90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f",
+        "sha256": "cad98b09419843484314ee2ef28388739c5160afb0975075e7cdcda3f68e82cf",
+        "status": "PASS",
+        "sha": "90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f",
+        "configMode": "ACTIONS_EXACT_CONFIG",
+        "cases": 158,
+        "stages": [
+          {
+            "name": "locked-install",
+            "status": "PASS",
+            "durationMs": 809
+          },
+          {
+            "name": "cli-help",
+            "status": "PASS",
+            "durationMs": 4588
+          },
+          {
+            "name": "start",
+            "status": "PASS",
+            "durationMs": 98285
+          },
+          {
+            "name": "reset",
+            "status": "PASS",
+            "durationMs": 33264
+          },
+          {
+            "name": "migration-names",
+            "status": "PASS",
+            "durationMs": 561
+          },
+          {
+            "name": "mcp",
+            "status": "PASS",
+            "durationMs": 17460,
+            "count": "132"
+          },
+          {
+            "name": "audit-before",
+            "status": "PASS",
+            "durationMs": 3265
+          },
+          {
+            "name": "inspector",
+            "status": "PASS",
+            "durationMs": 104837,
+            "count": "33 valid; 33 invalid; five retired v1 rejected; owner denial"
+          },
+          {
+            "name": "audit-after",
+            "status": "PASS",
+            "durationMs": 3267
+          },
+          {
+            "name": "database",
+            "status": "PASS",
+            "durationMs": 382082,
+            "count": "158"
+          },
+          {
+            "name": "migration-history",
+            "status": "PASS",
+            "durationMs": 1361
+          },
+          {
+            "name": "db-lint",
+            "status": "PASS",
+            "durationMs": 1141
+          },
+          {
+            "name": "security-advisors",
+            "status": "PASS",
+            "durationMs": 1031
+          },
+          {
+            "name": "audit-final",
+            "status": "PASS",
+            "durationMs": 3029
+          },
+          {
+            "name": "whitespace",
+            "status": "PASS",
+            "durationMs": 12
+          },
+          {
+            "name": "cleanup",
+            "status": "PASS",
+            "durationMs": 21858
+          }
+        ]
+      },
+      {
+        "artifact": "candidate-db-shard-2-90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f",
+        "sha256": "e52f72a8c6381b4d87fc2e2ff1d24808bab6eab7df239a34fee6c86ca3631daf",
+        "status": "PASS",
+        "sha": "90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f",
+        "configMode": "ACTIONS_EXACT_CONFIG",
+        "cases": 80,
+        "stages": [
+          {
+            "name": "locked-install",
+            "status": "PASS",
+            "durationMs": 790
+          },
+          {
+            "name": "cli-help",
+            "status": "PASS",
+            "durationMs": 4453
+          },
+          {
+            "name": "start",
+            "status": "PASS",
+            "durationMs": 99226
+          },
+          {
+            "name": "reset",
+            "status": "PASS",
+            "durationMs": 32914
+          },
+          {
+            "name": "migration-names",
+            "status": "PASS",
+            "durationMs": 542
+          },
+          {
+            "name": "audit-before",
+            "status": "PASS",
+            "durationMs": 3001
+          },
+          {
+            "name": "audit-after",
+            "status": "PASS",
+            "durationMs": 2879
+          },
+          {
+            "name": "database",
+            "status": "PASS",
+            "durationMs": 222991,
+            "count": "80"
+          },
+          {
+            "name": "migration-history",
+            "status": "PASS",
+            "durationMs": 1393
+          },
+          {
+            "name": "db-lint",
+            "status": "PASS",
+            "durationMs": 1055
+          },
+          {
+            "name": "security-advisors",
+            "status": "PASS",
+            "durationMs": 935
+          },
+          {
+            "name": "audit-final",
+            "status": "PASS",
+            "durationMs": 2927
+          },
+          {
+            "name": "whitespace",
+            "status": "PASS",
+            "durationMs": 13
+          },
+          {
+            "name": "cleanup",
+            "status": "PASS",
+            "durationMs": 14948
+          }
+        ]
+      },
+      {
+        "artifact": "candidate-source-90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f",
+        "sha256": "12066b0ba6eb11495fc6276c4a92e79701be365cba110487bf128140bbbdb21d",
+        "status": "PASS",
+        "sha": "90a16e1abb76defb5c55e0f3c4f9b1880cc8e71f",
+        "configMode": "COMMITTED_SOURCE",
+        "cases": null,
+        "stages": [
+          {
+            "name": "locked-install",
+            "status": "PASS",
+            "durationMs": 602
+          },
+          {
+            "name": "source",
+            "status": "PASS",
+            "durationMs": 11290,
+            "count": "root 14 files; root 208 cases"
+          }
+        ]
+      }
+    ]
+  },
+  "edge": {
+    "version": 40,
+    "status": "ACTIVE",
+    "verify_jwt": false,
+    "bundle_sha256": "a1e2471f7710bcf6c7df6385c6c1c5b1b07bbbe3eb227f42474f3da04132119d",
+    "runtime_files": 26,
+    "all_provider_bytes_match_gated_source": true,
+    "mcp_probe_unchanged": true
+  },
+  "plugin": {
+    "name": "Content Producer",
+    "version": "0.5.8",
+    "discoverability": "PRIVATE",
+    "same_plugin_release_and_mcpku2_binding": true,
+    "metadata_refreshed": true,
+    "package_reuploaded": false
+  },
+  "live": {
+    "catalog_publish_and_exact_readback": "PASS;3 definitions; editorial revision0 to3",
+    "keys": [
+      "qa_shoreline_pair",
+      "qa_outer_worlds",
+      "qa_compact_curiosity"
+    ],
+    "density_key": "compact_pair",
+    "page": "QA-PAGE-CR062",
+    "page_create_context_readback": "PASS;config2;fixed2facts",
+    "post": "QA-POST-CR062",
+    "save_readback": "PASS;revision1",
+    "revise_same_post_readback": "PASS;revision2",
+    "status": "draft",
+    "content_hash": "a02e1f89ca02125f9ce34732986ead27b8fcd56fc08c967a880223626f1460d2",
+    "snapshot_version": 3,
+    "effective_rules_hash": "e8ee314e3152f3a0998673931413524d3bd3ac52991f871f424927f4c12f7644",
+    "config_updated_at": "2026-11-14T08:38:18.446373Z",
+    "same_two_canonical_facts_retained": true,
+    "cta_placement": {
+      "kind": "after_fact",
+      "position": 1
+    },
+    "cta": "Which detail surprised you?\nSave this for later.",
+    "interaction_goal": null,
+    "cta_actions": [
+      "question",
+      "save"
+    ],
+    "quality_status": "passed",
+    "system_checks": "PASS5/5",
+    "editorial_checks": {
+      "meaning_preserved": "pass",
+      "caption_no_new_claim": "pass",
+      "no_known_substantive_issue": "pass"
+    },
+    "fact_source_url": "https://science.nasa.gov/saturn/moons/titan/facts/",
+    "facts_researched": 3,
+    "facts_saved": 2,
+    "source_dedup_review": "PASS; all matches reviewed; catalog66 before save and67 before revise",
+    "business_writes_succeeded": 6,
+    "approval": null,
+    "published": false
+  },
+  "data_only_demo": {
+    "status": "PASS",
+    "files": 291,
+    "mismatches": [],
+    "fingerprint_map_sha256": "657920e416680e2aaeb187716a3ede1d40751aa467b4570f86cc1e7ea8893ce2"
+  },
+  "preservation": {
+    "status": "PASS",
+    "method": "Same SHA256 over ordered full rows at original primary-key cutoffs, all seven table count/hash equal the pre-write baseline",
+    "rows": [
+      {
+        "table_name": "public.pages",
+        "rows": 5,
+        "max_id": 5,
+        "sha256": "e3f76d9ae3ad2806263b506ac1d09f1e8462b77e9e85141b8d92bef0cd097693"
+      },
+      {
+        "table_name": "public.page_niche_configs",
+        "rows": 5,
+        "max_id": 5,
+        "sha256": "b747064706becb0e18aff28da706a5be5d861b3433b53ed8da13270beb4f0545"
+      },
+      {
+        "table_name": "public.posts",
+        "rows": 53,
+        "max_id": 93,
+        "sha256": "4171cac1f2c074acbb7a6f23650cd224a61629397c77780f1715f4d4385be224"
+      },
+      {
+        "table_name": "internal.post_write_history",
+        "rows": 90,
+        "max_id": 151,
+        "sha256": "710515dcc48fa2ab7f4eaee4d7909a6b044b75cadaf3a749cb4bc5941d260814"
+      },
+      {
+        "table_name": "public.content_plans",
+        "rows": 9,
+        "max_id": 14,
+        "sha256": "2655a2899df96107d20a4ab96118f9b6b7756a612d8dca0e74854424ba79c44a"
+      },
+      {
+        "table_name": "public.content_plan_items",
+        "rows": 47,
+        "max_id": 60,
+        "sha256": "4cc85e34e90566e21c0cbfffab78c6c62375bdcc52d344ff0b8297d64cc48043"
+      },
+      {
+        "table_name": "internal.content_plan_item_events",
+        "rows": 94,
+        "max_id": 112,
+        "sha256": "cfa9f59056ddf98b6ccf06bb39719e352d9f17ed659ee66b3d429edd0c13e73b"
+      }
+    ]
+  },
+  "database": {
+    "migration_count": 94,
+    "latest": "20261112142435",
+    "new_migrations_this_fix": 0,
+    "pages": 6,
+    "config1_existing_pages": 5,
+    "config2_qa_pages": 1,
+    "posts": 54,
+    "facts": 330,
+    "plans": 9
+  },
+  "issue148": "FIXED by relevant LIVE connector publish and exact readback",
+  "limitations": [
+    "Minimal LIVE QA is not all33 tools exercised LIVE; full contracts checked in G4/Inspector",
+    "Three presets and broad lifecycle matrix remain CI/FIXTURE evidence from task9",
+    "Phone-layout and separate manual script review excluded by owner; written profile/source/dedup/attestations applied",
+    "No approval, publication, metrics, existing Page adoption, extra plugin or new connection",
+    "Private CLI backup verified earlier; restore not tested; no PITR claim"
+  ]
+}
