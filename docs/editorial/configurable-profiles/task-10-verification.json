@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "date": "2026-11-13",
+  "date": "2026-11-14",
   "change": "add-configurable-trivia-editorial-profiles",
-  "task_10": "IN PROGRESS; 9/10 tasks complete",
+  "task_10": "IN PROGRESS; 9/10 tasks complete; LIVE config2 owner QA BLOCKED by current chat metadata",
   "base_sha": "c02c5413479cebf50f39abc10149fafca757611a",
   "backend_candidate_sha": "a71fe5cb932c79d200e3efc4d14fc8ce0ddb0964",
   "branch": "codex/configurable-trivia-editorial-profiles",
@@ -59,49 +59,82 @@
     }
   },
   "formal_g4": {
-    "status": "FAIL",
-    "candidate": "93c38cb8f43c32f3f87de4020c21c9c67922c148",
-    "database_files": 33,
-    "database_cases": 238,
-    "shards": [
+    "status": "PASS",
+    "formal": "Actions manual exact-SHA committed config",
+    "sha": "30e8b3e31fb394b913114ad33cd743021e8f748f",
+    "run": 43543996820,
+    "seconds": 760,
+    "source": "PASS208root/19frontend",
+    "database": "PASS33files/238cases;158+80;0skip",
+    "mcp": "PASS18files/130cases once shard1",
+    "inspector": "PASS33valid/33invalid+5retired+ownerdenial once shard1",
+    "audits_advisors_cleanup": "PASS both shards",
+    "identity_fields_match": true,
+    "strict_local_report_verifier": "PASS",
+    "reports": [
       {
-        "files": 15,
-        "cases": 158
+        "path": "candidate-db-shard-1-30e8b3e31fb394b913114ad33cd743021e8f748f/report.json",
+        "sha256": "2aa202674ddeeecbdc61769b9117a7fc3192e7c8b6f368c0f5cec1d43e3b1689"
       },
       {
-        "files": 18,
-        "cases": 80
+        "path": "candidate-db-shard-2-30e8b3e31fb394b913114ad33cd743021e8f748f/report.json",
+        "sha256": "6f08fd08c790771b130f0725ed8c9be3e75ff5294d37e7a517a7cac2bfdaf750"
+      },
+      {
+        "path": "candidate-source-30e8b3e31fb394b913114ad33cd743021e8f748f/report.json",
+        "sha256": "4c7f33d410c73e73b9ece7abee472b4201bd259697074dfc260f6f0f5b18d233"
       }
     ],
-    "estimated_minutes": [
-      15,
-      20
-    ],
-    "run_url": "https://github.com/milyarderpro/content-producer/actions/runs/43406057727",
-    "failure": "shard2 database; source and shard1 full PASS; both cleanup PASS"
+    "run_url": "https://github.com/milyarderpro/content-producer/actions/runs/43543996820"
   },
   "not_run": [
-    "hosted preflight",
-    "deployment",
-    "LIVE config2 owner/plugin retest",
+    "LIVE config2 owner/plugin profile and data-only extension retest",
     "business QA Write"
   ],
   "owner_scope": {
     "phone_layout_review": "not required",
     "runtime_editorial_review": "written reference DNA with existing prewrite quality controls",
     "commit_push_draft_pr": "task10 PR preparation",
-    "merge_deploy_business_write": "separate authorization required"
+    "merge_deploy_business_write": "Owner operational authorization for task10; isolated QA only, no production Page adoption or publication"
   },
   "evidence_boundary": "CI/FIXTURE and source/release readback are not LIVE PASS or FIXED",
   "release_plan": "task-10-release-plan.md",
   "documentation_followup": "Documentation-only commit after backend candidate; final head CI is checked independently and reported in handoff. Backend fingerprints must remain identical.",
   "merge": {
     "status": "MERGED",
-    "sha": "93c38cb8f43c32f3f87de4020c21c9c67922c148",
-    "pr": 141,
-    "previous_pr": 139
+    "sha": "30e8b3e31fb394b913114ad33cd743021e8f748f",
+    "pr": 143,
+    "previous_prs": [
+      139,
+      141
+    ]
   },
-  "pin_correction": "task-10-catalog-pin-correction.json; LOCAL/CLEAN-REPLAY PASS; corrected final main G4 NOT RUN",
-  "inventory_correction": "task-10-shard2-acceptance.json; LOCAL 79 PASS + SEC focused retest1PASS; full G4 new final SHA NOT RUN",
-  "owner_authorization": "User directs operational decisions commit/push/PR/merge/release/QA for task10 without repeated permission; technical gates unchanged"
+  "pin_correction": "task-10-catalog-pin-correction.json; formal G4 audit PASS on final main SHA",
+  "inventory_correction": "task-10-shard2-acceptance.json; formal G4 shard2 18 files/80 cases PASS, zero skip on final main SHA",
+  "owner_authorization": "User directs operational decisions commit/push/PR/merge/release/QA for task10 without repeated permission; technical gates unchanged",
+  "formal_g4_history": [
+    {
+      "status": "FAIL",
+      "candidate": "93c38cb8f43c32f3f87de4020c21c9c67922c148",
+      "database_files": 33,
+      "database_cases": 238,
+      "shards": [
+        {
+          "files": 15,
+          "cases": 158
+        },
+        {
+          "files": 18,
+          "cases": 80
+        }
+      ],
+      "estimated_minutes": [
+        15,
+        20
+      ],
+      "run_url": "https://github.com/milyarderpro/content-producer/actions/runs/43406057727",
+      "failure": "shard2 database; source and shard1 full PASS; both cleanup PASS"
+    }
+  ],
+  "live_release": "task-10-live-release.json"
 }

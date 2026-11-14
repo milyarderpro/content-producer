@@ -8,10 +8,9 @@ memulihkan layanan, dan menelusuri masalah. Untuk pekerjaan lokal baca
 [testing](testing.md). Izin deployment dan perubahan data tetap mengikuti
 [AGENTS.md](../AGENTS.md) serta keputusan pemilik untuk tindakan yang tepat.
 
-**Tanggal peninjauan:** baseline 27 Oktober 2026; panduan source cutover CR-059
-diperbarui 3 November 2026. Task dokumentasi ini tidak mengakses atau
-mengubah production. Command di bawah adalah prosedur bersyarat, bukan bukti bahwa
-command sudah dijalankan atau otorisasi untuk langsung mengeksekusinya.
+**Tanggal peninjauan:** baseline 27 Oktober, cutover CR-059 3 November, readback rilis
+CR-062 14 November 2026. Tabel versi memuat bukti deployment aktual task 10; command
+prosedur di bawah tetap bersyarat dan tidak memberi otorisasi baru.
 
 ## 1. Satu ringkasan versi, dengan sumber bukti yang jelas
 
@@ -22,11 +21,11 @@ dan [bukti host/cleanup QA](../openspec/changes/archive/2026-11-05-cutover-trivi
 
 | Komponen             | Yang dapat dirujuk sekarang                                                                                                                                      | Batas bukti                                                                                        |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Source yang ditinjau | Backend exact G4 `37fbbbeb0a0c628d9c5e628b21b5f804a4df9501`; source paket/QA `352347c420fa389212718010b4c9d835064f0ff9` | Selisih keduanya hanya laporan/checklist; bukti pada laporan cutover 4 November 2026 |
-| Paket plugin, readback 13 November | PRIVATE Content Producer **0.5.8**, plugin yang sama; 15/15 file runtime dan compatibility overlay cocok melalui Plugin Creator. [Hasil task 8](editorial/configurable-profiles/task-8-results.md) | Scope source/package + readback release; identity, audience dan koneksi mcpku2 tetap. Refresh/chat baru, backend config2, G4, layout serta LIVE config2 belum diuji/deploy pada task ini. Bukti 0.5.7 di bawah tetap historis |
+| Source backend rilis 14 November | Exact G4 `30e8b3e31fb394b913114ad33cd743021e8f748f`; [run 43543996820](https://github.com/milyarderpro/content-producer/actions/runs/43543996820) aggregate PASS 12m40s | DB 33 file/238 kasus tanpa skip; [hasil/rilis task 10](editorial/configurable-profiles/task-10-results.md). SHA dokumentasi sesudahnya dipisahkan |
+| Paket plugin, readback 14 November | PRIVATE Content Producer **0.5.8**,15/15 file runtime dan compatibility overlay cocok melalui Plugin Creator; identity/audience/app binding tetap | Koneksi existing di-refresh, UI/discovery 33 tool; sesi chat lama masih 31 tool. Retest config2 owner QA BLOCKED; belum ada business Write QA/adopsi Page existing |
 | Paket plugin historis 6 November | PRIVATE Content Producer **0.5.7**, release `QA-RELEASE-10c52114aae7`; source kandidat `8069bb1bfd03316700e0dca9cfb4c6c8e880229a`, readback 15 source files + overlay sesuai | LIVE retest 6 November 2026: **10/10 D6 PASS sesudah repair terarah**, lima format dan output batch lulus; plan tetap completed 5/5. [Laporan/batas bukti](editorial/reference-dna-d6-retest-0.5.7-2026-11-06.md). PR #137 OPEN/CI PASS; Issue #134–#136 closed. FAIL lama tetap historis; tidak mengklaim first-pass atau factual certification baru |
-| Edge `mcp` | **v37**, verify_jwt=false; 24/24 file bundle provider identik kandidat backend pada rilis 4 November 2026 | Bukti task 5.2; tidak redeploy pada sesi QA task 5.4 |
-| Database | **85 migration**, latest `20261103072943`; seluruh konten owner final nol setelah reset dan cleanup QA | LIVE 4 November 2026; akun/workspace/4 Page/config dan 5 ledger Page tetap |
+| Edge `mcp`, 14 November | **v38 ACTIVE**, verify_jwt=false; 26/26 file provider identik source G4; mcp-probe v13 tetap | [Readback task 10](editorial/configurable-profiles/task-10-live-release.json); frontend tidak dideploy; owner Read berhasil, business Read tanpa OAuth ditolak di level MCP |
+| Database, 14 November | **94 migration**, latest `20261112142435`; hosted catalog pin source/ACL PASS; count/hash 16 tabel existing utuh | Lima Page tetap config1, 53 post/328 fact existing. Backup privat CLI terverifikasi, restore belum diuji, PITR/physical backup tidak tersedia. Batas cakupan pada [hasil task 10](editorial/configurable-profiles/task-10-results.md) |
 | Gate historis CR-049 | Kandidat `1a4e755a48f3c77eb557b931fd6bd99d5e1b24fd`, [run 39768822314](https://github.com/milyarderpro/content-producer/actions/runs/39768822314)                | Record pada CR-049; jangan menempelkan exact-SHA PASS tersebut ke HEAD yang berbeda                |
 | Gate CR-050          | Backend SHA `be7ce5455863d3c51f4cfdd9ec6c9263e837ede3`, [run 40364895835](https://github.com/milyarderpro/content-producer/actions/runs/40364895835) **SUCCESS** | Gate lokal terisolasi; bukan bukti deployment atau retest live                                     |
 | Frontend             | Tracker merekam hosting production; source memakai `auth-frontend/`, build `dist/`, Git auto-deployment dimatikan                                                | Deployment aktif, environment, dan flag hosted sekarang belum diperiksa                            |
