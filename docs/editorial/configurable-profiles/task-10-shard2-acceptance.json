@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "issue_url": "https://github.com/milyarderpro/content-producer/issues/142",
+  "failed_g4": {
+    "run": 43406057727,
+    "sha": "93c38cb8f43c32f3f87de4020c21c9c67922c148",
+    "source": "PASS 208 root/19 frontend",
+    "shard1": "PASS 158 database, 130 MCP, Inspector33/33, advisors/audit/history/cleanup",
+    "shard2": "FAIL database; audit-before/after and cleanup PASS; later stages NOT RUN",
+    "aggregate": "FAIL",
+    "identity_fields_and_runtime_match": true,
+    "reports": [
+      {
+        "path": "artifacts/editorial-profile-acceptance/evidence/g4-43406057727/candidate-db-shard-1-93c38cb8f43c32f3f87de4020c21c9c67922c148/report.json",
+        "sha256": "d4b1b81772937a507b44fcfa6df8fcd2533b72fe4cb4a61e647f41030fa6de79"
+      },
+      {
+        "path": "artifacts/editorial-profile-acceptance/evidence/g4-43406057727/candidate-db-shard-2-93c38cb8f43c32f3f87de4020c21c9c67922c148/report.json",
+        "sha256": "ac96a23125740a5c78369357178ba32932c0d90cbfc4a08359db2e8b257d0d53"
+      },
+      {
+        "path": "artifacts/editorial-profile-acceptance/evidence/g4-43406057727/candidate-source-93c38cb8f43c32f3f87de4020c21c9c67922c148/report.json",
+        "sha256": "5468b386726bd1662c9c3a87e08452f7376ced69308c991e83e7167774a6ec47"
+      }
+    ]
+  },
+  "before_fix_reproduction": {
+    "case": "SEC-* exact 31 v2 RPC signatures, owner policies/default ACL and historical replay security",
+    "result": "FAIL expected 33 to be 31",
+    "filtered_run": "1 failed/3 skipped; not complete shard execution"
+  },
+  "correction": {
+    "operations": 33,
+    "write": 21,
+    "read": 12,
+    "rls_tables": 19,
+    "business_tables": 19,
+    "added_exact_names": [
+      "get_trivia_editorial_catalog",
+      "update_trivia_editorial_catalog"
+    ],
+    "write_guards": [
+      "operation_key",
+      "expected_editorial_catalog_version"
+    ],
+    "registry_name_set_equality": true,
+    "historical_sql_modified": false,
+    "migration_or_backend_or_plugin_modified": false,
+    "timeout_modified": false,
+    "cases_removed": false,
+    "database_inventory": "unchanged 33 files/238 cases, 158+80",
+    "legacy_assertions_removed": false,
+    "catalog_policy_validation": "four exact policy names, commands, single API-owner role, exact scoped expression and USING/WITH CHECK; old 17-table helper checks retained"
+  },
+  "local_after": {
+    "status": "PASS after focused SEC retest; not a single full-shard PASS run",
+    "full_run": {
+      "status": "FAIL",
+      "files": 18,
+      "passed": 79,
+      "failed": 1,
+      "skipped": 0,
+      "seconds": 292.94
+    },
+    "remaining_failure": "legacy helper-only policy matcher rejected two reviewed catalog tables using scoped auth.uid()",
+    "sec_retest": {
+      "status": "PASS",
+      "passed": 1,
+      "skipped_by_name_filter": 3,
+      "skipped_not_counted_as_passed": true
+    },
+    "unique_cases_verified_after_retest": 80,
+    "cleanup": {
+      "status": "PASS",
+      "tables": 20,
+      "all_zero": true
+    },
+    "diagnostic_role_wire_type": "Audit JSON OID roles are exact strings; compare against oid::text, not numeric OID"
+  },
+  "source_check": "PASS lint/typecheck/build,208 root/19 frontend",
+  "new_final_main_g4": "NOT RUN",
+  "deployment": "NOT RUN",
+  "verified_on": "2026-11-14",
+  "evidence": [
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/task-10-shard2-local-after.json",
+      "sha256": "1129a50dd1478c8144bdf0ea3fe695f641004c022add078e3be95d95c0acc37e"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/task-10-shard2-sec-role-type-initial.log",
+      "sha256": "72e4006e121f56c323beff9083b223b361cc612ef1505d97da16c9a5e170b4f3"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/task-10-shard2-sec-after.log",
+      "sha256": "40983b6d20f513d0316e09ddff0d901f13b7612497d715c7daf57f043d5a136f"
+    },
+    {
+      "path": "artifacts/editorial-profile-acceptance/evidence/task-10-shard2-cleanup-final.json",
+      "sha256": "23f36737e84c0a0fd817f058642c7d99aef0ed330c7e41c432ceb02375004c22"
+    }
+  ]
+}

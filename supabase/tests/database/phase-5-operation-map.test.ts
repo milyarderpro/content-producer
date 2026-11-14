@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { activeMcpToolNames } from '../../../scripts/mcp-catalog-inventory.js';
 
 type Operation = {
   name: string;
@@ -282,15 +283,31 @@ export const phaseFiveOperationMap: readonly Operation[] = [
     requiredGuards: [],
     testOwner: 'api-metrics-insights.test.ts',
   },
+  {
+    name: 'get_trivia_editorial_catalog',
+    functionName: 'api.get_trivia_editorial_catalog',
+    rateGroup: 'read',
+    write: false,
+    requiredGuards: [],
+    testOwner: 'api-trivia-v2-read.test.ts',
+  },
+  {
+    name: 'update_trivia_editorial_catalog',
+    functionName: 'api.update_trivia_editorial_catalog',
+    rateGroup: 'write',
+    write: true,
+    requiredGuards: ['operation_key', 'expected_editorial_catalog_version'],
+    testOwner: 'api-trivia-v2-read.test.ts',
+  },
 ];
 
 describe('Phase 5 operation map', () => {
-  it('keeps the active 31-operation inventory machine-readable', () => {
-    expect(phaseFiveOperationMap).toHaveLength(31);
-    expect(new Set(phaseFiveOperationMap.map((operation) => operation.name)).size).toBe(31);
-    expect(new Set(phaseFiveOperationMap.map((operation) => operation.functionName)).size).toBe(31);
-    expect(phaseFiveOperationMap.filter((operation) => operation.write)).toHaveLength(20);
-    expect(phaseFiveOperationMap.filter((operation) => !operation.write)).toHaveLength(11);
+  it('keeps the active 33-operation inventory machine-readable', () => {
+    expect(phaseFiveOperationMap).toHaveLength(33);
+    expect(new Set(phaseFiveOperationMap.map((operation) => operation.name)).size).toBe(33);
+    expect(new Set(phaseFiveOperationMap.map((operation) => operation.functionName)).size).toBe(33);
+    expect(phaseFiveOperationMap.filter((operation) => operation.write)).toHaveLength(21);
+    expect(phaseFiveOperationMap.filter((operation) => !operation.write)).toHaveLength(12);
     expect(
       phaseFiveOperationMap
         .filter((operation) => operation.requiredGuards.length === 0)
@@ -307,6 +324,10 @@ describe('Phase 5 operation map', () => {
       'get_post',
       'get_post_performance',
       'get_performance_insights',
+      'get_trivia_editorial_catalog',
     ]);
+    expect(phaseFiveOperationMap.map((operation) => operation.name).sort()).toEqual(
+      activeMcpToolNames(),
+    );
   });
 });
