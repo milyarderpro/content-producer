@@ -4,15 +4,9 @@ export function closeUnionWrapper(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(closeUnionWrapper);
   if (!value || typeof value !== 'object') return value;
   const result = Object.fromEntries(Object.entries(value).map(([k, v]) => [k, closeUnionWrapper(v)]));
-  // A dynamic catalog map is closed to the registered key syntax and typed values.
-  // This is equivalent to propertyNames+additionalProperties, not a free JSON object.
-  const keyPattern = result.propertyNames && typeof result.propertyNames === 'object' && 'pattern' in result.propertyNames
-    ? result.propertyNames.pattern : undefined;
-  if (result.type === 'object' && typeof keyPattern === 'string' && result.additionalProperties &&
-    typeof result.additionalProperties === 'object') {
-    result.patternProperties = { [keyPattern]: result.additionalProperties };
-    result.additionalProperties = false;
-  }
+  // Preserve propertyNames + typed additionalProperties for bounded maps.
+  // The connector must be able to validate a new key through its typed fallback;
+  // the observed connector rejected pattern-only keys when the object was closed.
   const branches = result.anyOf ?? result.oneOf;
   if (result.type === 'object' && result.additionalProperties === undefined &&
     Array.isArray(branches) && branches.every((b) =>

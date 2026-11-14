@@ -160,5 +160,14 @@
     "config2_positive_write": "NOT RUN"
   },
   "current_backend_sha": "04ca90cbba3552f99b60b976cd0704f1219c618d",
-  "current_live_evidence": "task-10-issue145-live-retest.json"
+  "current_live_evidence": "task-10-issue145-live-retest.json",
+  "issue_148": {
+    "status": "OPEN; HOST schema rejection, catalog remains0, no business Write succeeded",
+    "report": "task-10-host-map-fix.md",
+    "mcp_files": 18,
+    "mcp_cases": 132,
+    "database_cases_unchanged": 238,
+    "fix_deployed": false,
+    "live_connector_retest": "NOT RUN"
+  }
 }

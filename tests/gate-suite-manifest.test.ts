@@ -57,7 +57,7 @@ describe('mandatory suite inventory (not a release gate)', () => {
     expect(manifest.baseSha).toMatch(/^[0-9a-f]{40}$/);
     expect(manifest.cutoverEvidence).toEqual({
       apiNames: 33,
-      mcpCases: 131,
+      mcpCases: 132,
       inspectorValid: 33,
       inspectorInvalid: 33,
       retiredV1NamesRejected: 5,

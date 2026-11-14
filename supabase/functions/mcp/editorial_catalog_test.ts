@@ -5,6 +5,8 @@ import { contentConfig2 } from './trivia_v2.ts';
 import { postPackage } from './post_base.ts';
 import {
   ctaActions,
+  densityMap,
+  editorialWeights,
   planOverrideConfig2,
   triviaConfig2,
   unicodeText,
@@ -495,14 +497,14 @@ Deno.test('CR-062 malformed snapshot3 and catalog outputs fail closed', async ()
     globalThis.fetch = original;
   }
 });
-Deno.test('CR-062 dynamic map factoring is equivalent and keeps unknown keys closed', () => {
+Deno.test('CR-062 dynamic map factoring preserves bounded key and value schemas', () => {
   const raw = {
     type: 'object',
     propertyNames: { type: 'string', pattern: '^[a-z][a-z0-9_]{1,49}$' },
     additionalProperties: { type: 'integer', minimum: 0, maximum: 100 },
   };
   const closed = closeUnionWrapper(raw) as Record<string, unknown>;
-  check(closed.additionalProperties === false && !!closed.patternProperties, 'dynamic map is open');
+  check(stable(closed) === stable(raw), 'bounded map constraints changed');
   check(
     stable(
       expandCatalogSchema(
@@ -523,6 +525,83 @@ Deno.test('CR-062 dynamic map factoring is equivalent and keeps unknown keys clo
     'factoring changed map constraints',
   );
 });
+Deno.test('CR-062 connector wire preserves all ten bounded maps across three tools', async () => {
+  const tools = (await mcp('tools/list')).result.tools;
+  const pageMaps = [
+    'properties.config.properties.format_weights',
+    'properties.config.properties.topic_weights',
+    'properties.config.properties.overrides.properties.density_preferences',
+  ];
+  const expected: Record<string, string[]> = {
+    create_page: pageMaps.map((path) => '$.oneOf[1].' + path),
+    update_page: pageMaps.map((path) => '$.properties.niche_config_patch.oneOf[1].' + path),
+    update_trivia_editorial_catalog: [
+      '$.properties.change.anyOf[0].properties.payload.properties.density_preferences',
+      '$.properties.change.anyOf[2].properties.payload.properties.format_weights',
+      '$.properties.change.anyOf[2].properties.payload.properties.topic_weights',
+      '$.properties.change.anyOf[2].properties.payload.properties.density_preferences',
+    ],
+  };
+  let count = 0;
+  for (const tool of tools) {
+    const paths: string[] = [];
+    const visit = (value: unknown, path = '$') => {
+      if (Array.isArray(value)) {
+        value.forEach((child, i) => visit(child, `${path}[${i}]`));
+      } else if (value && typeof value === 'object') {
+        const schema = value as Record<string, unknown>;
+        if (schema.type === 'object' && schema.propertyNames) {
+          paths.push(path);
+          count++;
+          // The connector must find a typed fallback for every new map key.
+          check(schema.additionalProperties && typeof schema.additionalProperties === 'object',
+            `${tool.name} ${path}: missing typed dynamic-key fallback`);
+          check(!schema.patternProperties, `${tool.name} ${path}: pattern-only fallback`);
+          const key = schema.propertyNames as { type: string; pattern: string };
+          check(key.type === 'string' && key.pattern === '^[a-z][a-z0-9_]{1,49}$',
+            `${tool.name} ${path}: key constraint changed`);
+          check(new RegExp(key.pattern).test('compact_pair') &&
+            !new RegExp(key.pattern).test('Bad-key'), 'key syntax changed');
+          const item = schema.additionalProperties as Record<string, unknown>;
+          if (path.endsWith('.density_preferences')) {
+            check(item.type === 'object' && item.additionalProperties === false,
+              'density value became open');
+            const fields = item.properties as Record<string, { maximum: number }>;
+            check(Object.keys(fields).length === 6 && fields.fact_count_max.maximum === 12,
+              'density value constraints changed');
+          } else {
+            check(item.type === 'integer' && item.minimum === 0 && item.maximum === 100,
+              'weight constraints changed');
+          }
+        }
+        Object.entries(schema).forEach(([key, child]) => visit(child, `${path}.${key}`));
+      }
+    };
+    visit(expandCatalogSchema(tool.inputSchema));
+    check(stable(paths) === stable(expected[tool.name] ?? []),
+      `${tool.name}: bounded map locations changed`);
+  }
+  check(count === 10, 'bounded map census changed');
+  const value = {
+    fact_count_min: 2, fact_count_max: 2, words_per_fact_min: 8,
+    words_per_fact_max: 18, total_words_min: 30, total_words_max: 65,
+  };
+  check(densityMap.safeParse({ compact_pair: value }).success, 'runtime rejects valid density');
+  check(!densityMap.safeParse({ 'Bad-key': value }).success, 'runtime accepts invalid key');
+  check(!densityMap.safeParse({ compact_pair: { ...value, fact_count_max: 13 } }).success,
+    'runtime accepts invalid value');
+  check(!densityMap.safeParse({ compact_pair: { ...value, injected_field: true } }).success,
+    'runtime accepts unknown value field');
+  check(!densityMap.safeParse({}).success && !densityMap.safeParse(Object.fromEntries(
+    Array.from({ length: 17 }, (_, i) => ['key_' + i, value]),
+  )).success, 'density map size bounds changed');
+  check(editorialWeights.safeParse({ compact_pair: 100 }).success, 'valid weight rejected');
+  for (const weights of [{ 'Bad-key': 1 }, { compact_pair: -1 }, { compact_pair: 101 },
+    { compact_pair: 0.5 }, { compact_pair: '1' }, {}, Object.fromEntries(
+      Array.from({ length: 129 }, (_, i) => ['key_' + i, 1]),
+    )]) check(!editorialWeights.safeParse(weights).success, 'invalid weight map accepted');
+});
+
 Deno.test('CR-062 authenticated catalog is exactly 33 unique tools with both editorial tools and five v1 names absent', async () => {
   const tools = (await mcp('tools/list')).result.tools as Array<{ name: string }>;
   const names = tools.map((t) => t.name);
