@@ -1,70 +1,89 @@
-# Hasil sementara task 10 — persiapan rilis CR-062
+# Hasil sementara task 10 — rilis CR-062
 
-Tanggal 13 November 2026. Change `add-configurable-trivia-editorial-profiles`,
-schema `spec-driven`. **Task 10 belum selesai; progres 9/10.**
+Diperbarui 14 November 2026. Change `add-configurable-trivia-editorial-profiles`,
+schema `spec-driven`. **Progres 9/10; task 10 belum selesai.** Rilis backend
+sudah terverifikasi; retest config2 melalui owner/plugin masih BLOCKED oleh
+metadata tool lama pada sesi chat saat ini. Tidak ada business Write QA pada sesi ini.
 
-[Issue #138](https://github.com/milyarderpro/content-producer/issues/138) dan
-[draft PR #139](https://github.com/milyarderpro/content-producer/pull/139) sudah
-tersedia. Commit backend kandidat `a71fe5cb932c79d200e3efc4d14fc8ce0ddb0964`
-memuat 145 file perubahan task 1–9 beserta persiapan rilis; base
-`c02c5413479cebf50f39abc10149fafca757611a`. Branch:
-`codex/configurable-trivia-editorial-profiles`.
+## Rilis dan bukti formal
 
-## Pemeriksaan dan batas bukti
+PR [#139](https://github.com/milyarderpro/content-producer/pull/139),
+[#141](https://github.com/milyarderpro/content-producer/pull/141), dan
+[#143](https://github.com/milyarderpro/content-producer/pull/143) sudah merged.
+Backend final `30e8b3e31fb394b913114ad33cd743021e8f748f` lulus
+[G4 manual exact-SHA](https://github.com/milyarderpro/content-producer/actions/runs/43543996820)
+**PASS**, 12m40s, committed config tanpa overlay. Source 208/frontend 19;
+DB 33 file/238 kasus (158+80, nol skip); MCP 18 file/130 kasus dan Inspector 33 valid/
+33 invalid+lima tool v1 ditolak+owner denial sekali pada shard 1. Kedua shard lulus
+history 94, lint, local advisors terpisah, audit before/after/final dan cleanup.
+Identitas SHA/hash/runtime semua report cocok; verifier aggregate lokal juga PASS.
+Light CI merge SHA tersebut [PASS 38s](https://github.com/milyarderpro/content-producer/actions/runs/43543850536).
 
-Test lokal tambahan: 3 file/63 kasus PASS dalam 1,55 detik. Validasi OpenSpec
-strict, reproduksi corpus/freeze dan whitespace PASS. Sebanyak 169 fingerprint
-runtime/demo serta 15 file runtime plugin cocok dengan bukti task 9; pada tahap persiapan PR, task 10
-hanya menambah dokumentasi rilis; koreksi pin audit sesudah G4 dijelaskan terpisah. Hasil task 9 tetap historis
-pada working tree waktu itu, tidak ditulis ulang sebagai bukti LIVE.
+Supabase production yang dikonfirmasi menerima sembilan migration melalui CLI
+2.120.0; history sekarang 94, latest `20261112142435`. Pin katalog hosted **PASS**
+source/ACL persis (300 functions, 33 API, 19 RLS tables). Count dan hash row16 tabel
+bisnis existing identik sebelum/sesudah migration, dengan proyeksi config1
+mengabaikan tiga kolom baru. Rate limiter dan migration history tidak termasuk
+klaim preservasi ini. Lima Page existing tetap config1; 53 post dan 328 fact utuh.
 
-Plugin Creator readback pada plugin PRIVATE yang sama: versi 0.5.8, 15/15 file
-runtime cocok byte source, compatibility overlay 0.5.8 serta app binding,
-audience dan defaultPrompt utuh. Tidak diperlukan update plugin baru. Ini belum
-membuktikan deployment backend atau refresh kemampuan pada chat baru.
+Edge `mcp` sekarang **v38 ACTIVE**, bundle
+`b621a18c359fd43f6d7ed9c033450c55ce03e36138d99f21dab68262c1f7724f`.
+Semua 26 file provider cocok byte source G4. Gateway verify_jwt=false dipertahankan;
+middleware owner OAuth tetap aktif. `mcp-probe` v13 tidak berubah; frontend tidak
+dideploy. Owner Read berhasil; workspace mengiklankan config_schema_versions[1,2].
+Discovery publik mengembalikan 33 tool. Business Read tanpa OAuth menghasilkan
+HTTP 200 **isError=true Authentication required** dan challenge; HTTP 200 itu
+bukan bukti akses bisnis berhasil.
 
-[Light CI kandidat backend](https://github.com/milyarderpro/content-producer/actions/runs/43393463414)
-**PASS**, 54 detik, pada exact SHA `a71fe5cb932c79d200e3efc4d14fc8ce0ddb0964`.
-Identitas dan batas bukti ada pada [verifikasi](task-10-verification.json).
-Commit dokumentasi handoff sesudah kandidat tidak mengubah backend; CI head PR
-terbaru diperiksa terpisah sebelum penyerahan. PASS ini tidak berlaku otomatis
-untuk merge SHA yang belum ada.
-PR #139 sudah merged pada `3b56ff33b9229765a88f1a04f31877c60fe9c820`.
-G4 43396490933 **FAIL** pada audit-before kedua shard; source/MCP dan cleanup PASS.
-Inspector, test database dan advisors NOT RUN. [Temuan serta koreksi](task-10-g4-findings.md)
-memuat reproduksi dan pin yang diperbaiki; G4 kandidat terkoreksi masih NOT RUN.
-Hosted preflight, deployment dan retest LIVE/Write QA **NOT RUN**.
-Review naskah runtime hanya terhadap DNA referensi tertulis; layout ponsel
-bukan persyaratan dan tidak dipindahkan dari task 9 menjadi gate task 10.
+Backup schema/data native CLI disimpan privat di luar repo (0700/0600), checksum
+dan gzip dibaca penuh serta count/history diperiksa. Cakupan public/internal/api/
+supabase_migrations; Auth credentials tidak diekspor, Storage kosong, Edge v37
+24 file dibackup dan diverifikasi terpisah. Restore belum diuji; PITR/physical
+backup tidak tersedia. Percobaan archive awal gagal dan tidak dipakai. Jalur
+retry forced-role ditolak auto-review dan tidak dijalankan; backup berhasil
+melalui CLI standar tanpa forced session role.
 
-## Handoff dan langkah berikutnya
+Hosted advisors memperlihatkan WARN SECURITY DEFINER API 31→33 sesuai dua RPC baru
+serta satu WARN Auth leaked-password protection existing. Ini berbeda dari
+local advisors G4. Arsitektur/grant/owner denial cocok pin; tidak mengubah
+keamanan untuk menghilangkan WARN generik. Referensi remediasi:
+[API SECURITY DEFINER](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable),
+[password protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection).
 
-[Rencana rilis/rollback](task-10-release-plan.md) memuat urutan dan syaratnya.
-Sesudah PR perbaikan ditinjau dan merge tersendiri diotorisasi, baca exact final SHA `main` dan jalankan
-satu G4 manual dengan committed config. Estimasi 15–20 menit berdasarkan run
-historis 8m51s dan 11m30s serta tambahan kasus. Setelah run dimulai, laporkan
-SHA/URL/status sekali dan akhiri respons; periksa lagi hanya setelah `lanjutkan`.
+## Plugin dan batas retest
 
-Deployment membutuhkan G4 aggregate PASS, target/history/backup dan preflight
-terverifikasi serta izin tersendiri. Page QA/payload harus dibuat konkret dari
-runtime sesudah rilis sebelum meminta scope Write. Tidak ada adopsi Page
-production otomatis atau klaim LIVE PASS/FIXED dari light CI.
+Plugin Creator mengonfirmasi plugin PRIVATE existing 0.5.8,15/15 file runtime
+cocok source, compatibility overlay 0.5.8 dan app binding tetap; tidak ada upload
+release identik. Refresh tools pada koneksi existing mcpku2 telah dijalankan;
+UI memperlihatkan **21 Write + 12 Read**, termasuk get/update_trivia_editorial_catalog.
+Namun sesi Codex ini masih menyediakan 31 tool lama dan schema create_page
+config1. Karena tool baru belum dideklarasikan pada sesi ini, catalog/Page QA
+config2 **NOT RUN**. SQL management tidak dipakai untuk menggantikan OAuth owner
+atau mengklaim host Write PASS.
 
-Task 10 tetap unchecked hingga seluruh bukti rilis dan retest yang diwajibkan
-terpenuhi. Persiapan PR ini bukan izin merge/deploy/Write menurut AGENTS §6 dan
-syarat task 10.1.
+[Petunjuk resmi refresh MCP](https://developers.openai.com/plugins/deploy/connect-chatgpt)
+meminta verifikasi metadata lalu pengujian pada percakapan baru. Langkah berikutnya
+adalah memuat metadata terbaru pada sesi/turn baru, memeriksa 33 tool dan schema 2,
+lalu melanjutkan katalog→Page QA→plan/context→save/revise→readback untuk tiga
+preset, custom dan ekstensi data-only. Gunakan koneksi/plugin yang sama, fresh
+context, timestamp 6 digit, fakta/sumber/dedup dan tiga attestation. Berhenti pada
+draft/readback; jangan mengadopsi lima Page existing atau merekam publikasi.
+Review naskah hanya terhadap DNA referensi tertulis; layout ponsel tidak dibutuhkan.
 
-## Pembaruan 14 November — Issue #142
+Pemilik telah mengotorisasi penyelesaian operasional task 10 tanpa pertanyaan izin
+ulang. Batas teknis metadata ini tidak mencabut otorisasi tersebut. Tidak perlu
+mengulang deployment/G4 untuk source identik; pisahkan SHA dokumen dari backend
+terpasang. [Rencana/rollback](task-10-release-plan.md),
+[verifikasi](task-10-verification.json) dan [readback aman](task-10-live-release.json)
+memuat cakupan/batas bukti. Task10 tetap unchecked sampai retest owner QA selesai.
 
-PR #141 sudah merged pada 93c38cb8. G4 43406057727 FAIL: source dan shard 1 lengkap
-PASS (158 DB,130MCP,Inspector33/33,advisors/audit/history/cleanup); shard 2 FAIL
-pada test database setelah audit-before/after PASS. Kedua cleanup PASS.
-[Hasil perbaikan inventaris/policy](task-10-shard2-results.md) mencatat 79/80
-pada run lokal awal dan SEC-only 1 PASS sesudah koreksi, cleanup 20 tabel nol,
-serta source/frontend final208/19 PASS. Failure dan skipped retest dipertahankan.
+## Riwayat kegagalan yang dipertahankan
 
-Pemilik sudah memberikan otorisasi operasional untuk menyelesaikan task 10,
-termasuk commit/push/PR/merge/rilis/QA tanpa pertanyaan izin ulang. Prasyarat G4,
-preflight, context, scope fixture dan readback tetap dipenuhi. Kandidat ini perlu
-PR/Actions, merge, lalu G4 exact final main SHA baru. Belum deploy/Write QA;
-task tetap unchecked,9/10.
+G4 [43396490933](https://github.com/milyarderpro/content-producer/actions/runs/43396490933)
+FAIL audit-before; source/MCP/cleanup PASS, DB/Inspector/advisors NOT RUN.
+[Koreksi pin](task-10-g4-findings.md) tidak menulis ulang migration.
+G4 [43406057727](https://github.com/milyarderpro/content-producer/actions/runs/43406057727)
+FAIL shard2; source/shard1 lengkap dan kedua cleanup PASS.
+[Issue #142/fix inventaris](task-10-shard2-results.md) mempertahankan run lokal 79/80
+serta SEC-only retest 1 PASS. G4 final di atas membuktikan satu run lengkap 238 kasus
+PASS; tidak mengubah hasil historis menjadi first-pass atau LIVE QA PASS.
